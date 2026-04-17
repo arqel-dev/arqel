@@ -1,0 +1,27 @@
+# Base PHPStan config para o monorepo.
+#
+# Notas:
+# - Larastan só é carregado em packages que dependam de laravel/framework.
+#   Cada package PHP extende este ficheiro via `includes:` no seu phpstan.neon
+#   local e adiciona `vendor/larastan/larastan/extension.neon` (via Composer
+#   symlink para a vendor raiz).
+# - Este ficheiro NÃO inclui Larastan directamente porque a raiz do monorepo
+#   não depende de Laravel (evita Fatal Error por falta da constante
+#   LARAVEL_VERSION).
+
+parameters:
+    level: max
+    paths:
+        - packages
+    excludePaths:
+        analyseAndScan:
+            - packages/*/tests
+            - packages/*/vendor
+            - packages/*/database
+        analyse:
+            - packages/*/config
+    tmpDir: .phpstan.cache
+    parallel:
+        maximumNumberOfProcesses: 4
+    reportUnmatchedIgnoredErrors: true
+    treatPhpDocTypesAsCertain: false

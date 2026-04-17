@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+# Carrega nvm/corepack em shells não-interactivos (hook não herda PATH).
+if [ -z "${PNPM_HOME:-}" ] && [ -d "$HOME/.nvm" ]; then
+  export NVM_DIR="$HOME/.nvm"
+  # shellcheck source=/dev/null
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" --no-use
+  nvm use --silent 2>/dev/null || nvm use default --silent 2>/dev/null || true
+fi
+
+# 1. Conventional Commits — validado por commitlint
+pnpm exec commitlint --edit "$1" || exit 1
+
+# 2. DCO sign-off obrigatório (ver CLAUDE.md §Commits)
+if ! grep -qE "^Signed-off-by: .+ <.+@.+>$" "$1"; then
+  echo ""
+  echo "Erro: commit sem DCO sign-off."
+  echo "Usa 'git commit --signoff' ou acrescenta manualmente:"
+  echo "   Signed-off-by: Nome <email>"
+  echo ""
+  exit 1
+fi

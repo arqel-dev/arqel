@@ -15,7 +15,10 @@
     "require": {
         "php": "^8.3"
     },
-    "require-dev": {},
+    "require-dev": {
+        "larastan/larastan": "^3.9",
+        "laravel/pint": "^1.29"
+    },
     "repositories": [
         {
             "type": "path",
@@ -33,9 +36,9 @@
     },
     "scripts": {
         "test": "echo 'no packages yet — sub-packages will expose pest via their own composer.json'",
-        "lint": "echo 'pint configured in INFRA-003'",
-        "format": "echo 'pint --dirty configured in INFRA-003'",
-        "analyse": "echo 'phpstan configured in INFRA-003'"
+        "lint": "vendor/bin/pint --test",
+        "format": "vendor/bin/pint",
+        "analyse": "@php -r \"passthru('bash scripts/phpstan.sh', $c); exit($c);\""
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

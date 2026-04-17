@@ -20,9 +20,19 @@
     "dev": "pnpm -r --parallel --if-present run dev",
     "test": "pnpm -r --if-present run test",
     "test:all": "pnpm run lint && pnpm run typecheck && pnpm run test",
-    "lint": "pnpm -r --if-present run lint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
     "typecheck": "pnpm -r --if-present run typecheck",
-    "clean": "pnpm -r --if-present run clean && rm -rf node_modules .pnpm-store"
+    "lint:php": "vendor/bin/pint --test",
+    "format:php": "vendor/bin/pint",
+    "analyse:php": "vendor/bin/phpstan analyse",
+    "clean": "pnpm -r --if-present run clean && rm -rf node_modules .pnpm-store .phpstan.cache",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,cjs,json,jsonc}": "biome check --write --no-errors-on-unmatched",
+    "*.php": "vendor/bin/pint --dirty"
   },
   "keywords": [
     "laravel",
@@ -32,5 +42,13 @@
     "inertia",
     "shadcn",
     "typescript"
-  ]
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.12",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "typescript": "^6.0.3"
+  }
 }

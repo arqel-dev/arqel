@@ -94,32 +94,18 @@ if [[ -f "package.json" ]]; then
 fi
 
 # ===== Git hooks =====
+#
+# Hooks são geridos por husky (ver .husky/). O `pnpm install` acima invocou
+# o script `prepare` (package.json), que executa `husky`, o qual aponta o
+# `core.hooksPath` do git para `.husky/`. Nada mais a configurar manualmente.
 
-if [[ -d ".git" ]]; then
-    log "Configurando git hooks..."
-    
-    # DCO reminder hook
-    mkdir -p .git/hooks
-    cat > .git/hooks/commit-msg << 'EOF'
-#!/bin/bash
-# Verifica DCO sign-off
-if ! grep -q "Signed-off-by:" "$1"; then
-    echo "Error: Commit must include DCO sign-off."
-    echo "Use: git commit --signoff -m \"...\""
-    exit 1
-fi
-
-# Verifica Conventional Commits format
-COMMIT_MSG=$(head -1 "$1")
-if ! echo "$COMMIT_MSG" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?!?: .+"; then
-    echo "Error: Commit message must follow Conventional Commits format."
-    echo "Example: feat(core): add Resource registry"
-    echo "See: https://www.conventionalcommits.org/"
-    exit 1
-fi
-EOF
-    chmod +x .git/hooks/commit-msg
-    success "Git hooks configurados (DCO + Conventional Commits)"
+if [[ -d ".git" ]] && [[ -d ".husky" ]]; then
+    HOOKS_PATH=$(git config core.hooksPath || echo "")
+    if [[ "$HOOKS_PATH" == ".husky/_" ]] || [[ "$HOOKS_PATH" == ".husky" ]]; then
+        success "Git hooks geridos via husky ($HOOKS_PATH)"
+    else
+        warn "Husky não está activo — corre 'pnpm install' para activar os hooks"
+    fi
 fi
 
 # ===== Verificação final =====

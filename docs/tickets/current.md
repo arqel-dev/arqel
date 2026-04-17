@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[INFRA-003] Configuração de ferramentas de formatação e lint (PHP e JS)**
+**[INFRA-004] Configuração do pipeline de CI no GitHub Actions**
 
 **Fase:** 1 (MVP)
 **Sprint:** 0 (Setup)
 **Prioridade:** P0 (blocker)
 **Estimativa:** M (1-3 dias)
-**Depende de:** INFRA-002 ✅
+**Depende de:** INFRA-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-003)
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-004)
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -21,8 +21,8 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 - [x] **INFRA-001** — Inicialização do monorepo Git ✅ 2026-04-17
 - [x] **INFRA-002** — Configuração pnpm workspace + Composer path repositories ✅ 2026-04-17
-- [ ] **INFRA-003** — Configuração de ferramentas de formatação e lint (PHP e JS) ← ATIVO
-- [ ] **INFRA-004** — Configuração do pipeline de CI no GitHub Actions
+- [x] **INFRA-003** — Configuração de ferramentas de formatação e lint (PHP e JS) ✅ 2026-04-17
+- [ ] **INFRA-004** — Configuração do pipeline de CI no GitHub Actions ← ATIVO
 - [ ] **INFRA-005** — Configuração de Renovate Bot + dependency grouping
 
 > **Nota:** a ordem em `CLAUDE.md` e `KICKOFF.md` divergia da canónica; a fonte é `PLANNING/08-fase-1-mvp.md` (ver regra de ouro #1 em `CLAUDE.md`).
@@ -35,6 +35,42 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 - [ ] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot
 
 ## ✅ Completados
+
+### INFRA-003 — Configuração de ferramentas de formatação e lint (PHP e JS) (2026-04-17)
+
+**Entregue:**
+
+- `pint.json` — preset Laravel + `declare_strict_types`, `final_class`, `ordered_imports` alfabético, `single_quote`, `trailing_comma_in_multiline`
+- `phpstan.neon` — level `max`, paths `packages/`, exclusões para tests/vendor/database/config; tmpDir `.phpstan.cache`; parallel 4. **Nota:** Larastan NÃO carregado no root (porque o root não depende de laravel/framework); cada package Laravel-dependente estenderá este ficheiro e incluirá a extensão Larastan localmente
+- `biome.json` — Biome 2.4.12, formatter 2-space LF, JS single quotes + JSX double + trailing commas + sempre-semi, linter recommended + `noExplicitAny=error`, `noConsole=warn`, `organizeImports` on save. Exclui `pint.json`/`composer.json` (seguem convenção PHP 4-space)
+- `tsconfig.base.json` — `strict: true`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, `moduleResolution: bundler`, target ES2022
+- `commitlint.config.mjs` — tipos e scopes canónicos (ver PLANNING/00-index.md)
+- `.husky/pre-commit` → `pnpm exec lint-staged`
+- `.husky/commit-msg` → commitlint + validação DCO sign-off
+- `lint-staged` config no `package.json`: `.{ts,tsx,js,…}` → biome; `.php` → pint --dirty
+- Scripts raiz: `pnpm lint`, `pnpm lint:fix`, `pnpm format`, `pnpm typecheck`, `pnpm lint:php`, `pnpm format:php`, `pnpm analyse:php`; `composer run lint|format|analyse`
+- `scripts/phpstan.sh` — wrapper que saía com exit 0 quando não há `packages/*/src` (toolerância ao estado inicial)
+- `scripts/init.sh` — removida criação manual de `.git/hooks/commit-msg` (agora gerido por husky via `pnpm install → prepare`)
+
+**Dependências adicionadas:**
+
+- Composer (require-dev): `laravel/pint ^1.29`, `larastan/larastan ^3.9`
+- npm (devDependencies root): `@biomejs/biome ^2.4.12`, `typescript ^6.0.3`, `husky ^9.1.7`, `lint-staged ^16.4.0`, `@commitlint/cli ^20.5.0`, `@commitlint/config-conventional ^20.5.0`
+
+**Validações:**
+
+- `pnpm run lint` → biome check OK em 4 ficheiros
+- `pnpm run typecheck` → workspace no-op (sem packages)
+- `vendor/bin/pint --test` → `{"result":"pass"}`
+- `composer run analyse` → skip gracioso (sem packages/*/src)
+- `pnpm exec commitlint` bloqueia mensagens inválidas (testado com mensagem sem type) e aceita mensagens Conventional + DCO
+
+**Desvios e decisões autónomas:**
+
+- Larastan aplicado por-package (não no root) — single-source phpstan config no root não funciona sem laravel/framework, e instalar Laravel na raiz do monorepo é desnecessário. Cada package PHP que depender de Laravel vai incluir `extension.neon` no seu phpstan.neon local
+- TypeScript `^6.0.3` em vez de `5.5+` — 6.x é o actual estável em 2026-04; satisfaz requisito mínimo
+- Biome 2.4.12 em vez de versão específica do ticket (não fixada) — usa última disponível
+- Husky substitui o hook manual `.git/hooks/commit-msg` que o `init.sh` antigo criava (evitava conflito)
 
 ### INFRA-002 — Configuração pnpm workspace + Composer path repositories (2026-04-17)
 
@@ -81,8 +117,8 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 2/123 tickets (1.6%)
-**Sprint atual (Sprint 0):** 2/5 tickets (40%)
+**Fase 1 MVP:** 3/123 tickets (2.4%)
+**Sprint atual (Sprint 0):** 3/5 tickets (60%)
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -108,4 +144,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (INFRA-002 completo)
+**Última atualização:** 2026-04-17 (INFRA-003 completo)

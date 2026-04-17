@@ -1,0 +1,64 @@
+# Dependências
+node_modules/
+vendor/
+.pnpm-store/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# Env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+coverage/
+.phpunit.cache/
+.phpunit.result.cache
+.pest.cache/
+.playwright/
+test-results/
+playwright-report/
+
+# PHP specific
+.php-cs-fixer.cache
+.phpstan.cache
+psalm.cache/
+
+# Laravel specific (para apps/ dentro do monorepo)
+apps/*/bootstrap/cache/*
+!apps/*/bootstrap/cache/.gitkeep
+apps/*/storage/app/*
+!apps/*/storage/app/.gitkeep
+apps/*/storage/framework/*
+!apps/*/storage/framework/.gitkeep
+apps/*/storage/logs/*
+!apps/*/storage/logs/.gitkeep
+apps/*/public/hot
+apps/*/public/storage
+
+# Claude Code
+.claude/local-settings.json
+.claude/logs/
+
+# Temporários
+*.tmp
+*.bak
+*~

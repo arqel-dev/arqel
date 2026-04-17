@@ -36,17 +36,35 @@ Ver `PLANNING/01-spec-tecnica.md` para spec completa.
 
 ### Pré-requisitos
 
-- PHP 8.3+
-- Composer 2.x
-- Node 20.9+ (LTS)
-- pnpm 9+
+- **PHP** 8.3+ (testado em 8.3 e 8.4)
+- **Composer** 2.x
+- **Node** 20.9+ LTS (recomendado 22.x — ver [`.nvmrc`](.nvmrc))
+- **pnpm** 10+ (habilitado automaticamente via `corepack`)
+- **Git** 2.30+
 
 ### Setup
 
 ```bash
 git clone https://github.com/arqel/arqel.git
 cd arqel
+
+# Se usas nvm, fixa a versão do projecto
+nvm use
+
+# Setup automático (instala pnpm via corepack, composer deps, etc.)
 ./scripts/init.sh
+```
+
+Comandos principais após setup:
+
+```bash
+pnpm install                    # Instala deps JS do workspace
+composer install                # Instala deps PHP (path repositories)
+pnpm build                      # Build de todos os packages
+pnpm test                       # Testes de todos os packages
+pnpm lint                       # Lint de todos os packages
+pnpm typecheck                  # tsc --noEmit em todos os packages
+pnpm test:all                   # lint + typecheck + test (tudo)
 ```
 
 ### Desenvolvimento

@@ -10,6 +10,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ### Added
 
 - Estrutura inicial do monorepo (INFRA-001)
+- Orquestração pnpm workspace + Composer path repositories (INFRA-002)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

@@ -1,0 +1,51 @@
+{
+    "name": "arqel/monorepo",
+    "description": "Arqel monorepo root — orchestrates PHP packages via Composer path repositories.",
+    "type": "project",
+    "license": "MIT",
+    "homepage": "https://arqel.dev",
+    "keywords": [
+        "laravel",
+        "admin",
+        "panel",
+        "react",
+        "inertia",
+        "shadcn"
+    ],
+    "require": {
+        "php": "^8.3"
+    },
+    "require-dev": {},
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {}
+    },
+    "autoload-dev": {
+        "psr-4": {}
+    },
+    "scripts": {
+        "test": "echo 'no packages yet — sub-packages will expose pest via their own composer.json'",
+        "lint": "echo 'pint configured in INFRA-003'",
+        "format": "echo 'pint --dirty configured in INFRA-003'",
+        "analyse": "echo 'phpstan configured in INFRA-003'"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true,
+            "composer/package-versions-deprecated": true
+        }
+    }
+}

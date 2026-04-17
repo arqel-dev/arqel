@@ -5,23 +5,23 @@
 
 ## 🎯 Ticket corrente
 
-**[INFRA-002] Configuração pnpm workspace + Composer path repositories**
+**[INFRA-003] Configuração de ferramentas de formatação e lint (PHP e JS)**
 
 **Fase:** 1 (MVP)
 **Sprint:** 0 (Setup)
 **Prioridade:** P0 (blocker)
-**Estimativa:** S (2-8h)
-**Depende de:** INFRA-001 ✅
+**Estimativa:** M (1-3 dias)
+**Depende de:** INFRA-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-002)
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-003)
 
 ## 📋 Sprint 0 — Backlog sequencial
 
 Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 - [x] **INFRA-001** — Inicialização do monorepo Git ✅ 2026-04-17
-- [ ] **INFRA-002** — Configuração pnpm workspace + Composer path repositories ← ATIVO
-- [ ] **INFRA-003** — Configuração de ferramentas de formatação e lint (PHP e JS)
+- [x] **INFRA-002** — Configuração pnpm workspace + Composer path repositories ✅ 2026-04-17
+- [ ] **INFRA-003** — Configuração de ferramentas de formatação e lint (PHP e JS) ← ATIVO
 - [ ] **INFRA-004** — Configuração do pipeline de CI no GitHub Actions
 - [ ] **INFRA-005** — Configuração de Renovate Bot + dependency grouping
 
@@ -35,6 +35,27 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 - [ ] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot
 
 ## ✅ Completados
+
+### INFRA-002 — Configuração pnpm workspace + Composer path repositories (2026-04-17)
+
+**Entregue:**
+
+- `pnpm-workspace.yaml` com globs `packages-js/*` e `apps/*`
+- `package.json` raiz: `private: true`, `packageManager: pnpm@10.33.0`, `engines.node: >=20.9.0`, scripts recursivos (`build`, `dev`, `test`, `lint`, `typecheck`, `test:all`, `clean`)
+- `composer.json` raiz com `type: project`, path repository apontando para `packages/*` (symlink), scripts placeholder que serão preenchidos em INFRA-003
+- `.npmrc` com `auto-install-peers=true`, `strict-peer-dependencies=false`, `link-workspace-packages=true`
+- `README.md` com bloco de pré-requisitos e comandos principais
+
+**Validações:**
+
+- `pnpm install` ok (workspace resolve, sem packages ainda)
+- `composer install` ok (path repositories activos, lockfile gerado)
+- `pnpm run build|lint|test` retornam "No projects matched" (esperado — ainda sem packages)
+
+**Desvios do ticket canónico:**
+
+- Ticket pedia `pnpm@9.x`; uso `pnpm@10.33.0` (versão estável actual via corepack). Não há ADR sobre versão de pnpm; decisão autónoma registada aqui
+- Ainda não existem packages para preencher `require-dev`; deixei vazio — será populado à medida que os packages CORE|FIELDS|etc. forem criados
 
 ### INFRA-001 — Inicialização do monorepo Git (2026-04-17)
 
@@ -60,8 +81,8 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 1/123 tickets (0.8%)
-**Sprint atual (Sprint 0):** 1/5 tickets (20%)
+**Fase 1 MVP:** 2/123 tickets (1.6%)
+**Sprint atual (Sprint 0):** 2/5 tickets (40%)
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -87,4 +108,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (INFRA-001 completo)
+**Última atualização:** 2026-04-17 (INFRA-002 completo)

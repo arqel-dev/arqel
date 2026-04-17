@@ -1,0 +1,42 @@
+name: ❓ Pergunta
+description: Dúvida sobre como usar Arqel
+title: "[Q] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Atenção:** perguntas gerais devem ir para [GitHub Discussions](https://github.com/arqel/arqel/discussions).
+        > Esta issue é apenas para casos onde acreditas que a documentação **está errada ou em falta**.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pré-verificações
+      options:
+        - label: Procurei em [docs.arqel.dev](https://arqel.dev/docs).
+          required: true
+        - label: Procurei em GitHub Discussions.
+          required: true
+        - label: Procurei em issues abertas e fechadas.
+          required: true
+
+  - type: input
+    id: package
+    attributes:
+      label: Package/área da dúvida
+      placeholder: "arqel/fields ou docs/guides/resources"
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Pergunta
+      description: Inclui contexto, exemplos de código, e o que já tentaste.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expectation
+    attributes:
+      label: O que esperavas encontrar na docs?
+      description: Ajuda-nos a melhorar a documentação.

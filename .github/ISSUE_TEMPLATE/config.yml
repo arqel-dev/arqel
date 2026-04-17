@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/arqel/arqel/discussions
+    about: Perguntas, ideias e discussões gerais vão aqui.
+  - name: 🔒 Vulnerabilidades de segurança
+    url: https://github.com/arqel/arqel/security/advisories/new
+    about: NÃO abras issue pública. Usa GitHub Security Advisories.
+  - name: 📚 Documentação
+    url: https://arqel.dev/docs
+    about: Confirma se a resposta já está na documentação.

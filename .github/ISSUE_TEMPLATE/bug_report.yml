@@ -1,0 +1,102 @@
+name: 🐛 Bug report
+description: Reportar um comportamento incorrecto num package Arqel
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar! Para acelerar o triage, preenche todos os campos.
+
+        > **Vulnerabilidade de segurança?** NÃO abras aqui — usa [GitHub Security Advisories](https://github.com/arqel/arqel/security/advisories/new).
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pré-verificações
+      description: Confirma antes de submeter.
+      options:
+        - label: Pesquisei issues abertas e fechadas e não encontrei duplicado.
+          required: true
+        - label: Estou na versão mais recente do package afectado.
+          required: true
+        - label: Isto NÃO é uma vulnerabilidade de segurança (senão uso Security Advisories).
+          required: true
+
+  - type: input
+    id: package
+    attributes:
+      label: Package afectado
+      description: "Ex: `arqel/core`, `@arqel/ui`, `arqel/fields`."
+      placeholder: "arqel/core"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versão do package
+      description: "Output de `composer show arqel/core` ou `pnpm ls @arqel/ui`."
+      placeholder: "0.1.3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: |
+        - PHP: `php --version`
+        - Laravel: `php artisan --version`
+        - Node: `node --version`
+        - pnpm: `pnpm --version`
+        - SO: macOS 15.4, Ubuntu 24.04, Windows 11, etc.
+      value: |
+        - PHP:
+        - Laravel:
+        - Node:
+        - pnpm:
+        - SO:
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do bug
+      description: O que observaste? O que esperavas?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Passos para reproduzir
+      description: Lista numerada com o mínimo reproduzível. Repo público se complexo.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots / stack trace
+      description: Anexa `storage/logs/laravel.log`, console do browser, ou screenshot.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Contexto adicional
+      description: Algo que ajude? Workarounds conhecidos?

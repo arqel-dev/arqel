@@ -1,0 +1,97 @@
+name: ✨ Feature request
+description: Sugerir nova funcionalidade ou melhoria
+title: "[FEAT] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado pela sugestão!
+
+        > **Features grandes** beneficiam de discussão prévia em [GitHub Discussions](https://github.com/arqel/arqel/discussions) antes de abrir esta issue.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pré-verificações
+      options:
+        - label: Pesquisei issues e discussions — não existe equivalente.
+          required: true
+        - label: Verifiquei se a feature já está planeada em `PLANNING/08-*.md` a `PLANNING/11-*.md`.
+          required: true
+        - label: Esta feature alinha com os ADRs canónicos (`PLANNING/03-adrs.md`).
+          required: true
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package (ou área) alvo
+      options:
+        - arqel/core
+        - arqel/fields
+        - arqel/table
+        - arqel/form
+        - arqel/actions
+        - arqel/auth
+        - arqel/nav
+        - arqel/tenant (Fase 2)
+        - arqel/audit (Fase 2)
+        - arqel/mcp (Fase 2)
+        - arqel/versioning (Fase 3)
+        - arqel/workflow (Fase 3)
+        - arqel/realtime (Fase 3)
+        - "@arqel/ui"
+        - "@arqel/react"
+        - "@arqel/hooks"
+        - "@arqel/types"
+        - "@arqel/fields"
+        - Registry ShadCN
+        - Docs
+        - CLI / DX
+        - Outra
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema / use case
+      description: O que estás a tentar fazer? Porque a API actual não chega?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solução proposta
+      description: API sugerida, comportamento, exemplos de código.
+      value: |
+        ```php
+        // exemplo
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: Outras abordagens que pensaste mas descartaste, e porquê.
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Estimativa de impacto
+      description: |
+        - Breaking change? Quem afeta?
+        - Dependências novas?
+        - Fase sugerida (1 MVP, 2 Essenciais, 3 Avançadas, 4 Ecossistema)?
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Estás disposto a implementar?
+      options:
+        - label: Estou disposto a abrir PR com mentoria
+        - label: Estou disposto a implementar completamente
+        - label: Só a sugerir por agora

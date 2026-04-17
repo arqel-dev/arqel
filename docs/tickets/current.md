@@ -5,17 +5,17 @@
 
 ## 🎯 Ticket corrente
 
-**[GOV-001] SECURITY.md e processo de disclosure (expandir placeholder)**
+**Sprint 0 COMPLETO** 🎉 — próximo alvo: Sprint 1 / CORE-001
 
-**Fase:** 1 (MVP)
-**Sprint:** 0 (Setup — paralelo)
-**Prioridade:** P0
-**Estimativa:** S
-**Depende de:** INFRA-001 ✅
+**[CORE-001]** Primeiro ticket do pacote `arqel/core` (a confirmar com o utilizador antes de avançar, pois entra em código de produto e não apenas infraestrutura).
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §12 (GOV)
+**Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
 
-> **Sprint 0 INFRA completo** 🎉 — a continuação canónica é GOV-001 + GOV-003 (paralelos).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE)
+
+**Próximo:** consultar §3 para ver CORE-001 (Service Provider base + Panel registry + skeleton do package core) e criar `packages/core/` com a estrutura canónica (ver `04-repo-structure.md` §3.2).
+
+> GOV-002 (Release pipeline) fica fora do Sprint 0 — é L (3-7d) e o ticket diz que depende de INFRA-004 mas materialmente depende de packages já existirem (para poder publicar algo). Fica para depois do primeiro package CORE estar scaffolded.
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,12 +31,41 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 ## 📋 Paralelo ao Sprint 0
 
-Pode ser trabalhado em paralelo após INFRA-001 pronto:
-
-- [ ] **GOV-001** — SECURITY.md e processo de disclosure (placeholder criado em INFRA-001, a expandir)
-- [ ] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot
+- [x] **GOV-001** — SECURITY.md e processo de disclosure ✅ 2026-04-17
+- [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### GOV-001 — SECURITY.md e processo de disclosure (2026-04-17)
+
+**Entregue:**
+
+- `SECURITY.md` expandido: SLA explícito (acknowledgement 48h, triage 5d úteis, patch críticas 14d, altas 30d, médias/baixas 90d), processo passo-a-passo com ID interno `ARQEL-SEC-YYYY-NNN`, CVSS 3.1 para severidade, âmbito dentro/fora detalhado, boas práticas para integradores, Hall of Fame mencionado, PGP adiado para ticket futuro (justificado)
+- Canal de contacto: GitHub Security Advisories (preferido) + `security@arqel.dev`
+- Referências cruzadas a `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, e `CHANGELOG.md`
+
+**Pendente humano:**
+
+- Registar `security@arqel.dev` como endereço real (alias para equipa-core)
+- Configurar GitHub Security Advisories no repo (Settings → Security)
+- Testar dry-run do processo (report simulado)
+
+### GOV-003 — CONTRIBUTING.md + PR/Issue templates + DCO (2026-04-17)
+
+**Entregue:**
+
+- `CONTRIBUTING.md` completo: tipos de contribuição, setup dev, fluxo de trabalho (branch → PR → review), Conventional Commits com scopes canónicos, DCO detalhado, instruções de testes (Pest, Vitest, Playwright), docs em PT-BR, secção "O que NÃO fazer", reconhecimento
+- `.github/PULL_REQUEST_TEMPLATE.md` com checklist: tipo de mudança, como foi testado, DCO, ADRs, coverage, breaking changes, screenshots, notas para reviewers
+- `.github/ISSUE_TEMPLATE/config.yml` — blank issues desabilitadas, contact links para Discussions + Security + Docs
+- `.github/ISSUE_TEMPLATE/bug_report.yml` — form estruturado com pré-verificações, package afectado, versão, ambiente, repro steps, logs
+- `.github/ISSUE_TEMPLATE/feature_request.yml` — dropdown de package, problem + proposta + alternativas, estimativa de impacto, disponibilidade para implementar
+- `.github/ISSUE_TEMPLATE/question.yml` — leve, redireciona maioria para Discussions; só para gaps de docs
+
+**Pendente humano:**
+
+- Instalar [DCO GitHub App](https://github.com/apps/dco) no repo (o hook local já enforça; o App enforça em PRs de forks)
+- Criar labels: `bug`, `enhancement`, `question`, `triage`, `major-update`, `dependencies`, `security`
+- Verificar rendering dos templates em GitHub UI (requer push)
 
 ### INFRA-005 — Configuração de Renovate Bot + dependency grouping (2026-04-17)
 
@@ -168,9 +197,8 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 5/123 tickets (4.1%)
-**Sprint atual (Sprint 0):** 5/5 tickets (100%) — INFRA completo ✅
-**Sprint 0 paralelo (GOV):** 0/2 tickets (GOV-001, GOV-003 pendentes)
+**Fase 1 MVP:** 7/123 tickets (5.7%)
+**Sprint atual (Sprint 0):** 7/7 tickets (100%) — INFRA ✅ + GOV-001 ✅ + GOV-003 ✅ 🎉
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -196,4 +224,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (INFRA-005 completo — Sprint 0 INFRA 5/5)
+**Última atualização:** 2026-04-17 (Sprint 0 COMPLETO: INFRA-001..005 + GOV-001 + GOV-003)

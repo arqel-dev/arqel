@@ -13,6 +13,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Orquestração pnpm workspace + Composer path repositories (INFRA-002)
 - Toolchain de lint/format (Pint, PHPStan, Biome) + git hooks (Husky + lint-staged + commitlint) (INFRA-003)
 - Pipeline CI/CD em GitHub Actions (ci, test-matrix, security, docs-deploy, release) + Dependabot grouping (INFRA-004)
+- Renovate Bot config com grouping completo + Dependabot reduzido a github-actions (INFRA-005)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

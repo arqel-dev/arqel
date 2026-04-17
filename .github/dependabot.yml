@@ -1,7 +1,12 @@
 version: 2
 
+# Coexistência com Renovate (ver renovate.json):
+# - Composer e npm são geridos pelo Renovate (melhor grouping, schedule, auto-merge).
+# - Dependabot só fica com GitHub Actions (para simplicidade) e Security Updates
+#   (automaticamente tratados pela GitHub Security, independente deste ficheiro).
+# - Se o Renovate Bot for desinstalado, reactivar as entradas composer/npm aqui.
+
 updates:
-  # GitHub Actions — runners, actions, workflows
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -16,79 +21,3 @@ updates:
     groups:
       github-actions:
         patterns: ["*"]
-
-  # Composer (root monorepo)
-  - package-ecosystem: composer
-    directory: "/"
-    schedule:
-      interval: weekly
-      day: monday
-      time: "06:00"
-      timezone: Europe/Lisbon
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "chore(deps)"
-      include: scope
-    groups:
-      laravel-stack:
-        patterns:
-          - "laravel/*"
-          - "illuminate/*"
-      inertia-stack:
-        patterns:
-          - "inertiajs/*"
-      testing:
-        patterns:
-          - "pestphp/*"
-          - "phpunit/*"
-          - "orchestra/testbench*"
-      lint-analyse:
-        patterns:
-          - "laravel/pint"
-          - "larastan/larastan"
-          - "phpstan/*"
-    ignore:
-      # As dependências dos packages internos são resolvidas via path repositories.
-      - dependency-name: "arqel/*"
-
-  # npm / pnpm (root workspace)
-  - package-ecosystem: npm
-    directory: "/"
-    schedule:
-      interval: weekly
-      day: monday
-      time: "06:00"
-      timezone: Europe/Lisbon
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "chore(deps)"
-      include: scope
-    versioning-strategy: increase
-    groups:
-      react-monorepo:
-        patterns:
-          - "react"
-          - "react-dom"
-          - "@types/react"
-          - "@types/react-dom"
-      inertia-stack:
-        patterns:
-          - "@inertiajs/*"
-      testing:
-        patterns:
-          - "vitest"
-          - "@vitest/*"
-          - "@testing-library/*"
-          - "@playwright/*"
-          - "playwright"
-      lint-format:
-        patterns:
-          - "@biomejs/biome"
-          - "typescript"
-      hooks:
-        patterns:
-          - "husky"
-          - "lint-staged"
-          - "@commitlint/*"
-    ignore:
-      - dependency-name: "@arqel/*"

@@ -5,15 +5,17 @@
 
 ## 🎯 Ticket corrente
 
-**[INFRA-005] Configuração de Renovate Bot + dependency grouping**
+**[GOV-001] SECURITY.md e processo de disclosure (expandir placeholder)**
 
 **Fase:** 1 (MVP)
-**Sprint:** 0 (Setup)
-**Prioridade:** P1
-**Estimativa:** S (2-8h)
-**Depende de:** INFRA-004 ✅
+**Sprint:** 0 (Setup — paralelo)
+**Prioridade:** P0
+**Estimativa:** S
+**Depende de:** INFRA-001 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-005)
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §12 (GOV)
+
+> **Sprint 0 INFRA completo** 🎉 — a continuação canónica é GOV-001 + GOV-003 (paralelos).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -23,7 +25,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **INFRA-002** — Configuração pnpm workspace + Composer path repositories ✅ 2026-04-17
 - [x] **INFRA-003** — Configuração de ferramentas de formatação e lint (PHP e JS) ✅ 2026-04-17
 - [x] **INFRA-004** — Configuração do pipeline de CI no GitHub Actions ✅ 2026-04-17
-- [ ] **INFRA-005** — Configuração de Renovate Bot + dependency grouping ← ATIVO
+- [x] **INFRA-005** — Configuração de Renovate Bot + dependency grouping ✅ 2026-04-17
 
 > **Nota:** a ordem em `CLAUDE.md` e `KICKOFF.md` divergia da canónica; a fonte é `PLANNING/08-fase-1-mvp.md` (ver regra de ouro #1 em `CLAUDE.md`).
 
@@ -35,6 +37,27 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 - [ ] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot
 
 ## ✅ Completados
+
+### INFRA-005 — Configuração de Renovate Bot + dependency grouping (2026-04-17)
+
+**Entregue:**
+
+- `renovate.json` com presets `config:recommended`, `group:monorepos`, `group:recommended`, `helpers:pinGitHubActionDigests`
+- Schedule semanal "before 5am every monday" (timezone Europe/Lisbon)
+- Groups: `react-monorepo`, `inertia-stack`, `laravel-stack`, `testing`, `lint-format`, `hooks`, `github-actions`
+- Auto-merge patch updates em dev deps
+- Major updates abertos como drafts
+- Vulnerability alerts habilitados
+- Lockfile maintenance mensal
+- Sign-off automático nos commits do bot (respeita DCO)
+- Internal workspace packages (`@arqel/*`, `arqel/*` excluindo registry) ignorados
+- `.github/dependabot.yml` reduzido a `github-actions` apenas (Renovate gere composer e npm; Dependabot Security Updates continuam activos automaticamente no repo)
+
+**Pendente humano:**
+
+- Instalar Renovate GitHub App no repo (https://github.com/apps/renovate)
+- Validar em `https://config-validator.renovatebot.com/`
+- Confirmar primeiro dashboard issue após primeira run
 
 ### INFRA-004 — Configuração do pipeline de CI no GitHub Actions (2026-04-17)
 
@@ -145,8 +168,9 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 4/123 tickets (3.3%)
-**Sprint atual (Sprint 0):** 4/5 tickets (80%)
+**Fase 1 MVP:** 5/123 tickets (4.1%)
+**Sprint atual (Sprint 0):** 5/5 tickets (100%) — INFRA completo ✅
+**Sprint 0 paralelo (GOV):** 0/2 tickets (GOV-001, GOV-003 pendentes)
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -172,4 +196,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (INFRA-004 completo)
+**Última atualização:** 2026-04-17 (INFRA-005 completo — Sprint 0 INFRA 5/5)

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    "group:monorepos",
+    "group:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "Europe/Lisbon",
+  "schedule": ["before 5am every monday"],
+  "prHourlyLimit": 4,
+  "prConcurrentLimit": 10,
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate Dependency Dashboard",
+  "rebaseWhen": "conflicted",
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitBody": "Signed-off-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on the first day of the month"]
+  },
+  "packageRules": [
+    {
+      "description": "Group React monorepo together",
+      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
+      "groupName": "react-monorepo"
+    },
+    {
+      "description": "Group Inertia stack (PHP + JS)",
+      "matchPackageNames": ["inertiajs/inertia-laravel", "@inertiajs/react", "@inertiajs/core"],
+      "groupName": "inertia-stack"
+    },
+    {
+      "description": "Group Laravel stack",
+      "matchPackageNames": [
+        "laravel/framework",
+        "laravel/pint",
+        "laravel/prompts",
+        "laravel/serializable-closure"
+      ],
+      "matchPackagePatterns": ["^illuminate/"],
+      "groupName": "laravel-stack"
+    },
+    {
+      "description": "Group testing libs",
+      "matchPackageNames": [
+        "pestphp/pest",
+        "phpunit/phpunit",
+        "vitest",
+        "@vitest/ui",
+        "@vitest/coverage-v8",
+        "@playwright/test",
+        "playwright",
+        "@testing-library/react",
+        "@testing-library/dom",
+        "@testing-library/user-event"
+      ],
+      "groupName": "testing"
+    },
+    {
+      "description": "Group lint/format/analyse tools",
+      "matchPackageNames": ["@biomejs/biome", "typescript", "larastan/larastan", "phpstan/phpstan"],
+      "groupName": "lint-format"
+    },
+    {
+      "description": "Group git hooks tooling",
+      "matchPackageNames": ["husky", "lint-staged"],
+      "matchPackagePatterns": ["^@commitlint/"],
+      "groupName": "hooks"
+    },
+    {
+      "description": "Auto-merge patch updates for dev deps",
+      "matchDepTypes": ["devDependencies", "require-dev"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "Major updates open as drafts for review",
+      "matchUpdateTypes": ["major"],
+      "draftPR": true,
+      "labels": ["dependencies", "major-update"]
+    },
+    {
+      "description": "shadcn registry components — never group (breaking by policy)",
+      "matchPackageNames": ["arqel/registry"],
+      "groupName": null
+    },
+    {
+      "description": "Internal workspace packages — ignore",
+      "matchPackageNames": [
+        "@arqel/types",
+        "@arqel/react",
+        "@arqel/hooks",
+        "@arqel/ui",
+        "@arqel/fields"
+      ],
+      "matchPackagePatterns": ["^arqel/"],
+      "enabled": false
+    },
+    {
+      "description": "GitHub Actions — pin to commit SHAs for supply-chain safety",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,
+      "groupName": "github-actions"
+    }
+  ]
+}

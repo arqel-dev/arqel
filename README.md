@@ -102,13 +102,15 @@ Total: **328 tickets detalhados** em `PLANNING/08-*.md` a `PLANNING/11-*.md`.
 
 ## Contribuir
 
-Contribuições são bem-vindas! Ver `CONTRIBUTING.md` (em breve).
+Contribuições são bem-vindas! Ver [`CONTRIBUTING.md`](CONTRIBUTING.md) (em breve — ticket GOV-003) e [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
 **Requisitos:**
-- DCO sign-off em todos commits: `git commit --signoff`
+- DCO sign-off em todos os commits: `git commit --signoff`
 - Conventional Commits: `feat(pkg): description`
 - Testes obrigatórios
 - ADRs respeitados (ver `PLANNING/03-adrs.md`)
+
+**Segurança:** ver [`SECURITY.md`](SECURITY.md) para a política de divulgação responsável.
 
 ## Documentação
 
@@ -118,7 +120,7 @@ Contribuições são bem-vindas! Ver `CONTRIBUTING.md` (em breve).
 
 ## Licença
 
-MIT — ver `LICENSE` (em breve).
+MIT — ver [`LICENSE`](LICENSE).
 
 ## Créditos
 

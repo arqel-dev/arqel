@@ -1,0 +1,30 @@
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# PHP — 4 espaços (PSR-12)
+[*.php]
+indent_size = 4
+
+# TypeScript / JavaScript / JSON / YAML / HTML / CSS — 2 espaços
+[*.{ts,tsx,js,jsx,mjs,cjs,json,jsonc,yaml,yml,html,css,scss,vue,svelte}]
+indent_size = 2
+
+# Markdown — 2 espaços, preservar trailing whitespace (hard line breaks)
+[*.{md,mdx}]
+indent_size = 2
+trim_trailing_whitespace = false
+
+# Makefiles — tab
+[{Makefile,*.mk}]
+indent_style = tab
+
+# Go — tab (caso venha a existir)
+[*.go]
+indent_style = tab

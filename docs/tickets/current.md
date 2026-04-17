@@ -5,40 +5,63 @@
 
 ## 🎯 Ticket corrente
 
-**[INFRA-001] Criar monorepo com pnpm workspaces + composer path repositories**
+**[INFRA-002] Configuração pnpm workspace + Composer path repositories**
 
 **Fase:** 1 (MVP)
 **Sprint:** 0 (Setup)
 **Prioridade:** P0 (blocker)
-**Estimativa:** M (1-3 dias)
+**Estimativa:** S (2-8h)
+**Depende de:** INFRA-001 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (seção INFRA)
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-002)
 
 ## 📋 Sprint 0 — Backlog sequencial
 
-Ordem exata (tickets são sequencialmente dependentes):
+Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
-- [ ] **INFRA-001** — Criar monorepo com pnpm workspaces + composer path repositories ← ATIVO
-- [ ] **INFRA-002** — Configurar TypeScript base config + Vite + tsup
-- [ ] **INFRA-003** — CI GitHub Actions com matrix PHP 8.3/8.4 × Laravel 12/13
-- [ ] **INFRA-004** — Release pipeline (splitsh/lite + npm publish)
-- [ ] **INFRA-005** — Pre-commit hooks (Husky + lint-staged)
+- [x] **INFRA-001** — Inicialização do monorepo Git ✅ 2026-04-17
+- [ ] **INFRA-002** — Configuração pnpm workspace + Composer path repositories ← ATIVO
+- [ ] **INFRA-003** — Configuração de ferramentas de formatação e lint (PHP e JS)
+- [ ] **INFRA-004** — Configuração do pipeline de CI no GitHub Actions
+- [ ] **INFRA-005** — Configuração de Renovate Bot + dependency grouping
+
+> **Nota:** a ordem em `CLAUDE.md` e `KICKOFF.md` divergia da canónica; a fonte é `PLANNING/08-fase-1-mvp.md` (ver regra de ouro #1 em `CLAUDE.md`).
 
 ## 📋 Paralelo ao Sprint 0
 
 Pode ser trabalhado em paralelo após INFRA-001 pronto:
 
-- [ ] **GOV-001** — SECURITY.md e processo de disclosure
+- [ ] **GOV-001** — SECURITY.md e processo de disclosure (placeholder criado em INFRA-001, a expandir)
 - [ ] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot
 
 ## ✅ Completados
 
-(vazio — primeiro ticket)
+### INFRA-001 — Inicialização do monorepo Git (2026-04-17)
+
+**Entregue:**
+
+- Estrutura top-level criada: `apps/`, `packages/`, `packages-js/`, `registry/`, `docs-content/`, `examples/`, `scripts/`, `.github/workflows/` (todos com `.gitkeep`)
+- `.gitattributes` com LF line endings, binary detection e export-ignore
+- `.editorconfig` com 4 espaços PHP / 2 espaços TS-JS-YAML-JSON / UTF-8 / LF
+- `LICENSE` MIT com copyright "Arqel Contributors" (2026)
+- `CHANGELOG.md` com cabeçalho "Unreleased"
+- `CODE_OF_CONDUCT.md` Contributor Covenant 2.1 (PT-BR)
+- `SECURITY.md` com política de divulgação (placeholder — GOV-001 expande)
+- Branch local renomeada para `main`
+- `README.md` com links corrigidos para ficheiros existentes
+- `.nvmrc` fixado em `22.22.0` + `scripts/init.sh` corrigido para usar corepack
+
+**Notas:**
+
+- O repositório remoto está em `diogocoutinho/arqel` (acordado com o utilizador), não `arqel/arqel` — push à org oficial fica para quando a org for criada
+- Commit `637f870` (o inicial) antecede DCO hooks e não tem sign-off; é aceitável conforme nota do `KICKOFF.md` §Passo 3
+- Branch protection fica para após INFRA-004 (CI verde como pré-requisito)
+- Push do `main` e eliminação do `origin/master` remoto ficam para o utilizador executar manualmente
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 0/123 tickets (0%)
-**Sprint atual (Sprint 0):** 0/5 tickets (0%)
+**Fase 1 MVP:** 1/123 tickets (0.8%)
+**Sprint atual (Sprint 0):** 1/5 tickets (20%)
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -48,7 +71,7 @@ O Claude Code deve:
 2. Mover entry para seção "✅ Completados" com data
 3. Atualizar "Ticket corrente" para próximo na sequência
 4. Incrementar contadores de progresso
-5. Commit este arquivo junto com o código: `chore(tickets): complete INFRA-001, start INFRA-002`
+5. Commit este arquivo junto com o código: `chore(tickets): complete INFRA-00X, start INFRA-00Y`
 
 ## 🚦 Critérios de saída Sprint 0
 
@@ -64,4 +87,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (inicial)
+**Última atualização:** 2026-04-17 (INFRA-001 completo)

@@ -1,0 +1,37 @@
+name: Release
+
+# Placeholder — será completado em GOV-002 (release pipeline:
+# splitsh/lite para Packagist + pnpm publish --recursive para npm).
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (não publica)"
+        required: false
+        default: "true"
+        type: choice
+        options: [ "true", "false" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  placeholder:
+    name: Release (placeholder)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Acknowledge trigger
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          echo "Release workflow triggered for ref: $REF"
+          echo "This workflow is a placeholder — real publishing is wired up in GOV-002."

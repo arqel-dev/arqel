@@ -12,6 +12,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Estrutura inicial do monorepo (INFRA-001)
 - Orquestração pnpm workspace + Composer path repositories (INFRA-002)
 - Toolchain de lint/format (Pint, PHPStan, Biome) + git hooks (Husky + lint-staged + commitlint) (INFRA-003)
+- Pipeline CI/CD em GitHub Actions (ci, test-matrix, security, docs-deploy, release) + Dependabot grouping (INFRA-004)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[INFRA-004] Configuração do pipeline de CI no GitHub Actions**
+**[INFRA-005] Configuração de Renovate Bot + dependency grouping**
 
 **Fase:** 1 (MVP)
 **Sprint:** 0 (Setup)
-**Prioridade:** P0 (blocker)
-**Estimativa:** M (1-3 dias)
-**Depende de:** INFRA-003 ✅
+**Prioridade:** P1
+**Estimativa:** S (2-8h)
+**Depende de:** INFRA-004 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-004)
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §2 (INFRA-005)
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -22,8 +22,8 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **INFRA-001** — Inicialização do monorepo Git ✅ 2026-04-17
 - [x] **INFRA-002** — Configuração pnpm workspace + Composer path repositories ✅ 2026-04-17
 - [x] **INFRA-003** — Configuração de ferramentas de formatação e lint (PHP e JS) ✅ 2026-04-17
-- [ ] **INFRA-004** — Configuração do pipeline de CI no GitHub Actions ← ATIVO
-- [ ] **INFRA-005** — Configuração de Renovate Bot + dependency grouping
+- [x] **INFRA-004** — Configuração do pipeline de CI no GitHub Actions ✅ 2026-04-17
+- [ ] **INFRA-005** — Configuração de Renovate Bot + dependency grouping ← ATIVO
 
 > **Nota:** a ordem em `CLAUDE.md` e `KICKOFF.md` divergia da canónica; a fonte é `PLANNING/08-fase-1-mvp.md` (ver regra de ouro #1 em `CLAUDE.md`).
 
@@ -35,6 +35,34 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 - [ ] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot
 
 ## ✅ Completados
+
+### INFRA-004 — Configuração do pipeline de CI no GitHub Actions (2026-04-17)
+
+**Entregue:**
+
+- `.github/workflows/ci.yml` — jobs `lint-php` (Pint + PHPStan via `composer run analyse` wrapper), `lint-js` (Biome), `typecheck` (workspace `tsc --noEmit`), `test-js` (Vitest workspace), `commitlint` (valida commits do PR). Concurrency com `cancel-in-progress`. Caches Composer e pnpm
+- `.github/workflows/test-matrix.yml` — matrix PHP `[8.3, 8.4]` × Laravel `[12.*, 13.*]` × DB `[mysql, postgres]`. Services MySQL 8.4 e Postgres 17. Preflight skip se ainda não há `packages/*/src`. Pin de Laravel version por matrix slot. Job sentinela `matrix-ok` para branch protection
+- `.github/workflows/security.yml` — CodeQL JS/TS + PHP (best-effort `continue-on-error`), `composer audit`, `pnpm audit`. Schedule diário 06:00 UTC
+- `.github/workflows/docs-deploy.yml` — placeholder (completado em ticket DOCS posterior)
+- `.github/workflows/release.yml` — placeholder (completado em GOV-002)
+- `.github/dependabot.yml` — groups `laravel-stack`, `inertia-stack`, `testing`, `lint-analyse` (composer); `react-monorepo`, `inertia-stack`, `testing`, `lint-format`, `hooks` (npm); github-actions mensais
+
+**Decisões autónomas:**
+
+- Todos os usos de variáveis derivadas de `github.event.*` passaram por `env:` antes de `run:` (mitigação de injection conforme hook de segurança alerta)
+- `lint-php` usa `composer run analyse` (que passa pelo wrapper `scripts/phpstan.sh`) — tolera estado sem packages
+- Coverage gate `85%` referido no ticket fica nos próprios Pest runs por package (matrix invoca `vendor/bin/pest --coverage --min=85` quando houver packages). Codecov upload só no slot canónico (PHP 8.4, Laravel 13, mysql)
+- CodeQL PHP: marcado `continue-on-error: true` porque em 2026-04 PHP está em beta. Removível quando estabilizar
+
+**Validações:**
+
+- `python3 yaml.safe_load` valida sintaxe de todos os 5 workflows e do dependabot.yml
+- Jobs de lint/typecheck/test-js tolerantes a estado vazio (já testado localmente via scripts `pnpm run lint|typecheck|test`)
+
+**Pendente humano:**
+
+- Push para remoto e habilitação real do dependabot e CodeQL no repo (requer admin)
+- Branch protection em `main` — exige CI verde + 1 review (critério de aceite do ticket; depende do push)
 
 ### INFRA-003 — Configuração de ferramentas de formatação e lint (PHP e JS) (2026-04-17)
 
@@ -117,8 +145,8 @@ Pode ser trabalhado em paralelo após INFRA-001 pronto:
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 3/123 tickets (2.4%)
-**Sprint atual (Sprint 0):** 3/5 tickets (60%)
+**Fase 1 MVP:** 4/123 tickets (3.3%)
+**Sprint atual (Sprint 0):** 4/5 tickets (80%)
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -144,4 +172,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (INFRA-003 completo)
+**Última atualização:** 2026-04-17 (INFRA-004 completo)

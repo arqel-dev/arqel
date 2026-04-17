@@ -1,0 +1,30 @@
+name: Docs — Deploy
+
+# Placeholder — será preenchido em ticket DOCS posterior.
+# Por agora: apenas garante que o ficheiro existe para branch protection
+# e dispara no merge para main sem fazer nada de destrutivo.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/docs/**"
+      - "docs-content/**"
+      - "PLANNING/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: true
+
+jobs:
+  placeholder:
+    name: Docs deploy (placeholder)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Acknowledge trigger
+        run: echo "Docs deploy workflow is a placeholder — real deployment wired up in a future DOCS ticket."

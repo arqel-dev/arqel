@@ -1,0 +1,18 @@
+# Excluir ficheiros de desenvolvimento do tarball publicado no Packagist.
+# Reduz tamanho do install e evita expor configs de dev.
+
+/.gitattributes      export-ignore
+/.gitignore          export-ignore
+/tests               export-ignore
+/phpunit.xml         export-ignore
+/pest.xml            export-ignore
+/SKILL.md            export-ignore
+
+# Forçar LF — consistência cross-platform
+* text=auto eol=lf
+*.php    text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.yaml   text eol=lf
+*.yml    text eol=lf
+*.xml    text eol=lf

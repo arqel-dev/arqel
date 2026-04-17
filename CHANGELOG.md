@@ -16,6 +16,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Renovate Bot config com grouping completo + Dependabot reduzido a github-actions (INFRA-005)
 - Política de segurança expandida (SLAs, disclosure process, âmbito) (GOV-001)
 - Guia de contribuição + PR template + Issue templates (bug/feature/question) (GOV-003)
+- Esqueleto do pacote `arqel/core` com composer.json, PSR-4, README, SKILL, phpunit/pest configs (CORE-001)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

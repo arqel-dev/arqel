@@ -5,17 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**Sprint 0 COMPLETO** 🎉 — próximo alvo: Sprint 1 / CORE-001
-
-**[CORE-001]** Primeiro ticket do pacote `arqel/core` (a confirmar com o utilizador antes de avançar, pois entra em código de produto e não apenas infraestrutura).
+**[CORE-002] Implementar ArqelServiceProvider com auto-discovery**
 
 **Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
+**Prioridade:** P0 • **Estimativa:** M
+**Depende de:** CORE-001 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE)
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-002, linha 381).
 
-**Próximo:** consultar §3 para ver CORE-001 (Service Provider base + Panel registry + skeleton do package core) e criar `packages/core/` com a estrutura canónica (ver `04-repo-structure.md` §3.2).
-
-> GOV-002 (Release pipeline) fica fora do Sprint 0 — é L (3-7d) e o ticket diz que depende de INFRA-004 mas materialmente depende de packages já existirem (para poder publicar algo). Fica para depois do primeiro package CORE estar scaffolded.
+**Objectivo:** Criar a primeira classe PHP real — `Arqel\Core\ArqelServiceProvider` extendendo `Spatie\LaravelPackageTools\PackageServiceProvider`, com auto-discovery via `composer.json` `extra.laravel.providers`, publish de config, registo de comandos e rotas. Isto valida também o phpstan real (com Larastan per-package) e abre caminho para CORE-003 em diante.
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -35,6 +33,38 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-001 — Esqueleto do pacote `arqel/core` com composer.json e PSR-4 (2026-04-17)
+
+**Entregue:**
+
+- `packages/core/composer.json` — name `arqel/core`, PHP `^8.3`, Laravel `^12.0|^13.0`, Inertia 3, spatie/laravel-package-tools 1.16+. Dev deps: Orchestra Testbench 10, Pest 3, pest-plugin-laravel 3, Larastan 3. PSR-4 `Arqel\Core\` → `src/`; PSR-4 dev `Arqel\Core\Tests\` → `tests/`
+- Estrutura: `src/`, `tests/Feature/`, `tests/Unit/`, `config/` (todos com `.gitkeep` por agora)
+- `README.md` com badges (License/PHP/Laravel/Status), visão do pacote, convenções e links
+- `SKILL.md` canónico — Purpose, Key Contracts, Conventions, Common tasks, Anti-patterns, Related
+- `phpunit.xml` para Pest — SQLite in-memory, APP_ENV=testing, strict output
+- `pest.xml` stub (a config real vive em phpunit.xml)
+- `.gitattributes` local — `export-ignore` para `tests/`, `phpunit.xml`, `pest.xml`, `SKILL.md` (não vão no Packagist tarball)
+
+**Root monorepo alterado:**
+
+- `composer.json` root: `require-dev` agora tem `"arqel/core": "@dev"` (constraint obrigatória para path repos em root `minimum-stability: stable`)
+- `composer.lock` regenerado — `arqel/core (dev-main): Symlinking from packages/core` confirma path repository activo
+- `.gitignore` — adicionado `packages/*/composer.lock` e `packages-js/*/pnpm-lock.yaml` (lockfiles canónicos vivem só na raiz)
+- `phpstan.neon` — exclude patterns corrigidas para `packages/*/vendor/*` (sufixo `/*` obrigatório) e `reportUnmatchedIgnoredErrors: false`
+- `scripts/phpstan.sh` — detecção refinada para usar `find -name '*.php'` em vez de `ls dir/`, para saltar graciosamente quando só há `.gitkeep`
+
+**Validações:**
+
+- `composer validate` em `packages/core/` → OK
+- `composer install` root → instala arqel/core via path repo (symlink em `vendor/arqel/core`)
+- `composer dump-autoload` gera classmap sem erro
+- `composer run analyse` → skip gracioso (ainda não há `.php` em src)
+- Autoload: `require 'vendor/autoload.php'` no root carrega o namespace `Arqel\Core\`
+
+**Desvios:**
+
+- Ticket pedia `"arqel/core": "*"` no root — composer rejeita porque path repo resolve em `dev-main`. Usei `"@dev"` (standard Composer para path repos em monorepos). Solução aplicável ao padrão para todos os packages subsequentes
 
 ### GOV-001 — SECURITY.md e processo de disclosure (2026-04-17)
 
@@ -197,8 +227,9 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 7/123 tickets (5.7%)
-**Sprint atual (Sprint 0):** 7/7 tickets (100%) — INFRA ✅ + GOV-001 ✅ + GOV-003 ✅ 🎉
+**Fase 1 MVP:** 8/123 tickets (6.5%)
+**Sprint 0 (Setup):** 7/7 ✅ 🎉
+**Sprint 1 (CORE):** 1/15 tickets (CORE-001 ✅)
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -224,4 +255,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (Sprint 0 COMPLETO: INFRA-001..005 + GOV-001 + GOV-003)
+**Última atualização:** 2026-04-17 (CORE-001 completo — primeiro package real scaffolded)

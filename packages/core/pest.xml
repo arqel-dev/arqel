@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Pest usa o phpunit.xml como base. Este ficheiro existe apenas para
+  o Pest Plugin (coverage config, printer) e para sinalizar que este
+  package é Pest-first. Configuração real vive em phpunit.xml.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/pestphp/pest/src/Plugin/pest.xsd">
+</phpunit>

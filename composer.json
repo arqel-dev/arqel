@@ -16,6 +16,7 @@
         "php": "^8.3"
     },
     "require-dev": {
+        "arqel/core": "@dev",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29"
     },

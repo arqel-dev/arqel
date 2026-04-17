@@ -42,6 +42,12 @@ playwright-report/
 .phpstan.cache
 psalm.cache/
 
+# Composer lockfiles dos packages internos (só o root composer.lock é commitado — é a única
+# fonte canónica de versões resolvidas no monorepo). O lockfile do package seria usado se
+# o package fosse instalado autonomamente, o que não acontece no nosso fluxo.
+packages/*/composer.lock
+packages-js/*/pnpm-lock.yaml
+
 # Laravel specific (para apps/ dentro do monorepo)
 apps/*/bootstrap/cache/*
 !apps/*/bootstrap/cache/.gitkeep

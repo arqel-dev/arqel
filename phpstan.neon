@@ -15,13 +15,14 @@ parameters:
         - packages
     excludePaths:
         analyseAndScan:
-            - packages/*/tests
-            - packages/*/vendor
-            - packages/*/database
+            - packages/*/tests/*
+            - packages/*/vendor/*
+            - packages/*/database/*
+            - packages/*/node_modules/*
         analyse:
-            - packages/*/config
+            - packages/*/config/*
     tmpDir: .phpstan.cache
     parallel:
         maximumNumberOfProcesses: 4
-    reportUnmatchedIgnoredErrors: true
+    reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false

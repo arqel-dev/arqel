@@ -6,16 +6,25 @@
 
 `arqel/core` é o pacote base do ecossistema Arqel. Contém:
 
-- **Service Provider** (`ArqelServiceProvider`) com auto-discovery via Laravel package discovery
-- **Contracts** (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`, `Renderable`) que outros pacotes implementam
-- **Registries** (`ResourceRegistry`, `PanelRegistry`) para descoberta de componentes em runtime
-- **Classe base `Resource`** abstracta, estendida por Resources concretos em apps consumidoras
-- **Controllers HTTP** genéricos (`ResourceController`, `ActionController`, `DashboardController`) que servem Inertia responses
-- **Middleware Inertia** que injecta estado partilhado (`HandleArqelInertia`, `ScopedForPanel`)
-- **Facade `Arqel`** como fachada pública
-- **Comandos Artisan** para install e generators (`arqel:install`, `arqel:resource`, etc.)
-- **`FieldSchemaSerializer`** — serialização de instâncias de `Field` para JSON que o React consome
-- **`InertiaDataBuilder`** — construção consistente de props Inertia com metadados de Resource
+- **Service Provider** (`ArqelServiceProvider`) com auto-discovery via Laravel package discovery (ADR-018)
+- **Contracts** (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`) que outros pacotes implementam
+- **Registries**:
+  - `ResourceRegistry` (em `src/Resources/`): `register`/`registerMany`/`discover` (PSR-4 + Symfony Finder)/`findByModel`/`findBySlug`/`has`/`clear`/`all`. Idempotente; valida o contract via `is_subclass_of`
+  - `PanelRegistry` (em `src/Panel/`): create-or-get via `panel($id)`, `setCurrent`/`getCurrent`, `all`, `has`, `clear`. Lança `PanelNotFoundException` em ID desconhecido
+- **`Panel` fluent builder** (`src/Panel/Panel.php`): `path`/`brand`/`theme`/`primaryColor`/`darkMode`/`middleware`/`resources`/`widgets`/`navigationGroups`/`authGuard`/`tenant` com getters tipados
+- **Classe base `Resource`** abstracta (`src/Resources/Resource.php`): static metadata (`$model`, `$slug`, `$label`, `$pluralLabel`, navigation), auto-derivation de slug/label/plural, 8 lifecycle hooks no-op, `recordTitle`/`recordSubtitle`/`indexQuery` defaults
+- **Facade `Arqel`** (`src/Facades/Arqel.php`) com accessor `arqel` aliasado ao `PanelRegistry`
+- **Comandos Artisan**:
+  - `arqel:install {--force}` — bootstrap pipeline com Laravel Prompts (publica config, faz scaffold de `app/Arqel`, `resources/js/Pages/Arqel`, gera provider/layout/`AGENTS.md`)
+  - `arqel:resource {model} {--with-policy} {--force}` — gera Resource em `app/Arqel/Resources` a partir de `stubs/resource.stub`. `--from-model`/`--from-migration` adiados até `Arqel\Fields\Field` existir
+- **Blade root view** `arqel::app` (`resources/views/app.blade.php`) com `@inertia`, CSRF, FOUC guard de tema; publicada para `resources/views/vendor/arqel/`
+- **Traduções** (`resources/lang/{en,pt_BR}/`): `messages`, `actions`, `table`, `form`, `validation`. Acesso via `__('arqel::messages.actions.create')`
+
+**Adiados** (entrarão noutros pacotes / tickets):
+
+- `ResourceController` (CORE-006): depende de `Field`/`InertiaDataBuilder`/Pages React
+- `HandleArqelInertiaRequests` middleware (CORE-007): depende do controller
+- `FieldSchemaSerializer` (CORE-010): depende de `Field`
 
 ## Key Contracts
 
@@ -42,9 +51,15 @@ Auto-registado via `composer.json`:
 ```php
 use Arqel\Core\Facades\Arqel;
 
-Arqel::registerResource(UserResource::class);
-Arqel::panel('admin')->register(...);
+// PanelRegistry::panel(): cria ou devolve o Panel com este ID
+Arqel::panel('admin')
+    ->path('/admin')
+    ->brand('Acme')
+    ->resources([UserResource::class, PostResource::class]);
 ```
+
+Internamente o accessor `arqel` está aliasado ao `Arqel\Core\Panel\PanelRegistry`,
+por isso `Arqel::panel(...)` é o mesmo que `app(PanelRegistry::class)->panel(...)`.
 
 ### Base Resource
 
@@ -57,19 +72,41 @@ final class UserResource extends Resource
 {
     public static string $model = \App\Models\User::class;
 
-    public function fields(): array { /* ... */ }
-    public function table(): Table { /* ... */ }
-    public function actions(): array { /* ... */ }
+    // Opcional — auto-derivado a partir do nome da classe quando null:
+    // public static ?string $slug = null;          // → 'users'
+    // public static ?string $label = null;         // → 'User'
+    // public static ?string $pluralLabel = null;   // → 'Users'
+
+    public static ?string $navigationIcon = 'heroicon-o-user';
+    public static ?string $navigationGroup = 'System';
+    public static ?int $navigationSort = 10;
+
+    public function fields(): array
+    {
+        return []; // Field::* virão em FIELDS-*
+    }
+
+    // Hooks opcionais (defaults são no-op):
+    // protected function beforeCreate(array $data): array
+    // protected function afterCreate(Model $record): void
+    // protected function beforeUpdate(Model $record, array $data): array
+    // protected function afterUpdate(Model $record): void
+    // protected function beforeSave(Model $record, array $data): array  // create + update
+    // protected function afterSave(Model $record): void
+    // protected function beforeDelete(Model $record): void
+    // protected function afterDelete(Model $record): void
 }
 ```
 
+`getModel()` lança `LogicException` se `$model` não for declarado — falha cedo
+em vez de obter erros opacos no controller.
+
 ### Contracts
 
-- `Arqel\Core\Contracts\HasResource` — marca classe como Resource discoverable
-- `Arqel\Core\Contracts\HasFields` — objetos que têm schema de fields (Resource, Form, Action)
-- `Arqel\Core\Contracts\HasActions` — objetos que expõem acções
-- `Arqel\Core\Contracts\HasPolicies` — ponto de integração com Laravel Policies (ADR-017)
-- `Arqel\Core\Contracts\Renderable` — o que pode ir via Inertia para React
+- `Arqel\Core\Contracts\HasResource` — 7 métodos estáticos: `getModel`, `getSlug`, `getLabel`, `getPluralLabel`, `getNavigationIcon`, `getNavigationGroup`, `getNavigationSort`. A classe base `Resource` implementa todos com auto-derivation
+- `Arqel\Core\Contracts\HasFields` — `fields(): array`. Tipo solto até `Arqel\Fields\Field` existir
+- `Arqel\Core\Contracts\HasActions` — marker interface; assinaturas concretas chegam com `arqel/actions`
+- `Arqel\Core\Contracts\HasPolicies` — `getPolicy(): ?string` opcional; integra com Laravel Policies (ADR-017)
 
 ## Conventions
 
@@ -91,8 +128,15 @@ final class UserResource extends Resource
 ### Registar um comando Artisan
 
 1. Criar classe em `src/Commands/MakeBarCommand.php` extendendo `Illuminate\Console\Command`
-2. Registar em `ArqelServiceProvider::configurePackage()` (via `spatie/laravel-package-tools`)
-3. Testar com `$this->artisan('arqel:bar')->assertSuccessful()`
+2. Adicionar à array `hasCommands([...])` em `ArqelServiceProvider::configurePackage()`
+3. Testar com `Artisan::call('arqel:bar', [...])` em Orchestra Testbench
+4. Padrão `stringArg()` para narrowing PHPStan (ver `MakeResourceCommand`)
+
+### Adicionar uma string traduzida
+
+1. Adicionar em `resources/lang/en/{messages|actions|table|form}.php`
+2. Replicar em `resources/lang/pt_BR/...` (PT-BR é locale obrigatório no MVP)
+3. Usar `__('arqel::messages.foo.bar')` no PHP, `t('messages.foo.bar')` no React (via shared props)
 
 ### Adicionar middleware
 

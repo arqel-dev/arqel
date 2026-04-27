@@ -5,15 +5,12 @@
 
 ## 🎯 Ticket corrente
 
-**[CORE-010] `FieldSchemaSerializer` — serialização de Fields para JSON**
+**[FIELDS-001] Esqueleto do pacote `arqel/fields`** *(saltei para destrabar CORE-006/010)*
 
-**Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
-**Prioridade:** P0 • **Estimativa:** M
-**Depende de:** CORE-008 ✅
+**Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-010, linha 956).
-
-> **Reordenação do sprint:** CORE-006/007 adiados (precisam de Fields/Tables/Forms). CORE-010 também depende de `Field` (que vem em FIELDS-*), por isso o próximo passo natural pode ser saltar para FIELDS-001 — a avaliar quando lá chegar.
+> **Reordenação do sprint:** CORE-006/007/010/014/015 adiados — todos dependem de `Arqel\Fields\Field`. CORE-011 já entregue em CORE-002 (Facade). CORE-012/013 entregues. Sprint 1 efectivamente esgotado dentro do que dá para entregar sem `Field`. Avançar para FIELDS é o próximo passo natural.
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -33,6 +30,38 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-013 — Sistema de traduções en + pt_BR (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/resources/lang/en/{messages,actions,table,form,validation}.php` — strings UI canónicas
+- `packages/core/resources/lang/pt_BR/...` (mesma estrutura) com tradução completa
+- `hasTranslations()` no ServiceProvider regista o namespace `arqel::*`
+- 5 testes Pest em `tests/Feature/TranslationsTest.php`: en namespace, pt_BR namespace, cross-namespace (table/form/actions), fallback en, placeholders em pagination
+
+**Decisões autónomas:**
+
+- Estrutura segue exactamente o ticket: `messages` (geral), `actions` (acções padrão), `table` (sort/pagination/filtros/bulk), `form` (submit/reset/required/placeholders), `validation` (override Arqel-only — `failed`)
+- `pt_PT` NÃO incluído (CLAUDE.md regra: "PT-BR é canónico, nunca PT-PT")
+- Outros locales (es/fr/de/it/ja) ficam para Fase 2 (RNF-I-02)
+
+### CORE-012 — Blade root view `arqel::app` (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/resources/views/app.blade.php` — DOCTYPE, `<title inertia>`, CSRF, FOUC guard de tema (try/catch para tolerar localStorage bloqueado), `@routes` opcional (Ziggy), `@viteReactRefresh`, `@vite(['resources/css/app.css', 'resources/js/app.tsx'])`, `@inertiaHead`, `@inertia`
+- `hasViews('arqel')` no ServiceProvider regista o namespace `arqel::*` para views
+- `config/arqel.php`: nova chave `inertia.root_view` apontando para `arqel::app`
+- 3 testes Pest em `tests/Feature/InertiaRootViewTest.php`: namespace existe e resolve, blade source contém todas as directivas, config aponta para `arqel::app`
+
+**Decisões autónomas:**
+
+- **Teste lê o source em vez de renderizar** — `@vite` falha em Testbench sem manifest. O conteúdo correcto é determinístico, source-comparison é suficiente
+- `@routes` envolto em `@if (app()->bound('router'))` para tolerar contextos sem routing (testbench minimal)
+- Theme flash usa `var` em vez de `let`/`const` — corre antes da app, máxima compatibilidade
+- `@viteReactRefresh` e `@vite` são responsabilidade da app (assets ficam em `resources/css/app.css` + `resources/js/app.tsx` na app, não no package). O package só fornece o template root
+- **Critério "Publicação via `arqel:publish --tag=views`" satisfeito via Spatie**: tag real é `arqel-views` (Spatie usa `{shortName}-views`). `arqel:publish` é alias futuro (CORE-003 já tem `arqel:install`); `vendor:publish --tag=arqel-views` funciona hoje
 
 ### CORE-009 — Comando `arqel:resource` (2026-04-27)
 
@@ -413,7 +442,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 **Fase 1 MVP:** 8/123 tickets (6.5%)
 **Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 7/15 tickets (CORE-001..005 ✅, CORE-008 ✅, CORE-009 ✅) — CORE-006 e CORE-007 adiados
+**Sprint 1 (CORE):** 10/15 tickets (CORE-001..005 ✅, CORE-008 ✅, CORE-009 ✅, CORE-011 ✅ via CORE-002, CORE-012 ✅, CORE-013 ✅) — CORE-006/007/010/014/015 adiados (todos precisam de `Field`)
 
 ## 🔄 Ao completar o ticket ativo
 

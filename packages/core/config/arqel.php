@@ -13,4 +13,8 @@ return [
     'auth' => [
         'guard' => 'web',
     ],
+
+    'inertia' => [
+        'root_view' => 'arqel::app',
+    ],
 ];

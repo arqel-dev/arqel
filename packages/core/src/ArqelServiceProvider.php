@@ -20,6 +20,8 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel')
             ->hasConfigFile('arqel')
+            ->hasViews('arqel')
+            ->hasTranslations()
             ->hasCommands([
                 InstallCommand::class,
                 MakeResourceCommand::class,

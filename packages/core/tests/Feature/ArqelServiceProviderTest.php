@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Arqel\Core\ArqelServiceProvider;
 use Arqel\Core\Facades\Arqel;
 use Arqel\Core\Registries\PanelRegistry;
-use Arqel\Core\Registries\ResourceRegistry;
+use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Contracts\Console\Kernel;
 
 it('registers ResourceRegistry as a singleton', function (): void {

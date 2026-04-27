@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[CORE-004] Implementar `ResourceRegistry` e contract `HasResource`**
+**[CORE-005] Implementar `Panel` e `PanelRegistry`**
 
 **Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
-**Prioridade:** P0 • **Estimativa:** M
-**Depende de:** CORE-003 ✅
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** CORE-004 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-004).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-005, linha 614).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,30 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-004 — `ResourceRegistry` + contract `HasResource` (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/src/Contracts/HasResource.php` — interface com 7 métodos estáticos: `getModel`, `getSlug`, `getLabel`, `getPluralLabel`, `getNavigationIcon`, `getNavigationGroup`, `getNavigationSort`
+- `packages/core/src/Resources/ResourceRegistry.php` — `final class` com API completa: `register` (idempotente, valida contract via `is_subclass_of`), `registerMany`, `discover` (Symfony Finder + PSR-4, sem `include`/`eval`), `all`, `findByModel`, `findBySlug`, `has`, `clear`
+- `ArqelServiceProvider` actualizado para fazer binding ao novo namespace `Arqel\Core\Resources\ResourceRegistry` (era `Registries\ResourceRegistry`)
+- Stub antigo em `src/Registries/ResourceRegistry.php` removido
+- Fixtures em `tests/Fixtures/`: `Models/User.php`, `Models/Post.php`, `Resources/UserResource.php`, `Resources/PostResource.php`, `NotAResource.php`
+- 12 testes Pest unit em `tests/Unit/ResourceRegistryTest.php` cobrindo todos os critérios de aceite + 3 edge cases (não-existência, return null, classes não-Resource ignoradas em discovery)
+
+**Validações:**
+
+- `vendor/bin/pest` → 27/27 passed (54 assertions, 0.18s)
+- `vendor/bin/pint` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 6 ficheiros analisados
+
+**Decisões autónomas:**
+
+- Lookup por model/slug é O(n) intencionalmente: working set por painel é dezenas de Resources, indexação adicional é prematura. Documentado em PHPDoc da classe
+- `discover()` confia no autoloader PSR-4 (sem `include`/`eval`): mais lento que ler tokens directamente mas evita carregar código indeterminado e mantém a função idempotente. Skips em classes abstract/interface/trait
+- Storage interno usa array associativo `FQCN => FQCN` em vez de array indexado: idempotência é grátis (`isset` ou re-write da mesma key), e `all()` desambigua via `array_values`
+- Stub `Registries\ResourceRegistry` foi removido (não migrado) — qualquer code do CORE-002 que ainda referenciasse o namespace antigo já foi corrigido nos testes
 
 ### CORE-003 — Comando Artisan `arqel:install` (2026-04-27)
 
@@ -287,7 +311,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 **Fase 1 MVP:** 8/123 tickets (6.5%)
 **Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 3/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅)
+**Sprint 1 (CORE):** 4/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅, CORE-004 ✅)
 
 ## 🔄 Ao completar o ticket ativo
 

@@ -6,7 +6,7 @@ namespace Arqel\Core;
 
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Registries\PanelRegistry;
-use Arqel\Core\Registries\ResourceRegistry;
+use Arqel\Core\Resources\ResourceRegistry;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 

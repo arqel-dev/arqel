@@ -17,6 +17,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Política de segurança expandida (SLAs, disclosure process, âmbito) (GOV-001)
 - Guia de contribuição + PR template + Issue templates (bug/feature/question) (GOV-003)
 - Esqueleto do pacote `arqel/core` com composer.json, PSR-4, README, SKILL, phpunit/pest configs (CORE-001)
+- `Arqel\Core\ArqelServiceProvider` com auto-discovery, registos singleton (`ResourceRegistry`, `PanelRegistry`), facade `Arqel`, `config/arqel.php`, comando `arqel:install` e suite Pest com Orchestra Testbench (CORE-002)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

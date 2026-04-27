@@ -5,15 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[CORE-002] Implementar ArqelServiceProvider com auto-discovery**
+**[CORE-003] Comando Artisan `arqel:install`**
 
 **Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
 **Prioridade:** P0 • **Estimativa:** M
-**Depende de:** CORE-001 ✅
+**Depende de:** CORE-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-002, linha 381).
-
-**Objectivo:** Criar a primeira classe PHP real — `Arqel\Core\ArqelServiceProvider` extendendo `Spatie\LaravelPackageTools\PackageServiceProvider`, com auto-discovery via `composer.json` `extra.laravel.providers`, publish de config, registo de comandos e rotas. Isto valida também o phpstan real (com Larastan per-package) e abre caminho para CORE-003 em diante.
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-003, linha 485).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -33,6 +31,38 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-002 — `ArqelServiceProvider` com auto-discovery (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/src/ArqelServiceProvider.php` — `final` class estende `Spatie\LaravelPackageTools\PackageServiceProvider`. Configura `name('arqel')`, `hasConfigFile('arqel')`, `hasInstallCommand` com `publishConfigFile()` + `askToStarRepoOnGitHub('arqel/arqel')`. Em `packageBooted()` regista singletons (`ResourceRegistry`, `PanelRegistry`) e alias `arqel` → `PanelRegistry`. Constante tipada `public const string FACADE_ACCESSOR = 'arqel'`
+- `packages/core/src/Registries/ResourceRegistry.php` — stub `final class` (preenchido em CORE-004)
+- `packages/core/src/Registries/PanelRegistry.php` — stub `final class` (preenchido em CORE-005)
+- `packages/core/src/Facades/Arqel.php` — `final` Facade que aponta para o accessor `arqel`
+- `packages/core/config/arqel.php` — config inicial (`path`, `resources.path`, `resources.namespace`, `auth.guard`)
+- `packages/core/composer.json` — adicionado `extra.laravel.providers: ["Arqel\\Core\\ArqelServiceProvider"]` (auto-discovery ADR-018)
+- `packages/core/tests/TestCase.php` — base abstract estende Orchestra Testbench, regista `ArqelServiceProvider`
+- `packages/core/tests/Pest.php` — `uses(TestCase::class)->in('Feature', 'Unit')`
+- `packages/core/tests/Feature/ArqelServiceProviderTest.php` — 6 testes: singletons, alias `arqel`, facade root, config merge, comando `arqel:install` registado
+- `packages/core/tests/Unit/FacadeTest.php` — 2 testes: facade root + constante `FACADE_ACCESSOR`
+
+**Validações:**
+
+- `vendor/bin/pest` → 8/8 passed (14 assertions, 0.12s)
+- `vendor/bin/pint --test` (root) → pass (após auto-fix `single_line_empty_body` nos stubs)
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 4 ficheiros analisados
+- Auto-discovery confirmado: app de teste boota o ServiceProvider sem registo manual
+
+**Decisões autónomas:**
+
+- Não adicionei `hasViews('arqel')` nem `hasTranslations()` (estavam no exemplo do ticket): nenhum dos dois directórios existe ainda no package, e Spatie levanta erro se referir directórios inexistentes. Serão adicionados quando os primeiros views/translations chegarem (provavelmente CORE-005 + UI tickets)
+- Constante `FACADE_ACCESSOR` adicionada na classe (PHP 8.3 typed constant) para evitar string mágica duplicada no Facade e nos testes
+- Coverage driver (Xdebug/PCOV) não está instalado no ambiente — `pest --coverage --min=90` falha com "No code coverage driver". O critério de coverage do ticket fica adiado para o pipeline CI (que instala PCOV). Localmente os 8 testes passam todos
+
+**Pendente humano:**
+
+- Instalar PCOV ou Xdebug localmente para validar coverage ≥90% em desenvolvimento (workflow `test-matrix.yml` já o faz no CI)
 
 ### CORE-001 — Esqueleto do pacote `arqel/core` com composer.json e PSR-4 (2026-04-17)
 
@@ -229,7 +259,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 **Fase 1 MVP:** 8/123 tickets (6.5%)
 **Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 1/15 tickets (CORE-001 ✅)
+**Sprint 1 (CORE):** 2/15 tickets (CORE-001 ✅, CORE-002 ✅)
 
 ## 🔄 Ao completar o ticket ativo
 

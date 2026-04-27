@@ -43,6 +43,13 @@
             "pestphp/pest-plugin": true
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Arqel\\Core\\ArqelServiceProvider"
+            ]
+        }
+    },
     "scripts": {
         "test": "vendor/bin/pest",
         "test:coverage": "vendor/bin/pest --coverage --min=90",

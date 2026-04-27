@@ -5,12 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-001] Esqueleto do pacote `arqel/fields`** *(saltei para destrabar CORE-006/010)*
+**[FIELDS-002] Classe abstracta `Field` base**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** FIELDS-001 ✅
 
-> **Reordenação do sprint:** CORE-006/007/010/014/015 adiados — todos dependem de `Arqel\Fields\Field`. CORE-011 já entregue em CORE-002 (Facade). CORE-012/013 entregues. Sprint 1 efectivamente esgotado dentro do que dá para entregar sem `Field`. Avançar para FIELDS é o próximo passo natural.
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-002 (linha 1388).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -30,6 +31,33 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-001 — Esqueleto do pacote `arqel/fields` (2026-04-27)
+
+**Entregue:**
+
+- `packages/fields/composer.json` — `arqel/fields` PHP ^8.3, Laravel ^12|^13, depende de `arqel/core: @dev` (com `repositories` apontando para `../core` para resolução em modo path-repo). Dev: Orchestra Testbench, Pest, Larastan
+- `packages/fields/src/FieldServiceProvider.php` — `final class` extends Spatie `PackageServiceProvider`, regista o package com nome `arqel-fields`. Concrete `Field` types serão registados aqui em FIELDS-002+
+- Auto-discovery via `extra.laravel.providers`
+- `packages/fields/src/{Types,Concerns}/` (placeholders com `.gitkeep`)
+- `packages/fields/tests/{TestCase.php,Pest.php}` — base extends Orchestra registando AMBOS providers (`ArqelServiceProvider` + `FieldServiceProvider`), porque `arqel/fields` depende de core e algumas integrações vão precisar do core booted
+- `packages/fields/tests/Feature/FieldServiceProviderTest.php` — 2 smoke tests: provider booted, namespace autoload
+- `phpunit.xml`, `pest.xml`, `.gitattributes`, `README.md`, `SKILL.md`
+- Root `composer.json` adicionou `arqel/fields: @dev` em `require-dev` — symlink confirmado
+
+**Validações:**
+
+- `vendor/bin/pest` (em `packages/fields`) → 2/2 passed (3 assertions)
+- `vendor/bin/pest` (em `packages/core`) → 67/67 passed (sem regressões)
+- `vendor/bin/pint` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 25 ficheiros
+
+**Decisões autónomas:**
+
+- Spatie `name('arqel-fields')` (não `arqel`): namespace do core já reservou `arqel`. Traduções/views futuras de fields ficam em `arqel-fields::*`
+- `repositories` local em `packages/fields/composer.json` aponta para `../core` (relative path): permite que `composer install` no package fields resolva `arqel/core` quando rodado standalone (CI por package, ou local debugging). Em modo monorepo, o root resolve via `packages/*` glob — ambos os paths funcionam
+- Smoke tests minimalistas (não testar coisas que ainda não existem). FIELDS-013 (cobertura completa) virá depois dos types existirem
+- Sem `config/` real ainda — tipos concretos não precisam de config até FIELDS-022 (registry runtime)
 
 ### CORE-013 — Sistema de traduções en + pt_BR (2026-04-27)
 

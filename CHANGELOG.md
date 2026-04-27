@@ -26,6 +26,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Blade root view `arqel::app` (`resources/views/app.blade.php`): doctype, `<title inertia>`, CSRF token, FOUC guard de tema (system/light/dark via `localStorage`), `@routes` (Ziggy opcional), `@viteReactRefresh`, `@vite`, `@inertiaHead`, `@inertia`. Config `arqel.inertia.root_view` aponta para `arqel::app`. Publicável via `vendor:publish --tag=arqel-views` (CORE-012)
 - Traduções em `en` e `pt_BR` (`resources/lang/{locale}/{messages,actions,table,form,validation}.php`) com namespace `arqel::*`. Cobre actions, confirmation, flash, errors, table sort/pagination/filtros/bulk, form submit/reset/required, validation failed (CORE-013)
 - SKILL.md actualizado para reflectir o âmbito real entregue (sem prometer `ResourceController`, `FieldSchemaSerializer`, `Renderable` que ainda não existem)
+- Esqueleto do pacote `arqel/fields` (PHP 8.3+, Laravel 12|13, depende de `arqel/core` via path repository): `FieldServiceProvider` registado via auto-discovery, PSR-4 `Arqel\Fields\` → `src/`, Pest + Orchestra Testbench, smoke tests verificando boot do provider e autoload do namespace. Adicionado a `require-dev` do monorepo root como path repo. Tipos concretos e `FieldFactory` chegam em FIELDS-002+ (FIELDS-001)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

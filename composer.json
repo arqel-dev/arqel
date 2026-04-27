@@ -17,6 +17,7 @@
     },
     "require-dev": {
         "arqel/core": "@dev",
+        "arqel/fields": "@dev",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29"
     },

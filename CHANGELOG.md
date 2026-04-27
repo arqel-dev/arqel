@@ -20,6 +20,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - `Arqel\Core\ArqelServiceProvider` com auto-discovery, registos singleton (`ResourceRegistry`, `PanelRegistry`), facade `Arqel`, `config/arqel.php`, comando `arqel:install` e suite Pest com Orchestra Testbench (CORE-002)
 - Comando `arqel:install` com Laravel Prompts: publica `config/arqel.php`, faz scaffold de `app/Arqel/Resources`, `app/Arqel/Widgets`, `resources/js/Pages/Arqel`, gera `App\Providers\ArqelServiceProvider`, `resources/views/arqel/layout.blade.php` e `AGENTS.md` (RF-DX-08). Stubs em `packages/core/stubs/`. Flag `--force` sobrescreve sem prompt (CORE-003)
 - Contract `Arqel\Core\Contracts\HasResource` (7 métodos estáticos: model, slug, label, plural, navigation icon/group/sort) e `Arqel\Core\Resources\ResourceRegistry` com `register`, `registerMany`, `discover` (PSR-4 + Symfony Finder), `findByModel`, `findBySlug`, `has`, `clear` e `all`. Idempotente; `InvalidArgumentException` em classes que não implementem o contract (CORE-004)
+- `Arqel\Core\Panel\Panel` fluent builder (path, brand, theme, primaryColor, darkMode, middleware, resources, widgets, navigationGroups, authGuard, tenant) com getters tipados; `Arqel\Core\Panel\PanelRegistry` create-or-get com `panel(id)`, `setCurrent`/`getCurrent`, `all`, `has`, `clear`; `PanelNotFoundException` em `setCurrent` desconhecido. Routing real adiado para CORE-006 (`ResourceController`) (CORE-005)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

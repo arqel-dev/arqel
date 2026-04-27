@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Core;
 
 use Arqel\Core\Commands\InstallCommand;
-use Arqel\Core\Registries\PanelRegistry;
+use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\ResourceRegistry;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;

@@ -5,13 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[CORE-005] Implementar `Panel` e `PanelRegistry`**
+**[CORE-006] Implementar `ResourceController` genérico**
 
 **Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
-**Prioridade:** P0 • **Estimativa:** L
-**Depende de:** CORE-004 ✅
+**Prioridade:** P0 • **Estimativa:** XL
+**Depende de:** CORE-005 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-005, linha 614).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-006, linha 700).
+
+> **Nota:** O routing real (rotas auto-geradas mencionadas no CORE-005) foi adiado para CORE-006, onde nasce o `ResourceController` genérico. CORE-005 entregou apenas o domínio (`Panel` + `PanelRegistry` + Facade) — sem `RouteRegistrar`.
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +33,39 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-005 — `Panel` fluent builder + `PanelRegistry` (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/src/Panel/Panel.php` — `final class` com construtor `readonly string $id` e 11 setters fluent (path, brand, theme, primaryColor, darkMode, middleware, resources, widgets, navigationGroups, authGuard, tenant) + getters tipados. `path()` normaliza para sempre começar com `/`. Defaults sensatos: `/admin`, brand "Arqel", theme `default`, middleware `['web']`, guard `web`
+- `packages/core/src/Panel/PanelRegistry.php` — `final class` create-or-get: `panel($id)` retorna instância existente ou cria. `setCurrent`/`getCurrent`, `all`, `has`, `clear`
+- `packages/core/src/Panel/PanelNotFoundException.php` — extends `RuntimeException`, lançada por `setCurrent` em ID desconhecido
+- Stub antigo em `src/Registries/PanelRegistry.php` removido; directório `Registries/` eliminado
+- `ArqelServiceProvider` actualizado para fazer binding ao novo namespace `Arqel\Core\Panel\PanelRegistry`
+- Testes Pest:
+  - `tests/Unit/PanelTest.php` — 5 testes: id readonly, defaults, fluent chain completo, normalização de path, toggle darkMode
+  - `tests/Unit/PanelRegistryTest.php` — 7 testes: create-on-first-call, idempotência (mesma instância), independência entre panels, current null por default, switch via setCurrent, exception em ID desconhecido, clear
+
+**Validações:**
+
+- `vendor/bin/pest` → 39/39 passed (96 assertions, 0.33s)
+- `vendor/bin/pint` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 8 ficheiros analisados
+
+**Decisões autónomas:**
+
+- **Routing adiado para CORE-006**: o ticket CORE-005 menciona auto-geração de rotas (`GET /admin`, `/admin/{resource}/...`) e o critério "Rotas auto-geradas aparecem em route:list", mas o `ResourceController` que essas rotas mapeiam só nasce em CORE-006 (XL). Implementar rotas para um controller que ainda não existe seria churn — o `RouteRegistrar` será adicionado em CORE-006 num único PR coerente. Documentado em PHPDoc da classe `Panel`
+- **`panel($id)` é create-or-get** (não criar nova): permite múltiplos service providers contribuírem para o mesmo painel sem registry global mutável; padrão alinhado com Filament
+- **`PanelNotFoundException` em `setCurrent`**: o ticket não especificava comportamento, mas falhar silenciosamente esconderia bugs de configuração — explicit fail-fast vence
+- Não criei `panel.stub` aplicação porque o existente (gerado pelo `arqel:install` em CORE-003) já cobre o caso. O stub vive em `packages/core/stubs/panel.stub`
+- `getBrand()` retorna array `{name, logo}` em vez de tuple ou DTO: o ticket diz `getBrand(): array` e mantemos o contrato. DTO é prematuro até haver mais campos
+- Facade `Arqel` (criada em CORE-002) já aponta correctamente para o accessor `'arqel'` que está aliasado ao `PanelRegistry` — não precisou alteração
+
+**Pendente (entrará em CORE-006):**
+
+- Auto-registo de rotas Inertia + naming convention `arqel.{panel}.{resource}.{action}`
+- Hook em `boot()` que itera `PanelRegistry::all()` e regista rotas
 
 ### CORE-004 — `ResourceRegistry` + contract `HasResource` (2026-04-27)
 
@@ -311,7 +346,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 **Fase 1 MVP:** 8/123 tickets (6.5%)
 **Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 4/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅, CORE-004 ✅)
+**Sprint 1 (CORE):** 5/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅, CORE-004 ✅, CORE-005 ✅)
 
 ## 🔄 Ao completar o ticket ativo
 

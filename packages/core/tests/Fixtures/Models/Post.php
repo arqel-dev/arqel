@@ -4,4 +4,9 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Tests\Fixtures\Models;
 
-final class Post {}
+use Illuminate\Database\Eloquent\Model;
+
+final class Post extends Model
+{
+    protected $guarded = [];
+}

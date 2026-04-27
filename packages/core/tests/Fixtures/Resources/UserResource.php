@@ -4,43 +4,21 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Tests\Fixtures\Resources;
 
-use Arqel\Core\Contracts\HasResource;
+use Arqel\Core\Resources\Resource;
 use Arqel\Core\Tests\Fixtures\Models\User;
 
-final class UserResource implements HasResource
+final class UserResource extends Resource
 {
-    public static function getModel(): string
-    {
-        return User::class;
-    }
+    public static string $model = User::class;
 
-    public static function getSlug(): string
-    {
-        return 'users';
-    }
+    public static ?string $navigationIcon = 'heroicon-o-user';
 
-    public static function getLabel(): string
-    {
-        return 'User';
-    }
+    public static ?string $navigationGroup = 'System';
 
-    public static function getPluralLabel(): string
-    {
-        return 'Users';
-    }
+    public static ?int $navigationSort = 10;
 
-    public static function getNavigationIcon(): ?string
+    public function fields(): array
     {
-        return 'heroicon-o-user';
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
-
-    public static function getNavigationSort(): ?int
-    {
-        return 10;
+        return [];
     }
 }

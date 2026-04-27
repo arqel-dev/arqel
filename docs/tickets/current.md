@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[CORE-006] Implementar `ResourceController` genérico**
+**[CORE-009] Comando `arqel:resource` — gerador de Resource**
 
 **Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
-**Prioridade:** P0 • **Estimativa:** XL
-**Depende de:** CORE-005 ✅
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** CORE-008 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-006, linha 700).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-009, linha 904).
 
-> **Nota:** O routing real (rotas auto-geradas mencionadas no CORE-005) foi adiado para CORE-006, onde nasce o `ResourceController` genérico. CORE-005 entregou apenas o domínio (`Panel` + `PanelRegistry` + Facade) — sem `RouteRegistrar`.
+> **Reordenação do sprint:** CORE-006 (`ResourceController`, XL) e CORE-007 (`HandleArqelInertiaRequests`, M) foram adiados porque dependem na prática de coisas que ainda não existem — `Resource` base (✅ entregue agora em CORE-008), `InertiaDataBuilder` com shape de `06-api-react.md` §3 (depende de Fields/Tables/Forms), Pages React (`arqel::index/create/edit`, REACT-001+) e Policies (CORE-013/14). PLANNING/08 ordena por número, não por dependência real. CORE-006/007 voltam à fila depois de Fields/Tables/Forms estarem prontos. Já documentado em `PLANNING/08-fase-1-mvp.md` (referência futura — não vou tocar no PLANNING).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -33,6 +33,44 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-008 — `Resource` abstract base + contracts (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/src/Contracts/HasFields.php` — interface mínima com `fields(): array`. Type loose intencionalmente: classe `Field` ainda não existe (vive em `arqel/fields`)
+- `packages/core/src/Contracts/HasActions.php` — marker interface. Métodos concretos (`actions()`, `tableActions()`) ficam para quando `arqel/actions`/`arqel/table` existirem
+- `packages/core/src/Contracts/HasPolicies.php` — `getPolicy(): ?string` opcional para Resources que declaram policy explicitamente
+- `packages/core/src/Resources/Resource.php` — `abstract class` que implementa os 3 contracts + `HasResource`. Static props (`$model`/`$label`/`$pluralLabel`/`$slug`/`$navigationIcon`/`$navigationGroup`/`$navigationSort`/`$recordTitleAttribute`). Auto-derivation:
+  - `getSlug()`: `UserResource` → `users` (via `Str::beforeLast('Resource')->snake('-')->plural()`)
+  - `getLabel()`: model basename → "User" (via `Str::snake(' ')->title()`)
+  - `getPluralLabel()`: pluraliza label
+- `getModel()` lança `LogicException` se `$model` não estiver declarado
+- 8 lifecycle hooks no-op por default: `beforeCreate`/`afterCreate`/`beforeUpdate`/`afterUpdate`/`beforeSave`/`afterSave`/`beforeDelete`/`afterDelete`
+- `recordTitle(Model)`: usa `$recordTitleAttribute` se declarado, senão fallback para primary key (type-safe via `is_scalar`)
+- `recordSubtitle(Model)` e `indexQuery()` retornam `null` por default
+- Fixtures actualizados: `User`/`Post` agora `extends Eloquent\Model`; `UserResource`/`PostResource` agora extendem `Resource`
+- 3 fixtures adicionais isolados em `tests/Fixtures/ResourcesExtras/` (não interferem com discovery do CORE-004): `TeamMemberResource` (override de slug/label), `MissingModelResource` (sem `$model`), `LifecycleResource` (records hook calls)
+- 14 testes Pest em `tests/Unit/ResourceTest.php` cobrindo todos os critérios
+
+**Validações:**
+
+- `vendor/bin/pest` → 53/53 passed (123 assertions, 0.28s)
+- `vendor/bin/pint` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 12 ficheiros
+
+**Decisões autónomas:**
+
+- **`HasActions` é marker interface** — o ticket pede `requer table(Table $table): Table` mas `Table` ainda não existe (vem em TABLE-* tickets). Marker permite o `Resource` implementar o contract hoje sem forçar uma assinatura que vai mudar. Documentado em PHPDoc
+- **`HasFields::fields()` retorna `array<int, mixed>`** — tipo solto intencional pelo mesmo motivo (classe `Field` vem em FIELDS-*). Apertar para `array<int, Field>` quando essa classe existir
+- **`table()`/`form()` não estão na classe abstract** — o exemplo do ticket inclui-os com defaults `Table $table` e `Form $form` mas essas classes não existem. Adiados para FIELDS/TABLE/FORM tickets, onde nascem juntos com a infraestrutura
+- **`MissingModelResource`** ignora type-hint do PHPStan (`@phpstan-ignore-next-line`) — único `@phpstan-ignore` no projecto, justificado: testar comportamento de erro de runtime quando o programador esquece de declarar `$model` é exactamente o que torna o ticket utilizável
+- **`Str::snake(' ')->title()`** para label — `User` → "User", `BlogPost` → "Blog post" → "Blog Post". Funciona para inglês; i18n usa override `$label`
+- **Fixtures separados em `ResourcesExtras/`** — o teste `discover()` do CORE-004 esperava 2 resources, mas adicionar fixtures para CORE-008 quebrou-o. Em vez de relaxar a expectativa do teste antigo, isolei os fixtures novos para outra pasta — preserva o sinal do CORE-004 e permite que cada teste controle o seu próprio universo
+
+**Pendente humano:**
+
+- Nenhum específico para este ticket
 
 ### CORE-005 — `Panel` fluent builder + `PanelRegistry` (2026-04-27)
 
@@ -346,7 +384,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 **Fase 1 MVP:** 8/123 tickets (6.5%)
 **Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 5/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅, CORE-004 ✅, CORE-005 ✅)
+**Sprint 1 (CORE):** 6/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅, CORE-004 ✅, CORE-005 ✅, CORE-008 ✅) — CORE-006 e CORE-007 adiados (ver nota acima)
 
 ## 🔄 Ao completar o ticket ativo
 

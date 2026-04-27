@@ -42,7 +42,7 @@ it('merges the package config under the "arqel" key', function (): void {
         ->and(config('arqel.resources.namespace'))->toBe('App\\Arqel\\Resources');
 });
 
-it('exposes the arqel:install command via Spatie InstallCommand', function (): void {
+it('registers the arqel:install command via Spatie hasCommands', function (): void {
     expect(array_keys(app(Kernel::class)->all()))
         ->toContain('arqel:install');
 });

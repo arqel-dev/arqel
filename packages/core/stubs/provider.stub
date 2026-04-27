@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Providers;
+
+use Arqel\Core\Facades\Arqel;
+use Illuminate\Support\ServiceProvider;
+
+final class ArqelServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        //
+    }
+
+    public function boot(): void
+    {
+        Arqel::registerPanel(__DIR__.'/../Arqel');
+    }
+}

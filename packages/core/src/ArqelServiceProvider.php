@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Arqel\Core;
 
+use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Registries\PanelRegistry;
 use Arqel\Core\Registries\ResourceRegistry;
-use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -19,11 +19,9 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel')
             ->hasConfigFile('arqel')
-            ->hasInstallCommand(function (InstallCommand $command): void {
-                $command
-                    ->publishConfigFile()
-                    ->askToStarRepoOnGitHub('arqel/arqel');
-            });
+            ->hasCommands([
+                InstallCommand::class,
+            ]);
     }
 
     public function packageBooted(): void

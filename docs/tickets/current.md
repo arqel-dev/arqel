@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[CORE-003] Comando Artisan `arqel:install`**
+**[CORE-004] Implementar `ResourceRegistry` e contract `HasResource`**
 
 **Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
 **Prioridade:** P0 • **Estimativa:** M
-**Depende de:** CORE-002 ✅
+**Depende de:** CORE-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-003, linha 485).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-004).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,34 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-003 — Comando Artisan `arqel:install` (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/src/Commands/InstallCommand.php` — `final` class estende `Illuminate\Console\Command`. Signature `arqel:install {--force}`. Pipeline: banner → publish config → scaffold dirs → provider stub → layout Blade → `AGENTS.md`. Usa Laravel Prompts (`info`, `note`, `confirm`, `warning`)
+- `packages/core/stubs/` com 4 templates: `provider.stub`, `panel.stub`, `agents.stub`, `layout.stub`
+- `agents.stub` com placeholders `{{app_name}}`, `{{arqel_version}}`, `{{php_version}}`, `{{laravel_version}}` substituídos em runtime; secções obrigatórias "Project overview", "Key conventions", "Commands", "Architecture" (RF-DX-08)
+- Registo via `hasCommands([InstallCommand::class])` no ServiceProvider (substitui o `hasInstallCommand` do Spatie)
+- 7 testes Pest novos em `tests/Feature/InstallCommandTest.php` — sucesso do comando, publish de config, scaffold de directórios, provider stub sem tokens, layout com `@inertia`, secções do AGENTS.md, `--force` sobrescreve
+
+**Validações:**
+
+- `vendor/bin/pest` → 15/15 passed (31 assertions, 0.18s)
+- `vendor/bin/pint --test` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 5 ficheiros
+
+**Decisões autónomas:**
+
+- `laravel/prompts` não foi adicionado a `require` do `arqel/core` — já vem como dep transitiva do `laravel/framework` (12+). Adicionar explicitamente seria redundante e arrisca conflito futuro
+- Substituí o `hasInstallCommand` do Spatie pelo nosso `InstallCommand` registado via `hasCommands` — o Spatie é demasiado limitado para o pipeline RF-DX-08 (Laravel Prompts, AGENTS.md, scaffold de múltiplos directórios). Mantemos o sinal `php artisan arqel:install` para o utilizador
+- Tag de publish `arqel-config` (confirmado por inspecção da Spatie `ProcessConfigs`: `"{$this->package->shortName()}-config"`)
+- `runMigrations()` e `scaffoldFirstResource()` mencionados no exemplo do ticket foram **omitidos**: não há migrations no `arqel/core` (decisão do próprio ticket, nota: "Não usar `loadMigrationsFrom` em CORE") e o comando `arqel:resource` só nasce em CORE-016+. Os "Next steps" do output mencionam ambos para o utilizador correr quando estiver pronto
+- `App\Providers\ArqelServiceProvider` é gerado mas **não** é registado automaticamente em `bootstrap/providers.php` — Laravel 11+ usa array literal e edição programática é frágil. O output instrui o utilizador a fazer manualmente
+
+**Pendente humano:**
+
+- Em app real, validar manualmente o fluxo `php artisan arqel:install` (Testbench cobre a parte automatizada)
 
 ### CORE-002 — `ArqelServiceProvider` com auto-discovery (2026-04-27)
 
@@ -259,7 +287,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 **Fase 1 MVP:** 8/123 tickets (6.5%)
 **Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 2/15 tickets (CORE-001 ✅, CORE-002 ✅)
+**Sprint 1 (CORE):** 3/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅)
 
 ## 🔄 Ao completar o ticket ativo
 

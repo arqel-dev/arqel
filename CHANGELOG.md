@@ -18,6 +18,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Guia de contribuição + PR template + Issue templates (bug/feature/question) (GOV-003)
 - Esqueleto do pacote `arqel/core` com composer.json, PSR-4, README, SKILL, phpunit/pest configs (CORE-001)
 - `Arqel\Core\ArqelServiceProvider` com auto-discovery, registos singleton (`ResourceRegistry`, `PanelRegistry`), facade `Arqel`, `config/arqel.php`, comando `arqel:install` e suite Pest com Orchestra Testbench (CORE-002)
+- Comando `arqel:install` com Laravel Prompts: publica `config/arqel.php`, faz scaffold de `app/Arqel/Resources`, `app/Arqel/Widgets`, `resources/js/Pages/Arqel`, gera `App\Providers\ArqelServiceProvider`, `resources/views/arqel/layout.blade.php` e `AGENTS.md` (RF-DX-08). Stubs em `packages/core/stubs/`. Flag `--force` sobrescreve sem prompt (CORE-003)
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 

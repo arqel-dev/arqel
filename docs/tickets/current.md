@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-002] Classe abstracta `Field` base**
+**[FIELDS-003] `FieldFactory` static fluent API**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** L
-**Depende de:** FIELDS-001 ✅
+**Prioridade:** P0 • **Estimativa:** M
+**Depende de:** FIELDS-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-002 (linha 1388).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-003 (linha 1494).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,35 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-002 — `Field` abstract base (2026-04-27)
+
+**Entregue:**
+
+- `packages/fields/src/Field.php` — `abstract class` com construtor `final` (subclasses não podem override). Subclasse declara apenas `$type` e `$component`
+- Auto-derivation de label: `Str::of($name)->snake()->replace('_', ' ')->title()` — `first_name` → "First Name", `billing_address_line_1` → "Billing Address Line 1"
+- Fluent API completa: `label`, `placeholder`, `helperText`, `default`, `readonly`, `disabled` (bool|Closure), `columnSpan`, `columnSpanFull`, `dehydrated` (bool|Closure), `live`, `liveDebounced(int)`, `afterStateUpdated(Closure)`
+- `live(true)` activa instant updates (debounce=0); `liveDebounced(500)` activa com debounce explícito; `afterStateUpdated()` activa `live` automaticamente
+- Getters tipados: `getType`, `getComponent`, `getName`, `getLabel`, `getPlaceholder`, `getHelperText`, `getDefault`, `isReadonly`, `isDisabled(?Model)`, `getColumnSpan`, `isDehydrated(?Model)`, `isLive`, `getLiveDebounce`, `getAfterStateUpdated`, `getTypeSpecificProps`
+- Closures em `disabled`/`dehydrated` recebem `?Model $record` e são avaliadas via `($closure)($record)` cast para bool
+- `tests/Fixtures/StubField.php` — concrete minimal extends `Field` com type/component dummy + `getTypeSpecificProps()` exemplificativo
+- 12 testes Pest unit em `tests/Unit/FieldTest.php` cobrindo cada método
+
+**Validações:**
+
+- `vendor/bin/pest` (fields) → 14/14 passed (31 assertions, 0.12s)
+- `vendor/bin/pest` (core) → 67/67 passed (sem regressões)
+- `vendor/bin/pint` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 26 ficheiros
+
+**Decisões autónomas:**
+
+- **Concerns (`HasValidation`, `HasVisibility`, `HasDependencies`, `HasAuthorization`) NÃO aplicados** — o ticket FIELDS-002 declara `use HasValidation; use HasVisibility; ...` mas esses traits só nascem em FIELDS-015..018. Aplicar agora exigia stubs vazios que iam ser substituídos. Cleaner: implementar `Field` core hoje, e os tickets FIELDS-015+ adicionam os `use Trait;` quando os traits existirem
+- **`afterStateUpdated()` activa `live` automaticamente** — não havia sentido um callback de state updated num field não-live. Documentação implícita do comportamento
+- **`live(true)` define `liveDebounce = 0` se ainda não estiver definido** — UX consistente: "live" = debounced ou instant, mas sempre definido. `null` reservado para "não está live"
+- **`isDisabled`/`isDehydrated` aceitam `?Model`** — o ticket diz `isDisabled(?Model $record = null)`. `isDehydrated` original não tinha signature mas é simétrico
+- **`final public function __construct`** — subclasses **não** podem override. Forçando o pattern factory que vem em FIELDS-003
+- **Construtor não recebe `$type`/`$component`** — esses ficam declarados como properties default na subclasse (`protected string $type = 'text';`). Mais clean que passar pelo construtor
 
 ### FIELDS-001 — Esqueleto do pacote `arqel/fields` (2026-04-27)
 

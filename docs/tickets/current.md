@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[CORE-009] Comando `arqel:resource` — gerador de Resource**
+**[CORE-010] `FieldSchemaSerializer` — serialização de Fields para JSON**
 
 **Fase:** 1 (MVP) • **Sprint:** 1 (CORE foundational)
-**Prioridade:** P0 • **Estimativa:** L
+**Prioridade:** P0 • **Estimativa:** M
 **Depende de:** CORE-008 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-009, linha 904).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §3 (CORE-010, linha 956).
 
-> **Reordenação do sprint:** CORE-006 (`ResourceController`, XL) e CORE-007 (`HandleArqelInertiaRequests`, M) foram adiados porque dependem na prática de coisas que ainda não existem — `Resource` base (✅ entregue agora em CORE-008), `InertiaDataBuilder` com shape de `06-api-react.md` §3 (depende de Fields/Tables/Forms), Pages React (`arqel::index/create/edit`, REACT-001+) e Policies (CORE-013/14). PLANNING/08 ordena por número, não por dependência real. CORE-006/007 voltam à fila depois de Fields/Tables/Forms estarem prontos. Já documentado em `PLANNING/08-fase-1-mvp.md` (referência futura — não vou tocar no PLANNING).
+> **Reordenação do sprint:** CORE-006/007 adiados (precisam de Fields/Tables/Forms). CORE-010 também depende de `Field` (que vem em FIELDS-*), por isso o próximo passo natural pode ser saltar para FIELDS-001 — a avaliar quando lá chegar.
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -33,6 +33,35 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-009 — Comando `arqel:resource` (2026-04-27)
+
+**Entregue:**
+
+- `packages/core/src/Commands/MakeResourceCommand.php` — `final class` extends `Illuminate\Console\Command`. Signature `arqel:resource {model} {--with-policy} {--force}`. Pipeline: resolve model (FQN ou `App\Models\{Model}`), valida com `class_exists` (erro claro se inexistente), prepara namespace + path a partir de `arqel.resources.namespace`/`arqel.resources.path`, escreve stub com `strtr`, `--with-policy` chama internamente `make:policy --model=<FQN>`
+- `packages/core/stubs/resource.stub` — template com placeholders `{{namespace}}`, `{{class}}`, `{{model}}`, `{{modelClass}}`. Resource gerada extends `Arqel\Core\Resources\Resource`, declara `$model`, e tem `fields(): array { return []; }` com comentários explicativos
+- Registo via `hasCommands` no ServiceProvider (junto com `InstallCommand`)
+- 6 testes Pest em `tests/Feature/MakeResourceCommandTest.php`: gera ficheiro, resolve `App\Models\X`, falha em FQN inexistente, `--with-policy` chama `make:policy`, `--force` sobrescreve, respeita config overrides
+
+**Validações:**
+
+- `vendor/bin/pest` → 59/59 passed (144 assertions, 0.47s)
+- `vendor/bin/pint` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 13 ficheiros
+
+**Decisões autónomas:**
+
+- **`--from-model` adiado** — o ticket pede introspecção que gera `Field::text(...)`, `Field::toggle(...)` etc., mas a classe `Field` não existe (vive em `arqel/fields`, FIELDS-*). Implementar agora seria gerar código que não compila ou hardcoded com `// TODO Field não existe`. Quando FIELDS-001 chegar, adicionar a flag é trivial: ler `getFillable()` + `getCasts()` e mapear para factory methods reais
+- **`--from-migration` adiado** pelo mesmo motivo
+- **`--dry-run` não implementado** — está nas notas como "considerar"; valor real só aparece depois de `--from-*` existirem
+- **`make:policy --model=<FQN>`** em vez de só `make:policy <Name>Policy`: gera o policy com os métodos do CRUD já preenchidos (Laravel reconhece a flag e popula o stub). Critério "Policy contém viewAny, view, create, update, delete" passa naturalmente
+- **Resolução de model**: `User` → `App\\Models\\User`; `\\App\\Models\\User` → `App\\Models\\User`; `App\\Custom\\Foo` → `App\\Custom\\Foo`. Studly cae apenas no caso curto. Se o utilizador passa `user`, vira `User`
+- **`stringArg()` helper** porque PHPStan strict não aceita `(string) $this->argument(...)` sem narrowing — `mixed` cast é proibido na config
+- **Path do stub**: `dirname(__DIR__, 2).'/stubs/resource.stub'` — mesmo padrão do `InstallCommand`, package-relative
+
+**Pendente humano:**
+
+- Validar manualmente em app real que a Resource gerada é descobrível pelo `ResourceRegistry::discover()` (Testbench cobre a parte automatizada de geração)
 
 ### CORE-008 — `Resource` abstract base + contracts (2026-04-27)
 
@@ -384,7 +413,7 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 
 **Fase 1 MVP:** 8/123 tickets (6.5%)
 **Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 6/15 tickets (CORE-001 ✅, CORE-002 ✅, CORE-003 ✅, CORE-004 ✅, CORE-005 ✅, CORE-008 ✅) — CORE-006 e CORE-007 adiados (ver nota acima)
+**Sprint 1 (CORE):** 7/15 tickets (CORE-001..005 ✅, CORE-008 ✅, CORE-009 ✅) — CORE-006 e CORE-007 adiados
 
 ## 🔄 Ao completar o ticket ativo
 

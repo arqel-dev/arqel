@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Core;
 
 use Arqel\Core\Commands\InstallCommand;
+use Arqel\Core\Commands\MakeResourceCommand;
 use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\ResourceRegistry;
 use Spatie\LaravelPackageTools\Package;
@@ -21,6 +22,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
             ->hasConfigFile('arqel')
             ->hasCommands([
                 InstallCommand::class,
+                MakeResourceCommand::class,
             ]);
     }
 

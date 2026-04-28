@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-004] `TextField` e variants de input texto**
+**[FIELDS-005] `NumberField` e `CurrencyField`**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** M
-**Depende de:** FIELDS-003 ✅
+**Prioridade:** P0 • **Estimativa:** S
+**Depende de:** FIELDS-004 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-004 (linha 1581).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-005 (linha 1639).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,33 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-004 — `TextField` e variantes (2026-04-27)
+
+**Entregue:**
+
+- `packages/fields/src/Types/TextField.php` — base extensível (não-`final`) com `maxLength`/`minLength`/`pattern`/`autocomplete`/`mask`, `getTypeSpecificProps()` filtra `null`
+- `TextareaField` (`final`, extends Text): adiciona `rows`/`cols`, `type='textarea'`, `component='TextareaInput'`, herda constraints
+- `EmailField` (`final`, extends Text): `type='email'`, `component='EmailInput'`, `getDefaultRules() = ['email']`
+- `UrlField` (`final`, extends Text): `type='url'`, `component='UrlInput'`, `getDefaultRules() = ['url']`
+- `PasswordField` (`final`, extends Text): `revealable(bool)`, `isRevealable()`, expõe `revealable` em props
+- `SlugField` (`final`, extends Text): `fromField(string)`, `separator(string)` (default `-`)
+- `FieldServiceProvider::packageBooted()` regista os 6 tipos no `FieldFactory`
+- 9 testes Pest unit em `tests/Unit/Types/TextFieldTest.php`
+
+**Validações:**
+
+- `vendor/bin/pest` (fields) → 30/30 passed (67 assertions, 0.11s)
+- `vendor/bin/pest` (core) → 67/67 passed (sem regressões)
+- `vendor/bin/pint` (root) → pass (após `final_class: false` no pint.json)
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 33 ficheiros
+
+**Decisões autónomas:**
+
+- **`TextField` não-`final`** — é classe base intencional para 5 subclasses. Pint default tinha `final_class: true` que forçava `final` quando rodado isoladamente. Solução: desactivar `final_class` em `pint.json` (root), porque temos várias hierarquias intencionais em todo o monorepo (`Resource`, `TextField`, `Field`...). Subclasses concretas continuam `final` manualmente
+- **`getDefaultRules(): array`** — método exposto em `EmailField` e `UrlField` para que `HasValidation` (FIELDS-015) possa absorver as regras quando chegar. Hoje não tem efeito runtime; é shape contract preparado
+- **`PasswordField::revealable` sem filter `null`** — sempre serializado como `bool`, não `null`. Diferente dos outros props porque o React precisa de saber explicitamente `false` para não mostrar o toggle
+- **Sem `Field::text(...)` ergonomic alias ainda** — alias virá quando todos os tipos do FIELDS-004..011 estiverem prontos. Hoje usa-se `FieldFactory::text(...)` que já funciona via `__callStatic`
 
 ### FIELDS-003 — `FieldFactory` (registry + macros + __callStatic) (2026-04-27)
 

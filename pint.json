@@ -4,8 +4,8 @@
         "declare_strict_types": true,
         "strict_comparison": true,
         "strict_param": true,
-        "final_class": true,
-        "final_internal_class": true,
+        "final_class": false,
+        "final_internal_class": false,
         "self_accessor": true,
         "ordered_imports": {
             "sort_algorithm": "alpha",

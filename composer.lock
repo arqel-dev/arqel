@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c0eae2e6f5f36887a8e23ef1513b23a1",
+    "content-hash": "a8e7b03db53ab5f298bb861a431c4a6a",
     "packages": [],
     "packages-dev": [
         {
@@ -146,6 +146,81 @@
                 "arqel",
                 "fields",
                 "forms",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/form",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/form",
+                "reference": "4dd766a1484918f505aec8d041477b7a7410d0ce"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "arqel/fields": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Form\\FormServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Form\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Form\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Form builder for Arqel — sections, fieldsets, grids, tabs over Arqel Fields.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "form",
                 "laravel"
             ],
             "support": {
@@ -6299,6 +6374,7 @@
     "stability-flags": {
         "arqel/core": 20,
         "arqel/fields": 20,
+        "arqel/form": 20,
         "arqel/table": 20
     },
     "prefer-stable": true,

@@ -5,21 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**Sprint 3 (TABLE) — bloqueio operacional**
+**[FORM-002] Classe `Form` builder fluent**
 
-**TABLE-001..005 ✅** entregues (Table builder + Column abstract + 9 tipos + Filter abstract + 6 tipos + TableQueryBuilder).
+**Fase:** 1 (MVP) • **Sprint:** 4 (Forms)
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** FORM-001 ✅
 
-**Adiados** (precisam de dependências em falta):
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FORM-002 (linha 3425).
 
-- **TABLE-006** (integração `ResourceController`) — depende de CORE-006 (adiado).
-- **TABLE-007** (row actions) e **TABLE-008** (bulk actions) — requerem `arqel/actions` que não existe.
-- **TABLE-009..013** restantes podem avançar (toolbar, sticky, exports, SKILL.md, testes consolidados).
-
-**Próximo:** ver `PLANNING/08-fase-1-mvp.md` §TABLE-009+ ou avançar para `arqel/form` (FORM-001+) para destrabar formulários.
-
-> **TABLE-001..004 ✅** entregues. 9 tipos de Column + 6 tipos de Filter + Table builder.
-
-> **FIELDS-015 ✅** (HasValidation aplicada à base) e **FIELDS-016 ✅** (HasVisibility aplicada à base) entregues nos commits anteriores. Detalhes em CHANGELOG.md.
+> **Sprint anterior status**: TABLE-001..005 ✅, FORM-001 ✅, FIELDS-001..019/022 ✅, CORE-001..013 ✅. CORE-006 + TABLE-006/007/008 + FIELDS-020/021 adiados (cadeia de deps em CORE-006).
 
 ## 📋 Sprint 0 — Backlog sequencial
 

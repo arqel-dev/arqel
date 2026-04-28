@@ -5,15 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FORM-003] Layout component `Section`**
+**[FORM-006] Form rendering / Inertia integration** (adiado — depende de CORE-006)
+
+**Próximo executável:** **[FORM-009] Form unit tests** (já parcialmente cobertos por FormTest/LayoutComponentsTest) ou **[FORM-010] SKILL.md do pacote form**.
 
 **Fase:** 1 (MVP) • **Sprint:** 4 (Forms)
-**Prioridade:** P0 • **Estimativa:** M
-**Depende de:** FORM-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FORM-003 (linha 3490).
-
-> **Status:** FORM-001/002 ✅. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados: CORE-006/007/010/014/015 + TABLE-006/007/008 + FIELDS-020/021 (cadeia de deps em CORE-006/`arqel/actions`).
+> **Status:** FORM-001..005 ✅. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados: CORE-006/007/010/014/015 + TABLE-006/007/008 + FIELDS-020/021 + FORM-006/007/008 (cadeia de deps em CORE-006/`arqel/actions`).
 
 ## 📋 Sprint 0 — Backlog sequencial
 

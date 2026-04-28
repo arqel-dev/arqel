@@ -79,7 +79,13 @@ it('serialises fields and layout components with their kind', function (): void 
         ->and($payload['inline'])->toBeTrue()
         ->and($payload['schema'])->toBe([
             ['kind' => 'field', 'name' => 'name', 'type' => 'text'],
-            ['kind' => 'layout', 'type' => 'stub', 'label' => 'Personal', 'count' => 1],
+            [
+                'kind' => 'layout',
+                'type' => 'stub',
+                'component' => 'StubLayout',
+                'columnSpan' => 1,
+                'props' => ['label' => 'Personal', 'count' => 1],
+            ],
         ]);
 });
 

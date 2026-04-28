@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-011] `ColorField`, `HiddenField`, `SlugField`**
+**[FIELDS-012] `ValidationBridge` — Laravel rules → Zod schema**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** S
-**Depende de:** FIELDS-003 ✅
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** FIELDS-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-011 (linha 2001).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-012 (linha 2041).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,26 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-011 — `ColorField` + `HiddenField` + `SlugField` extensions (2026-04-27)
+
+**Entregue:**
+
+- `ColorField` (final): `presets(array)`, `format(hex|rgb|hsl)` com constantes tipadas, `alpha(bool)`. `getDefaultRules() = ['string']`
+- `HiddenField` (final): `type='hidden'`, `component='HiddenInput'`. Sem setters próprios — herda config do Field base
+- `SlugField` extendido: `reservedSlugs(array)` → emite rule `not_in:admin,api` (concat com vírgula); `unique(class-string $modelClass, ?string $column = null)` → emite rule `unique:posts,slug` resolvendo `getTable()` quando disponível, fallback heurístico para `strtolower(basename).'s'`
+- Registados como `color`/`hidden` (slug já registado em FIELDS-004)
+- 7 testes Pest unit em `tests/Unit/Types/ColorHiddenSlugTest.php`
+
+**Validações:** `pest` 90/90 · `pint` ok · `phpstan` 48 ficheiros ok
+
+**Decisões autónomas:**
+
+- **Constantes tipadas (`const string`)** PHP 8.3+ em `ColorField` — alinha com `FileField` (FIELDS-010)
+- **`unique()` resolve table via `getTable()`** quando disponível — type-narrowing com `is_string` para satisfazer PHPStan strict. Fallback heurístico (`strtolower(basename).'s'`) cobre apps sem Eloquent ou stubs em testes
+- **`reservedSlugs` emite `not_in:` rule** + também é serializado em `props` para o React fazer feedback live antes do submit
+- **`unique` rule não inclui ID exclusion ainda** — para edits, `unique:posts,slug,1` precisaria do current record ID que vive no controller (CORE-006). PHPDoc nota que o controller injecta isso depois
+- **`HiddenField` é minimal** — tipo + componente. Validação herdada do Field base. Sem `getTypeSpecificProps()` override
 
 ### FIELDS-010 — `FileField` + `ImageField` (config-only) (2026-04-27)
 

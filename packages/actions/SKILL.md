@@ -6,22 +6,23 @@
 
 `arqel/actions` fornece as primitivas invocáveis do framework: row actions (botão por linha numa Table), bulk actions (sobre selecção), toolbar/header actions (botões globais), com confirmação opcional (modal), formulário inline (Action que abre um Form modal), authorization gates, notificações de sucesso/falha e (Fase 2) execução em queue com progresso.
 
-## Status (ACTIONS-001)
+## Status
 
-Apenas o esqueleto:
+**Entregue (ACTIONS-001..004):**
 
-- `composer.json` com deps em `arqel/core: @dev` + `arqel/fields: @dev` + `arqel/form: @dev`
-- `ActionsServiceProvider` registado via auto-discovery
-- PSR-4 `Arqel\Actions\` → `src/`
-- Smoke tests (provider boot + namespace autoload)
+- `Arqel\Actions\Action` abstract base com fluent API completo (label/icon/color/variant/action/url/visible/disabled/hidden/tooltip/successNotification/failureNotification), execução XOR (callback **ou** url), oracles `isVisibleFor`/`isDisabledFor`/`resolveUrl`, `execute()` invoca callback, `toArray()` serializa com chaves `null` filtradas
+- `Concerns\Confirmable` — modal config com constantes `MODAL_COLOR_*`, setters `modalHeading`/`modalDescription`/`modalIcon`/`modalColor`/`modalConfirmationRequiresText`/`modalSubmit/CancelButtonLabel`. Setters semânticos auto-activam `requiresConfirmation`. Cor inválida cai para `destructive`
+- `Concerns\HasAuthorization` — `authorize(Closure)` + `canBeExecutedBy(?Authenticatable, $record)`; default true sem callback
+- `Types\RowAction`, `Types\ToolbarAction`, `Types\HeaderAction`, `Types\BulkAction` (com `chunkSize` + `deselectRecordsAfterCompletion`; `execute()` faz chunk automático para `Collection`)
+- `Actions` factory: `view`/`edit`/`delete`/`restore`/`create`/`deleteBulk` com defaults razoáveis (delete pre-confirms destructive)
+- 24 testes Pest passando
 
-Ainda **NÃO existem** (chegam em ACTIONS-002+):
+**Por chegar:**
 
-- `Arqel\Actions\Action` abstract base
-- `Types/` concretos: `RowAction`, `BulkAction`, `ToolbarAction`, `HeaderAction`
-- `Concerns/`: `Confirmable`, `HasForm`, `HasAuthorization`, `HasQueuing`
-- `ActionExecutor` orquestrador
-- `Http/Controllers/ActionController`
+- `Concerns\HasForm` (ACTIONS-005) — depende de Form modal serialization
+- `ActionExecutor` + `Http\Controllers\ActionController` (ACTIONS-006) — depende de `CORE-006` (`ResourceController`)
+- Integração com Table (ACTIONS-007)
+- Queue stub para Fase 1 (ACTIONS-009)
 
 ## Conventions
 

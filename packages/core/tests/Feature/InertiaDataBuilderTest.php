@@ -22,9 +22,19 @@ final class FakeFieldedResource extends Resource
         return [
             new class
             {
-                public function toArray(): array
+                public function getName(): string
                 {
-                    return ['name' => 'email', 'type' => 'text', 'extra' => true];
+                    return 'email';
+                }
+
+                public function getType(): string
+                {
+                    return 'text';
+                }
+
+                public function getTypeSpecificProps(): array
+                {
+                    return ['extra' => true];
                 }
             },
             new class
@@ -84,11 +94,17 @@ it('buildShowData mirrors buildEditData', function (): void {
     expect($data)->toHaveKeys(['resource', 'record', 'recordTitle', 'recordSubtitle', 'fields']);
 });
 
-it('serializeFields prefers ->toArray() and falls back to {name,type}', function (): void {
+it('delegates field serialisation to FieldSchemaSerializer', function (): void {
     $data = $this->builder->buildCreateData(new FakeFieldedResource, new Request);
 
-    expect($data['fields'])->toBe([
-        ['name' => 'email', 'type' => 'text', 'extra' => true],
-        ['name' => 'created_at', 'type' => 'datetime'],
-    ]);
+    // The serializer emits the canonical rich shape — we just
+    // verify the contract (name+type+props) for the duck-typed
+    // fields. Snapshot coverage of the full shape lives in
+    // FieldSchemaSerializerTest.
+    expect($data['fields'])->toHaveCount(2)
+        ->and($data['fields'][0])->toHaveKeys(['type', 'name', 'validation', 'visibility', 'props'])
+        ->and($data['fields'][0]['name'])->toBe('email')
+        ->and($data['fields'][0]['type'])->toBe('text')
+        ->and($data['fields'][1]['name'])->toBe('created_at')
+        ->and($data['fields'][1]['type'])->toBe('datetime');
 });

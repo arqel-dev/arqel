@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Arqel\Core\Support;
 
 use Arqel\Core\Resources\Resource;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use ReflectionClass;
 use ReflectionException;
 
@@ -25,6 +27,10 @@ use ReflectionException;
  */
 final class InertiaDataBuilder
 {
+    public function __construct(
+        private readonly FieldSchemaSerializer $serializer = new FieldSchemaSerializer,
+    ) {}
+
     /**
      * @return array<string, mixed>
      */
@@ -65,7 +71,7 @@ final class InertiaDataBuilder
                 'perPage' => $paginator->perPage(),
                 'total' => $paginator->total(),
             ],
-            'fields' => $this->serializeFields($resource->fields()),
+            'fields' => $this->serializer->serialize($resource->fields(), null, $this->currentUser()),
         ];
     }
 
@@ -135,7 +141,7 @@ final class InertiaDataBuilder
         return [
             'resource' => $this->resourceMeta($resource),
             'record' => null,
-            'fields' => $this->serializeFields($resource->fields()),
+            'fields' => $this->serializer->serialize($resource->fields(), null, $this->currentUser()),
         ];
     }
 
@@ -149,7 +155,7 @@ final class InertiaDataBuilder
             'record' => $record->toArray(),
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
-            'fields' => $this->serializeFields($resource->fields()),
+            'fields' => $this->serializer->serialize($resource->fields(), $record, $this->currentUser()),
         ];
     }
 
@@ -163,8 +169,15 @@ final class InertiaDataBuilder
             'record' => $record->toArray(),
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
-            'fields' => $this->serializeFields($resource->fields()),
+            'fields' => $this->serializer->serialize($resource->fields(), $record, $this->currentUser()),
         ];
+    }
+
+    private function currentUser(): ?Authenticatable
+    {
+        $user = Auth::user();
+
+        return $user instanceof Authenticatable ? $user : null;
     }
 
     /**

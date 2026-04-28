@@ -1,0 +1,17 @@
+{
+  "type": "text",
+  "component": "TextInput",
+  "name": "full_name",
+  "label": "Full Name",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "maxLength": 255
+  }
+}

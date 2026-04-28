@@ -1,0 +1,19 @@
+{
+  "type": "toggle",
+  "component": "Toggle",
+  "name": "is_published",
+  "label": "Is Published",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": false,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "inline": false,
+    "onColor": "emerald",
+    "offColor": "zinc"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "hidden",
+  "component": "HiddenInput",
+  "name": "team_id",
+  "label": "Team Id",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": []
+}

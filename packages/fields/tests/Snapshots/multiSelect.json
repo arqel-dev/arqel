@@ -1,0 +1,26 @@
+{
+  "type": "multiSelect",
+  "component": "MultiSelectInput",
+  "name": "tags",
+  "label": "Tags",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "options": {
+      "php": "PHP",
+      "js": "JS"
+    },
+    "searchable": false,
+    "multiple": true,
+    "native": false,
+    "creatable": false,
+    "allowCustomValues": false,
+    "optionsRelation": null
+  }
+}

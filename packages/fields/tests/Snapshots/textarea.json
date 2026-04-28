@@ -1,0 +1,18 @@
+{
+  "type": "textarea",
+  "component": "TextareaInput",
+  "name": "bio",
+  "label": "Bio",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "maxLength": 500,
+    "rows": 6
+  }
+}

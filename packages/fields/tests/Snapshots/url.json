@@ -1,0 +1,15 @@
+{
+  "type": "url",
+  "component": "UrlInput",
+  "name": "homepage",
+  "label": "Homepage",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": []
+}

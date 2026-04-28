@@ -1,0 +1,20 @@
+{
+  "type": "dateTime",
+  "component": "DateTimeInput",
+  "name": "starts_at",
+  "label": "Starts At",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "format": "Y-m-d H:i:s",
+    "displayFormat": "d/m/Y H:i:s",
+    "closeOnSelect": true,
+    "seconds": true
+  }
+}

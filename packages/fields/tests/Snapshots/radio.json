@@ -1,0 +1,26 @@
+{
+  "type": "radio",
+  "component": "RadioInput",
+  "name": "size",
+  "label": "Size",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "options": {
+      "s": "S",
+      "l": "L"
+    },
+    "searchable": false,
+    "multiple": false,
+    "native": false,
+    "creatable": false,
+    "allowCustomValues": false,
+    "optionsRelation": null
+  }
+}

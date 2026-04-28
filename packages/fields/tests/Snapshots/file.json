@@ -1,0 +1,23 @@
+{
+  "type": "file",
+  "component": "FileInput",
+  "name": "document",
+  "label": "Document",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "disk": "s3",
+    "visibility": "private",
+    "maxSize": 5120,
+    "acceptedFileTypes": ["application/pdf"],
+    "multiple": false,
+    "reorderable": false,
+    "strategy": "direct"
+  }
+}

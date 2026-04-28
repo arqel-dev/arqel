@@ -1,0 +1,20 @@
+{
+  "type": "hasMany",
+  "component": "HasManyTable",
+  "name": "posts",
+  "label": "Posts",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "relatedResource": "Arqel\\Fields\\Tests\\Fixtures\\StubResource",
+    "relationship": "posts",
+    "canAdd": false,
+    "canEdit": false
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "image",
+  "component": "ImageInput",
+  "name": "avatar",
+  "label": "Avatar",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "disk": "local",
+    "visibility": "private",
+    "acceptedFileTypes": ["image/jpeg", "image/png", "image/webp"],
+    "multiple": false,
+    "reorderable": false,
+    "strategy": "direct",
+    "imageCropAspectRatio": "1:1",
+    "imageResizeTargetWidth": 512
+  }
+}

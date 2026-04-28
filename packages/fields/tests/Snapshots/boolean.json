@@ -1,0 +1,17 @@
+{
+  "type": "boolean",
+  "component": "Checkbox",
+  "name": "is_active",
+  "label": "Is Active",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": false,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "inline": true
+  }
+}

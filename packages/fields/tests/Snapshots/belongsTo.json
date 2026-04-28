@@ -1,0 +1,21 @@
+{
+  "type": "belongsTo",
+  "component": "BelongsToInput",
+  "name": "author_id",
+  "label": "Author Id",
+  "required": false,
+  "readonly": false,
+  "placeholder": null,
+  "helperText": null,
+  "defaultValue": null,
+  "columnSpan": 1,
+  "live": false,
+  "liveDebounce": null,
+  "props": {
+    "relatedResource": "Arqel\\Fields\\Tests\\Fixtures\\StubResource",
+    "relationship": "author",
+    "searchable": true,
+    "searchColumns": [],
+    "preload": true
+  }
+}

@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-013] Testes do pacote FIELDS (unitários e feature)**
+**[FIELDS-014] SKILL.md do pacote fields**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** L
-**Depende de:** FIELDS-012 ✅
+**Prioridade:** P1 • **Estimativa:** S
+**Depende de:** FIELDS-013 ✅ (parcial)
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-013 (linha 2106).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-014 (linha 2144).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,25 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-013 — Snapshot tests dos 21 field types (parcial) (2026-04-27)
+
+**Entregue:**
+
+- `tests/Unit/FieldSerializationSnapshotTest.php` com dataset `fieldSnapshots` cobrindo todos os 21 tipos de Field
+- 21 snapshots em `tests/Snapshots/{type}.json` documentando o shape JSON canónico (type, component, name, label, required, readonly, placeholder, helperText, defaultValue, columnSpan, live, liveDebounce, props)
+- Helper `assertSnapshot()`: cria ficheiro na primeira run (skip), compara byte-equality nas seguintes
+- Para aceitar mudança intencional de shape, o developer apaga o snapshot e re-run regenera
+
+**Validações:** `pest` 133/133 (21 snapshots + 112 unit) · `pint` ok · `phpstan` 50 ficheiros ok
+
+**Decisões autónomas:**
+
+- **Snapshots manuais (sem `pest-plugin-snapshot`)** — evitar dep extra para 1 caso de uso simples; `file_put_contents`/`file_get_contents` + `json_encode(JSON_PRETTY_PRINT)` chega
+- **Self-bootstrapping**: primeira run cria, segunda valida — workflow standard para snapshot testing
+- **Shape canónico abstracto**: o test não chama `serialize()` (não existe ainda em Field) mas constrói o payload manualmente com os getters públicos. Quando `FieldSchemaSerializer` (CORE-010) ship, refactor o helper para chamar `$serializer->serialize($field)` — 1 linha
+- **Feature tests adiados**: `BelongsToSearchTest`, `FileUploadTest`, `CreateOptionTest` precisam do `ResourceController` (CORE-006) que está adiado. Vou marcar FIELDS-013 como **parcial** — snapshots cumprem 60% do critério; feature tests virão com CORE-006
+- **Coverage ≥90% gate**: nem rodei localmente porque PCOV/Xdebug não estão instalados. CI matrix vai validar quando rodar
 
 ### FIELDS-012 — `ValidationBridge` Laravel → Zod (2026-04-27)
 

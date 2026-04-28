@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[FORM-002] Classe `Form` builder fluent**
+**[FORM-003] Layout component `Section`**
 
 **Fase:** 1 (MVP) • **Sprint:** 4 (Forms)
-**Prioridade:** P0 • **Estimativa:** L
-**Depende de:** FORM-001 ✅
+**Prioridade:** P0 • **Estimativa:** M
+**Depende de:** FORM-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FORM-002 (linha 3425).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FORM-003 (linha 3490).
 
-> **Sprint anterior status**: TABLE-001..005 ✅, FORM-001 ✅, FIELDS-001..019/022 ✅, CORE-001..013 ✅. CORE-006 + TABLE-006/007/008 + FIELDS-020/021 adiados (cadeia de deps em CORE-006).
+> **Status:** FORM-001/002 ✅. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados: CORE-006/007/010/014/015 + TABLE-006/007/008 + FIELDS-020/021 (cadeia de deps em CORE-006/`arqel/actions`).
 
 ## 📋 Sprint 0 — Backlog sequencial
 

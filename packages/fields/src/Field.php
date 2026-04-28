@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Fields;
 
 use Arqel\Fields\Concerns\HasValidation;
+use Arqel\Fields\Concerns\HasVisibility;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -29,6 +30,7 @@ use Illuminate\Support\Str;
 abstract class Field
 {
     use HasValidation;
+    use HasVisibility;
 
     protected string $type;
 

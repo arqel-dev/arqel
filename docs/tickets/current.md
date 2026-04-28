@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-007] `SelectField` com options estáticas e relationship**
+**[FIELDS-008] `BelongsToField` e `HasManyField` (readonly)**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** M
-**Depende de:** FIELDS-003 ✅
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** FIELDS-007 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-007 (linha 1710).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-008 (linha 1799).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,31 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-007 — `SelectField` + `MultiSelectField` + `RadioField` (2026-04-27)
+
+**Entregue:**
+
+- `SelectField` (extensível): 3 modos de options
+  - **Estático**: `options(['draft' => 'Draft'])`
+  - **Closure**: `options(fn () => Category::pluck('name','id')->all())`
+  - **Relationship**: `optionsRelationship('category','name',?$query)` — armazena metadata; resolução adiada para CORE-006 controller
+- Cada chamada de `options*` limpa as outras (não há ambiguidade)
+- Setters: `searchable`, `multiple`, `native` (default true), `creatable`, `createOptionUsing(Closure)` (auto-flips creatable), `allowCustomValues`
+- Getters expostos para o controller: `getOptionsRelation`, `getOptionsRelationDisplay`, `getOptionsRelationQuery`, `getCreateUsing`, `isMultiple`
+- `MultiSelectField` (final): `multiple=true`, `native=false`, `component='MultiSelectInput'`
+- `RadioField` (final): `native=false`, `component='RadioInput'`
+- Registados como `select`/`multiSelect`/`radio`
+- 10 testes Pest unit em `tests/Unit/Types/SelectFieldTest.php`
+
+**Validações:** `pest` 55/55 · `pint` ok · `phpstan` 40 ficheiros ok
+
+**Decisões autónomas:**
+
+- **`optionsRelationship` armazena, não resolve** — resolução requer owner Resource context (`$this->ownerResource::getModel()`) que só existe em runtime do controller. CORE-006 vai injectar context no momento da serialização. Hoje `resolveOptions()` retorna `[]` para relationship — UX gracioso, não crasha
+- **Closure options retorna `[]` quando não-array** — type safety; user passa closure malformada não rebenta o painel
+- **`createOptionUsing` auto-flipa `creatable=true`** — não faz sentido callback de criação sem o flag
+- **3 modos mutuamente exclusivos** — chamar `options()` depois de `optionsRelationship()` limpa relation. Evita ambiguidade silenciosa
 
 ### FIELDS-006 — `BooleanField` + `ToggleField` (2026-04-27)
 

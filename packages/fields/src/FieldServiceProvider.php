@@ -7,8 +7,11 @@ namespace Arqel\Fields;
 use Arqel\Fields\Types\BooleanField;
 use Arqel\Fields\Types\CurrencyField;
 use Arqel\Fields\Types\EmailField;
+use Arqel\Fields\Types\MultiSelectField;
 use Arqel\Fields\Types\NumberField;
 use Arqel\Fields\Types\PasswordField;
+use Arqel\Fields\Types\RadioField;
+use Arqel\Fields\Types\SelectField;
 use Arqel\Fields\Types\SlugField;
 use Arqel\Fields\Types\TextareaField;
 use Arqel\Fields\Types\TextField;
@@ -43,5 +46,8 @@ final class FieldServiceProvider extends PackageServiceProvider
         FieldFactory::register('currency', CurrencyField::class);
         FieldFactory::register('boolean', BooleanField::class);
         FieldFactory::register('toggle', ToggleField::class);
+        FieldFactory::register('select', SelectField::class);
+        FieldFactory::register('multiSelect', MultiSelectField::class);
+        FieldFactory::register('radio', RadioField::class);
     }
 }

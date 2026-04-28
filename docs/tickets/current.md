@@ -5,13 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-017] Trait `HasDependencies` — fields reativas**
+**[FIELDS-019] Eager loading automático baseado em fields**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
 **Prioridade:** P0 • **Estimativa:** M
-**Depende de:** FIELDS-002 ✅
+**Depende de:** FIELDS-002 ✅, FIELDS-008 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-017 (linha 2340).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-019 (linha 2470).
+
+> **FIELDS-015..018 ✅** entregues — todos os 4 concerns aplicados à classe base `Field`. Resta FIELDS-019..022.
 
 > **FIELDS-015 ✅** (HasValidation aplicada à base) e **FIELDS-016 ✅** (HasVisibility aplicada à base) entregues nos commits anteriores. Detalhes em CHANGELOG.md.
 

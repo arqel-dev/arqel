@@ -82,8 +82,8 @@ it('rejects HasMany related Resource classes that do not implement HasResource',
 it('accepts canAdd/canEdit forward-compat flags and overrides relationship', function (): void {
     $field = HasManyField::make('posts', OtherStubResource::class)
         ->relationship('articles')
-        ->canAdd()
-        ->canEdit();
+        ->canAddRecords()
+        ->canEditRecords();
 
     expect($field->getRelationshipName())->toBe('articles')
         ->and($field->getTypeSpecificProps())->toBe([

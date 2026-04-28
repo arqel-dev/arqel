@@ -71,7 +71,7 @@ final class HasManyField extends Field
      * Phase-2 placeholder — accepted today so Resource configs do not
      * break when inline creation ships.
      */
-    public function canAdd(bool $allowed = true): static
+    public function canAddRecords(bool $allowed = true): static
     {
         $this->canAdd = $allowed;
 
@@ -81,7 +81,7 @@ final class HasManyField extends Field
     /**
      * Phase-2 placeholder.
      */
-    public function canEdit(bool $allowed = true): static
+    public function canEditRecords(bool $allowed = true): static
     {
         $this->canEdit = $allowed;
 

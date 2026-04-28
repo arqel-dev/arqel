@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**[FORM-006] Integração Form com ResourceController** ou **[FORM-007] FormRequest auto-generated** (próximos executáveis)
+**[AUTH-004] `<CanAccess>` SSR + middleware helpers** ou **[FIELDS-020/021] search/upload endpoints** (próximos executáveis)
 
 **Fase:** 1 (MVP)
 
-> **Status:** CORE-001..013 + CORE-006/007 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..003 + AUTH-005 parcial ✅. FORM-001..005 + FORM-010 parcial ✅. FIELDS-001..019/022 ✅. Adiados: CORE-010/014/015 + TABLE-007/008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-007/008 + AUTH-004.
+> **Status:** CORE-001..013 + CORE-006/007 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..003 + AUTH-005 parcial ✅. FORM-001..005/007 + FORM-010 parcial ✅. FIELDS-001..019/022 ✅. Adiados: CORE-010/014/015 + TABLE-007/008 + FIELDS-020/021 + FORM-006/008 + ACTIONS-007/008 + AUTH-004.
 
 ## 📋 Sprint 0 — Backlog sequencial
 

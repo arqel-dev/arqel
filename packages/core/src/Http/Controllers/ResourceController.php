@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
@@ -62,7 +64,7 @@ final class ResourceController
 
         $this->authorize('create', $instance::getModel());
 
-        $data = $this->validated($request);
+        $data = $this->validated($request, $instance);
 
         $record = $instance->runCreate($data);
 
@@ -98,7 +100,7 @@ final class ResourceController
 
         $this->authorize('update', $record);
 
-        $data = $this->validated($request);
+        $data = $this->validated($request, $instance);
 
         $instance->runUpdate($record, $data);
 
@@ -169,19 +171,74 @@ final class ResourceController
     }
 
     /**
-     * Light-weight validation pass: drops the route parameters and
-     * the CSRF token, returning the rest of the request body. Full
-     * FormRequest generation arrives in FORM-007.
+     * Run validation against the rules extracted from the
+     * Resource's Field schema (FORM-007). When `arqel/form` is not
+     * installed (extractor class missing) we fall back to a
+     * permissive pass that just strips route + CSRF params.
+     *
+     * Hand-rolled FormRequests still take precedence — when Laravel
+     * type-hint resolution wires one through the route, this method
+     * is bypassed automatically.
      *
      * @return array<string, mixed>
      */
-    private function validated(Request $request): array
+    private function validated(Request $request, Resource $resource): array
     {
+        $rules = $this->extractRules($resource);
+
+        if ($rules !== []) {
+            $validated = $request->validate($rules);
+            $clean = [];
+            foreach ($validated as $key => $value) {
+                $clean[(string) $key] = $value;
+            }
+
+            return $clean;
+        }
+
         $data = $request->except(['_token', '_method', 'resource', 'id']);
 
         $clean = [];
         foreach ($data as $key => $value) {
             $clean[(string) $key] = $value;
+        }
+
+        return $clean;
+    }
+
+    /**
+     * @return array<string, array<int, mixed>>
+     */
+    private function extractRules(Resource $resource): array
+    {
+        $extractorClass = 'Arqel\\Form\\FieldRulesExtractor';
+
+        if (! class_exists($extractorClass)) {
+            return [];
+        }
+
+        try {
+            $reflection = new ReflectionClass($extractorClass);
+            $extractor = $reflection->newInstance();
+        } catch (ReflectionException) {
+            return [];
+        }
+
+        if (! method_exists($extractor, 'extract')) {
+            return [];
+        }
+
+        $rules = $extractor->extract($resource->fields());
+
+        if (! is_array($rules)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach ($rules as $name => $set) {
+            if (is_string($name) && is_array($set)) {
+                $clean[$name] = $set;
+            }
         }
 
         return $clean;

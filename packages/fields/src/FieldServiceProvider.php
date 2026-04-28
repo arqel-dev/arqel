@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Arqel\Fields;
 
+use Arqel\Fields\Types\BelongsToField;
 use Arqel\Fields\Types\BooleanField;
 use Arqel\Fields\Types\CurrencyField;
 use Arqel\Fields\Types\EmailField;
+use Arqel\Fields\Types\HasManyField;
 use Arqel\Fields\Types\MultiSelectField;
 use Arqel\Fields\Types\NumberField;
 use Arqel\Fields\Types\PasswordField;
@@ -49,5 +51,7 @@ final class FieldServiceProvider extends PackageServiceProvider
         FieldFactory::register('select', SelectField::class);
         FieldFactory::register('multiSelect', MultiSelectField::class);
         FieldFactory::register('radio', RadioField::class);
+        FieldFactory::register('belongsTo', BelongsToField::class);
+        FieldFactory::register('hasMany', HasManyField::class);
     }
 }

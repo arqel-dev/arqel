@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-008] `BelongsToField` e `HasManyField` (readonly)**
+**[FIELDS-009] `DateField` e `DateTimeField`**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** L
-**Depende de:** FIELDS-007 ✅
+**Prioridade:** P0 • **Estimativa:** M
+**Depende de:** FIELDS-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-008 (linha 1799).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-009 (linha 1880).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,27 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-008 — `BelongsToField` + `HasManyField` (2026-04-27)
+
+**Entregue:**
+
+- `BelongsToField` (final) configurada via static factory `make($name, $relatedResource)` (porque `Field::__construct` é `final` em FIELDS-002). Valida em runtime que `relatedResource` implementa `HasResource`, deriva `relationshipName` via `Str::beforeLast('_id')`. Setters: `searchable`, `preload`, `searchColumns(array)`, `optionLabel(Closure)`, `relationship(name, ?query)`
+- `HasManyField` (final, readonly em Phase 1): mesma factory pattern, `canAdd()`/`canEdit()` aceites como flags forward-compat para Phase 2 (Repeater)
+- Search/preload routes e endpoint de createOption são metadata armazenada — resolução real adiada para CORE-006 (controller)
+- Fixtures locais `StubResource`/`OtherStubResource` em `fields/tests/Fixtures/` (não pude reusar fixtures de core porque autoload-dev é per-package)
+- Registados como `belongsTo`/`hasMany`
+- 9 testes Pest unit em `tests/Unit/Types/BelongsToFieldTest.php`
+
+**Validações:** `pest` 64/64 · `pint` ok · `phpstan` 42 ficheiros ok
+
+**Decisões autónomas:**
+
+- **Static factory `make()`** em vez de override do constructor — `Field::__construct` é `final` (FIELDS-002 design intent: forçar pattern factory). `make()` cria a instância e chama `setRelatedResource()` que faz a validação. Diferente das outras Fields, BelongsTo/HasMany **precisam** de 2 args (name + relatedResource), por isso `FieldFactory::belongsTo('author_id', UserResource::class)` é a UX final
+- **`is_subclass_of(..., HasResource::class)`** valida em runtime — falha cedo se utilizador passa classe errada
+- **Routes/forms adiados** — `searchRoute`, `preloadedOptions`, `createRoute`, `optionLabel` serializado dependem de owner Resource context + panel routing (CORE-006). PHPDoc no `getTypeSpecificProps` indica isso
+- **`HasManyField::canAdd/canEdit` aceitos hoje** — Phase 1 é readonly, mas aceitar flags forward-compat permite que apps escrevam config "completa" sem refactor quando Phase 2 ship
+- **Fixtures locais em `fields/tests`** — autoload-dev (`Arqel\Core\Tests\`) só vive em `core/composer.json`. Reusar `Arqel\Core\Tests\Fixtures\Resources\UserResource` exigia autoload custom complexo — mais simples criar `StubResource` minimal aqui
 
 ### FIELDS-007 — `SelectField` + `MultiSelectField` + `RadioField` (2026-04-27)
 

@@ -5,13 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-015] Trait `HasValidation` em Concerns**
+**[FIELDS-017] Trait `HasDependencies` — fields reativas**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
 **Prioridade:** P0 • **Estimativa:** M
-**Depende de:** FIELDS-002 ✅, FIELDS-012 ✅
+**Depende de:** FIELDS-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-015 (linha 2172).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-017 (linha 2340).
+
+> **FIELDS-015 ✅** (HasValidation aplicada à base) e **FIELDS-016 ✅** (HasVisibility aplicada à base) entregues nos commits anteriores. Detalhes em CHANGELOG.md.
 
 ## 📋 Sprint 0 — Backlog sequencial
 

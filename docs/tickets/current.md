@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-019] Eager loading automático baseado em fields**
+**[FIELDS-022] Macros e field registry runtime**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** M
-**Depende de:** FIELDS-002 ✅, FIELDS-008 ✅
+**Prioridade:** P1 • **Estimativa:** M
+**Depende de:** FIELDS-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-019 (linha 2470).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-022 (linha 2663).
 
-> **FIELDS-015..018 ✅** entregues — todos os 4 concerns aplicados à classe base `Field`. Resta FIELDS-019..022.
+> **FIELDS-015..019 ✅** entregues. FIELDS-020 (search endpoint) e FIELDS-021 (upload endpoint) **adiados** — ambos exigem `ResourceController` (CORE-006) que está adiado até Tables/Forms/Pages React existirem.
 
 > **FIELDS-015 ✅** (HasValidation aplicada à base) e **FIELDS-016 ✅** (HasVisibility aplicada à base) entregues nos commits anteriores. Detalhes em CHANGELOG.md.
 

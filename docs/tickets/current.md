@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-003] `FieldFactory` static fluent API**
+**[FIELDS-004] `TextField` e variants de input texto**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
 **Prioridade:** P0 • **Estimativa:** M
-**Depende de:** FIELDS-002 ✅
+**Depende de:** FIELDS-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-003 (linha 1494).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-004 (linha 1581).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,30 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-003 — `FieldFactory` (registry + macros + __callStatic) (2026-04-27)
+
+**Entregue:**
+
+- `packages/fields/src/FieldFactory.php` — `final class` com a infraestrutura transversal: `register(string $type, class-string<Field>)` valida com `is_subclass_of` e lança `InvalidArgumentException` para classes que não estendem `Field`; `hasType`; `macro(string $name, Closure)`; `hasMacro`; `flush()` (apenas para testes); `__callStatic` resolve macros antes de tipos registados e lança `BadMethodCallException` para chamadas desconhecidas
+- `tests/Pest.php` ajustado — `TestCase` (Orchestra) só aplicado a `Feature/`, deixando `Unit/` como tests puros (memória mais leve, sem boot do Laravel)
+- 7 testes Pest unit em `tests/Unit/FieldFactoryTest.php`: register+`__callStatic`, validação de subclass, `hasType` retornando false, macros que compõem, prioridade macro vs registry, `BadMethodCallException`, `flush` limpa ambos
+
+**Validações:**
+
+- `vendor/bin/pest` (fields) → 21/21 passed (46 assertions, 0.10s)
+- `vendor/bin/pest` (core) → 67/67 passed (sem regressões)
+- `vendor/bin/pint` (root) → pass
+- `bash scripts/phpstan.sh` (root, level max) → No errors em 27 ficheiros
+
+**Decisões autónomas:**
+
+- **Nome `FieldFactory` (não `Field`)** — o ticket reconhece o conflito de nomes. A abstract `Field` já vive em `Arqel\Fields\Field` (FIELDS-002). Renomear seria churn. O alias público `Field::text(...)` virá com os tipos concretos via `class_alias` ou doc-block facade
+- **Sem factory methods concretos hoje** — `text()`, `email()`, `select()`, etc. nascem em FIELDS-004..011 com cada tipo. Adicionar agora exigia stubs vazios e seria refactor garantido
+- **`flush()` exposto como API pública** — sem alternativa pragmática para tests reusarem static state. Marcado em PHPDoc como tests-only
+- **Macros têm prioridade sobre registry** — útil para apps que querem fazer override de tipos default sem mudar o registry. Documentado em PHPDoc do `__callStatic`
+- **Pest config**: `Unit/` rodando sem `TestCase` (Orchestra) — tests puros são mais rápidos e mais leves em memória. Feature continua a usar Orchestra
+- **Bug encontrado durante TDD**: o teste original do critério "macros prefer registry" usava `FieldFactory::stub($name)` dentro do macro `stub`, criando recursão infinita via `__callStatic`. Corrigido para instanciar `StubField` directamente — o que aliás é o pattern correcto para macros que estendem tipos registados (referenciar a classe, não o factory shortcut)
 
 ### FIELDS-002 — `Field` abstract base (2026-04-27)
 

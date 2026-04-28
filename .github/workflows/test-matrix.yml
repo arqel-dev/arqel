@@ -3,7 +3,7 @@ name: Test Matrix (PHP × Laravel × DB)
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [master, main]
 
 concurrency:
   group: matrix-${{ github.workflow }}-${{ github.ref }}

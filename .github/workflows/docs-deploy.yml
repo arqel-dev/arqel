@@ -6,7 +6,7 @@ name: Docs — Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [master, main]
     paths:
       - "apps/docs/**"
       - "docs-content/**"

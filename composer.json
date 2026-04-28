@@ -16,6 +16,7 @@
         "php": "^8.3"
     },
     "require-dev": {
+        "arqel/actions": "@dev",
         "arqel/core": "@dev",
         "arqel/fields": "@dev",
         "arqel/form": "@dev",

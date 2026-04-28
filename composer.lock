@@ -4,9 +4,85 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a8e7b03db53ab5f298bb861a431c4a6a",
+    "content-hash": "cfbb1055083744681748a33376262907",
     "packages": [],
     "packages-dev": [
+        {
+            "name": "arqel/actions",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/actions",
+                "reference": "d6bb470d82b698f14aaa9137c3906912dbc6d119"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "arqel/fields": "@dev",
+                "arqel/form": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Actions\\ActionsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Actions\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Actions\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Action invocation primitives for Arqel — row, bulk, toolbar, header actions with confirmation, forms, authorization.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "actions",
+                "arqel",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
         {
             "name": "arqel/core",
             "version": "dev-main",
@@ -6372,6 +6448,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "arqel/actions": 20,
         "arqel/core": 20,
         "arqel/fields": 20,
         "arqel/form": 20,

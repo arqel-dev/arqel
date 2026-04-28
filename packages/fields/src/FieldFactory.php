@@ -99,6 +99,25 @@ final class FieldFactory
     }
 
     /**
+     * @return array<string, class-string<Field>>
+     */
+    public static function getRegisteredTypes(): array
+    {
+        return self::$registry;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function getRegisteredMacros(): array
+    {
+        $names = array_keys(self::$macros);
+        sort($names);
+
+        return $names;
+    }
+
+    /**
      * Forget all registered types and macros.
      *
      * Intended for tests; production code should not need to call this.

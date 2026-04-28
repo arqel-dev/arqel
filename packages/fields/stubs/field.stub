@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{namespace}};
+
+use Arqel\Fields\Field;
+
+final class {{class}} extends Field
+{
+    protected string $type = '{{type}}';
+
+    protected string $component = '{{component}}';
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getTypeSpecificProps(): array
+    {
+        return [
+            // Add type-specific props here.
+        ];
+    }
+}

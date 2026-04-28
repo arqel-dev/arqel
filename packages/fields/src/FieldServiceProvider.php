@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Fields;
 
+use Arqel\Fields\Commands\MakeFieldCommand;
 use Arqel\Fields\Types\BelongsToField;
 use Arqel\Fields\Types\BooleanField;
 use Arqel\Fields\Types\ColorField;
@@ -39,7 +40,10 @@ final class FieldServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $package->name('arqel-fields');
+        $package->name('arqel-fields')
+            ->hasCommands([
+                MakeFieldCommand::class,
+            ]);
     }
 
     public function packageBooted(): void

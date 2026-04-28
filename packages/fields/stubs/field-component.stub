@@ -1,0 +1,23 @@
+import type { ChangeEvent } from 'react';
+
+interface {{component}}Props {
+  name: string;
+  value: string | null;
+  onChange: (value: string) => void;
+  // TODO: type-specific props (forwarded by the Arqel form layer).
+}
+
+/**
+ * Renders the {{type}} field. The Arqel form layer forwards
+ * `value`, `onChange`, validation state, and field metadata.
+ */
+export function {{component}}({ name, value, onChange }: {{component}}Props) {
+  return (
+    <input
+      type="text"
+      name={name}
+      value={value ?? ''}
+      onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value)}
+    />
+  );
+}

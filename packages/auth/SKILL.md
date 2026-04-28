@@ -14,18 +14,20 @@ User escreve as Policies (Laravel-native). Arqel apenas verifica existência, au
 
 ## Status
 
-**Entregue (AUTH-001..003):**
+**Entregue (AUTH-001..004):**
 
 - `Arqel\Auth\AuthServiceProvider` — auto-discovery, regista `AbilityRegistry` e `PolicyDiscovery` como singletons
 - `Arqel\Auth\AbilityRegistry` — `registerGlobal/Globals/Computed`, `resolveForUser` com cache per-request, `clear`
 - `Arqel\Auth\PolicyDiscovery` — `autoRegisterPoliciesFor(array $resources)` retorna `{registered, missing}`. Heurística `\Models\` → `\Policies\`. Honra `Resource::$policy` override
 - `Arqel\Auth\ArqelGate` — facade com `register/abilities/allows/denies/snapshot` integrada ao `AbilityRegistry`
-- 13 testes Pest passando
+- `Arqel\Auth\Concerns\AuthorizesRequests` trait com 3 oracles: `authorizeResource(class, action, ?record)`, `authorizeAction(action, ?record)`, `authorizeField(field, operation, ?record)`. Aborta 403 quando o gate denies; silently allow quando não há policy registada
+- `Arqel\Auth\Http\Middleware\EnsureUserCanAccessPanel` — middleware com ability configurável (default `viewAdminPanel`). Aborta 401 para guests, 403 quando o gate denies, allow-through quando a ability não está registada
+- `arqel_can(string, mixed)` global helper: `AbilityRegistry` snapshot first, Gate fallback. Retorna false para guests
+- 28 testes Pest passando
 
 **Por chegar:**
 
-- `<CanAccess>` middleware helpers (AUTH-004) — depende de CORE-007 (Inertia middleware)
-- Integração com `arqel/core` `ArqelServiceProvider::packageBooted` para chamar `PolicyDiscovery::autoRegisterPoliciesFor(ResourceRegistry::all())` automaticamente
+- Integração com `arqel/core` `ArqelServiceProvider::packageBooted` para chamar `PolicyDiscovery::autoRegisterPoliciesFor(ResourceRegistry::all())` automaticamente (AUTH-005 wrap-up)
 
 ## Key Contracts
 

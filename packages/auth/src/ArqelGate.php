@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Gate;
  */
 final class ArqelGate
 {
+    use Concerns\AuthorizesRequests;
+
     public function __construct(
         protected AbilityRegistry $registry,
     ) {}

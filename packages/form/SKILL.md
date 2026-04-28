@@ -8,18 +8,21 @@
 
 ## Status
 
-**Entregue (FORM-001..005):**
+**Entregue (FORM-001..005, 007, 008, 010 parcial):**
 
 - `Arqel\Form\Form` — fluent builder (`schema`/`columns`/`model`/`inline`/`disabled`), `getFields()` flatten recursivo, `toArray()` com `kind: field|layout`
 - `Arqel\Form\Layout\Component` — abstract base partilhada
 - `Section`, `Fieldset`, `Grid`, `Columns`, `Group`, `Tabs`, `Tab`
+- `Arqel\Form\FieldRulesExtractor` — agrega `extract`/`extractMessages`/`extractAttributes` a partir de uma lista de Fields
+- `Arqel\Form\FormRequestGenerator` — gera `Store{Model}Request`/`Update{Model}Request` com stub que delega rules ao `FieldRulesExtractor`
 - `FormServiceProvider` auto-discovery
-- 25 testes Pest a passar
+- Inertia useForm flow consumido transparentemente: `ResourceController::validated()` lança `ValidationException` → Laravel converte em `back()->withErrors()->withInput()` (FORM-008)
+- Precognition stub em routes (`Route::middleware('precognitive')->post`/`put`/`patch`) — Fase 2 expande para field-level real-time
+- 37 testes Pest passando
 
 **Por chegar:**
 
-- `FormRequestGenerator` (FORM-007) — depende de `arqel/fields` ValidationBridge e Field rules (já entregues), mas ainda não foi implementado o gerador
-- Inertia helpers / rendering pipeline (FORM-006, FORM-008) — depende de `CORE-006` (`ResourceController`)
+- Form rendering / Inertia integration (FORM-006) — UI side, depende de `arqel/ui` React
 
 ## Key Contracts
 

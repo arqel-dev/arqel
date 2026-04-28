@@ -17,17 +17,22 @@ use Illuminate\Support\Facades\Route;
 Route::name('arqel.resources.')->group(function (): void {
     Route::get('{resource}', [ResourceController::class, 'index'])->name('index');
     Route::get('{resource}/create', [ResourceController::class, 'create'])->name('create');
-    Route::post('{resource}', [ResourceController::class, 'store'])->name('store');
+
+    // Precognition support (RF-FM-10) — Laravel runs validation only,
+    // returning 204 No Content for `Precognition: true` requests.
+    Route::middleware('precognitive')->post('{resource}', [ResourceController::class, 'store'])
+        ->name('store');
+
     Route::get('{resource}/{id}', [ResourceController::class, 'show'])
         ->name('show')
         ->where('id', '[0-9a-zA-Z\-_]+');
     Route::get('{resource}/{id}/edit', [ResourceController::class, 'edit'])
         ->name('edit')
         ->where('id', '[0-9a-zA-Z\-_]+');
-    Route::put('{resource}/{id}', [ResourceController::class, 'update'])
+    Route::middleware('precognitive')->put('{resource}/{id}', [ResourceController::class, 'update'])
         ->name('update')
         ->where('id', '[0-9a-zA-Z\-_]+');
-    Route::patch('{resource}/{id}', [ResourceController::class, 'update'])
+    Route::middleware('precognitive')->patch('{resource}/{id}', [ResourceController::class, 'update'])
         ->where('id', '[0-9a-zA-Z\-_]+');
     Route::delete('{resource}/{id}', [ResourceController::class, 'destroy'])
         ->name('destroy')

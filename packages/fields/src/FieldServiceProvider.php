@@ -7,6 +7,8 @@ namespace Arqel\Fields;
 use Arqel\Fields\Types\BelongsToField;
 use Arqel\Fields\Types\BooleanField;
 use Arqel\Fields\Types\CurrencyField;
+use Arqel\Fields\Types\DateField;
+use Arqel\Fields\Types\DateTimeField;
 use Arqel\Fields\Types\EmailField;
 use Arqel\Fields\Types\HasManyField;
 use Arqel\Fields\Types\MultiSelectField;
@@ -53,5 +55,7 @@ final class FieldServiceProvider extends PackageServiceProvider
         FieldFactory::register('radio', RadioField::class);
         FieldFactory::register('belongsTo', BelongsToField::class);
         FieldFactory::register('hasMany', HasManyField::class);
+        FieldFactory::register('date', DateField::class);
+        FieldFactory::register('dateTime', DateTimeField::class);
     }
 }

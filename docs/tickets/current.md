@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-009] `DateField` e `DateTimeField`**
+**[FIELDS-010] `FileField` e `ImageField`**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** M
+**Prioridade:** P0 • **Estimativa:** L
 **Depende de:** FIELDS-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-009 (linha 1880).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-010 (linha 1934).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,27 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-009 — `DateField` + `DateTimeField` (2026-04-27)
+
+**Entregue:**
+
+- `DateField` (extensível) com defaults `format='Y-m-d'` / `displayFormat='d/m/Y'` (PT-BR convention)
+- `minDate`/`maxDate` aceitam `string|Closure`; closures resolvidas em `getTypeSpecificProps()` (`resolveBound`); retornos não-string descartados como `null` (não rebenta)
+- Setters: `format`, `displayFormat`, `closeOnDateSelection(bool)`, `timezone(string)`
+- `getDefaultRules() = ['date']`
+- `DateTimeField` (final extends Date): `format='Y-m-d H:i:s'`, `displayFormat='d/m/Y H:i'` por defeito; `seconds(bool)` flipa display para `H:i:s` ou volta a `H:i`
+- Registados como `date`/`dateTime`
+- 9 testes Pest unit em `tests/Unit/Types/DateFieldTest.php`
+
+**Validações:** `pest` 73/73 · `pint` ok · `phpstan` 44 ficheiros ok
+
+**Decisões autónomas:**
+
+- **`resolveBound()` é `protected`** — permite override em DateTimeField se precisarmos timezone-aware. Hoje DateTime herda inalterado
+- **Closures retornam não-string → `null`** — type safety; "now()" sem `->toDateString()` não rebenta o painel
+- **`seconds(bool)` muda displayFormat directamente** — em vez de calcular em getter, manter state explícito. User pode override `displayFormat()` depois de `seconds()` se quiser custom shape
+- **TZ conversion adiada para client/controller** — Carbon na serialização seria over-engineering aqui. Field só armazena o nome do TZ; React + controller fazem conversão real em CORE-006 + REACT-*
 
 ### FIELDS-008 — `BelongsToField` + `HasManyField` (2026-04-27)
 

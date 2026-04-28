@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Arqel\Fields;
 
+use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
+use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Fields\Commands\MakeFieldCommand;
 use Arqel\Fields\Types\BelongsToField;
 use Arqel\Fields\Types\BooleanField;
@@ -26,6 +28,7 @@ use Arqel\Fields\Types\TextareaField;
 use Arqel\Fields\Types\TextField;
 use Arqel\Fields\Types\ToggleField;
 use Arqel\Fields\Types\UrlField;
+use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -69,5 +72,29 @@ final class FieldServiceProvider extends PackageServiceProvider
         FieldFactory::register('image', ImageField::class);
         FieldFactory::register('color', ColorField::class);
         FieldFactory::register('hidden', HiddenField::class);
+
+        $this->registerFieldRoutes();
+    }
+
+    protected function registerFieldRoutes(): void
+    {
+        if (! $this->app->bound(PanelRegistry::class)) {
+            return;
+        }
+
+        $registry = $this->app->make(PanelRegistry::class);
+        $panel = $registry->getCurrent();
+
+        $configPath = config('arqel.path', 'admin');
+        $path = $panel?->getPath() ?? (is_string($configPath) ? $configPath : 'admin');
+        $middleware = $panel?->getMiddleware() ?? ['web', HandleArqelInertiaRequests::class];
+
+        if (! in_array(HandleArqelInertiaRequests::class, $middleware, true)) {
+            $middleware[] = HandleArqelInertiaRequests::class;
+        }
+
+        Route::prefix($path)
+            ->middleware($middleware)
+            ->group(__DIR__.'/../routes/arqel-fields.php');
     }
 }

@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-020] BelongsToField search endpoint** ou **[FIELDS-021] FileField/ImageField upload endpoint** (próximos executáveis)
+**Fase 1 PHP substancialmente completa.** Próximo natural: integração frontend (REACT/HOOKS/UI/FIELDS-JS) ou polish remanescente (CORE-010 FieldSchemaSerializer, FORM-006/008, ACTIONS-007/008, TABLE-007/008).
 
 **Fase:** 1 (MVP)
 
-> **Status:** CORE-001..013 + CORE-006/007 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007 + FORM-010 parcial ✅. FIELDS-001..019/022 ✅. Adiados: CORE-010/014/015 + TABLE-007/008 + FIELDS-020/021 + FORM-006/008 + ACTIONS-007/008.
+> **Status:** CORE-001..013 + CORE-006/007 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007 + FORM-010 parcial ✅. FIELDS-001..022 ✅ (incl. 020/021). Adiados: CORE-010/014/015 + TABLE-007/008 + FORM-006/008 + ACTIONS-007/008.
 
 ## 📋 Sprint 0 — Backlog sequencial
 

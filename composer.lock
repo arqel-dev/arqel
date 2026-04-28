@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cfbb1055083744681748a33376262907",
+    "content-hash": "df5312db90b9965c826fbd109db25501",
     "packages": [],
     "packages-dev": [
         {
@@ -72,6 +72,82 @@
                 "actions",
                 "arqel",
                 "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/auth",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/auth",
+                "reference": "7a8bcdea6256c656ce02a635bc95ceef67fd3bb9"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Auth\\AuthServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Auth\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Auth\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Authorization layer for Arqel — wraps Laravel Policies + Gate with conveniences for Resources and panels.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "auth",
+                "authorization",
+                "laravel",
+                "policies"
             ],
             "support": {
                 "issues": "https://github.com/arqel/arqel/issues",
@@ -6449,6 +6525,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "arqel/actions": 20,
+        "arqel/auth": 20,
         "arqel/core": 20,
         "arqel/fields": 20,
         "arqel/form": 20,

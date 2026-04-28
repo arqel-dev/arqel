@@ -17,6 +17,7 @@
     },
     "require-dev": {
         "arqel/actions": "@dev",
+        "arqel/auth": "@dev",
         "arqel/core": "@dev",
         "arqel/fields": "@dev",
         "arqel/form": "@dev",

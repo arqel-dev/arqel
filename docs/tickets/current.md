@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**[WIDGETS-001] Esqueleto do pacote `arqel/widgets`** (próximo)
+**[NAV-001] Esqueleto do pacote `arqel/nav`** (próximo)
 
-**Fase:** 1 (MVP) • **Sprint:** 6 (Widgets)
+**Fase:** 1 (MVP) • **Sprint:** 7 (Navigation)
 
-> **Status:** ACTIONS-001..005 + ACTIONS-009 ✅. FORM-001..005 ✅ + FORM-010 parcial. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados: CORE-006/007/010/014/015 + TABLE-006/007/008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-006/007/008 (cadeia de deps em CORE-006/Feature tests).
+> **Status:** AUTH-001..003 ✅ + AUTH-005 parcial (SKILL+tests). ACTIONS-001..005/009 ✅. FORM-001..005 ✅ + FORM-010 parcial. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados: CORE-006/007/010/014/015 + TABLE-006..008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-006/007/008 + AUTH-004 (cadeia de deps em CORE-006/CORE-007).
 
 ## 📋 Sprint 0 — Backlog sequencial
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Fields;
 
+use Arqel\Fields\Types\BooleanField;
 use Arqel\Fields\Types\CurrencyField;
 use Arqel\Fields\Types\EmailField;
 use Arqel\Fields\Types\NumberField;
@@ -11,6 +12,7 @@ use Arqel\Fields\Types\PasswordField;
 use Arqel\Fields\Types\SlugField;
 use Arqel\Fields\Types\TextareaField;
 use Arqel\Fields\Types\TextField;
+use Arqel\Fields\Types\ToggleField;
 use Arqel\Fields\Types\UrlField;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -39,5 +41,7 @@ final class FieldServiceProvider extends PackageServiceProvider
         FieldFactory::register('slug', SlugField::class);
         FieldFactory::register('number', NumberField::class);
         FieldFactory::register('currency', CurrencyField::class);
+        FieldFactory::register('boolean', BooleanField::class);
+        FieldFactory::register('toggle', ToggleField::class);
     }
 }

@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-006] `BooleanField` e `ToggleField`**
+**[FIELDS-007] `SelectField` com options estáticas e relationship**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** S
+**Prioridade:** P0 • **Estimativa:** M
 **Depende de:** FIELDS-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-006 (linha 1676).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-007 (linha 1710).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,23 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-006 — `BooleanField` + `ToggleField` (2026-04-27)
+
+**Entregue:**
+
+- `BooleanField` (extensível): `type='boolean'`, `component='Checkbox'`, `default=false`, `inline(bool)`, `getDefaultRules() = ['boolean']`
+- `ToggleField` (`final` extends Boolean): `type='toggle'`, `component='Toggle'`, opcionais `onColor`/`offColor`/`onIcon`/`offIcon` filtrados quando `null`
+- Registados como `boolean`/`toggle`
+- 6 testes Pest unit em `tests/Unit/Types/BooleanFieldTest.php`
+
+**Validações:** `pest` 45/45 · `pint` ok · `phpstan` 37 ficheiros ok
+
+**Decisões:**
+
+- `BooleanField` é extensível (não-final) para `ToggleField` poder estendê-la
+- Toggle herda `inline` do Boolean — sempre aparece nos props
+- Visuais (`onColor`/`offColor`/...) filtrados via `array_filter` para payload limpo
 
 ### FIELDS-005 — `NumberField` + `CurrencyField` (2026-04-27)
 

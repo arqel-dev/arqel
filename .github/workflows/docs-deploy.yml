@@ -25,6 +25,6 @@ jobs:
     name: Docs deploy (placeholder)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Acknowledge trigger
         run: echo "Docs deploy workflow is a placeholder — real deployment wired up in a future DOCS ticket."

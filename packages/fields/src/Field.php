@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Fields;
 
+use Arqel\Fields\Concerns\HasDependencies;
 use Arqel\Fields\Concerns\HasValidation;
 use Arqel\Fields\Concerns\HasVisibility;
 use Closure;
@@ -29,6 +30,7 @@ use Illuminate\Support\Str;
  */
 abstract class Field
 {
+    use HasDependencies;
     use HasValidation;
     use HasVisibility;
 

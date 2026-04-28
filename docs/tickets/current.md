@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[TABLE-004] `Filter` classes — Select, DateRange, Text, Ternary**
+**[TABLE-005] `TableQueryBuilder`**
 
 **Fase:** 1 (MVP) • **Sprint:** 3 (Tables)
-**Prioridade:** P0 • **Estimativa:** M
-**Depende de:** TABLE-002 ✅
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** TABLE-004 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §TABLE-004 (linha 2930).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §TABLE-005 (linha 3015).
 
-> **TABLE-001..003 ✅** entregues. 9 tipos de Column + Table builder.
+> **TABLE-001..004 ✅** entregues. 9 tipos de Column + 6 tipos de Filter + Table builder.
 
 > **FIELDS-015 ✅** (HasValidation aplicada à base) e **FIELDS-016 ✅** (HasVisibility aplicada à base) entregues nos commits anteriores. Detalhes em CHANGELOG.md.
 

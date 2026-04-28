@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-022] Macros e field registry runtime**
+**[TABLE-002] Classe `Table` builder fluent**
 
-**Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P1 • **Estimativa:** M
-**Depende de:** FIELDS-003 ✅
+**Fase:** 1 (MVP) • **Sprint:** 3 (Tables)
+**Prioridade:** P0 • **Estimativa:** L
+**Depende de:** TABLE-001 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-022 (linha 2663).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §TABLE-002 (linha 2734).
 
-> **FIELDS-015..019 ✅** entregues. FIELDS-020 (search endpoint) e FIELDS-021 (upload endpoint) **adiados** — ambos exigem `ResourceController` (CORE-006) que está adiado até Tables/Forms/Pages React existirem.
+> **Sprint 2 (FIELDS) fechado** com 18/22 tickets. **TABLE-001 ✅** scaffold do pacote. FIELDS-020/021 ainda adiados (precisam de CORE-006).
 
 > **FIELDS-015 ✅** (HasValidation aplicada à base) e **FIELDS-016 ✅** (HasVisibility aplicada à base) entregues nos commits anteriores. Detalhes em CHANGELOG.md.
 

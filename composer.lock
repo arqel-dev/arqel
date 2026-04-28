@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5c9903a145d2873c05a23e168d5bbb48",
+    "content-hash": "c0eae2e6f5f36887a8e23ef1513b23a1",
     "packages": [],
     "packages-dev": [
         {
@@ -89,7 +89,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/fields",
-                "reference": "23b4424f7bb7124849cb1d1f46c15b4f2330a370"
+                "reference": "111659148c3bc772dd71df6e40ec449f9b9f5b9b"
             },
             "require": {
                 "arqel/core": "@dev",
@@ -147,6 +147,81 @@
                 "fields",
                 "forms",
                 "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/table",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/table",
+                "reference": "a64f9d63b5fdf1bf53fb8a7c8e8050a909be632e"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Table\\TableServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Table\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Table\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Table builder for Arqel — sort, filter, search, paginate against Eloquent.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "datatable",
+                "laravel",
+                "table"
             ],
             "support": {
                 "issues": "https://github.com/arqel/arqel/issues",
@@ -6223,7 +6298,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "arqel/core": 20,
-        "arqel/fields": 20
+        "arqel/fields": 20,
+        "arqel/table": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

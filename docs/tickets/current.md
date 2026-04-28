@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP completa + frontend types base.** Próximo natural: REACT-001 (`@arqel/react` core) ou HOOKS-001.
+**Fase 1 backend PHP + types/react base.** Próximo natural: HOOKS-001 (`@arqel/hooks`) ou UI-001 (`@arqel/ui`).
 
 **Fase:** 1 (MVP)
 
-> **Status:** **PHP:** CORE-001..013 + CORE-006/007/010 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007/008 + FORM-010 parcial ✅. FIELDS-001..022 ✅. **JS:** TYPES-001/002 + TYPES-004 parcial ✅. Adiados: CORE-014/015 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 + TYPES-003 (spatie integration).
+> **Status:** **PHP:** CORE-001..013 + CORE-006/007/010 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007/008 + FORM-010 parcial ✅. FIELDS-001..022 ✅. **JS:** TYPES-001/002 + TYPES-004 parcial ✅. REACT-001..004 ✅. Adiados: CORE-014/015 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 + TYPES-003 (spatie integration).
 
 ## 📋 Sprint 0 — Backlog sequencial
 

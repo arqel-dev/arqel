@@ -1,0 +1,84 @@
+{
+  "name": "@arqel/react",
+  "version": "0.0.0",
+  "description": "React + Inertia bindings, providers, and utilities for Arqel.",
+  "license": "MIT",
+  "homepage": "https://arqel.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arqel/arqel.git",
+    "directory": "packages-js/react"
+  },
+  "keywords": [
+    "arqel",
+    "laravel",
+    "inertia",
+    "react"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./inertia": {
+      "types": "./dist/inertia.d.ts",
+      "import": "./dist/inertia.js"
+    },
+    "./providers": {
+      "types": "./dist/providers.d.ts",
+      "import": "./dist/providers.js"
+    },
+    "./context": {
+      "types": "./dist/context.d.ts",
+      "import": "./dist/context.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check --diagnostic-level=error src tests",
+    "format": "biome format --write src tests",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@arqel/types": "workspace:*"
+  },
+  "peerDependencies": {
+    "@inertiajs/react": "^2.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@inertiajs/react": "^2.0.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "expect-type": "^1.2.2",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

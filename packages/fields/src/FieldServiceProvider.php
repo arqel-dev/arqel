@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Arqel\Fields;
 
+use Arqel\Fields\Types\CurrencyField;
 use Arqel\Fields\Types\EmailField;
+use Arqel\Fields\Types\NumberField;
 use Arqel\Fields\Types\PasswordField;
 use Arqel\Fields\Types\SlugField;
 use Arqel\Fields\Types\TextareaField;
@@ -35,5 +37,7 @@ final class FieldServiceProvider extends PackageServiceProvider
         FieldFactory::register('url', UrlField::class);
         FieldFactory::register('password', PasswordField::class);
         FieldFactory::register('slug', SlugField::class);
+        FieldFactory::register('number', NumberField::class);
+        FieldFactory::register('currency', CurrencyField::class);
     }
 }

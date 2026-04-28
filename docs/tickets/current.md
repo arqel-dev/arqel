@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-005] `NumberField` e `CurrencyField`**
+**[FIELDS-006] `BooleanField` e `ToggleField`**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
 **Prioridade:** P0 • **Estimativa:** S
-**Depende de:** FIELDS-004 ✅
+**Depende de:** FIELDS-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-005 (linha 1639).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-006 (linha 1676).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,28 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-005 — `NumberField` + `CurrencyField` (2026-04-27)
+
+**Entregue:**
+
+- `NumberField` (extensível): `min`/`max`/`step` (int|float), `integer(bool)`, `decimals(int)`. `getDefaultRules()` emite `numeric` (ou `integer` quando `integer()` é chamado) + `min:X`/`max:Y` conforme configurado
+- `CurrencyField` (`final` extends Number): `prefix(string)` default `$`, `suffix(string)` (omit if vazio), `thousandsSeparator` default `,`, `decimalSeparator` default `.`, `decimals` default `2` via property override
+- Registados em `FieldServiceProvider` como `number`/`currency`
+- 9 testes Pest unit em `tests/Unit/Types/NumberFieldTest.php`
+
+**Validações:**
+
+- `vendor/bin/pest` (fields) → 39/39 passed (81 assertions)
+- `vendor/bin/pint` → pass
+- `bash scripts/phpstan.sh` → No errors em 35 ficheiros
+
+**Decisões autónomas:**
+
+- **`CurrencyField::__construct` removido** — `Field::__construct` é `final` (FIELDS-002 design intent: forçar pattern factory). Solução: `protected ?int $decimals = 2;` como property override directa em vez de constructor body
+- **`integer` flag em `getTypeSpecificProps()` só aparece quando `true`** — usar `$this->integer ?: null` para o filter limpar `false` (UX consistente: ausência = default `false`)
+- **`suffix` filtrado quando vazio** — diferente do `prefix` que sempre tem valor. Empty string seria ruido no payload
+- **PT-BR via fluent chain explicit** — `prefix('R$')->thousandsSeparator('.')->decimalSeparator(',')` em vez de criar `Field::priceBRL()` macro. Macros ficam para apps consumidoras. O nota do ticket sobre macro fica como sugestão futura
 
 ### FIELDS-004 — `TextField` e variantes (2026-04-27)
 

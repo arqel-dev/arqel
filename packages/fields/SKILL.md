@@ -4,85 +4,179 @@
 
 ## Purpose
 
-`arqel/fields` é o pacote que define a abstracção declarativa de campos do ecossistema Arqel. Um `Field` descreve **um e apenas um** atributo do model — como deve aparecer num formulário, numa tabela, numa página de detalhe — e leva consigo:
+`arqel/fields` define a abstracção declarativa de campos. Um `Field` descreve **um e apenas um** atributo do model — como aparece num formulário, numa tabela, numa página de detalhe — e leva consigo:
 
 - **Tipo + componente React** (`type` → `component` mapping)
-- **Label, placeholder, helper text** (i18n-ready)
-- **Validação Laravel server-side** + schema **Zod** inferido para o cliente
-- **Autorização per-field** (`canSee`, `canEdit`)
-- **Visibilidade contextual** (`visibleOnIndex`, `visibleOnDetail`, etc.)
-- **Dependências reactivas** entre fields (`dependsOn`, `live`, `liveDebounce`)
-- **Default values** e `cast` Eloquent conscientes
+- **Label, placeholder, helper text** (i18n-ready via `getLabel()` server-side)
+- **Validação Laravel server-side** + schema **Zod** inferido client-side via `ValidationBridge`
+- **Visibilidade contextual** e dependências reactivas (FIELDS-016/017, em construção)
+- **Default values** e flags de `dehydrated`/`live`
 
-## Status (FIELDS-001)
+## Status (2026-04)
 
-Apenas o esqueleto:
+**Entregue:**
 
-- `composer.json` com dep em `arqel/core: @dev`
-- Auto-discovery do `FieldServiceProvider` via `extra.laravel.providers`
-- PSR-4 `Arqel\Fields\` → `src/`
-- Pest + Orchestra Testbench configurados
-- Smoke test verifica que o ServiceProvider boota
+- `Arqel\Fields\Field` abstract base com construtor `final` e fluent API completa (FIELDS-002)
+- `Arqel\Fields\FieldFactory` registry + macros + `__callStatic` (FIELDS-003)
+- 21 tipos concretos em `src/Types/` (ver tabela abaixo)
+- `Arqel\Fields\ValidationBridge` Laravel rules → Zod schema string (FIELDS-012)
+- 21 snapshot tests do shape JSON canónico em `tests/Snapshots/` (FIELDS-013)
 
-Ainda **NÃO existem**:
+**Ainda por chegar:**
 
-- `Arqel\Fields\Field` abstract (FIELDS-002)
-- `Arqel\Fields\FieldFactory` (FIELDS-003)
-- Tipos concretos: `TextField`, `NumberField`, `BooleanField`, `SelectField`, `DateField`, `FileField`, etc. (FIELDS-004..011)
-- `ValidationBridge` (FIELDS-012)
-- Concerns (`HasValidation`, `HasVisibility`, `HasDependencies`, `HasAuthorization`) (FIELDS-015..018)
+- `Arqel\Fields\Concerns\HasValidation`/`HasVisibility`/`HasDependencies`/`HasAuthorization` (FIELDS-015..018)
+- Eager loading automático (FIELDS-019)
+- Endpoints search/upload/createOption (FIELDS-020/021, dependem de CORE-006)
+- Macros + field registry runtime polish (FIELDS-022)
 
-## Key Contracts (futuros)
+## Field types
 
-A API que apps consumidoras vão escrever:
+Todos registados no `FieldServiceProvider::packageBooted()` para que `FieldFactory::{type}(...)` funcione via `__callStatic`.
+
+| Type | Class | Component | Notes |
+|---|---|---|---|
+| `text` | `TextField` | `TextInput` | Base extensível: `maxLength`/`minLength`/`pattern`/`autocomplete`/`mask` |
+| `textarea` | `TextareaField` | `TextareaInput` | Herda Text + `rows`/`cols` |
+| `email` | `EmailField` | `EmailInput` | Default rule `email` |
+| `url` | `UrlField` | `UrlInput` | Default rule `url` |
+| `password` | `PasswordField` | `PasswordInput` | `revealable()` toggle |
+| `slug` | `SlugField` | `SlugInput` | `fromField`/`separator`/`reservedSlugs`/`unique` |
+| `number` | `NumberField` | `NumberInput` | `min`/`max`/`step`/`integer`/`decimals` |
+| `currency` | `CurrencyField` | `CurrencyInput` | `prefix`/`suffix`/`thousandsSeparator`/`decimalSeparator` |
+| `boolean` | `BooleanField` | `Checkbox` | `inline()` para layout horizontal |
+| `toggle` | `ToggleField` | `Toggle` | `onColor`/`offColor`/`onIcon`/`offIcon` |
+| `select` | `SelectField` | `SelectInput` | Static array, Closure, ou `optionsRelationship` |
+| `multiSelect` | `MultiSelectField` | `MultiSelectInput` | `multiple=true`, `native=false` defaults |
+| `radio` | `RadioField` | `RadioInput` | `native=false` default |
+| `belongsTo` | `BelongsToField` | `BelongsToInput` | Factory `make($name, $resource)`. `searchable`/`preload`/`searchColumns` |
+| `hasMany` | `HasManyField` | `HasManyTable` | Readonly Phase 1; `canAdd`/`canEdit` forward-compat |
+| `date` | `DateField` | `DateInput` | `minDate`/`maxDate` (`string|Closure`), `format`/`displayFormat`/`timezone` |
+| `dateTime` | `DateTimeField` | `DateTimeInput` | Herda Date + `seconds(bool)` |
+| `file` | `FileField` | `FileInput` | `disk`/`directory`/`visibility`/`maxSize`/`acceptedFileTypes`/`multiple`/`reorderable`/`using(strategy)` |
+| `image` | `ImageField` | `ImageInput` | Herda File + mime gate default + `imageCropAspectRatio`/`imageResizeTargetWidth` |
+| `color` | `ColorField` | `ColorInput` | `presets`/`format(hex|rgb|hsl)`/`alpha` |
+| `hidden` | `HiddenField` | `HiddenInput` | Para passing IDs sem UI |
+
+## Examples
+
+### Resource típico
 
 ```php
-use Arqel\Fields\Field;
+namespace App\Arqel\Resources;
 
-public function fields(): array
+use Arqel\Core\Resources\Resource;
+use Arqel\Fields\FieldFactory as Field;
+use Arqel\Fields\Types\BelongsToField;
+use Arqel\Fields\Types\HasManyField;
+
+final class UserResource extends Resource
 {
-    return [
-        Field::text('name')->required()->maxLength(255),
-        Field::email('email')->required()->unique('users', 'email'),
-        Field::select('role')->options(['admin' => 'Admin', 'user' => 'User']),
-        Field::belongsTo('team', TeamResource::class),
-        Field::date('birth_date')->maxDate('today'),
-        Field::toggle('is_active')->default(true),
-    ];
+    public static string $model = \App\Models\User::class;
+
+    public function fields(): array
+    {
+        return [
+            Field::text('name')->maxLength(255),
+            Field::email('email'),
+            Field::password('password')->revealable(),
+            Field::date('birthday')->maxDate('today'),
+            Field::toggle('is_active')->default(true),
+            BelongsToField::make('team_id', TeamResource::class)
+                ->searchable()
+                ->preload(),
+            HasManyField::make('posts', PostResource::class),
+        ];
+    }
 }
+```
+
+### Currency PT-BR
+
+```php
+Field::currency('price')
+    ->prefix('R$')
+    ->thousandsSeparator('.')
+    ->decimalSeparator(',')
+    ->decimals(2);
+```
+
+### Custom select com closure
+
+```php
+Field::select('category_id')
+    ->options(fn () => \App\Models\Category::pluck('name', 'id')->all())
+    ->searchable();
+```
+
+## Creating custom fields
+
+1. Criar `src/Types/MyField.php` extendendo `Arqel\Fields\Field` (NÃO override do `__construct` — é `final` por design)
+2. Declarar `protected string $type = 'myType'; protected string $component = 'MyInput';`
+3. Adicionar setters fluent que retornam `static`
+4. Override `getTypeSpecificProps(): array` se houver props específicas
+5. Override `getDefaultRules(): array` se houver regras Laravel implícitas
+6. Registar via `FieldFactory::register('myType', MyField::class)` no ServiceProvider da app
+7. Snapshot test em `tests/Snapshots/myType.json` para garantir shape
+
+## Macros
+
+```php
+// Em ServiceProvider::boot()
+FieldFactory::macro('priceBRL', fn (string $name) =>
+    \Arqel\Fields\Types\CurrencyField::class
+        ::make($name)
+        ->prefix('R$')
+        ->thousandsSeparator('.')
+        ->decimalSeparator(',')
+);
+
+// Uso
+Field::priceBRL('price'); // Returns CurrencyField pré-configurado
+```
+
+## ValidationBridge
+
+```php
+use Arqel\Fields\ValidationBridge;
+
+ValidationBridge::translate(['required', 'email', 'max:255']);
+// → 'z.string().min(1).email().max(255)'
+
+ValidationBridge::translate(['in:draft,published,archived']);
+// → 'z.enum(["draft", "published", "archived"])'
+
+ValidationBridge::register('shouty', function (?string $arg, \Arqel\Fields\Translation $t): void {
+    $t->ensureType('z.string()');
+    $t->addChain('.transform((v) => v.toUpperCase())');
+});
 ```
 
 ## Conventions
 
 - `declare(strict_types=1)` obrigatório
-- Classes `final` por default; extensão via composição (`Concerns`) preferida sobre herança
-- Cada tipo concreto vive em `src/Types/{TipoField}.php`; trait partilhado em `src/Concerns/`
-- **Sem dependência inversa para `arqel/core`**: core não pode depender de fields. Fields depende de core (precisa de `Arqel\Core\Contracts\HasFields` e da classe base `Resource`).
-
-## Common tasks
-
-### Adicionar um tipo novo de Field
-
-1. Criar `src/Types/FooField.php` extendendo `Arqel\Fields\Field` (FIELDS-002)
-2. Adicionar factory method em `Arqel\Fields\FieldFactory` (FIELDS-003)
-3. Documentar `getType()` único + componente React equivalente em `06-api-react.md`
-4. Testes em `tests/Unit/Types/FooFieldTest.php` cobrindo: serialização, validação, visibility/auth se aplicáveis
-5. Snapshot test do JSON serializado
+- Subclasses concretas são `final` por convenção; bases (Text, Number, Date, File, Boolean, Select) são extensíveis intencionalmente
+- Closures em props (`disabled`, `dehydrated`, `minDate`, `maxDate`) são avaliadas em `getTypeSpecificProps()` — non-string returns (em `minDate`/`maxDate`) são descartados graciosamente
+- **Sem dependência inversa para `arqel/core`**: core não depende de fields. Fields depende de core (precisa de `HasResource` para BelongsTo/HasMany)
+- Snapshot tests obrigatórios para cada tipo novo
 
 ## Anti-patterns
 
-- ❌ **Field com lógica de query** — eager loading vive no `ResourceController`/`indexQuery`, não no Field
-- ❌ **Field com state mutável runtime** — Fields são definição imutável; runtime state vive no record/request
-- ❌ **String types** — `'text'`, `'number'` em vez de classes. Usa sempre as factories
+- ❌ **Override de `Field::__construct`** — é `final` por design. Use static factory `make()` ou setters
+- ❌ **Mutar field state directamente** — usar setters fluent que retornam `static`
+- ❌ **Skip de validação client-side** — `ValidationBridge` é o espelho server→client, não corte sem motivo (UX inferior)
+- ❌ **`FieldFactory::register()` em código não-ServiceProvider** — o registry é shared state global; registo deve ser idempotente e early-boot
+- ❌ **Stringly-typed types** — sempre `Field::text(...)` ou subclasse, nunca `'text'` em arrays
 - ❌ **Acoplamento ao `ResourceRegistry`** — Fields conhecem-se a si próprios e ao record que recebem; o registry é responsabilidade do core
 
 ## Related
 
 - Source: [`packages/fields/src/`](./src/)
 - Testes: [`packages/fields/tests/`](./tests/)
-- Documentação: https://arqel.dev/docs/fields (em construção)
+- Snapshots: [`packages/fields/tests/Snapshots/`](./tests/Snapshots/)
 - APIs detalhadas: [`PLANNING/05-api-php.md`](../../PLANNING/05-api-php.md) §3
 - Schema TS equivalente: [`PLANNING/06-api-react.md`](../../PLANNING/06-api-react.md) §4
+- Tickets: [`PLANNING/08-fase-1-mvp.md`](../../PLANNING/08-fase-1-mvp.md) §FIELDS-001..014
 - ADRs:
-  - [ADR-001](../../PLANNING/03-adrs.md) — Inertia como única bridge (Fields serializam para o cliente)
+  - [ADR-001](../../PLANNING/03-adrs.md) — Inertia como única bridge
   - [ADR-008](../../PLANNING/03-adrs.md) — Pest 3 obrigatório
+  - [ADR-014](../../PLANNING/03-adrs.md) — Field design (Filament-like fluent API)

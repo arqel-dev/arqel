@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-014] SKILL.md do pacote fields**
+**[FIELDS-015] Trait `HasValidation` em Concerns**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P1 • **Estimativa:** S
-**Depende de:** FIELDS-013 ✅ (parcial)
+**Prioridade:** P0 • **Estimativa:** M
+**Depende de:** FIELDS-002 ✅, FIELDS-012 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-014 (linha 2144).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-015 (linha 2172).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,22 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-014 — SKILL.md do pacote fields (2026-04-27)
+
+**Entregue:**
+
+- `packages/fields/SKILL.md` reescrito de raiz para reflectir o estado real (todos os 21 tipos entregues, ValidationBridge, snapshots)
+- Secções: Purpose, Status (entregue + por chegar), tabela completa dos 21 tipos com classe/component/notes, 3 exemplos copy-pasteáveis (Resource típico com Field/BelongsTo/HasMany, Currency PT-BR, Custom select com Closure), guia "Creating custom fields" passo-a-passo, Macros com exemplo `priceBRL`, secção ValidationBridge com 3 exemplos (translate/enum/register), Conventions, 6 Anti-patterns
+- Links para PLANNING tickets, ADRs, snapshots, source
+
+**Validações:** apenas docs — sem `pest`/`pint`/`phpstan` necessários
+
+**Decisões:**
+
+- **Sem rodar pipeline** — SKILL.md é markdown puro, não há código PHP que requer validação. Pre-commit hook ignora .md
+- **`FieldFactory as Field` alias** sugerido nos exemplos — UX final será `Field::text(...)` quando publicarmos um helper público (futuro). Hoje, alias local na ficheiro do utilizador chega
+- **Macro `priceBRL`** documentada como exemplo — não está implementada no package porque é convenção de app, não core
 
 ### FIELDS-013 — Snapshot tests dos 21 field types (parcial) (2026-04-27)
 

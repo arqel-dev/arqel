@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-010] `FileField` e `ImageField`**
+**[FIELDS-011] `ColorField`, `HiddenField`, `SlugField`**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
-**Prioridade:** P0 • **Estimativa:** L
+**Prioridade:** P0 • **Estimativa:** S
 **Depende de:** FIELDS-003 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-010 (linha 1934).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-011 (linha 2001).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,28 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-010 — `FileField` + `ImageField` (config-only) (2026-04-27)
+
+**Entregue:**
+
+- `FileField` (extensível) com setters: `disk`, `directory`, `visibility`, `maxSize(kilobytes)`, `acceptedFileTypes(mimes)`, `multiple`, `reorderable` (auto-multiple), `using(strategy)`
+- Constantes tipadas: `STRATEGY_DIRECT`, `STRATEGY_SPATIE_MEDIA_LIBRARY`, `STRATEGY_PRESIGNED`, `VISIBILITY_PRIVATE`, `VISIBILITY_PUBLIC`
+- `getDefaultRules()` emite `file|array` + `max:` + `mimetypes:` (apenas em single-file mode; multiple é `array` minimal)
+- `ImageField` (final extends File): default mime gate `['image/jpeg','image/png','image/webp']`, `imageCropAspectRatio(string)`, `imageResizeTargetWidth(int)`. `getDefaultRules()` retorna `['image']` (single) ou `['array']` (multiple)
+- Registados como `file`/`image`
+- 10 testes Pest unit em `tests/Unit/Types/FileFieldTest.php`
+
+**Validações:** `pest` 83/83 · `pint` ok · `phpstan` 46 ficheiros ok
+
+**Decisões autónomas:**
+
+- **`handleUpload(UploadedFile)` / `handleDelete(string)` adiados** — exigem request context + Storage façade que vivem no controller (CORE-006). Field só carrega config; React faz POST no endpoint que CORE-006 vai gerar
+- **`reorderable()` auto-flips `multiple=true`** — não há sentido reordenar single. UX consistente
+- **Constantes tipadas (`const string`)** PHP 8.3+ — type safety + IDE autocomplete em vez de string mágica
+- **`maxSize` em kilobytes** — convenção Laravel (`max:` rule). Documento no PHPDoc da signature
+- **Mime gate em rules só para single-file** — `mimetypes:` rule do Laravel não funciona em arrays sem refactor; multiple usa `each.mimetypes` que precisaria nested rules. Pragmaticamente, multiple usa `array` minimal e individual upload valida no endpoint (CORE-006)
+- **`spatie-media-library` strategy** assume pacote opt-in (`spatie/laravel-medialibrary`); não adicionado a `require` — utilizadores que usem essa strategy declaram a dep eles próprios
 
 ### FIELDS-009 — `DateField` + `DateTimeField` (2026-04-27)
 

@@ -10,7 +10,9 @@ use Arqel\Fields\Types\CurrencyField;
 use Arqel\Fields\Types\DateField;
 use Arqel\Fields\Types\DateTimeField;
 use Arqel\Fields\Types\EmailField;
+use Arqel\Fields\Types\FileField;
 use Arqel\Fields\Types\HasManyField;
+use Arqel\Fields\Types\ImageField;
 use Arqel\Fields\Types\MultiSelectField;
 use Arqel\Fields\Types\NumberField;
 use Arqel\Fields\Types\PasswordField;
@@ -57,5 +59,7 @@ final class FieldServiceProvider extends PackageServiceProvider
         FieldFactory::register('hasMany', HasManyField::class);
         FieldFactory::register('date', DateField::class);
         FieldFactory::register('dateTime', DateTimeField::class);
+        FieldFactory::register('file', FileField::class);
+        FieldFactory::register('image', ImageField::class);
     }
 }

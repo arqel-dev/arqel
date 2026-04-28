@@ -5,15 +5,15 @@
 
 ## 🎯 Ticket corrente
 
-**[TABLE-002] Classe `Table` builder fluent**
+**[TABLE-003] Classe `Column` abstract + tipos básicos**
 
 **Fase:** 1 (MVP) • **Sprint:** 3 (Tables)
 **Prioridade:** P0 • **Estimativa:** L
-**Depende de:** TABLE-001 ✅
+**Depende de:** TABLE-002 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §TABLE-002 (linha 2734).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §TABLE-003 (linha 2818).
 
-> **Sprint 2 (FIELDS) fechado** com 18/22 tickets. **TABLE-001 ✅** scaffold do pacote. FIELDS-020/021 ainda adiados (precisam de CORE-006).
+> **Sprint 2 (FIELDS) fechado** com 18/22 tickets. **TABLE-001 + TABLE-002 ✅** entregues. FIELDS-020/021 ainda adiados (precisam de CORE-006).
 
 > **FIELDS-015 ✅** (HasValidation aplicada à base) e **FIELDS-016 ✅** (HasVisibility aplicada à base) entregues nos commits anteriores. Detalhes em CHANGELOG.md.
 

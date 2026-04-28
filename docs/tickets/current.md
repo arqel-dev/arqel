@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**[NAV-001] Esqueleto do pacote `arqel/nav`** (próximo)
+**Fase 1 PHP packages substancialmente completa.** Próximo executável: TYPES-001 (npm `@arqel/types`) ou voltar para CORE-006 quando cadeia frontend estiver pronta.
 
-**Fase:** 1 (MVP) • **Sprint:** 7 (Navigation)
+**Fase:** 1 (MVP)
 
-> **Status:** AUTH-001..003 ✅ + AUTH-005 parcial (SKILL+tests). ACTIONS-001..005/009 ✅. FORM-001..005 ✅ + FORM-010 parcial. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados: CORE-006/007/010/014/015 + TABLE-006..008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-006/007/008 + AUTH-004 (cadeia de deps em CORE-006/CORE-007).
+> **Status:** NAV-001..004 + NAV-005 parcial ✅. AUTH-001..003 + AUTH-005 parcial ✅. ACTIONS-001..005/009 ✅. FORM-001..005 + FORM-010 parcial ✅. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados (deps em CORE-006/CORE-007): CORE-006/007/010/014/015 + TABLE-006..008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-006/007/008 + AUTH-004.
 
 ## 📋 Sprint 0 — Backlog sequencial
 

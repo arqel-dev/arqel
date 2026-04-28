@@ -21,6 +21,7 @@
         "arqel/core": "@dev",
         "arqel/fields": "@dev",
         "arqel/form": "@dev",
+        "arqel/nav": "@dev",
         "arqel/table": "@dev",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29"

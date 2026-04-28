@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df5312db90b9965c826fbd109db25501",
+    "content-hash": "99d2690357bc16588e28699870cf1c48",
     "packages": [],
     "packages-dev": [
         {
@@ -374,6 +374,82 @@
                 "arqel",
                 "form",
                 "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/nav",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/nav",
+                "reference": "3c6d6777a3d334e931bfca39e1e25b18ee88f19d"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Nav\\NavServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Nav\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Nav\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Navigation primitives for Arqel — sidebar items, groups, breadcrumbs.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "breadcrumbs",
+                "laravel",
+                "navigation",
+                "sidebar"
             ],
             "support": {
                 "issues": "https://github.com/arqel/arqel/issues",
@@ -6529,6 +6605,7 @@
         "arqel/core": 20,
         "arqel/fields": 20,
         "arqel/form": 20,
+        "arqel/nav": 20,
         "arqel/table": 20
     },
     "prefer-stable": true,

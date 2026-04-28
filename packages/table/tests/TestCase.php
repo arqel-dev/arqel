@@ -6,6 +6,7 @@ namespace Arqel\Table\Tests;
 
 use Arqel\Core\ArqelServiceProvider;
 use Arqel\Table\TableServiceProvider;
+use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -19,5 +20,17 @@ abstract class TestCase extends Orchestra
             ArqelServiceProvider::class,
             TableServiceProvider::class,
         ];
+    }
+
+    protected function defineEnvironment($app): void
+    {
+        /** @var Application $app */
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ]);
     }
 }

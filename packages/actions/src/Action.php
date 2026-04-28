@@ -6,6 +6,7 @@ namespace Arqel\Actions;
 
 use Arqel\Actions\Concerns\Confirmable;
 use Arqel\Actions\Concerns\HasAuthorization;
+use Arqel\Actions\Concerns\HasForm;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Str;
@@ -29,6 +30,7 @@ abstract class Action
 {
     use Confirmable;
     use HasAuthorization;
+    use HasForm;
 
     public const string COLOR_PRIMARY = 'primary';
 
@@ -298,6 +300,8 @@ abstract class Action
             'disabled' => $this->isDisabledFor($record) ?: null,
             'requiresConfirmation' => $this->isRequiringConfirmation() ?: null,
             'confirmation' => $this->getConfirmationConfig(),
+            'form' => $this->hasForm() ? $this->getFormSchemaArray() : null,
+            'modalSize' => $this->hasForm() ? $this->getModalSize() : null,
             'successNotification' => $this->successNotification,
             'failureNotification' => $this->failureNotification,
         ], fn ($v) => $v !== null);

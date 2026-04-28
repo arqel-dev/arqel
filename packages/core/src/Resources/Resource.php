@@ -121,6 +121,23 @@ abstract class Resource implements HasActions, HasFields, HasResource
         return null;
     }
 
+    /**
+     * Return the `Arqel\Table\Table` that drives the index page.
+     *
+     * Returning `null` makes the controller fall back to a plain
+     * paginated list of all model attributes. Subclasses should
+     * override and return a fully-configured Table when they want
+     * declarative columns/filters/actions.
+     *
+     * The return type is `mixed` (not `?Table`) to avoid making
+     * `arqel/core` depend on `arqel/table` — the controller duck-
+     * types the result.
+     */
+    public function table(): mixed
+    {
+        return null;
+    }
+
     public function recordTitle(Model $record): string
     {
         $attribute = static::$recordTitleAttribute;

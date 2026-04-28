@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Arqel\Core\Support;
 
 use Arqel\Core\Resources\Resource;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Assembles the Inertia payloads for the index/create/edit/show
@@ -26,6 +29,23 @@ final class InertiaDataBuilder
      * @return array<string, mixed>
      */
     public function buildIndexData(Resource $resource, Request $request): array
+    {
+        $table = $resource->table();
+
+        if (is_object($table) && $this->isTableObject($table)) {
+            return $this->buildTableIndexData($resource, $table, $request);
+        }
+
+        return $this->buildPlainIndexData($resource, $request);
+    }
+
+    /**
+     * Plain (no Table) fallback — paginate the model and emit the
+     * minimum payload the React side needs to render a list.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildPlainIndexData(Resource $resource, Request $request): array
     {
         $query = $this->resolveIndexQuery($resource);
 
@@ -47,6 +67,64 @@ final class InertiaDataBuilder
             ],
             'fields' => $this->serializeFields($resource->fields()),
         ];
+    }
+
+    /**
+     * Build the rich Inertia payload when the Resource declares a
+     * Table. Delegates pagination to `TableQueryBuilder` (provided
+     * by `arqel/table`) and serialises columns/filters/actions.
+     *
+     * Both `arqel/table` and `arqel/actions` are duck-typed — this
+     * file lives in `arqel/core` and cannot import them as hard
+     * deps.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildTableIndexData(Resource $resource, object $table, Request $request): array
+    {
+        $query = $this->resolveIndexQuery($resource);
+        $paginator = $this->runTableQueryBuilder($table, $query, $request);
+
+        $records = $paginator !== null
+            ? array_map(fn ($r): array => $this->serializeRecord($r, $resource), $paginator->items())
+            : [];
+
+        return [
+            'resource' => $this->resourceMeta($resource),
+            'records' => $records,
+            'pagination' => $paginator !== null ? [
+                'currentPage' => $paginator->currentPage(),
+                'lastPage' => $paginator->lastPage(),
+                'perPage' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ] : null,
+            'columns' => $this->serializeMany($this->callTableArray($table, 'getColumns')),
+            'filters' => $this->serializeMany($this->callTableArray($table, 'getFilters')),
+            'actions' => [
+                'row' => $this->serializeMany($this->callTableArray($table, 'getActions')),
+                'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions')),
+                'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions')),
+            ],
+            'search' => $request->input('search'),
+            'sort' => [
+                'column' => $request->input('sort'),
+                'direction' => $request->input('direction'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    private function callTableArray(object $table, string $method): array
+    {
+        if (! method_exists($table, $method)) {
+            return [];
+        }
+
+        $result = $table->{$method}();
+
+        return is_array($result) ? array_values($result) : [];
     }
 
     /**
@@ -124,6 +202,106 @@ final class InertiaDataBuilder
         $query = $modelClass::query();
 
         return $query;
+    }
+
+    /**
+     * Detect whether `$candidate` looks like an `Arqel\Table\Table`
+     * (or a structurally-compatible builder). Duck-typed because
+     * `arqel/core` does not depend on `arqel/table`.
+     */
+    private function isTableObject(object $candidate): bool
+    {
+        return method_exists($candidate, 'getColumns')
+            && method_exists($candidate, 'getFilters');
+    }
+
+    /**
+     * Run `Arqel\Table\TableQueryBuilder` against the table + query
+     * + request when the class is available. Returns the paginator
+     * or null when the class isn't installed (the controller then
+     * falls back to a raw paginate).
+     *
+     * @param Builder<Model> $query
+     *
+     * @return LengthAwarePaginator<int, Model>|null
+     */
+    private function runTableQueryBuilder(object $table, Builder $query, Request $request): ?LengthAwarePaginator
+    {
+        $builderClass = 'Arqel\\Table\\TableQueryBuilder';
+
+        if (! class_exists($builderClass)) {
+            return null;
+        }
+
+        try {
+            $reflection = new ReflectionClass($builderClass);
+            $instance = $reflection->newInstance($table, $query, $request);
+        } catch (ReflectionException) {
+            return null;
+        }
+
+        if (! method_exists($instance, 'build')) {
+            return null;
+        }
+
+        $result = $instance->build();
+
+        return $result instanceof LengthAwarePaginator ? $result : null;
+    }
+
+    /**
+     * @param array<int, mixed> $items
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function serializeMany(array $items): array
+    {
+        $serialized = [];
+        foreach ($items as $item) {
+            if (is_object($item) && method_exists($item, 'toArray')) {
+                $payload = $item->toArray();
+                if (is_array($payload)) {
+                    /** @var array<string, mixed> $payload */
+                    $serialized[] = $payload;
+                }
+            }
+        }
+
+        return $serialized;
+    }
+
+    /**
+     * Render a single record for index payloads. Adds Arqel-side
+     * meta (recordTitle/recordSubtitle) on top of the model's
+     * default `toArray`.
+     *
+     * @return array<string, mixed>
+     */
+    private function serializeRecord(mixed $record, Resource $resource): array
+    {
+        if (! $record instanceof Model) {
+            if (! is_array($record)) {
+                return [];
+            }
+
+            $clean = [];
+            foreach ($record as $key => $value) {
+                $clean[(string) $key] = $value;
+            }
+
+            return $clean;
+        }
+
+        $payload = [];
+        foreach ($record->toArray() as $key => $value) {
+            $payload[(string) $key] = $value;
+        }
+        $payload['arqel'] = [
+            'title' => $resource->recordTitle($record),
+            'subtitle' => $resource->recordSubtitle($record),
+        ];
+
+        return $payload;
     }
 
     /**

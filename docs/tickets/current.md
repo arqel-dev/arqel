@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**[TABLE-006] Integração Table com ResourceController** ou **[FORM-006] Integração Form com ResourceController** (próximos executáveis — agora que CORE-006/007 chegaram)
+**[FORM-006] Integração Form com ResourceController** ou **[FORM-007] FormRequest auto-generated** (próximos executáveis)
 
 **Fase:** 1 (MVP)
 
-> **Status:** CORE-001..013 + CORE-006/007 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..003 + AUTH-005 parcial ✅. ACTIONS-001..005/009 ✅. FORM-001..005 + FORM-010 parcial ✅. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. Adiados: CORE-010/014/015 + TABLE-006..008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-006/007/008 + AUTH-004 (todos agora destravados — CORE-006/CORE-007 entregues).
+> **Status:** CORE-001..013 + CORE-006/007 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..003 + AUTH-005 parcial ✅. FORM-001..005 + FORM-010 parcial ✅. FIELDS-001..019/022 ✅. Adiados: CORE-010/014/015 + TABLE-007/008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-007/008 + AUTH-004.
 
 ## 📋 Sprint 0 — Backlog sequencial
 

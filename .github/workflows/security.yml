@@ -19,8 +19,12 @@ permissions:
 
 jobs:
   codeql-js:
+    # Code scanning requires GitHub Advanced Security on private repos.
+    # Skipping until the repo is public (Arqel is open source MIT) or GHAS is
+    # purchased. Re-enable by removing the `if: false` line below.
     name: CodeQL — JavaScript/TypeScript
     runs-on: ubuntu-latest
+    if: false
     steps:
       - uses: actions/checkout@v5
 
@@ -35,10 +39,11 @@ jobs:
           category: "/language:javascript-typescript"
 
   codeql-php:
-    # Em 2026-04 o CodeQL tem PHP em beta. Corremos best-effort.
+    # CodeQL PHP is beta as of 2026-04 AND requires GHAS on private repos.
+    # Skipping until the repo is public or GHAS is purchased.
     name: CodeQL — PHP (best-effort)
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: false
     steps:
       - uses: actions/checkout@v5
 
@@ -69,7 +74,7 @@ jobs:
         run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Composer audit
-        run: composer audit --no-dev=false --ansi
+        run: composer audit --ansi
 
   audit-pnpm:
     name: pnpm audit

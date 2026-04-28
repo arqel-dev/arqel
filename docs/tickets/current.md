@@ -5,13 +5,13 @@
 
 ## 🎯 Ticket corrente
 
-**[FIELDS-012] `ValidationBridge` — Laravel rules → Zod schema**
+**[FIELDS-013] Testes do pacote FIELDS (unitários e feature)**
 
 **Fase:** 1 (MVP) • **Sprint:** 2 (Fields foundation)
 **Prioridade:** P0 • **Estimativa:** L
-**Depende de:** FIELDS-002 ✅
+**Depende de:** FIELDS-012 ✅
 
-**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-012 (linha 2041).
+**Localização no planejamento:** `PLANNING/08-fase-1-mvp.md` §FIELDS-013 (linha 2106).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -31,6 +31,27 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-012 — `ValidationBridge` Laravel → Zod (2026-04-27)
+
+**Entregue:**
+
+- `Arqel\Fields\ValidationBridge` (final): static API `register(rule, Closure)`, `hasRule(rule)`, `translate(rules[]) → string`, `flush()` (tests-only), `bootBuiltins()` auto-chamado em `ensureBooted()`
+- `Arqel\Fields\Translation` accumulator (final): `setType`, `ensureType`, `addChain`, `markRequired`, `toString` — abstrai a construção da string Zod para os translators custom
+- 19 translators built-in: tipos (`string`/`numeric`/`integer`/`boolean`/`array`/`date`/`file`/`image`); refinements (`email`/`url`/`uuid`); ranges (`min`/`max`/`size`); estruturas (`regex`/`in`/`not_in`); composição (`unique`/`nullable`/`required`/`mimetypes`)
+- Output exemplo: `['required','email','max:255','nullable']` → `z.string().min(1).email().max(255).nullable()`
+- Unknown rules saltadas silenciosamente para que regras server-only (`confirmed`) não rebentem
+- 22 testes Pest unit em `tests/Unit/ValidationBridgeTest.php`
+
+**Validações:** `pest` 112/112 · `pint` ok · `phpstan` 50 ficheiros ok
+
+**Decisões autónomas:**
+
+- **Helper `Translation` accumulator** em vez de translators a construir string crua — permite ordering correto (`.nullable()` sempre no fim, `.min(1)` injectado para `required` em string types)
+- **Unknown rules saltam** em vez de levantar exception — Laravel tem rules como `confirmed`/`bail`/`sometimes` que são server-only e fazem sentido manter na regra mesmo sem espelho client. Throw quebraria isso
+- **`unique:` gera `await checkUnique(...)`** com placeholder de runtime — o client expõe esse helper que faz round-trip; o ID-exclusion para edits virá com CORE-006 quando o controller injectar current record id
+- **`required` está acoplado a `z.string()`** — Laravel `required` semântica é "presente E não-vazio", o que em Zod significa `.min(1)` para strings. Para outros tipos, `required` é a ausência de `.optional()/.nullable()`; o accumulator garante isso
+- **Closures tipadas `(?string $arg, Translation $t): void`** — assinatura uniforme; corrige PHPDoc strict do PHPStan que não aceita `void` como expressão de ternário (forçou refactor de 3 lambdas para function blocks)
 
 ### FIELDS-011 — `ColorField` + `HiddenField` + `SlugField` extensions (2026-04-27)
 

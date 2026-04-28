@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 PHP packages substancialmente completa.** Próximo executável: TYPES-001 (npm `@arqel/types`) ou voltar para CORE-006 quando cadeia frontend estiver pronta.
+**[TABLE-006] Integração Table com ResourceController** ou **[FORM-006] Integração Form com ResourceController** (próximos executáveis — agora que CORE-006/007 chegaram)
 
 **Fase:** 1 (MVP)
 
-> **Status:** NAV-001..004 + NAV-005 parcial ✅. AUTH-001..003 + AUTH-005 parcial ✅. ACTIONS-001..005/009 ✅. FORM-001..005 + FORM-010 parcial ✅. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. CORE-001..013 ✅. Adiados (deps em CORE-006/CORE-007): CORE-006/007/010/014/015 + TABLE-006..008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-006/007/008 + AUTH-004.
+> **Status:** CORE-001..013 + CORE-006/007 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..003 + AUTH-005 parcial ✅. ACTIONS-001..005/009 ✅. FORM-001..005 + FORM-010 parcial ✅. TABLE-001..005 ✅. FIELDS-001..019/022 ✅. Adiados: CORE-010/014/015 + TABLE-006..008 + FIELDS-020/021 + FORM-006/007/008 + ACTIONS-006/007/008 + AUTH-004 (todos agora destravados — CORE-006/CORE-007 entregues).
 
 ## 📋 Sprint 0 — Backlog sequencial
 

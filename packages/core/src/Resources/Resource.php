@@ -182,4 +182,67 @@ abstract class Resource implements HasActions, HasFields, HasResource
     protected function beforeDelete(Model $record): void {}
 
     protected function afterDelete(Model $record): void {}
+
+    /**
+     * Public orchestrator for resource creation. Runs through
+     * `beforeSave` → `beforeCreate` → persist → `afterCreate` →
+     * `afterSave`. Subclasses should override the hooks, not this
+     * method. Returns the persisted record.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function runCreate(array $data): Model
+    {
+        $modelClass = static::getModel();
+        /** @var Model $record */
+        $record = app($modelClass);
+
+        $data = $this->beforeSave($record, $data);
+        $data = $this->beforeCreate($data);
+
+        $record->fill($data)->save();
+
+        $this->afterCreate($record);
+        $this->afterSave($record);
+
+        return $record;
+    }
+
+    /**
+     * Public orchestrator for resource update. Runs through
+     * `beforeSave` → `beforeUpdate` → persist → `afterUpdate` →
+     * `afterSave`.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function runUpdate(Model $record, array $data): Model
+    {
+        $data = $this->beforeSave($record, $data);
+        $data = $this->beforeUpdate($record, $data);
+
+        $record->fill($data)->save();
+
+        $this->afterUpdate($record);
+        $this->afterSave($record);
+
+        return $record;
+    }
+
+    /**
+     * Public orchestrator for resource deletion. Returns true on
+     * success — false when the underlying `delete()` call returns
+     * a falsey value.
+     */
+    public function runDelete(Model $record): bool
+    {
+        $this->beforeDelete($record);
+
+        $result = (bool) $record->delete();
+
+        if ($result) {
+            $this->afterDelete($record);
+        }
+
+        return $result;
+    }
 }

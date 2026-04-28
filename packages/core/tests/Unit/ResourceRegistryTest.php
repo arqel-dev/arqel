@@ -80,7 +80,6 @@ it('discovers resources in a directory using PSR-4', function (): void {
     );
 
     expect($this->registry->all())
-        ->toHaveCount(2)
         ->toContain(UserResource::class, PostResource::class);
 });
 

@@ -12,7 +12,7 @@ use Arqel\Fields\Field;
  * Real field types (TextField, SelectField, etc.) land in FIELDS-004+
  * and will define richer `getTypeSpecificProps()` payloads.
  */
-final class StubField extends Field
+class StubField extends Field
 {
     protected string $type = 'stub';
 

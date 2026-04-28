@@ -63,7 +63,7 @@ final class SlugField extends TextField
     /**
      * @param class-string $modelClass
      */
-    public function unique(string $modelClass, ?string $column = null): static
+    public function uniqueIn(string $modelClass, ?string $column = null): static
     {
         $this->uniqueModel = $modelClass;
         $this->uniqueColumn = $column ?? $this->getName();

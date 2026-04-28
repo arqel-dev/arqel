@@ -3,7 +3,6 @@
   "component": "SlugInput",
   "name": "slug",
   "label": "Slug",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["string", "not_in:admin"],
   "props": {
     "fromField": "title",
     "separator": "-",

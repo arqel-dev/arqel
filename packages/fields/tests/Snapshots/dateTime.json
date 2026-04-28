@@ -3,7 +3,6 @@
   "component": "DateTimeInput",
   "name": "starts_at",
   "label": "Starts At",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["date"],
   "props": {
     "format": "Y-m-d H:i:s",
     "displayFormat": "d/m/Y H:i:s",

@@ -3,7 +3,6 @@
   "component": "NumberInput",
   "name": "age",
   "label": "Age",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["integer", "min:0", "max:120"],
   "props": {
     "min": 0,
     "max": 120,

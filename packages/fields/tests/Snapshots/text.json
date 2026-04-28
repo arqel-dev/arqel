@@ -3,7 +3,6 @@
   "component": "TextInput",
   "name": "full_name",
   "label": "Full Name",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": [],
   "props": {
     "maxLength": 255
   }

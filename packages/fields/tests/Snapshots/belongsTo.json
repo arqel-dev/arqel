@@ -3,7 +3,6 @@
   "component": "BelongsToInput",
   "name": "author_id",
   "label": "Author Id",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": [],
   "props": {
     "relatedResource": "Arqel\\Fields\\Tests\\Fixtures\\StubResource",
     "relationship": "author",

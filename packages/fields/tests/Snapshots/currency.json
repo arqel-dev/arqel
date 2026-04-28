@@ -3,7 +3,6 @@
   "component": "CurrencyInput",
   "name": "price",
   "label": "Price",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["numeric"],
   "props": {
     "decimals": 2,
     "prefix": "R$",

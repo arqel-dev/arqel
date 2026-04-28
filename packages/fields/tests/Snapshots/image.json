@@ -3,7 +3,6 @@
   "component": "ImageInput",
   "name": "avatar",
   "label": "Avatar",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["image"],
   "props": {
     "disk": "local",
     "visibility": "private",

@@ -3,7 +3,6 @@
   "component": "Checkbox",
   "name": "is_active",
   "label": "Is Active",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["boolean"],
   "props": {
     "inline": true
   }

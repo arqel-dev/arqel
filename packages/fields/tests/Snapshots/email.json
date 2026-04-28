@@ -3,7 +3,6 @@
   "component": "EmailInput",
   "name": "email",
   "label": "Email",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,5 +10,6 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["email"],
   "props": []
 }

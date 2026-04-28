@@ -3,7 +3,6 @@
   "component": "ColorInput",
   "name": "brand_color",
   "label": "Brand Color",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["string"],
   "props": {
     "presets": ["#FF0000", "#00FF00"],
     "format": "hex",

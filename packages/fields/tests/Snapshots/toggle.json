@@ -3,7 +3,6 @@
   "component": "Toggle",
   "name": "is_published",
   "label": "Is Published",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["boolean"],
   "props": {
     "inline": false,
     "onColor": "emerald",

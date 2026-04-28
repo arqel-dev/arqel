@@ -43,7 +43,6 @@ function snapshot(Field $field): array
         'component' => $field->getComponent(),
         'name' => $field->getName(),
         'label' => $field->getLabel(),
-        'required' => false,
         'readonly' => $field->isReadonly(),
         'placeholder' => $field->getPlaceholder(),
         'helperText' => $field->getHelperText(),
@@ -51,6 +50,10 @@ function snapshot(Field $field): array
         'columnSpan' => $field->getColumnSpan(),
         'live' => $field->isLive(),
         'liveDebounce' => $field->getLiveDebounce(),
+        'rules' => array_map(
+            fn ($r) => is_object($r) ? $r::class : $r,
+            $field->getValidationRules(),
+        ),
         'props' => $field->getTypeSpecificProps(),
     ];
 }

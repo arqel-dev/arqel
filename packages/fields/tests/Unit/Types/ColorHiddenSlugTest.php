@@ -70,7 +70,7 @@ it('records unique target and emits a unique rule against the resolved table', f
         }
     };
 
-    $field = (new SlugField('slug'))->unique($modelClass::class);
+    $field = (new SlugField('slug'))->uniqueIn($modelClass::class);
 
     expect($field->getUniqueModel())->toBe($modelClass::class)
         ->and($field->getUniqueColumn())->toBe('slug')
@@ -86,7 +86,7 @@ it('honours an explicit unique column override', function (): void {
         }
     };
 
-    $field = (new SlugField('slug'))->unique($modelClass::class, 'permalink');
+    $field = (new SlugField('slug'))->uniqueIn($modelClass::class, 'permalink');
 
     expect($field->getUniqueColumn())->toBe('permalink')
         ->and($field->getDefaultRules())->toContain('unique:articles,permalink');

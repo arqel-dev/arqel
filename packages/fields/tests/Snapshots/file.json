@@ -3,7 +3,6 @@
   "component": "FileInput",
   "name": "document",
   "label": "Document",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["file", "max:5120", "mimetypes:application/pdf"],
   "props": {
     "disk": "s3",
     "visibility": "private",

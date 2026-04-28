@@ -3,7 +3,6 @@
   "component": "DateInput",
   "name": "birthday",
   "label": "Birthday",
-  "required": false,
   "readonly": false,
   "placeholder": null,
   "helperText": null,
@@ -11,6 +10,7 @@
   "columnSpan": 1,
   "live": false,
   "liveDebounce": null,
+  "rules": ["date"],
   "props": {
     "minDate": "1900-01-01",
     "format": "Y-m-d",

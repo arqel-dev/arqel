@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend stack (@arqel/ui completo).** Próximo natural: FIELDS-JS-001 (rich inputs registrados via FieldRegistry) ou DOCS-001+ (docs site).
+**Fase 1 backend PHP + frontend runtime completo (@arqel/ui + @arqel/fields).** Próximo natural: DOCS-001+ (docs site) ou voltar para tickets adiados (CORE-014/015, TABLE-007/008, etc.).
 
 **Fase:** 1 (MVP)
 
-> **Status:** **PHP:** CORE-001..013 + CORE-006/007/010 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007/008 + FORM-010 parcial ✅. FIELDS-001..022 ✅. **JS:** TYPES-001/002 + TYPES-004 parcial ✅. REACT-001..004 ✅. HOOKS-001 ✅ (10 hooks). UI-001..007 ✅ (shell + table + form + action + flash + utility, 70 testes). Adiados: CORE-014/015 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 + TYPES-003 (spatie), HOOKS-002..006 (Zod validate / URL sync — coberto minimally em HOOKS-001).
+> **Status:** **PHP:** CORE-001..013 + CORE-006/007/010 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007/008 + FORM-010 parcial ✅. FIELDS-001..022 ✅. **JS:** TYPES-001/002 + TYPES-004 parcial ✅. REACT-001..004 ✅. HOOKS-001 ✅ (10 hooks). UI-001..007 ✅ (shell + table + form + action + flash + utility, 70 testes). FIELDS-JS-001..006 ✅ (21 rich inputs via FieldRegistry, 23 testes). Adiados: CORE-014/015 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 + TYPES-003 (spatie), HOOKS-002..006 (Zod validate / URL sync — coberto minimally em HOOKS-001).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -29,6 +29,24 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FIELDS-JS-001..006 — `@arqel/fields` completo (2026-04-29)
+
+**Entregue (12 entry points subpath, 21 components 1:1 com PHP, 23 testes Vitest):**
+
+- **FIELDS-JS-001/002 (scaffold + 9 inputs básicos)**: pacote `@arqel/fields` com `sideEffects: ['./dist/register.js']`, peerDeps `@arqel/ui` + `react`. Inputs: TextInput, TextareaInput, EmailInput, UrlInput, PasswordInput (toggle reveal `aria-pressed`), NumberInput (stepper buttons), CurrencyInput (Intl-format on blur), Checkbox, Toggle (role=switch + iOS thumb)
+- **FIELDS-JS-003 (advanced)**: SelectInput, MultiSelectInput (chips removíveis), RadioGroup (role=radiogroup), BelongsToInput (async fetch + 300ms debounce + role=combobox/listbox), HasManyReadonly, DateInput, DateTimeInput, FileInput (drag-drop em `<section>`), ImageInput (URL.createObjectURL preview, sem crop)
+- **FIELDS-JS-004/005/006 (slug + color + hidden + helper)**: SlugInput + helper `slugify` (NFD + `[a-z0-9-]+`), ColorInput (native picker + presets + hex text), HiddenInput; `register.ts` registra os 21; `getRegisteredFields()` re-exportado de `@arqel/ui/form`
+- SKILL.md PT-BR completo com guia "Creating a custom field" (PHP `Field::component()` + React component + `registerField` triple)
+
+**Validações:** `tsc --noEmit` strict ✅ · `biome check` ✅ · `vitest run` 23 testes passando ✅ · `tsup` 12 ESM entries com dts ✅
+
+**Decisões autónomas:**
+
+- **Folder `packages-js/fields-js/`** — nome diverge de `@arqel/fields` (npm) para não colidir com `packages/fields/` (PHP/Composer)
+- **Componente único por field type** — 21 components mapeiam 1:1 aos 21 PHP `FIELDS-001..022`. Combobox searchable Base UI fica para Phase 2
+- **`<input type="color">` nativo + presets** — mesma decisão de não importar libs pesadas; `react-image-crop` + `react-day-picker` ficam para Phase 2
+- **Single side-effect entry** (`./dist/register.js`) — apps que querem subset chamam `registerField` manualmente; tree-shake stays preserved
 
 ### UI-001..007 — `@arqel/ui` completo (2026-04-29)
 

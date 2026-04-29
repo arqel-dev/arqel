@@ -5,8 +5,16 @@
  * (`@arqel/ui/action`, `@arqel/ui/auth`) are recommended for tree-shaking.
  */
 
+export type { ActionButtonProps } from './action/ActionButton.js';
+export { ActionButton } from './action/ActionButton.js';
+export type { ActionFormModalProps } from './action/ActionFormModal.js';
+export { ActionFormModal } from './action/ActionFormModal.js';
+export type { ActionMenuProps } from './action/ActionMenu.js';
+export { ActionMenu } from './action/ActionMenu.js';
 export type { ButtonProps } from './action/Button.js';
 export { Button, buttonVariants } from './action/Button.js';
+export type { ConfirmDialogProps } from './action/ConfirmDialog.js';
+export { ConfirmDialog } from './action/ConfirmDialog.js';
 export type { CanAccessProps } from './auth/CanAccess.js';
 export { CanAccess } from './auth/CanAccess.js';
 export {

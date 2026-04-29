@@ -1,0 +1,79 @@
+{
+    "name": "arqel/fields-advanced",
+    "description": "Advanced field types for Arqel — RichText (Tiptap), Markdown, Code, Repeater, Builder, KeyValue, Tags, Wizard.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "arqel",
+        "fields",
+        "tiptap",
+        "richtext"
+    ],
+    "homepage": "https://arqel.dev",
+    "support": {
+        "issues": "https://github.com/arqel/arqel/issues",
+        "source": "https://github.com/arqel/arqel",
+        "docs": "https://arqel.dev/docs"
+    },
+    "require": {
+        "php": "^8.3",
+        "arqel/core": "@dev",
+        "arqel/fields": "@dev",
+        "laravel/framework": "^12.0|^13.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arqel\\FieldsAdvanced\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Arqel\\FieldsAdvanced\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Arqel\\FieldsAdvanced\\FieldsAdvancedServiceProvider"
+            ]
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../core",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../fields",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage --min=90",
+        "analyse": "phpstan analyse",
+        "lint": "pint --test",
+        "format": "pint"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

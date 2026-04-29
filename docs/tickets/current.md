@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-016 (auto-install JS).** Próximo natural: voltar para tickets adiados (CORE-014/015, TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 fechados.** Próximo natural: voltar para tickets adiados restantes (TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,26 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-014/015 — Testes de infraestrutura + SKILL.md atualizado (2026-04-29)
+
+**Entregue:**
+
+- `tests/TestCase.php` ganha `defineEnvironment()` configurando DB SQLite in-memory para Feature/integration tests (isolamento + sem touch no host filesystem)
+- `tests/Feature/ArqelServiceProviderTest.php` expandido de 6 → 11 testes cobrindo: registro do `arqel:resource` command, `InertiaDataBuilder` como singleton, view namespace `arqel::app` resolvível, translation namespace `arqel::actions.view` em en + pt_BR, mount das 7 rotas polimórficas (`arqel.resources.{index,create,store,show,edit,update,destroy}`)
+- `packages/core/SKILL.md` § "Adiados" reescrita como "Entregues após o scope inicial" — sincroniza com a realidade pós-CORE-006/007/010/016 (5 sub-bullets descrevendo o que cada ticket entregou: ResourceController, HandleArqelInertiaRequests, FieldSchemaSerializer, InertiaDataBuilder, auto-install frontend)
+
+**Validações:** `pest` 99/99 passando, 289 assertions ✅ · `phpstan analyse packages/core` ✅ · `pint --test packages/core` ✅
+
+**Critérios não-mensurados:**
+
+- ⏭️ **Coverage ≥ 90%** — sem driver xdebug/pcov instalado local; CI matrix continua a medir e enforcar via threshold em `phpunit.xml`. Ratio LOC tests/source ~ 1500/2000 (qualitativamente alto)
+
+**Decisões autónomas:**
+
+- **Audit em vez de greenfield** — todos os 8 ficheiros de teste listados na descrição técnica do CORE-014 já existiam (`ResourceRegistryTest`, `PanelRegistryTest`, `FieldSchemaSerializerTest`, etc.); foco foi preencher gaps reais (provider tests + TestCase env), não rewrite
+- **`arqel::app` em vez de `arqel::layout`** — view real do CORE-012 é `app.blade.php`, não `layout.blade.php`; ticket descrevia genérico
+- **Sem dependência de `Illuminate\Foundation\Application` real** — `defineEnvironment` recebe `$app` typed via Orchestra Testbench (acesso por `$app['config']`)
 
 ### CORE-016 — `arqel:install` instala e configura frontend (2026-04-29)
 

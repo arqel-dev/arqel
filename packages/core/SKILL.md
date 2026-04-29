@@ -20,11 +20,13 @@
 - **Blade root view** `arqel::app` (`resources/views/app.blade.php`) com `@inertia`, CSRF, FOUC guard de tema; publicada para `resources/views/vendor/arqel/`
 - **Traduções** (`resources/lang/{en,pt_BR}/`): `messages`, `actions`, `table`, `form`, `validation`. Acesso via `__('arqel::messages.actions.create')`
 
-**Adiados** (entrarão noutros pacotes / tickets):
+**Entregues após o scope inicial:**
 
-- `ResourceController` (CORE-006): depende de `Field`/`InertiaDataBuilder`/Pages React
-- `HandleArqelInertiaRequests` middleware (CORE-007): depende do controller
-- `FieldSchemaSerializer` (CORE-010): depende de `Field`
+- `ResourceController` (CORE-006) — 7 endpoints polimórficos (`index/create/store/show/edit/update/destroy`) sob `arqel.resources.{action}`. Resolve Resource pelo slug via `ResourceRegistry::findBySlug`, autoriza via `Gate::denies(viewAny|create|view|update|delete)`, materializa payload via `InertiaDataBuilder`, invoca lifecycle via `Resource::runCreate/runUpdate/runDelete`. Validation via `FieldRulesExtractor` (carregado via Reflection — sem hard dep em `arqel/form`).
+- `HandleArqelInertiaRequests` middleware (CORE-007) — estende `Inertia\Middleware`. Shared props: `auth.user` (`only(['id','name','email'])`), `auth.can` (delegated to `AbilityRegistry::resolveForUser` quando `arqel/auth` está bound), `panel`, `tenant`, `flash` (success/error/info/warning closures), `translations` (`arqel::*`), `arqel.version`.
+- `FieldSchemaSerializer` (CORE-010) — duck-typed contra `Arqel\Fields\Field`. Filtra fields por `canBeSeenBy(user, record)`, combina `isReadonly` com `canBeEditedBy` num único flag, emite `validation.{rules,messages,attribute}`, `visibility.{create,edit,detail,table,canSee}`, `dependsOn` e `props`. `stringifyRules` descarta Closures e converte rule objects para class-string.
+- `InertiaDataBuilder` (CORE-006 partial → CORE-010) — assembler dos payloads index/create/edit/show. `buildIndexData` paginate sanitizado; `buildCreateData/EditData/ShowData` retornam `{resource, record, recordTitle, recordSubtitle, fields}`. Detecta `Resource::table()` via duck-typing e roteia para `buildTableIndexData` (delega ao `Arqel\Table\TableQueryBuilder` via Reflection).
+- `arqel:install` extendido com auto-instalação frontend (CORE-016) — detecta package manager (`pnpm`/`yarn`/`npm`), instala `@arqel/{react,ui,hooks,fields,types}` + peer dev deps, scaffolda `resources/js/app.tsx` + `resources/css/app.css`. Flag `--no-frontend` para skip; `--force` re-escreve.
 
 ## Key Contracts
 

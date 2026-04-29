@@ -47,7 +47,15 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 - **Out-of-scope** (chega em MCP-005+): introspecção de fields, table columns, actions e policy do Resource — exigem instanciar o Resource e walk de form/table; MCP-004 entrega só o payload de metadata estático
 - **6 testes novos** (5 unit + 1 feature): schema canônico, payload completo das 8 chaves para slug conhecido, `InvalidArgumentException` para slug ausente e não-string, `RuntimeException` para slug desconhecido, defensiva (icon throws → null + outros campos populados), auto-registo conjunto de `describe_resource` + `list_resources` no boot
 
-**Por chegar (MCP-005..010):**
+**Entregue (MCP-005):**
+
+- **`Tools\GenerateResourceTool` (final)** — terceira tool exposta; wrapper do Artisan `arqel:resource`. `schema()` devolve `name=generate_resource`, `description="Generate a new Arqel Resource for an Eloquent model"`, `inputSchema={type:object, properties:{model:string, fromModel:boolean (default true), withPolicy:boolean (default true)}, required:[model]}`. `__invoke(array)` valida `model` (string obrigatória → `InvalidArgumentException`), monta `args = {model, --from-model, --with-policy}` e devolve payload `{model, exitCode, output, success}` (`success === exitCode === 0`)
+- **Closure runner (testabilidade)**: construtor aceita `?Closure $runner = null` com signature `(array): array{exitCode: int, output: string}` — testes injetam closure que captura args e devolve resultado mock, evitando boot completo do Artisan + filesystem real. Quando `null`, fallback default delega para `Container::getInstance()->make(Kernel::class)->call('arqel:resource', $args)` + `Artisan::output()`. Mesmo padrão de injeção dos resolvers de MCP-003/004 (`final` no domain class, behavior swap via Closure)
+- **Divergência vs spec**: o `MakeResourceCommand` real (assinatura `arqel:resource {model} {--with-policy} {--force}`) não tem `--from-model`. O schema MCP ainda expõe `fromModel` para forward-compat; o default runner remove `--from-model` antes de chamar Artisan para não disparar "unknown option". Custom runners injetados em testes recebem o flag tal qual — assim o LLM pode introspeccionar o que foi pedido
+- **Auto-registro**: `McpServiceProvider::packageBooted()` agora instancia `ListResourcesTool` + `DescribeResourceTool` + `GenerateResourceTool` (3 tools built-in), todas via mesmo padrão `$server->registerTool($name, $description, $inputSchema, $handler)`
+- **7 testes novos** (6 unit + 1 feature): schema canônico, happy path com captura de args, `InvalidArgumentException` para `model` ausente e não-string, passthrough de `fromModel=false` + `withPolicy=false`, falha (`exitCode=1` → `success=false`), auto-registo das 3 tools no boot
+
+**Por chegar (MCP-006..010):**
 
 - Artisan `arqel:mcp:serve` envolvendo `McpServer::serve()` — followup de MCP-002
 - Auto-descoberta: cada Resource Arqel vira tool CRUD + resource read; cada Action vira tool — MCP-006

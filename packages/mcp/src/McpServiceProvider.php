@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Mcp;
 
 use Arqel\Mcp\Tools\DescribeResourceTool;
+use Arqel\Mcp\Tools\GenerateResourceTool;
 use Arqel\Mcp\Tools\ListResourcesTool;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -49,6 +50,15 @@ final class McpServiceProvider extends PackageServiceProvider
             $describeSchema['description'],
             $describeSchema['inputSchema'],
             static fn (array $params): array => $describeResource($params),
+        );
+
+        $generateResource = new GenerateResourceTool;
+        $generateSchema = $generateResource->schema();
+        $server->registerTool(
+            $generateSchema['name'],
+            $generateSchema['description'],
+            $generateSchema['inputSchema'],
+            static fn (array $params): array => $generateResource($params),
         );
     }
 }

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001..005 ✅ · MCP-001 ✅ · FIELDS-ADV-001/002 ✅) + 9 bugs do dogfooding fechados + primeiro batch de 3 sub-agentes paralelos completo.** Próximo natural: WIDGETS-006 (DashboardController + endpoint), MCP-002 (JSON-RPC core), ou FIELDS-ADV-003+ (Markdown/Code/Repeater/Builder/KeyValue/Tags/Wizard).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001..006 ✅ · MCP-001/002 ✅ · FIELDS-ADV-001..003 ✅) + 9 bugs do dogfooding fechados + Batch #1 e #2 de sub-agentes paralelos completos.** Próximo natural: TENANT-009 (tenant switcher backend) + EXPORT-001 (scaffold arqel/export) + AUDIT-001 (scaffold arqel/audit) — Batch #3 já preparado em `.claude/batch-3-prompts.md`.
 
 **Fase:** 1 (MVP)
 

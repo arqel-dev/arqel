@@ -9,6 +9,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Added
 
+- **Batch paralelo #2** (3 sub-agentes em worktrees isolados, merged 2026-04-29): WIDGETS-006 (Dashboard multi-instance + DashboardRegistry singleton, refatoração com props readonly + factory + responsive columns + class-string resolution), MCP-002 (JSON-RPC 2.0 core + tool/resource/prompt dispatch + stdio loop, McpDispatchException para `-32601`/`-32602`), FIELDS-ADV-003 (MarkdownField config-only com preview modes + syncScroll). Testes Pest: widgets 102, mcp 24, fields-advanced 26 — todos verdes.
 - Estrutura inicial do monorepo (INFRA-001)
 - Orquestração pnpm workspace + Composer path repositories (INFRA-002)
 - Toolchain de lint/format (Pint, PHPStan, Biome) + git hooks (Husky + lint-staged + commitlint) (INFRA-003)

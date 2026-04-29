@@ -87,11 +87,21 @@ export default defineConfig({
       ],
       '/reference/': [
         {
-          text: 'API Reference',
+          text: 'PHP',
           items: [
-            { text: 'PHP — overview', link: '/reference/php-overview' },
-            { text: 'TypeScript — overview', link: '/reference/typescript-overview' },
+            { text: 'Overview', link: '/reference/php-overview' },
+            { text: 'arqel/core', link: '/reference/php/core' },
+            { text: 'arqel/fields', link: '/reference/php/fields' },
+            { text: 'arqel/table', link: '/reference/php/table' },
+            { text: 'arqel/form', link: '/reference/php/form' },
+            { text: 'arqel/actions', link: '/reference/php/actions' },
+            { text: 'arqel/auth', link: '/reference/php/auth' },
+            { text: 'arqel/nav', link: '/reference/php/nav' },
           ],
+        },
+        {
+          text: 'TypeScript',
+          items: [{ text: 'Overview', link: '/reference/typescript-overview' }],
         },
       ],
       '/advanced/': [

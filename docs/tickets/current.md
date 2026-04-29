@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..004).** Próximo natural: DOCS-005/006 (API references) ou voltar para tickets adiados.
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..005).** Próximo natural: DOCS-006 (API reference TypeScript) ou DOCS-007 (migration guides Filament/Nova).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,28 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### DOCS-005 — API Reference PHP curada (parcial) (2026-04-29)
+
+**Entregue:**
+
+- 7 páginas em `apps/docs/reference/php/` (uma por pacote): `core.md` (Resource abstract com lifecycle hooks + orchestrators, ResourceRegistry, Panel fluent + getters, PanelRegistry, contracts HasResource/HasFields/HasActions/HasPolicies, ResourceController, HandleArqelInertiaRequests, InertiaDataBuilder, FieldSchemaSerializer, comandos Artisan), `fields.md` (Field abstract + 5 traits em tabela + oracles + FieldFactory + tabela props per-type para os 21 types + ValidationBridge + EagerLoadingResolver + FieldSearchController/UploadController), `table.md` (Table builder + 9 column types + 6 filter types + TableQueryBuilder), `form.md` (Form builder + 7 layout components + FieldRulesExtractor + FormRequestGenerator), `actions.md` (Action abstract + constantes + 3 traits + 4 variantes + Actions factory + 4 endpoints ActionController), `auth.md` (AbilityRegistry + PolicyDiscovery + ArqelGate + AuthorizesRequests trait + EnsureUserCanAccessPanel middleware + helper `arqel_can`), `nav.md` (NavigationItem + NavigationGroup + Navigation builder + BreadcrumbsBuilder)
+- `php-overview.md` reescrito como índice com tabela de pacotes apontando para cada página, seção "Convenções gerais" e nota TODO sobre auto-geração via phpDocumentor
+- Sidebar atualizado em `.vitepress/config.ts` agrupando por linguagem (PHP com 7 sub-itens + TypeScript Overview)
+
+**Critérios não-entregues (parcial):**
+
+- ❌ **Auto-geração via phpDocumentor/Doctum** — escolha de fonte canónica foi escrita curada (alinhada com SKILL.md já existentes); auto-geração fica para PR follow-up quando o build CI puder executar `phpdoc`
+- ❌ **CI regenera em cada push** — depende do item acima; `.github/workflows/docs-deploy.yml` precisa do step `phpdoc -d packages/ -t apps/docs/reference/php/_generated`
+
+**Validações:** `pnpm build` 27 páginas em 17s ✅ · sem deadlinks · `biome check .` ✅
+
+**Decisões autónomas:**
+
+- **Curado em vez de auto-gerado** — phpDocumentor é viável mas pesado (composer require --dev); duplicaria SKILL.md já completos. Escolha mantém a docs em PT-BR consistente com as guides
+- **Tabelas como formato dominante** — cada página tem 3-5 tabelas (classe → método → tipo → descrição) em vez de prosa. Mais útil para lookup rápido
+- **Sem links absolutos source** entre páginas — apenas para SKILL.md no GitHub. Auto-geração via TypeDoc/phpDoc poderá adicionar source links quando entrar
+- **Estrutura `reference/php/{pkg}.md`** em vez de `reference/php/{namespace}/{Class}.md` — granularidade per-pacote bate com a estrutura do monorepo e do `composer.json`
 
 ### DOCS-004 — Tutorial primeiro CRUD completo (parcial) (2026-04-29)
 

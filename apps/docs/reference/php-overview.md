@@ -1,17 +1,41 @@
 # API Reference — PHP
 
-> **Status:** stub — DOCS-005.
+Referência curada por pacote (PHP 8.3+). Cada página documenta as classes públicas, setters fluentes, oracles e endpoints HTTP.
 
-Pacotes PHP entregues em Fase 1:
+## Pacotes
 
-| Pacote | Namespace | SKILL |
+| Pacote | Conteúdo | Página |
 |---|---|---|
-| `arqel/core` | `Arqel\Core\` | [SKILL.md](https://github.com/arqel/arqel/blob/main/packages/core/SKILL.md) |
-| `arqel/fields` | `Arqel\Fields\` | [SKILL.md](https://github.com/arqel/arqel/blob/main/packages/fields/SKILL.md) |
-| `arqel/table` | `Arqel\Table\` | [SKILL.md](https://github.com/arqel/arqel/blob/main/packages/table/SKILL.md) |
-| `arqel/form` | `Arqel\Form\` | [SKILL.md](https://github.com/arqel/arqel/blob/main/packages/form/SKILL.md) |
-| `arqel/actions` | `Arqel\Actions\` | [SKILL.md](https://github.com/arqel/arqel/blob/main/packages/actions/SKILL.md) |
-| `arqel/auth` | `Arqel\Auth\` | [SKILL.md](https://github.com/arqel/arqel/blob/main/packages/auth/SKILL.md) |
-| `arqel/nav` | `Arqel\Nav\` | [SKILL.md](https://github.com/arqel/arqel/blob/main/packages/nav/SKILL.md) |
+| `arqel/core` | Resource, ResourceRegistry, Panel, PanelRegistry, controller, middleware | [Core →](/reference/php/core) |
+| `arqel/fields` | Field abstract, FieldFactory, 21 field types, ValidationBridge | [Fields →](/reference/php/fields) |
+| `arqel/table` | Table builder, 9 column types, 6 filter types, TableQueryBuilder | [Table →](/reference/php/table) |
+| `arqel/form` | Form builder, 7 layout components, FieldRulesExtractor, FormRequestGenerator | [Form →](/reference/php/form) |
+| `arqel/actions` | Action abstract, 4 variantes, Confirmable + HasForm + HasAuthorization, ActionController | [Actions →](/reference/php/actions) |
+| `arqel/auth` | AbilityRegistry, PolicyDiscovery, ArqelGate, EnsureUserCanAccessPanel, helpers | [Auth →](/reference/php/auth) |
+| `arqel/nav` | NavigationItem, NavigationGroup, Navigation builder, BreadcrumbsBuilder | [Nav →](/reference/php/nav) |
 
-API reference auto-gerada via phpDocumentor chega em DOCS-005.
+## Convenções gerais
+
+- Todos os pacotes declaram `declare(strict_types=1)` no topo de cada source file
+- Classes são `final` por defeito; abstratas (`Resource`, `Field`, `Action`, `Column`, `Filter`, `Component`) têm `__construct` final para impedir override
+- Setters retornam `$this` para encadeamento; getters são tipados
+- Service Providers são auto-discovered via `composer.json` → `extra.laravel.providers`
+- Singletons (`ResourceRegistry`, `PanelRegistry`, `AbilityRegistry`) são bound em `Provider::register`
+
+## Geração automática (TODO)
+
+Esta referência ainda é **curada manualmente** — fonte canónica para cada pacote são os ficheiros `SKILL.md` em `packages/{pkg}/`. Auto-geração via [phpDocumentor](https://www.phpdoc.org/) ou [Doctum](https://github.com/code-lts/doctum) chega como follow-up:
+
+```yaml
+# .github/workflows/docs-deploy.yml (futuro)
+- name: Generate phpDocumentor
+  run: phpdoc -d packages/ -t apps/docs/reference/php/_generated
+```
+
+Os critérios de DOCS-005 ("CI regenera em cada push", "todas as classes públicas documentadas via docblock") cobertos pela auto-geração ficam pendentes até esse PR.
+
+## Related
+
+- TypeScript: [API Reference TS](/reference/typescript-overview)
+- ADRs: [`PLANNING/03-adrs.md`](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md)
+- Roadmap: [`PLANNING/07-roadmap-fases.md`](https://github.com/arqel/arqel/blob/main/PLANNING/07-roadmap-fases.md)

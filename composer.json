@@ -23,6 +23,8 @@
         "arqel/form": "@dev",
         "arqel/nav": "@dev",
         "arqel/table": "@dev",
+        "arqel/fields-advanced": "@dev",
+        "arqel/mcp": "@dev",
         "arqel/tenant": "@dev",
         "arqel/widgets": "@dev",
         "larastan/larastan": "^3.9",

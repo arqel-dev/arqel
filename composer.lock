@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "00f84fcf0d2e879abe66adbe53816267",
+    "content-hash": "11e47073608f908b2dd0d39d9d633ebb",
     "packages": [],
     "packages-dev": [
         {
@@ -314,6 +314,83 @@
             }
         },
         {
+            "name": "arqel/fields-advanced",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/fields-advanced",
+                "reference": "2e6235711b96c47e4e6b583ec73cc27076483b23"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "arqel/fields": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\FieldsAdvanced\\FieldsAdvancedServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\FieldsAdvanced\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\FieldsAdvanced\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Advanced field types for Arqel — RichText (Tiptap), Markdown, Code, Repeater, Builder, KeyValue, Tags, Wizard.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "fields",
+                "laravel",
+                "richtext",
+                "tiptap"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "arqel/form",
             "version": "dev-main",
             "dist": {
@@ -377,6 +454,82 @@
                 "arqel",
                 "form",
                 "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/mcp",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/mcp",
+                "reference": "9ebdfb9f0a4bc1e78374d785928369416e779811"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Mcp\\McpServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Mcp\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Mcp\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Model Context Protocol server for Arqel — exposes panel resources, fields, tables, and actions to MCP-compatible AI clients.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "ai",
+                "arqel",
+                "laravel",
+                "mcp",
+                "model-context-protocol"
             ],
             "support": {
                 "issues": "https://github.com/arqel/arqel/issues",
@@ -6759,7 +6912,9 @@
         "arqel/auth": 20,
         "arqel/core": 20,
         "arqel/fields": 20,
+        "arqel/fields-advanced": 20,
         "arqel/form": 20,
+        "arqel/mcp": 20,
         "arqel/nav": 20,
         "arqel/table": 20,
         "arqel/tenant": 20,

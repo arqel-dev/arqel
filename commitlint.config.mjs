@@ -16,6 +16,7 @@ const scopes = [
   'nav',
   'tenant',
   'widgets',
+  'fields-advanced',
   'audit',
   'versioning',
   'workflow',

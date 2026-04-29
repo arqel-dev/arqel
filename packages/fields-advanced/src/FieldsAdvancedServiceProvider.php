@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\FieldsAdvanced;
 
 use Arqel\Fields\FieldFactory;
+use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -28,5 +29,6 @@ final class FieldsAdvancedServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         FieldFactory::register('richText', RichTextField::class);
+        FieldFactory::register('markdown', MarkdownField::class);
     }
 }

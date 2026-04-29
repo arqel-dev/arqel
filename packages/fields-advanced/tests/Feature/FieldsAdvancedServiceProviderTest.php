@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Fields\FieldFactory;
 use Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider;
+use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
 
 it('boots the FieldsAdvancedServiceProvider without errors', function (): void {
@@ -23,5 +24,14 @@ it('registers the richText macro on the FieldFactory', function (): void {
     $field = FieldFactory::richText('content');
 
     expect($field)->toBeInstanceOf(RichTextField::class)
+        ->and($field->getName())->toBe('content');
+});
+
+it('registers the markdown macro on the FieldFactory', function (): void {
+    expect(FieldFactory::hasType('markdown'))->toBeTrue();
+
+    $field = FieldFactory::markdown('content');
+
+    expect($field)->toBeInstanceOf(MarkdownField::class)
         ->and($field->getName())->toBe('content');
 });

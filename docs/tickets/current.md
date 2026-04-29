@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008).** Fase 1 docs essencialmente completa. Próximo natural: voltar para tickets adiados (CORE-014/015, TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008).** Próximo natural: **CORE-016** (auto-install JS deps via `arqel:install` — DX P0 surfaced em sessão 2026-04-29) ou voltar para tickets adiados (CORE-014/015, TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 

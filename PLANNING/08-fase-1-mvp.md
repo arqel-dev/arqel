@@ -1324,6 +1324,71 @@ packages/core/src/
 
 ---
 
+### [CORE-016] `arqel:install` instala e configura o frontend automaticamente
+
+**Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [CORE-003]
+
+**Contexto**
+
+Hoje `arqel:install` faz scaffold PHP completo mas deixa o setup frontend (`pnpm add @arqel/{ui,fields,react,hooks,types}`, configuração de `resources/js/app.tsx`, configuração de Tailwind v4 em `resources/css/app.css`) como steps manuais — o user precisa ler [Getting Started](apps/docs/guide/getting-started.md) e copiar comandos.
+
+Isso é fricção alta para o **primeiro contato** do user com Arqel — exatamente o ponto onde a primeira impressão importa mais. Um dev Laravel sem JS background não sabe escolher entre `pnpm`/`npm`/`yarn`, fica confuso ao editar `app.tsx`/`app.css`, e desiste antes de ver a primeira UI funcional.
+
+Arqel é fundamentalmente Inertia + React (ADR-001) — não há admin sem o lado JS. O install deve refletir isso: **uma única execução** para sair de zero a `php artisan serve && pnpm dev` funcional.
+
+**Descrição técnica**
+
+Estender `Arqel\Core\Commands\InstallCommand` com 4 fases novas após o scaffolding PHP atual:
+
+1. **Detectar package manager** — checar `pnpm-lock.yaml`/`yarn.lock`/`package-lock.json` na ordem; se nenhum existir, perguntar via `select()` Laravel Prompts (default `pnpm`).
+2. **Instalar dependências JS** — perguntar via `confirm()` "Instalar pacotes frontend agora?" (default yes) e invocar:
+   ```bash
+   {pm} add @arqel/react @arqel/ui @arqel/hooks @arqel/fields @arqel/types
+   {pm} add -D @inertiajs/react react react-dom @types/react @types/react-dom
+   ```
+   Via `Symfony\Component\Process\Process` com timeout 300s e output streamado para o terminal. Em falha (rede, lockfile conflict, etc.), exibir warning não-fatal e seguir.
+3. **Scaffold `resources/js/app.tsx`** — substituir o conteúdo default de Laravel por:
+   ```tsx
+   import '@arqel/ui/styles.css';
+   import '@arqel/fields/register';
+   import { createArqelApp } from '@arqel/react/inertia';
+
+   createArqelApp({
+     appName: import.meta.env.VITE_APP_NAME ?? 'Arqel',
+     pages: import.meta.glob('./Pages/**/*.tsx'),
+   });
+   ```
+   Stub em `packages/core/stubs/app.tsx.stub`. Idempotente: detecta `import '@arqel/ui/styles.css'` para skip (a menos que `--force`).
+4. **Scaffold `resources/css/app.css`** — garantir as duas linhas:
+   ```css
+   @import 'tailwindcss';
+   @import '@arqel/ui/styles.css';
+   ```
+   Idempotente: skip se ambas já presentes.
+
+Adicionar flag `--no-frontend` para users que querem o scaffold PHP-only (e.g., contribuidores do monorepo, CI smoke tests).
+
+**Critérios de aceite**
+
+- [ ] `php artisan arqel:install` em Laravel fresh completa do zero ao "pnpm dev funcional" sem steps manuais
+- [ ] Detection automática de pm; `select()` apenas quando nenhum lockfile existe
+- [ ] `--no-frontend` flag funciona (pula fases 1-4 silently)
+- [ ] `--force` re-escreve `app.tsx`/`app.css` mesmo quando já configurados
+- [ ] Falha de rede no `{pm} add` não mata o comando — emite warning amarelo e continua
+- [ ] Stub `app.tsx.stub` substitui `{{ appName }}` por `config('app.name')` quando aplicável
+- [ ] Idempotência: rodar 2× sem `--force` não duplica imports
+- [ ] Teste Pest: mock `Process` + assert sequência de comandos chamados
+- [ ] `getting-started.md` em `apps/docs/guide/` atualizado: passos 3+4 viram "tudo isso é feito automaticamente pelo `arqel:install`"
+
+**Notas de implementação**
+
+- Symfony Process: usar `setTty(false)` em CI (Pest sem TTY); `setTty(Process::isTtySupported())` em dev real.
+- O step 3 é destrutivo (sobrescreve `app.tsx`) — sempre `confirm()` antes a menos que `--force`.
+- `package.json` do user pode não existir (Laravel novo cria, mas `arqel:install` não pode assumir). Detectar e abortar a fase 2 com warning se ausente.
+- Considerar: hint para rodar `pnpm dev` no final do output success — fechamos o loop visualmente.
+
+---
+
 ## 4. Pacote FIELDS
 
 ### [FIELDS-001] Esqueleto do pacote `arqel/fields`

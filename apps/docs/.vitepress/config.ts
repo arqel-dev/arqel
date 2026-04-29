@@ -68,6 +68,10 @@ export default defineConfig({
             { text: 'Auth', link: '/guide/auth' },
           ],
         },
+        {
+          text: 'Tutorial',
+          items: [{ text: 'Primeiro CRUD completo', link: '/guide/tutorial-first-crud' }],
+        },
       ],
       '/resources/': [
         {

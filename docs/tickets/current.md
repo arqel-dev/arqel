@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..003).** Próximo natural: DOCS-004 (tutorial blog admin) ou voltar para tickets adiados.
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..004).** Próximo natural: DOCS-005/006 (API references) ou voltar para tickets adiados.
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,29 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### DOCS-004 — Tutorial primeiro CRUD completo (parcial) (2026-04-29)
+
+**Entregue:**
+
+- `apps/docs/guide/tutorial-first-crud.md` real com 10 steps testáveis: cenário (blog com Post+Category), migrations completas (`categories` + `posts` com FK + softDeletes + status), models (Post/Category com fillable/casts/relations), `arqel:resource Category --with-policy`, declaração `CategoryResource` (slug `uniqueIn`), declaração `PostResource` completa com `Form::make()->schema([Section::make('Conteúdo')->columns(2), Section::make('Publicação')->aside()])` + `Table` com 5 columns + 2 filters + 3 actions (incluindo custom `RowAction publish` com visible/successNotification) + `bulkActions/toolbarActions` + `indexQuery` com eager loading + `beforeCreate` setando user_id, Policy com 5 métodos (viewAny/view/create/update/delete), registro no Panel
+- Sidebar atualizado em `.vitepress/config.ts` com seção "Tutorial" → tutorial-first-crud
+- `examples/blog-admin.md` simplificado para redirect ao tutorial
+- Bloco "Deploy considerations" com 6-item checklist (`optimize`, `pnpm build`, `composer install --no-dev`, env vars, cache driver, file disk)
+- Containers VitePress (`::: tip`/`::: warning`) usados consistentemente
+
+**Critérios não-entregues (parcial):**
+
+- ❌ **Repositório exemplo em `examples/first-crud`** — criar uma app Laravel completa funcional como sub-repo é fora do escopo de docs site; fica para PR follow-up quando DEMO-* tickets entrarem em fase
+- ❌ **Timer < 30 min** — só validável com user real testando
+
+**Validações:** `pnpm build` 20 páginas em 17s ✅ (jump no tempo é Vue compilation cache cold) · `biome check .` ✅
+
+**Decisões autónomas:**
+
+- **Path canónico do ticket** (`guide/tutorial-first-crud.md`) usado em vez do meu stub `examples/blog-admin.md`; o stub vira redirect — o ticket DOCS-004 listou esse caminho explicitamente
+- **`uniqueIn(Class)`** em vez de `unique(Class, 'col')` — esse é o nome correto após FIELDS-015 (renomeado para não colidir com `Field::unique` da `HasValidation` trait)
+- **Sem RichText real** — o ticket pede `RichText stub`; uso `Field::textarea` puro e mencionao em "Próximos passos" que custom RichTextField fica para `/advanced/custom-fields`
 
 ### DOCS-003 — Conceitos essenciais (2026-04-29)
 

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅).** Próximo natural: TENANT-009..012 (UI: tenant switcher + registration flow + profile + white-labeling) ou TENANT-013 (Cashier billing) ou WIDGETS/MCP/etc.
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001 ✅).** Próximo natural: WIDGETS-002 (StatWidget concrete) ou MCP-001 (esqueleto MCP server) ou FIELDS-ADV-001 (RichText).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,27 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### WIDGETS-001 — Esqueleto do pacote `arqel/widgets` (2026-04-29)
+
+**Entregue:**
+
+- Esqueleto do pacote `arqel/widgets` (PHP 8.3+, Laravel 12|13, dep em `arqel/core` via path repo): `composer.json` PSR-4 `Arqel\Widgets\` → `src/`, scripts test/coverage/analyse/lint/format. `WidgetsServiceProvider` auto-discovered + `phpunit.xml` config padrão Arqel
+- **`Arqel\Widgets\Widget`** (abstract) — base com fluent API completo: construtor `(string $name)`, getters/setters para `heading`/`description`/`sort`/`columnSpan(int|string)` (clamp ≥1 quando int, passthrough quando string)/`poll(int)` (≤0 disable, >0 sets)/`deferred(bool)`/`canSee(Closure)`/`filters(array)`. Subclasses declaram `protected string $type` + `protected string $component` e implementam `data(): array`. `id()` default `<type>:<name>`. `canBeSeenBy(?Authenticatable)` default true, delegação ao Closure quando registrado. `toArray(?Authenticatable)` emite payload canônico para Inertia: deferred → `data: null`, inline → chama `data()`
+- **`Arqel\Widgets\Dashboard`** (final) — builder de schema dashboard. `make()`, `widgets(array)` (filtra non-Widget silently), `addWidget(Widget)`, `columns(int)` (clamp 1..12), `heading`, `description`, `canSee(Closure)`. `toArray(?Authenticatable)` filtra widgets por `canBeSeenBy` + sort por `getSort()` (null sorts last via PHP_INT_MAX) + serializa cada widget. `canBeSeenBy(?Authenticatable)` oracle no nível do dashboard
+- **`Arqel\Widgets\WidgetRegistry`** (final, singleton) — `register(type, class-string<Widget>)` valida `is_subclass_of(Widget)` (lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`. Bound em `WidgetsServiceProvider::packageRegistered`
+- 29 testes Pest passando: 13 Widget, 7 Dashboard, 6 WidgetRegistry, 3 ServiceProvider smoke
+- Test scaffolding: `Fixtures/CounterWidget` extends `Widget` com `type='counter'`/`component='CounterWidget'`/`data()` retornando `['value' => $this->value]`
+
+**Validações:** `pest packages/widgets` 29/29, 65 assertions ✅ · `phpstan analyse packages/widgets` ✅ · `pint --test` ✅ · pacote registrado em `composer.json` raiz e symlinkado via path repo
+
+**Decisões autónomas:**
+
+- **`Widget` é abstract com `protected string $type='' / $component=''`** — força subclasse a override; permite reflection/registry ler o type sem instanciar
+- **`columnSpan` aceita `int|string`** — int para grid simples (1..12), string para atalhos client-side (`'full'`, `'1/2'`, `'1/3'`); a decode fica no `<DashboardRenderer>` React (WIDGETS-007+)
+- **`Dashboard::widgets()` filtra non-Widget silently** — UX consistente com `Form::schema()` em `arqel/form`; consumidor não precisa lembrar de `array_filter`
+- **`PHP_INT_MAX` para null sort** — null widgets vão pro fim da lista naturalmente sem precisar de comparator complexo
+- **`pollingInterval=null` quando `poll(0)` ou `poll(<0)`** — server emite `pollingInterval: null` no payload e o React skip o setInterval
 
 ### TENANT-007/008 — Adapters stancl/tenancy + spatie/laravel-multitenancy (2026-04-29)
 

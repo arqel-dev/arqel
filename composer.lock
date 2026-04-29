@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5cc5e2b1d7fa4892287e04fb1065a556",
+    "content-hash": "00f84fcf0d2e879abe66adbe53816267",
     "packages": [],
     "packages-dev": [
         {
@@ -604,6 +604,82 @@
                 "multi-tenancy",
                 "saas",
                 "tenant"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/widgets",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/widgets",
+                "reference": "acebd542265e82a92979d6c28ec7b97822f28bab"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Widgets\\WidgetsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Widgets\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Widgets\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Dashboard widgets for Arqel — Stat/Chart/Table/Custom widgets with deferred loading and polling.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "dashboard",
+                "kpi",
+                "laravel",
+                "widgets"
             ],
             "support": {
                 "issues": "https://github.com/arqel/arqel/issues",
@@ -6686,7 +6762,8 @@
         "arqel/form": 20,
         "arqel/nav": 20,
         "arqel/table": 20,
-        "arqel/tenant": 20
+        "arqel/tenant": 20,
+        "arqel/widgets": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

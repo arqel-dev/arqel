@@ -24,6 +24,7 @@
         "arqel/nav": "@dev",
         "arqel/table": "@dev",
         "arqel/tenant": "@dev",
+        "arqel/widgets": "@dev",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29"
     },

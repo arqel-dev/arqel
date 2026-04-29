@@ -20,10 +20,11 @@
 - `<Topbar>`: brand slot + theme toggle (`useTheme`) + mobile menu trigger (`onMobileMenuClick`) + slots `search | userMenu | tenantSwitcher`
 - `<MainContent>`: padding responsivo (`px-4 sm:px-6 lg:px-8`) + max-width configurável (`md..7xl | none`) + slots `breadcrumbs | header`
 - `<Footer>`: faixa minimal abaixo do `<MainContent>`
-
-**Por chegar (placeholder barrels):**
-
-- UI-003: ResourceIndex + DataTable + TableFilters + TablePagination + TableToolbar
+- `<DataTable>`: TanStack Table v8 com column polymorphism (9 cell types: text/badge/boolean/date/number/icon/image/relationship/computed), seleção controlada (Shift+click range), sticky header, sort visual, loading/empty states, `aria-sort` per column
+- `<TableFilters>`: 4 tipos (select/multiSelect/text/ternary), chip "Clear filters (n)" só quando ativos. dateRange/scope ficam para UI-004
+- `<TablePagination>`: prev/next + range "11–20 of 47" + per-page picker, disabled em first/last
+- `<TableToolbar>`: search slot + filters slot + bulk-action bar (aparece quando `selectedCount > 0`)
+- `<ResourceIndex>`: page-level wrapper que costura `ResourceIndexProps` server payload com toda a stack acima — header/toolbar/table/pagination — presentational, callbacks lifted
 - UI-004: FormRenderer + FieldRenderer + FormSection + FormActions
 - UI-005: ActionModal + ConfirmDialog + FlashContainer + FlashToast
 

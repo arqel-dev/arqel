@@ -1,8 +1,10 @@
-/**
- * Table components — placeholder until UI-003.
- *
- * DataTable, TableHeader, TableRow, TableFilters, TablePagination, TableToolbar
- * land in UI-003.
- */
-
-export {};
+export type { CellProps } from './cells.js';
+export { TableCell } from './cells.js';
+export type { DataTableProps, DataTableRecord } from './DataTable.js';
+export { DataTable } from './DataTable.js';
+export type { TableFiltersProps } from './TableFilters.js';
+export { TableFilters } from './TableFilters.js';
+export type { TablePaginationProps } from './TablePagination.js';
+export { TablePagination } from './TablePagination.js';
+export type { TableToolbarProps } from './TableToolbar.js';
+export { TableToolbar } from './TableToolbar.js';

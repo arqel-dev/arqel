@@ -8,18 +8,18 @@
 
 ## Status
 
-**Entregue (WIDGETS-001):**
+**Entregue (WIDGETS-001..002):**
 
 - Esqueleto do pacote `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo
 - **`Arqel\Widgets\Widget`** abstract base com fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case identifier) + `protected string $component` (PascalCase React component name) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload canônico para Inertia; `data: null` quando deferred. `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)` oracle (default true)
 - **`Arqel\Widgets\Dashboard`** (final) builder de schema dashboard: `widgets(array)` (filtra non-Widget silently), `addWidget(Widget)`, `columns(int)` (clamp 1..12), `heading`, `description`, `canSee(Closure)`. `toArray(?Authenticatable)` filtra widgets por `canBeSeenBy` + sort por `getSort()` (null sorts last via PHP_INT_MAX) + serializa cada widget
 - **`Arqel\Widgets\WidgetRegistry`** (final, singleton) `register(type, class-string<Widget>)` valida `is_subclass_of(Widget)` (lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`. Singleton bound em `WidgetsServiceProvider::packageRegistered`
 - **`Arqel\Widgets\WidgetsServiceProvider`** auto-discovered via `extra.laravel.providers`; `packageRegistered()` faz `singleton(WidgetRegistry::class)`
-- 25 testes Pest passando: 13 Widget (name/type/component getters, id default, fluent setters, columnSpan int clamp + string passthrough, poll(0|<0) disable + poll(>0) sets, canBeSeenBy default + closure, toArray inline data + deferred null, polling/filters/heading), 7 Dashboard (empty/12 cols default, widgets filter non-Widget, addWidget, columns clamp 1..12, canBeSeenBy default+closure, toArray sort+visibility, canBeSeenBy via user), 6 WidgetRegistry (empty, register, all, has/get unknown, clear, throws on invalid class), 3 ServiceProvider smoke
+- **`Arqel\Widgets\StatWidget`** (final) — KPI/big-number widget. Fluent API: `make(string $name)` (factory), `value(scalar|Closure)`, `statDescription(string|Closure)`, `descriptionIcon(string)`, `color(string)` (palette: primary/secondary/success/warning/danger/info, fallback primary em valores desconhecidos via constantes `COLOR_*`), `icon(string)`, `chart(array|Closure)` (sparkline points), `url(string)`. `data()` resolve Closures lazy (não invoca quando `deferred()` é true). `chart()` filtra silently non-numeric points; non-array Closure return → null. Construtor herdado de `Widget` aceita `name`
+- 45 testes Pest passando: 13 Widget, 7 Dashboard, 6 WidgetRegistry, 3 ServiceProvider smoke + **16 StatWidget** (type/component, value scalar/Closure/non-scalar coerce, statDescription string/Closure/non-string→null, color canonical/unknown→primary/all 6 constants, chart filter non-numeric/Closure/null/non-array, url+icon+descriptionIcon passthrough, toArray envelope shape, deferred → data null + Closures não invocados)
 
-**Por chegar (WIDGETS-002..015):**
+**Por chegar (WIDGETS-003..015):**
 
-- `StatWidget` (KPI cards com value/trend/icon) — WIDGETS-002
 - `ChartWidget` (Recharts integration: line/bar/pie/area) — WIDGETS-003
 - `TableWidget` (paginated table embedded em dashboard) — WIDGETS-004
 - `CustomWidget` (escape hatch para Inertia component arbitrário) — WIDGETS-005

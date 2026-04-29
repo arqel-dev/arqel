@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001 ✅) + 9 bugs do dogfooding fechados.** Próximo natural: WIDGETS-002 (StatWidget concrete) ou MCP-001 (esqueleto MCP server) ou FIELDS-ADV-001 (RichText). Re-rodar `setup-test-app.sh` no `arqel-test` deve agora funcionar end-to-end.
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001..005 ✅ · MCP-001 ✅ · FIELDS-ADV-001/002 ✅) + 9 bugs do dogfooding fechados + primeiro batch de 3 sub-agentes paralelos completo.** Próximo natural: WIDGETS-006 (DashboardController + endpoint), MCP-002 (JSON-RPC core), ou FIELDS-ADV-003+ (Markdown/Code/Repeater/Builder/KeyValue/Tags/Wizard).
 
 **Fase:** 1 (MVP)
 
@@ -52,6 +52,67 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - `resolvePage.ts` docblock atualizado: descreve o pattern correto de merge `{ ...arqelPages, ...userPages }` em vez do stale "registered later by @arqel/ui"
 
 **Validações pós-fixes:** `pest packages/core` 113/113 ✅ · `pest packages/tenant` 95/95 ✅ · `pest packages/widgets` 29/29 ✅ · `pest packages/actions` 49/49 ✅ · `pnpm build @arqel/ui` 11 ESM entries + dts ✅ · `pnpm test @arqel/ui` 70/70 ✅ · phpstan + pint todos limpos.
+
+### Batch paralelo #1 — WIDGETS-003/004/005 + MCP-001 + FIELDS-ADV-001/002 (2026-04-29)
+
+**Modelo:** primeira execução paralela com 3 sub-agentes em git worktrees isolados, eu (orquestrador) coordenando merge final. Total: 6 tickets, 6 commits dos agentes + 3 merge commits + 1 commit consolidando root configs.
+
+**Cluster A — `worktree-agent-a2728c0fdb2bfcbe5`** (3 tickets, 3 commits, 39 testes novos):
+- **WIDGETS-003 ChartWidget** (final, fluent) — `chartType` (line/bar/area/pie/donut/radar com `CHART_*` constants, fallback line), `height` (clamp ≥ 50), `showLegend`/`showGrid`, `chartData(array|Closure)` (Closure non-array → `{labels:[], datasets:[]}`), `chartOptions(array|Closure)`. `data()` resolve Closures lazy
+- **WIDGETS-004 TableWidget** (final, fluent) — `query(Closure(): Builder<Model>)`, `limit` (clamp ≥ 1), `columns` (duck-typed), `seeAllUrl`. **Sem dep em `arqel/table`** — duck-typing preserva o dep graph mínimo. Throwables capturados → `loadError + records: []`
+- **WIDGETS-005 CustomWidget** (final, escape hatch) — `make(name, component)`, `component(string)` valida não-vazio, `withData(array|Closure)` define payload (note: setter renomeado de `data()` para `withData()` para preservar LSP do `Widget::data(): array`)
+
+**Cluster B — `worktree-agent-a56324a69056748ac`** (1 ticket, 1 commit, 4 testes):
+- **MCP-001** — esqueleto `arqel/mcp` (PHP 8.3+, Laravel 12|13, dep `arqel/core`). `Arqel\Mcp\McpServer` (final stub) com `registerTool/Resource/Prompt` no-op + `getTools/Resources/Prompts` retornando `[]`. `Arqel\Mcp\McpServiceProvider` auto-discovered + singleton binding. SKILL.md PT-BR. Implementação real do JSON-RPC fica para MCP-002
+
+**Cluster C — `worktree-agent-ad1a26bdfd116074f`** (2 tickets, 2 commits, 14 testes):
+- **FIELDS-ADV-001** — esqueleto `arqel/fields-advanced` (PHP 8.3+, Laravel 12|13, deps `arqel/core` + `arqel/fields`). `Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider` registra macro `richText` em `FieldFactory`
+- **FIELDS-ADV-002 RichTextField** — `final extends Arqel\Fields\Field`, `type='richText'`/`component='RichTextInput'`. Setters: `toolbar`/`imageUploadDisk`/`imageUploadDirectory`/`maxLength` (clamp ≥1)/`fileAttachments`/`customMarks`/`mentionable` (filtra entries sem id+name). `getTypeSpecificProps()` emite `imageUploadRoute` como string literal (`/arqel/fields/upload?disk=<disk>`) ou `null`. **Sem hard dep em HTML Purifier** — sanitização documentada como responsabilidade do consumer (FormRequest rules, Eloquent mutators)
+
+**Merge issues resolvidos pelo orquestrador:**
+
+1. **Cluster A vs main**: worktree do A foi forked **antes** de WIDGETS-002 (StatWidget) ser mergeado em main — merge automático conflitou em `SKILL.md`. Resolvi manualmente preservando ambos os widgets na seção "Entregue" + consolidei test count para 84 (45 baseline + 39 do batch)
+2. **Snapshot tests pré-existentes (`packages/fields/tests/Snapshots/*.json`)**: 21 testes falhavam com diff cosmético (PHP 8.4 mudou `JSON_PRETTY_PRINT` indent de 2→4 spaces). **Não relacionado ao batch** — verificado fazendo `git checkout` no commit anterior e reproduzindo. Regenerei os 21 snapshots → 195/195 passing
+3. **`commitlint.config.mjs`** ganhou scope `fields-advanced` (cluster C usou scope `fields` que já existe — sem bloqueio na hora; serve para commits futuros do pacote)
+
+**Commits no main:**
+
+- `7f06f98` feat(mcp): scaffold arqel/mcp package (MCP-001) [agente B]
+- `6140c8c` feat(fields): scaffold arqel/fields-advanced (FIELDS-ADV-001) [agente C]
+- `41dfeb3` feat(fields): RichTextField with Tiptap config (FIELDS-ADV-002) [agente C]
+- `4d89c8a` feat(widgets): add ChartWidget Recharts wrapper (WIDGETS-003) [agente A]
+- `5f285d5` feat(widgets): add TableWidget mini-table dashboard widget (WIDGETS-004) [agente A]
+- `4dd25cf` feat(widgets): add CustomWidget escape-hatch widget (WIDGETS-005) [agente A]
+- `02fe73b` chore(mcp): merge cluster B
+- `46ad…` chore(fields): merge cluster C
+- `2aa8213` chore(widgets): merge cluster A (com SKILL.md conflict resolution)
+- `2f287f4` chore(infra): register MCP + fields-advanced + regen field snapshots
+
+**Validações finais (suite global, pós-merge):**
+
+- `pest packages/core` 113/113 ✅
+- `pest packages/fields` 195/195 ✅ (era 174 + 21 snapshots regenerados)
+- `pest packages/widgets` 84/84 ✅ (45 + 39 do batch)
+- `pest packages/tenant` 95/95 ✅
+- `pest packages/actions` 49/49 ✅
+- `pest packages/table` 56/56 ✅
+- `pest packages/form` 37/37 ✅
+- `pest packages/auth` 28/28 ✅
+- `pest packages/nav` 24/24 ✅
+- `pest packages/mcp` 4/4 ✅ (novo)
+- `pest packages/fields-advanced` 14/14 ✅ (novo)
+- `phpstan analyse packages` clean (151 files)
+- `pint --test packages` pass
+
+**Total: 699 testes Pest passando.**
+
+**Lições da execução paralela:**
+
+1. **Worktrees isolados funcionaram bem** — 3 agentes 100% sucesso, zero corrupção de filesystem
+2. **Cluster A teve problema de divergência** porque foi spawned antes de WIDGETS-002 estar no main. **Mitigação:** futuras paralelas devem ser spawned imediatamente após eu commitar o último ticket relevante, não com lag
+3. **Sub-agentes respeitaram os "do NOT touch"** — nenhum tocou `composer.json` raiz/`commitlint`/`current.md`/`CHANGELOG.md` (eu fiz tudo no merge)
+4. **Snapshot pre-existing** que se manifestou na suite global teria sido invisível sem o merge — vale rodar `pest` per-package no main antes de cada batch para baseline limpo
+5. **Tempo total**: ~15 min para 6 tickets + merge. Sequential teria sido ~45-60 min
 
 ### WIDGETS-001 — Esqueleto do pacote `arqel/widgets` (2026-04-29)
 

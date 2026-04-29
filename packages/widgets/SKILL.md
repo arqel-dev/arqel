@@ -17,12 +17,15 @@
 - **`Arqel\Widgets\WidgetsServiceProvider`** auto-discovered via `extra.laravel.providers`; `packageRegistered()` faz `singleton(WidgetRegistry::class)`
 - 25 testes Pest passando: 13 Widget (name/type/component getters, id default, fluent setters, columnSpan int clamp + string passthrough, poll(0|<0) disable + poll(>0) sets, canBeSeenBy default + closure, toArray inline data + deferred null, polling/filters/heading), 7 Dashboard (empty/12 cols default, widgets filter non-Widget, addWidget, columns clamp 1..12, canBeSeenBy default+closure, toArray sort+visibility, canBeSeenBy via user), 6 WidgetRegistry (empty, register, all, has/get unknown, clear, throws on invalid class), 3 ServiceProvider smoke
 
-**Por chegar (WIDGETS-002..015):**
+**Entregue (WIDGETS-003..005):**
 
-- `StatWidget` (KPI cards com value/trend/icon) — WIDGETS-002
-- `ChartWidget` (Recharts integration: line/bar/pie/area) — WIDGETS-003
-- `TableWidget` (paginated table embedded em dashboard) — WIDGETS-004
-- `CustomWidget` (escape hatch para Inertia component arbitrário) — WIDGETS-005
+- **`Arqel\Widgets\ChartWidget`** (final) — Recharts wrapper. Fluent: `chartType(line|bar|area|pie|donut|radar)` (unknown → line; `CHART_*` constants), `height(int)` (clamp ≥ 50, default 300), `showLegend(bool)`, `showGrid(bool)` (ambos default true), `chartData(array|Closure)` (Closure non-array → `{labels: [], datasets: []}`), `chartOptions(array|Closure)` (Closure non-array → `[]`). `data()` envelope `{chartType, chartData, chartOptions, height, showLegend, showGrid}`. Closures resolvidos lazy em `data()` time; `deferred()` skip a invocação.
+- **`Arqel\Widgets\TableWidget`** (final) — mini-tabela em dashboard. Fluent: `query(Closure(): Builder<Model>)`, `limit(int)` (clamp ≥ 1, default 10), `columns(array)` (passthrough; entries duck-typed em `serialiseColumns()` — só objetos com `toArray()` sobrevivem), `seeAllUrl(string|Closure|null)`. `data()` envelope `{columns, records, limit, seeAllUrl}`. Sem dependência em `arqel/table` — duck-typing preserva o dep graph mínimo. Throwables do Closure (e.g. PDO indisponível em testes) são capturados e expostos em `loadError: <message>` com `records: []`.
+- **`Arqel\Widgets\CustomWidget`** (final) — escape hatch. Factory `make(string $name, string $component)`; `component(string)` valida não-vazio (`InvalidArgumentException`); `withData(array|Closure)` define payload (default `[]`; Closure non-array → `[]`). `type = 'custom'` fixo, `component` configurado em runtime. `data()` resolve o payload, satisfazendo o contrato abstrato — note que o setter foi nomeado `withData()` em vez de `data()` para preservar a assinatura LSP de `Widget::data(): array`.
+- 39 testes Pest adicionais (68 totais): 14 ChartWidget, 10 TableWidget, 10 CustomWidget + fixture `FakeBuilder` (substitui Eloquent\Builder em testes — host sem `pdo_sqlite`).
+
+**Por chegar (WIDGETS-006..015):**
+
 - `Http\Controllers\DashboardController` + `WidgetDataController` (deferred fetch endpoint) — WIDGETS-006
 - React components em `@arqel/ui/widgets` — WIDGETS-007..010
 - Filters compartilhados (date range global, dropdown filter por dashboard) — WIDGETS-011..012

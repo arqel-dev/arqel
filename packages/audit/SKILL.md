@@ -24,10 +24,21 @@ A escolha é **integrar, não reinventar**: ActivityLog do Spatie é maduro, bem
   - **Total: 11 testes** (assumindo execução pós `composer install`)
 - `TestCase` registra `ActivitylogServiceProvider` + `AuditServiceProvider`, faz `loadMigrationsFrom(<vendor>/spatie/laravel-activitylog/database/migrations)` em `setUp()` (com fallback para `vendor/.../migrations`), e cria a tabela `fake_auditable_models` via `Schema::create` para alimentar os testes do trait
 
-**Por chegar (AUDIT-002+):**
+**Entregue (AUDIT-002 PHP slice):**
 
-- `ActivityLogController` rendering Inertia + filtros (subject, causer, date range)
-- `Activity` timeline tab embarcada em Resource detail (`showActivityLog(): bool`)
+- **`Arqel\Audit\Http\Controllers\RecordActivityController`** (final) — endpoint per-record `show(Request, string $subjectType, string|int $subjectId): JsonResponse`. Valida `$subjectType` via `class_exists` + `is_subclass_of(Model::class)` (HTTP 400 com `{error: 'invalid_subject_type'}` em caso negativo); query `Activity::where('subject_type', ...)->where('subject_id', ...)->with('causer')->latest()->paginate($perPage)`; mapeia para shape `{id, log_name, description, event, properties, causer: {id, type, name?, email?}|null, created_at}` e devolve no formato paginator default do Laravel (`data, current_page, last_page, per_page, total`). **Decisão:** mapping slug → FQCN é responsabilidade do consumidor (Resource registry no `arqel/core` futuro); o controller aceita FQCN puro porque é exatamente o que o Spatie persiste em `activity_log.subject_type`
+- **Rota** `GET /admin/audit/{subjectType}/{subjectId}/activity` registrada via `routes/admin.php` + `->hasRoute('admin')` no `AuditServiceProvider::configurePackage()`. Middleware `['web', 'auth']`. Constraint `where('subjectType', '.*')` permite `\` no FQCN. Nome: `arqel.audit.record-activity`
+- **`LogsActivity::activityLog(int $perPage = 20): LengthAwarePaginator`** — helper PHP-side equivalente ao endpoint, para consumidores que preferem buscar sem ir via HTTP (Inertia controllers próprios, Livewire, CLI, testes). Reutiliza `activities()` (morphMany do Spatie) + `with('causer')->latest()->paginate()`
+- Testes adicionados:
+  - `Feature/RecordActivityControllerTest` (5): happy path + 400 (subjectType inválido) + 400 (vazio) + paginator vazio + isolamento por `subject_id`
+  - `Unit/LogsActivityFetchTest` (2): paginator default + `perPage` honrado
+  - **Total acumulado: 18 testes passando**
+
+**Por chegar (cross-package + JS):**
+
+- React `ActivityTimeline` component (FIELDS-JS / ticket JS dedicado) — render bonito com diff, avatar do causer, timestamps relativos, filtros
+- Resource-base integration no `arqel/core` (`showActivityLog(): bool`, `activityLogForRecord(Model): array`) — auto-mount da tab quando o trait `LogsActivity` está presente no model
+- `ActivityLogController::index` (global) rendering Inertia + filtros (subject, causer, date range)
 - Causer automático via Auth facade — já é default Spatie quando há `Auth::user()` no request
 - Configuração para mascarar atributos sensíveis (PII, secrets) globalmente
 - Retention policies / pruning command

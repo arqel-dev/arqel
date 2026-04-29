@@ -24,6 +24,8 @@ final class AuditServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $package->name('arqel-audit');
+        $package
+            ->name('arqel-audit')
+            ->hasRoute('admin');
     }
 }

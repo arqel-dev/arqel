@@ -72,6 +72,18 @@ export default defineConfig({
           text: 'Tutorial',
           items: [{ text: 'Primeiro CRUD completo', link: '/guide/tutorial-first-crud' }],
         },
+        {
+          text: 'Integrações',
+          items: [{ text: 'AGENTS.md (LLMs)', link: '/guide/agents' }],
+        },
+        {
+          text: 'Migração',
+          items: [
+            { text: 'Vindo de Filament', link: '/guide/migration/from-filament' },
+            { text: 'Vindo de Nova', link: '/guide/migration/from-nova' },
+            { text: 'Vindo de react-admin', link: '/guide/migration/from-react-admin' },
+          ],
+        },
       ],
       '/resources/': [
         {

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..006).** Próximo natural: DOCS-007 (migration guides Filament/Nova) ou DOCS-008 (AGENTS.md template).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008).** Fase 1 docs essencialmente completa. Próximo natural: voltar para tickets adiados (CORE-014/015, TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,38 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### DOCS-007 — Migration guides Filament/Nova/react-admin (2026-04-29)
+
+**Entregue:**
+
+- 3 guias de migração reais em `apps/docs/guide/migration/`:
+  - `from-filament.md` — TL;DR + when-to-migrate + when-NOT, mapping side-by-side em 6 tabelas (Resource declaration / Fields / Tables / Actions / Layout / Authorization), o-que-NÃO-migra (Livewire components, plugins paid, `->reactive()`, Filament Notifications), 2 estratégias de migração (paralelo vs rewrite), nota sobre script de conversão community
+  - `from-nova.md` — TL;DR + Vue→React mental shift em tabela, 5 tabelas de mapping (Resource / Fields / Visibility / Actions / Authorization / Filters & Lenses / Tools/Cards/Dashboards), o-que-não-migra (Vue components, Tools paid, Trend/Value/Partition cards, Lenses), playbook de migração em 4 steps
+  - `from-react-admin.md` — Comparação client-driven vs server-driven com snippets lado-a-lado, mapping em tabela (`<Resource>`/`dataProvider`/`<List>`/etc. → equivalentes Arqel), quando ainda escreve React vs quando não, partial reload Inertia em vez de React Query/SWR
+- Sidebar atualizado com seção "Migração" e os 3 sub-itens
+
+**Validações:** `pnpm build` 36 páginas em 6.3s ✅ · `biome check .` ✅
+
+**Decisões autónomas:**
+
+- **3 guides em vez de 2** — ticket pediu Filament + Nova; adicionei react-admin pelo "Notas de implementação" do ticket ("migration guides atraem users mesmo que não migrem realmente — funcionam como 'what's different' positioning"). react-admin é o framework dominante no mundo React-only, vale fora-do-radar
+- **Sem scripts de conversão** — implementação é fora de scope de docs; mencionado como "community PRs welcome"
+
+### DOCS-008 — AGENTS.md template + MCP docs (2026-04-29)
+
+**Entregue:**
+
+- `apps/docs/guide/agents.md` real cobrindo: por que `AGENTS.md` importa para LLMs (4 problemas que resolve), o que `arqel:install` gera (7 seções: Projeto/Stack/Comandos/Convenções obrigatórias/Estrutura/Architecture summary/Links), como customizar (versionar via git), reprodução do template via `cat packages/core/stubs/agents.stub`, MCP stub Phase 2 com 5 tools planeadas (`list-resources`/`get-resource-fields`/`list-actions`/`query-resource`/`inspect-policy`)
+- Sidebar atualizado com seção "Integrações" → "AGENTS.md (LLMs)"
+- Confirmado que `packages/core/stubs/agents.stub` existe (foi criado em CORE-003) — a doc apenas referencia
+
+**Validações:** `pnpm build` ✅ · `biome check .` ✅
+
+**Decisões autónomas:**
+
+- **Página única em `guide/agents.md`** em vez de `guide/integrations/agents.md` — não criei sub-dir já que só há 1 integração documentada hoje (LLMs/MCP). Sub-dir será criado quando 2+ integrações existirem
+- **MCP docs como stub Phase 2** — o ticket pede "MCP docs stub"; documentei as tools planeadas mas com aviso explícito de que é Phase 2
 
 ### DOCS-006 — API Reference TypeScript curada (parcial) (2026-04-29)
 

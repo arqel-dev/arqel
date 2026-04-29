@@ -37,6 +37,16 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $this->registerPanelRegistry();
         $this->registerInertiaDataBuilder();
         $this->registerFacade();
+
+        // Apps register panels in their own ServiceProvider::boot, which
+        // runs before ours by registration order. Defer the panel→registry
+        // sync to `app->booted` so we always see the final list of panels
+        // and resources, regardless of provider order.
+        $this->app->booted(function (): void {
+            $this->syncPanelResourcesIntoRegistry();
+            $this->electDefaultCurrentPanel();
+        });
+
         $this->registerResourceRoutes();
     }
 
@@ -81,5 +91,63 @@ final class ArqelServiceProvider extends PackageServiceProvider
         Route::prefix($path)
             ->middleware($middleware)
             ->group(__DIR__.'/../routes/arqel.php');
+    }
+
+    /**
+     * Walk every registered Panel and copy its `resources([...])`
+     * declaration into the global `ResourceRegistry`. The
+     * controller resolves slugs against the registry, not against
+     * Panel state, so this sync is mandatory for `/admin/{slug}`
+     * to ever resolve.
+     *
+     * Idempotent: `ResourceRegistry::register()` skips duplicates.
+     */
+    protected function syncPanelResourcesIntoRegistry(): void
+    {
+        $panelRegistry = $this->app->make(PanelRegistry::class);
+        $resourceRegistry = $this->app->make(ResourceRegistry::class);
+
+        foreach ($panelRegistry->all() as $panel) {
+            foreach ($panel->getResources() as $resourceClass) {
+                if (! is_string($resourceClass) || ! class_exists($resourceClass)) {
+                    continue;
+                }
+
+                if ($resourceRegistry->has($resourceClass)) {
+                    continue;
+                }
+
+                $resourceRegistry->register($resourceClass);
+            }
+        }
+    }
+
+    /**
+     * Set the first declared panel as the current one when no
+     * panel has been picked yet. Single-panel apps (the common
+     * case) get this for free; multi-panel apps must override
+     * via middleware that calls `PanelRegistry::setCurrent($id)`
+     * based on path.
+     */
+    protected function electDefaultCurrentPanel(): void
+    {
+        $panelRegistry = $this->app->make(PanelRegistry::class);
+
+        if ($panelRegistry->getCurrent() !== null) {
+            return;
+        }
+
+        $panels = $panelRegistry->all();
+        if ($panels === []) {
+            return;
+        }
+
+        // First panel by insertion order; PanelRegistry::all()
+        // returns a numerically-indexed list, so we read the id
+        // from the Panel object itself.
+        $first = $panels[0] ?? null;
+        if ($first !== null) {
+            $panelRegistry->setCurrent($first->id);
+        }
     }
 }

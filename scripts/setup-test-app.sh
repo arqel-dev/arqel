@@ -276,6 +276,63 @@ else
       warn "Couldn't auto-patch $VITE_CONFIG — please change app.js → app.tsx manually."
     fi
   fi
+
+  # Composer path repos copy each package's vendor/ alongside the
+  # symlink (~65k+ files), and Vite tries to watch all of it,
+  # blowing past the inotify limit (ENOSPC). Add a server.watch
+  # ignored block when missing.
+  if ! grep -q "vendor/arqel" "$VITE_CONFIG"; then
+    if grep -q "watch:" "$VITE_CONFIG"; then
+      warn "Vite already has a server.watch block — please add vendor/arqel/* + node_modules manually."
+    else
+      cp "$VITE_CONFIG" "$VITE_CONFIG.watch.bak"
+      python3 - "$VITE_CONFIG" <<'PY' || warn "Couldn't auto-inject server.watch.ignored — add manually."
+import re, sys, pathlib
+path = pathlib.Path(sys.argv[1])
+src = path.read_text()
+ignored = """    server: {
+        watch: {
+            ignored: [
+                '**/vendor/arqel/*/vendor/**',
+                '**/vendor/arqel/*/node_modules/**',
+                '**/storage/framework/views/**',
+            ],
+        },
+    },
+"""
+# Replace existing `server: { watch: { ignored: [...] } }` block
+# only when it doesn't already mention vendor/arqel.
+if "vendor/arqel" in src:
+    sys.exit(0)
+
+new = re.sub(
+    r"server:\s*\{\s*watch:\s*\{[^}]*\},\s*\},",
+    ignored.strip(),
+    src,
+    count=1,
+    flags=re.DOTALL,
+)
+if new == src:
+    # No existing block — insert before the closing `});` of
+    # defineConfig({ ... });
+    new = re.sub(
+        r"(\n\s*\}\);\s*$)",
+        f"\n{ignored}\\1",
+        src,
+        count=1,
+    )
+path.write_text(new)
+PY
+      if grep -q "vendor/arqel" "$VITE_CONFIG"; then
+        ok "vite config gained server.watch.ignored (.watch.bak left as backup)"
+      else
+        warn "Auto-inject of server.watch.ignored failed — add the block manually:"
+        warn "  server: { watch: { ignored: ['**/vendor/arqel/*/vendor/**', '**/vendor/arqel/*/node_modules/**'] } }"
+      fi
+    fi
+  else
+    ok "vite already filters vendor/arqel from watch"
+  fi
 fi
 
 # ---------- 9. App\Providers\ArqelServiceProvider ----------------

@@ -63,6 +63,8 @@ final class InertiaDataBuilder
 
         $paginator = $query->paginate(perPage: $perPage, page: $page);
 
+        $fields = $resource->fields();
+
         return [
             'resource' => $this->resourceMeta($resource),
             'records' => $paginator->items(),
@@ -72,8 +74,68 @@ final class InertiaDataBuilder
                 'perPage' => $paginator->perPage(),
                 'total' => $paginator->total(),
             ],
-            'fields' => $this->serializer->serialize($resource->fields(), null, $this->currentUser()),
+            'fields' => $this->serializer->serialize($fields, null, $this->currentUser()),
+            // The plain fallback emits empty/derived versions of the
+            // table-shaped keys so the React `<DataTable>` /
+            // `<ResourceIndex>` components never have to guard for
+            // `undefined` (`filters.length`, `columns.map`, etc.).
+            'columns' => $this->deriveColumnsFromFields($fields),
+            'filters' => [],
+            'actions' => [
+                'row' => [],
+                'bulk' => [],
+                'toolbar' => [],
+            ],
+            'search' => $request->input('search'),
+            'sort' => [
+                'column' => $request->input('sort'),
+                'direction' => $request->input('direction'),
+            ],
         ];
+    }
+
+    /**
+     * Derive a minimal `columns` payload from the Resource's fields
+     * when no `Table::make()` is declared. Honours `visibility.table`
+     * so fields hidden from tables stay hidden, and emits the same
+     * shape the rich path would.
+     *
+     * @param array<int, mixed> $fields
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function deriveColumnsFromFields(array $fields): array
+    {
+        $columns = [];
+        foreach ($fields as $field) {
+            if (! is_object($field)) {
+                continue;
+            }
+
+            // Honour visibility.table when the field exposes the
+            // visibility oracle from `HasVisibility` — defaults to
+            // visible when the trait is absent.
+            if (method_exists($field, 'isVisibleIn') && $field->isVisibleIn('table') === false) {
+                continue;
+            }
+
+            $name = method_exists($field, 'getName') ? $field->getName() : null;
+            if (! is_string($name) || $name === '') {
+                continue;
+            }
+
+            $label = method_exists($field, 'getLabel') ? $field->getLabel() : ucfirst($name);
+
+            $columns[] = [
+                'name' => $name,
+                'type' => 'text',
+                'label' => is_string($label) ? $label : ucfirst($name),
+                'sortable' => false,
+                'searchable' => false,
+            ];
+        }
+
+        return $columns;
     }
 
     /**

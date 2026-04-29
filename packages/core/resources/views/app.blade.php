@@ -24,7 +24,7 @@
     @endif
 
     @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.tsx'])
+    @vite(config('arqel.inertia.vite_entries', ['resources/css/app.css', 'resources/js/app.tsx']))
     @inertiaHead
 </head>
 <body class="h-full bg-background text-foreground antialiased">

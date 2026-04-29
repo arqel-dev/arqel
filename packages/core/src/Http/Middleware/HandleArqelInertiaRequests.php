@@ -20,6 +20,25 @@ use Inertia\Middleware;
 final class HandleArqelInertiaRequests extends Middleware
 {
     /**
+     * The Blade root view. Defaults to `arqel::app` (the Inertia
+     * root template published by `arqel/core`) so apps don't need
+     * to publish their own. Override `arqel.inertia.root_view`
+     * config to point at an app-owned view (e.g. `'app'` after
+     * publishing the package's `app.blade.php` or a custom one).
+     *
+     * @var string
+     */
+    protected $rootView = 'arqel::app';
+
+    public function __construct()
+    {
+        $configured = config('arqel.inertia.root_view');
+        if (is_string($configured) && $configured !== '') {
+            $this->rootView = $configured;
+        }
+    }
+
+    /**
      * Bust the Inertia asset version when Arqel itself updates so
      * the client picks up new bundles without a manual hard reload.
      */

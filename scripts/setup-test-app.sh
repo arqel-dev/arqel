@@ -217,10 +217,13 @@ else
 import '@arqel/ui/styles.css';
 import '@arqel/fields/register';
 import { createArqelApp } from '@arqel/react/inertia';
+import { arqelPages } from '@arqel/ui/pages';
 
 createArqelApp({
   appName: import.meta.env.VITE_APP_NAME ?? 'Arqel Test',
-  pages: import.meta.glob('./Pages/**/*.tsx'),
+  // Spread arqelPages first so user pages can override per-resource
+  // (e.g. resources/js/Pages/Arqel/Posts/Index.tsx).
+  pages: { ...arqelPages, ...import.meta.glob('./Pages/**/*.tsx') },
 });
 TSX
   ok "app.tsx written"

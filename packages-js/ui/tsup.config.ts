@@ -12,6 +12,7 @@ export default defineConfig({
     flash: 'src/flash/index.ts',
     utility: 'src/utility/index.ts',
     utils: 'src/utils/index.ts',
+    pages: 'src/pages/index.ts',
   },
   format: ['esm'],
   dts: true,

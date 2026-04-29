@@ -9,16 +9,16 @@ export type PageRegistry = Record<string, LazyPage>;
  * the registered loader; missing pages throw a clear error so
  * users see the typo at boot rather than a blank screen.
  *
- * Apps typically construct the user pages registry like:
+ * Apps merge the built-in `arqel::*` page registry from
+ * `@arqel/ui/pages` with their own glob output. Spread `arqelPages`
+ * first so user pages can override per-resource (e.g. a custom
+ * `Pages/Arqel/Posts/Index.tsx`):
  *
- *   const pages = import.meta.glob<{ default: ComponentType }>(
- *     './Pages/**\/*.tsx',
- *   );
- *   createArqelApp({ pages });
+ *   import { arqelPages } from '@arqel/ui/pages';
  *
- * Built-in `arqel::*` pages are registered later by `@arqel/ui`
- * (UI-001+) — at that point we'll merge the two registries inside
- * `createArqelApp`.
+ *   const userPages = import.meta.glob('./Pages/**\/*.tsx');
+ *
+ *   createArqelApp({ pages: { ...arqelPages, ...userPages } });
  */
 export function resolveArqelPage(
   registries: PageRegistry[],

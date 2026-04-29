@@ -63,6 +63,10 @@
       "types": "./dist/utils.d.ts",
       "import": "./dist/utils.js"
     },
+    "./pages": {
+      "types": "./dist/pages.d.ts",
+      "import": "./dist/pages.js"
+    },
     "./styles.css": "./src/styles/globals.css"
   },
   "files": [

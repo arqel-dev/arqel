@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Arqel\Tenant;
 
 use Arqel\Tenant\Contracts\TenantResolver;
+use Arqel\Tenant\Middleware\ResolveTenantMiddleware;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Routing\Router;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -53,6 +55,15 @@ final class TenantServiceProvider extends PackageServiceProvider
 
             return new TenantManager($resolver, $events);
         });
+    }
+
+    public function packageBooted(): void
+    {
+        $router = $this->app->make(Router::class);
+
+        if ($router instanceof Router) {
+            $router->aliasMiddleware('arqel.tenant', ResolveTenantMiddleware::class);
+        }
     }
 
     /**

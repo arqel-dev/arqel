@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001/002/003 ✅).** Próximo natural: TENANT-004 (`ResolveTenantMiddleware` integrando com `HandleArqelInertiaRequests`).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..004 ✅).** Próximo natural: TENANT-005 (trait `BelongsToTenant` + `TenantScope` global Eloquent scope).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,25 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TENANT-004 — `ResolveTenantMiddleware` + `TenantNotFoundException` (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Tenant\Middleware\ResolveTenantMiddleware` (final) — `handle(Request, Closure, string $mode='required')` invoca `TenantManager::resolve()` antes do controller, lança `TenantNotFoundException` quando required+missing, deixa passar quando optional. Constantes `MODE_REQUIRED`/`MODE_OPTIONAL`. `normaliseMode()` privado: case-insensitive, trim-tolerant, valores desconhecidos caem em `required` por segurança
+- `Arqel\Tenant\Exceptions\TenantNotFoundException` — não-final por design (apps podem extend para custom render). `__construct($message, ?string $identifier)` carrega host/subdomain para o payload. Método `render(Request)` retorna 3 shapes: (1) JSON 404 quando `$request->expectsJson()`, (2) Inertia `arqel::errors.tenant-not-found` quando view publicada (gate `inertia()` + `view()->exists()`), (3) plain Symfony Response 404 como fallback
+- `TenantServiceProvider::packageBooted` adicionado: registra alias `arqel.tenant` → `ResolveTenantMiddleware` no Router. Apps usam `->middleware(['web', 'auth', 'arqel.tenant'])` ou `'arqel.tenant:optional'`
+- 8 testes Pest novos (62 total, 98 assertions): `ResolveTenantMiddlewareTest` com let-through happy, throws on required+missing, optional lets-through, unknown mode→required (safe default), mode case/trim tolerant (' OPTIONAL ' funciona), JSON 404 render com payload `{message, tenantIdentifier}`, plain 404 fallback sem Inertia view, alias registrado no Router
+- Test scaffolding: `tenantStubResolver()` (anonymous TenantResolver inline), `middlewareWithTenant()` (factory pre-wired)
+
+**Validações:** `pest packages/tenant` 62/62, 98 assertions ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test` ✅
+
+**Decisões autónomas:**
+
+- **`TenantNotFoundException` não-final** — diferente do middleware. Apps podem ter custom render (`extends TenantNotFoundException` + override). Esse é o pattern Laravel idiomático para exceptions com `render()`
+- **3 shapes de render** com gates de `function_exists`/`view()->exists()` — pacote funciona em apps **sem** Inertia ou em routes API-only sem ter que registrar handler custom; degrade gracioso para plain 404
+- **Mode `required` como default + safe-fallback** — `?mode=lol` é tratado como required, não optional. Mais seguro: erro silente em URL malformed seria pior que 404
+- **Alias em `packageBooted`, não `packageRegistered`** — Router só está disponível após boot do `RoutingServiceProvider`. `packageBooted` corre depois do framework completo, garante que Router está bound
 
 ### TENANT-003 — `TenantManager` singleton + resolução em request (2026-04-29)
 

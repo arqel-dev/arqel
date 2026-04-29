@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001 ✅).** Próximo natural: WIDGETS-002 (StatWidget concrete) ou MCP-001 (esqueleto MCP server) ou FIELDS-ADV-001 (RichText).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001 ✅) + 9 bugs do dogfooding fechados.** Próximo natural: WIDGETS-002 (StatWidget concrete) ou MCP-001 (esqueleto MCP server) ou FIELDS-ADV-001 (RichText). Re-rodar `setup-test-app.sh` no `arqel-test` deve agora funcionar end-to-end.
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,29 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### Bug fixes — `arqel-test` dogfooding (2026-04-29)
+
+Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 medium, 1 low, 1 wontfix). Todos fechados em 2 commits:
+
+**`f58eeb3` — fix(core): unblock arqel-test smoke flow (bugs 1, 2, 4, 5, 6, 8)**
+
+- **Bug 1 (blocker)** — Resources do Panel não chegavam ao `ResourceRegistry` global → 404 em qualquer `/admin/{slug}`. `ArqelServiceProvider::packageBooted` agora agenda um `$this->app->booted` callback que (a) copia `Panel::getResources()` para o `ResourceRegistry` global (idempotente, valida `class_exists`) e (b) elege o primeiro panel declarado como current quando nenhum foi setado (single-panel apps recebem isso de graça)
+- **Bug 2 (blocker)** — `HandleArqelInertiaRequests` herdava `$rootView = 'app'` do Inertia mas só `arqel::app` está publicada → `View [app] not found`. Override `$rootView = 'arqel::app'` + leitura de `config('arqel.inertia.root_view')` no `__construct`
+- **Bug 4 (high)** — `buildPlainIndexData` não emitia `columns/filters/search/sort/actions` → React `<ResourceIndex>` quebrava em `filters.length`. Plain fallback agora deriva columns automaticamente de `fields()` (honra `visibility.table` via `isVisibleIn` duck-type) + emite arrays/objetos vazios para todos os keys table-shaped
+- **Bug 5 (medium)** — `app.blade.php` hardcoded `resources/css/app.css + resources/js/app.tsx`. Agora lê `config('arqel.inertia.vite_entries', [...])`; default config publicado mantém os 2 entries originais
+- **Bug 6 (high)** — `@arqel/ui/styles/globals.css` faz `@import 'tailwindcss'` mas tailwindcss não estava em peerDependencies. Adicionado `"tailwindcss": "^4.0.0"` em peerDependencies
+- **Bug 8 (medium)** — `arqel:resource --with-policy` delegava para `make:policy` cujo stub Laravel default retorna `false` em todos os métodos → 403 em qualquer access pós-scaffolding. `MakeResourceCommand::rewritePolicyToArqelDefaults` reescreve o ficheiro gerado com policy "allow-all + TODOs apontando os pontos de tightening"
+- 4 testes Pest novos (`PanelToRegistrySyncTest`, 113/113 total) cobrindo o sync, election, override explicit, skip de invalid resource entries
+- **Bug 9 (low)** — `Panel::path()` prepend `/`. Marcado wontfix — `Route::prefix` aceita ambos formatos e mudar agora ondularia em testes existentes
+
+**`e443e1f` — feat(ui): built-in Inertia page registry for arqel::* (bug 3, bug 7)**
+
+- **Bug 3 (blocker)** — `ResourceController` emite `component: 'arqel::index'` mas `@arqel/ui` não exportava registry de pages → `resolveArqelPage: no page found for [arqel::index]`. Novo subpath `@arqel/ui/pages` exportando `arqelPages: Record<string, LazyPage>` mapeando os 4 names canônicos para componentes default. `ArqelIndexPage` wrappa `<ResourceIndex>` com `usePage().props`; `ArqelCreatePage`/`EditPage` usam `useArqelForm` + `<FormRenderer>` + `<FormActions>` com submit via `router.post/put`; `ArqelShowPage` re-usa `<FormRenderer>` com `schema.disabled = true` (read-only). `tsup.config.ts` ganha entry `pages`; `package.json` exports declaram `./pages`. `setup-test-app.sh` agora gera `app.tsx` com `pages: { ...arqelPages, ...userPages }` por defeito
+- **Bug 7 (high)** — Vite ENOSPC em `pnpm dev` por watch dos `vendor/arqel/*/vendor/**` symlinkados (~65k+ files). `setup-test-app.sh` auto-inject `server.watch.ignored` no `vite.config.{ts,js,mjs}` com glob para `vendor/arqel/*/vendor/**` + `vendor/arqel/*/node_modules/**` quando o block ainda não existe (Python inline regex pass com fallback warning)
+- `resolvePage.ts` docblock atualizado: descreve o pattern correto de merge `{ ...arqelPages, ...userPages }` em vez do stale "registered later by @arqel/ui"
+
+**Validações pós-fixes:** `pest packages/core` 113/113 ✅ · `pest packages/tenant` 95/95 ✅ · `pest packages/widgets` 29/29 ✅ · `pest packages/actions` 49/49 ✅ · `pnpm build @arqel/ui` 11 ESM entries + dts ✅ · `pnpm test @arqel/ui` 70/70 ✅ · phpstan + pint todos limpos.
 
 ### WIDGETS-001 — Esqueleto do pacote `arqel/widgets` (2026-04-29)
 

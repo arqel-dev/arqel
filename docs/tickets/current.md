@@ -5,11 +5,11 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + types/react base.** Próximo natural: HOOKS-001 (`@arqel/hooks`) ou UI-001 (`@arqel/ui`).
+**Fase 1 backend PHP + frontend stack (@arqel/ui completo).** Próximo natural: FIELDS-JS-001 (rich inputs registrados via FieldRegistry) ou DOCS-001+ (docs site).
 
 **Fase:** 1 (MVP)
 
-> **Status:** **PHP:** CORE-001..013 + CORE-006/007/010 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007/008 + FORM-010 parcial ✅. FIELDS-001..022 ✅. **JS:** TYPES-001/002 + TYPES-004 parcial ✅. REACT-001..004 ✅. Adiados: CORE-014/015 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 + TYPES-003 (spatie integration).
+> **Status:** **PHP:** CORE-001..013 + CORE-006/007/010 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007/008 + FORM-010 parcial ✅. FIELDS-001..022 ✅. **JS:** TYPES-001/002 + TYPES-004 parcial ✅. REACT-001..004 ✅. HOOKS-001 ✅ (10 hooks). UI-001..007 ✅ (shell + table + form + action + flash + utility, 70 testes). Adiados: CORE-014/015 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 + TYPES-003 (spatie), HOOKS-002..006 (Zod validate / URL sync — coberto minimally em HOOKS-001).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -29,6 +29,34 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### UI-001..007 — `@arqel/ui` completo (2026-04-29)
+
+**Entregue (8 entry points subpath, 70 testes Vitest passando):**
+
+- **UI-001 (scaffold + tokens)**: 9 subpath entries, `globals.css` com Tailwind v4 + design tokens em `oklch` + `.dark` flip, `cn()` (clsx + tailwind-merge), `<Button>` cva, `<CanAccess>` sobre `useCanAccess`
+- **UI-002 (shell)**: `<AppShell>` 4 variants, `<Sidebar>` rail desktop + Base UI Dialog overlay mobile (items via `useNavigation()` ou prop), `<Topbar>` com theme toggle/mobile menu, `<MainContent>` (maxWidth md..7xl + slots), `<Footer>`
+- **UI-003 (table)**: `<DataTable>` TanStack Table v8 com 9 cell renderers polimórficos, seleção controlada Shift+click, sticky header, `aria-sort`; `<TableFilters>` (4 tipos), `<TablePagination>`, `<TableToolbar>`, `<ResourceIndex>` page-level
+- **UI-004 (form)**: `<FormRenderer>` recursivo + `<FieldRenderer>` com `FieldRegistry` global + native HTML fallback (17 dos 21 types); `<FormSection>` (collapsible/aside), `<FormFieldset>`, `<FormGrid>`, `<FormTabs>` (WAI-ARIA keyboard nav), `<FormActions>`
+- **UI-005 (action)**: `<ActionButton>` matriz (confirm/form/ambos/direto), `<ActionMenu>` (inline → Base UI dropdown), `<ConfirmDialog>` (type-to-confirm), `<ActionFormModal>`
+- **UI-006 (flash + utility)**: `<FlashContainer>` consome `useFlash()`, `<FlashToast>` self-rendered (4 posições, role=alert/status); `<Breadcrumbs>` (auto/explicit), `<PageHeader>`, `<EmptyState>`, `<ErrorState>`, `<LoadingSkeleton>`
+- **UI-007 (testes + docs)**: SKILL.md + README.md em PT-BR completos, coverage report 67% global (barrels + Sidebar mobile-Portal são os principais miss)
+
+**Validações:** `tsc --noEmit` strict + exactOptionalPropertyTypes ✅ · `biome check` ✅ · `vitest run` 70 testes passando ✅ · `tsup` 9 ESM entries com dts ✅
+
+**Decisões autónomas:**
+
+- **Self-rendered FlashToast** sem `sonner` — apps que querem podem registrar fallback custom; bundle stays lean
+- **FieldRegistry global** (`registerField/getFieldComponent`) — `@arqel/fields` JS plugará via essa API; native fallback cobre 17 tipos enquanto isso
+- **Lazy `usePage()`** em Breadcrumbs/Sidebar — quando `items` é passado explicitamente, hook não é invocado, permite uso fora de Inertia (testes, dashboards)
+- **Components presentational** — selection/sort/filters lifted via callbacks, sem fetch interno
+- **`exactOptionalPropertyTypes` compliance** — props opcionais declaradas como `T | undefined` quando recebem undefined explícito (necessário pelo strict mode)
+
+### HOOKS-001 — `@arqel/hooks` completo (2026-04-28)
+
+**Entregue:** 10 hooks reusáveis com 11 entry points subpath tree-shakeable: `useResource<T>()`, `useArqelForm({ fields, record })`, `useCanAccess(ability, record?)`, `useFlash({ onMessage })`, `useTable()` (sort/filters/selection local), `useAction(action)`, `useFieldDependencies()` (debounce 300ms), `useNavigation()`, `useBreakpoint()` (Tailwind v4 SSR-safe), `useArqelOptimistic()` (React 19 wrapper). 4 testes Vitest. SKILL + README PT-BR.
+
+**Decisão autónoma:** Inertia `useForm<T>` sofre de "type instantiation excessively deep" com `Record<string, FormDataConvertible>` literal — narrowed via cast `useForm as unknown as (data: FormValues) => InertiaFormProps<FormValues>` para evitar TS2589 mantendo o tipo de retorno público. Zod validation client-side fica para HOOKS-002 follow-up.
 
 ### FIELDS-014 — SKILL.md do pacote fields (2026-04-27)
 
@@ -778,4 +806,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-17 (CORE-001 completo — primeiro package real scaffolded)
+**Última atualização:** 2026-04-29 (UI-007 completo — `@arqel/ui` totalmente scaffolded com 70 testes Vitest passando)

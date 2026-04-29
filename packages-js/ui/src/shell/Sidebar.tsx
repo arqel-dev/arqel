@@ -98,9 +98,27 @@ function groupItems(
   return Array.from(map.entries());
 }
 
-export function Sidebar({ items, brand, footer, open, onOpenChange, className }: SidebarProps) {
+export function Sidebar(props: SidebarProps) {
+  if (props.items === undefined) {
+    return <SidebarFromShared {...props} />;
+  }
+  return <SidebarImpl {...props} items={props.items} />;
+}
+
+function SidebarFromShared(props: SidebarProps) {
   const fromHook = useNavigation();
-  const resolvedItems = items ?? fromHook.items;
+  return <SidebarImpl {...props} items={fromHook.items} />;
+}
+
+function SidebarImpl({
+  items,
+  brand,
+  footer,
+  open,
+  onOpenChange,
+  className,
+}: SidebarProps & { items: NavigationItemPayload[] }) {
+  const resolvedItems = items;
 
   const desktop = (
     <aside

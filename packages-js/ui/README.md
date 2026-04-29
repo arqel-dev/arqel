@@ -8,7 +8,7 @@ Structural React components for [Arqel](https://arqel.dev) admin panels.
 
 ## Status
 
-🚧 **Pre-alpha** — UI-001 entregue (esqueleto + Button + CanAccess + cn). UI-002..005 vêm a seguir.
+🚧 **Pre-alpha** — UI-001..006 entregues (shell, table, form, action, flash, utility).
 
 ## Install
 
@@ -21,39 +21,39 @@ pnpm add @inertiajs/react react react-dom @base-ui-components/react @tanstack/re
 
 ```tsx
 import '@arqel/ui/styles.css';
-import { Button, CanAccess } from '@arqel/ui';
-
-export function CreateUserButton() {
-  return (
-    <CanAccess ability="users.create">
-      <Button>Create user</Button>
-    </CanAccess>
-  );
-}
+import {
+  AppShell, Sidebar, Topbar, MainContent,
+  ResourceIndex, FormRenderer, ActionButton, FlashContainer,
+} from '@arqel/ui';
 ```
+
+## What's inside
+
+| Subpath           | Components                                                                    |
+|-------------------|--------------------------------------------------------------------------------|
+| `@arqel/ui/shell`    | `AppShell`, `Sidebar`, `Topbar`, `MainContent`, `Footer`                       |
+| `@arqel/ui/table`    | `DataTable`, `TableCell`, `TableFilters`, `TablePagination`, `TableToolbar`    |
+| `@arqel/ui/resource` | `ResourceIndex`                                                                |
+| `@arqel/ui/form`     | `FormRenderer`, `FieldRenderer`, `FormSection`, `FormFieldset`, `FormGrid`, `FormTabs`, `FormActions`, `registerField` |
+| `@arqel/ui/action`   | `Button`, `ActionButton`, `ActionMenu`, `ConfirmDialog`, `ActionFormModal`     |
+| `@arqel/ui/auth`     | `CanAccess`                                                                    |
+| `@arqel/ui/flash`    | `FlashContainer`, `FlashToast`                                                 |
+| `@arqel/ui/utility`  | `Breadcrumbs`, `PageHeader`, `EmptyState`, `ErrorState`, `LoadingSkeleton`     |
+| `@arqel/ui/utils`    | `cn`                                                                           |
 
 ## Design tokens
 
 Tokens são CSS vars em `oklch`, honram light/dark via `.dark` class flip aplicada pelo `<ThemeProvider>`:
 
 ```css
---color-arqel-bg
---color-arqel-fg
+--color-arqel-bg / -fg
 --color-arqel-primary / -fg
 --color-arqel-secondary / -fg
 --color-arqel-destructive / -fg
+--color-arqel-success / -warning
 --color-arqel-muted / -fg
---color-arqel-border
---color-arqel-ring
+--color-arqel-border / -input / -ring
 --radius-arqel / -sm / -lg
-```
-
-## Subpath imports
-
-```ts
-import { Button } from '@arqel/ui/action';
-import { CanAccess } from '@arqel/ui/auth';
-import { cn } from '@arqel/ui/utils';
 ```
 
 ## Links

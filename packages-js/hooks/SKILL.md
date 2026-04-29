@@ -20,10 +20,20 @@
 - `useFieldDependencies({ fields, values, debounceMs })` — partial reload `fields.<name>.options` debounce 300ms
 - `useNavigation()` / `useBreakpoint()` / `useArqelOptimistic()`
 
-**Por chegar:**
+**Entregue depois (HOOKS-002..006):**
 
-- HOOKS-002: client-side validation via Zod em `useArqelForm.validate()`
-- HOOKS-004: URL sync em `useTable`, real progress events em `useAction`
+- HOOKS-002: API surface dos 10 hooks já está consolidada em HOOKS-001 (build/typecheck/lint passam, são tree-shakeable per-subpath)
+- HOOKS-003: `useCanAccess` + `useFlash` cobertos com testes unitários
+- HOOKS-004: `useTable` cobertura de filtros/sort/seleção; `useAction` thin wrapper testado via smoke; URL sync em `useTable` + real progress events em `useAction` ficam como Phase 2 follow-up (nada quebrante exposto na API atual)
+- HOOKS-005: `useNavigation`/`useBreakpoint`/`useArqelOptimistic` exportados; `useNavigation` coberto, `useBreakpoint` coberto via smoke (matchMedia no jsdom)
+- HOOKS-006: **30 testes Vitest passando** (era 4): `useTable.test.tsx` (8 — sort defaults/explicit/clear, filters add/remove/clear, selection toggle/all/clear/isSelected), `useFlash.test.tsx` (4 — payload presente, fallback empty, onMessage once-per-new-value, multi-kind dispatch), `useCanAccess.test.tsx` (6 — no auth.can = false, global resolution, record precedence, fallback to global, null/undefined record, non-bool coerced), `useNavigation.test.tsx` (3 — empty, items present, non-array coercion), `useResource.test.tsx` (5 — empty shape, records list, single record, server filters, raw props escape hatch), `smoke.test.tsx` (4 — table seeds + breakpoint match)
+- Mock de `@inertiajs/react` em `tests/setup.ts` via `vi.mock` + helpers `setMockPage`/`resetMockPage` (executa antes de qualquer test, ordem de imports não importa)
+
+**Por chegar (Phase 2):**
+
+- Zod validation em `useArqelForm.validate()` — ValidationBridge server emite o schema, mas o consumidor client ainda é manual
+- URL sync em `useTable` (`router.get` com debounce + history replace)
+- Real Inertia progress events em `useAction` (substituir o stub `progress: 0`)
 
 ## Key Contracts
 

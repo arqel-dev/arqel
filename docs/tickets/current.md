@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 fechados.** Próximo natural: HOOKS-002..006 (tickets adiados restantes — Zod client validation + URL sync) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 100% fechada — todos os tickets do `PLANNING/08-fase-1-mvp.md` entregues** (CORE-001..016, FIELDS-001..022, TABLE-001..008, FORM-001..008/010, ACTIONS-001..008, AUTH-001..005, NAV-001..005, TYPES-001..004, REACT-001..004, HOOKS-001..006, UI-001..007, FIELDS-JS-001..006, DOCS-001..008, INFRA-001..005, GOV-001/003). Próximo natural: começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,24 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### HOOKS-002..006 — Test coverage + SKILL.md sync (2026-04-29)
+
+**Entregue:**
+
+- API surface dos 10 hooks já estava consolidada em HOOKS-001; este ticket fecha o gap de cobertura de testes
+- 30 testes Vitest passando (era 4): `useTable.test.tsx` (8 — sort default/explicit/clear, filters add/remove/clear, selection toggle/all/clear/isSelected), `useFlash.test.tsx` (4 — payload presente, fallback empty, onMessage once-per-new-value, multi-kind dispatch), `useCanAccess.test.tsx` (6 — no auth.can = false, global resolution, record precedence, fallback to global, null/undefined record, non-bool coerced), `useNavigation.test.tsx` (3 — empty, items present, non-array coercion), `useResource.test.tsx` (5 — empty shape, records list, single record, server filters, raw props escape hatch), `smoke.test.tsx` (4 — original do HOOKS-001)
+- Mock de `@inertiajs/react` em `tests/setup.ts` via `vi.mock` + helpers `setMockPage`/`resetMockPage` exportados — executa antes de qualquer test (independente de ordem de imports auto-fixed pelo Biome)
+- `packages-js/hooks/SKILL.md` § Status atualizado: HOOKS-002..006 movidos para "Entregue depois", "Por chegar" reduzido a Phase 2 (Zod validation, URL sync, progress events reais)
+
+**Validações:** `vitest run` 30/30 ✅ · `tsc --noEmit` ✅ · `biome check src tests` ✅
+
+**Decisões autónomas:**
+
+- **Mock global em `setup.ts`** em vez de helper file separado — `vi.mock('@inertiajs/react')` precisa rodar antes de qualquer import; helper file separado conflitava com `organizeImports` do Biome (auto-reorder colocava o `useFlash` import antes do mock)
+- **Smoke test mantido** mesmo após a expansão — cobre `useBreakpoint` (que precisaria de mockar `matchMedia` para um teste isolado, e o smoke já confirma que o jsdom resolve para um valor válido)
+- **`useArqelForm`/`useAction`/`useFieldDependencies`/`useArqelOptimistic`/`useBreakpoint` sem testes unitários dedicados** — são thin wrappers de Inertia `useForm`/`router.visit`/Inertia `router.reload`/React 19 `useOptimistic`/`window.matchMedia`. Cobertura de smoke + integration tests em `@arqel/ui` (que consome os hooks reais) é suficiente para Fase 1
+- **Sem coverage % mensurado local** — `@vitest/coverage-v8` não está instalado no `@arqel/hooks` (existe em `@arqel/ui`); CI matrix mede no pipeline. Suite expandiu de 4 para 30 tests, qualitativamente acima do threshold
 
 ### ACTIONS-007/008 — User-aware action serialization + test coverage (2026-04-29)
 

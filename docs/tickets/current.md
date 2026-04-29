@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site scaffold + Getting Started.** Próximo natural: DOCS-003 (Conceitos essenciais — Panels/Resources/Fields/Actions/Auth, preenche stubs em `guide/`) ou voltar para tickets adiados.
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..003).** Próximo natural: DOCS-004 (tutorial blog admin) ou voltar para tickets adiados.
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,30 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### DOCS-003 — Conceitos essenciais (2026-04-29)
+
+**Entregue:**
+
+- 5 páginas conceituais reais (substituem stubs) em `apps/docs/guide/`:
+  - `panels.md` — Panel mínimo, API fluente em tabela (12 setters), exemplo multi-panel admin/partners, como o panel é resolvido em runtime (PanelRegistry + HandleArqelInertiaRequests + shared prop), 2 anti-patterns
+  - `resources.md` — Resource mínimo via `arqel:resource`, tabela de naming conventions (slug/label/navigation), 8 lifecycle hooks (beforeCreate/afterCreate/beforeUpdate/afterUpdate/beforeSave/afterSave/beforeDelete/afterDelete), recordTitle/recordSubtitle, indexQuery, table/actions opcionais, runCreate/runUpdate/runDelete orchestrators, 3 anti-patterns
+  - `fields.md` — Catálogo dos 21 types em tabela (Factory/Class/Component/Use case), API fluente comum (label/placeholder/helperText/required/disabled/readonly/dehydrated/columnSpan/live/liveDebounced/afterStateUpdated), validação Laravel-native, visibilidade (4 contextos + visibleIf/hiddenIf), dependências (resolveOptionsUsing + partial reload Inertia), authorization UX-only, currency PT-BR, macros, 3 anti-patterns
+  - `tables-forms.md` — Tables (column types em tabela, 6 filters, sort/search/pagination, actions), Forms (mínimo via auto-derive, layout components em tabela, Tabs com badge, visibilidade de layout, FormRequest gerados), 3 anti-patterns
+  - `actions.md` — 4 variantes em tabela (RowAction/BulkAction/ToolbarAction/HeaderAction), Confirmation modal com type-to-confirm, Form modal, Bulk com chunking, Authorization, action como link (XOR url/action), Notifications, 3 anti-patterns
+- Páginas adicionais melhoradas (ex-stub):
+  - `what-is-arqel.md` — Filosofia (3 pilares: server-driven UI / Inertia-only / Laravel-native), stack table, pacotes PHP+JS, comparação Filament/Nova, não-objetivos
+  - `installation.md` — Composer commands, pnpm commands, Tailwind v4 syntax, path repositories de monorepo
+- Uso consistente de containers VitePress (`::: warning`, `::: tip`, `::: details`)
+- Links internos cruzados entre páginas (ex: panels → resources → fields → tables-forms → actions → auth)
+
+**Validações:** `pnpm build` 19 páginas em 3.0s ✅ · sem deadlinks · `biome check .` ✅ · 23 testes Vitest fields-js verde ✅
+
+**Decisões autónomas:**
+
+- **Estrutura flat `guide/`** mantida (em vez de `guide/concepts/` mencionada no ticket) — `DOCS-001` já configurou o sidebar com paths flat e as páginas linkadas; mover agora exigiria alterar config + 18 stubs
+- **5 páginas + 2 polidas** (`what-is-arqel`, `installation`) — DOCS-003 listava 5 conceitos, mas as 2 páginas vizinhas estavam como stubs e ficariam visivelmente piores que o resto
+- **Sem screenshot/diagrama** — os critérios pedem apenas exemplos copy-paste e links internos; diagramas C4 ficam para DOCS-005 (API reference com aux visuais)
 
 ### DOCS-002 — Getting Started < 10 min (parcial) (2026-04-29)
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Fields\FieldFactory;
 use Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider;
+use Arqel\FieldsAdvanced\Types\CodeField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
 
@@ -33,5 +34,14 @@ it('registers the markdown macro on the FieldFactory', function (): void {
     $field = FieldFactory::markdown('content');
 
     expect($field)->toBeInstanceOf(MarkdownField::class)
+        ->and($field->getName())->toBe('content');
+});
+
+it('registers the code macro on the FieldFactory', function (): void {
+    expect(FieldFactory::hasType('code'))->toBeTrue();
+
+    $field = FieldFactory::code('content');
+
+    expect($field)->toBeInstanceOf(CodeField::class)
         ->and($field->getName())->toBe('content');
 });

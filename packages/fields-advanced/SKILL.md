@@ -10,18 +10,18 @@ A separação core × advanced existe porque estes types arrastam dependências 
 
 ## Status
 
-**Entregue (FIELDS-ADV-001..003):**
+**Entregue (FIELDS-ADV-001..004):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\FieldsAdvanced\` → `src/`, deps em `arqel/core` + `arqel/fields` via path repos)
-- `FieldsAdvancedServiceProvider` (final, auto-discovered) registra `richText` e `markdown` no `FieldFactory`
+- `FieldsAdvancedServiceProvider` (final, auto-discovered) registra `richText`, `markdown` e `code` no `FieldFactory`
 - **`Arqel\FieldsAdvanced\Types\RichTextField`** (final, extends `Arqel\Fields\Field`) — `type='richText'`, `component='RichTextInput'`. Setters fluentes `toolbar(array)` (drop silencioso de não-strings), `imageUploadDisk(string)`, `imageUploadDirectory(string)`, `maxLength(int)` (clamp ≥1, default 65535), `fileAttachments(bool=true)`, `customMarks(array)` (filtra não-strings), `mentionable(array)` (filtra entries sem `id`+`name` válidos; aceita `avatar` opcional). `getTypeSpecificProps()` devolve `{toolbar, imageUploadRoute, imageUploadDirectory, maxLength, fileAttachments, customMarks, mentionable}` — `imageUploadRoute` é `null` enquanto nenhum disk for configurado, caso contrário a string `/arqel/fields/upload?disk=<disk>` (sem `route()` para o campo permanecer testável fora de contexto HTTP)
 - **`Arqel\FieldsAdvanced\Types\MarkdownField`** (final, extends `Arqel\Fields\Field`) — `type='markdown'`, `component='MarkdownInput'`. Setters fluentes `preview(bool=true)`, `previewMode(string)` com paleta `'side-by-side' | 'tab' | 'popup'` (constantes `PREVIEW_MODE_SIDE_BY_SIDE/TAB/POPUP`; valores desconhecidos fazem fallback silencioso para `'side-by-side'`), `toolbar(bool=true)`, `rows(int)` (clamp ≥3, default 10), `fullscreen(bool=true)` e o knob extra `syncScroll(bool=true)` (sincroniza scroll entre editor e preview). `getTypeSpecificProps()` devolve `{preview, previewMode, toolbar, rows, fullscreen, syncScroll}`. Defaults preservam UX out-of-the-box: preview lado-a-lado, toolbar visível, fullscreen disponível, scroll sincronizado. Sanitização Markdown→HTML é responsabilidade do consumidor (PHP é config-only); a preview React usa `remark` + `rehype-sanitize` como camada client-side
+- **`Arqel\FieldsAdvanced\Types\CodeField`** (final, extends `Arqel\Fields\Field`) — `type='code'`, `component='CodeInput'`. Setters fluentes `language(string)` (default `'plaintext'`), `theme(?string)` (null deixa o React herdar do toggle dark/light do panel), `lineNumbers(bool=true)` (default `true`), `wordWrap(bool=true)` (default `false`), `tabSize(int)` (clamp ≥1, default 2), `minHeight(?int)` (clamp ≥0 quando inteiro, `null` reseta para o default React-side). O flag `readonly` é herdado da `Field` base (`readonly(bool=true)`) e re-emitido no payload. `getTypeSpecificProps()` devolve `{language, theme, lineNumbers, wordWrap, tabSize, readonly, minHeight}`. PHP é config-only — a render React usa CodeMirror 6 + Shiki com lazy-load das grammars; sanitização do código submetido (XSS no render, command injection se for `eval`'d) é responsabilidade do consumidor
 - Pest 3 + Orchestra Testbench setup com `defineEnvironment` SQLite in-memory
-- **26 testes Pest passando** — 4 ServiceProvider (boot, autoload, macros `richText` e `markdown` registradas) + 10 RichTextField + 11 MarkdownField (type/component, defaults canónicos, toggle `preview`, 3 modos canónicos via constantes, fallback `previewMode` em valores desconhecidos, toggle `toolbar`, clamp `rows`, default `rows`, toggle `fullscreen`, toggle `syncScroll`, payload end-to-end)
+- **38 testes Pest passando** — 5 ServiceProvider (boot, autoload, macros `richText`, `markdown` e `code` registradas) + 10 RichTextField + 11 MarkdownField + 12 CodeField (type/component, construção via `make` e via macro `Field::code`, defaults canónicos, fluência de `language`/`theme`/`lineNumbers`/`wordWrap`, clamp `tabSize` ≥1, clamp `minHeight` ≥0 com reset por `null`, toggle `readonly` herdado, lista de chaves do payload, payload end-to-end)
 
-**Por chegar (FIELDS-ADV-004..010):**
+**Por chegar (FIELDS-ADV-005..010):**
 
-- `CodeField` — Monaco editor com syntax highlight (FIELDS-ADV-004)
 - `RepeaterField` — array dinâmico de sub-fields (FIELDS-ADV-005)
 - `BuilderField` — repeater heterogêneo (blocks tipados) (FIELDS-ADV-006)
 - `KeyValueField` — map editável (FIELDS-ADV-007)

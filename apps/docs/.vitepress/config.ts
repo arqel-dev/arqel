@@ -26,7 +26,7 @@ export default defineConfig({
     siteTitle: 'Arqel',
 
     nav: [
-      { text: 'Guia', link: '/guide/getting-started', activeMatch: '/guide/' },
+      { text: 'Docs', link: '/guide/getting-started', activeMatch: '/guide/' },
       {
         text: 'Recursos',
         link: '/resources/resource',

@@ -25,57 +25,41 @@ cd acme
 
 Aceite os defaults — sem starter kit (Arqel não depende de Breeze/Jetstream).
 
-## 2. Instalar Arqel (PHP)
+## 2. Instalar Arqel
 
 ```bash
 composer require arqel/core
 php artisan arqel:install
 ```
 
-`arqel:install` faz scaffolding interativo via Laravel Prompts e cria:
+`arqel:install` faz **tudo**: scaffold PHP + instalação automática dos pacotes JS + configuração de `resources/js/app.tsx` e `resources/css/app.css`. Ele detecta seu package manager (`pnpm`/`yarn`/`npm`) via lockfile e roda o equivalente:
+
+```bash
+{pm} add @arqel/react @arqel/ui @arqel/hooks @arqel/fields @arqel/types
+{pm} add -D @inertiajs/react react react-dom @types/react @types/react-dom
+```
+
+Arquivos criados/modificados:
 
 - `config/arqel.php`
-- `app/Arqel/Resources/`
-- `app/Arqel/Widgets/`
+- `app/Arqel/Resources/` + `app/Arqel/Widgets/`
 - `app/Providers/ArqelServiceProvider.php`
 - `resources/js/Pages/Arqel/`
+- `resources/js/app.tsx` (com `createArqelApp`)
+- `resources/css/app.css` (`@import 'tailwindcss'` + `@import '@arqel/ui/styles.css'`)
 - `resources/views/arqel/layout.blade.php`
 - `AGENTS.md` (contexto canónico para LLMs)
 
-::: details Forçar reescrita
-Use `php artisan arqel:install --force` para sobrescrever sem prompt.
+::: details Flags úteis
+- `--force` — sobrescreve sem prompt
+- `--no-frontend` — pula instalação de pacotes JS e scaffold de `resources/js/`/`resources/css/` (útil em CI smoke tests ou contribuidores do monorepo)
 :::
 
-## 3. Instalar Arqel (frontend)
+::: tip Já tem um `app.tsx` configurado?
+O comando é idempotente: se `resources/js/app.tsx` já contém `import '@arqel/ui/styles.css'`, ele pula esse step. Mesma coisa pro `app.css`. Use `--force` para forçar rescrita.
+:::
 
-```bash
-pnpm add @arqel/react @arqel/ui @arqel/hooks @arqel/fields @arqel/types
-pnpm add -D @inertiajs/react react react-dom @types/react @types/react-dom
-```
-
-## 4. Configurar `resources/js/app.tsx`
-
-Substitua o conteúdo por:
-
-```tsx
-import '@arqel/ui/styles.css';
-import '@arqel/fields/register'; // side effect: registra os 21 inputs ricos
-import { createArqelApp } from '@arqel/react/inertia';
-
-createArqelApp({
-  appName: 'Acme Admin',
-  pages: import.meta.glob('./Pages/**/*.tsx'),
-});
-```
-
-E em `resources/css/app.css`:
-
-```css
-@import 'tailwindcss';
-@import '@arqel/ui/styles.css';
-```
-
-## 5. Gerar primeiro Resource
+## 3. Gerar primeiro Resource
 
 Laravel já trás o model `User` por defeito. Vamos servi-lo no admin:
 
@@ -113,7 +97,7 @@ final class UserResource extends Resource
 }
 ```
 
-## 6. Subir o servidor
+## 4. Subir o servidor
 
 Em terminais separados:
 
@@ -124,7 +108,7 @@ pnpm dev
 
 Abra <http://127.0.0.1:8000/admin/users>. Você deve ver o `UserResource` listado, com index, "Create user" no toolbar e ações row de edit/delete.
 
-## 7. (Opcional) Login
+## 5. (Opcional) Login
 
 Arqel não força um starter kit de auth — use o que preferir (Breeze, Jetstream, Fortify). Em dev, autentique manualmente via `tinker`:
 

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008).** Próximo natural: **CORE-016** (auto-install JS deps via `arqel:install` — DX P0 surfaced em sessão 2026-04-29) ou voltar para tickets adiados (CORE-014/015, TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-016 (auto-install JS).** Próximo natural: voltar para tickets adiados (CORE-014/015, TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,31 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### CORE-016 — `arqel:install` instala e configura frontend (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Core\Commands\InstallCommand` estendido com 4 fases novas após o scaffold PHP, gated por `--no-frontend`:
+  1. **Detect package manager** via lockfile (`pnpm-lock.yaml`/`yarn.lock`/`package-lock.json`); fallback para `select()` Laravel Prompts
+  2. **Install runtime + dev deps** via `Symfony\Component\Process\Process` com timeout 300s e TTY auto-detect; verbo correto por pm (`pnpm/yarn add` vs `npm install`); flag dev correto (`-D` vs `--dev`)
+  3. **Scaffold `resources/js/app.tsx`** a partir de `packages/core/stubs/app.tsx.stub` com `{{app_name}}` substituído por `config('app.name')`
+  4. **Scaffold `resources/css/app.css`** garantindo `@import 'tailwindcss';` + `@import '@arqel/ui/styles.css';` (idempotente — só adiciona o que falta)
+- Property estática `$processFactory` para test injection (mock Process sem TTY)
+- Flags: `--force` re-escreve `app.tsx`/`app.css` mesmo configurados; `--no-frontend` pula tudo silently; idempotente sem `--force`
+- Skip silente quando `package.json` não existe (caso monorepo dev sem app Laravel real)
+- Falha de rede no `pm add` emite warning amarelo e continua (não-fatal)
+- 7 testes Pest novos cobrindo: skip sem package.json, detect pnpm/yarn/npm, scaffold `app.tsx`, append em `app.css` sem duplicar, warning não-fatal em exit-code não-zero. Total 14/14 passando, 39 assertions
+- `apps/docs/guide/getting-started.md` reescrito: steps 3+4 (manuais) viram step 2 unificado descrevendo o auto-install; renumeração de "Subir o servidor" (6→4) e "Login" (7→5)
+
+**Validações:** `pest` 14/14 ✅ · `phpstan analyse` ✅ · `pint --test` ✅ · `pnpm build` docs ✅
+
+**Decisões autónomas:**
+
+- **`ArrayObject` no helper de teste** em vez de `&$invocations` reference — PHP arrays passam por valor; `ArrayObject` mantém identity entre closure e assertions
+- **`(string) select()` cast** — PHPStan exige (Laravel Prompts retorna `int|string`)
+- **TTY auto-detect** via `Process::isTtySupported()` — funciona em dev real, é skip em CI Pest
+- **Scaffold `app.tsx` é destrutivo apenas com `--force` ou prompt** — proteção contra usuário com `app.tsx` custom já existente
 
 ### DOCS-007 — Migration guides Filament/Nova/react-admin (2026-04-29)
 

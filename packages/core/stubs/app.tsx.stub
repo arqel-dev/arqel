@@ -1,0 +1,8 @@
+import '@arqel/ui/styles.css';
+import '@arqel/fields/register';
+import { createArqelApp } from '@arqel/react/inertia';
+
+createArqelApp({
+  appName: import.meta.env.VITE_APP_NAME ?? '{{app_name}}',
+  pages: import.meta.glob('./Pages/**/*.tsx'),
+});

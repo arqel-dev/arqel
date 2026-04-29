@@ -12,7 +12,11 @@
 
 import { registerField } from '@arqel/ui/form';
 import { Checkbox, Toggle } from './boolean/index.js';
+import { DateInput, DateTimeInput } from './date/index.js';
+import { FileInput, ImageInput } from './file/index.js';
 import { CurrencyInput, NumberInput } from './number/index.js';
+import { BelongsToInput, HasManyReadonly } from './relationship/index.js';
+import { MultiSelectInput, RadioGroup, SelectInput } from './select/index.js';
 import { EmailInput, PasswordInput, TextareaInput, TextInput, UrlInput } from './text/index.js';
 
 registerField('TextInput', TextInput);
@@ -24,3 +28,12 @@ registerField('NumberInput', NumberInput);
 registerField('CurrencyInput', CurrencyInput);
 registerField('Checkbox', Checkbox);
 registerField('Toggle', Toggle);
+registerField('SelectInput', SelectInput);
+registerField('MultiSelectInput', MultiSelectInput);
+registerField('RadioGroup', RadioGroup);
+registerField('BelongsToInput', BelongsToInput);
+registerField('HasManyReadonly', HasManyReadonly);
+registerField('DateInput', DateInput);
+registerField('DateTimeInput', DateTimeInput);
+registerField('FileInput', FileInput);
+registerField('ImageInput', ImageInput);

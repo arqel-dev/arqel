@@ -8,22 +8,26 @@
 
 ## Status
 
-**Entregue (FIELDS-JS-001 + FIELDS-JS-002):**
+**Entregue (FIELDS-JS-001..003):**
 
-- Pacote `@arqel/fields` com 5 entry points subpath (`./`, `./register`, `./text`, `./number`, `./boolean`)
-- 9 components básicos:
-  - **text/**: `TextInput`, `TextareaInput`, `EmailInput`, `UrlInput`, `PasswordInput` (com toggle reveal)
-  - **number/**: `NumberInput` (com stepper buttons), `CurrencyInput` (Intl-format on blur)
-  - **boolean/**: `Checkbox`, `Toggle` (role="switch")
-- Side-effect `register.ts` registra todos os 9 no FieldRegistry
+- Pacote `@arqel/fields` com 9 entry points subpath (`./`, `./register`, `./text`, `./number`, `./boolean`, `./select`, `./relationship`, `./date`, `./file`)
+- 18 components no total:
+  - **text/**: `TextInput`, `TextareaInput`, `EmailInput`, `UrlInput`, `PasswordInput` (toggle reveal com `aria-pressed`)
+  - **number/**: `NumberInput` (stepper buttons), `CurrencyInput` (Intl-format on blur, raw on focus)
+  - **boolean/**: `Checkbox`, `Toggle` (role=switch + iOS track/thumb)
+  - **select/**: `SelectInput` (native), `MultiSelectInput` (chips removíveis + native multiple), `RadioGroup` (role=radiogroup + inline/stacked)
+  - **relationship/**: `BelongsToInput` (async combobox via fetch + 300ms debounce ao `field.props.searchRoute`, role=combobox/listbox), `HasManyReadonly` (lista flat readonly)
+  - **date/**: `DateInput` (`type="date"` nativo + min/max), `DateTimeInput` (`type="datetime-local"` + step se `seconds`)
+  - **file/**: `FileInput` (drag-drop + section semântica, armazena `File` no form state), `ImageInput` (preview via `URL.createObjectURL`, sem crop em Phase 1)
+- Side-effect `register.ts` registra todos os 18 no FieldRegistry
 - Estilo via CSS vars de `@arqel/ui` (sem hardcode); `aria-invalid` quando há erros
 
 **Por chegar:**
 
-- FIELDS-JS-003: `SelectInput`, `MultiSelectInput`, `RadioGroup`, `BelongsToInput` (async combobox), `HasManyReadonly`, `DateInput`, `DateTimeInput`, `FileInput`, `ImageInput`
 - FIELDS-JS-004: `SlugInput`, `ColorInput`, `HiddenInput`
 - FIELDS-JS-005: `getRegisteredFields()` helper + smoke check
 - FIELDS-JS-006: testes adicionais + coverage ≥ 80%
+- Phase 2: image crop (`react-image-crop`), date-picker custom (`react-day-picker`), Combobox searchable de Base UI para Select
 
 ## Key Contracts
 

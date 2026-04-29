@@ -41,6 +41,22 @@
     "./boolean": {
       "types": "./dist/boolean.d.ts",
       "import": "./dist/boolean.js"
+    },
+    "./select": {
+      "types": "./dist/select.d.ts",
+      "import": "./dist/select.js"
+    },
+    "./relationship": {
+      "types": "./dist/relationship.d.ts",
+      "import": "./dist/relationship.js"
+    },
+    "./date": {
+      "types": "./dist/date.d.ts",
+      "import": "./dist/date.js"
+    },
+    "./file": {
+      "types": "./dist/file.d.ts",
+      "import": "./dist/file.js"
     }
   },
   "files": [

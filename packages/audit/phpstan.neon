@@ -1,0 +1,14 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    excludePaths:
+        analyseAndScan:
+            - vendor/*
+    tmpDir: .phpstan.cache
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false

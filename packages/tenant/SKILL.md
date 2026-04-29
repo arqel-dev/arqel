@@ -10,17 +10,20 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 
 ## Status
 
-**Entregue (TENANT-001):**
+**Entregue (TENANT-001..002):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\Tenant\` → `src/`, dep em `arqel/core` via path repo)
 - `TenantServiceProvider` registado via auto-discovery (`extra.laravel.providers`)
 - `TenantManager` (final) registado como singleton — stub com `current(): mixed` e `hasCurrent(): bool` retornando null/false até TENANT-003 entregar a implementação real
+- **`Arqel\Tenant\Contracts\TenantResolver`** — interface `resolve(Request): ?Model` + `identifierFor(Model): string`
+- **`AbstractTenantResolver`** — base com validação `is_subclass_of(Model::class)` (lança `InvalidArgumentException`), `identifierFor` default (coluna configurada → fallback `getKey()`), `findByIdentifier(string)` protected helper
+- **5 resolvers concretos** (não-final — extensão explícita): `SubdomainResolver` (centralDomain + heurística leftmost label, www rejeitado), `PathResolver` (primeiro segmento + `ignoreSegments` case-insensitive), `HeaderResolver` (X-Tenant-ID configurável), `SessionResolver` (`hasSession()` guard + coerção scalar→string), `AuthUserResolver` (`currentTeam` Jetstream-style: aceita `BelongsTo`/`Model`/property)
 - Pest 3 + Orchestra Testbench setup com `defineEnvironment` SQLite in-memory
-- 4 testes Feature smoke passando: boot OK, autoload do namespace, singleton binding, stub reporta no-current
+- **32 testes Pest passando** (era 4): 4 ServiceProvider smoke + 9 SubdomainResolver + 5 PathResolver + 4 HeaderResolver + 5 SessionResolver + 5 AuthUserResolver
+- Estratégia DB-less: subclasses anônimas dos resolvers sobrescrevem `findByIdentifier` retornando fixture; cobre host parsing/header/session/relation sem `pdo_sqlite` no host
 
-**Por chegar (TENANT-002..015):**
+**Por chegar (TENANT-003..015):**
 
-- `TenantResolver` (interface + implementações `Subdomain`, `Path`, `Header`, `Session`) — TENANT-002
 - `TenantManager::setCurrent`/`forget`/`forUser`/`for` (com closure scoping) — TENANT-003
 - `ResolveTenantMiddleware` integrado com `HandleArqelInertiaRequests` — TENANT-004
 - Trait `BelongsToTenant` + global scope `TenantScope` — TENANT-005
@@ -34,7 +37,7 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 ## Conventions
 
 - `declare(strict_types=1)` obrigatório
-- Classes `final` por defeito; abstratas com `__construct` final
+- Classes `final` por defeito; **resolvers em `src/Resolvers/` são `class` (não-final)** — extensibilidade explícita: apps reais frequentemente customizam parsing de host/header (ex: subdomain regex específica, fallback a `currentTeam` ou `currentOrganization`)
 - **Sem hard dep** em `stancl/tenancy` ou `spatie/laravel-multitenancy` no `composer.json`: estão como `suggest`/integrations opt-in; cada adapter tem seu próprio gate de classe (`class_exists` antes de bind)
 - Multi-DB queries fora de scope nativo — pacote sempre integra via adapter, nunca implementa migration/seed isolation por conta
 

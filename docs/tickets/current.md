@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 iniciada (TENANT-001 ✅).** Próximo natural: TENANT-002 (`TenantResolver` interface + 4 implementações canônicas Subdomain/Path/Header/Session).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001/002 ✅).** Próximo natural: TENANT-003 (`TenantManager::setCurrent`/`forget`/`forUser`/`for` com closure scoping + resolver chain).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,31 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TENANT-002 — `TenantResolver` interface + 5 implementações (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Tenant\Contracts\TenantResolver` — interface canônica com 2 métodos: `resolve(Request): ?Model` e `identifierFor(Model): string`
+- `Arqel\Tenant\Resolvers\AbstractTenantResolver` (abstract) — scaffolding compartilhado: validação `is_subclass_of(Model::class)` no construtor (lança `InvalidArgumentException`), tracking de `modelClass`/`identifierColumn`, `identifierFor` default (lê coluna configurada via `getAttribute`, fallback `getKey()` quando coluna ausente), `findByIdentifier(string)` protected helper que faz `query()->where(col, val)->first()`
+- 5 resolvers concretos em `src/Resolvers/` (não-final por design — apps reais customizam parsing):
+  - `SubdomainResolver(modelClass, identifierColumn='subdomain', centralDomain=null)` — extrai leftmost label do host. Com `centralDomain` configurado, suffix-match estrito; sem ele, heurística "≥3 labels". `www` sempre rejeitado. Case-insensitive
+  - `PathResolver(modelClass, identifierColumn='slug', ignoreSegments=[])` — primeiro segmento do path (`/acme/dashboard` → `acme`). `ignoreSegments` case-insensitive evita conflito com `/admin`/`/api`
+  - `HeaderResolver(modelClass, identifierColumn='id', header='X-Tenant-ID')` — lê via Symfony HeaderBag (case-insensitive); empty/missing → null
+  - `SessionResolver(modelClass, identifierColumn='id', sessionKey='current_tenant_id')` — `hasSession()` guard antes; coerção scalar→string; rejeita non-scalar (arrays, objetos)
+  - `AuthUserResolver(modelClass, identifierColumn='id', relation='currentTeam')` — convenção Jetstream/Spark. `resolveRelation()` aceita method retornando `BelongsTo` (chama `getResults()`), method retornando `Model` direto, ou property pública. Sempre valida `instanceof $modelClass` antes de retornar
+- Estratégia DB-less de teste: subclasses anônimas dos resolvers sobrescrevem `findByIdentifier` para retornar fixture pre-seeded — permite testar host parsing/header/session/relation lookup sem `pdo_sqlite` no host
+- 28 testes Pest novos (32 total): `SubdomainResolverTest` (9 — extract leftmost, central match=null, www rejected, outside-central=null, heuristic 3+ labels, lowercase, ≥3 labels guard, throws on non-Model class, identifierFor reads column), `PathResolverTest` (5 — extract segment, empty path, ignoreSegments, case-insensitive ignore, lowercase), `HeaderResolverTest` (4 — read header, missing→null, empty→null, custom name), `SessionResolverTest` (5 — no session→null, missing key→null, read key, scalar coerce, non-scalar→null), `AuthUserResolverTest` (5 — no user→null, no relation→null, method returning Model, public property fallback, instanceof check)
+
+**Validações:** `pest packages/tenant` 32/32, 41 assertions ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test` ✅
+
+**Decisões autónomas:**
+
+- **Resolvers `class` em vez de `final`** — apps reais quase sempre customizam (subdomain regex específica, organização própria de header/path); extensão é a UX esperada. Ainda assim a base abstract está bem isolada — herdar é override pontual, não rewrite
+- **`AbstractTenantResolver` em vez de trait** — composition via herança casa melhor com a interface contract; trait deixaria cada resolver duplicando o construtor + validação
+- **`findByIdentifier` retornando `Model` (não generic)** — PHPStan não suporta generic Eloquent bem hoje; `class-string<Model>` no constructor cobre o type-narrowing onde importa (no controle do consumidor)
+- **`identifierFor` lê a coluna configurada antes de `getKey()`** — útil quando o tenant é identificado por slug humano-readable (cache keys, logs); apenas cai no key quando a coluna não retorna scalar
+- **`AuthUserResolver` aceita 3 shapes** (`BelongsTo`, `Model`, property) — espelha o realismo: Jetstream usa `currentTeam()` method; código novo prefere acessor com tipo; alguns usam relação com `belongsTo` para lazy-load. Cobrir os 3 evita rebar para o user
 
 ### TENANT-001 — Esqueleto do pacote `arqel/tenant` (2026-04-29) — **Início Fase 2**
 

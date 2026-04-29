@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Mcp;
 
+use Arqel\Mcp\Tools\DescribeResourceTool;
 use Arqel\Mcp\Tools\ListResourcesTool;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -12,7 +13,8 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
  * Auto-discovered provider for `arqel/mcp`.
  *
  * Binds `McpServer` as a singleton and auto-registers built-in tools
- * (e.g. `list_resources`) once the application has booted.
+ * (e.g. `list_resources`, `describe_resource`) once the application has
+ * booted.
  */
 final class McpServiceProvider extends PackageServiceProvider
 {
@@ -32,12 +34,21 @@ final class McpServiceProvider extends PackageServiceProvider
         $server = $this->app->make(McpServer::class);
 
         $listResources = new ListResourcesTool;
-        $schema = $listResources->schema();
+        $listSchema = $listResources->schema();
         $server->registerTool(
-            $schema['name'],
-            $schema['description'],
-            $schema['inputSchema'],
+            $listSchema['name'],
+            $listSchema['description'],
+            $listSchema['inputSchema'],
             static fn (array $params): array => $listResources($params),
+        );
+
+        $describeResource = new DescribeResourceTool;
+        $describeSchema = $describeResource->schema();
+        $server->registerTool(
+            $describeSchema['name'],
+            $describeSchema['description'],
+            $describeSchema['inputSchema'],
+            static fn (array $params): array => $describeResource($params),
         );
     }
 }

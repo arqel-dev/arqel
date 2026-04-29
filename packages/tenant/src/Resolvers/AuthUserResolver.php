@@ -18,6 +18,12 @@ use Illuminate\Http\Request;
  *
  * `modelClass` is still required so `identifierFor()` can be
  * called by the manager even when no user is authenticated.
+ *
+ * For tenant switching, the resolver writes the chosen tenant
+ * key back to a configurable foreign-key column on the user
+ * (default `current_tenant_id`), and enumerates available
+ * tenants via a configurable many-to-many style relation
+ * (default `tenants`).
  */
 class AuthUserResolver extends AbstractTenantResolver
 {
@@ -25,6 +31,8 @@ class AuthUserResolver extends AbstractTenantResolver
         string $modelClass,
         string $identifierColumn = 'id',
         private readonly string $relation = 'currentTeam',
+        private readonly string $availableRelation = 'tenants',
+        private readonly string $foreignKeyColumn = 'current_tenant_id',
     ) {
         parent::__construct($modelClass, $identifierColumn);
     }
@@ -69,5 +77,15 @@ class AuthUserResolver extends AbstractTenantResolver
         $value = $user->{$this->relation} ?? null;
 
         return $value instanceof Model ? $value : null;
+    }
+
+    protected function switchableRelationName(): string
+    {
+        return $this->availableRelation;
+    }
+
+    protected function switchTargetColumn(): string
+    {
+        return $this->foreignKeyColumn;
     }
 }

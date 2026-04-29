@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Arqel\Tenant;
 
+use Arqel\Tenant\Contracts\SupportsTenantSwitching;
 use Arqel\Tenant\Contracts\TenantResolver;
 use Arqel\Tenant\Events\TenantForgotten;
 use Arqel\Tenant\Events\TenantResolved;
 use Closure;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -201,5 +203,48 @@ final class TenantManager
         $id = $this->id();
 
         return $id === null ? '' : (string) $id;
+    }
+
+    /**
+     * Tenants the user is allowed to switch into. Delegates to the
+     * active resolver when it implements `SupportsTenantSwitching`;
+     * returns an empty list otherwise.
+     *
+     * @return array<int, Model>
+     */
+    public function availableFor(Authenticatable $user): array
+    {
+        if (! $this->resolver instanceof SupportsTenantSwitching) {
+            return [];
+        }
+
+        return $this->resolver->availableFor($user);
+    }
+
+    public function canSwitchTo(Authenticatable $user, Model $tenant): bool
+    {
+        if (! $this->resolver instanceof SupportsTenantSwitching) {
+            return false;
+        }
+
+        return $this->resolver->canSwitchTo($user, $tenant);
+    }
+
+    /**
+     * Persist `$tenant` as the user's current tenant via the
+     * resolver and update the in-memory `current()` reference so
+     * subsequent calls in the same request see the new value.
+     * Throws when the active resolver does not support switching.
+     */
+    public function switchTo(Authenticatable $user, Model $tenant): void
+    {
+        if (! $this->resolver instanceof SupportsTenantSwitching) {
+            throw new LogicException(
+                'Active TenantResolver does not implement SupportsTenantSwitching — cannot switch tenant.',
+            );
+        }
+
+        $this->resolver->switchTo($user, $tenant);
+        $this->set($tenant);
     }
 }

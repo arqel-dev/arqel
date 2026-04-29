@@ -33,7 +33,9 @@ final class TenantServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $package->name('arqel-tenant');
+        $package
+            ->name('arqel-tenant')
+            ->hasRoute('admin');
     }
 
     public function packageRegistered(): void

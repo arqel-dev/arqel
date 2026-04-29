@@ -25,9 +25,15 @@
 - **`spatie/simple-excel: ^3.0`** promovido de `suggest` para `require` (deixa de ser opcional para o pacote — apps que não exportam continuam a poder excluir manualmente). `dompdf/dompdf` continua em `suggest` até EXPORT-004
 - Pest tests `tests/Unit/CsvExporterTest.php` cobrindo: header+rows + return value, empty iterable (só header), boolean → Yes/No, date → `Y-m-d`, relationship → `display_path`, fallback de label, null cell em row mista. `ExportersTest` mantém apenas as asserções de RuntimeException para XLSX/PDF (CSV deixou de lançar)
 
-**Por chegar (EXPORT-003..010):**
+**Entregue (EXPORT-003):**
 
-- `XlsxExporter` com `spatie/simple-excel` writer — EXPORT-003
+- **`Arqel\Export\Exporters\XlsxExporter`** — implementação real backed por `spatie/simple-excel` (`SimpleExcelWriter::create($destination)`; OpenSpout under the hood). Mesma estrutura do `CsvExporter` (header derivado de `column['label'] ?? column['name']`, streaming row-by-row, contrato `export(iterable $rows, array $columns, string $destination): string`) com uma diferença chave: `formatCell()` **preserva tipos nativos quando útil para Excel** — `DateTimeInterface` flui inalterado (Excel renderiza como data real, não string `Y-m-d`); scalars passam through; só `boolean` (`Yes`/`No`) e `relationship` (`display_path` → `data_get`) são stringificados. Header row é negrito via `setHeaderStyle((new Style)->setFontBold())`
+- **`XlsxExporter::streamDownload(iterable $rows, array $columns, string $filename): StreamedResponse`** — helper estático mirror do `CsvExporter::streamDownload`, mas com `Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` e usando `SimpleExcelWriter::streamDownload($filename)` (SimpleExcel infere o formato pela extensão do filename). Contrato file-based intacto
+- Trade-off documentado: frozen header row + auto column widths ficam de fora — `spatie/simple-excel` v3 não expõe helpers first-class e mexer em internals do OpenSpout introduz acoplamento frágil. `// TODO(EXPORT-XXX)` comment no código se um ticket futuro decidir adicionar
+- Pest tests `tests/Unit/XlsxExporterTest.php` (6 cenários) com **round-trip read** via `SimpleExcelReader::create($path)->noHeaderRow()->getRows()` para asserir conteúdo (header+rows, empty iterable, boolean → Yes/No, **DateTime preservado** via assertion `instanceof DateTimeInterface`, relationship `display_path`, fallback de label). `ExportersTest` deixou de asserir RuntimeException para XLSX — só PDF ainda stub
+
+**Por chegar (EXPORT-004..010):**
+
 - `PdfExporter` com `dompdf/dompdf` (template Blade `export.pdf.blade.php`) — EXPORT-004
 - `ExportAction::execute()` real — dispatcha `ProcessExportJob` e devolve notification + URL — EXPORT-005
 - `Arqel\Export\Models\Export` + migration (`exports` table: `id`, `user_id`, `tenant_id`, `format`, `status`, `filename`, `mime_type`, `rows`, `bytes`, `disk`, `path`, `created_at`, `expires_at`) — EXPORT-006

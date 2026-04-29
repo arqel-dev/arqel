@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..006 ✅).** Próximo natural: TENANT-007 (Adapter `stancl/tenancy` multi-DB) ou TENANT-014 (suite de testes completa) ou voltar para WIDGETS/MCP/etc.
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅).** Próximo natural: TENANT-009..012 (UI: tenant switcher + registration flow + profile + white-labeling) ou TENANT-013 (Cashier billing) ou WIDGETS/MCP/etc.
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,25 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TENANT-007/008 — Adapters stancl/tenancy + spatie/laravel-multitenancy (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Tenant\Integrations\StanclAdapter` (final, `implements TenantResolver`) — pass-through para [stancl/tenancy](https://tenancyforlaravel.com). Construtor: `(string $modelClass)`. `resolve(Request)` busca `Stancl\Tenancy\Tenancy::tenant` via `Container::getInstance()->make(self::TENANCY_BINDING)`; lança `LogicException` actionable quando Stancl não instalado (com mensagem que diz `composer require stancl/tenancy`) ou quando bound não disponível (TenancyServiceProvider não registado). `identifierFor()` honra `getTenantKey()` (convenção Stancl) com fallback para `(string) getKey()`. **Sem hard dep** — string class-name `'Stancl\\Tenancy\\Tenancy'` resolvida via `class_exists` (TENANT-007)
+- `Arqel\Tenant\Integrations\SpatieAdapter` (final, `implements TenantResolver`) — pass-through para [spatie/laravel-multitenancy](https://spatie.be/docs/laravel-multitenancy). Construtor: `(string $modelClass)`. `resolve(Request)` chama `current()` static via class-string resolution (verifica `method_exists`); aceita `modelClass` vazio como sinal de "use o canonical `Spatie\\Multitenancy\\Models\\Tenant`". Lança `LogicException` actionable quando classe não existe ou não expõe `current()`. `identifierFor()` retorna `(string) getKey()`. **Sem hard dep** (TENANT-008)
+- 13 testes Pest novos (95 total, 142 assertions) cobrindo:
+  - `StanclAdapterTest` (7): throws sem stancl/tenancy, throws sem container binding, returns tenant from initialised tenancy via `class_alias` para FakeStanclTenancy, null sem tenant, `identifierFor()` com `getTenantKey` (StanclLikeTenant) e fallback `getKey` (Tenant base)
+  - `SpatieAdapterTest` (6): returns tenant from `current()`, null when no current, throws quando configured class não tem `current()` method, throws quando nenhuma classe disponível, fallback ao canonical Spatie class quando `modelClass` vazio + `class_alias` registrado, `identifierFor()` (string)`getKey()`
+
+**Validações:** `pest packages/tenant` 95/95, 142 assertions ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test` ✅
+
+**Decisões autónomas:**
+
+- **`class_alias()` nos testes** para simular pacotes não instalados — registra a classe canônica (`Stancl\\Tenancy\\Tenancy` ou `Spatie\\Multitenancy\\Models\\Tenant`) como alias do nosso fake só para o test runtime; permite testar paths que dependem de `class_exists()` retornar true sem realmente instalar a lib externa
+- **`Container::getInstance()` no StanclAdapter** — adapter pode ser instanciado fora de Laravel (testes unit, jobs); resolver via static getInstance é serializable
+- **`SpatieAdapter` aceita `modelClass=''`** — UX: usuário pode escolher entre apontar para uma extension custom da `Spatie\\Multitenancy\\Models\\Tenant` ou usar o canonical sem precisar lembrar o FQN
+- **`@phpstan-ignore return.type` no SpatieAdapter::resolveTenantClass** — `class_exists()` na constante string narrow-able mas PHPStan não acompanha; ignore localizado é melhor que disable da regra ou cast unsafe
 
 ### TENANT-006 — Validation rule `ScopedUnique` (2026-04-29)
 

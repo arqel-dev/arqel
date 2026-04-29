@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..008 ✅ · WIDGETS-001..006 ✅ · MCP-001/002 ✅ · FIELDS-ADV-001..003 ✅) + 9 bugs do dogfooding fechados + Batch #1 e #2 de sub-agentes paralelos completos.** Próximo natural: TENANT-009 (tenant switcher backend) + EXPORT-001 (scaffold arqel/export) + AUDIT-001 (scaffold arqel/audit) — Batch #3 já preparado em `.claude/batch-3-prompts.md`.
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..009 ✅ · WIDGETS-001..006 ✅ · MCP-001/002 ✅ · FIELDS-ADV-001..003 ✅ · EXPORT-001 ✅ · AUDIT-001 ✅) + 9 bugs do dogfooding fechados + Batch #1, #2 e #3 de sub-agentes paralelos completos.** Próximo natural: WIDGETS-007 (DashboardController + WidgetDataController endpoint), MCP-003 (tools/resources concretos), TENANT-010 (registration flow) ou EXPORT-002+ (CsvExporter streaming).
 
 **Fase:** 1 (MVP)
 

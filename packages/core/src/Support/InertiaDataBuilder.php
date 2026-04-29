@@ -91,8 +91,11 @@ final class InertiaDataBuilder
         $query = $this->resolveIndexQuery($resource);
         $paginator = $this->runTableQueryBuilder($table, $query, $request);
 
+        $rowActions = $this->callTableArray($table, 'getActions');
+        $user = $this->currentUser();
+
         $records = $paginator !== null
-            ? array_map(fn ($r): array => $this->serializeRecord($r, $resource), $paginator->items())
+            ? array_map(fn ($r): array => $this->serializeRecord($r, $resource, $rowActions, $user), $paginator->items())
             : [];
 
         return [
@@ -107,7 +110,7 @@ final class InertiaDataBuilder
             'columns' => $this->serializeMany($this->callTableArray($table, 'getColumns')),
             'filters' => $this->serializeMany($this->callTableArray($table, 'getFilters')),
             'actions' => [
-                'row' => $this->serializeMany($this->callTableArray($table, 'getActions')),
+                'row' => $this->serializeMany($rowActions),
                 'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions')),
                 'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions')),
             ],
@@ -286,11 +289,14 @@ final class InertiaDataBuilder
     /**
      * Render a single record for index payloads. Adds Arqel-side
      * meta (recordTitle/recordSubtitle) on top of the model's
-     * default `toArray`.
+     * default `toArray`, plus the per-row visible-actions list
+     * (resolved against `Action::isVisibleFor` + `canBeExecutedBy`).
+     *
+     * @param array<int, mixed> $rowActions Row actions declared on Resource::table
      *
      * @return array<string, mixed>
      */
-    private function serializeRecord(mixed $record, Resource $resource): array
+    private function serializeRecord(mixed $record, Resource $resource, array $rowActions = [], ?Authenticatable $user = null): array
     {
         if (! $record instanceof Model) {
             if (! is_array($record)) {
@@ -312,9 +318,46 @@ final class InertiaDataBuilder
         $payload['arqel'] = [
             'title' => $resource->recordTitle($record),
             'subtitle' => $resource->recordSubtitle($record),
+            'actions' => $this->resolveVisibleActionNames($rowActions, $record, $user),
         ];
 
         return $payload;
+    }
+
+    /**
+     * Returns the names of row actions that are visible AND executable
+     * for `$record` by `$user`. Duck-typed against `arqel/actions` so
+     * `arqel/core` keeps no hard dep on it.
+     *
+     * @param array<int, mixed> $actions
+     *
+     * @return list<string>
+     */
+    private function resolveVisibleActionNames(array $actions, Model $record, ?Authenticatable $user): array
+    {
+        $names = [];
+        foreach ($actions as $action) {
+            if (! is_object($action)) {
+                continue;
+            }
+
+            $name = method_exists($action, 'getName') ? $action->getName() : null;
+            if (! is_string($name) || $name === '') {
+                continue;
+            }
+
+            if (method_exists($action, 'isVisibleFor') && $action->isVisibleFor($record) === false) {
+                continue;
+            }
+
+            if (method_exists($action, 'canBeExecutedBy') && $action->canBeExecutedBy($user, $record) === false) {
+                continue;
+            }
+
+            $names[] = $name;
+        }
+
+        return $names;
     }
 
     /**

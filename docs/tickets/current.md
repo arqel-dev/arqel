@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 fechados.** Próximo natural: voltar para tickets adiados restantes (TABLE-007/008, FORM-006, ACTIONS-007/008, HOOKS-002..006) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 + TABLE-007/008 fechados.** Próximo natural: FORM-006, ACTIONS-007/008, HOOKS-002..006 (tickets adiados restantes) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,28 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TABLE-007/008 — Per-row action authorization + bulk pipeline (2026-04-29)
+
+**Entregue:**
+
+- **TABLE-007 — Per-row authorization**: `Arqel\Core\Support\InertiaDataBuilder::resolveVisibleActionNames` implementado (duck-typed contra `arqel/actions` — sem hard dep). Para cada record do payload index, emite `arqel.actions: ['view', 'edit', ...]` (lista de nomes das row actions visíveis) avaliando `Action::isVisibleFor($record)` + `Action::canBeExecutedBy($user, $record)`. O `<DataTable>` em `@arqel/ui` filtra a lista global pelo nome contra `record.arqel.actions`
+- **`InertiaDataBuilder::serializeRecord`** estendido com 2 args opcionais (`array $rowActions = []`, `?Authenticatable $user = null`); `buildTableIndexData` propaga `$rowActions` + `$user` resolved uma vez antes do loop (evita N+1 em `Auth::user()`)
+- 5 testes Pest novos (`PerRowActionVisibilityTest`) cobrindo: keep all, drop por `isVisibleFor=false`, drop por `canBeExecutedBy=false`, per-record evaluation com Closure, skip silent de entries não-objeto ou sem `getName`. Reflection do método private — testa unidade sem precisar de `pdo_sqlite` driver
+- **TABLE-008 — Bulk pipeline**: já implementado pré-existente em `ActionController::invokeBulk` + `BulkAction::execute(Collection)` chunking via `chunkSize(int)` (default 100, clamp ≥ 1) + teste unit pré-existente (250 records → 3 chunks). Per-record authorization no bulk usa `Action::canBeExecutedBy($user, $records)` global (não itera per-record — Phase 2 considera fine-grained)
+- **SKILL.md `arqel/table` reescrito** (46 → 130 linhas): § Status atualizado para refletir TABLE-001..008 entregues, exemplo copy-paste completo de `Resource::table()` com 4 columns + 3 filters + 3 actions, seções dedicadas para "Per-row authorization" (com payload JSON exemplo) e "Bulk pipeline" (sequência de chamadas), 5 anti-patterns
+
+**Validações:** `pest packages/core` 104/104 passando (era 99) ✅ · `pest packages/table` 56/56 ✅ · `phpstan analyse packages/{core,table,actions}` ✅ · `pint --test` ✅
+
+**Critérios não-mensurados:**
+
+- ⏭️ **Bulk delete de 50 users end-to-end** — exige `pdo_sqlite` driver no host; coberto qualitativamente pelo unit test de chunking + `ActionControllerTest` futuro com Testbench DB
+
+**Decisões autónomas:**
+
+- **Lista de nomes em vez de lista de Actions per-row** — payload size: 50 records × 5 actions × 200B JSON = 50KB extra. Lista de nomes (5 strings × 50 = ~1KB). Decisão: emit names only, React faz filter
+- **Reflection nos testes em vez de end-to-end** — sem `pdo_sqlite` no host, testar via Reflection o método privado mantém cobertura sem flaky integration. Test integration com DB chega via CI matrix
+- **Implementação no `arqel/core`** (`InertiaDataBuilder`) em vez de `arqel/table` — `arqel/table` não tem visibilidade do `Authenticatable user` ou do payload pipeline; o builder em core já centraliza serialização
 
 ### CORE-014/015 — Testes de infraestrutura + SKILL.md atualizado (2026-04-29)
 

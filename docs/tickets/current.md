@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..005).** Próximo natural: DOCS-006 (API reference TypeScript) ou DOCS-007 (migration guides Filament/Nova).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..006).** Próximo natural: DOCS-007 (migration guides Filament/Nova) ou DOCS-008 (AGENTS.md template).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,26 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### DOCS-006 — API Reference TypeScript curada (parcial) (2026-04-29)
+
+**Entregue:**
+
+- 5 páginas em `apps/docs/reference/typescript/` (uma por pacote): `types.md` (FieldType discriminated union sobre 21 types, FieldSchema canônico, type guards `isFieldType`/`isFieldEntry`/`isLayoutEntry`/`resolveFieldEntry`, ResourceMeta + 4 ResourceProps genéricos sobre RecordType, ColumnType×9 + FilterType×6, FormSchema com `kind: 'field' | 'layout'`, ActionSchema discriminada por variant, SharedProps), `react.md` (`createArqelApp` options, `<ArqelProvider>`, `<ThemeProvider>` + `useTheme()`, 3 contexts com variantes `useRequired*`, utilities `route`/`translate`/`useTranslator`/`buildInitialFormState`/`indexFieldsByName`/`fieldsVisibleIn`), `hooks.md` (10 hooks com signature + exemplo + nota TS2589 do `useArqelForm`), `ui.md` (todos os components agrupados por subpath em tabela props-chave: Action/Shell/Table/Form/FieldRegistry/Action interaction/Flash/Utility + tokens CSS oklch + `cn()`), `fields.md` (catálogo dos 21 inputs por subpath, `FieldRendererProps` shape, `slugify` exemplos, `register.ts` side-effect, override custom, custom Field type triple PHP+React+register)
+- `typescript-overview.md` reescrito como índice com tabela de pacotes + "Convenções gerais" + TODO sobre auto-geração via TypeDoc
+- Sidebar atualizado com 5 sub-itens TS
+
+**Critérios não-entregues (parcial):**
+
+- ❌ **TypeDoc auto-gen** — escolha curada (mesma rationale de DOCS-005); TypeDoc fica para PR follow-up no `.github/workflows/docs-deploy.yml`
+- ❌ **TSDoc comments nos sources** — esparsos hoje; preencher comprehensive vai requerer pass dedicado em todos os 5 pacotes (sub-ticket TYPES-005?)
+
+**Validações:** `pnpm build` 32 páginas em 3.8s ✅ · `biome check .` ✅
+
+**Decisões autónomas:**
+
+- **Mesma estrutura de DOCS-005** (`reference/{lang}/{pkg}.md`) — uniforme entre PHP e TS
+- **Tabela com props chave** em vez de listar full type signature dos components — types completos vivem no source. A doc resume a forma de uso
 
 ### DOCS-005 — API Reference PHP curada (parcial) (2026-04-29)
 

@@ -101,7 +101,14 @@ export default defineConfig({
         },
         {
           text: 'TypeScript',
-          items: [{ text: 'Overview', link: '/reference/typescript-overview' }],
+          items: [
+            { text: 'Overview', link: '/reference/typescript-overview' },
+            { text: '@arqel/types', link: '/reference/typescript/types' },
+            { text: '@arqel/react', link: '/reference/typescript/react' },
+            { text: '@arqel/hooks', link: '/reference/typescript/hooks' },
+            { text: '@arqel/ui', link: '/reference/typescript/ui' },
+            { text: '@arqel/fields', link: '/reference/typescript/fields' },
+          ],
         },
       ],
       '/advanced/': [

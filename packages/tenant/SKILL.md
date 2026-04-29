@@ -10,21 +10,22 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 
 ## Status
 
-**Entregue (TENANT-001..002):**
+**Entregue (TENANT-001..003):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\Tenant\` → `src/`, dep em `arqel/core` via path repo)
 - `TenantServiceProvider` registado via auto-discovery (`extra.laravel.providers`)
-- `TenantManager` (final) registado como singleton — stub com `current(): mixed` e `hasCurrent(): bool` retornando null/false até TENANT-003 entregar a implementação real
+- **`TenantManager` (final)** singleton com API completa: `resolve(Request)` (memoiza per-request), `set(?Model)` (override programático + dispatch `TenantResolved`/`TenantForgotten`), `forget()`, `runFor(Model, Closure)` (swap+restore mesmo em throw via try/finally), `current()`/`currentOrFail()` (lança `LogicException`)/`hasCurrent()`/`id()`/`identifier()` (delega ao resolver quando bound, fallback `(string) id()`)/`resolved()`. Construtor aceita `?TenantResolver` + `?Dispatcher` — apps sem tenancy ainda recebem manager funcional
+- **Events** `Arqel\Tenant\Events\TenantResolved` + `TenantForgotten` (final, propriedade `readonly Model $tenant`)
+- **`TenantServiceProvider::packageRegistered`** binda 2 singletons: `TenantResolver` (lê `arqel.tenancy.resolver` + `model` + `identifier_column` do config; valida `class_exists` + `is_subclass_of`; null se config ausente) e `TenantManager` (resolve resolver + Dispatcher do container)
 - **`Arqel\Tenant\Contracts\TenantResolver`** — interface `resolve(Request): ?Model` + `identifierFor(Model): string`
 - **`AbstractTenantResolver`** — base com validação `is_subclass_of(Model::class)` (lança `InvalidArgumentException`), `identifierFor` default (coluna configurada → fallback `getKey()`), `findByIdentifier(string)` protected helper
 - **5 resolvers concretos** (não-final — extensão explícita): `SubdomainResolver` (centralDomain + heurística leftmost label, www rejeitado), `PathResolver` (primeiro segmento + `ignoreSegments` case-insensitive), `HeaderResolver` (X-Tenant-ID configurável), `SessionResolver` (`hasSession()` guard + coerção scalar→string), `AuthUserResolver` (`currentTeam` Jetstream-style: aceita `BelongsTo`/`Model`/property)
 - Pest 3 + Orchestra Testbench setup com `defineEnvironment` SQLite in-memory
-- **32 testes Pest passando** (era 4): 4 ServiceProvider smoke + 9 SubdomainResolver + 5 PathResolver + 4 HeaderResolver + 5 SessionResolver + 5 AuthUserResolver
-- Estratégia DB-less: subclasses anônimas dos resolvers sobrescrevem `findByIdentifier` retornando fixture; cobre host parsing/header/session/relation sem `pdo_sqlite` no host
+- **54 testes Pest passando** (era 4 → 32 → 54): 6 ServiceProvider Feature (boot, autoload, singleton, no-resolver default, configured resolver build, null on missing/invalid config) + 9 SubdomainResolver + 5 PathResolver + 4 HeaderResolver + 5 SessionResolver + 5 AuthUserResolver + **20 TenantManager** (init state, no-resolver resolve, resolver delegation+memoise, TenantResolved emit/non-emit, set override+events, set(null) clears+emits Forgotten, idempotent set, forget+events, no-op forget, runFor swap+restore, runFor restore on throw, currentOrFail throws/returns, id() int+string keyType, identifier() resolver delegate/fallback/empty)
+- Estratégia DB-less: subclasses anônimas dos resolvers sobrescrevem `findByIdentifier` retornando fixture; tenant manager testado com fakeResolver inline + recordingDispatcher (Dispatcher anônimo que captura events em array)
 
-**Por chegar (TENANT-003..015):**
+**Por chegar (TENANT-004..015):**
 
-- `TenantManager::setCurrent`/`forget`/`forUser`/`for` (com closure scoping) — TENANT-003
 - `ResolveTenantMiddleware` integrado com `HandleArqelInertiaRequests` — TENANT-004
 - Trait `BelongsToTenant` + global scope `TenantScope` — TENANT-005
 - `Rules\ScopedUnique` (validation rule respeitando tenant) — TENANT-006

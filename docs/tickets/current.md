@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001/002 ✅).** Próximo natural: TENANT-003 (`TenantManager::setCurrent`/`forget`/`forUser`/`for` com closure scoping + resolver chain).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001/002/003 ✅).** Próximo natural: TENANT-004 (`ResolveTenantMiddleware` integrando com `HandleArqelInertiaRequests`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,27 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TENANT-003 — `TenantManager` singleton + resolução em request (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Tenant\TenantManager` (final) reescrito de stub para impl completa: `resolve(Request)` memoiza per-request (resolver é called só uma vez, subsequent calls retornam cache), `set(?Model)` (override programático com dispatch correto: emite `TenantResolved` em set positivo distinto do anterior, `TenantForgotten` em set(null)), `forget()` (drop tenant + emit Forgotten), `runFor(Model, Closure)` (swap state, run callback, **restore via try/finally** mesmo em exceção), `current()`/`currentOrFail()` (lança `LogicException` quando ausente)/`hasCurrent()`/`id()` (int|string|null com narrow para scalar)/`identifier()` (delega ao resolver via `identifierFor()` quando bound, fallback `(string) id()`, vazio sem tenant)/`resolved()`. Construtor aceita `?TenantResolver` + `?Dispatcher` — apps sem tenancy ainda recebem manager funcional
+- 2 events em `Arqel\Tenant\Events\`: `TenantResolved` e `TenantForgotten` (ambos final, com `public readonly Model $tenant`)
+- `TenantServiceProvider::packageRegistered` reescrito: bind `TenantResolver` (lê `arqel.tenancy.resolver` + `model` + `identifier_column` do config; valida `class_exists` + `is_subclass_of(TenantResolver)`; retorna null gracioso se config ausente/inválido) + bind `TenantManager` (resolve resolver via container quando bound + Dispatcher quando disponível)
+- 22 testes Pest novos (54 total, 86 assertions): TenantManagerTest com 20 (init state, resolve sem resolver = null, resolver delegation + memoise count, TenantResolved emit/non-emit, set override+events, set(null) clears+emits, idempotent set, forget+events, no-op forget, runFor swap+restore, runFor restore on throw, currentOrFail throws/returns, id() para int e string keyType, identifier() resolver delegate/fallback/empty); ServiceProviderTest expandido para 6 (era 4 — adiciona "binds configured resolver" + "null when config missing" + "null when class invalid")
+- Test scaffolding novo: `fakeResolver()` (anonymous TenantResolver com counter `resolveCalls`), `recordingDispatcher()` (anonymous Dispatcher que captura events em array — evita boot do dispatcher real Laravel)
+
+**Validações:** `pest packages/tenant` 54/54, 86 assertions ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test` ✅
+
+**Decisões autónomas:**
+
+- **`TenantResolver` aceito como `?TenantResolver`** no construtor — apps sem tenancy (queue jobs, console comandos) ainda devem ter `TenantManager` funcional via `set()`/`runFor()` direto. Forçar resolver criaria boilerplate
+- **Dispatcher injectado e opcional** — em vez de `event()` global helper. Isso desacopla testes (RecordingDispatcher) e permite container `bound()` check no Provider
+- **`runFor` usa `try/finally`** em vez de `try/catch` — restore acontece mesmo quando o callback throw, e a exception propaga sem catching; comportamento de "scope guard" idiomático
+- **Sem `setCurrent()` alias** — o ticket sugere `setCurrent`, mas `set()` é mais conciso e não conflita com o significado canônico Laravel (`Auth::setUser` etc). API canônica adotada: `set/forget/runFor/current`
+- **Events não fired em `set()` quando o mesmo tenant é passado 2×** — evita ruído em listeners; comparação por identity (`!== $previous`) vs equality
+- **`TenantForgotten` emitido em set(null) E em forget()** — duas APIs, mesma semântica (drop tenant); listeners não precisam saber qual caminho foi usado
 
 ### TENANT-002 — `TenantResolver` interface + 5 implementações (2026-04-29)
 

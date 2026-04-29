@@ -14,16 +14,27 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\Mcp\` → `src/`, dep em `arqel/core` via path repo)
 - `McpServiceProvider` registado via auto-discovery (`extra.laravel.providers`)
-- **`McpServer` (final, stub)** — assinaturas reais que MCP-002+ vai preencher: `registerTool(name, description, inputSchema, handler)`, `registerResource(uri, name, description, fetcher)`, `registerPrompt(name, description, arguments, generator)`, `getTools()`/`getResources()`/`getPrompts()`. Métodos de registro são no-op; getters retornam `[]`. Padrão TENANT-001: downstream type-hints já estáveis hoje, sem nullability shims quando a implementação real chegar
 - Pest 3 + Orchestra Testbench setup com `defineEnvironment` SQLite in-memory
-- **4 testes Pest passando**: boot do provider, autoload do namespace, `McpServer` bind como singleton (mesma instância em duas resoluções), métodos stub não lançam e getters retornam arrays vazios
 
-**Por chegar (MCP-002..010):**
+**Entregue (MCP-002):**
 
-- JSON-RPC 2.0 transport (stdio + HTTP) + Artisan `arqel:mcp:serve` — MCP-002
-- Tool registry funcional (`registerTool` persiste + expõe via `tools/list`/`tools/call`) — MCP-003
-- Resource registry (`resources/list`, `resources/read`) lendo Eloquent + `arqel/core` Resources — MCP-004
-- Prompt registry (`prompts/list`, `prompts/get`) — MCP-005
+- **`McpServer` (final)** — handler JSON-RPC 2.0 completo aderente ao spec MCP `2024-11-05`. API pública:
+  - **Registro**: `registerTool($name, $description, $inputSchema, $handler)`, `registerResource($uri, $name, $description, $fetcher)`, `registerPrompt($name, $description, $arguments, $generator)` persistem metadata + callable em mapas privados (chave: `name` para tools/prompts, `uri` para resources)
+  - **Introspecção**: `getTools()`/`getResources()`/`getPrompts()` devolvem o mapa de metadata SEM o callable (handlers são runtime-only)
+  - **Dispatch**: `handleRequest(array $request): array` — público para permitir testes unitários sem stdio. Implementa: `initialize`, `tools/list`, `tools/call`, `resources/list`, `resources/read`, `prompts/list`, `prompts/get`
+  - **Loop**: `serve()` — wrapper fino do loop stdio newline-delimited (lê `fgets(STDIN)` → `handleRequest` → escreve em `STDOUT`). Não testado diretamente (bound a stdio); cobertura vem via `handleRequest`
+- **Envelope JSON-RPC**:
+  - Resposta sempre carrega `{jsonrpc: '2.0', id: <request.id>}` + `result` OU `error: {code, message, data?}`
+  - Notifications (request sem `id`) NÃO recebem resposta — `handleRequest` retorna `[]`
+  - Códigos de erro: `-32600` Invalid Request (envelope malformado, faltando `method` ou `jsonrpc !== '2.0'`), `-32601` Method not found (método desconhecido), `-32602` Invalid params (tool/resource/prompt name/uri desconhecido), `-32603` Internal error (handler lança Throwable; `data.exception` carrega a mensagem original)
+  - Resultado de tool é wrapped em `{content: [{type: 'text', text: <stringified>}]}`; strings passam direto, arrays/objetos são `json_encode`-ados
+  - Resultado de resource é wrapped em `{contents: [{uri, text, mimeType?}]}`
+  - Resultado de prompt é wrapped em `{description, messages: <generator output>}` — generator é responsável por devolver o array de messages no formato MCP
+- **24 testes Pest passando** (4 Feature + 20 Unit) cobrindo: registro persiste e excluí callables, dispatch de cada método, wrapping de resultados (string + array + objeto), erros `-32600..-32603`, notifications retornam `[]`, preservação de `id` numérico/string
+
+**Por chegar (MCP-003..010):**
+
+- Artisan `arqel:mcp:serve` envolvendo `McpServer::serve()` — followup de MCP-002
 - Auto-descoberta: cada Resource Arqel vira tool CRUD + resource read; cada Action vira tool — MCP-006
 - Auth (token bearer + tenant scoping via `arqel/tenant`) — MCP-007
 - Streaming responses para tools de longa duração — MCP-008

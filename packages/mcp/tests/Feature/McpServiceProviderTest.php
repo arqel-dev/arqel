@@ -20,14 +20,14 @@ it('binds McpServer as a singleton', function (): void {
         ->and($second)->toBe($first);
 });
 
-it('exposes stub registration methods and empty registry getters', function (): void {
+it('exposes registration methods that persist into the registry getters', function (): void {
     $server = app(McpServer::class);
 
     $server->registerTool('noop', 'desc', ['type' => 'object'], fn (array $args): array => $args);
     $server->registerResource('arqel://noop', 'noop', 'desc', fn (string $uri): string => $uri);
-    $server->registerPrompt('noop', 'desc', [], fn (array $args): string => 'noop');
+    $server->registerPrompt('noop', 'desc', [], fn (array $args): array => []);
 
-    expect($server->getTools())->toBe([])
-        ->and($server->getResources())->toBe([])
-        ->and($server->getPrompts())->toBe([]);
+    expect($server->getTools())->toHaveKey('noop')
+        ->and($server->getResources())->toHaveKey('arqel://noop')
+        ->and($server->getPrompts())->toHaveKey('noop');
 });

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 
 /**
  * Assembles the Inertia payloads for the index/create/edit/show
@@ -110,9 +111,9 @@ final class InertiaDataBuilder
             'columns' => $this->serializeMany($this->callTableArray($table, 'getColumns')),
             'filters' => $this->serializeMany($this->callTableArray($table, 'getFilters')),
             'actions' => [
-                'row' => $this->serializeMany($rowActions),
-                'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions')),
-                'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions')),
+                'row' => $this->serializeMany($rowActions, $user),
+                'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions'), $user),
+                'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions'), $user),
             ],
             'search' => $request->input('search'),
             'sort' => [
@@ -330,24 +331,66 @@ final class InertiaDataBuilder
     }
 
     /**
+     * Serialise a list of toArray-able items. When `$user` is given
+     * and the item's `toArray` is `Action::toArray($user, $record)`-
+     * shaped (≥ 1 parameter), we pass it through so the action
+     * payload can resolve user-aware fields (`disabled`, `url`).
+     *
+     * Duck-typed: items without `toArray` are skipped silently.
+     *
      * @param array<int, mixed> $items
      *
      * @return list<array<string, mixed>>
      */
-    private function serializeMany(array $items): array
+    private function serializeMany(array $items, ?Authenticatable $user = null): array
     {
         $serialized = [];
         foreach ($items as $item) {
-            if (is_object($item) && method_exists($item, 'toArray')) {
-                $payload = $item->toArray();
-                if (is_array($payload)) {
-                    /** @var array<string, mixed> $payload */
-                    $serialized[] = $payload;
+            if (! is_object($item) || ! method_exists($item, 'toArray')) {
+                continue;
+            }
+
+            $payload = $this->callToArray($item, $user);
+            if (is_array($payload)) {
+                $clean = [];
+                foreach ($payload as $key => $value) {
+                    $clean[(string) $key] = $value;
                 }
+                $serialized[] = $clean;
             }
         }
 
         return $serialized;
+    }
+
+    /**
+     * Call `$item->toArray()` while respecting the actual signature.
+     * Action-shaped objects accept `($user, $record)`; column/filter
+     * objects take no args. ReflectionMethod inspection lets us pass
+     * `$user` only when accepted.
+     *
+     * Caller already guarantees `method_exists($item, 'toArray')`,
+     * so the dynamic dispatch is safe — PHPStan can't see that
+     * across the call boundary, hence the explicit phpstan-ignore.
+     */
+    private function callToArray(object $item, ?Authenticatable $user): mixed
+    {
+        if ($user === null) {
+            return $item->toArray(); // @phpstan-ignore method.notFound
+        }
+
+        try {
+            $reflection = new ReflectionMethod($item, 'toArray');
+            $params = $reflection->getNumberOfParameters();
+        } catch (ReflectionException) {
+            return $item->toArray(); // @phpstan-ignore method.notFound
+        }
+
+        if ($params >= 1) {
+            return $item->toArray($user); // @phpstan-ignore method.notFound
+        }
+
+        return $item->toArray(); // @phpstan-ignore method.notFound
     }
 
     /**

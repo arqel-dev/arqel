@@ -8,21 +8,23 @@
 
 ## Status
 
-**Entregue (ACTIONS-001..005):**
+**Entregue (ACTIONS-001..008):**
 
 - `Arqel\Actions\Action` abstract base com fluent API completo, oracles, XOR action↔url
-- `Concerns\Confirmable` — modal de confirmação
-- `Concerns\HasAuthorization` — gates per-action
-- `Concerns\HasForm` — form modal com fields
-- `Types\RowAction`, `Types\ToolbarAction`, `Types\HeaderAction`, `Types\BulkAction` (chunking automático)
+- `Concerns\Confirmable` — modal de confirmação (cores destructive/warning/info, type-to-confirm, auto-active flags)
+- `Concerns\HasAuthorization` — gates per-action via Closure `(?Authenticatable, mixed) => bool`
+- `Concerns\HasForm` — form modal com fields + size + validation
+- `Types\RowAction`, `Types\ToolbarAction`, `Types\HeaderAction`, `Types\BulkAction` (chunking automático via `chunkSize`)
 - `Actions` factory para verbos comuns (view/edit/delete/restore/create/deleteBulk)
-- 30 testes Pest passando
+- `Http\Controllers\ActionController` (ACTIONS-006) — 4 endpoints `invokeRow/invokeHeader/invokeToolbar/invokeBulk` sob `arqel.actions.{name}`. Resolve Resource via `ResourceRegistry::findBySlug`, action por nome em coleções duck-typed (`actions/headerActions/toolbarActions/bulkActions`), autoriza via `canBeExecutedBy`, valida payload do form modal, executa callback e flasha success/failure (ACTIONS-006)
+- Integração com Table — `InertiaDataBuilder::serializeMany` agora aceita `?Authenticatable $user` e via `ReflectionMethod::getNumberOfParameters` passa-o para `Action::toArray($user, $record)` quando a assinatura aceita; permite resolução user-aware de `disabled`/`url` no payload. Per-row visibility via `arqel.actions: ['view','edit']` lista os nomes habilitados para `(user, record)` cada record (ACTIONS-007)
+- **49 testes Pest passando** (era 30): cobertura nova de `Confirmable` (8 tests), `HasAuthorization` (4 tests), `ActionController` Feature (7 tests cobrindo 404 slug, 404 action name, success notification, deny via authorize → 403, failure notification, 422 sem ids[], duck-typed collection lookup) (ACTIONS-008)
 
 **Por chegar:**
 
-- `ActionExecutor` + `Http\Controllers\ActionController` (ACTIONS-006) — depende de `CORE-006`
-- Integração com Table (ACTIONS-007) — depende de TABLE-007
-- Queue helper full com progress (Fase 2, RF-A-06)
+- Queue helper full com progress real-time (Fase 2, RF-A-06)
+- Bulk per-record authorization (ACTIONS-007 follow-up Phase 2)
+- Feature tests end-to-end com DB (`bulk delete de 50 users`) — bloqueado por `pdo_sqlite` driver no host
 
 ## Key Contracts
 

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 + TABLE-007/008 + FORM-006 fechados.** Próximo natural: ACTIONS-007/008, HOOKS-002..006 (tickets adiados restantes) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 fechados.** Próximo natural: HOOKS-002..006 (tickets adiados restantes — Zod client validation + URL sync) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,26 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### ACTIONS-007/008 — User-aware action serialization + test coverage (2026-04-29)
+
+**Entregue:**
+
+- **ACTIONS-007**: `InertiaDataBuilder::serializeMany` aceita opcionalmente `?Authenticatable $user` e via `ReflectionMethod::getNumberOfParameters` passa-o para `Action::toArray($user, $record)` quando a assinatura aceita ≥1 param. Resolução user-aware de `disabled`/`url` no payload das listas globais (`actions.row`, `actions.bulk`, `actions.toolbar`). Helper privado `callToArray` centraliza a lógica de inspeção (column/filter ainda recebem chamada zero-arg)
+- **ACTIONS-008**: 19 testes novos (era 30, agora 49):
+  - `Unit/ConfirmableTest.php` (8): default false, requiresConfirmation flag, modalHeading/Description/ConfirmationRequiresText auto-activam, modalColor com fallback destructive, `getConfirmationConfig()` shape em toArray
+  - `Unit/HasAuthorizationTest.php` (4): canBeExecutedBy default true, delegação ao Closure, coerção bool, propagação de user+record
+  - `Feature/ActionControllerTest.php` (7): 404 slug desconhecido, 404 action name, success notification (toolbar action callback invocado + session flash), deny via `authorize → false` resulta em 403, failure notification quando callback throw, 422 bulk sem `ids[]`, duck-typed collection (Resource sem `toolbarActions()` cai em 404)
+- `tests/Pest.php` do `arqel/actions` ganha `'Unit'` (antes só rodava `Feature/`)
+- `packages/actions/SKILL.md` § Status atualizado — ACTIONS-001..008 entregue (era 001..005); 49 testes Pest passando; "Por chegar" reduzido a Queue helper + bulk per-record authorization + DB end-to-end (bloqueado por `pdo_sqlite`)
+
+**Validações:** `pest packages/actions` 49/49, 140 assertions ✅ · `pest packages/core` 109/109, 311 assertions ✅ · `phpstan analyse packages/{core,actions}` ✅ · `pint` ✅
+
+**Decisões autónomas:**
+
+- **`ReflectionMethod` em vez de `instanceof Action`** — `arqel/core` não pode importar `Arqel\Actions\Action` (dep direction é `actions → core`). Reflection inspeciona signature dinamicamente sem hard dep
+- **`@phpstan-ignore method.notFound`** localizado em cada chamada (não no método inteiro) — caller já valida `method_exists`, mas PHPStan não atravessa o boundary; ternário split em if/else porque uma única annotation não cobre 2 chamadas no mesmo statement
+- **Test `Feature/ActionControllerTest`** sem DB — focado em paths que não exigem `pdo_sqlite`: resolveOrFail, resolveAction, invokeToolbar (sem record), invokeBulk até a checagem de `ids[]`. Row/header e bulk fetch path ficam para CI matrix com DB real
 
 ### FORM-006 — Integração `Resource::form()` com Inertia payload (2026-04-29)
 

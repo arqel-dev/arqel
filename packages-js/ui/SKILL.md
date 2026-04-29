@@ -25,6 +25,10 @@
 - `<TablePagination>`: prev/next + range "11–20 of 47" + per-page picker, disabled em first/last
 - `<TableToolbar>`: search slot + filters slot + bulk-action bar (aparece quando `selectedCount > 0`)
 - `<ResourceIndex>`: page-level wrapper que costura `ResourceIndexProps` server payload com toda a stack acima — header/toolbar/table/pagination — presentational, callbacks lifted
+- `<FormRenderer>` recursivo + `<FieldRenderer>` (registry + native fallback) + `<FormSection>`/`<FormFieldset>`/`<FormGrid>`/`<FormTabs>`/`<FormActions>` — renderiza `FormSchema` server-side
+- `<ActionButton>` (matriz: confirmação / form / direto) + `<ActionMenu>` (inline → Base UI dropdown) + `<ConfirmDialog>` (type-to-confirm) + `<ActionFormModal>`
+- `<FlashContainer>` consome `useFlash()` + `<FlashToast>` self-rendered (auto-dismiss, role=alert/status)
+- Utilities: `<Breadcrumbs>` (auto/explicit), `<PageHeader>`, `<EmptyState>`, `<ErrorState>`, `<LoadingSkeleton>`
 - UI-004: FormRenderer + FieldRenderer + FormSection + FormActions
 - UI-005: ActionModal + ConfirmDialog + FlashContainer + FlashToast
 

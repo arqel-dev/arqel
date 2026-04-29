@@ -1,7 +1,4 @@
-/**
- * Flash components — placeholder until UI-005.
- *
- * FlashContainer, FlashToast land in UI-005.
- */
-
-export {};
+export type { FlashContainerProps, FlashPosition } from './FlashContainer.js';
+export { FlashContainer } from './FlashContainer.js';
+export type { FlashKind, FlashToastProps } from './FlashToast.js';
+export { FlashToast } from './FlashToast.js';

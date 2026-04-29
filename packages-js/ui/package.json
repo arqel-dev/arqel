@@ -55,6 +55,10 @@
       "types": "./dist/flash.d.ts",
       "import": "./dist/flash.js"
     },
+    "./utility": {
+      "types": "./dist/utility.d.ts",
+      "import": "./dist/utility.js"
+    },
     "./utils": {
       "types": "./dist/utils.d.ts",
       "import": "./dist/utils.js"

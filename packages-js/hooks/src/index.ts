@@ -15,7 +15,7 @@ export { useBreakpoint } from './useBreakpoint.js';
 export { useCanAccess } from './useCanAccess.js';
 export type { UseFieldDependenciesOptions } from './useFieldDependencies.js';
 export { useFieldDependencies } from './useFieldDependencies.js';
-export type { UseFlashOptions, UseFlashResult } from './useFlash.js';
+export type { FlashKind, UseFlashOptions, UseFlashResult } from './useFlash.js';
 export { useFlash } from './useFlash.js';
 export type { NavigationItemPayload, UseNavigationResult } from './useNavigation.js';
 export { useNavigation } from './useNavigation.js';

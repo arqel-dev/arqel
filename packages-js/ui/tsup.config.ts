@@ -10,6 +10,7 @@ export default defineConfig({
     action: 'src/action/index.ts',
     auth: 'src/auth/index.ts',
     flash: 'src/flash/index.ts',
+    utility: 'src/utility/index.ts',
     utils: 'src/utils/index.ts',
   },
   format: ['esm'],

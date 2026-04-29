@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada — todos os tickets do `PLANNING/08-fase-1-mvp.md` entregues** (CORE-001..016, FIELDS-001..022, TABLE-001..008, FORM-001..008/010, ACTIONS-001..008, AUTH-001..005, NAV-001..005, TYPES-001..004, REACT-001..004, HOOKS-001..006, UI-001..007, FIELDS-JS-001..006, DOCS-001..008, INFRA-001..005, GOV-001/003). Próximo natural: começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 100% fechada + Fase 2 iniciada (TENANT-001 ✅).** Próximo natural: TENANT-002 (`TenantResolver` interface + 4 implementações canônicas Subdomain/Path/Header/Session).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,29 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TENANT-001 — Esqueleto do pacote `arqel/tenant` (2026-04-29) — **Início Fase 2**
+
+**Entregue:**
+
+- Esqueleto do pacote `arqel/tenant` (PHP 8.3+, Laravel 12|13, dep em `arqel/core` via path repo): `composer.json` com PSR-4 `Arqel\Tenant\` → `src/`, autoload-dev `Arqel\Tenant\Tests\`, scripts `test`/`test:coverage`/`analyse`/`lint`/`format`, suggested deps comentadas (stancl, spatie)
+- `Arqel\Tenant\TenantServiceProvider` (final, extends `PackageServiceProvider`) registado via `extra.laravel.providers`. `packageRegistered()` faz `singleton(TenantManager::class)`
+- `Arqel\Tenant\TenantManager` (final) — stub com `current(): mixed` retornando `null` e `hasCurrent(): bool` retornando `false` até TENANT-003 entregar resolver/scope chain
+- `tests/TestCase.php` extendendo `Orchestra\Testbench\TestCase`: `getPackageProviders` registra `ArqelServiceProvider + TenantServiceProvider`, `defineEnvironment` configura SQLite in-memory para isolamento
+- `tests/Pest.php` com `uses(TestCase::class)->in('Feature', 'Unit')`
+- `tests/Feature/TenantServiceProviderTest.php` (4 testes smoke): boot OK, autoload do namespace, `singleton` binding (instâncias idênticas), stub reporta `hasCurrent=false` + `current=null`
+- `phpunit.xml` com configuração padrão dos pacotes Arqel (testsuites Unit/Feature, env testing/sqlite/array)
+- `SKILL.md` PT-BR com Status (entregue + por chegar TENANT-002..015), Conventions (sem hard dep em stancl/spatie — adapters são opt-in), 3 Anti-patterns
+- `README.md` minimal + ponteiro pro SKILL
+- Pacote registrado em `composer.json` raiz (`"arqel/tenant": "@dev"`); `composer update` symlinkou via path repo `packages/*`
+
+**Validações:** `pest packages/tenant` 4/4 ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test packages/tenant` ✅
+
+**Decisões autónomas:**
+
+- **`TenantManager` stub criado já em TENANT-001** (não em TENANT-003) — `TenantServiceProvider::singleton` precisa da classe existir; criar stub vazio agora evita o catch-22 e permite type-hint downstream desde já
+- **`current(): mixed` em vez de `?Tenant`** — não há `Tenant` model concreto (cada app pode usar seu próprio: `Team`, `Workspace`, `Organization`); abstração via `mixed` mantém o contrato aberto até TENANT-002 fechar a interface `TenantResolver`
+- **`defineEnvironment` SQLite in-memory já em TENANT-001** — alinha com o padrão fechado em CORE-014; testes feature pós-TENANT-005 (trait `BelongsToTenant`) vão precisar de migrations, melhor estabelecer o environment cedo
 
 ### HOOKS-002..006 — Test coverage + SKILL.md sync (2026-04-29)
 

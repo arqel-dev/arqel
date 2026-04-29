@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "99d2690357bc16588e28699870cf1c48",
+    "content-hash": "5cc5e2b1d7fa4892287e04fb1065a556",
     "packages": [],
     "packages-dev": [
         {
@@ -89,7 +89,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/auth",
-                "reference": "7a8bcdea6256c656ce02a635bc95ceef67fd3bb9"
+                "reference": "75726ca274bb322838011fb7507c868173c707ab"
             },
             "require": {
                 "arqel/core": "@dev",
@@ -113,7 +113,10 @@
             "autoload": {
                 "psr-4": {
                     "Arqel\\Auth\\": "src/"
-                }
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
             },
             "autoload-dev": {
                 "psr-4": {
@@ -525,6 +528,82 @@
                 "datatable",
                 "laravel",
                 "table"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/tenant",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/tenant",
+                "reference": "ed5c624617230e59890d4f4023282c4d2b448c0c"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Tenant\\TenantServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Tenant\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Tenant\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Multi-tenancy primitives for Arqel — TenantManager, resolver, scoped Eloquent traits, and adapters for stancl/tenancy + spatie/laravel-multitenancy.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "laravel",
+                "multi-tenancy",
+                "saas",
+                "tenant"
             ],
             "support": {
                 "issues": "https://github.com/arqel/arqel/issues",
@@ -6606,7 +6685,8 @@
         "arqel/fields": 20,
         "arqel/form": 20,
         "arqel/nav": 20,
-        "arqel/table": 20
+        "arqel/table": 20,
+        "arqel/tenant": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
@@ -6614,5 +6694,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

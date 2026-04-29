@@ -6,6 +6,7 @@ use Arqel\Fields\FieldFactory;
 use Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider;
 use Arqel\FieldsAdvanced\Types\CodeField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
+use Arqel\FieldsAdvanced\Types\RepeaterField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
 
 it('boots the FieldsAdvancedServiceProvider without errors', function (): void {
@@ -44,4 +45,13 @@ it('registers the code macro on the FieldFactory', function (): void {
 
     expect($field)->toBeInstanceOf(CodeField::class)
         ->and($field->getName())->toBe('content');
+});
+
+it('registers the repeater macro on the FieldFactory', function (): void {
+    expect(FieldFactory::hasType('repeater'))->toBeTrue();
+
+    $field = FieldFactory::repeater('addresses');
+
+    expect($field)->toBeInstanceOf(RepeaterField::class)
+        ->and($field->getName())->toBe('addresses');
 });

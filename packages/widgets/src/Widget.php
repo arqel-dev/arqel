@@ -133,6 +133,24 @@ abstract class Widget
         return $this->name;
     }
 
+    /**
+     * Read a filter value previously applied via `filters([...])`,
+     * falling back to `$default` when the filter is not set. This
+     * is the canonical reader subclasses should call inside their
+     * `data()` method (mirrors `Filter::default` resolution on the
+     * Dashboard side).
+     */
+    public function filterValue(string $name, mixed $default = null): mixed
+    {
+        return $this->filters[$name] ?? $default;
+    }
+
+    /** @return array<string, mixed> */
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
     public function getType(): string
     {
         return $this->type;

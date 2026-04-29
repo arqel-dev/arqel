@@ -8,7 +8,7 @@
 
 ## Status
 
-**Entregue (WIDGETS-001..006):**
+**Entregue (WIDGETS-001..006, 009):**
 
 - Esqueleto do pacote `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo
 - **`Arqel\Widgets\Widget`** abstract base com fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case identifier) + `protected string $component` (PascalCase React component name) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload canônico para Inertia; `data: null` quando deferred. `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)` oracle (default true)
@@ -21,12 +21,19 @@
 - **`Arqel\Widgets\TableWidget`** (final) — mini-tabela em dashboard. Fluent: `query(Closure(): Builder<Model>)`, `limit(int)` (clamp ≥ 1, default 10), `columns(array)` (passthrough; entries duck-typed em `serialiseColumns()` — só objetos com `toArray()` sobrevivem), `seeAllUrl(string|Closure|null)`. `data()` envelope `{columns, records, limit, seeAllUrl}`. Sem dependência em `arqel/table` — duck-typing preserva o dep graph mínimo. Throwables do Closure (e.g. PDO indisponível em testes) são capturados e expostos em `loadError: <message>` com `records: []`.
 - **`Arqel\Widgets\CustomWidget`** (final) — escape hatch. Factory `make(string $name, string $component)`; `component(string)` valida não-vazio (`InvalidArgumentException`); `withData(array|Closure)` define payload (default `[]`; Closure non-array → `[]`). `type = 'custom'` fixo, `component` configurado em runtime. `data()` resolve o payload, satisfazendo o contrato abstrato — note que o setter foi nomeado `withData()` em vez de `data()` para preservar a assinatura LSP de `Widget::data(): array`.
 - **Testes Pest:** consolidação WIDGETS-001..006 = ~90 testes (13 Widget, 18 Dashboard, 6 DashboardRegistry, 6 WidgetRegistry, 4 ServiceProvider smoke, 16 StatWidget, 14 ChartWidget, 10 TableWidget, 10 CustomWidget) + fixture `FakeBuilder`.
+- **`Arqel\Widgets\Filters\Filter`** (abstract, novo em WIDGETS-009) — base declarativa para filtros do dashboard. Construtor `final (string $name)`; factory `Filter::make($name)`. Setters fluentes `label(string)`, `default(mixed)`. Subclasses declaram `protected string $type` + `protected string $component` e implementam `getTypeSpecificProps(): array`. `toArray()` emite envelope canônico `{name, type, component, label, default, ...typeSpecificProps}`. Label sem setter explícito ↦ `Str::of($name)->snake()->replace('_',' ')->title()` (mesma convenção do `Field`).
+- **`Arqel\Widgets\Filters\DateRangeFilter`** (final) — `type='date_range'`, `component='DateRangeFilter'`. Setter `defaultRange(?DateTimeInterface $from, ?DateTimeInterface $to)` armazena `['from' => ?DateTime, 'to' => ?DateTime]` como default. `getTypeSpecificProps()` vazio.
+- **`Arqel\Widgets\Filters\SelectFilter`** (final) — `type='select'`, `component='SelectFilter'`. Setters `options(array|Closure)` (Closure resolvida lazy em `toArray()`; non-array Closure return ↦ `[]`) e `multiple(bool=true)`. `getTypeSpecificProps()` retorna `{options, multiple}`.
+- **`Widget::filterValue(string $name, mixed $default = null)`** lê do filter map merged (preenchido pelo Dashboard a `resolve()` time). `Widget::getFilters()` exposto para inspeção.
+- **`Dashboard::filters(array)` dual-mode**: aceita `array<string, mixed>` legado (passthrough — BC mantida) **OU** `list<Filter>` (novo). Detecção por presença de qualquer instância `Filter`. Em modo declarativo, armazena `$declaredFilters` (instâncias) e `$filterDefaults` (`{name => default}` map) — esse map é o que `resolve()` mescla em cada widget. Getters: `getDeclaredFilters()` (para o React renderizar a toolbar) e `getFilterDefaults()`.
+- **Propagação Dashboard → Widget**: em `resolve()`, após instanciar/filtrar cada widget, `array_merge($dashboardFilters, $widget->getFilters())` é aplicado via `$widget->filters($merged)` — request-time values (e.g. `WidgetDataController` setter) **vencem** os defaults declarados no dashboard.
+- **Testes adicionais WIDGETS-009:** 8 em `tests/Unit/Filters/FilterTest.php` (shape de `DateRangeFilter`, `SelectFilter`, Closure options lazy, multiple flag, fallback de label) + 7 em `tests/Unit/DashboardFilterPropagationTest.php` (propagação a múltiplos widgets, override request-time, mode legado mantém BC, `Widget::filterValue` reader). Fixture nova: `EchoFiltersWidget` que ecoa o filter map em `data()`.
 
-**Por chegar (WIDGETS-007..015):**
+**Por chegar (WIDGETS-007..015 exceto 009):**
 
 - `Http\Controllers\DashboardController` + `WidgetDataController` (deferred fetch endpoint) — WIDGETS-007
-- React components em `@arqel/ui/widgets` — WIDGETS-008..010
-- Filters compartilhados (date range global, dropdown filter por dashboard) — WIDGETS-011..012
+- React components em `@arqel/ui/widgets` — WIDGETS-008..010 (incluindo `DateRangeFilter` / `SelectFilter` JS-side, fora do escopo PHP)
+- Filters compartilhados (URL sync, refetch on filter change) — WIDGETS-011..012
 - Suite full de testes + SKILL.md final + dashboard demo — WIDGETS-013..015
 
 ## Conventions

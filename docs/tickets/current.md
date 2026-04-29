@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..009 ✅ · WIDGETS-001..006 ✅ · MCP-001/002 ✅ · FIELDS-ADV-001..003 ✅ · EXPORT-001 ✅ · AUDIT-001 ✅) + 9 bugs do dogfooding fechados + Batch #1, #2 e #3 de sub-agentes paralelos completos.** Próximo natural: WIDGETS-007 (DashboardController + WidgetDataController endpoint), MCP-003 (tools/resources concretos), TENANT-010 (registration flow) ou EXPORT-002+ (CsvExporter streaming).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..009 ✅ · WIDGETS-001..007 ✅ · MCP-001..003 ✅ · FIELDS-ADV-001..003 ✅ · EXPORT-001/002 ✅ · AUDIT-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#4 de sub-agentes paralelos completos.** Próximo natural: WIDGETS-008 (WidgetDataController para deferred + polling), MCP-004 (describe_resource tool), EXPORT-003 (XlsxExporter), AUDIT-002 (UI timeline) ou TENANT-010 (registration scaffolder).
 
 **Fase:** 1 (MVP)
 

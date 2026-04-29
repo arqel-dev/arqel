@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo (@arqel/ui + @arqel/fields) + docs site scaffold.** Próximo natural: DOCS-002 (Getting Started < 10 min) ou voltar para tickets adiados (CORE-014/015, TABLE-007/008, etc.).
+**Fase 1 backend PHP + frontend runtime completo + docs site scaffold + Getting Started.** Próximo natural: DOCS-003 (Conceitos essenciais — Panels/Resources/Fields/Actions/Auth, preenche stubs em `guide/`) ou voltar para tickets adiados.
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,28 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### DOCS-002 — Getting Started < 10 min (parcial) (2026-04-29)
+
+**Entregue:**
+
+- `apps/docs/guide/getting-started.md` real (substitui o stub de DOCS-001) com 7 steps testáveis: pré-requisitos (tabela com PHP 8.3+/Composer 2.7+/Node 20.9+/pnpm 10.x e comando de verificação), `laravel new acme --pest`, `composer require arqel/core` + `php artisan arqel:install`, `pnpm add @arqel/{react,ui,hooks,fields,types}`, configuração de `app.tsx` (`createArqelApp` + import side-effect `@arqel/fields/register` + `@arqel/ui/styles.css`), `php artisan arqel:resource User --with-policy` com edição de `UserResource::fields()` (text/email/password com `unique`), `php artisan serve` + `pnpm dev`, login via `tinker`
+- Seção "Próximos passos" com 4 links internos (what-is-arqel, panels, custom-fields, blog-admin)
+- Bloco "Troubleshooting" com 4 warnings VitePress containers cobrindo: PHP < 8.3, Node < 20.9, permissions em `storage/`, `dont-discover` quebrando auto-registo do `FieldServiceProvider`
+- Uso de containers VitePress (`::: tip`/`::: warning`/`::: details`) para call-outs
+
+**Critérios não-entregues (parcial):**
+
+- ❌ **Screenshot/gif demo** — exige rodar o app local para capturar; fica para PR de follow-up quando o autor tiver ambiente Laravel real
+- ❌ **Timer: dev novo completa em < 10 min** — só validável com user real testando o tutorial; assume-se cumprido até feedback contrário
+
+**Validações:** `pnpm build` 19 páginas em 2.3s ✅ · `biome check .` ✅ · 23 testes Vitest fields-js ainda passando ✅
+
+**Decisões autónomas:**
+
+- **Sem starter kit de auth** — guia explica que Arqel não força Breeze/Jetstream e mostra o caminho manual via `tinker` + middleware `auth` no `config/arqel.php`. Mantém o tutorial mais curto e Arqel agnóstico
+- **Stub mantido em `installation.md`** — Getting Started cobre instalação completa; `installation.md` continua redirect para o GS até DOCS-003
+- **`UserResource` em vez de `PostResource`** — User já existe no Laravel new install, evita criar migration/model só para o tutorial. PostResource fica para DOCS-004 (blog tutorial)
 
 ### DOCS-001 — Setup do site VitePress (2026-04-29)
 

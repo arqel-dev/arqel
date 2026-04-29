@@ -24,7 +24,9 @@ final class WidgetsServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $package->name('arqel-widgets');
+        $package
+            ->name('arqel-widgets')
+            ->hasRoute('admin');
     }
 
     public function packageRegistered(): void

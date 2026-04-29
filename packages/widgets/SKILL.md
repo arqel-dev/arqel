@@ -8,7 +8,7 @@
 
 ## Status
 
-**Entregue (WIDGETS-001..006):**
+**Entregue (WIDGETS-001..007):**
 
 - Esqueleto do pacote `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo
 - **`Arqel\Widgets\Widget`** abstract base com fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case identifier) + `protected string $component` (PascalCase React component name) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload canônico para Inertia; `data: null` quando deferred. `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)` oracle (default true)
@@ -20,12 +20,13 @@
 - **`Arqel\Widgets\ChartWidget`** (final) — Recharts wrapper. Fluent: `chartType(line|bar|area|pie|donut|radar)` (unknown → line; `CHART_*` constants), `height(int)` (clamp ≥ 50, default 300), `showLegend(bool)`, `showGrid(bool)` (ambos default true), `chartData(array|Closure)` (Closure non-array → `{labels: [], datasets: []}`), `chartOptions(array|Closure)` (Closure non-array → `[]`). `data()` envelope `{chartType, chartData, chartOptions, height, showLegend, showGrid}`. Closures resolvidos lazy em `data()` time; `deferred()` skip a invocação.
 - **`Arqel\Widgets\TableWidget`** (final) — mini-tabela em dashboard. Fluent: `query(Closure(): Builder<Model>)`, `limit(int)` (clamp ≥ 1, default 10), `columns(array)` (passthrough; entries duck-typed em `serialiseColumns()` — só objetos com `toArray()` sobrevivem), `seeAllUrl(string|Closure|null)`. `data()` envelope `{columns, records, limit, seeAllUrl}`. Sem dependência em `arqel/table` — duck-typing preserva o dep graph mínimo. Throwables do Closure (e.g. PDO indisponível em testes) são capturados e expostos em `loadError: <message>` com `records: []`.
 - **`Arqel\Widgets\CustomWidget`** (final) — escape hatch. Factory `make(string $name, string $component)`; `component(string)` valida não-vazio (`InvalidArgumentException`); `withData(array|Closure)` define payload (default `[]`; Closure non-array → `[]`). `type = 'custom'` fixo, `component` configurado em runtime. `data()` resolve o payload, satisfazendo o contrato abstrato — note que o setter foi nomeado `withData()` em vez de `data()` para preservar a assinatura LSP de `Widget::data(): array`.
-- **Testes Pest:** consolidação WIDGETS-001..006 = ~90 testes (13 Widget, 18 Dashboard, 6 DashboardRegistry, 6 WidgetRegistry, 4 ServiceProvider smoke, 16 StatWidget, 14 ChartWidget, 10 TableWidget, 10 CustomWidget) + fixture `FakeBuilder`.
+- **`Arqel\Widgets\Http\Controllers\DashboardController`** (final, WIDGETS-007) — único método `show(Request, DashboardRegistry, ?string $dashboardId = null): Inertia\Response`. `$dashboardId` default `'main'`. Resolve via `DashboardRegistry::get()` (404 quando ausente), serializa via `Dashboard::resolve($request->user())` e devolve Inertia render `'arqel::dashboard'` com `dashboard` + `filterValues` (query `?filters[...]` passa direto). Rotas registradas em `routes/admin.php` via `PackageServiceProvider::hasRoute('admin')`: `GET /admin` → `arqel.dashboard.main`, `GET /admin/dashboards/{dashboardId}` → `arqel.dashboard.show`. Ambas dentro de `web` + `auth` middleware.
+- **Testes Pest:** consolidação WIDGETS-001..007 = ~107 testes (13 Widget, 18 Dashboard, 6 DashboardRegistry, 6 WidgetRegistry, 4 ServiceProvider smoke, 16 StatWidget, 14 ChartWidget, 10 TableWidget, 10 CustomWidget, 5 DashboardController) + fixture `FakeBuilder` + `CounterWidget`. `DashboardControllerTest` invoca o controller diretamente (mesma gotcha de Inertia SSR observada em TENANT-009) e lê props via reflexão sobre `Inertia\Response`.
 
-**Por chegar (WIDGETS-007..015):**
+**Por chegar (WIDGETS-008..015):**
 
-- `Http\Controllers\DashboardController` + `WidgetDataController` (deferred fetch endpoint) — WIDGETS-007
-- React components em `@arqel/ui/widgets` — WIDGETS-008..010
+- `WidgetDataController` (deferred fetch endpoint) — WIDGETS-008
+- React components em `@arqel/ui/widgets` — WIDGETS-009..010
 - Filters compartilhados (date range global, dropdown filter por dashboard) — WIDGETS-011..012
 - Suite full de testes + SKILL.md final + dashboard demo — WIDGETS-013..015
 

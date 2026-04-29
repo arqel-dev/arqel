@@ -10,17 +10,17 @@ A separação core × advanced existe porque estes types arrastam dependências 
 
 ## Status
 
-**Entregue (FIELDS-ADV-001..002):**
+**Entregue (FIELDS-ADV-001..003):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\FieldsAdvanced\` → `src/`, deps em `arqel/core` + `arqel/fields` via path repos)
-- `FieldsAdvancedServiceProvider` (final, auto-discovered) registra `richText` no `FieldFactory`
+- `FieldsAdvancedServiceProvider` (final, auto-discovered) registra `richText` e `markdown` no `FieldFactory`
 - **`Arqel\FieldsAdvanced\Types\RichTextField`** (final, extends `Arqel\Fields\Field`) — `type='richText'`, `component='RichTextInput'`. Setters fluentes `toolbar(array)` (drop silencioso de não-strings), `imageUploadDisk(string)`, `imageUploadDirectory(string)`, `maxLength(int)` (clamp ≥1, default 65535), `fileAttachments(bool=true)`, `customMarks(array)` (filtra não-strings), `mentionable(array)` (filtra entries sem `id`+`name` válidos; aceita `avatar` opcional). `getTypeSpecificProps()` devolve `{toolbar, imageUploadRoute, imageUploadDirectory, maxLength, fileAttachments, customMarks, mentionable}` — `imageUploadRoute` é `null` enquanto nenhum disk for configurado, caso contrário a string `/arqel/fields/upload?disk=<disk>` (sem `route()` para o campo permanecer testável fora de contexto HTTP)
+- **`Arqel\FieldsAdvanced\Types\MarkdownField`** (final, extends `Arqel\Fields\Field`) — `type='markdown'`, `component='MarkdownInput'`. Setters fluentes `preview(bool=true)`, `previewMode(string)` com paleta `'side-by-side' | 'tab' | 'popup'` (constantes `PREVIEW_MODE_SIDE_BY_SIDE/TAB/POPUP`; valores desconhecidos fazem fallback silencioso para `'side-by-side'`), `toolbar(bool=true)`, `rows(int)` (clamp ≥3, default 10), `fullscreen(bool=true)` e o knob extra `syncScroll(bool=true)` (sincroniza scroll entre editor e preview). `getTypeSpecificProps()` devolve `{preview, previewMode, toolbar, rows, fullscreen, syncScroll}`. Defaults preservam UX out-of-the-box: preview lado-a-lado, toolbar visível, fullscreen disponível, scroll sincronizado. Sanitização Markdown→HTML é responsabilidade do consumidor (PHP é config-only); a preview React usa `remark` + `rehype-sanitize` como camada client-side
 - Pest 3 + Orchestra Testbench setup com `defineEnvironment` SQLite in-memory
-- **13 testes Pest passando** — 3 ServiceProvider (boot, autoload, macro `richText` registrada) + 10 RichTextField (type/component, default toolbar, replace+drop não-strings, clamp `maxLength`, default `maxLength`, passthrough disco/diretório, `imageUploadRoute=null` sem disk, toggle `fileAttachments`, filtro `customMarks`, filtro `mentionable`, payload end-to-end)
+- **26 testes Pest passando** — 4 ServiceProvider (boot, autoload, macros `richText` e `markdown` registradas) + 10 RichTextField + 11 MarkdownField (type/component, defaults canónicos, toggle `preview`, 3 modos canónicos via constantes, fallback `previewMode` em valores desconhecidos, toggle `toolbar`, clamp `rows`, default `rows`, toggle `fullscreen`, toggle `syncScroll`, payload end-to-end)
 
-**Por chegar (FIELDS-ADV-003..010):**
+**Por chegar (FIELDS-ADV-004..010):**
 
-- `MarkdownField` — editor Markdown com preview (FIELDS-ADV-003)
 - `CodeField` — Monaco editor com syntax highlight (FIELDS-ADV-004)
 - `RepeaterField` — array dinâmico de sub-fields (FIELDS-ADV-005)
 - `BuilderField` — repeater heterogêneo (blocks tipados) (FIELDS-ADV-006)
@@ -33,7 +33,7 @@ A separação core × advanced existe porque estes types arrastam dependências 
 
 - `declare(strict_types=1)` obrigatório
 - Classes `final` por defeito
-- **Sanitização HTML é responsabilidade do consumidor** — `RichTextField` só configura o editor; o pacote NÃO carrega `ezyang/htmlpurifier` ou similar como hard dep. Use FormRequest rules, mutators Eloquent ou o trait sanitizer planejado para FIELDS-ADV-002-followup
+- **Sanitização HTML/Markdown é responsabilidade do consumidor** — `RichTextField` e `MarkdownField` só configuram o editor; o pacote NÃO carrega `ezyang/htmlpurifier` nem qualquer parser Markdown como hard dep. Use FormRequest rules, mutators Eloquent ou o trait sanitizer planejado para FIELDS-ADV-002-followup. Para Markdown, a preview React encadeia `remark` + `rehype-sanitize`, mas qualquer renderização server-side (blade, e-mail, RSS) deve sanitizar no boundary
 - `imageUploadRoute` é construído como string literal (`'/arqel/fields/upload?disk='.$disk`) porque a chamada `route()` exige roteamento ativo no container — manter literal preserva testabilidade unitária
 - Setters silenciosamente filtram entradas inválidas (não-strings em `toolbar`/`customMarks`, entries sem `id`+`name` em `mentionable`) para que misconfigurações no PHP nunca cheguem ao React
 

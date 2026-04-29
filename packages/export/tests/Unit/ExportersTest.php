@@ -12,7 +12,3 @@ it('implements the Exporter contract for all 3 formats', function (): void {
     expect(new XlsxExporter)->toBeInstanceOf(Exporter::class);
     expect(new PdfExporter)->toBeInstanceOf(Exporter::class);
 });
-
-it('throws RuntimeException for the PDF stub', function (): void {
-    (new PdfExporter)->export([], [], '/tmp/x.pdf');
-})->throws(RuntimeException::class, 'Not implemented in EXPORT-001');

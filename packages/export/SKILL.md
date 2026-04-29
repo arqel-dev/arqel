@@ -32,9 +32,18 @@
 - Trade-off documentado: frozen header row + auto column widths ficam de fora — `spatie/simple-excel` v3 não expõe helpers first-class e mexer em internals do OpenSpout introduz acoplamento frágil. `// TODO(EXPORT-XXX)` comment no código se um ticket futuro decidir adicionar
 - Pest tests `tests/Unit/XlsxExporterTest.php` (6 cenários) com **round-trip read** via `SimpleExcelReader::create($path)->noHeaderRow()->getRows()` para asserir conteúdo (header+rows, empty iterable, boolean → Yes/No, **DateTime preservado** via assertion `instanceof DateTimeInterface`, relationship `display_path`, fallback de label). `ExportersTest` deixou de asserir RuntimeException para XLSX — só PDF ainda stub
 
-**Por chegar (EXPORT-004..010):**
+**Entregue (EXPORT-004):**
 
-- `PdfExporter` com `dompdf/dompdf` (template Blade `export.pdf.blade.php`) — EXPORT-004
+- **`Arqel\Export\Exporters\PdfExporter`** — implementação real backed por `dompdf/dompdf`. Renderiza um HTML mínimo (`<table>` simples com styling inline, font default `DejaVu Sans` para suportar Unicode sem registrar fonts custom) e passa pelo `Dompdf::loadHtml()` + `setPaper()` + `render()`; o output é escrito em `$destination` via `file_put_contents()`. Não há dependência em Blade neste ticket — o template default é uma string PHP — para manter o footprint do pacote pequeno. Override via Blade (`Resource::pdfView()`) chega em EXPORT-005
+- **`PdfExporter::setOrientation(string $orientation): static`** + **`setPaperSize(string $size): static`** — fluent setters aplicados em cada `render()`. Defaults `'portrait'` / `'a4'`. Aceitam qualquer string que dompdf entenda (`'landscape'`, `'letter'`, `'legal'`, etc.)
+- **`PdfExporter::streamDownload(iterable $rows, array $columns, string $filename): StreamedResponse`** — helper estático mirror do CSV/XLSX para downloads sync. Renderiza para memória e devolve `Content-Type: application/pdf`. Em datasets grandes, continuar a usar o pipeline async (`ExportAction` + `ProcessExportJob`, EXPORT-005+)
+- `formatCell()` espelha o do `CsvExporter` — sempre stringifica (`date` → `Y-m-d`, `boolean` → `Yes`/`No`, `relationship` → `data_get($record, $display_path ?? $name)`, fallback `(string) $value` com null → `''`). Toda saída passa por `htmlspecialchars()` antes de ir para o HTML para evitar quebra de layout
+- **`dompdf/dompdf: ^3.0`** promovido de `suggest` para `require` — deixa de ser opcional. Apps que não exportam PDF continuam a poder excluir manualmente via `replace`/`exclude-from-classmap` se quiserem
+- Pest tests `tests/Unit/PdfExporterTest.php` (8 cenários) com guard `markTestSkipped` se `Dompdf\Dompdf` ou `ext-mbstring` não estiverem disponíveis. Cobertura: happy path com assertion dos 4 bytes mágicos `%PDF`, empty rows ainda gera PDF válido, `setOrientation`/`setPaperSize` fluentes e persistentes (via reflexão na property privada), `formatCell` para boolean/date/relationship/scalar (também via reflexão — mais barato que parsear o PDF). `ExportersTest` deixou de asserir RuntimeException — todos os 3 exporters são reais agora
+
+**Por chegar (EXPORT-005..010):**
+
+- Override de template Blade (`Resource::pdfView()` + `Resource::pdfOrientation()`) — EXPORT-005
 - `ExportAction::execute()` real — dispatcha `ProcessExportJob` e devolve notification + URL — EXPORT-005
 - `Arqel\Export\Models\Export` + migration (`exports` table: `id`, `user_id`, `tenant_id`, `format`, `status`, `filename`, `mime_type`, `rows`, `bytes`, `disk`, `path`, `created_at`, `expires_at`) — EXPORT-006
 - `Arqel\Export\Jobs\ProcessExportJob` (queueable, idempotent, persiste `Export` model) — EXPORT-007

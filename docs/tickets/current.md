@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..009 ✅ · WIDGETS-001..007 ✅ · MCP-001..003 ✅ · FIELDS-ADV-001..003 ✅ · EXPORT-001/002 ✅ · AUDIT-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#4 de sub-agentes paralelos completos.** Próximo natural: WIDGETS-008 (WidgetDataController para deferred + polling), MCP-004 (describe_resource tool), EXPORT-003 (XlsxExporter), AUDIT-002 (UI timeline) ou TENANT-010 (registration scaffolder).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..009 ✅ · WIDGETS-001..008 ✅ · MCP-001..004 ✅ · FIELDS-ADV-001..004 ✅ · EXPORT-001/002 ✅ · AUDIT-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#5 de sub-agentes paralelos completos.** Próximo natural: WIDGETS-009 (React components em @arqel/ui/widgets), MCP-005 (call_action tool), FIELDS-ADV-005 (RepeaterField), EXPORT-003 (XlsxExporter), AUDIT-002 (timeline UI), TENANT-010 (registration scaffolder).
 
 **Fase:** 1 (MVP)
 

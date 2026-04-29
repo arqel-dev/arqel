@@ -39,7 +39,15 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 - **Auto-registro**: `McpServiceProvider::packageBooted()` instancia a tool, lê o schema e chama `$server->registerTool($name, $description, $inputSchema, $handler)` para que `list_resources` apareça em `tools/list` sem qualquer setup extra do panel
 - **5 testes unitários** + **2 testes de feature** novos cobrindo: schema canônico, serialização completa de 2 fixtures, registry vazio, fixture que joga em `getLabel` é skipped, fallback ao container, auto-registro via boot do package, dispatch via `tools/call`
 
-**Por chegar (MCP-004..010):**
+**Entregue (MCP-004):**
+
+- **`Tools\DescribeResourceTool` (final)** — segunda tool exposta. `schema()` devolve o envelope MCP (`name=describe_resource`, `description="Get detailed information about a specific Arqel Resource"`, `inputSchema={type:object, properties:{slug:{type:string, description:...}}, required:[slug]}`); `__invoke(array)` valida `slug` (string obrigatória → `InvalidArgumentException`), resolve via `Container::getInstance()->make(ResourceRegistry::class)->findBySlug($slug)` (ou via construtor `?Closure $resolver = null` com signature `(string $slug): ?class-string` — usado em testes para contornar o `final ResourceRegistry` + type-guard `HasResource`), e devolve payload estático com 8 chaves: `class`, `model`, `slug`, `label`, `pluralLabel`, `navigationIcon`, `navigationGroup`, `navigationSort`. Slug desconhecido → `RuntimeException` com a slug na mensagem
+- **Defensiva por campo**: `class`/`slug`/`model` são estritos (propagam exceção — Resource que falha neles é inutilizável); restantes campos opcionais são `try/catch`-ados — nulláveis (`navigationIcon`/`navigationGroup`/`navigationSort`) degradam para `null`, não-nulláveis (`label`/`pluralLabel`) degradam para a `getMessage()` da exceção. Permite descrever Resources parcialmente quebrados sem derrubar a tool
+- **Auto-registro**: `McpServiceProvider::packageBooted()` instancia a tool ao lado de `ListResourcesTool` e chama `$server->registerTool(...)` com schema + handler — segue o mesmo padrão de MCP-003
+- **Out-of-scope** (chega em MCP-005+): introspecção de fields, table columns, actions e policy do Resource — exigem instanciar o Resource e walk de form/table; MCP-004 entrega só o payload de metadata estático
+- **6 testes novos** (5 unit + 1 feature): schema canônico, payload completo das 8 chaves para slug conhecido, `InvalidArgumentException` para slug ausente e não-string, `RuntimeException` para slug desconhecido, defensiva (icon throws → null + outros campos populados), auto-registo conjunto de `describe_resource` + `list_resources` no boot
+
+**Por chegar (MCP-005..010):**
 
 - Artisan `arqel:mcp:serve` envolvendo `McpServer::serve()` — followup de MCP-002
 - Auto-descoberta: cada Resource Arqel vira tool CRUD + resource read; cada Action vira tool — MCP-006

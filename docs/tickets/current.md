@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 + TABLE-007/008 fechados.** Próximo natural: FORM-006, ACTIONS-007/008, HOOKS-002..006 (tickets adiados restantes) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
+**Fase 1 backend PHP + frontend runtime completo + docs site (DOCS-001..008) + CORE-014/015/016 + TABLE-007/008 + FORM-006 fechados.** Próximo natural: ACTIONS-007/008, HOOKS-002..006 (tickets adiados restantes) ou começar Fase 2 (`PLANNING/09-fase-2-essenciais.md`).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,27 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### FORM-006 — Integração `Resource::form()` com Inertia payload (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Core\Resources\Resource::form(): mixed` (default `null`) — hook opcional simétrico ao `table()` já existente
+- `Arqel\Core\Support\InertiaDataBuilder::resolveFormFields` (private) duck-typed contra `arqel/form`: detecta presença de `getFields()` + `toArray()`, emite `[fields, formPayload]`. Sem hard dep em `arqel/form`
+- `buildCreateData`/`buildEditData`/`buildShowData` agora chamam `resolveFormFields` e:
+  - Quando `Resource::form()` retorna um Form: emitem chave nova `form: Form::toArray()` no payload + `fields` source de `Form::getFields()` (flatten)
+  - Quando retorna `null` ou objeto sem o contract: caem no fallback existente (`Resource::fields()` flat, sem chave `form`) — zero breaking-change para Resources que não declaram form
+- Normalização de keys em `resolveFormFields` para satisfazer PHPStan (`array<int|string, mixed>` → `array<int, mixed>` + `array<string, mixed>`)
+- 5 testes Pest novos (`FormPayloadIntegrationTest`): no-form fallback, form declarado, propagação em Edit/Show com record (com `setRawAttributes` para evitar dependência de DB), fallback gracioso para retorno não-objeto. Suite core: 104 → 109 passando, 311 assertions
+- `packages/form/SKILL.md` § Status atualizado — FORM-006 movido de "Por chegar" → "Entregue", com descrição completa do contrato duck-typed
+
+**Validações:** `pest packages/core` 109/109 ✅ · `phpstan analyse packages/core` ✅ · `pint --test` ✅
+
+**Decisões autónomas:**
+
+- **Hook `form(): mixed` em vez de `?Form`** — espelha `table(): mixed` para manter `arqel/core` independente de `arqel/form` (o dep direction já é `form → core`, adicionar `core → form` criaria ciclo path-repo)
+- **Sem chave `form` no payload quando ausente** — Resources que só declaram `fields()` continuam emitindo o payload exato pré-FORM-006. Isso evita ter que atualizar testes de InertiaDataBuilder existentes (e front-end componentes) que assumiam shape strict
+- **`Form::getFields()` em vez de `Resource::fields()` quando form declarado** — fonte da verdade muda explicitamente. User que quer mix (e.g., extra fields no form mas não no Resource::fields()) declara tudo no `form()`
 
 ### TABLE-007/008 — Per-row action authorization + bulk pipeline (2026-04-29)
 

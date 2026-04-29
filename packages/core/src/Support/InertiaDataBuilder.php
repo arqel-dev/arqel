@@ -141,11 +141,20 @@ final class InertiaDataBuilder
      */
     public function buildCreateData(Resource $resource, Request $request): array
     {
-        return [
+        $user = $this->currentUser();
+        [$fields, $form] = $this->resolveFormFields($resource);
+
+        $payload = [
             'resource' => $this->resourceMeta($resource),
             'record' => null,
-            'fields' => $this->serializer->serialize($resource->fields(), null, $this->currentUser()),
+            'fields' => $this->serializer->serialize($fields, null, $user),
         ];
+
+        if ($form !== null) {
+            $payload['form'] = $form;
+        }
+
+        return $payload;
     }
 
     /**
@@ -153,13 +162,22 @@ final class InertiaDataBuilder
      */
     public function buildEditData(Resource $resource, Model $record, Request $request): array
     {
-        return [
+        $user = $this->currentUser();
+        [$fields, $form] = $this->resolveFormFields($resource);
+
+        $payload = [
             'resource' => $this->resourceMeta($resource),
             'record' => $record->toArray(),
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
-            'fields' => $this->serializer->serialize($resource->fields(), $record, $this->currentUser()),
+            'fields' => $this->serializer->serialize($fields, $record, $user),
         ];
+
+        if ($form !== null) {
+            $payload['form'] = $form;
+        }
+
+        return $payload;
     }
 
     /**
@@ -167,13 +185,59 @@ final class InertiaDataBuilder
      */
     public function buildShowData(Resource $resource, Model $record, Request $request): array
     {
-        return [
+        $user = $this->currentUser();
+        [$fields, $form] = $this->resolveFormFields($resource);
+
+        $payload = [
             'resource' => $this->resourceMeta($resource),
             'record' => $record->toArray(),
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
-            'fields' => $this->serializer->serialize($resource->fields(), $record, $this->currentUser()),
+            'fields' => $this->serializer->serialize($fields, $record, $user),
         ];
+
+        if ($form !== null) {
+            $payload['form'] = $form;
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Returns the field list to serialise plus the optional layout
+     * payload. When `Resource::form()` is declared, the schema (with
+     * Section/Tabs/etc.) goes through `Form::toArray()` and the
+     * field list is sourced from `Form::getFields()` (flatten).
+     *
+     * Duck-typed against `arqel/form` so `arqel/core` does not need
+     * a hard dep.
+     *
+     * @return array{0: array<int, mixed>, 1: ?array<string, mixed>}
+     */
+    private function resolveFormFields(Resource $resource): array
+    {
+        $form = $resource->form();
+
+        if (is_object($form)
+            && method_exists($form, 'getFields')
+            && method_exists($form, 'toArray')
+        ) {
+            $fields = $form->getFields();
+            $payload = $form->toArray();
+
+            $normalisedFields = is_array($fields) ? array_values($fields) : $resource->fields();
+            $normalisedPayload = null;
+            if (is_array($payload)) {
+                $normalisedPayload = [];
+                foreach ($payload as $key => $value) {
+                    $normalisedPayload[(string) $key] = $value;
+                }
+            }
+
+            return [$normalisedFields, $normalisedPayload];
+        }
+
+        return [$resource->fields(), null];
     }
 
     private function currentUser(): ?Authenticatable

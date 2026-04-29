@@ -138,6 +138,22 @@ abstract class Resource implements HasActions, HasFields, HasResource
         return null;
     }
 
+    /**
+     * Optional Form schema for create/edit/show pages. When the
+     * Resource declares one, the controller renders a layout-aware
+     * payload (Section/Fieldset/Grid/Columns/Group/Tabs/Tab) instead
+     * of just the flat field list from `fields()`.
+     *
+     * The return type is `mixed` (not `?Form`) for the same reason
+     * as `table()` — `arqel/core` cannot depend on `arqel/form`.
+     * The InertiaDataBuilder duck-types the result against
+     * `getFields()`/`getSchema()`/`toArray()`.
+     */
+    public function form(): mixed
+    {
+        return null;
+    }
+
     public function recordTitle(Model $record): string
     {
         $attribute = static::$recordTitleAttribute;

@@ -1,0 +1,100 @@
+{
+    "name": "arqel/export",
+    "description": "Export pipeline for Arqel — CSV/XLSX/PDF exporters and the ExportAction bulk action.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "arqel",
+        "export",
+        "csv",
+        "xlsx",
+        "pdf"
+    ],
+    "homepage": "https://arqel.dev",
+    "support": {
+        "issues": "https://github.com/arqel/arqel/issues",
+        "source": "https://github.com/arqel/arqel",
+        "docs": "https://arqel.dev/docs"
+    },
+    "require": {
+        "php": "^8.3",
+        "arqel/actions": "@dev",
+        "arqel/core": "@dev",
+        "illuminate/support": "^12.0|^13.0",
+        "spatie/laravel-package-tools": "^1.16"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.9",
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "suggest": {
+        "spatie/simple-excel": "Required by CsvExporter and XlsxExporter once EXPORT-002/003 wire the implementation.",
+        "dompdf/dompdf": "Required by PdfExporter once EXPORT-004 wires the implementation."
+    },
+    "autoload": {
+        "psr-4": {
+            "Arqel\\Export\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Arqel\\Export\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Arqel\\Export\\ExportServiceProvider"
+            ]
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../core",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../actions",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../fields",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../form",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage --min=90",
+        "analyse": "phpstan analyse",
+        "lint": "pint --test",
+        "format": "pint"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -18,6 +18,7 @@ const scopes = [
   'widgets',
   'fields-advanced',
   'audit',
+  'export',
   'versioning',
   'workflow',
   'realtime',

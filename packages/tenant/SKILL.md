@@ -10,7 +10,7 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 
 ## Status
 
-**Entregue (TENANT-001..005):**
+**Entregue (TENANT-001..006):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\Tenant\` → `src/`, dep em `arqel/core` via path repo)
 - `TenantServiceProvider` registado via auto-discovery (`extra.laravel.providers`)
@@ -21,15 +21,16 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 - **`Arqel\Tenant\Exceptions\TenantNotFoundException`** — método `render(Request)` retorna JSON 404 (quando `expectsJson()`), Inertia view `arqel::errors.tenant-not-found` (quando publicada), ou plain Symfony 404 fallback. Construtor aceita `$message` + `?string $identifier` para passar host/subdomain ao payload
 - **`Arqel\Tenant\Scopes\TenantScope`** (final, `implements Scope<Model>`) — global scope aplicado por `BelongsToTenant`. Lê `TenantManager::current()` via `Container::getInstance()`; quando há tenant, adiciona `where(<table>.<tenant_fk>, <id>)` à query. No-op gracioso quando não há tenant (background jobs sem `runFor()`), quando o container não bind `TenantManager`, ou quando o model não expõe `getQualifiedTenantKeyName()`
 - **`Arqel\Tenant\Concerns\BelongsToTenant`** trait — `bootBelongsToTenant()` registra `TenantScope` global + listener `creating` que auto-fill `<tenant_fk>` com `current()->getKey()` quando o atributo está null. Foreign key resolve por: model-level `$tenantForeignKey` property → `config('arqel.tenancy.foreign_key')` → fallback `'tenant_id'`. `getTenantKeyName()`/`getQualifiedTenantKeyName()` (table.col) expostos. `tenant()` retorna `BelongsTo` (lança `LogicException` se `arqel.tenancy.model` não configurado). Query scopes `withoutTenant()` (drop global scope) e `forTenant(Model|int|string)` (drop + re-where com id explícito)
+- **`Arqel\Tenant\Rules\ScopedUnique`** (final, `implements ValidationRule`) — substituto tenant-aware da rule `unique` do Laravel para single-DB tenancy. Construtor: `(string $table, string $column, mixed $ignore=null, string $ignoreColumn='id', ?string $tenantForeignKey=null, ?string $connection=null)`. Lê `Container::getInstance()->make(ConnectionResolverInterface::class)` (fallback `'db'`); aplica filtro `where(<tenant_fk>, <id>)` quando `TenantManager::current()` retorna não-null; ignore expressa como `where(<col>, '!=', $ignore)` para permitir update do próprio record manter o valor; foreign key resolve via override explícito → `config('arqel.tenancy.foreign_key')` → `'tenant_id'`; quando não há tenant current, faz fallback global (mesmo comportamento da `unique` Laravel); mensagem via `trans('validation.unique', ['attribute' => $attr])` com fallback hardcoded
 - **`Arqel\Tenant\Contracts\TenantResolver`** — interface `resolve(Request): ?Model` + `identifierFor(Model): string`
 - **`AbstractTenantResolver`** — base com validação `is_subclass_of(Model::class)` (lança `InvalidArgumentException`), `identifierFor` default (coluna configurada → fallback `getKey()`), `findByIdentifier(string)` protected helper
 - **5 resolvers concretos** (não-final — extensão explícita): `SubdomainResolver` (centralDomain + heurística leftmost label, www rejeitado), `PathResolver` (primeiro segmento + `ignoreSegments` case-insensitive), `HeaderResolver` (X-Tenant-ID configurável), `SessionResolver` (`hasSession()` guard + coerção scalar→string), `AuthUserResolver` (`currentTeam` Jetstream-style: aceita `BelongsTo`/`Model`/property)
 - Pest 3 + Orchestra Testbench setup com `defineEnvironment` SQLite in-memory
-- **76 testes Pest passando** (era 4 → 32 → 54 → 62 → 76): 6 ServiceProvider + 9 SubdomainResolver + 5 PathResolver + 4 HeaderResolver + 5 SessionResolver + 5 AuthUserResolver + 20 TenantManager + 8 ResolveTenantMiddleware + **14 BelongsToTenant** (foreign key config + override + fallback, qualified name, tenant() throws sem model, auto-fill creating happy/skip-when-set/skip-when-no-tenant, scope registrado, scope no-op sem tenant, scope adds where com tenant, forTenant id/Model, withoutTenant remove scope)
+- **83 testes Pest passando** (era 4 → 32 → 54 → 62 → 76 → 83) — adiciona `ScopedUniqueTest` (7 testes: passa sem duplicata, falha com duplicata, adiciona where tenant_id quando current, fallback global sem tenant, ignore append, ignoreColumn custom, tenantForeignKey override): 6 ServiceProvider + 9 SubdomainResolver + 5 PathResolver + 4 HeaderResolver + 5 SessionResolver + 5 AuthUserResolver + 20 TenantManager + 8 ResolveTenantMiddleware + **14 BelongsToTenant** (foreign key config + override + fallback, qualified name, tenant() throws sem model, auto-fill creating happy/skip-when-set/skip-when-no-tenant, scope registrado, scope no-op sem tenant, scope adds where com tenant, forTenant id/Model, withoutTenant remove scope)
 - Estratégia DB-less: subclasses anônimas dos resolvers sobrescrevem `findByIdentifier`; tenant manager testado com fakeResolver inline + recordingDispatcher (Dispatcher anônimo); middleware testado com tenantStubResolver; trait testado disparando manualmente o evento `eloquent.creating` via `app('events')->dispatch()` (evita `performInsert` que precisaria de DB)
 - `phpstan.neon` raiz ganha ignore para `trait.unused` em `packages/tenant/src/Concerns/*` (false positive — traits são consumidas em apps user-land)
 
-**Por chegar (TENANT-006..015):**
+**Por chegar (TENANT-007..015):**
 
 - `ResolveTenantMiddleware` integrado com `HandleArqelInertiaRequests` — TENANT-004
 - Trait `BelongsToTenant` + global scope `TenantScope` — TENANT-005

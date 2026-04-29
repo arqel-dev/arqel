@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..005 ✅).** Próximo natural: TENANT-006 (`Rules\ScopedUnique` validation rule respeitando tenant).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..006 ✅).** Próximo natural: TENANT-007 (Adapter `stancl/tenancy` multi-DB) ou TENANT-014 (suite de testes completa) ou voltar para WIDGETS/MCP/etc.
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,24 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TENANT-006 — Validation rule `ScopedUnique` (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Tenant\Rules\ScopedUnique` (final, `implements ValidationRule`) — versão tenant-aware da rule `unique` do Laravel para single-DB tenancy. Construtor: `(string $table, string $column, mixed $ignore=null, string $ignoreColumn='id', ?string $tenantForeignKey=null, ?string $connection=null)`. Resolução via `Container::getInstance()->make(ConnectionResolverInterface::class)` com fallback ao binding `'db'`. Adiciona `where(<tenant_fk>, <id>)` quando `TenantManager::current()` retorna não-null; faz fallback global quando ausente (mesmo comportamento da `unique` Laravel). Ignore expressa como `where(<col>, '!=', $ignore)` para que update do próprio record possa manter seu valor. Mensagem via `trans('validation.unique')` com fallback hardcoded
+- 7 testes Pest novos (83 total, 126 assertions): passa sem duplicata, falha com duplicata, adiciona where tenant_id quando current, skip tenant clause sem current (global fallback), append ignore clause, ignoreColumn custom, tenantForeignKey override
+- Test scaffolding: `recordingQueryBuilder(bool $existsResult, array &$captured)` (anonymous QueryBuilder-shaped object) + `fakeConnectionResolver(object, ?string &$tableSeen)` (anonymous `ConnectionResolverInterface`) — drive da rule sem precisar `pdo_sqlite`
+
+**Validações:** `pest packages/tenant` 83/83, 126 assertions ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test` ✅
+
+**Decisões autónomas:**
+
+- **`Container::getInstance()` em vez de `app()` helper** — mantém a rule serializable (importante porque rules são geralmente atribuídas a Field e podem ser serializadas para o payload Inertia), e desacopla do helper global
+- **Fallback global quando não há tenant** — match com expectativa: validação de slug em route pública (sem tenant scope) ainda deve ser unique global. Apps que querem comportamento estrito devem combinar com `EnsureUserCanAccessPanel` middleware que aborta sem tenant
+- **`?string $connection` em vez de string** — apps multi-DB podem direcionar a rule para uma connection específica; default null usa a connection padrão (resolver decide)
+- **Helper de Field `uniqueInTenant`** mencionado no ticket fica para um sub-ticket TENANT-006-followup (precisa mexer em `arqel/fields`); sintaxe atual é `Field::text('slug')->rule(new ScopedUnique('posts', 'slug'))` — verbosa mas funcional
+- **Test do "no DB resolver bound"** removido — Testbench sempre boota um `db` slot; o guard existe na impl (defere silently para outras rules) mas testá-lo unitário exigiria desbindar todo o `DatabaseServiceProvider`
 
 ### TENANT-005 — Trait `BelongsToTenant` + scope `TenantScope` (2026-04-29)
 

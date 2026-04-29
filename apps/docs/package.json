@@ -1,0 +1,17 @@
+{
+  "name": "@arqel/docs",
+  "version": "0.0.0",
+  "description": "Arqel documentation site (VitePress).",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "typecheck": "vitepress build --outDir .vitepress/.typecheck-out && rm -rf .vitepress/.typecheck-out"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.18"
+  }
+}

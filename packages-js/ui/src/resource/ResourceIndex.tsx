@@ -90,13 +90,12 @@ export function ResourceIndex<TRecord extends RecordType = RecordType>({
     );
   };
 
-  const normalisedSort: TableSort | null =
-    sort && sort.column
-      ? {
-          column: sort.column,
-          direction: sort.direction === 'desc' ? 'desc' : 'asc',
-        }
-      : null;
+  const normalisedSort: TableSort | null = sort?.column
+    ? {
+        column: sort.column,
+        direction: sort.direction === 'desc' ? 'desc' : 'asc',
+      }
+    : null;
 
   return (
     <section

@@ -79,7 +79,7 @@ export function BelongsToInput({
         }
         placeholder={f.placeholder ?? `Search ${f.props.relatedResource}…`}
         disabled={isDisabled}
-        readOnly={f.readonly === true || f.readonly === undefined ? false : true}
+        readOnly={!(f.readonly === true || f.readonly === undefined)}
         aria-invalid={hasError || undefined}
         aria-describedby={describedBy}
         aria-expanded={open}

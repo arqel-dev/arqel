@@ -13,6 +13,7 @@ export interface FormGridProps {
 }
 
 export function FormGrid({ config, children, className }: FormGridProps) {
+  // biome-ignore lint/complexity/useLiteralKeys: tsc `noPropertyAccessFromIndexSignature` exige bracket access
   const columns = typeof config.columns === 'number' ? config.columns : (config.columns['md'] ?? 1);
   return (
     <div

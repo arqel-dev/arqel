@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 backend PHP + frontend runtime completo (@arqel/ui + @arqel/fields).** Próximo natural: DOCS-001+ (docs site) ou voltar para tickets adiados (CORE-014/015, TABLE-007/008, etc.).
+**Fase 1 backend PHP + frontend runtime completo (@arqel/ui + @arqel/fields) + docs site scaffold.** Próximo natural: DOCS-002 (Getting Started < 10 min) ou voltar para tickets adiados (CORE-014/015, TABLE-007/008, etc.).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,29 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### DOCS-001 — Setup do site VitePress (2026-04-29)
+
+**Entregue:**
+
+- `apps/docs/` adicionado ao workspace `apps/*` com `@arqel/docs` (private, vitepress 1.6.4 + vue 3.5)
+- `.vitepress/config.ts` PT-BR completo: nav (Guia/Recursos/API/Avançado/Exemplos/Versão), sidebar declarativo cobrindo 18 páginas, edit-on-GitHub link, footer, search local com translations PT-BR, outline/docFooter/notFound labels, head meta (favicon SVG, OpenGraph, Twitter Card, theme-color)
+- `.vitepress/theme/` override de paleta brand para indigo→purple (`--vp-c-brand-1=#6366f1`/`--vp-c-brand-2=#4f46e5`/`--vp-c-brand-3=#4338ca` + gradient hero `#6366f1 → #ec4899`)
+- Landing page `index.md` (layout `home`) com hero + 6 features (Resources/React 19/21 fields/Auth/Hooks/Extensible)
+- 18 stubs PT-BR cobrindo todos os links do sidebar (`guide/{what-is-arqel,getting-started,installation,panels,resources,fields,tables-forms,actions,auth}`, `resources/{resource,fields,table,form,actions}`, `reference/{php-overview,typescript-overview}`, `advanced/{custom-fields,macros,multi-tenancy}`, `examples/blog-admin`); cada stub marca `> **Status:** stub — DOCS-NNN` referindo o ticket que vai preencher
+- Assets `public/` (favicon.svg, logo.svg, hero.svg) com SVG inline gradiente brand
+- `srcExclude: ['**/SKILL.md', '**/README.md']` no config — evita VitePress tratar os SKILL.md como páginas (resolveu deadlinks `../../PLANNING/...`)
+- SKILL.md + README.md PT-BR em `apps/docs/`
+
+**Validações:** `pnpm build` → 19 páginas renderizadas em 2.7s ✅ · `biome check .` ✅ · `pnpm typecheck` ✅ · todos os 23 testes Vitest de `@arqel/fields` continuam passando ✅
+
+**Decisões autónomas:**
+
+- **VitePress 1.6** sobre Nextra — alinhado com a recomendação canónica em `PLANNING/08-fase-1-mvp.md` §DOCS-001 (Vite ecosystem, sem Next.js overhead)
+- **Search local** (`provider: 'local'`) na fase MVP — Algolia DocSearch chega quando o site tiver tráfego e for indexado
+- **Stubs em vez de páginas vazias** — cada página linkada no sidebar tem markdown válido com pointer para o SKILL.md ou para o ticket DOCS-NNN que vai preenchê-la; o build valida deadlinks por defeito
+- **Deploy preview** ainda não configurado — escolha entre Cloudflare Pages e GitHub Pages é DOCS-001 follow-up no CI (`.github/workflows/docs-deploy.yml` já existe parcialmente)
+- **Fix paralelo** de 4 lint warnings pré-existentes (`noUselessTernary` em `BelongsToInput`, `useOptionalChain` em `ResourceIndex`, 2× `useLiteralKeys` em `FormGrid`/`types/inertia.test.ts`); os 2 últimos receberam `// biome-ignore` porque conflitam com tsc `noPropertyAccessFromIndexSignature`
 
 ### FIELDS-JS-001..006 — `@arqel/fields` completo (2026-04-29)
 

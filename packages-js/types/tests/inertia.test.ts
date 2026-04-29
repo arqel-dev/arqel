@@ -13,6 +13,7 @@ describe('SharedProps shape', () => {
   it('auth.can is a string→bool map', () => {
     const can: AuthPayload['can'] = { viewAdminPanel: true };
 
+    // biome-ignore lint/complexity/useLiteralKeys: tsc `noPropertyAccessFromIndexSignature` exige bracket access
     expectTypeOf(can['viewAdminPanel']).toEqualTypeOf<boolean | undefined>();
   });
 });

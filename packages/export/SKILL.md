@@ -13,14 +13,20 @@
 - Esqueleto do pacote `arqel/export` com PSR-4 `Arqel\Export\` → `src/`, deps em `arqel/core` e `arqel/actions` via path repo
 - **`Arqel\Export\ExportFormat`** — enum `string` com casos `CSV`/`XLSX`/`PDF` + métodos `mimeType(): string` e `extension(): string`. Single source of truth para Content-Type headers e filenames
 - **`Arqel\Export\Contracts\Exporter`** — interface `export(iterable $rows, array $columns, string $destination): string` (retorna o path escrito)
-- **`Arqel\Export\Exporters\CsvExporter|XlsxExporter|PdfExporter`** — três `final class` implementando `Exporter`. Bodies lançam `RuntimeException` apontando para EXPORT-002/003/004
+- **`Arqel\Export\Exporters\XlsxExporter|PdfExporter`** — `final class` implementando `Exporter`. Bodies lançam `RuntimeException` apontando para EXPORT-003/004 (CsvExporter já real — ver EXPORT-002 abaixo)
 - **`Arqel\Export\Actions\ExportAction`** — `final` action bulk pré-configurada com label `'Export'` + icon `'download'`. Factory `make(string $name = 'export')`, fluent `format(ExportFormat)` + getter `getFormat()`. `execute()` lança `RuntimeException("Wired in EXPORT-005")` (stub posture). Detalhe técnico: a spec original do ticket pede `extends BulkAction`, mas `Arqel\Actions\Types\BulkAction` é `final`. Como o ticket proíbe modificar outros pacotes, `ExportAction` estende `Arqel\Actions\Action` directamente e emite `type = 'bulk'` — consumidores tratam-na como BulkAction sem nenhuma diferença observável no payload Inertia. Chunking + `deselectRecordsAfterCompletion` voltam quando a wiring real chegar em EXPORT-005
 - **`Arqel\Export\ExportServiceProvider`** auto-discovered via `extra.laravel.providers` (extends `Spatie\LaravelPackageTools\PackageServiceProvider`). Sem migrations, sem config, sem routes — todos esses ficam em tickets posteriores
 - Tests Pest cobrindo enum, contract stubs, ExportAction defaults + fluent setter, ServiceProvider boot
 
-**Por chegar (EXPORT-002..010):**
+**Entregue (EXPORT-002):**
 
-- `CsvExporter` real com `spatie/simple-excel` streaming + UTF-8 BOM (Excel-on-Windows compat) — EXPORT-002
+- **`Arqel\Export\Exporters\CsvExporter`** — implementação real backed por `spatie/simple-excel` (`SimpleExcelWriter::create($destination)`). Header derivado de `column['label'] ?? column['name']`; cells formatadas por `formatCell()` com handling explícito para `date` (`Y-m-d` quando `DateTimeInterface`), `boolean` (`Yes`/`No`), `relationship` (segue `display_path`) e fallback `(string) $value` (null → `''`). Streaming row-by-row, sem `->all()`/`->get()` — memory constante mesmo em datasets grandes. UTF-8 BOM ligado por default (Excel-on-Windows)
+- **`CsvExporter::streamDownload(iterable $rows, array $columns, string $filename): StreamedResponse`** — helper estático `static` para o caminho HTTP sync. Devolve um `Symfony\Component\HttpFoundation\StreamedResponse` com `Content-Type: text/csv; charset=UTF-8` + `Content-Disposition: attachment` que invoca `SimpleExcelWriter::streamDownload()` dentro do callback. Mantém o contrato file-based (`export()`) intacto — é apenas um conveniência para downloads sync de datasets pequenos. Datasets grandes continuam a passar pelo pipeline async (`ExportAction` + `ProcessExportJob`, EXPORT-005+)
+- **`spatie/simple-excel: ^3.0`** promovido de `suggest` para `require` (deixa de ser opcional para o pacote — apps que não exportam continuam a poder excluir manualmente). `dompdf/dompdf` continua em `suggest` até EXPORT-004
+- Pest tests `tests/Unit/CsvExporterTest.php` cobrindo: header+rows + return value, empty iterable (só header), boolean → Yes/No, date → `Y-m-d`, relationship → `display_path`, fallback de label, null cell em row mista. `ExportersTest` mantém apenas as asserções de RuntimeException para XLSX/PDF (CSV deixou de lançar)
+
+**Por chegar (EXPORT-003..010):**
+
 - `XlsxExporter` com `spatie/simple-excel` writer — EXPORT-003
 - `PdfExporter` com `dompdf/dompdf` (template Blade `export.pdf.blade.php`) — EXPORT-004
 - `ExportAction::execute()` real — dispatcha `ProcessExportJob` e devolve notification + URL — EXPORT-005

@@ -1,0 +1,119 @@
+{
+  "name": "@arqel/ui",
+  "version": "0.0.0",
+  "description": "Structural React components (AppShell, DataTable, FormRenderer, etc.) for Arqel admin panels.",
+  "license": "MIT",
+  "homepage": "https://arqel.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arqel/arqel.git",
+    "directory": "packages-js/ui"
+  },
+  "keywords": [
+    "arqel",
+    "laravel",
+    "inertia",
+    "react",
+    "ui",
+    "shadcn",
+    "tailwind"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./shell": {
+      "types": "./dist/shell.d.ts",
+      "import": "./dist/shell.js"
+    },
+    "./resource": {
+      "types": "./dist/resource.d.ts",
+      "import": "./dist/resource.js"
+    },
+    "./table": {
+      "types": "./dist/table.d.ts",
+      "import": "./dist/table.js"
+    },
+    "./form": {
+      "types": "./dist/form.d.ts",
+      "import": "./dist/form.js"
+    },
+    "./action": {
+      "types": "./dist/action.d.ts",
+      "import": "./dist/action.js"
+    },
+    "./auth": {
+      "types": "./dist/auth.d.ts",
+      "import": "./dist/auth.js"
+    },
+    "./flash": {
+      "types": "./dist/flash.d.ts",
+      "import": "./dist/flash.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js"
+    },
+    "./styles.css": "./src/styles/globals.css"
+  },
+  "files": [
+    "dist",
+    "src/styles",
+    "README.md",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check --diagnostic-level=error src tests",
+    "format": "biome format --write src tests",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@arqel/types": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.5"
+  },
+  "peerDependencies": {
+    "@arqel/hooks": "workspace:*",
+    "@arqel/react": "workspace:*",
+    "@base-ui-components/react": "^1.0.0-alpha.0",
+    "@inertiajs/react": "^2.0.0",
+    "@tanstack/react-table": "^8.20.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@arqel/hooks": "workspace:*",
+    "@arqel/react": "workspace:*",
+    "@base-ui-components/react": "^1.0.0-alpha.0",
+    "@inertiajs/react": "^2.0.0",
+    "@tanstack/react-table": "^8.20.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "jsdom": "^25.0.1",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

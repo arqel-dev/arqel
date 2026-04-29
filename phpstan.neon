@@ -26,3 +26,11 @@ parameters:
         maximumNumberOfProcesses: 4
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # Traits are analysed in isolation; PHPStan flags them as
+        # `trait.unused` when no class in the analysis paths actually
+        # uses them. Our traits are consumed by user-land Eloquent
+        # models, so the warning is a false positive here.
+        -
+            identifier: trait.unused
+            path: packages/tenant/src/Concerns/*.php

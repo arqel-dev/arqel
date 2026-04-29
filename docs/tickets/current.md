@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..004 ✅).** Próximo natural: TENANT-005 (trait `BelongsToTenant` + `TenantScope` global Eloquent scope).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..005 ✅).** Próximo natural: TENANT-006 (`Rules\ScopedUnique` validation rule respeitando tenant).
 
 **Fase:** 1 (MVP)
 
@@ -29,6 +29,26 @@ Ordem canónica (fonte: `PLANNING/08-fase-1-mvp.md` §2):
 - [x] **GOV-003** — CONTRIBUTING.md + PR templates + DCO bot ✅ 2026-04-17 (App instalação pendente)
 
 ## ✅ Completados
+
+### TENANT-005 — Trait `BelongsToTenant` + scope `TenantScope` (2026-04-29)
+
+**Entregue:**
+
+- `Arqel\Tenant\Scopes\TenantScope` (final, `implements Scope<Model>`) — global scope que lê `TenantManager::current()` via `Container::getInstance()` e adiciona `where(<table>.<tenant_fk>, <id>)` à query. No-op gracioso quando: container não bind `TenantManager`, manager `hasCurrent()` é false, current() é null, model não expõe `getQualifiedTenantKeyName()`, ou coluna não é string. PHPDoc `@implements Scope<Model>` para satisfazer PHPStan generic
+- `Arqel\Tenant\Concerns\BelongsToTenant` trait — `bootBelongsToTenant()` registra `TenantScope` global + listener `creating` (via `static::creating(Closure)`) que auto-fill `<tenant_fk>` com `current()->getKey()` quando atributo está null. Foreign key resolve via 3-tier fallback: model-level `$tenantForeignKey` property → `config('arqel.tenancy.foreign_key')` → fallback hardcoded `'tenant_id'` (mantém pacote funcional fora de Laravel via `function_exists('config')` guard). `tenant()` retorna `BelongsTo` (lança `LogicException` quando `arqel.tenancy.model` não configurado). 4 query scopes: `getTenantKeyName()`, `getQualifiedTenantKeyName()`, `scopeWithoutTenant()` (drop global), `scopeForTenant(Model|int|string $tenant)` (drop + re-where com id explícito)
+- 14 testes Pest novos (76 total, 113 assertions) cobrindo: foreign key config + override + fallback, qualified name, `tenant()` throws sem model, auto-fill creating happy/skip-when-set/skip-when-no-tenant, scope registrado como global, scope no-op sem tenant, scope adds where com tenant id, `forTenant(id)` filtra, `forTenant(Model)` lê key, `withoutTenant` remove scope
+- Test scaffolding: `TenantedPost` fixture (não-final, `BelongsToTenant`), `fireCreating(Model)` helper que dispara o evento `eloquent.creating` via `app('events')->dispatch()` para evitar `performInsert` que requer DB
+- `phpstan.neon` raiz ganha ignore para `trait.unused` em `packages/tenant/src/Concerns/*` (false positive — traits são consumidas em apps user-land, não em packages do monorepo)
+
+**Validações:** `pest packages/tenant` 76/76, 113 assertions ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test` ✅
+
+**Decisões autónomas:**
+
+- **`Container::getInstance()` em vez de `app(...)`** dentro do scope — mantém o scope serializável e desacoplado do helper global (apps com container customizado funcionam)
+- **No-op gracioso em todas as condições** — scope que falha silenciosamente é melhor que scope que throw em background jobs sem tenant; isolation cross-tenant ainda é garantida pela ausência da clausula `where`
+- **Foreign key 3-tier fallback** — apps com migration legacy podem usar `protected string $tenantForeignKey = 'team_id'` no model sem precisar config global; convenção `config('arqel.tenancy.foreign_key')` é o caminho default
+- **Trait dispatch via `app('events')->dispatch()`** nos testes — `Model::performInsert()` é o caminho normal mas precisa DB; disparar o evento manualmente exercita o listener real do trait (`static::creating(...)`) sem precisar `pdo_sqlite`
+- **`TenantScope` é `final`** — design intent: scope é leaf da composition; apps que precisam custom logic devem implementar `Scope` próprio, não estender este
 
 ### TENANT-004 — `ResolveTenantMiddleware` + `TenantNotFoundException` (2026-04-29)
 

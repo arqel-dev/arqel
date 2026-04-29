@@ -8,14 +8,15 @@
 
 ## Status
 
-**Entregue (WIDGETS-001):**
+**Entregue (WIDGETS-001, WIDGETS-006):**
 
 - Esqueleto do pacote `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo
 - **`Arqel\Widgets\Widget`** abstract base com fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case identifier) + `protected string $component` (PascalCase React component name) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload canônico para Inertia; `data: null` quando deferred. `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)` oracle (default true)
-- **`Arqel\Widgets\Dashboard`** (final) builder de schema dashboard: `widgets(array)` (filtra non-Widget silently), `addWidget(Widget)`, `columns(int)` (clamp 1..12), `heading`, `description`, `canSee(Closure)`. `toArray(?Authenticatable)` filtra widgets por `canBeSeenBy` + sort por `getSort()` (null sorts last via PHP_INT_MAX) + serializa cada widget
+- **`Arqel\Widgets\Dashboard`** (refatorado em WIDGETS-006): construtor `(string $id, string $label, ?string $path = null)` com props readonly; factory `Dashboard::make($id, $label, $path = null)`. `widgets(array)` aceita Widget instances **e** `class-string<Widget>` (resolução via container deferida para `resolve()`); filtra non-Widget/non-class-string silently. `addWidget(Widget|class-string<Widget>)`. `columns(int|array)` aceita int (clamp 1..12) ou mapa responsivo `['sm'=>n,'md'=>n,'lg'=>n,'xl'=>n,'2xl'=>n]` (cada valor clampado, chaves desconhecidas/valores não-int dropped). Setters `heading`, `description`, `filters(array)` (passthrough), `canSee(Closure)`. **`resolve(?Authenticatable)`** é o serializador canônico: instancia class-strings via `Container::getInstance()->make()` (skip silencioso em falha), filtra por `canBeSeenBy`, sort por `getSort()` (null → PHP_INT_MAX), e devolve `[id, label, path, widgets, filters, columns, heading, description]`. `toArray()` é alias histórico (retorna o mesmo payload, mantém paridade com `Widget`/`Form`/`Table`)
+- **`Arqel\Widgets\DashboardRegistry`** (final, singleton) `register(Dashboard)` keyed por `$dashboard->id` (lança `InvalidArgumentException` em duplicata — multi-dashboard panels devem saber); `has(id)`/`get(id)`/`all()`/`clear()`. Singleton bound em `WidgetsServiceProvider::packageRegistered`
 - **`Arqel\Widgets\WidgetRegistry`** (final, singleton) `register(type, class-string<Widget>)` valida `is_subclass_of(Widget)` (lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`. Singleton bound em `WidgetsServiceProvider::packageRegistered`
-- **`Arqel\Widgets\WidgetsServiceProvider`** auto-discovered via `extra.laravel.providers`; `packageRegistered()` faz `singleton(WidgetRegistry::class)`
-- 25 testes Pest passando: 13 Widget (name/type/component getters, id default, fluent setters, columnSpan int clamp + string passthrough, poll(0|<0) disable + poll(>0) sets, canBeSeenBy default + closure, toArray inline data + deferred null, polling/filters/heading), 7 Dashboard (empty/12 cols default, widgets filter non-Widget, addWidget, columns clamp 1..12, canBeSeenBy default+closure, toArray sort+visibility, canBeSeenBy via user), 6 WidgetRegistry (empty, register, all, has/get unknown, clear, throws on invalid class), 3 ServiceProvider smoke
+- **`Arqel\Widgets\WidgetsServiceProvider`** auto-discovered via `extra.laravel.providers`; `packageRegistered()` faz `singleton(WidgetRegistry::class)` + `singleton(DashboardRegistry::class)`
+- 47 testes Pest passando: 13 Widget, 18 Dashboard (constructor/factory, columns int+responsive, filters passthrough, addWidget/widgets aceita class-string, resolve shape canônica de 8 keys, container resolution, sort+visibility, fallback silencioso, toArray==resolve), 6 DashboardRegistry (empty/register/has/get/all/clear/duplicate throws), 6 WidgetRegistry, 4 ServiceProvider smoke
 
 **Por chegar (WIDGETS-002..015):**
 
@@ -23,8 +24,8 @@
 - `ChartWidget` (Recharts integration: line/bar/pie/area) — WIDGETS-003
 - `TableWidget` (paginated table embedded em dashboard) — WIDGETS-004
 - `CustomWidget` (escape hatch para Inertia component arbitrário) — WIDGETS-005
-- `Http\Controllers\DashboardController` + `WidgetDataController` (deferred fetch endpoint) — WIDGETS-006
-- React components em `@arqel/ui/widgets` — WIDGETS-007..010
+- `Http\Controllers\DashboardController` + `WidgetDataController` (deferred fetch endpoint) — WIDGETS-007
+- React components em `@arqel/ui/widgets` — WIDGETS-008..010
 - Filters compartilhados (date range global, dropdown filter por dashboard) — WIDGETS-011..012
 - Suite full de testes + SKILL.md final + dashboard demo — WIDGETS-013..015
 

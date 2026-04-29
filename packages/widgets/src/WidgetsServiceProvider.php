@@ -13,6 +13,8 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
  * Binds:
  *   - `WidgetRegistry` as a singleton (apps register custom widget
  *     types via `app(WidgetRegistry::class)->register('foo', ...)`)
+ *   - `DashboardRegistry` as a singleton (multi-dashboard panels
+ *     register every `Dashboard` here keyed by id)
  *
  * Concrete widget types (StatWidget, ChartWidget, TableWidget,
  * CustomWidget) and the dashboard/data controllers land in
@@ -28,5 +30,6 @@ final class WidgetsServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->app->singleton(WidgetRegistry::class);
+        $this->app->singleton(DashboardRegistry::class);
     }
 }

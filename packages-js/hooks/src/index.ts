@@ -17,7 +17,7 @@ export type { UseFieldDependenciesOptions } from './useFieldDependencies.js';
 export { useFieldDependencies } from './useFieldDependencies.js';
 export type { UseFlashOptions, UseFlashResult } from './useFlash.js';
 export { useFlash } from './useFlash.js';
-export type { UseNavigationResult } from './useNavigation.js';
+export type { NavigationItemPayload, UseNavigationResult } from './useNavigation.js';
 export { useNavigation } from './useNavigation.js';
 export { useArqelOptimistic } from './useOptimistic.js';
 export type { UseResourceResult } from './useResource.js';

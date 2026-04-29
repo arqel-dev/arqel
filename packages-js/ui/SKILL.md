@@ -8,17 +8,21 @@
 
 ## Status
 
-**Entregue (UI-001):**
+**Entregue (UI-001 + UI-002):**
 
 - Esqueleto do pacote com 9 entry points subpath
 - `globals.css` com Tailwind v4 `@import` + design tokens (oklch) + `.dark` override
 - `cn(...inputs)` utility (clsx + tailwind-merge)
 - `<Button>` primitive com cva variants (`default | outline | ghost | destructive`) e sizes (`sm | md | lg | icon`) — base para ActionButton
 - `<CanAccess>` wrapper sobre `useCanAccess`
+- `<AppShell variant>`: 4 variants (`sidebar-left | sidebar-right | topbar-only | full-width`) com slots `sidebar | topbar | footer | children`
+- `<Sidebar>`: rail desktop fixo (`--sidebar-width`, default 240px) + overlay mobile via Base UI Dialog quando `open`/`onOpenChange` fornecidos. Items vêm de `useNavigation()` ou via prop. Suporta groups, badges, `aria-current="page"`, focus ring
+- `<Topbar>`: brand slot + theme toggle (`useTheme`) + mobile menu trigger (`onMobileMenuClick`) + slots `search | userMenu | tenantSwitcher`
+- `<MainContent>`: padding responsivo (`px-4 sm:px-6 lg:px-8`) + max-width configurável (`md..7xl | none`) + slots `breadcrumbs | header`
+- `<Footer>`: faixa minimal abaixo do `<MainContent>`
 
 **Por chegar (placeholder barrels):**
 
-- UI-002: AppShell + Sidebar + Topbar + MainContent + Footer
 - UI-003: ResourceIndex + DataTable + TableFilters + TablePagination + TableToolbar
 - UI-004: FormRenderer + FieldRenderer + FormSection + FormActions
 - UI-005: ActionModal + ConfirmDialog + FlashContainer + FlashToast

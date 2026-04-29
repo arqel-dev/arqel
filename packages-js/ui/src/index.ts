@@ -9,5 +9,15 @@ export type { ButtonProps } from './action/Button.js';
 export { Button, buttonVariants } from './action/Button.js';
 export type { CanAccessProps } from './auth/CanAccess.js';
 export { CanAccess } from './auth/CanAccess.js';
+export type { AppShellProps, AppShellVariant } from './shell/AppShell.js';
+export { AppShell } from './shell/AppShell.js';
+export type { FooterProps } from './shell/Footer.js';
+export { Footer } from './shell/Footer.js';
+export type { MainContentMaxWidth, MainContentProps } from './shell/MainContent.js';
+export { MainContent } from './shell/MainContent.js';
+export type { SidebarProps } from './shell/Sidebar.js';
+export { Sidebar } from './shell/Sidebar.js';
+export type { TopbarProps } from './shell/Topbar.js';
+export { Topbar } from './shell/Topbar.js';
 
 export { cn } from './utils/cn.js';

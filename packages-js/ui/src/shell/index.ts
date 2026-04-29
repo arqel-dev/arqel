@@ -1,7 +1,10 @@
-/**
- * Shell components — placeholder until UI-002.
- *
- * AppShell, Sidebar, Topbar, MainContent, Footer land in UI-002.
- */
-
-export {};
+export type { AppShellProps, AppShellVariant } from './AppShell.js';
+export { AppShell } from './AppShell.js';
+export type { FooterProps } from './Footer.js';
+export { Footer } from './Footer.js';
+export type { MainContentMaxWidth, MainContentProps } from './MainContent.js';
+export { MainContent } from './MainContent.js';
+export type { SidebarProps } from './Sidebar.js';
+export { Sidebar } from './Sidebar.js';
+export type { TopbarProps } from './Topbar.js';
+export { Topbar } from './Topbar.js';

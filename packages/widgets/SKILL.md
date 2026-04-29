@@ -8,7 +8,7 @@
 
 ## Status
 
-**Entregue (WIDGETS-001..007):**
+**Entregue (WIDGETS-001..008):**
 
 - Esqueleto do pacote `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo
 - **`Arqel\Widgets\Widget`** abstract base com fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case identifier) + `protected string $component` (PascalCase React component name) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload canônico para Inertia; `data: null` quando deferred. `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)` oracle (default true)
@@ -21,11 +21,12 @@
 - **`Arqel\Widgets\TableWidget`** (final) — mini-tabela em dashboard. Fluent: `query(Closure(): Builder<Model>)`, `limit(int)` (clamp ≥ 1, default 10), `columns(array)` (passthrough; entries duck-typed em `serialiseColumns()` — só objetos com `toArray()` sobrevivem), `seeAllUrl(string|Closure|null)`. `data()` envelope `{columns, records, limit, seeAllUrl}`. Sem dependência em `arqel/table` — duck-typing preserva o dep graph mínimo. Throwables do Closure (e.g. PDO indisponível em testes) são capturados e expostos em `loadError: <message>` com `records: []`.
 - **`Arqel\Widgets\CustomWidget`** (final) — escape hatch. Factory `make(string $name, string $component)`; `component(string)` valida não-vazio (`InvalidArgumentException`); `withData(array|Closure)` define payload (default `[]`; Closure non-array → `[]`). `type = 'custom'` fixo, `component` configurado em runtime. `data()` resolve o payload, satisfazendo o contrato abstrato — note que o setter foi nomeado `withData()` em vez de `data()` para preservar a assinatura LSP de `Widget::data(): array`.
 - **`Arqel\Widgets\Http\Controllers\DashboardController`** (final, WIDGETS-007) — único método `show(Request, DashboardRegistry, ?string $dashboardId = null): Inertia\Response`. `$dashboardId` default `'main'`. Resolve via `DashboardRegistry::get()` (404 quando ausente), serializa via `Dashboard::resolve($request->user())` e devolve Inertia render `'arqel::dashboard'` com `dashboard` + `filterValues` (query `?filters[...]` passa direto). Rotas registradas em `routes/admin.php` via `PackageServiceProvider::hasRoute('admin')`: `GET /admin` → `arqel.dashboard.main`, `GET /admin/dashboards/{dashboardId}` → `arqel.dashboard.show`. Ambas dentro de `web` + `auth` middleware.
+- **`Dashboard::findWidget(string $widgetId): ?Widget`** (WIDGETS-008) — lookup por id com class-string resolution. Refator extracted private `resolveEntry(Widget|class-string<Widget>): ?Widget` partilhado com `resolve()`. Retorna null em entry inválido, container failure, ou id desconhecido. **Authorization deliberadamente NÃO enforced** — permite ao caller distinguir 404 vs 403.
+- **`Arqel\Widgets\Http\Controllers\WidgetDataController`** (final, WIDGETS-008) — `show(Request, DashboardRegistry, string $dashboardId, string $widgetId): JsonResponse`. Aborts: 404 se dashboard ou widget id desconhecido, 403 se `Widget::canBeSeenBy($user)` rejeita. Aplica `$widget->filters($request->input('filters'))` quando array, depois retorna `{data: $widget->data()}`. Rota `GET /admin/dashboards/{dashboardId}/widgets/{widgetId}/data` (`arqel.dashboard.widget-data`), mesmo middleware stack. **Cobre RF-W-04 (Polling) + RF-W-05 (Deferred)** — clientes React fazem fetch contra esta rota com cadência `widget.poll(N)` ou on-demand para `widget.deferred(true)`. 5 feature tests + 1 unit test new (116 total widgets).
 - **Testes Pest:** consolidação WIDGETS-001..007 = ~107 testes (13 Widget, 18 Dashboard, 6 DashboardRegistry, 6 WidgetRegistry, 4 ServiceProvider smoke, 16 StatWidget, 14 ChartWidget, 10 TableWidget, 10 CustomWidget, 5 DashboardController) + fixture `FakeBuilder` + `CounterWidget`. `DashboardControllerTest` invoca o controller diretamente (mesma gotcha de Inertia SSR observada em TENANT-009) e lê props via reflexão sobre `Inertia\Response`.
 
-**Por chegar (WIDGETS-008..015):**
+**Por chegar (WIDGETS-009..015):**
 
-- `WidgetDataController` (deferred fetch endpoint) — WIDGETS-008
 - React components em `@arqel/ui/widgets` — WIDGETS-009..010
 - Filters compartilhados (date range global, dropdown filter por dashboard) — WIDGETS-011..012
 - Suite full de testes + SKILL.md final + dashboard demo — WIDGETS-013..015
@@ -36,7 +37,7 @@
 - Subclasses `Widget` são `final` por convenção; `Widget` base é abstract
 - **Sem hard dep** em libs de chart (Recharts é JS-side, ChartWidget só serializa config — render é client-only)
 - `columnSpan(int)` semântica é "spans X colunas do grid raiz" (1..12 default); `columnSpan(string)` aceita atalhos (`'full'`, `'1/2'`) que o `<DashboardRenderer>` React decodifica
-- `deferred` widgets devem ter um `WidgetDataController` endpoint para fetch — esse vem em WIDGETS-007
+- `deferred` widgets devem ter um `WidgetDataController` endpoint para fetch — entregue em WIDGETS-008
 
 ## Anti-patterns
 

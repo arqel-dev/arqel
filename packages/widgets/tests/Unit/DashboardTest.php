@@ -201,6 +201,51 @@ it('resolve() skips entries that fail to resolve to a Widget', function (): void
         ->and($payload['widgets'][0]['name'])->toBe('ok');
 });
 
+it('findWidget returns the matching widget by id()', function (): void {
+    $a = new CounterWidget('alpha');
+    $b = new CounterWidget('beta');
+
+    $dash = Dashboard::make('t', 'T')->widgets([$a, $b]);
+
+    expect($dash->findWidget('counter:alpha'))->toBe($a)
+        ->and($dash->findWidget('counter:beta'))->toBe($b);
+});
+
+it('findWidget returns null when no widget matches', function (): void {
+    $dash = Dashboard::make('t', 'T')->widgets([new CounterWidget('alpha')]);
+
+    expect($dash->findWidget('counter:missing'))->toBeNull()
+        ->and(Dashboard::make('empty', 'E')->findWidget('any'))->toBeNull();
+});
+
+it('findWidget resolves class-string entries via the container', function (): void {
+    Container::getInstance()->bind(
+        CounterWidget::class,
+        fn () => new CounterWidget('from-container'),
+    );
+
+    $dash = Dashboard::make('t', 'T')->widgets([CounterWidget::class]);
+
+    $widget = $dash->findWidget('counter:from-container');
+
+    expect($widget)->toBeInstanceOf(CounterWidget::class)
+        ->and($widget?->getName())->toBe('from-container');
+});
+
+it('findWidget skips class-string entries that throw on resolution', function (): void {
+    Container::getInstance()->bind(CounterWidget::class, function (): Widget {
+        throw new RuntimeException('boom');
+    });
+
+    $dash = Dashboard::make('t', 'T')->widgets([
+        CounterWidget::class,
+        new CounterWidget('ok'),
+    ]);
+
+    expect($dash->findWidget('counter:ok'))->not->toBeNull()
+        ->and($dash->findWidget('counter:from-container'))->toBeNull();
+});
+
 it('toArray() returns identical shape to resolve()', function (): void {
     $widget = new CounterWidget('a');
 

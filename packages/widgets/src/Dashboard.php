@@ -210,19 +210,10 @@ final class Dashboard
      */
     public function resolve(?Authenticatable $user = null): array
     {
-        $container = Container::getInstance();
         $resolved = [];
         foreach ($this->widgets as $entry) {
-            $widget = $entry;
-            if (is_string($widget)) {
-                try {
-                    $widget = $container->make($widget);
-                } catch (Throwable) {
-                    continue;
-                }
-            }
-
-            if (! $widget instanceof Widget) {
+            $widget = $this->resolveEntry($entry);
+            if ($widget === null) {
                 continue;
             }
 
@@ -263,5 +254,56 @@ final class Dashboard
     public function toArray(?Authenticatable $user = null): array
     {
         return $this->resolve($user);
+    }
+
+    /**
+     * Look up a widget by its `id()` (default `<type>:<name>`).
+     *
+     * Class-string entries are resolved through the container —
+     * mirroring `resolve()` — so deferred widgets can be fetched by
+     * id without forcing instantiation at registration time.
+     * Returns `null` when the id is unknown, when the entry fails
+     * to resolve to a `Widget`, or when the container throws.
+     *
+     * Authorization is intentionally NOT enforced here so callers
+     * (e.g. `WidgetDataController`) can return a 403 distinct from
+     * the 404 path.
+     */
+    public function findWidget(string $widgetId): ?Widget
+    {
+        foreach ($this->widgets as $entry) {
+            $widget = $this->resolveEntry($entry);
+            if ($widget === null) {
+                continue;
+            }
+
+            if ($widget->id() === $widgetId) {
+                return $widget;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve a single widget entry (Widget instance or class-string)
+     * to a concrete `Widget`, or `null` if it cannot be materialised
+     * (invalid class-string or container throws on construction).
+     *
+     * @param Widget|class-string<Widget> $entry
+     */
+    private function resolveEntry(Widget|string $entry): ?Widget
+    {
+        if ($entry instanceof Widget) {
+            return $entry;
+        }
+
+        try {
+            $widget = Container::getInstance()->make($entry);
+        } catch (Throwable) {
+            return null;
+        }
+
+        return $widget instanceof Widget ? $widget : null;
     }
 }

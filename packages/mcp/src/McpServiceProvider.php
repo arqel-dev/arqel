@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Arqel\Mcp;
 
+use Arqel\Mcp\Tools\ListResourcesTool;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
  * Auto-discovered provider for `arqel/mcp`.
  *
- * Phase 2 scaffold (MCP-001). Binds `McpServer` as a singleton so
- * downstream packages can type-hint a stable instance even before
- * the real JSON-RPC handler lands in MCP-002. The current
- * `McpServer` is a stub — see its docblock for the migration path.
+ * Binds `McpServer` as a singleton and auto-registers built-in tools
+ * (e.g. `list_resources`) once the application has booted.
  */
 final class McpServiceProvider extends PackageServiceProvider
 {
@@ -25,5 +24,20 @@ final class McpServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->app->singleton(McpServer::class);
+    }
+
+    public function packageBooted(): void
+    {
+        /** @var McpServer $server */
+        $server = $this->app->make(McpServer::class);
+
+        $listResources = new ListResourcesTool;
+        $schema = $listResources->schema();
+        $server->registerTool(
+            $schema['name'],
+            $schema['description'],
+            $schema['inputSchema'],
+            static fn (array $params): array => $listResources($params),
+        );
     }
 }

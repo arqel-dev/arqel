@@ -32,7 +32,14 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
   - Resultado de prompt é wrapped em `{description, messages: <generator output>}` — generator é responsável por devolver o array de messages no formato MCP
 - **24 testes Pest passando** (4 Feature + 20 Unit) cobrindo: registro persiste e excluí callables, dispatch de cada método, wrapping de resultados (string + array + objeto), erros `-32600..-32603`, notifications retornam `[]`, preservação de `id` numérico/string
 
-**Por chegar (MCP-003..010):**
+**Entregue (MCP-003):**
+
+- **`Tools\ListResourcesTool` (final)** — primeira tool exposta. `schema()` devolve o envelope MCP (`name=list_resources`, `inputSchema={type:object, properties:[]}`); `__invoke(array)` resolve `Arqel\Core\Resources\ResourceRegistry` via `Container::getInstance()->make(...)` (ou via construtor `?Closure $resolver = null` que devolve `array<int, class-string>` — usado em testes para evitar o `final ResourceRegistry` + o type-guard `HasResource`) e mapeia cada class-string para `{class, model, slug, label, pluralLabel, navigationGroup}` chamando os 5 metadata estáticos
+- **Defensiva**: cada resource é embrulhado em `try/catch \Throwable` — uma Resource parcialmente definida durante boot é silenciosamente ignorada, não derruba a tool
+- **Auto-registro**: `McpServiceProvider::packageBooted()` instancia a tool, lê o schema e chama `$server->registerTool($name, $description, $inputSchema, $handler)` para que `list_resources` apareça em `tools/list` sem qualquer setup extra do panel
+- **5 testes unitários** + **2 testes de feature** novos cobrindo: schema canônico, serialização completa de 2 fixtures, registry vazio, fixture que joga em `getLabel` é skipped, fallback ao container, auto-registro via boot do package, dispatch via `tools/call`
+
+**Por chegar (MCP-004..010):**
 
 - Artisan `arqel:mcp:serve` envolvendo `McpServer::serve()` — followup de MCP-002
 - Auto-descoberta: cada Resource Arqel vira tool CRUD + resource read; cada Action vira tool — MCP-006

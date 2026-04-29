@@ -1,0 +1,112 @@
+{
+  "name": "@arqel/hooks",
+  "version": "0.0.0",
+  "description": "Reusable React hooks for Arqel admin panels.",
+  "license": "MIT",
+  "homepage": "https://arqel.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arqel/arqel.git",
+    "directory": "packages-js/hooks"
+  },
+  "keywords": [
+    "arqel",
+    "laravel",
+    "inertia",
+    "react",
+    "hooks"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./useResource": {
+      "types": "./dist/useResource.d.ts",
+      "import": "./dist/useResource.js"
+    },
+    "./useArqelForm": {
+      "types": "./dist/useArqelForm.d.ts",
+      "import": "./dist/useArqelForm.js"
+    },
+    "./useCanAccess": {
+      "types": "./dist/useCanAccess.d.ts",
+      "import": "./dist/useCanAccess.js"
+    },
+    "./useFlash": {
+      "types": "./dist/useFlash.d.ts",
+      "import": "./dist/useFlash.js"
+    },
+    "./useTable": {
+      "types": "./dist/useTable.d.ts",
+      "import": "./dist/useTable.js"
+    },
+    "./useAction": {
+      "types": "./dist/useAction.d.ts",
+      "import": "./dist/useAction.js"
+    },
+    "./useFieldDependencies": {
+      "types": "./dist/useFieldDependencies.d.ts",
+      "import": "./dist/useFieldDependencies.js"
+    },
+    "./useNavigation": {
+      "types": "./dist/useNavigation.d.ts",
+      "import": "./dist/useNavigation.js"
+    },
+    "./useBreakpoint": {
+      "types": "./dist/useBreakpoint.d.ts",
+      "import": "./dist/useBreakpoint.js"
+    },
+    "./useOptimistic": {
+      "types": "./dist/useOptimistic.d.ts",
+      "import": "./dist/useOptimistic.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check --diagnostic-level=error src tests",
+    "format": "biome format --write src tests",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@arqel/types": "workspace:*"
+  },
+  "peerDependencies": {
+    "@arqel/react": "workspace:*",
+    "@inertiajs/react": "^2.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@arqel/react": "workspace:*",
+    "@inertiajs/core": "^2.0.0",
+    "@inertiajs/react": "^2.0.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "expect-type": "^1.2.2",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

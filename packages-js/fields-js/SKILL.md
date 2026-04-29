@@ -8,10 +8,10 @@
 
 ## Status
 
-**Entregue (FIELDS-JS-001..003):**
+**Entregue (FIELDS-JS-001..006):**
 
-- Pacote `@arqel/fields` com 9 entry points subpath (`./`, `./register`, `./text`, `./number`, `./boolean`, `./select`, `./relationship`, `./date`, `./file`)
-- 18 components no total:
+- Pacote `@arqel/fields` com 12 entry points subpath (`./`, `./register`, `./text`, `./number`, `./boolean`, `./select`, `./relationship`, `./date`, `./file`, `./slug`, `./color`, `./hidden`)
+- **21 components no total** — um por field type canônico:
   - **text/**: `TextInput`, `TextareaInput`, `EmailInput`, `UrlInput`, `PasswordInput` (toggle reveal com `aria-pressed`)
   - **number/**: `NumberInput` (stepper buttons), `CurrencyInput` (Intl-format on blur, raw on focus)
   - **boolean/**: `Checkbox`, `Toggle` (role=switch + iOS track/thumb)
@@ -19,15 +19,61 @@
   - **relationship/**: `BelongsToInput` (async combobox via fetch + 300ms debounce ao `field.props.searchRoute`, role=combobox/listbox), `HasManyReadonly` (lista flat readonly)
   - **date/**: `DateInput` (`type="date"` nativo + min/max), `DateTimeInput` (`type="datetime-local"` + step se `seconds`)
   - **file/**: `FileInput` (drag-drop + section semântica, armazena `File` no form state), `ImageInput` (preview via `URL.createObjectURL`, sem crop em Phase 1)
-- Side-effect `register.ts` registra todos os 18 no FieldRegistry
+  - **slug/**: `SlugInput` (normaliza para `[a-z0-9-]+` no keystroke + helper `slugify`)
+  - **color/**: `ColorInput` (native picker + presets + hex text input)
+  - **hidden/**: `HiddenInput` (`type="hidden"` value carrier)
+- Side-effect `register.ts` registra todos os 21 no FieldRegistry
+- `getRegisteredFields()` (re-exportado de `@arqel/ui/form`) retorna nomes registrados ordenados
+- 23 testes Vitest passando — registry roundtrip, behaviour + a11y de cada componente
 - Estilo via CSS vars de `@arqel/ui` (sem hardcode); `aria-invalid` quando há erros
 
-**Por chegar:**
+**Por chegar (Phase 2):**
 
-- FIELDS-JS-004: `SlugInput`, `ColorInput`, `HiddenInput`
-- FIELDS-JS-005: `getRegisteredFields()` helper + smoke check
-- FIELDS-JS-006: testes adicionais + coverage ≥ 80%
-- Phase 2: image crop (`react-image-crop`), date-picker custom (`react-day-picker`), Combobox searchable de Base UI para Select
+- Image crop (`react-image-crop`)
+- Date-picker custom (`react-day-picker`)
+- Combobox searchable de Base UI para `SelectInput`
+- `SlugInput` auto-derivado de outro field (depende de FormContext exposed pelo `useArqelForm`)
+
+## Creating a custom field
+
+```tsx
+// resources/js/fields/MoneyInput.tsx
+import type { FieldRendererProps } from '@arqel/ui/form';
+
+export function MoneyInput({ field, value, onChange, errors, inputId }: FieldRendererProps) {
+  const hasError = errors !== undefined && errors.length > 0;
+  return (
+    <input
+      id={inputId}
+      type="text"
+      inputMode="decimal"
+      className="…"
+      value={typeof value === 'string' ? value : ''}
+      aria-invalid={hasError || undefined}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+```
+
+```tsx
+// resources/js/app.tsx
+import '@arqel/ui/styles.css';
+import '@arqel/fields/register';
+import { registerField } from '@arqel/ui/form';
+import { MoneyInput } from './fields/MoneyInput';
+
+registerField('MoneyInput', MoneyInput); // depois do register.ts default
+```
+
+```php
+// app/Arqel/Fields/MoneyField.php
+final class MoneyField extends Field
+{
+    protected string $type = 'money';
+    protected string $component = 'MoneyInput';
+}
+```
 
 ## Key Contracts
 

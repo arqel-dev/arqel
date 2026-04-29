@@ -27,6 +27,10 @@ export function unregisterField(name: string): void {
   registry.delete(name);
 }
 
+export function getRegisteredFields(): string[] {
+  return Array.from(registry.keys()).sort();
+}
+
 /** Test-only helper. */
 export function clearFieldRegistry(): void {
   registry.clear();

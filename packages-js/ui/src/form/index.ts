@@ -2,6 +2,7 @@ export {
   clearFieldRegistry,
   type FieldComponent,
   getFieldComponent,
+  getRegisteredFields,
   registerField,
   unregisterField,
 } from './FieldRegistry.js';

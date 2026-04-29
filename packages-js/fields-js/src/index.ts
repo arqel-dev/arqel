@@ -8,11 +8,14 @@
  */
 
 export { Checkbox, Toggle } from './boolean/index.js';
+export { ColorInput } from './color/index.js';
 export { DateInput, DateTimeInput } from './date/index.js';
 export { FileInput, ImageInput } from './file/index.js';
+export { HiddenInput } from './hidden/index.js';
 export { CurrencyInput, NumberInput } from './number/index.js';
 export { BelongsToInput, HasManyReadonly } from './relationship/index.js';
 export { MultiSelectInput, RadioGroup, SelectInput } from './select/index.js';
+export { SlugInput, slugify } from './slug/index.js';
 export {
   EmailInput,
   PasswordInput,

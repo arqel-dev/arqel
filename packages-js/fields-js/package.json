@@ -57,6 +57,18 @@
     "./file": {
       "types": "./dist/file.d.ts",
       "import": "./dist/file.js"
+    },
+    "./slug": {
+      "types": "./dist/slug.d.ts",
+      "import": "./dist/slug.js"
+    },
+    "./color": {
+      "types": "./dist/color.d.ts",
+      "import": "./dist/color.js"
+    },
+    "./hidden": {
+      "types": "./dist/hidden.d.ts",
+      "import": "./dist/hidden.js"
     }
   },
   "files": [

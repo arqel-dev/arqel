@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batch #27 = AI/RT/WF scaffolds ✅; Batch #28 = AI-003 ClaudeProvider ✅ + RT-003 useResourceUpdates ✅ + WF-003 StateTransitionField PHP ✅ — 38 testes adicionais, total Fase 3 ≈ 70 testes).** Próximo: AI-004 OpenAi/AI-006 manager, RT-004 presence channels, WF-003 React component (C29).
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batch #27 scaffolds ✅; Batch #28 = AI-003 + RT-003 + WF-003 PHP ✅; Batch #29 = AI-004 OpenAi ✅ + RT-004 presence ✅ + WF-003 React (`@arqel/workflow`) ✅ — total Fase 3 ≈ 121 testes (23 ai + 20 realtime + 22 workflow PHP + 8 workflow JS + ...)).** Próximo: AI-005 Ollama / AI-006 manager, RT-005 collaborative editing ou RT-008 echo setup, WF-004 transitions com side effects.
 
 **Fase:** 1 (MVP)
 

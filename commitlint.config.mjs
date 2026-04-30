@@ -15,6 +15,7 @@ const scopes = [
   'auth',
   'nav',
   'tenant',
+  'ai',
   'widgets',
   'fields-advanced',
   'audit',

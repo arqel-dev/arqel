@@ -17,6 +17,7 @@
 - **Per-row authorization de actions** (TABLE-007) — implementado em `arqel/core` (`InertiaDataBuilder::resolveVisibleActionNames`): cada record carrega `arqel.actions: ['view', 'edit']` (lista de **nomes** das row actions visíveis para `(user, record)`); o React filtra a lista global pelo nome. Avalia `Action::isVisibleFor($record)` + `Action::canBeExecutedBy($user, $record)` duck-typed
 - **Bulk actions endpoint** (TABLE-008) — `POST {panel}/{resource}/bulk-actions/{action}` em `arqel/actions`, recebe `ids[]`, fetcha records via `whereIn(getKeyName, ids)`, delega para `BulkAction::execute(Collection)` que **chunka automaticamente** via `chunkSize(int)` (default 100, clamp ≥ 1) — chama callback uma vez por chunk. `deselectRecordsAfterCompletion(bool)` controla UX pós-execução
 
+<<<<<<< HEAD
 **Entregue (TABLE-V2-002 — PHP slice):**
 
 - **3 novos editable column types** em `src/Columns/` extendendo `Arqel\Table\Column`:
@@ -44,10 +45,18 @@
 - **Security guarantee crítica**: cada `condition` lookup vai por `findConstraint($field)` contra o whitelist declarado. **Field desconhecido é silenciosamente descartado** — não há caminho de input arbitrário do usuário para nome de coluna SQL. Operators fora da lista declarada na constraint também são descartados.
 - React tree UI (drag-drop de groups, field/operator/value pickers polimórficos, save/load saved queries) **diferida para TABLE-JS-XXX** — é UI-only sobre o payload acima.
 
+**Entregue (TABLE-V2-004 — PHP slice):**
+
+- **Column visibility flags** — 3 flags fluentes na base `Column`: `togglable(bool=true)`, `hiddenByDefault(bool=true)` (auto-enables `togglable` quando `true` — coluna escondida sem toggle seria invisível para sempre; `togglable(false)` posterior wins), `hiddenOnMobile(bool=true)` (independente).
+- Getters: `isTogglable()`, `isHiddenByDefault()`, `isHiddenOnMobile()`. `toArray()` expõe as 3 chaves no payload Inertia.
+- 9 unit tests (65 total).
+- **Adiado**: React dropdown de column visibility no header + endpoint `POST /admin/user-settings/tables/{resource}` para persistência cross-package + propagação em shared props.
+
 **Diferido para tickets follow-up cross-package:**
 
-- **`POST {panel}/{resource}/{id}/inline-update` controller** — depende de `arqel/core` para policy authorization (`Gate::authorize('update', $record)`) + `ResourceRegistry::findBySlug()`; rota e validation pipeline ficam em `arqel/core` ou `arqel/actions`, não no `arqel/table` para evitar dep circular
-- **React inline-cell components** (`@arqel/ui` + `@arqel/react`) — double-click para editar, debounce save, `useOptimistic` (React 19.2) com rollback, Escape cancela, Tab avança, validation errors inline
+- **`POST {panel}/{resource}/{id}/inline-update` controller** (TABLE-V2-002) — depende de `arqel/core` para policy authorization + `ResourceRegistry::findBySlug()`
+- **React inline-cell components** (`@arqel/ui` + `@arqel/react`) — TABLE-V2-002
+- **React tree UI do QueryBuilder** (TABLE-V2-003) — drag-drop de groups + value pickers polimórficos
 - Concurrency optimistic via version column (Phase 3)
 
 **Adiados:**

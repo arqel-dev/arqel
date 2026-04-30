@@ -51,6 +51,10 @@ abstract class Column
 
     protected bool $hiddenOnMobile = false;
 
+    protected bool $togglable = false;
+
+    protected bool $hiddenByDefault = false;
+
     protected ?string $alignment = null;
 
     protected ?string $width = null;
@@ -116,6 +120,33 @@ abstract class Column
     public function hiddenOnMobile(bool $hidden = true): static
     {
         $this->hiddenOnMobile = $hidden;
+
+        return $this;
+    }
+
+    public function togglable(bool $enable = true): static
+    {
+        $this->togglable = $enable;
+
+        return $this;
+    }
+
+    /**
+     * Marca a coluna como escondida por padrão (até o usuário togglar).
+     *
+     * Implica `togglable=true` automaticamente — uma coluna escondida
+     * por padrão sem ser togglable seria invisível para sempre. Se o
+     * caller quiser desativar o toggle depois, pode chamar
+     * `togglable(false)` explicitamente — `togglable` é a fonte da
+     * verdade final.
+     */
+    public function hiddenByDefault(bool $hidden = true): static
+    {
+        $this->hiddenByDefault = $hidden;
+
+        if ($hidden) {
+            $this->togglable = true;
+        }
 
         return $this;
     }
@@ -224,6 +255,16 @@ abstract class Column
         return $this->hiddenOnMobile;
     }
 
+    public function isTogglable(): bool
+    {
+        return $this->togglable;
+    }
+
+    public function isHiddenByDefault(): bool
+    {
+        return $this->hiddenByDefault;
+    }
+
     public function getAlignment(): ?string
     {
         return $this->alignment;
@@ -327,6 +368,8 @@ abstract class Column
             'copyable' => $this->copyable,
             'hidden' => $this->hidden,
             'hiddenOnMobile' => $this->hiddenOnMobile,
+            'togglable' => $this->togglable,
+            'hiddenByDefault' => $this->hiddenByDefault,
             'alignment' => $this->alignment,
             'width' => $this->width,
             'url' => is_string($this->url) ? $this->url : null,

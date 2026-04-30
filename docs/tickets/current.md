@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 ESSENCIALMENTE COMPLETA (TENANT-001..015 ✅ · WIDGETS-001..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..020 ✅ — TODOS os 8 React components shipped (scoped, sem Tiptap/Shiki/dnd-kit) · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001..005 ✅ · DOCS-V2-001/002 ✅ · GOV-V2-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#25 paralelos completos.** Tickets restantes da Fase 2 são integrações pesadas (Tiptap full, Shiki highlight, dnd-kit drag) ou parts opcionais. Próximo natural: tag real `v0.8.0-rc.1` seguindo `docs/release-checklist-v0.8.md`, ou avançar para PLANNING/10-fase-3-avancadas.md.
+**Fase 1 100% fechada + Fase 2 COMPLETA (TENANT-001..015 ✅ · WIDGETS-001..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..020 ✅ + completion: Tiptap full + Shiki highlight + dnd-kit drag ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001..005 ✅ · DOCS-V2-001/002 ✅ · GOV-V2-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#26 paralelos completos.** Próximo natural: tag real `v0.8.0-rc.1` seguindo `docs/release-checklist-v0.8.md`, ou avançar para PLANNING/10-fase-3-avancadas.md.
 
 **Fase:** 1 (MVP)
 

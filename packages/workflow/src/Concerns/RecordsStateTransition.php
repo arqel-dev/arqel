@@ -21,7 +21,7 @@ trait RecordsStateTransition
     /**
      * Dispara `StateTransitioned` capturando `Auth::id()` automaticamente.
      *
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed>  $context
      */
     protected function recordTransition(
         Model $record,

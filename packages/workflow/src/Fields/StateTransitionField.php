@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Arqel\Workflow\Fields;
 
 use Arqel\Fields\Field;
+use Arqel\Workflow\Authorization\TransitionAuthorizer;
 use Arqel\Workflow\Concerns\HasWorkflow;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 use ReflectionMethod;
 use Throwable;
 
@@ -203,7 +204,7 @@ final class StateTransitionField extends Field
                     'from' => $from,
                     'to' => $to,
                     'label' => $label,
-                    'authorized' => $this->isAuthorized($from, $to),
+                    'authorized' => $this->isAuthorized($transitionClass),
                 ];
             }
         }
@@ -246,28 +247,30 @@ final class StateTransitionField extends Field
         }
     }
 
-    private function isAuthorized(string $from, string $to): bool
+    /**
+     * @param  class-string  $transitionClass
+     */
+    private function isAuthorized(string $transitionClass): bool
     {
-        if ($this->record === null) {
-            return true;
-        }
-
         try {
-            if (! class_exists(Gate::class) || ! Gate::getFacadeRoot()) {
-                return true;
+            $user = null;
+
+            try {
+                if (Auth::getFacadeRoot()) {
+                    $user = Auth::user();
+                }
+            } catch (Throwable) {
+                $user = null;
             }
 
-            $ability = sprintf('transition-%s-to-%s', self::shortName($from), self::shortName($to));
-
-            return Gate::allows($ability, $this->record);
+            return TransitionAuthorizer::authorize($transitionClass, $user, $this->record);
         } catch (Throwable) {
-            return true;
+            return false;
         }
     }
 
     /**
-     * @param class-string $transition
-     *
+     * @param  class-string  $transition
      * @return list<string>|null
      */
     private static function transitionFroms(string $transition): ?array
@@ -305,7 +308,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionTo(string $transition): string
     {
@@ -330,7 +333,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionLabel(string $transition): string
     {

@@ -17,7 +17,7 @@ final class SampleSpatieTransition
     use RecordsStateTransition;
 
     /**
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed>  $context
      */
     public function fire(Model $record, string $from, string $to, array $context = []): void
     {

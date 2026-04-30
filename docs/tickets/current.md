@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 ARRANCOU (Batch #27 = AI-001/002 ✅ + RT-001/002 ✅ + WF-001/002 ✅ — scaffolds dos três pacotes novos `arqel/ai`, `arqel/realtime`, `arqel/workflow` com 32 testes).** Próximo: tag real `v0.8.0-rc.1` em paralelo, ou prosseguir Fase 3 (AI-003+ providers concretos, RT-003+ React hooks, WF-003+ guards/transitions).
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batch #27 = AI/RT/WF scaffolds ✅; Batch #28 = AI-003 ClaudeProvider ✅ + RT-003 useResourceUpdates ✅ + WF-003 StateTransitionField PHP ✅ — 38 testes adicionais, total Fase 3 ≈ 70 testes).** Próximo: AI-004 OpenAi/AI-006 manager, RT-004 presence channels, WF-003 React component (C29).
 
 **Fase:** 1 (MVP)
 

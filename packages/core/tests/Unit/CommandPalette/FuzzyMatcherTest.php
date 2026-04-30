@@ -85,3 +85,24 @@ it('rank() also scores command descriptions', function (): void {
 it('rank() returns empty when given no commands', function (): void {
     expect(FuzzyMatcher::rank([], 'anything'))->toBe([]);
 });
+
+it('rank() preserves original insertion order on score ties', function (): void {
+    // All three labels score 100 against an empty query — the order
+    // must match the input array exactly.
+    $first = cmd('a', 'Alpha');
+    $second = cmd('b', 'Bravo');
+    $third = cmd('c', 'Charlie');
+
+    $hits = FuzzyMatcher::rank([$first, $second, $third], '');
+
+    expect(array_map(fn (Command $c): string => $c->id, $hits))->toBe(['a', 'b', 'c']);
+});
+
+it('rank() returns an empty array when limit is zero', function (): void {
+    $hits = FuzzyMatcher::rank([
+        cmd('a', 'Alpha'),
+        cmd('b', 'Bravo'),
+    ], '', 0);
+
+    expect($hits)->toBe([]);
+});

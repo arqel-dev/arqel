@@ -93,7 +93,8 @@
     "@tiptap/extension-link": "^2.10.0",
     "@tiptap/extension-placeholder": "^2.10.0",
     "@tiptap/react": "^2.10.0",
-    "@tiptap/starter-kit": "^2.10.0"
+    "@tiptap/starter-kit": "^2.10.0",
+    "shiki": "^3.0.0"
   },
   "peerDependencies": {
     "@arqel/ui": "workspace:*",

@@ -55,11 +55,20 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 - **Auto-registro**: `McpServiceProvider::packageBooted()` agora instancia `ListResourcesTool` + `DescribeResourceTool` + `GenerateResourceTool` (3 tools built-in), todas via mesmo padrão `$server->registerTool($name, $description, $inputSchema, $handler)`
 - **7 testes novos** (6 unit + 1 feature): schema canônico, happy path com captura de args, `InvalidArgumentException` para `model` ausente e não-string, passthrough de `fromModel=false` + `withPolicy=false`, falha (`exitCode=1` → `success=false`), auto-registo das 3 tools no boot
 
-**Por chegar (MCP-006..010):**
+**Entregue (MCP-007):**
+
+- **`Resources\SkillResource` (final)** — primeiro MCP Resource exposto. URI scheme: `arqel-skill://<package>` onde `<package>` casa `[a-z0-9-]+` e referencia uma pasta sob `packages/` no monorepo (ex.: `arqel-skill://core` → `packages/core/SKILL.md`). API:
+  - `list(): array` — devolve lista de entries `{uri, name, description, mimeType: 'text/markdown'}`, uma por package descoberto
+  - `read(string $uri): array` — valida URI via regex `^arqel-skill://([a-z0-9-]+)$` (uppercase, slashes ou outros caracteres → `RuntimeException('Invalid URI: ...')`), lê o `SKILL.md` correspondente e devolve no envelope MCP `{contents: [{uri, mimeType, text}]}`. Erro de leitura é re-embrulhado como `RuntimeException('SKILL.md not found for arqel/<package>')` preservando a exceção original como `previous`
+- **Closure injection (testabilidade)**: construtor aceita `?Closure $packagesResolver = null` (signature `(): array<int, string>`) e `?Closure $contentReader = null` (signature `(string $package): string`) — testes injetam closures e bypassam o filesystem. Quando ambos são `null`, fallback default (a) descobre packages via `glob(<root>/packages/*/SKILL.md)` e (b) lê `realpath(<root>/packages/<package>/SKILL.md)`. Mesmo padrão de `final class + Closure swap` de MCP-003/004/005
+- **Path resolution**: o resolver default tenta `Container::getInstance()->make('path.base')` primeiro e cai para `realpath(__DIR__/../../../..)` se o `base_path` do app host (Testbench, ou app que consome o pacote via vendor) não tiver uma pasta `packages/`. Permite que dogfooding do monorepo funcione sem que o usuário precise configurar caminhos manualmente
+- **Auto-registro pre-flattened**: `McpServiceProvider::packageBooted()` chama `SkillResource::list()` UMA vez no boot e registra cada entry como um resource individual no `McpServer` via `registerResource($uri, $name, $description, $fetcher)`. Isso significa que `resources/list` devolve um item por package descoberto e `resources/read?uri=arqel-skill://core` é dispatched pelo McpServer padrão (sem código MCP-007 no caminho hot). Se o conjunto de SKILL.md mudar em runtime, o servidor MCP precisa ser reiniciado
+- **11 testes novos** (9 unit + 2 feature): shape de `list()` com closure, lista vazia, `read()` happy path, scheme inválido (`http://`), package name inválido (uppercase, slash), reader que joga propaga com nome no message, resolver vazio não chama reader, ordering preservado, auto-registro de N entries no McpServer, dispatch de `resources/read` via `handleRequest`
+
+**Por chegar (MCP-008..010):**
 
 - Artisan `arqel:mcp:serve` envolvendo `McpServer::serve()` — followup de MCP-002
 - Auto-descoberta: cada Resource Arqel vira tool CRUD + resource read; cada Action vira tool — MCP-006
-- Auth (token bearer + tenant scoping via `arqel/tenant`) — MCP-007
 - Streaming responses para tools de longa duração — MCP-008
 - Manifest publishing (`mcp.json` para Claude Desktop autoinstall) — MCP-009
 - Suite completa de testes + SKILL.md final — MCP-010

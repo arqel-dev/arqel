@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Mcp;
 
+use Arqel\Mcp\Resources\SkillResource;
 use Arqel\Mcp\Tools\DescribeResourceTool;
 use Arqel\Mcp\Tools\GenerateResourceTool;
 use Arqel\Mcp\Tools\ListResourcesTool;
@@ -27,6 +28,7 @@ final class McpServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->app->singleton(McpServer::class);
+        $this->app->singleton(SkillResource::class);
     }
 
     public function packageBooted(): void
@@ -60,5 +62,24 @@ final class McpServiceProvider extends PackageServiceProvider
             $generateSchema['inputSchema'],
             static fn (array $params): array => $generateResource($params),
         );
+
+        // Register one McpServer resource per discovered SKILL.md. The
+        // discovery is pre-flattened: `SkillResource::list()` is called
+        // ONCE here and each entry is wired into McpServer's standard
+        // `resources/list` + `resources/read` dispatch. If new SKILL.md
+        // files appear at runtime, restart the MCP server.
+        /** @var SkillResource $skillResource */
+        $skillResource = $this->app->make(SkillResource::class);
+        foreach ($skillResource->list() as $entry) {
+            $uri = $entry['uri'];
+            $server->registerResource(
+                $uri,
+                $entry['name'],
+                $entry['description'],
+                static function (string $resourceUri) use ($skillResource): array {
+                    return $skillResource->read($resourceUri);
+                },
+            );
+        }
     }
 }

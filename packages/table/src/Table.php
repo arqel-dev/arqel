@@ -83,6 +83,8 @@ final class Table
     /** @var array<int, Summary> */
     protected array $groupSummaries = [];
 
+    protected ?string $reorderColumn = null;
+
     /**
      * @param array<int, mixed> $columns
      */
@@ -270,6 +272,31 @@ final class Table
     }
 
     /**
+     * Enable drag-drop row reordering.
+     *
+     * Calling without arguments uses the conventional `position`
+     * column. Pass an explicit column name to use a different
+     * integer column. Pass `null` to disable reordering after it
+     * has been enabled.
+     */
+    public function reorderable(?string $columnName = 'position'): self
+    {
+        $this->reorderColumn = $columnName;
+
+        return $this;
+    }
+
+    public function getReorderColumn(): ?string
+    {
+        return $this->reorderColumn;
+    }
+
+    public function isReorderable(): bool
+    {
+        return $this->reorderColumn !== null;
+    }
+
+    /**
      * Build groups against a Collection of records.
      *
      * Returns a list of `{label, key, records, summaries}`. When no
@@ -449,6 +476,7 @@ final class Table
                 static fn (Summary $summary): array => $summary->toArray(),
                 $this->groupSummaries,
             ),
+            'reorderable' => $this->reorderColumn,
         ];
     }
 }

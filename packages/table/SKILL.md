@@ -60,6 +60,14 @@
 - **`toArray()`** mescla `{groupBy, summaries: [...summary.toArray()]}` ao payload Inertia (groups são computados em render time).
 - 16 testes (9 Summaries + 6 Grouping + 141 total table). React rendering (sticky headers + summary rows) deferida para TABLE-JS-XXX.
 
+**Entregue (TABLE-V2-006 — PHP slice):**
+
+- **`Table::reorderable(?string $columnName = 'position')`** — habilita drag-drop reorder de rows. Sem args usa a coluna convencional `position`; passando string custom (ex: `'sort_order'`) usa esse campo; passando `null` desabilita o reorder.
+- Getters: `getReorderColumn(): ?string` e `isReorderable(): bool` (retorna `true` quando `reorderColumn !== null`).
+- `toArray()` mescla a chave `reorderable` (string com nome da coluna ou `null`) no payload Inertia.
+- 6 unit tests em `tests/Unit/Table/ReorderableTest.php`.
+- **Diferido cross-package**: o controller `POST /admin/{resource}/reorder` (atualiza `position` per record via `array_search` no payload `ids[]`) depende de `arqel/core` (`ResourceRegistry::findBySlug` + Policy authorization via `update`). React drag-drop UI (dnd-kit + drag handles + optimistic update com rollback + auto-scroll) deferida para TABLE-JS-XXX. Regra: não permitir reorder quando sort column != reorder column.
+
 **Entregue (TABLE-V2-007 — PHP slice):**
 
 - **`Table::mobileMode(string)`** + 2 constantes: `Table::MOBILE_MODE_STACKED = 'stacked'` (default) e `Table::MOBILE_MODE_SCROLL = 'scroll'`. Getter `getMobileMode(): string`. `toArray()` mescla `config.mobileMode`.

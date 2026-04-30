@@ -110,6 +110,72 @@ mergeado no batch #32. Renderiza:
 Não toque no `aria-label` do botão sem alinhar com o PHP — testes do
 form usam essa string para encontrar o trigger.
 
+## AiTranslateInput (AI-008 React)
+
+Componente React que fecha o slice React do ticket AI-008 — o slice
+PHP foi mergeado no batch #33 (`Arqel\Ai\Fields\AiTranslateField`,
+component string `AiTranslateInput`).
+
+```ts
+interface AiTranslateInputProps {
+  name: string;
+  value: Record<string, string> | null;
+  onChange?: (value: Record<string, string>) => void;
+  props: {
+    languages: string[];
+    defaultLanguage: string;
+    autoTranslate: boolean;
+    provider?: string | null;
+  } | undefined;
+  resource?: string;
+  field?: string;
+  translateUrl?: string;
+  csrfToken?: string;
+}
+```
+
+Render:
+
+- `role="tablist"` com uma `<button role="tab">` por idioma de
+  `props.languages`. Tabs com tradução vazia/null carregam
+  `data-missing="true"` + um pontinho visual (`Missing translation`).
+- Painel ativo: `<textarea>` controlado editando
+  `translations[activeLang]`; o `onChange` recebe sempre o objeto
+  completo `Record<lang, string>`.
+- Botão `Translate from {defaultLanguage}` em cada tab **não-default**:
+  `POST` com `targetLanguages: [activeLang]`.
+- Botão `Translate all missing` no topo: itera as línguas com
+  tradução vazia e dispara um único `POST` com `targetLanguages: missing[]`.
+- Loading per-language (`Set<string>`); banner `role="alert"` quando o
+  `fetch` falha (HTTP code visível).
+
+Rota canônica: `POST /admin/{resource}/fields/{field}/translate`
+(override via `translateUrl`). Body:
+`{ sourceLanguage, targetLanguages, sourceText }`. Resposta esperada:
+`{ translations: { [lang]: text } }` — mesclada no state e propagada
+via `onChange`.
+
+### Uso direto
+
+```tsx
+import { AiTranslateInput } from '@arqel/ai';
+
+<AiTranslateInput
+  name="title"
+  value={form.title}
+  onChange={(v) => setForm((f) => ({ ...f, title: v }))}
+  props={{
+    languages: ['en', 'pt', 'es'],
+    defaultLanguage: 'en',
+    autoTranslate: false,
+    provider: 'claude',
+  }}
+  resource="posts"
+  field="title"
+  csrfToken={csrfToken}
+/>;
+```
+
 ## Anti-patterns
 
 - Trazer o prompt template para o cliente — segurança/IP. O backend

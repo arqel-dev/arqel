@@ -44,4 +44,21 @@ return [
         'resource_updated' => true,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Presence channels (RT-004)
+    |--------------------------------------------------------------------------
+    |
+    | Configures the presence channel exposed by `routes/channels.php`. When
+    | `enabled` is `false`, `PresenceChannelResolver::forResource()` raises a
+    | `RealtimeException` so callers fail fast instead of silently building a
+    | dead channel name. `channel_pattern` accepts the placeholders
+    | `{resource}` (Resource slug) and `{recordId}` (primary key).
+    |
+    */
+    'presence' => [
+        'enabled' => env('ARQEL_REALTIME_PRESENCE_ENABLED', true),
+        'channel_pattern' => 'arqel.presence.{resource}.{recordId}',
+    ],
+
 ];

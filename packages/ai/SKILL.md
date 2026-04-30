@@ -47,11 +47,18 @@ Entregue em AI-008 (PHP slice — componente React `AiTranslateInput.tsx` fica p
 - **`Arqel\Ai\Http\Controllers\AiTranslateController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/translate` (named `arqel.ai.translate`, middleware `web,auth`). Aceita `{sourceLanguage, targetLanguages, sourceText}` e devolve `{translations: {<lang>: <text>}}`. `ResourceRegistry` é resolvido por FQCN string (`Arqel\\Core\\Resources\\ResourceRegistry`) com fallback 404 quando ausente. 422 quando o field não é `AiTranslateField`.
 - 8 testes unit + 3 testes feature.
 
+Entregue em AI-009 (PHP slice — componente React `AiSelectInput.tsx` fica para batch futuro):
+
+- **`Arqel\Ai\Fields\AiSelectField`** (final, estende `Arqel\Fields\Field`) — classifica `formData` em uma das opções via AI. Setters fluentes `options(array)`, `classifyFromFields(array)`, `prompt(string|Closure)`, `provider(?string)`, `aiOptions(array)`, `fallbackOption(?string)`. Método `classify(array $formData): ?string` resolve placeholders `{fieldName}` no prompt template, anexa lista `key: label` das categorias disponíveis, chama `AiManager::complete()`, normaliza o output (trim + lowercase + strip de aspas/pontuação) e valida contra `options`. Output inválido cai em `fallbackOption()` (default `null`). O prompt template **nunca** é exposto via `getTypeSpecificProps()`.
+- **`Arqel\Ai\Http\Controllers\AiClassifyController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/classify` (named `arqel.ai.classify`, middleware `web,auth`). Aceita `{formData}` e devolve `{key, label}` (ambos `null` quando AI inválida e sem fallback). 404 quando resource ausente, 422 quando field não é `AiSelectField`.
+- 8 testes unit + 3 testes feature.
+
 Por chegar:
 
 - **AI-007 React** componente `AiTextInput.tsx` (botão Generate + estado loading + replace value).
 - **AI-008 React** componente `AiTranslateInput.tsx` (tabs por idioma + botão Auto-translate).
-- **AI-009..AI-011** os 3 field types restantes (`AiSelectField`/`AiExtractField`/`AiImageField`).
+- **AI-009 React** componente `AiSelectInput.tsx` (select + botão Classify with AI).
+- **AI-010..AI-011** os 2 field types restantes (`AiExtractField`/`AiImageField`).
 - **AI-012** prompt library reutilizável.
 - **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).
 
@@ -171,6 +178,38 @@ dispara `POST /admin/{slug}/fields/description/translate` com o texto do
 `defaultLanguage` e os idiomas restantes; o backend chama `translate()`
 para cada idioma alvo. Traduções manuais já preenchidas **não são
 sobrescritas** por `translateAll()` — só os campos vazios são gerados.
+
+### AiSelectField (AI-009)
+
+```php
+use Arqel\Ai\Fields\AiSelectField;
+
+public function fields(): array
+{
+    return [
+        Field::text('title')->required(),
+        Field::textarea('description'),
+
+        (new AiSelectField('category'))
+            ->options([
+                'tech' => 'Technology',
+                'finance' => 'Finance',
+                'health' => 'Health',
+            ])
+            ->classifyFromFields(['title', 'description'])
+            ->prompt('Classify this article. Title: {title}. Description: {description}.')
+            ->fallbackOption('tech')
+            ->provider('claude'),
+    ];
+}
+```
+
+O React (AI-009 React, batch futuro) dispara
+`POST /admin/{slug}/fields/category/classify` com o `formData` atual; o
+backend chama `classify()` e devolve `{key, label}`. Quando a AI retorna
+uma key fora do set declarado, o resultado cai em `fallbackOption` —
+sem `fallbackOption()`, o response é `{key: null, label: null}` e o
+select fica sem seleção.
 
 ### Consumir um result
 

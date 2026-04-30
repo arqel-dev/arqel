@@ -31,6 +31,19 @@
   - `toArray()` mescla `{editable, debounce, rules}` (e options/onValue/offValue conforme o tipo)
 - Getters: `isEditable()`, `getDebounce()`, `getRules()`, `getReadonly()` (+ `resolveOptions()` no `SelectColumn` e `getOnValue/getOffValue` no `ToggleColumn`)
 
+**Entregue (TABLE-V2-003 — PHP slice):**
+
+- **`Arqel\Table\Filters\Constraints\Constraint`** (abstract) — base de constraint do Visual Query Builder. Construtor `(string $field)` (final), setter fluente `label(string)` + `operators(array)`, getters `getField/getLabel/getType/getOperators` (label fallback via `Str::headline`). Subclasses declaram `protected string $type` + implementam `getDefaultOperators(): array<int, string>` e `apply(Builder $query, string $operator, mixed $value, string $method = 'where'): void`. `toArray()` serializa `{field, label, type, operators}` para o React.
+- **5 concrete constraints** em `src/Filters/Constraints/` (todas `final`):
+  - `TextConstraint` — `type='text'`, operators `equals/not_equals/contains/starts_with/ends_with` traduzidos para `=`, `!=`, `LIKE %v%`, `LIKE v%`, `LIKE %v`
+  - `NumberConstraint` — `type='number'`, operators `=,!=,>,<,>=,<=,between`. Cast numérico defensivo (int quando possível, senão float); valor não-numérico → `InvalidArgumentException`. `between` espera `[min, max]` (usa `whereBetween`/`orWhereBetween`)
+  - `DateConstraint` — `type='date'`, operators `=,before,after,between`. Parse via `Carbon::parse` (data inválida → `InvalidArgumentException`). `between` usa `whereBetween` com `[from, to]`
+  - `BooleanConstraint` — `type='boolean'`, operators `is_true,is_false` → `where(field, true|false)`
+  - `SelectConstraint` — `type='select'`, operators `equals,not_equals,in,not_in`. `options(array|Closure)` resolvido lazy em `toArray()` (Closure não-array degrada para `[]`). `in`/`not_in` usam `whereIn`/`whereNotIn` e ignoram silenciosamente valores não-array
+- **`Arqel\Table\Filters\QueryBuilderFilter`** (`final extends Filter`) — `type='queryBuilder'`. `constraints(array)` filtra silenciosamente entradas não-`Constraint`. `applyToQuery()` valida que o valor é um array com `conditions` não-vazio, envolve tudo em `$query->where(Closure)`, e delega para `applyConditions()` recursivo. Suporta `operator: 'AND'|'OR'` no nível do payload e em cada `group` aninhado.
+- **Security guarantee crítica**: cada `condition` lookup vai por `findConstraint($field)` contra o whitelist declarado. **Field desconhecido é silenciosamente descartado** — não há caminho de input arbitrário do usuário para nome de coluna SQL. Operators fora da lista declarada na constraint também são descartados.
+- React tree UI (drag-drop de groups, field/operator/value pickers polimórficos, save/load saved queries) **diferida para TABLE-JS-XXX** — é UI-only sobre o payload acima.
+
 **Diferido para tickets follow-up cross-package:**
 
 - **`POST {panel}/{resource}/{id}/inline-update` controller** — depende de `arqel/core` para policy authorization (`Gate::authorize('update', $record)`) + `ResourceRegistry::findBySlug()`; rota e validation pipeline ficam em `arqel/core` ou `arqel/actions`, não no `arqel/table` para evitar dep circular
@@ -136,7 +149,7 @@ ActionController::invokeBulk
 ## Related
 
 - Source: [`packages/table/src/`](./src/)
-- Testes: [`packages/table/tests/`](./tests/) (56 testes Pest passando)
+- Testes: [`packages/table/tests/`](./tests/) (117 testes Pest passando)
 - Tickets: [`PLANNING/08-fase-1-mvp.md`](../../PLANNING/08-fase-1-mvp.md) §TABLE-001..008
 - API: [`PLANNING/05-api-php.md`](../../PLANNING/05-api-php.md) §Table
 - Per-row impl: [`packages/core/src/Support/InertiaDataBuilder.php`](../../packages/core/src/Support/InertiaDataBuilder.php) (`resolveVisibleActionNames`)

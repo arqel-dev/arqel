@@ -10,7 +10,7 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 
 ## Status
 
-**Entregue (TENANT-001..012):**
+**Entregue (TENANT-001..012, 014):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\Tenant\` → `src/`, dep em `arqel/core` via path repo)
 - `TenantServiceProvider` registado via auto-discovery (`extra.laravel.providers`)
@@ -37,10 +37,11 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 
 - **TENANT-012 — White-labeling theme value-object (escopo reduzido)**: novo namespace `Arqel\Tenant\Theming\` com 3 classes finais. **`TenantTheme`** — readonly value-object com 5 props nullable (`primaryColor`, `logoUrl`, `fontFamily`, `secondaryColor`, `faviconUrl`). Factory estática `fromTenant(?Model)` lê os 5 atributos canônicos (`primary_color`, `logo_url`, `font_family`, `secondary_color`, `favicon_url`) defensivamente — non-string ou empty string degrada a null. Helpers `toArray()` (5 keys) + `isEmpty()` (true quando todas nullas, permite skip do payload Inertia quando não há tema). **`TenantThemeResolver`** — singleton injetando `TenantManager`; método `resolve()` ↦ `TenantTheme::fromTenant($manager->current())`. Bound em `packageRegistered`. **`CssVarsRenderer::renderInlineStyle(TenantTheme)`** static helper — emite `<style>:root { --color-primary: …; … }</style>` block; **defesa anti-injeção HTML**: drop silencioso de qualquer prop contendo `<`, `>`, ou `"`; valores seguros passam por `htmlspecialchars` para escapar `&`. 18 testes em `tests/Unit/Theming/` (8 TenantTheme, 7 CssVarsRenderer com sanitization, 3 Resolver com singleton check). **Cross-package wiring deferido**: a injeção em `HandleArqelInertiaRequests::share()` (em `arqel/core`) e a aplicação de CSS vars no `ArqelProvider` React (em `@arqel/react`) ficam para um follow-up. Padrão de hand-off documentado: consumers chamam `app(TenantThemeResolver::class)->resolve()->toArray()` no seu próprio `HandleInertiaRequests::share()`.
 
-**Por chegar (TENANT-013..015):**
+- **TENANT-014 — Coverage gaps + SKILL polish (escopo reduzido)**: 9 testes novos em `tests/Unit/Coverage/` cobrindo 3 gaps de alto valor identificados pela auditoria. **(1) `TenantManager::runFor` exception path** (3 testes em `TenantManagerRunForExceptionTest.php`): restore tanto de `currentTenant` quanto da flag `resolved` quando o callback lança; nested `runFor` desempilha em LIFO; outer context preservado quando inner throws. **(2) `ResolveTenantMiddleware` MODE_OPTIONAL** (2 testes em `MiddlewareOptionalModeTest.php`): unresolved request flui através do `next` cleanly; aceita case-insensitive (`OPTIONAL`/`Optional`/`optional`/com whitespace). **(3) `AbstractTenantResolver::availableFor` defaults** (4 testes em `AbstractResolverAvailableForTest.php`): non-Model Authenticatable → `[]`; missing relation method → `[]`; Collection mixed-type filtra para `modelClass` only; plain array property também aceita. **140 testes total** (era 131). Cross-tenant data leak tests + Stancl integration tests deferidos — precisam DB schema setup mais pesado que testbench resolve cleanly.
+
+**Por chegar (TENANT-013, 015):**
 
 - Integração opcional com Laravel Cashier (billing/subscriptions) — TENANT-013
-- Suite completa de testes + cobertura ≥90% — TENANT-014
 - SKILL.md final + docs guides — TENANT-015
 - Tenant switcher panel UI + flow de registro + profile + white-labeling — TENANT-009..012
 - Integração opcional com `Laravel Cashier` para billing — TENANT-013

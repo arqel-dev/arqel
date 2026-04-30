@@ -136,7 +136,7 @@ if [ ${#MISSING_PHP[@]} -eq 0 ]; then
   ok "All 13 Arqel PHP packages already required"
 else
   warn "Adding ${#MISSING_PHP[@]} missing package(s)…"
-  composer require "${MISSING_PHP[@]}" --no-interaction
+  composer require "${MISSING_PHP[@]}" --no-interaction --ignore-platform-req=ext-zip
   ok "composer require done"
 fi
 
@@ -440,6 +440,40 @@ else
   ok "bootstrap/providers.php patched (.bak left as backup)"
 fi
 
+# ---------- 10b. login route stub --------------------------------
+#
+# Laravel's `Authenticate` middleware redirects unauthenticated users
+# via `route('login')`. Fresh Laravel 12 installs without a starter
+# kit (Breeze/Jetstream/Fortify) don't define this route, so any
+# admin route under `auth` middleware (e.g. arqel/widgets dashboards)
+# 500s with `Route [login] not defined` instead of redirecting.
+#
+# Drop a placeholder route so unauthenticated hits at least surface
+# a clean 401-ish response instead of a 500. Real apps replace this
+# with their starter kit's login flow.
+
+log "Ensuring a [login] named route exists"
+
+WEB_ROUTES="$TARGET_APP/routes/web.php"
+
+if [ ! -f "$WEB_ROUTES" ]; then
+  warn "routes/web.php missing — skipping login stub"
+elif grep -q "->name('login')" "$WEB_ROUTES"; then
+  ok "[login] route already defined"
+else
+  cat >> "$WEB_ROUTES" <<'PHP'
+
+// Placeholder login route so Laravel's Authenticate middleware can
+// redirect unauthenticated users without throwing `Route [login] not
+// defined`. Replace with a proper login page (Breeze/Jetstream/
+// Fortify) once the auth flow matters.
+\Illuminate\Support\Facades\Route::get('/login', function () {
+    return response('Login route placeholder — install a starter kit (Breeze/Jetstream) for real auth.', 401);
+})->name('login');
+PHP
+  ok "[login] route stub appended to routes/web.php"
+fi
+
 # ---------- 11. publish vendor migrations + run migrate -----------
 
 # arqel/audit hard-deps spatie/laravel-activitylog. Its migrations are
@@ -454,6 +488,15 @@ php artisan vendor:publish \
 
 log "Running migrations"
 php artisan migrate --force --no-interaction || warn "migrate failed — re-run manually"
+
+# Stale `public/hot` from a prior `pnpm dev` invocation makes
+# `@vite()` emit `<script src="http://127.0.0.1:5173/...">` even when
+# no Vite server is running — the JS never executes and the React app
+# stays blank. Clean it up so the production manifest is used by default.
+if [ -f public/hot ]; then
+  rm -f public/hot
+  ok "Removed stale public/hot — fresh dev/prod choice on next reload"
+fi
 
 cat <<EOF
 

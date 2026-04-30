@@ -38,6 +38,42 @@
   - `Arqel\Core\CommandPalette\Providers\ThemeCommandProvider` — 3 commands estáticos (`theme:light` / `theme:dark` / `theme:system`, category `'Settings'`, icons `sun`/`moon`/`monitor`). Sempre devolve os 3 independentemente de user/query — filtragem é responsabilidade do registry.
   - Auto-registo em `ArqelServiceProvider::packageBooted()` via `$registry->registerProvider(...)`. `CreateCommandProvider` + `RecordSearchProvider` ainda deferidos (Policy + Resource model traversal).
   - **Coverage:** 35 testes unit (`tests/Unit/CommandPalette/` — Registry, FuzzyMatcher, Command value-object, Navigation/Theme providers) + 2 feature (`tests/Feature/CommandPalette*Test.php`). Total core test count: **154** (suite completa, todos verdes).
+- **Command Palette ergonomics (CMDPAL-004):**
+  - `CommandRegistry::registerStatic(id, label, url, description?, category?, icon?)` — sugar que cria o `Command` e chama `register()`. Re-registar o mesmo `id` lança `InvalidArgumentException("Command id '{id}' already registered")` para fazer aflorar duplicados acidentais.
+  - `CommandRegistry::registerClosureProvider(Closure)` — sugar explícito sobre `registerProvider(closure)`; mesmo comportamento, mas o nome lê melhor no call-site.
+  - `Command` ganhou 2 flags opcionais nullable: `?bool $requiresAuth` (true → só visível para autenticados) e `?bool $hideForAuthenticated` (true → escondido depois de login). Ambos `null` por default = sempre visível. `resolveFor()` aplica o filtro **depois** do merge static + provider e **antes** do fuzzy ranking.
+  - `Arqel\Core\CommandPalette\Concerns\HasCustomCommands` — trait com `commands(CommandRegistry $registry): void` (no-op por default) que classes user-land podem override para manter o registo de custom commands DRY e dependency-free.
+  - **Exemplo de uso num `ArqelServiceProvider` da app:**
+    ```php
+    public function boot(CommandRegistry $registry): void
+    {
+        $registry->registerStatic(
+            id: 'cache:clear',
+            label: 'Clear application cache',
+            url: '/admin/system/cache-clear',
+            category: 'System',
+            icon: 'refresh-cw',
+        );
+
+        $registry->registerClosureProvider(function ($user, string $query): array {
+            if ($user === null) {
+                return [];
+            }
+
+            return [
+                new Command(
+                    id: 'logout',
+                    label: 'Log out',
+                    url: '/logout',
+                    category: 'Account',
+                    icon: 'log-out',
+                    requiresAuth: true,
+                ),
+            ];
+        });
+    }
+    ```
+  - **Coverage:** +8 testes unit (`CommandRegistryStaticHelperTest`, `AuthAwareFilterTest`).
 
 ## Key Contracts
 

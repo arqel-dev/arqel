@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Arqel\Workflow\Concerns;
 
 use Arqel\Workflow\Events\StateTransitioned;
+use Arqel\Workflow\Models\StateTransition;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 use ReflectionException;
 use ReflectionMethod;
@@ -140,6 +142,27 @@ trait HasWorkflow
             userId: is_int($userId) ? $userId : null,
             context: $context,
         ));
+    }
+
+    /**
+     * Histórico append-only de transições deste record (WF-007).
+     *
+     * Persistido pelo listener `PersistStateTransitionToHistory` quando
+     * `arqel-workflow.history.enabled` está ativo. Ordenado por
+     * `created_at` desc para uso direto em UIs de timeline.
+     *
+     * @return MorphMany<StateTransition, $this>
+     */
+    public function stateTransitions(): MorphMany
+    {
+        assert($this instanceof Model);
+
+        /** @var MorphMany<StateTransition, $this> $relation */
+        $relation = $this->morphMany(StateTransition::class, 'model')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
+
+        return $relation;
     }
 
     /**

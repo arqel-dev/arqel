@@ -60,9 +60,36 @@ A escolha é **integrar quando útil, sem amarrar**: a integração canônica é
 - **Breaking change vs WF-003**: `StateTransitionField` original retornava `true` quando nenhuma Gate estava registrada. Agora deny-by-default — defina a flag `deny_when_undefined => false` para opt-out.
 - **10 Pest tests** novos (8 unit + 2 feature integration).
 
-**Por chegar (WF-007+ — diferidos):**
+**Entregue (WF-007):**
 
-- `StateTransitionField` (Field Arqel para tabela/form) — render do select/dropdown de transições disponíveis no admin (depende do `arqel/fields` API estável).
+- **Migration `2026_05_01_000000_create_arqel_state_transitions_table`** — cria a tabela append-only `arqel_state_transitions` com `morphs('model')`, `from_state` (nullable), `to_state`, `transitioned_by_user_id` (indexed), `metadata` (JSON), `created_at` com `useCurrent()`. Sem `updated_at` por design (audit é append-only).
+- **`Arqel\Workflow\Models\StateTransition`** (final) — Eloquent model com `$timestamps = false`, casts `metadata => array` + `created_at => datetime`. Relacionamentos: `model(): MorphTo` (polimórfico) e `user(): ?BelongsTo` (defensive — lê `arqel-workflow.user_model` default `App\\Models\\User`, retorna `null` se a classe não existir/não for `Model`).
+- **`Arqel\Workflow\Listeners\PersistStateTransitionToHistory`** (final) — listener auto-registado pelo `WorkflowServiceProvider::packageBooted()` via `Event::listen(StateTransitioned::class, ...)`. Persiste cada transição em `arqel_state_transitions` com `model_type`, `model_id`, `from_state` (null se vazio), `to_state`, `transitioned_by_user_id`, `metadata` (null se context vazio). Skip silencioso quando `arqel-workflow.history.enabled === false`. Captura `Throwable` defensivamente — falha de persistência não impede a transição do domínio.
+- **`HasWorkflow::stateTransitions()`** — `MorphMany<StateTransition, $this>` retornando o histórico do record ordenado por `created_at desc, id desc` (sqlite second-level ties resolvidos pelo id auto-increment). Uso direto em UIs de timeline: `$order->stateTransitions()->latest()->first()`.
+- **`StateTransitionField::resolveHistory()`** — agora retorna entries reais filtradas por `(model_type, model_id)` (limit configurável via `arqel-workflow.history.limit`, default 50). Cada row: `{from, to, at (ISO 8601), by, metadata}`. Best-effort: captura `Throwable` e retorna `[]` se a tabela não foi migrada.
+- **Config bloco `history`** em `arqel-workflow.php`: `enabled` (env `ARQEL_WORKFLOW_HISTORY_ENABLED`, default `true`) + `limit` (env `ARQEL_WORKFLOW_HISTORY_LIMIT`, default `50`).
+- **`tests/TestCase.php`** carrega migrações do pacote via `defineDatabaseMigrations()` (pattern alinhado com `arqel/ai`).
+- **7 testes Pest** novos em `Feature/StateTransitionHistoryTest`: persistência (model_type/model_id/from/to/userId/metadata) + JSON cast + relacionamento `stateTransitions()` + skip quando `history.enabled=false` + 2 transições sequenciais em ordem desc + `StateTransitionField::resolveHistory()` non-empty + `[]` quando record não está bound. **Total acumulado: 46 testes**.
+
+Exemplo de consumo:
+
+```php
+// Latest transition de um order
+$last = $order->stateTransitions()->first();
+// StateTransition { from_state: 'Pending', to_state: 'Paid', metadata: [...], created_at }
+
+// Timeline completo
+foreach ($order->stateTransitions as $entry) {
+    echo "{$entry->from_state} → {$entry->to_state} at {$entry->created_at}\n";
+}
+
+// Disabled em jobs / seeders
+config()->set('arqel-workflow.history.enabled', false);
+$order->transitionTo(NewState::class); // não grava em arqel_state_transitions
+```
+
+**Por chegar (WF-008+ — diferidos):**
+
 - `Http\Controllers\TransitionController` — endpoint `POST /admin/{resource}/{record}/transition/{transition}` que valida + dispara a transição (depende do registro `arqel/core` Resource + auth).
 - `WorkflowVisualizer` React component — diagrama interativo do workflow (states + transitions) consumindo `WorkflowDefinition::toArray()`.
 - Integração canônica com `spatie/laravel-model-states` — guard helpers + casts + transition events; o suggest entra em `require` quando o usuário opta in.

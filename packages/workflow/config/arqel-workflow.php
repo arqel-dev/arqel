@@ -65,4 +65,20 @@ return [
     'authorization' => [
         'deny_when_undefined' => env('ARQEL_WORKFLOW_DENY_WHEN_UNDEFINED', true),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | State transition history (WF-007)
+    |--------------------------------------------------------------------------
+    |
+    | Quando `history.enabled` está ativo, o `WorkflowServiceProvider`
+    | registra o listener `PersistStateTransitionToHistory` para gravar
+    | cada `StateTransitioned` em `arqel_state_transitions`. `limit`
+    | controla quantas entradas o `StateTransitionField::resolveHistory()`
+    | devolve por record.
+    */
+    'history' => [
+        'enabled' => env('ARQEL_WORKFLOW_HISTORY_ENABLED', true),
+        'limit' => env('ARQEL_WORKFLOW_HISTORY_LIMIT', 50),
+    ],
 ];

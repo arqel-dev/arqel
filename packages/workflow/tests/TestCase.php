@@ -46,4 +46,9 @@ abstract class TestCase extends Orchestra
             'foreign_key_constraints' => true,
         ]);
     }
+
+    protected function defineDatabaseMigrations(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+    }
 }

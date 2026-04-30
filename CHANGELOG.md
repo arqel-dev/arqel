@@ -7,6 +7,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+_Placeholder para próximo ciclo (pós v0.8.0-rc.1). Adicionar entradas conforme novos batches forem mesclados._
+
+---
+
+## [0.8.0-rc.1 — pendente de tag]
+
+> Conteúdo abaixo será movido para a seção `## [0.8.0-rc.1] - YYYY-MM-DD` no momento da tag, conforme `docs/release-checklist-v0.8.md`.
+
 ### Added
 
 - **Batch paralelo #16** (3 sub-agentes, merged 2026-04-30): TABLE-V2-006 PHP slice (`Table::reorderable(?string $columnName = 'position')` setter — null disables, isReorderable() + getReorderColumn(), toArray() expõe key; 6 testes), TABLE-V2-007 PHP slice (`Table::mobileMode(string)` com constants `MOBILE_MODE_STACKED`/`MOBILE_MODE_SCROLL`, default 'stacked', defensive fallback para unknown; 7 testes — 154 table total), CMDPAL-005 scoped (6 testes coverage gaps: ordering invariant static-before-provider, FuzzyMatcher tie-breaking insertion order preserved, rank limit=0, Command toArray shape, NavigationCommandProvider broken pluralLabel skip; SKILL.md polish para canonical CMDPAL-001/002 entries; 154 core total). **Apenas B16 entregou auto; A16 sandbox blocked Bash, C16 entregue. Orquestrador finalizou A16+C16 manualmente.**

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..008 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..003 ✅ · TABLE-V2-002 PHP slice ✅ · CMDPAL-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#13 de sub-agentes paralelos completos + 2ª rodada de bug fixes do dogfooding.** Próximo natural: WIDGETS-010 (React widgets em @arqel/ui), MCP-009 (testes integration), AUDIT-004 (cobertura final), EXPORT-007 (Blade pdf template), TABLE-V2-003 (Visual Query Builder), CMDPAL-002 (built-in command providers).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..008 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002/003 PHP slice ✅ · CMDPAL-001/002 ✅) + 9 bugs do dogfooding fechados + Batch #1..#14 paralelos completos + 2ª rodada de bug fixes do dogfooding.** Próximo natural: WIDGETS-010 (React widgets em @arqel/ui), MCP-009 (testes integration), TABLE-V2-004 (Column visibility persistence), TABLE-V2-005 (Grouping com summaries), MCP-010 (SKILL polish), CMDPAL-003 (React command palette), DOCS-V2-001.
 
 **Fase:** 1 (MVP)
 

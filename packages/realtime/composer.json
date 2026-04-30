@@ -1,0 +1,81 @@
+{
+    "name": "arqel/realtime",
+    "description": "Realtime broadcasting integration for Arqel — Reverb-friendly events for Resource updates.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "arqel",
+        "realtime",
+        "broadcasting",
+        "reverb",
+        "websockets"
+    ],
+    "homepage": "https://arqel.dev",
+    "support": {
+        "issues": "https://github.com/arqel/arqel/issues",
+        "source": "https://github.com/arqel/arqel",
+        "docs": "https://arqel.dev/docs"
+    },
+    "require": {
+        "php": "^8.3",
+        "arqel/core": "@dev",
+        "illuminate/broadcasting": "^12.0|^13.0",
+        "illuminate/contracts": "^12.0|^13.0",
+        "illuminate/database": "^12.0|^13.0",
+        "illuminate/queue": "^12.0|^13.0",
+        "illuminate/support": "^12.0|^13.0",
+        "spatie/laravel-package-tools": "^1.16"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.9",
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "suggest": {
+        "laravel/reverb": "^1.0 — first-party Laravel WebSocket server to deliver these broadcast events"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arqel\\Realtime\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Arqel\\Realtime\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Arqel\\Realtime\\RealtimeServiceProvider"
+            ]
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../core",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage --min=90",
+        "analyse": "phpstan analyse src tests",
+        "lint": "pint --test",
+        "format": "pint"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

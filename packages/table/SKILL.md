@@ -17,6 +17,26 @@
 - **Per-row authorization de actions** (TABLE-007) — implementado em `arqel/core` (`InertiaDataBuilder::resolveVisibleActionNames`): cada record carrega `arqel.actions: ['view', 'edit']` (lista de **nomes** das row actions visíveis para `(user, record)`); o React filtra a lista global pelo nome. Avalia `Action::isVisibleFor($record)` + `Action::canBeExecutedBy($user, $record)` duck-typed
 - **Bulk actions endpoint** (TABLE-008) — `POST {panel}/{resource}/bulk-actions/{action}` em `arqel/actions`, recebe `ids[]`, fetcha records via `whereIn(getKeyName, ids)`, delega para `BulkAction::execute(Collection)` que **chunka automaticamente** via `chunkSize(int)` (default 100, clamp ≥ 1) — chama callback uma vez por chunk. `deselectRecordsAfterCompletion(bool)` controla UX pós-execução
 
+**Entregue (TABLE-V2-002 — PHP slice):**
+
+- **3 novos editable column types** em `src/Columns/` extendendo `Arqel\Table\Column`:
+  - `TextInputColumn` (final) — `type='textInput'`, edição inline via input de texto
+  - `SelectColumn` (final) — `type='select'`, com `options(array|Closure)` resolvido **lazy** em `toArray()` (Closure que retorna não-array degrada para `[]`)
+  - `ToggleColumn` (final) — `type='toggle'`, com `onValue(mixed)` / `offValue(mixed)` para mapear o boolean da UI a valores persistidos arbitrários (e.g. `'active'` / `'inactive'`)
+- **Contrato comum de editable** (em todas as 3):
+  - `editable = true` por **default** — opt-out via `readonly()`
+  - `debounce = 500ms` por default; `debounce(int)` clampa em `≥ 0` (ms negativos viram 0)
+  - `rules(array)` — validation rules estilo Laravel persistidas para o controller server-side resolver
+  - `readonly(bool|Closure = true)` — bool flipa `editable` imediatamente; Closure é armazenada para resolução per-record server-side (não flipa `editable` eagerly)
+  - `toArray()` mescla `{editable, debounce, rules}` (e options/onValue/offValue conforme o tipo)
+- Getters: `isEditable()`, `getDebounce()`, `getRules()`, `getReadonly()` (+ `resolveOptions()` no `SelectColumn` e `getOnValue/getOffValue` no `ToggleColumn`)
+
+**Diferido para tickets follow-up cross-package:**
+
+- **`POST {panel}/{resource}/{id}/inline-update` controller** — depende de `arqel/core` para policy authorization (`Gate::authorize('update', $record)`) + `ResourceRegistry::findBySlug()`; rota e validation pipeline ficam em `arqel/core` ou `arqel/actions`, não no `arqel/table` para evitar dep circular
+- **React inline-cell components** (`@arqel/ui` + `@arqel/react`) — double-click para editar, debounce save, `useOptimistic` (React 19.2) com rollback, Escape cancela, Tab avança, validation errors inline
+- Concurrency optimistic via version column (Phase 3)
+
 **Adiados:**
 
 - TABLE-009..013 (advanced filters: relationship-based, range numeric, computed) — Phase 2

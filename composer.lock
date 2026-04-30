@@ -4,12 +4,12 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "00597aaecf3065c61b2ab25226f48bc3",
+    "content-hash": "1928df55c742884a2c8d60ca20cb8d97",
     "packages": [],
     "packages-dev": [
         {
             "name": "arqel/actions",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/actions",
@@ -84,8 +84,90 @@
             }
         },
         {
+            "name": "arqel/ai",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/ai",
+                "reference": "cefc939935318a0185ad777fe5510ff3f57da447"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "suggest": {
+                "anthropic/anthropic-php": "Native SDK for ClaudeProvider (deferred to AI-003)",
+                "ollama-laravel": "Local LLM via Ollama for OllamaProvider (deferred to AI-005)",
+                "openai-php/client": "Native SDK for OpenAiProvider (deferred to AI-004)"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Ai\\AiServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Ai\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Ai\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AI-assisted fields for Arqel — translation, summarization, classification, extraction, generation. Provider-agnostic (Claude / OpenAI / Ollama).",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "ai",
+                "anthropic",
+                "arqel",
+                "laravel",
+                "ollama",
+                "openai"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "arqel/audit",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/audit",
@@ -163,7 +245,7 @@
         },
         {
             "name": "arqel/auth",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/auth",
@@ -242,7 +324,7 @@
         },
         {
             "name": "arqel/core",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
@@ -318,7 +400,7 @@
         },
         {
             "name": "arqel/export",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/export",
@@ -400,7 +482,7 @@
         },
         {
             "name": "arqel/fields",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/fields",
@@ -475,7 +557,7 @@
         },
         {
             "name": "arqel/fields-advanced",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/fields-advanced",
@@ -552,7 +634,7 @@
         },
         {
             "name": "arqel/form",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/form",
@@ -627,7 +709,7 @@
         },
         {
             "name": "arqel/mcp",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
@@ -703,7 +785,7 @@
         },
         {
             "name": "arqel/nav",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/nav",
@@ -779,7 +861,7 @@
         },
         {
             "name": "arqel/realtime",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/realtime",
@@ -865,7 +947,7 @@
         },
         {
             "name": "arqel/table",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/table",
@@ -940,7 +1022,7 @@
         },
         {
             "name": "arqel/tenant",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/tenant",
@@ -1019,7 +1101,7 @@
         },
         {
             "name": "arqel/widgets",
-            "version": "dev-worktree-agent-b27",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/widgets",
@@ -1082,6 +1164,87 @@
                 "kpi",
                 "laravel",
                 "widgets"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel/workflow",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/workflow",
+                "reference": "8feac4ed876b899779050f255b8ba209d1a22ab1"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "illuminate/support": "^12.0|^13.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.29",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "suggest": {
+                "spatie/laravel-model-states": "Required to use class-based state objects with transitions (^2.5)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Workflow\\WorkflowServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Workflow\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Workflow\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse src tests"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "State-machine workflow integration for Arqel — fluent definition + HasWorkflow trait wrapping spatie/laravel-model-states.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "laravel",
+                "spatie",
+                "state-machine",
+                "workflow"
             ],
             "support": {
                 "issues": "https://github.com/arqel/arqel/issues",
@@ -7847,6 +8010,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "arqel/actions": 20,
+        "arqel/ai": 20,
         "arqel/audit": 20,
         "arqel/auth": 20,
         "arqel/core": 20,
@@ -7859,7 +8023,8 @@
         "arqel/realtime": 20,
         "arqel/table": 20,
         "arqel/tenant": 20,
-        "arqel/widgets": 20
+        "arqel/widgets": 20,
+        "arqel/workflow": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

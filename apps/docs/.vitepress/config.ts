@@ -10,6 +10,17 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   srcExclude: ['**/SKILL.md', '**/README.md'],
+  // Phase 2 guides reference packages/*/SKILL.md and PLANNING/*.md which
+  // live outside the site root — VitePress can't resolve them but they
+  // are valid GitHub paths (rendered correctly when viewing the source
+  // on github.com). Mark them as known-external so the build doesn't fail.
+  ignoreDeadLinks: [
+    /\/\.\.\/\.\.\/packages\//,
+    /\/\.\.\/\.\.\/PLANNING\//,
+    /\/README$/,
+    /^\.\.\/\.\.\/packages\//,
+    /^\.\.\/\.\.\/PLANNING\//,
+  ],
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
@@ -129,7 +140,16 @@ export default defineConfig({
           items: [
             { text: 'Custom Fields', link: '/advanced/custom-fields' },
             { text: 'Macros', link: '/advanced/macros' },
-            { text: 'Multi-tenancy (stub)', link: '/advanced/multi-tenancy' },
+          ],
+        },
+        {
+          text: 'Phase 2 features',
+          items: [
+            { text: 'Multi-tenancy', link: '/advanced/multi-tenancy' },
+            { text: 'Dashboards & Widgets', link: '/advanced/dashboards' },
+            { text: 'Tables V2 enhancements', link: '/advanced/tables-v2' },
+            { text: 'MCP server', link: '/advanced/mcp' },
+            { text: 'Command palette', link: '/advanced/command-palette' },
           ],
         },
       ],

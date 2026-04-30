@@ -4,90 +4,86 @@
 
 ## Purpose
 
-`arqel/table` constrói tabelas declarativas para Resources Arqel — sorting, filtering, search, pagination, ações row/bulk/toolbar. Recebe Columns + Filters declarados em PHP, aplica-os a uma query Eloquent via `TableQueryBuilder`, e expõe o schema serializado para o `<DataTable>` em `@arqel/ui`.
+`arqel/table` constrói tabelas declarativas para Resources Arqel — sorting, filtering, search, pagination, ações row/bulk/toolbar, edição inline, agrupamento, visual query builder, reorder e mobile mode. Recebe Columns + Filters declarados em PHP, aplica-os a uma query Eloquent via `TableQueryBuilder`, e expõe o schema serializado para o `<DataTable>` em `@arqel/ui`.
+
+`Resource::table()` é detectado por duck-typing em `Arqel\Core\Support\InertiaDataBuilder::isTableObject` (presença de `getColumns/getFilters/getActions/getBulkActions/getToolbarActions`). Quando presente, `buildTableIndexData` carrega via Reflection o `TableQueryBuilder` para paginar.
 
 ## Status
 
-**Entregue (TABLE-001..008):**
+**Base (TABLE-001..008):**
 
-- **`Arqel\Table\Table`** (final) builder com `make()`, `columns(array)`, `filters(array)`, `actions(array)`, `bulkActions(array)`, `toolbarActions(array)`, `defaultSort(col, dir)`, `perPage(int)`, `perPageOptions(array<int>)`, `searchable(bool)`, `selectable(bool)`, `striped(bool)`, `compact(bool)`, `emptyState(array)`, `toArray()`. Action arrays são `array<int, mixed>` (duck-typed contra `arqel/actions` para não criar circular dep)
-- **9 Column types** em `src/Columns/` extendendo `Arqel\Table\Column`: `TextColumn` (limit/wrap), `BadgeColumn` (colors map), `BooleanColumn` (true/false icon+color), `DateColumn` (displayFormat/timezone), `NumberColumn` (decimals/prefix/suffix), `IconColumn` (icon|Closure + color|Closure), `ImageColumn` (disk/circular/size), `RelationshipColumn` (factory `make(name, relation, attribute)`), `ComputedColumn` (factory `make(name, Closure)`). Setters comuns: `label`, `sortable`, `searchable`, `hidden`, `hiddenOnMobile`, `align`, `width`, `tooltip`
-- **6 Filter types** em `src/Filters/` extendendo `Arqel\Table\Filter`: `SelectFilter` (options array|Closure), `MultiSelectFilter`, `DateRangeFilter`, `TextFilter` (column override), `TernaryFilter` (true/false/all labels), `ScopeFilter` (factory `make($name, $scopeName)`). Setters comuns: `label`, `apply(Closure)`, `default`, `placeholder`
-- **`Arqel\Table\TableQueryBuilder`** (final) orquestra request → Eloquent query: search global cross-column, filter application, sort whitelisted contra columns sortable, eager-load inferido de `RelationshipColumn`, paginate sanitizado contra `perPageOptions`. Factory `for(Table, Builder, Request)` + `paginate(): LengthAwarePaginator`
-- **Per-row authorization de actions** (TABLE-007) — implementado em `arqel/core` (`InertiaDataBuilder::resolveVisibleActionNames`): cada record carrega `arqel.actions: ['view', 'edit']` (lista de **nomes** das row actions visíveis para `(user, record)`); o React filtra a lista global pelo nome. Avalia `Action::isVisibleFor($record)` + `Action::canBeExecutedBy($user, $record)` duck-typed
-- **Bulk actions endpoint** (TABLE-008) — `POST {panel}/{resource}/bulk-actions/{action}` em `arqel/actions`, recebe `ids[]`, fetcha records via `whereIn(getKeyName, ids)`, delega para `BulkAction::execute(Collection)` que **chunka automaticamente** via `chunkSize(int)` (default 100, clamp ≥ 1) — chama callback uma vez por chunk. `deselectRecordsAfterCompletion(bool)` controla UX pós-execução
+- `Arqel\Table\Table` (final) builder: `make/columns/filters/actions/bulkActions/toolbarActions/defaultSort/perPage/perPageOptions/searchable/selectable/striped/compact/emptyState/toArray`. Action arrays são `array<int, mixed>` (duck-typed contra `arqel/actions` para evitar circular dep — ambos dependem só de `arqel/core`).
+- **9 Column types** em `src/Columns/`: `TextColumn` (limit/wrap), `BadgeColumn` (colors map), `BooleanColumn`, `DateColumn` (displayFormat/timezone), `NumberColumn` (decimals/prefix/suffix), `IconColumn`, `ImageColumn` (disk/circular/size), `RelationshipColumn` (`make(name, relation, attribute)`), `ComputedColumn` (`make(name, Closure)`). Setters comuns: `label/sortable/searchable/hidden/hiddenOnMobile/align/width/tooltip`.
+- **6 Filter types** em `src/Filters/`: `SelectFilter`, `MultiSelectFilter`, `DateRangeFilter`, `TextFilter`, `TernaryFilter`, `ScopeFilter`. Setters comuns: `label/apply(Closure)/default/placeholder`.
+- `TableQueryBuilder` (final): search global cross-column, filter application, sort whitelisted, eager-load inferido de `RelationshipColumn`, paginate sanitizado contra `perPageOptions`. Factory `for(Table, Builder, Request)::paginate()`.
+- **Per-row authz** (TABLE-007): `arqel/core` `InertiaDataBuilder::resolveVisibleActionNames` injeta `record.arqel.actions: ['view', 'edit']`; React filtra a lista global pelo nome. Avalia `Action::isVisibleFor` + `Action::canBeExecutedBy` duck-typed.
+- **Bulk actions endpoint** (TABLE-008): `POST {panel}/{resource}/bulk-actions/{action}` em `arqel/actions`, fetcha via `whereIn(getKeyName, ids)`, delega para `BulkAction::execute(Collection)` que chunka via `chunkSize(int)` (default 100, clamp ≥ 1). `deselectRecordsAfterCompletion(bool)` controla UX pós-execução.
 
-<<<<<<< HEAD
-**Entregue (TABLE-V2-002 — PHP slice):**
+**Inline editing (TABLE-V2-002):**
 
-- **3 novos editable column types** em `src/Columns/` extendendo `Arqel\Table\Column`:
-  - `TextInputColumn` (final) — `type='textInput'`, edição inline via input de texto
-  - `SelectColumn` (final) — `type='select'`, com `options(array|Closure)` resolvido **lazy** em `toArray()` (Closure que retorna não-array degrada para `[]`)
-  - `ToggleColumn` (final) — `type='toggle'`, com `onValue(mixed)` / `offValue(mixed)` para mapear o boolean da UI a valores persistidos arbitrários (e.g. `'active'` / `'inactive'`)
-- **Contrato comum de editable** (em todas as 3):
-  - `editable = true` por **default** — opt-out via `readonly()`
-  - `debounce = 500ms` por default; `debounce(int)` clampa em `≥ 0` (ms negativos viram 0)
-  - `rules(array)` — validation rules estilo Laravel persistidas para o controller server-side resolver
-  - `readonly(bool|Closure = true)` — bool flipa `editable` imediatamente; Closure é armazenada para resolução per-record server-side (não flipa `editable` eagerly)
-  - `toArray()` mescla `{editable, debounce, rules}` (e options/onValue/offValue conforme o tipo)
-- Getters: `isEditable()`, `getDebounce()`, `getRules()`, `getReadonly()` (+ `resolveOptions()` no `SelectColumn` e `getOnValue/getOffValue` no `ToggleColumn`)
+- 3 editable column types: `TextInputColumn` (`type='textInput'`), `SelectColumn` (`type='select'`, `options(array|Closure)` lazy em `toArray()` — Closure não-array degrada para `[]`), `ToggleColumn` (`type='toggle'`, `onValue/offValue` para mapear boolean → valor persistido arbitrário).
+- **Contrato comum**: `editable=true` por default (opt-out via `readonly()`); `debounce=500ms` default, `debounce(int)` clampa em `≥0`; `rules(array)` para validation server-side; `readonly(bool|Closure=true)` — bool flipa `editable`, Closure resolvida per-record server-side. `toArray()` mescla `{editable, debounce, rules}` (+ extras por tipo).
 
-**Entregue (TABLE-V2-003 — PHP slice):**
+**Visual Query Builder (TABLE-V2-003):**
 
-- **`Arqel\Table\Filters\Constraints\Constraint`** (abstract) — base de constraint do Visual Query Builder. Construtor `(string $field)` (final), setter fluente `label(string)` + `operators(array)`, getters `getField/getLabel/getType/getOperators` (label fallback via `Str::headline`). Subclasses declaram `protected string $type` + implementam `getDefaultOperators(): array<int, string>` e `apply(Builder $query, string $operator, mixed $value, string $method = 'where'): void`. `toArray()` serializa `{field, label, type, operators}` para o React.
-- **5 concrete constraints** em `src/Filters/Constraints/` (todas `final`):
-  - `TextConstraint` — `type='text'`, operators `equals/not_equals/contains/starts_with/ends_with` traduzidos para `=`, `!=`, `LIKE %v%`, `LIKE v%`, `LIKE %v`
-  - `NumberConstraint` — `type='number'`, operators `=,!=,>,<,>=,<=,between`. Cast numérico defensivo (int quando possível, senão float); valor não-numérico → `InvalidArgumentException`. `between` espera `[min, max]` (usa `whereBetween`/`orWhereBetween`)
-  - `DateConstraint` — `type='date'`, operators `=,before,after,between`. Parse via `Carbon::parse` (data inválida → `InvalidArgumentException`). `between` usa `whereBetween` com `[from, to]`
-  - `BooleanConstraint` — `type='boolean'`, operators `is_true,is_false` → `where(field, true|false)`
-  - `SelectConstraint` — `type='select'`, operators `equals,not_equals,in,not_in`. `options(array|Closure)` resolvido lazy em `toArray()` (Closure não-array degrada para `[]`). `in`/`not_in` usam `whereIn`/`whereNotIn` e ignoram silenciosamente valores não-array
-- **`Arqel\Table\Filters\QueryBuilderFilter`** (`final extends Filter`) — `type='queryBuilder'`. `constraints(array)` filtra silenciosamente entradas não-`Constraint`. `applyToQuery()` valida que o valor é um array com `conditions` não-vazio, envolve tudo em `$query->where(Closure)`, e delega para `applyConditions()` recursivo. Suporta `operator: 'AND'|'OR'` no nível do payload e em cada `group` aninhado.
-- **Security guarantee crítica**: cada `condition` lookup vai por `findConstraint($field)` contra o whitelist declarado. **Field desconhecido é silenciosamente descartado** — não há caminho de input arbitrário do usuário para nome de coluna SQL. Operators fora da lista declarada na constraint também são descartados.
-- React tree UI (drag-drop de groups, field/operator/value pickers polimórficos, save/load saved queries) **diferida para TABLE-JS-XXX** — é UI-only sobre o payload acima.
+- `Filters\Constraints\Constraint` (abstract): construtor `(string $field)`, `label/operators` setters, getters `getField/getLabel/getType/getOperators` (label fallback via `Str::headline`). Subclasses declaram `protected string $type` + `getDefaultOperators()` + `apply(Builder, string $operator, mixed $value, string $method='where')`.
+- 5 concrete (final): `TextConstraint` (equals/not_equals/contains/starts_with/ends_with), `NumberConstraint` (=,!=,>,<,>=,<=,between — cast int/float defensivo, valor não-numérico → `InvalidArgumentException`), `DateConstraint` (=/before/after/between via `Carbon::parse`), `BooleanConstraint` (is_true/is_false), `SelectConstraint` (equals/not_equals/in/not_in — `whereIn`/`whereNotIn` ignora silenciosamente não-arrays).
+- `Filters\QueryBuilderFilter` (final): `type='queryBuilder'`, `constraints(array)` filtra não-`Constraint`, `applyToQuery` envolve em `where(Closure)` e delega recursivo a `applyConditions`. Suporta `operator: 'AND'|'OR'` no payload e em groups aninhados.
+- **Security guarantee**: cada lookup vai por `findConstraint($field)` contra whitelist declarado. Field desconhecido ou operator fora da lista são silenciosamente descartados — não há caminho de input arbitrário do usuário para nome de coluna SQL.
 
-**Entregue (TABLE-V2-004 — PHP slice):**
+**Column visibility (TABLE-V2-004):**
 
-- **Column visibility flags** — 3 flags fluentes na base `Column`: `togglable(bool=true)`, `hiddenByDefault(bool=true)` (auto-enables `togglable` quando `true` — coluna escondida sem toggle seria invisível para sempre; `togglable(false)` posterior wins), `hiddenOnMobile(bool=true)` (independente).
-- Getters: `isTogglable()`, `isHiddenByDefault()`, `isHiddenOnMobile()`. `toArray()` expõe as 3 chaves no payload Inertia.
-- 9 unit tests (65 total).
-- **Adiado**: React dropdown de column visibility no header + endpoint `POST /admin/user-settings/tables/{resource}` para persistência cross-package + propagação em shared props.
+- 3 flags fluentes na base `Column`: `togglable(bool=true)`, `hiddenByDefault(bool=true)` (auto-enables `togglable` quando `true`; `togglable(false)` posterior wins), `hiddenOnMobile(bool=true)`.
+- Getters `isTogglable/isHiddenByDefault/isHiddenOnMobile`. `toArray()` expõe as 3 chaves no payload Inertia.
 
-**Entregue (TABLE-V2-005 — PHP slice):**
+**Grouping (TABLE-V2-005):**
 
-- **`Arqel\Table\Summaries\Summary`** (abstract base) — agregação declarativa sobre `Collection<int, mixed>`. Construtor `(?string $field = null, ?string $label = null)`. Setters fluentes `field(string)`, `label(string)`. Subclasses declaram `protected string $type` e `compute(Collection): mixed`. `toArray()` emite `{type, field, label}`. Static factory facade na própria base: `Summary::sum/avg/count/min/max($field)` retorna a concrete class apropriada.
-- **5 concretes finais** em `src/Summaries/`: `SumSummary` (default label "Total"), `AvgSummary` ("Average", `Collection::avg()` skipa nulls), `CountSummary` ("Count", aceita field opcional para contar não-null), `MinSummary` ("Minimum"), `MaxSummary` ("Maximum").
-- **`Table::groupBy(string $field, ?Closure $labelResolver = null)`** + **`Table::groupSummaries(array)`** (filtra não-`Summary` silenciosamente). `buildGroups(Collection): array<{label, key, records, summaries}>` — quando `groupBy` é null devolve um único grupo `'All'`; quando set, agrupa via `Collection::groupBy` + computa label per group via resolver (chamado com primeiro record do grupo) + computa cada summary via `compute($groupRecords)`.
-- **`toArray()`** mescla `{groupBy, summaries: [...summary.toArray()]}` ao payload Inertia (groups são computados em render time).
-- 16 testes (9 Summaries + 6 Grouping + 141 total table). React rendering (sticky headers + summary rows) deferida para TABLE-JS-XXX.
+- `Summaries\Summary` (abstract): construtor `(?string $field, ?string $label)`, setters `field/label`, subclasses declaram `protected string $type` + `compute(Collection): mixed`. `toArray()` emite `{type, field, label}`. Static facade `Summary::sum/avg/count/min/max($field)`.
+- 5 concretes finais em `src/Summaries/`: `SumSummary` ("Total"), `AvgSummary` ("Average", skipa nulls), `CountSummary` ("Count", field opcional), `MinSummary`, `MaxSummary`.
+- `Table::groupBy(string $field, ?Closure $labelResolver=null)` + `Table::groupSummaries(array)` (filtra não-`Summary`). `buildGroups(Collection)` devolve `array<{label, key, records, summaries}>` — sem `groupBy` retorna grupo único `'All'`. `toArray()` mescla `{groupBy, summaries}` (groups computados em render time).
 
-**Entregue (TABLE-V2-006 — PHP slice):**
+**Reorderable (TABLE-V2-006):**
 
-- **`Table::reorderable(?string $columnName = 'position')`** — habilita drag-drop reorder de rows. Sem args usa a coluna convencional `position`; passando string custom (ex: `'sort_order'`) usa esse campo; passando `null` desabilita o reorder.
-- Getters: `getReorderColumn(): ?string` e `isReorderable(): bool` (retorna `true` quando `reorderColumn !== null`).
-- `toArray()` mescla a chave `reorderable` (string com nome da coluna ou `null`) no payload Inertia.
-- 6 unit tests em `tests/Unit/Table/ReorderableTest.php`.
-- **Diferido cross-package**: o controller `POST /admin/{resource}/reorder` (atualiza `position` per record via `array_search` no payload `ids[]`) depende de `arqel/core` (`ResourceRegistry::findBySlug` + Policy authorization via `update`). React drag-drop UI (dnd-kit + drag handles + optimistic update com rollback + auto-scroll) deferida para TABLE-JS-XXX. Regra: não permitir reorder quando sort column != reorder column.
+- `Table::reorderable(?string $columnName='position')` — `null` desabilita. Getters `getReorderColumn(): ?string`, `isReorderable(): bool`. `toArray()` mescla chave `reorderable`.
 
-**Entregue (TABLE-V2-007 — PHP slice):**
+**Mobile mode (TABLE-V2-007):**
 
-- **`Table::mobileMode(string)`** + 2 constantes: `Table::MOBILE_MODE_STACKED = 'stacked'` (default) e `Table::MOBILE_MODE_SCROLL = 'scroll'`. Getter `getMobileMode(): string`. `toArray()` mescla `config.mobileMode`.
-- **Defensivo**: valor desconhecido (typo, string vazia, etc.) cai silenciosamente para `'stacked'` — não throw, porque um typo não deve crashar o render do Inertia. O default é a opção segura.
-- 7 unit tests em `tests/Unit/Table/MobileModeTest.php`.
-- **Diferido para `@arqel/ui`**: rendering real de stacked-cards no `<DataTable>` (detect breakpoint via `useBreakpoint()`, em `sm` ou menor renderiza cards com `Card`/checkbox/actions per record). `'scroll'` mantém a tabela horizontal com overflow. Esta PHP slice é só o config flag que o React lê.
+- `Table::mobileMode(string)` + 2 constantes: `MOBILE_MODE_STACKED='stacked'` (default) e `MOBILE_MODE_SCROLL='scroll'`. Valor desconhecido cai silenciosamente para `'stacked'` (typo não deve crashar Inertia render). `toArray()` mescla `config.mobileMode`.
 
-**Diferido para tickets follow-up cross-package:**
+**Pagination types (TABLE-V2-008):**
 
-- **`POST {panel}/{resource}/{id}/inline-update` controller** (TABLE-V2-002) — depende de `arqel/core` para policy authorization + `ResourceRegistry::findBySlug()`
-- **React inline-cell components** (`@arqel/ui` + `@arqel/react`) — TABLE-V2-002
-- **React tree UI do QueryBuilder** (TABLE-V2-003) — drag-drop de groups + value pickers polimórficos
-- Concurrency optimistic via version column (Phase 3)
+- `Table::paginationType(string)` + 4 constantes: `PAGINATION_LENGTH_AWARE` (default), `PAGINATION_SIMPLE`, `PAGINATION_CURSOR`, `PAGINATION_NONE`. Valor desconhecido cai para o default. `toArray()` mescla `config.paginationType`.
 
-**Adiados:**
+**Coverage:** ~141 testes Pest passando (Base 117 + V2-002..008 ≈24: 9 visibility + 16 grouping + 6 reorderable + 7 mobile + outros).
 
-- TABLE-009..013 (advanced filters: relationship-based, range numeric, computed) — Phase 2
-- Persistência de preferências de tabela per-user (column visibility, sort default) — Phase 2
+**Por chegar (cross-package + JS):**
 
-## Key Contracts
+- `POST {panel}/{resource}/{id}/inline-update` controller (TABLE-V2-002 — depende de `arqel/core` `ResourceRegistry::findBySlug` + Policy authorization).
+- React inline-cell components, query-builder tree UI (drag-drop groups + value pickers polimórficos), column-visibility dropdown + persistência cross-package (`POST /admin/user-settings/tables/{resource}`), grouping sticky headers + summary rows render, reorder DnD-kit + auto-scroll + rollback (regra: bloquear reorder quando sort != reorder column), mobile stacked-cards render via `useBreakpoint`.
+- Concurrency optimistic via version column (Phase 3).
+- Adiados Phase 2: TABLE-009..013 (advanced filters: relationship-based, range numeric, computed) e persistência per-user de preferências (column visibility + sort default).
+
+## Conventions
+
+- `declare(strict_types=1)` obrigatório; classes `final` (Columns, Filters, Constraints, Summaries, Table, TableQueryBuilder).
+- Action arrays são `array<int, mixed>` — `arqel/table` não declara dep em `arqel/actions` (circular path-repo).
+- Eager loading inferido de `RelationshipColumn`, não de `BelongsToField` (essa coordenação fica em `EagerLoadingResolver` de `arqel/fields` no contexto de form).
+- Sort whitelisted: `?sort=anything` só funciona se a column declarou `->sortable()`.
+- Visual Query Builder: field/operator whitelist é fonte da verdade — input desconhecido é descartado, não rejeitado com erro.
+- Mobile mode / pagination type: valores inválidos degradam para default, nunca lançam.
+
+## Anti-patterns
+
+- Lógica de query no Column — eager loading via `RelationshipColumn`/`indexQuery`, nunca em `formatState`.
+- Side-effects em columns (logging, eventos) — Columns são definição declarativa.
+- `Column::make('x')->sortable(false)` — basta omitir `sortable()` (default false).
+- Per-row action authorization no client — fonte da verdade é o servidor (`canBeExecutedBy`); React só filtra pelo `record.arqel.actions`.
+- Bulk action sem `chunkSize` quando a operação é pesada — default 100 cobre maioria; ajuste explícito quando o callback faz I/O por record.
+- Constraint custom que aceita `field` arbitrário do payload — sempre validar via `findConstraint($field)` contra o whitelist declarado.
+
+## Examples
+
+Tabela base com columns, filters e actions:
 
 ```php
 use Arqel\Table\Table;
@@ -95,94 +91,69 @@ use Arqel\Table\Columns\{TextColumn, BadgeColumn, DateColumn, RelationshipColumn
 use Arqel\Table\Filters\{SelectFilter, DateRangeFilter, TernaryFilter};
 use Arqel\Actions\Actions;
 
-public function table(): Table
-{
-    return Table::make()
-        ->columns([
-            TextColumn::make('title')->sortable()->searchable()->limit(60),
-            BadgeColumn::make('status')->colors([
-                'draft' => 'gray',
-                'published' => 'green',
-            ]),
-            DateColumn::make('published_at')->displayFormat('d/m/Y H:i')->sortable(),
-            RelationshipColumn::make('author', 'user', 'name')->label('Author'),
-        ])
-        ->filters([
-            SelectFilter::make('status')->options([
-                'draft' => 'Draft',
-                'published' => 'Published',
-            ]),
-            DateRangeFilter::make('created_at'),
-            TernaryFilter::make('is_featured'),
-        ])
-        ->defaultSort('created_at', 'desc')
-        ->perPage(25)
-        ->searchable()
-        ->selectable()
-        ->actions([Actions::edit(), Actions::delete()])
-        ->bulkActions([Actions::deleteBulk()])
-        ->toolbarActions([Actions::create()]);
-}
+return Table::make()
+    ->columns([
+        TextColumn::make('title')->sortable()->searchable()->limit(60),
+        BadgeColumn::make('status')->colors(['draft' => 'gray', 'published' => 'green']),
+        DateColumn::make('published_at')->displayFormat('d/m/Y H:i')->sortable(),
+        RelationshipColumn::make('author', 'user', 'name'),
+    ])
+    ->filters([
+        SelectFilter::make('status')->options(['draft' => 'Draft', 'published' => 'Published']),
+        DateRangeFilter::make('created_at'),
+        TernaryFilter::make('is_featured'),
+    ])
+    ->defaultSort('created_at', 'desc')
+    ->perPage(25)
+    ->searchable()
+    ->selectable()
+    ->actions([Actions::edit(), Actions::delete()])
+    ->bulkActions([Actions::deleteBulk()]);
 ```
 
-`Resource::table()` é detectado por duck-typing em `Arqel\Core\Support\InertiaDataBuilder::isTableObject` (presença de `getColumns/getFilters/getActions/getBulkActions/getToolbarActions`). Quando presente, o `buildTableIndexData` carrega via Reflection o `TableQueryBuilder` para paginar.
+Inline editing com SelectColumn e ToggleColumn:
 
-## Per-row authorization
+```php
+use Arqel\Table\Columns\{SelectColumn, ToggleColumn};
 
-Cada record do payload index carrega:
+SelectColumn::make('status')
+    ->options(['draft' => 'Draft', 'published' => 'Published'])
+    ->rules(['required', 'in:draft,published'])
+    ->debounce(800);
 
-```jsonc
-{
-  "id": 42,
-  "title": "Hello",
-  "arqel": {
-    "title": "Hello",
-    "subtitle": "Daisy",
-    "actions": ["view", "edit"]  // nomes visíveis para este record
-  }
-}
+ToggleColumn::make('is_active')
+    ->onValue('active')
+    ->offValue('inactive')
+    ->readonly(fn ($record) => $record->locked_at !== null);
 ```
 
-`<DataTable>` filtra a lista global de `actions.row` pelo nome contra `record.arqel.actions`. Authorization que falha → action não renderiza para aquele row.
+Visual Query Builder + grouping com summaries:
 
-## Bulk pipeline
+```php
+use Arqel\Table\Filters\QueryBuilderFilter;
+use Arqel\Table\Filters\Constraints\{TextConstraint, NumberConstraint, DateConstraint};
+use Arqel\Table\Summaries\Summary;
 
+Table::make()
+    ->filters([
+        QueryBuilderFilter::make('advanced')->constraints([
+            new TextConstraint('title'),
+            new NumberConstraint('price'),
+            new DateConstraint('published_at'),
+        ]),
+    ])
+    ->groupBy('category', fn ($record) => $record->category->name)
+    ->groupSummaries([
+        Summary::sum('price'),
+        Summary::count(),
+    ]);
 ```
-POST /admin/posts/bulk-actions/publish_all
-body: { ids: [1, 2, 3, ..., 250] }
-
-ActionController::invokeBulk
-  -> resolve Resource by slug
-  -> resolve action by name in bulkActions()
-  -> Model::whereIn(key, ids).get()  // fetch all once
-  -> Action::canBeExecutedBy($user, $records)
-  -> BulkAction::execute(Collection)
-       -> Collection::chunk(chunkSize)  // default 100
-       -> for each chunk: parent::execute($chunk, $data)
-  -> redirect back with success/error flash
-```
-
-## Conventions
-
-- `declare(strict_types=1)` obrigatório
-- Classes `final` (Columns, Filters, Table, TableQueryBuilder)
-- **Action arrays são `array<int, mixed>`** — `arqel/table` não declara dep em `arqel/actions` para evitar circular path-repo (ambos dependem de `arqel/core`)
-- Eager loading **inferido de `RelationshipColumn`**, não de `BelongsToField` (essa coordenação fica no `EagerLoadingResolver` de `arqel/fields` no contexto de form)
-- Sort whitelisted — passar `?sort=anything` na query string só funciona se a column declarou `->sortable()`
-
-## Anti-patterns
-
-- ❌ **Lógica de query no Column** — eager loading via `RelationshipColumn`/`indexQuery`, nunca no `formatState`
-- ❌ **Side-effects em columns** (logging, eventos) — Columns são definição declarativa
-- ❌ **`Column::make('x')->sortable(false)`** — basta omitir `sortable()` (default false)
-- ❌ **Per-row action authorization no client** — fonte da verdade é o servidor (`canBeExecutedBy` na Action). React só filtra pelo `record.arqel.actions`
-- ❌ **Bulk action sem `chunkSize`** quando a operação é pesada — default 100 cobre maioria; ajuste explícito quando o callback faz I/O por record
 
 ## Related
 
 - Source: [`packages/table/src/`](./src/)
-- Testes: [`packages/table/tests/`](./tests/) (117 testes Pest passando)
-- Tickets: [`PLANNING/08-fase-1-mvp.md`](../../PLANNING/08-fase-1-mvp.md) §TABLE-001..008
+- Testes: [`packages/table/tests/`](./tests/)
+- Tickets: [`PLANNING/08-fase-1-mvp.md`](../../PLANNING/08-fase-1-mvp.md) §TABLE-001..008 + [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §TABLE-V2-002..010
 - API: [`PLANNING/05-api-php.md`](../../PLANNING/05-api-php.md) §Table
 - Per-row impl: [`packages/core/src/Support/InertiaDataBuilder.php`](../../packages/core/src/Support/InertiaDataBuilder.php) (`resolveVisibleActionNames`)
 - Bulk impl: [`packages/actions/src/Http/Controllers/ActionController.php`](../../packages/actions/src/Http/Controllers/ActionController.php) (`invokeBulk`)

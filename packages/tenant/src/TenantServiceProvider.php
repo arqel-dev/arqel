@@ -61,6 +61,8 @@ final class TenantServiceProvider extends PackageServiceProvider
 
             return new TenantManager($resolver, $events);
         });
+
+        $this->app->singleton(Theming\TenantThemeResolver::class);
     }
 
     public function packageBooted(): void

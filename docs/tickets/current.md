@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27..#33): scaffolds + AI-003..008 PHP + AI-007 React (@arqel/ai novo pacote) ✅ · RT-003/004/008/009/010 ✅ · WF-003..007 (incl. StateTransition history + auto-persist listener) ✅. Total Fase 3 ≈ 73 ai + 35 realtime + 46 workflow PHP + 17 workflow JS + 19 realtime JS + 10 ai JS = ~200 testes diretos.** Próximo: AI-009 AiSelectField + AI-010 AiExtractField, RT-011 testes E2E, WF-008 filter records by state, AiTranslateInput React component (B34).
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27..#34): AI-003..009 PHP + AI-007/008 React ✅ · RT-003/004/008/009/010 ✅ · WF-003..008 (StateFilter + factory) ✅. Total Fase 3 ≈ 84 ai + 35 realtime + 58 workflow PHP + 17 workflow JS + 19 realtime JS + 21 ai JS = ~234 testes diretos.** Próximo: AI-010 AiExtractField + AI-011 AiImageField, RT-011 E2E, WF-009 testes coverage, AiSelectInput React.
 
 **Fase:** 1 (MVP)
 

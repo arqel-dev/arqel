@@ -88,7 +88,31 @@ config()->set('arqel-workflow.history.enabled', false);
 $order->transitionTo(NewState::class); // não grava em arqel_state_transitions
 ```
 
-**Por chegar (WF-008+ — diferidos):**
+**Entregue (WF-008):**
+
+- **`Arqel\Workflow\Filters\StateFilter`** (final readonly) — filtro standalone que extrai automaticamente as options do `WorkflowDefinition` de um Eloquent model com trait `HasWorkflow`. Construtor recebe `(string $field, class-string<Model> $modelClass)` e valida defensivamente que a classe existe + usa o trait (lança `InvalidArgumentException` caso contrário). Métodos:
+  - `make($field, $modelClass): self` — factory.
+  - `toArray(): array{field, type: 'state', label: 'State', options}` — payload pronto para Inertia / consumo do `arqel/table` no user-land.
+  - `optionsArray(): array<string, {value, label, color, icon}>` — keyed pelo state class/token, com metadata derivada de `WorkflowDefinition::getStateMetadata()`.
+  - `apply(Builder $query, mixed $value): void` — string aplica `where`, array aplica `whereIn`, null/empty/array vazio é no-op silencioso.
+- **`Arqel\Workflow\Filters\StateFilterFactory::forResource($modelClass, ?$field = null)`** — helper que resolve o `field` automaticamente via `arqelWorkflow()->getField()` quando o segundo argumento é omitido. Mesma validação defensiva.
+- **Sem hard-dep em `arqel/table`** — design intent. O `arqel/workflow` continua standalone; integração com `arqel/table` é responsabilidade do user-land (plug `StateFilter::toArray()` em `Table::filters([...])` ou exponha o `apply()` callback diretamente).
+- **12 Pest tests** novos em `tests/Unit/Filters/StateFilterTest.php`: factory, shape do `toArray()`, `optionsArray()` por state, `apply()` com string/array/null/empty/array vazio, defensive throws (sem trait, classe inexistente, field vazio), `StateFilterFactory::forResource()` resolve field e respeita override. **Total acumulado: 58 testes**.
+
+Exemplo de integração com `arqel/table` no user-land:
+
+```php
+use Arqel\Workflow\Filters\StateFilter;
+use Arqel\Workflow\Filters\StateFilterFactory;
+
+Table::make()->filters([
+    StateFilter::make('order_state', Order::class),
+    // ou via factory (resolve o field automaticamente):
+    StateFilterFactory::forResource(Order::class),
+]);
+```
+
+**Por chegar (WF-009+ — diferidos):**
 
 - `Http\Controllers\TransitionController` — endpoint `POST /admin/{resource}/{record}/transition/{transition}` que valida + dispara a transição (depende do registro `arqel/core` Resource + auth).
 - `WorkflowVisualizer` React component — diagrama interativo do workflow (states + transitions) consumindo `WorkflowDefinition::toArray()`.

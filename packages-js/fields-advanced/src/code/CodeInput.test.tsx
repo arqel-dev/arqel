@@ -5,9 +5,22 @@
  */
 
 import type { FieldSchema } from '@arqel/types/fields';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+
+// Mock the dynamic `import('shiki')` so tests don't pull the real
+// (~1MB) WASM-backed Shiki bundle into the jsdom env. The mock returns
+// a faux highlighter that emits a recognisable colored span — enough
+// to assert the overlay layer wires up correctly.
+vi.mock('shiki', () => {
+  const codeToHtml = (code: string, opts: { lang: string; theme: string }) =>
+    `<pre class="shiki" style="background-color:#0d1117" data-shiki-lang="${opts.lang}" data-shiki-theme="${opts.theme}"><code><span style="color:#ff7b72">${code}</span></code></pre>`;
+  return {
+    createHighlighter: vi.fn(async () => ({ codeToHtml })),
+  };
+});
+
 import { CodeInput } from './CodeInput.js';
 
 interface CodeProps {
@@ -166,5 +179,72 @@ describe('<CodeInput>', () => {
     await user.click(button);
 
     expect(screen.getByRole('button', { name: 'Exit fullscreen' })).toBeInTheDocument();
+  });
+
+  /* ------------------------------------------------------------------------ */
+  /* Shiki overlay layer                                                      */
+  /* ------------------------------------------------------------------------ */
+
+  it('renders the Shiki overlay with colored tokens for known languages', async () => {
+    const onChange = vi.fn();
+    render(
+      <CodeInput
+        field={buildField({ language: 'javascript' })}
+        value="const x = 1"
+        onChange={onChange}
+      />,
+    );
+
+    const overlay = screen.getByTestId('code-overlay');
+    // Wait for the lazy `import('shiki')` + createHighlighter to resolve.
+    await waitFor(() => {
+      expect(overlay.innerHTML).toContain('<span style="color:');
+    });
+    expect(overlay.innerHTML).toContain('data-shiki-lang="javascript"');
+  });
+
+  it('skips Shiki for plaintext language (no colored tokens, just escaped text)', async () => {
+    const onChange = vi.fn();
+    render(
+      <CodeInput
+        field={buildField({ language: 'plaintext' })}
+        value="hello <world>"
+        onChange={onChange}
+      />,
+    );
+
+    const overlay = screen.getByTestId('code-overlay');
+    // No async work — should be the static fallback already.
+    expect(overlay.innerHTML).toContain('shiki-fallback');
+    // The angle brackets must be escaped, not rendered as a tag.
+    expect(overlay.innerHTML).toContain('hello &lt;world&gt;');
+    // No colored token spans from the Shiki mock.
+    expect(overlay.innerHTML).not.toContain('data-shiki-lang');
+
+    // Give any pending microtasks a chance to settle and confirm we
+    // still didn't switch to a Shiki-rendered output.
+    await new Promise((r) => setTimeout(r, 10));
+    expect(overlay.innerHTML).not.toContain('data-shiki-lang');
+  });
+
+  it('falls back to plaintext rendering for unknown languages without throwing', async () => {
+    const onChange = vi.fn();
+    expect(() => {
+      render(
+        <CodeInput
+          field={buildField({ language: 'unknown-fake-lang' })}
+          value="abc"
+          onChange={onChange}
+        />,
+      );
+    }).not.toThrow();
+
+    const overlay = screen.getByTestId('code-overlay');
+    expect(overlay.innerHTML).toContain('shiki-fallback');
+    expect(overlay.innerHTML).toContain('abc');
+
+    // Confirm we never invoked Shiki for this unknown language.
+    await new Promise((r) => setTimeout(r, 10));
+    expect(overlay.innerHTML).not.toContain('data-shiki-lang');
   });
 });

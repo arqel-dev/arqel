@@ -84,7 +84,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@arqel/types": "workspace:*"
+    "@arqel/types": "workspace:*",
+    "shiki": "^3.0.0"
   },
   "peerDependencies": {
     "@arqel/ui": "workspace:*",

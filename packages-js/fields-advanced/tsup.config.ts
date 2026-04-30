@@ -20,5 +20,5 @@ export default defineConfig({
   treeshake: true,
   splitting: false,
   minify: false,
-  external: ['react', 'react-dom', '@arqel/ui', '@arqel/types', '@inertiajs/react'],
+  external: ['react', 'react-dom', '@arqel/ui', '@arqel/types', '@inertiajs/react', 'shiki'],
 });

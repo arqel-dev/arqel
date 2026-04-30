@@ -6,6 +6,7 @@ namespace Arqel\Workflow\Concerns;
 
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
+use Illuminate\Database\Eloquent\Model;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -25,7 +26,7 @@ use ReflectionMethod;
  *
  * @method WorkflowDefinition arqelWorkflow()
  *
- * @phpstan-require-extends \Illuminate\Database\Eloquent\Model
+ * @phpstan-require-extends Model
  */
 trait HasWorkflow
 {
@@ -114,7 +115,7 @@ trait HasWorkflow
      * `from()` method is considered always-available; otherwise the
      * current state key must appear in its `from()` list.
      *
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionApplies(string $transition, ?string $current): bool
     {

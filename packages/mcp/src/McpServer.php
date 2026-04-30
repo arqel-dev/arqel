@@ -35,6 +35,8 @@ final class McpServer
     private const SERVER_VERSION = '0.1.0-alpha';
 
     /** JSON-RPC 2.0 error codes. */
+    private const ERROR_PARSE = -32700;
+
     private const ERROR_INVALID_REQUEST = -32600;
 
     private const ERROR_METHOD_NOT_FOUND = -32601;
@@ -211,13 +213,36 @@ final class McpServer
      * stdio loop: read newline-delimited JSON-RPC requests from STDIN,
      * write responses to STDOUT. One JSON object per line.
      *
-     * Not unit-tested directly (stdio-bound) — `handleRequest()` carries
-     * the dispatch logic and is exercised by the unit suite.
+     * Thin wrapper over {@see serveStreams()} bound to the real stdio
+     * descriptors; the testable loop lives in `serveStreams()` and is
+     * exercised end-to-end by `tests/Feature/McpConversationTest.php`
+     * via `php://memory` handles.
      */
     public function serve(): void
     {
         // @codeCoverageIgnoreStart
-        while (($line = fgets(STDIN)) !== false) {
+        $this->serveStreams(STDIN, STDOUT);
+        // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * Newline-delimited JSON-RPC loop over arbitrary stream resources.
+     *
+     * Reads one JSON object per line from `$input` until EOF, dispatches
+     * each through {@see handleRequest()}, and writes the response (if
+     * any) to `$output` followed by `PHP_EOL`. Malformed JSON lines emit
+     * a `-32700` Parse error response and the loop continues.
+     *
+     * Decoupling the loop from `STDIN`/`STDOUT` makes the full MCP
+     * conversation testable against `fopen('php://memory', 'rw')`
+     * handles without forking a subprocess.
+     *
+     * @param resource $input Readable stream resource.
+     * @param resource $output Writable stream resource.
+     */
+    public function serveStreams($input, $output): void
+    {
+        while (($line = fgets($input)) !== false) {
             $line = trim($line);
             if ($line === '') {
                 continue;
@@ -226,8 +251,8 @@ final class McpServer
             /** @var mixed $decoded */
             $decoded = json_decode($line, true);
             if (! is_array($decoded)) {
-                $response = $this->errorResponse(null, self::ERROR_INVALID_REQUEST, 'Invalid Request');
-                fwrite(STDOUT, json_encode($response, JSON_UNESCAPED_SLASHES).PHP_EOL);
+                $response = $this->errorResponse(null, self::ERROR_PARSE, 'Parse error');
+                fwrite($output, json_encode($response, JSON_UNESCAPED_SLASHES).PHP_EOL);
 
                 continue;
             }
@@ -237,9 +262,8 @@ final class McpServer
                 continue;
             }
 
-            fwrite(STDOUT, json_encode($response, JSON_UNESCAPED_SLASHES).PHP_EOL);
+            fwrite($output, json_encode($response, JSON_UNESCAPED_SLASHES).PHP_EOL);
         }
-        // @codeCoverageIgnoreEnd
     }
 
     /**

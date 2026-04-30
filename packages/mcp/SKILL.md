@@ -79,14 +79,28 @@ Configuração para Claude Desktop (`~/Library/Application Support/Claude/claude
 
 Setup guides para Cursor e Windsurf (e exemplos por tool) ficam em DOCS-V2-001 (cross-package).
 
+### Integration testing (MCP-009 scoped)
+
+`McpServer::serveStreams(resource $input, resource $output): void` é o entrypoint testável do loop newline-delimited. `serve()` virou wrapper finíssimo que chama `serveStreams(STDIN, STDOUT)`. Testes de integração em `tests/Feature/McpConversationTest.php` simulam conversações completas Claude Desktop / Cursor escrevendo JSON-RPC em `php://memory` e relendo a saída:
+
+```php
+$input = fopen('php://memory', 'rw+');
+fwrite($input, json_encode(['jsonrpc' => '2.0', 'id' => 1, 'method' => 'initialize'])."\n");
+rewind($input);
+$output = fopen('php://memory', 'rw+');
+$server->serveStreams($input, $output);
+```
+
+Linha JSON malformada → `-32700` Parse error e o loop segue. Integração manual com Claude Code/Cursor + setup guides ficam em DOCS-V2-001.
+
 ### Coverage
 
-- **Total: 87 testes Pest, 267 asserções**
+- **Total: 93 testes Pest, 306 asserções**
 - `tests/Unit/McpServerTest.php` — 22 (envelope JSON-RPC, dispatch, wrapping, erros, notifications, coerção de params/arguments)
 - `tests/Unit/Tools/` — 26 (ListResources 5 + DescribeResource 6 + GenerateResource 5 + RunTest 10)
 - `tests/Unit/Resources/SkillResourceTest.php` — 9
 - `tests/Unit/Prompts/` — 13 (Migrate 7 + Review 6)
-- `tests/Feature/` — 17 (auto-registro de cada tool/resource/prompt + dispatch via `handleRequest`)
+- `tests/Feature/` — 23 (auto-registro de cada tool/resource/prompt + dispatch via `handleRequest` + 6 conversation tests via `serveStreams` em `php://memory`)
 
 ## Conventions
 

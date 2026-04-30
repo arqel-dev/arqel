@@ -66,6 +66,31 @@ Gate::define('view-resource-presence', fn ($user, string $resource, string|int $
 );
 ```
 
+**Entregue (RT-009 — Broadcasting authorization middleware):**
+
+- **`routes/channels.php`** registra os 4 patterns canónicos do Arqel: list, per-record, action progress e presence
+- **`Arqel\Realtime\Channels\ResourceChannelAuthorizer`** (final readonly) — helper estático com 3 métodos (`authorizeResource`, `authorizeRecord`, `authorizeActionJob`) que concentra a lógica de Gate-checking. Os callbacks em `routes/channels.php` apenas delegam, mantendo o auth testável sem broadcast machinery
+- **Defensive by default**: cada método encapsula a lógica em `try/catch \Throwable` e regista via `Log::warning()` em caso de falha. Sem `arqel/core` no container (`app()->bound(...)` retorna `false`), o authorizer denega por defeito ao invés de explodir — preservando o desacoplamento opcional com o core
+- **13 testes adicionais** (10 unit + 3 feature). Total do pacote: **35 testes**
+
+### Channel authorization (RT-009) — exemplo
+
+| Pattern | Método do authorizer | Gate verificado |
+| --- | --- | --- |
+| `arqel.{resource}` | `authorizeResource` | `viewAny` no model class |
+| `arqel.{resource}.{recordId}` | `authorizeRecord` | `view` no model record |
+| `arqel.action.{jobId}` | `authorizeActionJob` | `Cache::get("arqel.action.{jobId}.user") === $user->getAuthIdentifier()` |
+| `arqel.presence.{resource}.{recordId}` | callback inline (RT-004) | Gate opcional `view-resource-presence` |
+
+```php
+// App-level Gate definitions (em AuthServiceProvider ou similar):
+Gate::define('viewAny', fn ($user, string $modelClass) => $user->can('view-list', $modelClass));
+Gate::define('view', fn ($user, $record) => $user->id === $record->owner_id);
+
+// Action progress: o job grava o owner antes de dispatch.
+Cache::put("arqel.action.{$jobId}.user", auth()->id(), now()->addMinutes(30));
+```
+
 **Diferido (RT-003+, fora do escopo deste batch):**
 
 - React hook `useResourceUpdates` + Inertia `router.reload` (RT-003) — Camada `react`, fica para o próximo ticket JS

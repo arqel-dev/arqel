@@ -21,8 +21,8 @@ final readonly class PresenceChannelResolver
     /**
      * Resolve the presence channel name for the given Resource slug + record id.
      *
-     * @param string $slug Resource slug (e.g., `posts`).
-     * @param int|string $recordId Primary key of the record being viewed.
+     * @param  string  $slug  Resource slug (e.g., `posts`).
+     * @param  int|string  $recordId  Primary key of the record being viewed.
      *
      * @throws RealtimeException When presence is globally disabled.
      */

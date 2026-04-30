@@ -249,9 +249,6 @@ importers:
 
   packages-js/realtime:
     dependencies:
-      '@inertiajs/react':
-        specifier: ^3.0.0
-        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       laravel-echo:
         specifier: ^2.0.0
         version: 2.3.4(pusher-js@8.5.0)(socket.io-client@4.8.3)
@@ -259,15 +256,27 @@ importers:
         specifier: ^8.4.0
         version: 8.5.0
     devDependencies:
+      '@inertiajs/react':
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@testing-library/react':
+        specifier: ^16.1.0
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.2.3(@types/react@19.2.14)
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
       react:
         specifier: ^19.0.0
         version: 19.2.5
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.12)(typescript@5.9.3)(yaml@2.8.3)

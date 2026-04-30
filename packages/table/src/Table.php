@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Arqel\Table;
 
+use Arqel\Table\Summaries\Summary;
+use Closure;
+use Illuminate\Support\Collection;
+
 /**
  * Fluent builder for Resource tables.
  *
@@ -65,6 +69,13 @@ final class Table
     protected bool $striped = false;
 
     protected bool $compact = false;
+
+    protected ?string $groupBy = null;
+
+    protected ?Closure $groupLabelResolver = null;
+
+    /** @var array<int, Summary> */
+    protected array $groupSummaries = [];
 
     /**
      * @param array<int, mixed> $columns
@@ -182,6 +193,121 @@ final class Table
         return $this;
     }
 
+    public function groupBy(string $field, ?Closure $labelResolver = null): self
+    {
+        $this->groupBy = $field;
+        $this->groupLabelResolver = $labelResolver;
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, mixed> $summaries
+     */
+    public function groupSummaries(array $summaries): self
+    {
+        $this->groupSummaries = array_values(array_filter(
+            $summaries,
+            static fn (mixed $summary): bool => $summary instanceof Summary,
+        ));
+
+        return $this;
+    }
+
+    public function getGroupBy(): ?string
+    {
+        return $this->groupBy;
+    }
+
+    public function getGroupLabel(mixed $record): string
+    {
+        if ($this->groupLabelResolver !== null) {
+            return (string) ($this->groupLabelResolver)($record);
+        }
+
+        if ($this->groupBy === null) {
+            return '';
+        }
+
+        $value = data_get($record, $this->groupBy);
+
+        return $value === null ? '' : (string) $value;
+    }
+
+    /** @return array<int, Summary> */
+    public function getGroupSummaries(): array
+    {
+        return $this->groupSummaries;
+    }
+
+    /**
+     * Build groups against a Collection of records.
+     *
+     * Returns a list of `{label, key, records, summaries}`. When no
+     * `groupBy` is configured, a single synthetic group `'All'` is
+     * returned with all records and the configured summaries
+     * computed against them. The render layer (React) consumes this
+     * shape — the schema itself only carries the configuration via
+     * `toArray()`.
+     *
+     * @param Collection<int, mixed> $records
+     *
+     * @return array<int, array{label: string, key: mixed, records: Collection<int, mixed>, summaries: array<int, array{type: string, field: ?string, label: ?string, value: mixed}>}>
+     */
+    public function buildGroups(Collection $records): array
+    {
+        if ($this->groupBy === null) {
+            return [[
+                'label' => 'All',
+                'key' => null,
+                'records' => $records,
+                'summaries' => $this->computeSummaries($records),
+            ]];
+        }
+
+        $field = $this->groupBy;
+
+        $grouped = $records->groupBy(static fn (mixed $record): string => (string) data_get($record, $field));
+
+        $groups = [];
+
+        foreach ($grouped as $key => $groupRecords) {
+            /** @var Collection<int, mixed> $groupRecords */
+            $first = $groupRecords->first();
+            $label = $this->groupLabelResolver !== null
+                ? (string) ($this->groupLabelResolver)($first)
+                : (string) $key;
+
+            $groups[] = [
+                'label' => $label,
+                'key' => $key,
+                'records' => $groupRecords,
+                'summaries' => $this->computeSummaries($groupRecords),
+            ];
+        }
+
+        return $groups;
+    }
+
+    /**
+     * @param Collection<int, mixed> $records
+     *
+     * @return array<int, array{type: string, field: ?string, label: ?string, value: mixed}>
+     */
+    protected function computeSummaries(Collection $records): array
+    {
+        $out = [];
+
+        foreach ($this->groupSummaries as $summary) {
+            $out[] = array_merge(
+                $summary->toArray(),
+                ['value' => $summary->compute($records)],
+            );
+        }
+
+        return $out;
+    }
+
     /** @return array<int, mixed> */
     public function getColumns(): array
     {
@@ -288,6 +414,11 @@ final class Table
                 'description' => $this->emptyStateDescription,
                 'icon' => $this->emptyStateIcon,
             ] : null,
+            'groupBy' => $this->groupBy,
+            'summaries' => array_map(
+                static fn (Summary $summary): array => $summary->toArray(),
+                $this->groupSummaries,
+            ),
         ];
     }
 }

@@ -52,6 +52,14 @@
 - 9 unit tests (65 total).
 - **Adiado**: React dropdown de column visibility no header + endpoint `POST /admin/user-settings/tables/{resource}` para persistência cross-package + propagação em shared props.
 
+**Entregue (TABLE-V2-005 — PHP slice):**
+
+- **`Arqel\Table\Summaries\Summary`** (abstract base) — agregação declarativa sobre `Collection<int, mixed>`. Construtor `(?string $field = null, ?string $label = null)`. Setters fluentes `field(string)`, `label(string)`. Subclasses declaram `protected string $type` e `compute(Collection): mixed`. `toArray()` emite `{type, field, label}`. Static factory facade na própria base: `Summary::sum/avg/count/min/max($field)` retorna a concrete class apropriada.
+- **5 concretes finais** em `src/Summaries/`: `SumSummary` (default label "Total"), `AvgSummary` ("Average", `Collection::avg()` skipa nulls), `CountSummary` ("Count", aceita field opcional para contar não-null), `MinSummary` ("Minimum"), `MaxSummary` ("Maximum").
+- **`Table::groupBy(string $field, ?Closure $labelResolver = null)`** + **`Table::groupSummaries(array)`** (filtra não-`Summary` silenciosamente). `buildGroups(Collection): array<{label, key, records, summaries}>` — quando `groupBy` é null devolve um único grupo `'All'`; quando set, agrupa via `Collection::groupBy` + computa label per group via resolver (chamado com primeiro record do grupo) + computa cada summary via `compute($groupRecords)`.
+- **`toArray()`** mescla `{groupBy, summaries: [...summary.toArray()]}` ao payload Inertia (groups são computados em render time).
+- 16 testes (9 Summaries + 6 Grouping + 141 total table). React rendering (sticky headers + summary rows) deferida para TABLE-JS-XXX.
+
 **Diferido para tickets follow-up cross-package:**
 
 - **`POST {panel}/{resource}/{id}/inline-update` controller** (TABLE-V2-002) — depende de `arqel/core` para policy authorization + `ResourceRegistry::findBySlug()`

@@ -7,6 +7,7 @@ namespace Arqel\Mcp;
 use Arqel\Mcp\Tools\DescribeResourceTool;
 use Arqel\Mcp\Tools\GenerateResourceTool;
 use Arqel\Mcp\Tools\ListResourcesTool;
+use Arqel\Mcp\Tools\RunTestTool;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -59,6 +60,15 @@ final class McpServiceProvider extends PackageServiceProvider
             $generateSchema['description'],
             $generateSchema['inputSchema'],
             static fn (array $params): array => $generateResource($params),
+        );
+
+        $runTest = new RunTestTool;
+        $runTestSchema = $runTest->schema();
+        $server->registerTool(
+            $runTestSchema['name'],
+            $runTestSchema['description'],
+            $runTestSchema['inputSchema'],
+            static fn (array $params): array => $runTest($params),
         );
     }
 }

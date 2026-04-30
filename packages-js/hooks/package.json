@@ -62,6 +62,10 @@
     "./useOptimistic": {
       "types": "./dist/useOptimistic.d.ts",
       "import": "./dist/useOptimistic.js"
+    },
+    "./useResourceUpdates": {
+      "types": "./dist/useResourceUpdates.d.ts",
+      "import": "./dist/useResourceUpdates.js"
     }
   },
   "files": [

@@ -13,6 +13,7 @@ export default defineConfig({
     useNavigation: 'src/useNavigation.ts',
     useBreakpoint: 'src/useBreakpoint.ts',
     useOptimistic: 'src/useOptimistic.ts',
+    useResourceUpdates: 'src/useResourceUpdates.ts',
   },
   format: ['esm'],
   dts: true,

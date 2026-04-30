@@ -22,5 +22,12 @@ export { useNavigation } from './useNavigation.js';
 export { useArqelOptimistic } from './useOptimistic.js';
 export type { UseResourceResult } from './useResource.js';
 export { useResource } from './useResource.js';
+export type {
+  EchoChannelLike,
+  EchoLike,
+  ResourceUpdatePayload,
+  UseResourceUpdatesOptions,
+} from './useResourceUpdates.js';
+export { useResourceUpdates } from './useResourceUpdates.js';
 export type { TableSort, UseTableOptions, UseTableResult } from './useTable.js';
 export { useTable } from './useTable.js';

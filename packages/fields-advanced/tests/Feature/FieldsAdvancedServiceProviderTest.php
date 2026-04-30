@@ -11,6 +11,7 @@ use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
 use Arqel\FieldsAdvanced\Types\TagsField;
+use Arqel\FieldsAdvanced\Types\WizardField;
 
 it('boots the FieldsAdvancedServiceProvider without errors', function (): void {
     $provider = app()->getProvider(FieldsAdvancedServiceProvider::class);
@@ -84,4 +85,13 @@ it('registers the tags macro on the FieldFactory', function (): void {
 
     expect($field)->toBeInstanceOf(TagsField::class)
         ->and($field->getName())->toBe('categories');
+});
+
+it('registers the wizard macro on the FieldFactory', function (): void {
+    expect(FieldFactory::hasType('wizard'))->toBeTrue();
+
+    $field = FieldFactory::wizard('signup');
+
+    expect($field)->toBeInstanceOf(WizardField::class)
+        ->and($field->getName())->toBe('signup');
 });

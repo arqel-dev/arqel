@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..005 PHP slices ✅ · CMDPAL-001/002 ✅) + 9 bugs do dogfooding fechados + Batch #1..#15 paralelos completos.** Próximo natural: TABLE-V2-006 (Reorderable rows), TABLE-V2-007 (Stacked rows mobile), MCP-009 (integration tests), CMDPAL-003 (React command palette), DOCS-V2-001 (docs guides).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..007 PHP slices ✅ · CMDPAL-001/002/005 ✅) + 9 bugs do dogfooding fechados + Batch #1..#16 paralelos completos.** Próximo natural: TABLE-V2-008 (Infinite scroll Inertia 3 merge), TABLE-V2-009 (testes), TABLE-V2-010 (SKILL polish), MCP-009 (integration tests), DOCS-V2-001/002 (docs).
 
 **Fase:** 1 (MVP)
 

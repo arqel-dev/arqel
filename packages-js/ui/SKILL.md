@@ -103,6 +103,10 @@ export default function UsersIndex(props: ResourceIndexProps<User>) {
 - `pnpm test` para watch, `pnpm exec vitest run --coverage` para relatório
 - Coverage atual: ~67% global; barrels (`index.ts`) e overlay mobile do Sidebar (Base UI Portal) baixam o número
 
+### Coverage
+
+- Total: 126 testes Vitest passando (inclui surface tests para `widgets/` e `palette/` garantindo o contrato de import dos consumidores)
+
 ## Related
 
 - Tickets: [`PLANNING/08-fase-1-mvp.md`](../../PLANNING/08-fase-1-mvp.md) §UI-001..007

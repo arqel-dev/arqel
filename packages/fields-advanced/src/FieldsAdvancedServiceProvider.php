@@ -11,6 +11,7 @@ use Arqel\FieldsAdvanced\Types\KeyValueField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
+use Arqel\FieldsAdvanced\Types\TagsField;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -38,5 +39,6 @@ final class FieldsAdvancedServiceProvider extends PackageServiceProvider
         FieldFactory::register('repeater', RepeaterField::class);
         FieldFactory::register('builder', BuilderField::class);
         FieldFactory::register('keyValue', KeyValueField::class);
+        FieldFactory::register('tags', TagsField::class);
     }
 }

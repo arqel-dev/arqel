@@ -10,6 +10,7 @@ use Arqel\FieldsAdvanced\Types\KeyValueField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
+use Arqel\FieldsAdvanced\Types\TagsField;
 
 it('boots the FieldsAdvancedServiceProvider without errors', function (): void {
     $provider = app()->getProvider(FieldsAdvancedServiceProvider::class);
@@ -74,4 +75,13 @@ it('registers the keyValue macro on the FieldFactory', function (): void {
 
     expect($field)->toBeInstanceOf(KeyValueField::class)
         ->and($field->getName())->toBe('headers');
+});
+
+it('registers the tags macro on the FieldFactory', function (): void {
+    expect(FieldFactory::hasType('tags'))->toBeTrue();
+
+    $field = FieldFactory::tags('categories');
+
+    expect($field)->toBeInstanceOf(TagsField::class)
+        ->and($field->getName())->toBe('categories');
 });

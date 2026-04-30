@@ -4,50 +4,137 @@
 
 ## Purpose
 
-`arqel/fields-advanced` agrupa os field types "ricos" que não fazem parte do core `arqel/fields`: editores WYSIWYG (RichText/Tiptap), Markdown, Code (Monaco), estruturas dinâmicas (Repeater, Builder, KeyValue, Tags) e fluxos multi-step (Wizard). Cada type registra-se no `Arqel\Fields\FieldFactory` no `packageBooted` do provider, mantendo a ergonomia única `FieldFactory::richText('content')`.
+`arqel/fields-advanced` agrupa os field types "ricos" que não fazem parte do core `arqel/fields`: editores WYSIWYG (RichText/Tiptap), Markdown (CodeMirror + preview), Code (CodeMirror + Shiki), estruturas dinâmicas (Repeater, Builder, KeyValue, Tags) e fluxos multi-step (Wizard). Cada type registra-se no `Arqel\Fields\FieldFactory` no `packageBooted` do provider, mantendo a ergonomia única `FieldFactory::richText('content')`.
 
-A separação core × advanced existe porque estes types arrastam dependências JS pesadas (Tiptap, Monaco) e padrões de UI mais opinionados — manter o `arqel/fields` enxuto preserva o tempo de boot e o bundle size em panels que só usam inputs simples.
+A separação core × advanced existe porque estes types arrastam dependências JS pesadas (Tiptap, CodeMirror, Shiki) e padrões de UI mais opinionados — manter o `arqel/fields` enxuto preserva o tempo de boot e o bundle size em panels que só usam inputs simples.
 
 ## Status
 
-**Entregue (FIELDS-ADV-001..009):**
+**Setup (FIELDS-ADV-001):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\FieldsAdvanced\` → `src/`, deps em `arqel/core` + `arqel/fields` via path repos)
-- `FieldsAdvancedServiceProvider` (final, auto-discovered) registra `richText`, `markdown`, `code`, `repeater`, `builder`, `keyValue`, `tags` e `wizard` no `FieldFactory` (8 macros)
-- **`Arqel\FieldsAdvanced\Types\RichTextField`** (final, extends `Arqel\Fields\Field`) — `type='richText'`, `component='RichTextInput'`. Setters fluentes `toolbar(array)` (drop silencioso de não-strings), `imageUploadDisk(string)`, `imageUploadDirectory(string)`, `maxLength(int)` (clamp ≥1, default 65535), `fileAttachments(bool=true)`, `customMarks(array)` (filtra não-strings), `mentionable(array)` (filtra entries sem `id`+`name` válidos; aceita `avatar` opcional). `getTypeSpecificProps()` devolve `{toolbar, imageUploadRoute, imageUploadDirectory, maxLength, fileAttachments, customMarks, mentionable}` — `imageUploadRoute` é `null` enquanto nenhum disk for configurado, caso contrário a string `/arqel/fields/upload?disk=<disk>` (sem `route()` para o campo permanecer testável fora de contexto HTTP)
-- **`Arqel\FieldsAdvanced\Types\MarkdownField`** (final, extends `Arqel\Fields\Field`) — `type='markdown'`, `component='MarkdownInput'`. Setters fluentes `preview(bool=true)`, `previewMode(string)` com paleta `'side-by-side' | 'tab' | 'popup'` (constantes `PREVIEW_MODE_SIDE_BY_SIDE/TAB/POPUP`; valores desconhecidos fazem fallback silencioso para `'side-by-side'`), `toolbar(bool=true)`, `rows(int)` (clamp ≥3, default 10), `fullscreen(bool=true)` e o knob extra `syncScroll(bool=true)` (sincroniza scroll entre editor e preview). `getTypeSpecificProps()` devolve `{preview, previewMode, toolbar, rows, fullscreen, syncScroll}`. Defaults preservam UX out-of-the-box: preview lado-a-lado, toolbar visível, fullscreen disponível, scroll sincronizado. Sanitização Markdown→HTML é responsabilidade do consumidor (PHP é config-only); a preview React usa `remark` + `rehype-sanitize` como camada client-side
-- **`Arqel\FieldsAdvanced\Types\CodeField`** (final, extends `Arqel\Fields\Field`) — `type='code'`, `component='CodeInput'`. Setters fluentes `language(string)` (default `'plaintext'`), `theme(?string)` (null deixa o React herdar do toggle dark/light do panel), `lineNumbers(bool=true)` (default `true`), `wordWrap(bool=true)` (default `false`), `tabSize(int)` (clamp ≥1, default 2), `minHeight(?int)` (clamp ≥0 quando inteiro, `null` reseta para o default React-side). O flag `readonly` é herdado da `Field` base (`readonly(bool=true)`) e re-emitido no payload. `getTypeSpecificProps()` devolve `{language, theme, lineNumbers, wordWrap, tabSize, readonly, minHeight}`. PHP é config-only — a render React usa CodeMirror 6 + Shiki com lazy-load das grammars; sanitização do código submetido (XSS no render, command injection se for `eval`'d) é responsabilidade do consumidor
-- **`Arqel\FieldsAdvanced\Types\RepeaterField`** (final, extends `Arqel\Fields\Field`) — `type='repeater'`, `component='RepeaterInput'`. Construção via `new RepeaterField($name)`, `RepeaterField::make($name)` ou macro `FieldFactory::repeater($name)`. Setters fluentes `schema(array)` (filtra silenciosamente entradas que não são `Field`), `minItems(int)` (clamp ≥0), `maxItems(int)` (clamp ≥1; lança `InvalidArgumentException` se o novo max for menor que o `minItems` já configurado, preservando o invariante `min ≤ max`), `reorderable(bool=true)`, `collapsible(bool=true)`, `cloneable(bool=true)`, `itemLabel(string)` (template tipo `"Address {{label}}"`), `relationship(string)` (nome da HasMany Eloquent). `getTypeSpecificProps()` devolve `{schema, minItems, maxItems, reorderable, collapsible, cloneable, itemLabel, relationship}` — cada child é serializado via `toArray()` quando disponível, caso contrário cai num payload mínimo `{name, type}`. **Hidratação a partir do registro e persistência (`afterCreate`/`afterUpdate` chamando `$record->{relationship}()->create($item)`) ficam fora do escopo deste ticket**: precisam dos hooks de lifecycle do Resource em `arqel/core` e são tratadas como trabalho cross-package em ticket subsequente. O lado React (`RepeaterInput.tsx` com dnd-kit + FormRenderer aninhado) é FIELDS-JS-XXX
-- Pest 3 + Orchestra Testbench setup com `defineEnvironment` SQLite in-memory
-- **`Arqel\FieldsAdvanced\Blocks\Block`** (abstract, FIELDS-ADV-006) — base para Builder blocks. Métodos `static abstract type(): string`, `static abstract label(): string`, `static icon(): ?string` (default null), `abstract schema(): array<int, Field>`. `toArray()` final emite `{type, label, icon, schema: [field.toArray()...]}`. Stateless config carrier — construtor padrão sem args.
-- **`Arqel\FieldsAdvanced\Types\BuilderField`** (final, FIELDS-ADV-006) — repeater heterogêneo. `type='builder'`, `component='BuilderInput'`. Setters: `blocks(array)` aceita `class-string<Block>[]` (key by `static::type()` após resolução), `array<string, Block|class-string<Block>>` (key explicit), ou misto; class-strings instanciados via `new $cls()`; non-Block silenciosamente filtrados; **duplicate `Block::type()` lança `InvalidArgumentException`**. `minItems/maxItems` (mesmas invariantes do RepeaterField), `reorderable/collapsible/cloneable` toggles, `itemLabel(string)`. `getTypeSpecificProps()` emite `{blocks: <map type->payload>, minItems, maxItems, reorderable, collapsible, cloneable, itemLabel}`.
-- **`Arqel\FieldsAdvanced\Types\KeyValueField`** (final, FIELDS-ADV-007, extends `Arqel\Fields\Field`) — `type='keyValue'`, `component='KeyValueInput'`. Construção via `new KeyValueField($name)`, `KeyValueField::make($name)` ou macro `FieldFactory::keyValue($name)`. Setters fluentes `keyLabel(string)` e `valueLabel(string)` (lança `InvalidArgumentException` se a string for vazia, para que a coluna React nunca renderize um header vazio que confundiria leitores de tela), `keyPlaceholder(string)` e `valuePlaceholder(string)` (aceitam vazio — sinaliza "sem placeholder" para o React), `editableKeys(bool=true)`, `addable(bool=true)`, `deletable(bool=true)`, `reorderable(bool=true)`, e o **switch de output shape** `asObject(bool=true)`: quando `false` (default) o React emite uma lista ordenada `[{key, value}, ...]` (preserva ordem, tolera duplicates); quando `true` emite um map associativo `{key: value}` (duplicates colapsam, last-wins). Persistência é responsabilidade do consumidor — combine com cast Eloquent `'array'` ou coluna JSON. `getTypeSpecificProps()` devolve `{keyLabel, valueLabel, keyPlaceholder, valuePlaceholder, editableKeys, addable, deletable, reorderable, asObject}` (9 keys). O lado React (`KeyValueInput.tsx` com tabela 2-cols + add/delete por linha + dnd-kit quando `reorderable`) é FIELDS-JS-XXX.
-- **`Arqel\FieldsAdvanced\Types\TagsField`** (final, FIELDS-ADV-008, extends `Arqel\Fields\Field`) — `type='tags'`, `component='TagsInput'`. Construção via `new TagsField($name)`, `TagsField::make($name)` ou macro `FieldFactory::tags($name)`. Setters fluentes `suggestions(array|Closure)` (filtragem silenciosa de não-strings em arrays; `Closure` resolvido lazily em `getTypeSpecificProps()`, com fallback para `[]` quando o callback devolve não-array — útil para popular o dropdown com base em auth user, tenant ou query cacheada), `creatable(bool=true)` (quando `false`, o React só permite escolher dos suggestions), `maxTags(?int)` (clamp ≥1; `null` reseta para "sem cap"), `separator(string)` (lança `InvalidArgumentException` se vazio — separador vazio congelaria o splitter de paste), `uniqueTags(bool=true)` (renomeado de `unique()` para evitar colisão com o helper de validação `Field::unique(?string $table, ?string $column, mixed $ignorable)` herdado de `HasValidation`; a chave do payload **continua sendo `unique`**, preservando o contrato React documentado no spec). `getTypeSpecificProps()` devolve `{suggestions, creatable, maxTags, separator, unique}` (5 keys). **Eloquent `fromRelationship(...)` (Spatie/laravel-tags ou sync HasMany/BelongsToMany) ficou fora deste ticket** — depende de hooks de hidratação de Field que ainda não existem em `arqel/core` e será tratado como trabalho cross-package em ticket subsequente. O lado React (`TagsInput.tsx` — combobox com chips, Enter para adicionar, Backspace para remover último, paste split por `separator`) é FIELDS-JS-XXX.
-- **`Arqel\FieldsAdvanced\Steps\Step`** (final, FIELDS-ADV-009) — value-object para um passo do `WizardField`. Construção via `new Step($name)` ou `Step::make($name)`. Setters fluentes `label(string)` (default vazio → `getLabel()` cai num humanised do nome, e.g. `'user_details'` → `'User Details'`), `icon(?string)` (default `null`), `schema(array)` (filtra silenciosamente entradas que não são `Field`). Getters `getName()`, `getLabel()`, `getIcon()`, `getSchema()`. `toArray()` emite `{name, label, icon, schema: [field.toArray()...]}` — cada child é serializado via `toArray()` quando disponível, caso contrário cai num payload mínimo `{name, type}`.
-- **`Arqel\FieldsAdvanced\Types\WizardField`** (final, FIELDS-ADV-009, extends `Arqel\Fields\Field`) — `type='wizard'`, `component='WizardInput'`. Construção via `new WizardField($name)`, `WizardField::make($name)` ou macro `FieldFactory::wizard($name)`. Setters fluentes `steps(array)` (filtra silenciosamente entradas que não são `Step`; **lança `InvalidArgumentException("Step names must be unique; duplicate: {$name}")` em colisão de nomes** — colisões silenciosas fariam `persistInUrl` apontar para o passo errado e quebrar o roteamento de validação per-step), `persistInUrl(bool=true)` (default `false`; quando true, o React sincroniza o índice do passo corrente com query param), `skippable(bool=true)` (default `false`; permite navegação não-linear via progress indicator). `getTypeSpecificProps()` devolve `{steps, persistInUrl, skippable}` (3 keys) — cada step é serializado via `Step::toArray()`. **Form/FormRenderer integration (tratar Wizard como layout component em vez de field-leaf) está fora do escopo deste ticket** — depende de FORM-005 cross-package; nesta camada de scaffolding o wizard se apresenta como um type regular de `Field`. O lado React (`WizardInput.tsx` com `<Activity>` da React 19.2 para preservação de state, progress indicator, validação per-step via partial Inertia reload) é FIELDS-JS-XXX.
-- **124 testes Pest passando** — 10 ServiceProvider (todas 8 macros: `richText`, `markdown`, `code`, `repeater`, `builder`, `keyValue`, `tags`, `wizard`) + 10 RichTextField + 11 MarkdownField + 12 CodeField + 15 RepeaterField + 5 Block + 16 BuilderField + 14 KeyValueField + 14 TagsField + 5 Step + 12 WizardField (construção via `new`/`make()`/macro, defaults canônicos, fluência, filtro silencioso de não-Step em `steps()`, duplicate-name lança `InvalidArgumentException`, `persistInUrl`/`skippable` toggles, payload completo de 3 keys end-to-end com steps via `Step::toArray()`)
+- `FieldsAdvancedServiceProvider` (final, auto-discovered) registra 8 macros no `FieldFactory`: `richText`, `markdown`, `code`, `repeater`, `builder`, `keyValue`, `tags`, `wizard`
+- Pest 3 + Orchestra Testbench setup com SQLite in-memory
 
-**Por chegar (FIELDS-ADV-010):**
+**Rich content (FIELDS-ADV-002, 003, 004):**
 
-- Sanitizer trait + integração com FormRequest para HTML purification em RichText/Markdown (FIELDS-ADV-002-followup)
+- **`RichTextField`** — `type='richText'`, `component='RichTextInput'`. Setters: `toolbar(array)`, `imageUploadDisk(string)`, `imageUploadDirectory(string)`, `maxLength(int)` (clamp ≥1, default 65535), `fileAttachments(bool)`, `customMarks(array)`, `mentionable(array)` (filtra entries sem `id`+`name`). `imageUploadRoute` é construído como string literal `'/arqel/fields/upload?disk='.$disk` (sem `route()` para preservar testabilidade).
+- **`MarkdownField`** — `type='markdown'`, `component='MarkdownInput'`. Setters: `preview(bool)`, `previewMode(string)` com paleta `'side-by-side'|'tab'|'popup'` (constantes `PREVIEW_MODE_*`; valores desconhecidos fallback silencioso para `side-by-side`), `toolbar(bool)`, `rows(int)` (clamp ≥3, default 10), `fullscreen(bool)`, `syncScroll(bool)`. Preview React encadeia `remark` + `rehype-sanitize`.
+- **`CodeField`** — `type='code'`, `component='CodeInput'`. Setters: `language(string)` (default `'plaintext'`), `theme(?string)` (null herda do panel), `lineNumbers(bool)`, `wordWrap(bool)`, `tabSize(int)` (clamp ≥1, default 2), `minHeight(?int)`. `readonly` herdado da `Field` base. React lazy-load grammars Shiki.
+
+**Dynamic structure (FIELDS-ADV-005, 006):**
+
+- **`RepeaterField`** — `type='repeater'`, `component='RepeaterInput'`. Setters: `schema(array)` (filtra não-`Field`), `minItems/maxItems(int)` (clamps + invariante `min ≤ max` lança `InvalidArgumentException`), `reorderable/collapsible/cloneable(bool)`, `itemLabel(string)` (template `"Address {{label}}"`), `relationship(string)` (HasMany Eloquent). Hidratação/persistência via lifecycle hooks do Resource fica fora do escopo (cross-package).
+- **`Block`** (abstract) + **`BuilderField`** — `type='builder'`. `Block` declara `static type/label/icon` + `schema(): array<int, Field>`. `BuilderField::blocks()` aceita `class-string<Block>[]`, `array<string, Block|class-string>` ou misto; class-strings instanciados via `new $cls()`; **duplicate `type()` lança `InvalidArgumentException`**. Mesmas invariantes de `min/max` do Repeater.
+
+**Map/list (FIELDS-ADV-007, 008):**
+
+- **`KeyValueField`** — `type='keyValue'`. Setters: `keyLabel/valueLabel(string)` (vazio lança `InvalidArgumentException`), `keyPlaceholder/valuePlaceholder(string)`, `editableKeys/addable/deletable/reorderable(bool)`, `asObject(bool)` — switch de output: `false` (default) emite lista ordenada `[{key,value}]`, `true` emite map `{key: value}` (last-wins).
+- **`TagsField`** — `type='tags'`. Setters: `suggestions(array|Closure)` (Closure resolvida lazy, fallback `[]`), `creatable(bool)`, `maxTags(?int)` (clamp ≥1), `separator(string)` (vazio lança `InvalidArgumentException`), `uniqueTags(bool)` (renomeado para evitar colisão com `Field::unique()` de validação; chave do payload continua `unique`). Integração Spatie/laravel-tags fica fora do escopo.
+
+**Multi-step (FIELDS-ADV-009):**
+
+- **`Step`** (value-object, final) — `name`, `label` (fallback humanised via `Str::headline`), `icon(?string)`, `schema(array)`. `toArray()` emite `{name, label, icon, schema}`.
+- **`WizardField`** — `type='wizard'`. Setters: `steps(array)` (filtra não-`Step`; **duplicate names lança `InvalidArgumentException`**), `persistInUrl(bool)`, `skippable(bool)`. Form/FormRenderer integration (tratar Wizard como layout) fica fora do escopo (depende de FORM-005).
+
+**Coverage:** 124 testes Pest passando — 10 ServiceProvider + 10 RichText + 11 Markdown + 12 Code + 15 Repeater + 5 Block + 16 Builder + 14 KeyValue + 14 Tags + 5 Step + 12 Wizard.
+
+**Por chegar:**
+
+- React components `RichTextInput`/`MarkdownInput`/`CodeInput`/`RepeaterInput`/`BuilderInput`/`KeyValueInput`/`TagsInput`/`WizardInput` (FIELDS-ADV-010..017)
+- Registry boot client-side (FIELDS-ADV-018)
+- Spatie/laravel-tags integration em `TagsField::fromRelationship(...)`
+- Sanitizer trait + FormRequest helper para HTML purification em RichText/Markdown
+- Repeater hidratação/persistência (HasMany binding via Resource lifecycle hooks `afterCreate`/`afterUpdate`)
 
 ## Conventions
 
-- `declare(strict_types=1)` obrigatório
-- Classes `final` por defeito
-- **Sanitização HTML/Markdown é responsabilidade do consumidor** — `RichTextField` e `MarkdownField` só configuram o editor; o pacote NÃO carrega `ezyang/htmlpurifier` nem qualquer parser Markdown como hard dep. Use FormRequest rules, mutators Eloquent ou o trait sanitizer planejado para FIELDS-ADV-002-followup. Para Markdown, a preview React encadeia `remark` + `rehype-sanitize`, mas qualquer renderização server-side (blade, e-mail, RSS) deve sanitizar no boundary
-- `imageUploadRoute` é construído como string literal (`'/arqel/fields/upload?disk='.$disk`) porque a chamada `route()` exige roteamento ativo no container — manter literal preserva testabilidade unitária
-- Setters silenciosamente filtram entradas inválidas (não-strings em `toolbar`/`customMarks`, entries sem `id`+`name` em `mentionable`) para que misconfigurações no PHP nunca cheguem ao React
+- `declare(strict_types=1)` obrigatório; classes `final` por defeito (exceto `Block` abstract).
+- **PHP é config-only** — sanitização HTML/Markdown/Code é responsabilidade do consumidor. O pacote NÃO carrega `ezyang/htmlpurifier` nem qualquer parser Markdown como hard dep. Use FormRequest rules, mutators Eloquent ou o sanitizer trait planejado.
+- Setters silenciosamente filtram entradas inválidas (não-strings em arrays de config, `Field`/`Block`/`Step` checks) para que misconfiguração no PHP nunca chegue ao React.
+- Valores enum-like (`previewMode`) degradam para default em vez de lançar — typo não deve crashar Inertia render.
+- Invariantes estruturais (`min ≤ max`, duplicate `Block::type()`/`Step` name) lançam `InvalidArgumentException` — colisões silenciosas quebrariam roteamento/payload.
 
 ## Anti-patterns
 
-- ❌ **Persistir HTML do RichText sem purificar** — o editor produz HTML cliente-side; sempre rode `Purifier::clean($html)` (ou equivalente) num mutator/FormRequest antes de gravar
-- ❌ **`toolbar([...])` com identifiers que o `RichTextInput.tsx` não conhece** — botões desconhecidos são silenciosamente ignorados pelo Tiptap; consulte a lista canónica suportada antes de customizar
-- ❌ **Hard-dep em libs JS (Tiptap, Monaco) no `composer.json`** — dependências JS vivem em `@arqel/fields-advanced` (npm), nunca em `composer.json`
+- ❌ **Persistir HTML do RichText sem purificar** — sempre rode `Purifier::clean($html)` (ou equivalente) num mutator/FormRequest antes de gravar.
+- ❌ **Hard-dep em libs JS (Tiptap, CodeMirror, Shiki) no `composer.json`** — dependências JS vivem em `@arqel/fields-advanced` (npm), nunca em `composer.json`.
+- ❌ **Aninhar `Repeater`/`Builder` além de 2 níveis** — performance React degrada exponencialmente com FormRenderer recursivo; quebre em Resources separados ou use Wizard.
+- ❌ **`toolbar([...])` com identifiers que `RichTextInput.tsx` não conhece** — botões desconhecidos são ignorados pelo Tiptap; consulte a lista canónica.
+
+## Examples
+
+RichText com toolbar customizado e upload de imagens:
+
+```php
+use Arqel\Fields\FieldFactory;
+
+FieldFactory::richText('content')
+    ->toolbar(['bold', 'italic', 'link', 'image', 'code-block'])
+    ->imageUploadDisk('public')
+    ->imageUploadDirectory('posts/images')
+    ->maxLength(20000)
+    ->mentionable([
+        ['id' => 1, 'name' => 'Alice', 'avatar' => '/a.png'],
+    ]);
+```
+
+Repeater com sub-schema:
+
+```php
+use Arqel\Fields\FieldFactory;
+
+FieldFactory::repeater('addresses')
+    ->schema([
+        FieldFactory::text('street')->required(),
+        FieldFactory::text('city')->required(),
+        FieldFactory::select('country')->options(['BR' => 'Brasil', 'PT' => 'Portugal']),
+    ])
+    ->minItems(1)
+    ->maxItems(5)
+    ->itemLabel('Address {{city}}')
+    ->relationship('addresses');
+```
+
+Builder com blocks heterogêneos:
+
+```php
+use Arqel\Fields\FieldFactory;
+use App\Blocks\{HeroBlock, GalleryBlock, QuoteBlock};
+
+FieldFactory::builder('content')
+    ->blocks([HeroBlock::class, GalleryBlock::class, QuoteBlock::class])
+    ->minItems(1)
+    ->reorderable()
+    ->collapsible();
+```
+
+Wizard com steps:
+
+```php
+use Arqel\Fields\FieldFactory;
+use Arqel\FieldsAdvanced\Steps\Step;
+
+FieldFactory::wizard('onboarding')
+    ->steps([
+        Step::make('account')->icon('user')->schema([
+            FieldFactory::text('name')->required(),
+            FieldFactory::text('email')->required()->email(),
+        ]),
+        Step::make('profile')->icon('id-card')->schema([
+            FieldFactory::textarea('bio'),
+        ]),
+        Step::make('confirm')->schema([
+            FieldFactory::checkbox('terms')->required(),
+        ]),
+    ])
+    ->persistInUrl()
+    ->skippable();
+```
 
 ## Related
 
-- Tickets: [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §FIELDS-ADV-001..010
+- Tickets: [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §FIELDS-ADV-001..020
 - API: [`PLANNING/05-api-php.md`](../../PLANNING/05-api-php.md) §Field
 - Source: [`packages/fields-advanced/src/`](./src/)
 - Tests: [`packages/fields-advanced/tests/`](./tests/)
@@ -55,4 +142,4 @@ A separação core × advanced existe porque estes types arrastam dependências 
 - ADRs:
   - [ADR-001](../../PLANNING/03-adrs.md) — Inertia-only
   - [ADR-008](../../PLANNING/03-adrs.md) — Pest 3
-- Externos: [Tiptap](https://tiptap.dev) (RichText), [Monaco](https://microsoft.github.io/monaco-editor/) (Code)
+- Externos: [Tiptap](https://tiptap.dev) (RichText), [CodeMirror](https://codemirror.net) + [Shiki](https://shiki.style) (Code/Markdown)

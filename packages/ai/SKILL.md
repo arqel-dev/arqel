@@ -41,10 +41,17 @@ Entregue em AI-007 (PHP slice — componente React `AiTextInput.tsx` fica para b
 - `arqel/fields` adicionado ao `composer.json` (path repo + `@dev`).
 - 8 testes unit + 3 testes feature.
 
+Entregue em AI-008 (PHP slice — componente React `AiTranslateInput.tsx` fica para batch futuro):
+
+- **`Arqel\Ai\Fields\AiTranslateField`** (final, estende `Arqel\Fields\Field`) — armazena `{languageCode => text}` para conteúdo multi-idioma. Setters fluentes `languages(array)`, `defaultLanguage(string)`, `autoTranslate(bool)`, `provider(?string)`, `aiOptions(array)`. Métodos `translate(sourceText, targetLanguage, ?sourceLanguage): string` (chama `AiManager::complete()` com prompt construído server-side) e `translateAll(translations, sourceLanguage): array` (preenche apenas idiomas ausentes ou vazios, nunca sobrescreve traduções manuais, pula o `sourceLanguage`). `defaultLanguage()` lança `InvalidArgumentException` quando o código não está em `languages()`. O prompt **nunca** é exposto via `getTypeSpecificProps()` (consistente com AI-007).
+- **`Arqel\Ai\Http\Controllers\AiTranslateController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/translate` (named `arqel.ai.translate`, middleware `web,auth`). Aceita `{sourceLanguage, targetLanguages, sourceText}` e devolve `{translations: {<lang>: <text>}}`. `ResourceRegistry` é resolvido por FQCN string (`Arqel\\Core\\Resources\\ResourceRegistry`) com fallback 404 quando ausente. 422 quando o field não é `AiTranslateField`.
+- 8 testes unit + 3 testes feature.
+
 Por chegar:
 
 - **AI-007 React** componente `AiTextInput.tsx` (botão Generate + estado loading + replace value).
-- **AI-008..AI-011** os 4 field types restantes (`AiTranslateField`/`AiSelectField`/`AiExtractField`/`AiImageField`).
+- **AI-008 React** componente `AiTranslateInput.tsx` (tabs por idioma + botão Auto-translate).
+- **AI-009..AI-011** os 3 field types restantes (`AiSelectField`/`AiExtractField`/`AiImageField`).
 - **AI-012** prompt library reutilizável.
 - **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).
 
@@ -128,6 +135,42 @@ O placeholder `{title}` é resolvido server-side em `generate()` com o
 `formData` que o cliente envia para `POST /admin/{slug}/fields/summary/generate`.
 O prompt template **não trafega** para o cliente — apps com prompts que
 contêm regras de negócio podem mantê-los privados.
+
+### AiTranslateField (AI-008)
+
+```php
+use Arqel\Ai\Fields\AiTranslateField;
+
+public function fields(): array
+{
+    return [
+        Field::text('title')->required(),
+
+        (new AiTranslateField('description'))
+            ->languages(['en', 'pt-BR', 'es'])
+            ->defaultLanguage('en')
+            ->autoTranslate()
+            ->provider('claude')
+            ->aiOptions(['temperature' => 0.2]),
+    ];
+}
+```
+
+O valor persiste como JSON `{en: "...", pt-BR: "...", es: "..."}`. Configure
+o cast no model:
+
+```php
+protected function casts(): array
+{
+    return ['description' => 'array'];
+}
+```
+
+Quando `autoTranslate()` está ativo, o React (AI-008 React, batch futuro)
+dispara `POST /admin/{slug}/fields/description/translate` com o texto do
+`defaultLanguage` e os idiomas restantes; o backend chama `translate()`
+para cada idioma alvo. Traduções manuais já preenchidas **não são
+sobrescritas** por `translateAll()` — só os campos vazios são gerados.
 
 ### Consumir um result
 

@@ -3,8 +3,13 @@
 declare(strict_types=1);
 
 use Arqel\Ai\Http\Controllers\AiGenerateController;
+use Arqel\Ai\Http\Controllers\AiTranslateController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/admin/{resource}/fields/{field}/generate', AiGenerateController::class)
     ->middleware(['web', 'auth'])
     ->name('arqel.ai.generate');
+
+Route::post('/admin/{resource}/fields/{field}/translate', AiTranslateController::class)
+    ->middleware(['web', 'auth'])
+    ->name('arqel.ai.translate');

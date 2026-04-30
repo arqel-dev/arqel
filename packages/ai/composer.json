@@ -1,0 +1,77 @@
+{
+    "name": "arqel/ai",
+    "description": "AI-assisted fields for Arqel — translation, summarization, classification, extraction, generation. Provider-agnostic (Claude / OpenAI / Ollama).",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "arqel",
+        "ai",
+        "anthropic",
+        "openai",
+        "ollama"
+    ],
+    "homepage": "https://arqel.dev",
+    "support": {
+        "issues": "https://github.com/arqel/arqel/issues",
+        "source": "https://github.com/arqel/arqel",
+        "docs": "https://arqel.dev/docs"
+    },
+    "require": {
+        "php": "^8.3",
+        "arqel/core": "@dev",
+        "laravel/framework": "^12.0|^13.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "suggest": {
+        "anthropic/anthropic-php": "Native SDK for ClaudeProvider (deferred to AI-003)",
+        "openai-php/client": "Native SDK for OpenAiProvider (deferred to AI-004)",
+        "ollama-laravel": "Local LLM via Ollama for OllamaProvider (deferred to AI-005)"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arqel\\Ai\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Arqel\\Ai\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Arqel\\Ai\\AiServiceProvider"
+            ]
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../core",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage --min=90",
+        "analyse": "phpstan analyse",
+        "lint": "pint --test",
+        "format": "pint"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

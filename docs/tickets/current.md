@@ -1,11 +1,11 @@
-# Ticket ativo
+2# Ticket ativo
 
 > Este arquivo é atualizado automaticamente após cada ticket completado.
 > Serve como ponteiro para o Claude Code saber onde continuar.
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..008 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002/003 PHP slice ✅ · CMDPAL-001/002 ✅) + 9 bugs do dogfooding fechados + Batch #1..#14 paralelos completos + 2ª rodada de bug fixes do dogfooding.** Próximo natural: WIDGETS-010 (React widgets em @arqel/ui), MCP-009 (testes integration), TABLE-V2-004 (Column visibility persistence), TABLE-V2-005 (Grouping com summaries), MCP-010 (SKILL polish), CMDPAL-003 (React command palette), DOCS-V2-001.
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..005 PHP slices ✅ · CMDPAL-001/002 ✅) + 9 bugs do dogfooding fechados + Batch #1..#15 paralelos completos.** Próximo natural: TABLE-V2-006 (Reorderable rows), TABLE-V2-007 (Stacked rows mobile), MCP-009 (integration tests), CMDPAL-003 (React command palette), DOCS-V2-001 (docs guides).
 
 **Fase:** 1 (MVP)
 

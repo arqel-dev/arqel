@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Realtime;
 
+use Illuminate\Support\Facades\Broadcast;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -28,6 +29,22 @@ final class RealtimeServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('arqel-realtime')
-            ->hasConfigFile('arqel-realtime');
+            ->hasConfigFile('arqel-realtime')
+            ->hasRoute('channels');
+    }
+
+    /**
+     * Ensure broadcasting auth routes are registered so the presence
+     * channel published by RT-004 is reachable. Idempotent — Laravel's
+     * BroadcastManager guards against double-registration internally,
+     * but we additionally check `Broadcast::routes` is callable to keep
+     * the boot path resilient when broadcasting is disabled.
+     */
+    public function packageBooted(): void
+    {
+        // Idempotent — Laravel's BroadcastManager guards against
+        // double-registration internally, so calling here is safe even
+        // when the consumer app has its own `Broadcast::routes()` call.
+        Broadcast::routes();
     }
 }

@@ -42,10 +42,34 @@ A integração foca em três blocos:
   - **Total: 11 testes** (assumindo `composer install` no pacote)
 - `TestCase` registra `RealtimeServiceProvider`, sqlite `:memory:`, broadcaster `null`, e cria a tabela `fake_resource_records` para os fixtures
 
+**Entregue (RT-004 — Presence channels, PHP slice):**
+
+- **`routes/channels.php`** registra o canal `arqel.presence.{resource}.{recordId}` via `Broadcast::channel()`. O callback retorna `{id, name, avatar}` para o user autenticado, ou `false` quando o Gate opcional `view-resource-presence` é registrado pela app e nega
+- **`Arqel\Realtime\Presence\PresenceChannelResolver`** (final readonly) — helper estático `forResource(string $slug, int|string $recordId): string`. Lê `arqel-realtime.presence.channel_pattern` (placeholders `{resource}` + `{recordId}`) e levanta `Arqel\Realtime\Exceptions\RealtimeException` se `presence.enabled` estiver `false`
+- **`Arqel\Realtime\Exceptions\RealtimeException`** (final, extends `RuntimeException`) — base runtime exception do pacote
+- **`config/arqel-realtime.php`** ganha bloco `presence` com `enabled` (env `ARQEL_REALTIME_PRESENCE_ENABLED`, default `true`) e `channel_pattern`
+- **`RealtimeServiceProvider`** agora registra o file de canais via `->hasRoute('channels')` e chama `Broadcast::routes()` em `packageBooted()` (idempotente)
+- **9 testes adicionais** (Pest 3): `Unit\Presence\PresenceChannelResolverTest` (5) + `Feature\PresenceChannelTest` (4). Total do pacote: **20 testes**
+
+### Presence channels (RT-004) — exemplo
+
+```php
+use Arqel\Realtime\Presence\PresenceChannelResolver;
+
+// Resolve o nome do canal (idêntico ao registrado em routes/channels.php):
+$channel = PresenceChannelResolver::forResource('posts', 42);
+// → "arqel.presence.posts.42"
+
+// Autorização opcional via Gate na app consumidora:
+Gate::define('view-resource-presence', fn ($user, string $resource, string|int $id) =>
+    $user->can('view', app(\App\Models\Post::class)->find($id))
+);
+```
+
 **Diferido (RT-003+, fora do escopo deste batch):**
 
 - React hook `useResourceUpdates` + Inertia `router.reload` (RT-003) — Camada `react`, fica para o próximo ticket JS
-- Presence channels (online users tracking) (RT-004)
+- React hook `useResourcePresence` (RT-004 React slice) — bind a Echo presence channels usando o nome derivado de `PresenceChannelResolver`
 - Yjs / collaborative editing integration (RT-005+)
 - `BroadcastAuthController` para autorizar canais privados quando o app não usa o boilerplate `routes/channels.php` padrão
 - `Channels/ResourceChannel` e `Channels/ActionProgressChannel` — gates com `Resource::can('view', $record)` + tenancy awareness

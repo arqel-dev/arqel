@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001/002/005 ✅) + 9 bugs do dogfooding fechados + Batch #1..#17 paralelos completos.** Próximo natural: WIDGETS-014 (testes finais), WIDGETS-015 (SKILL final), TENANT-015 (SKILL final), DOCS-V2-001/002 (docs guides), MCP-009 (integration tests com Claude Code real).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..015 ✅ · WIDGETS-001..009 + 013..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001/002/005 ✅) + 9 bugs do dogfooding fechados + Batch #1..#18 paralelos completos.** Próximo natural: FIELDS-ADV-018 (Registry boot), FIELDS-ADV-019 (testes), FIELDS-ADV-020 (SKILL final), MCP-009 (integration tests), DOCS-V2-001/002 (docs).
 
 **Fase:** 1 (MVP)
 

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Arqel\Workflow\Concerns;
 
 use Arqel\Workflow\Events\StateTransitioned;
+use Arqel\Workflow\Models\StateTransition;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 use ReflectionException;
 use ReflectionMethod;
@@ -99,8 +101,8 @@ trait HasWorkflow
      * The audit event is suppressed when `arqel-workflow.audit.enabled` is
      * `false`, allowing apps to opt-out per environment.
      *
-     * @param string $newState FQCN of the new state class, an enum value or a slug.
-     * @param array<string, mixed> $context Arbitrary metadata propagated to listeners.
+     * @param  string  $newState  FQCN of the new state class, an enum value or a slug.
+     * @param  array<string, mixed>  $context  Arbitrary metadata propagated to listeners.
      */
     public function transitionTo(string $newState, array $context = []): void
     {
@@ -143,6 +145,27 @@ trait HasWorkflow
     }
 
     /**
+     * Histórico append-only de transições deste record (WF-007).
+     *
+     * Persistido pelo listener `PersistStateTransitionToHistory` quando
+     * `arqel-workflow.history.enabled` está ativo. Ordenado por
+     * `created_at` desc para uso direto em UIs de timeline.
+     *
+     * @return MorphMany<StateTransition, $this>
+     */
+    public function stateTransitions(): MorphMany
+    {
+        assert($this instanceof Model);
+
+        /** @var MorphMany<StateTransition, $this> $relation */
+        $relation = $this->morphMany(StateTransition::class, 'model')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
+
+        return $relation;
+    }
+
+    /**
      * Resolve the canonical key for a state value:
      * - object → its FQCN (matches spatie/laravel-model-states which
      *   keys metadata by `State::class`)
@@ -172,7 +195,7 @@ trait HasWorkflow
      * `from()` method is considered always-available; otherwise the
      * current state key must appear in its `from()` list.
      *
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionApplies(string $transition, ?string $current): bool
     {

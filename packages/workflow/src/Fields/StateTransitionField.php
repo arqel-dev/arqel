@@ -7,6 +7,7 @@ namespace Arqel\Workflow\Fields;
 use Arqel\Fields\Field;
 use Arqel\Workflow\Authorization\TransitionAuthorizer;
 use Arqel\Workflow\Concerns\HasWorkflow;
+use Arqel\Workflow\Models\StateTransition;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
@@ -213,13 +214,53 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * History resolution will be implemented in WF-007.
+     * Histórico append-only do record atual (WF-007).
+     *
+     * Lê `arqel_state_transitions` filtrado pelo `(model_type, model_id)`
+     * deste record, ordenado desc por `created_at`. Retorna `[]` quando
+     * não há record, a tabela ainda não foi migrada ou ocorre qualquer
+     * erro de query (best-effort — a UI degrada graciosamente).
      *
      * @return list<array<string, mixed>>
      */
     public function resolveHistory(): array
     {
-        return [];
+        if ($this->record === null) {
+            return [];
+        }
+
+        $configured = config('arqel-workflow.history.limit', 50);
+        $limit = is_int($configured) ? $configured : (is_numeric($configured) ? (int) $configured : 50);
+
+        if ($limit <= 0) {
+            $limit = 50;
+        }
+
+        try {
+            $entries = StateTransition::query()
+                ->where('model_type', $this->record::class)
+                ->where('model_id', $this->record->getKey())
+                ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc')
+                ->limit($limit)
+                ->get();
+        } catch (Throwable) {
+            return [];
+        }
+
+        $rows = [];
+
+        foreach ($entries as $entry) {
+            $rows[] = [
+                'from' => $entry->from_state,
+                'to' => $entry->to_state,
+                'at' => $entry->created_at?->toIso8601String(),
+                'by' => $entry->transitioned_by_user_id,
+                'metadata' => $entry->metadata,
+            ];
+        }
+
+        return $rows;
     }
 
     private function resolveDefinition(): ?WorkflowDefinition
@@ -248,7 +289,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transitionClass
+     * @param  class-string  $transitionClass
      */
     private function isAuthorized(string $transitionClass): bool
     {
@@ -270,8 +311,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
-     *
+     * @param  class-string  $transition
      * @return list<string>|null
      */
     private static function transitionFroms(string $transition): ?array
@@ -309,7 +349,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionTo(string $transition): string
     {
@@ -334,7 +374,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionLabel(string $transition): string
     {

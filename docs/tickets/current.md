@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27/#28/#29/#30): scaffolds + AI-003 Claude + AI-004 OpenAi + AI-005 Ollama ✅ · RT-003 useResourceUpdates + RT-004 presence + RT-008 @arqel/realtime npm ✅ · WF-003 PHP+React + WF-004 StateTransitioned event + transitionTo audit helper ✅. Total Fase 3 ≈ 32 ai + 20 realtime + 30 workflow PHP + 8 workflow JS + 4 realtime JS = 94 testes diretos.** Próximo: AI-006 manager + rate limiting, RT-005 collaborative editing (Yjs) ou RT-009 broadcasting auth, WF-005 visualizer.
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27..#31): scaffolds + AI-003/004/005/006 (providers + AiManager + CostTracker + AiCache + ai_usage) ✅ · RT-003/004/008/009 (hook + presence + @arqel/realtime npm + channel auth) ✅ · WF-003/004/005 (Field PHP+React + StateTransitioned event + transitionTo audit + WorkflowVisualizer Mermaid) ✅. Total Fase 3 ≈ 51 ai + 35 realtime + 30 workflow PHP + 17 workflow JS + 4 realtime JS = 137 testes diretos.** Próximo: AI-007..011 field types (AiTextField/Translate/Select/Extract/Image), RT-005 Yjs collaborative ou RT-010 reconnect, WF-006 transition policies + WF-007 history audit.
 
 **Fase:** 1 (MVP)
 

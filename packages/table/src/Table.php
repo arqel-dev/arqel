@@ -36,6 +36,14 @@ final class Table
 
     public const string MOBILE_MODE_SCROLL = 'scroll';
 
+    public const string PAGINATION_LENGTH_AWARE = 'lengthAware';
+
+    public const string PAGINATION_SIMPLE = 'simple';
+
+    public const string PAGINATION_CURSOR = 'cursor';
+
+    public const string PAGINATION_INFINITE = 'infinite';
+
     /** @var array<int, mixed> */
     protected array $columns = [];
 
@@ -75,6 +83,8 @@ final class Table
     protected bool $compact = false;
 
     protected string $mobileMode = self::MOBILE_MODE_STACKED;
+
+    protected string $paginationType = self::PAGINATION_LENGTH_AWARE;
 
     protected ?string $groupBy = null;
 
@@ -222,6 +232,35 @@ final class Table
     public function getMobileMode(): string
     {
         return $this->mobileMode;
+    }
+
+    /**
+     * Configure pagination type used by the resource controller.
+     *
+     * Unknown values fall back to {@see self::PAGINATION_LENGTH_AWARE}
+     * defensively — the React layer reads this flag to decide between
+     * length-aware paginator UI, simple prev/next buttons, cursor
+     * navigation, or Inertia 3 `merge` infinite scroll. Throwing on
+     * typo would crash the Inertia render; the safe default keeps
+     * the table usable.
+     */
+    public function paginationType(string $type): self
+    {
+        $this->paginationType = in_array($type, [
+            self::PAGINATION_LENGTH_AWARE,
+            self::PAGINATION_SIMPLE,
+            self::PAGINATION_CURSOR,
+            self::PAGINATION_INFINITE,
+        ], true)
+            ? $type
+            : self::PAGINATION_LENGTH_AWARE;
+
+        return $this;
+    }
+
+    public function getPaginationType(): string
+    {
+        return $this->paginationType;
     }
 
     public function groupBy(string $field, ?Closure $labelResolver = null): self
@@ -465,6 +504,7 @@ final class Table
                 'striped' => $this->striped,
                 'compact' => $this->compact,
                 'mobileMode' => $this->mobileMode,
+                'paginationType' => $this->paginationType,
             ],
             'emptyState' => $this->emptyStateHeading !== null ? [
                 'heading' => $this->emptyStateHeading,

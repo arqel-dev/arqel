@@ -50,11 +50,13 @@
 
 - `Table::mobileMode(string)` + 2 constantes: `MOBILE_MODE_STACKED='stacked'` (default) e `MOBILE_MODE_SCROLL='scroll'`. Valor desconhecido cai silenciosamente para `'stacked'` (typo não deve crashar Inertia render). `toArray()` mescla `config.mobileMode`.
 
-**Pagination types (TABLE-V2-008):**
+**Entregue (TABLE-V2-008 — PHP slice):**
 
-- `Table::paginationType(string)` + 4 constantes: `PAGINATION_LENGTH_AWARE` (default), `PAGINATION_SIMPLE`, `PAGINATION_CURSOR`, `PAGINATION_NONE`. Valor desconhecido cai para o default. `toArray()` mescla `config.paginationType`.
+- `Table::paginationType(string)` + 4 constantes: `PAGINATION_LENGTH_AWARE` (`'lengthAware'`, default), `PAGINATION_SIMPLE` (`'simple'`), `PAGINATION_CURSOR` (`'cursor'`), `PAGINATION_INFINITE` (`'infinite'`). Valor desconhecido cai silenciosamente para o default (typo não deve crashar Inertia render). Getter `getPaginationType(): string`. `toArray()` mescla `config.paginationType`.
+- **Semântica**: `lengthAware` ativa o paginator clássico com page numbers + total; `simple` expõe apenas prev/next; `cursor` troca para cursor-based navigation (recomendado em datasets grandes ou ordering instável); `infinite` flagga o React layer para usar Inertia 3 `merge` em scroll.
+- Inertia 3 merge React side **deferido** para `TABLE-JS-XXX`: `IntersectionObserver` no último row + `router.reload({ only: ['records'], merge: ['records.data'], data: { page: currentPage + 1 } })`, loading indicator durante fetch, "No more results" no fim, dedupe contra duplicate rows, integração com filters aplicados.
 
-**Coverage:** ~141 testes Pest passando (Base 117 + V2-002..008 ≈24: 9 visibility + 16 grouping + 6 reorderable + 7 mobile + outros).
+**Coverage:** ~150 testes Pest passando (Base 117 + V2-002..008 ≈33: 9 visibility + 16 grouping + 6 reorderable + 7 mobile + 9 pagination type + outros).
 
 **Por chegar (cross-package + JS):**
 

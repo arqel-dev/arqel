@@ -41,23 +41,27 @@
 - **`dompdf/dompdf: ^3.0`** promovido de `suggest` para `require` — deixa de ser opcional. Apps que não exportam PDF continuam a poder excluir manualmente via `replace`/`exclude-from-classmap` se quiserem
 - Pest tests `tests/Unit/PdfExporterTest.php` (8 cenários) com guard `markTestSkipped` se `Dompdf\Dompdf` ou `ext-mbstring` não estiverem disponíveis. Cobertura: happy path com assertion dos 4 bytes mágicos `%PDF`, empty rows ainda gera PDF válido, `setOrientation`/`setPaperSize` fluentes e persistentes (via reflexão na property privada), `formatCell` para boolean/date/relationship/scalar (também via reflexão — mais barato que parsear o PDF). `ExportersTest` deixou de asserir RuntimeException — todos os 3 exporters são reais agora
 
-**Entregue (EXPORT-005, escopo reduzido):**
+**Entregue (EXPORT-005 — escopo reduzido):**
 
 - **`Arqel\Export\Actions\ExportAction::execute(mixed $record, array $data)`** wired pela primeira vez. Resolve o `Exporter` correto a partir de `$this->format` (`CsvExporter`/`XlsxExporter`/`PdfExporter`), constrói filename `'export-' . date('Ymd-His') . '.' . $format->extension()`, escreve em `rtrim($destinationDir, '/') . '/' . $filename` chamando `$exporter->export($record, $columns, $destination)`, e devolve `['path' => ..., 'filename' => ..., 'format' => $format->value, 'mimeType' => $format->mimeType()]`. `$record` é a `Collection|Traversable|iterable` que o pipeline `BulkAction` passa; scalar/null lança `InvalidArgumentException`
-- **`withColumns(array $columns): self`** — fluent setter para os column descriptors entregues ao exporter (default `[]`)
-- **`withDestinationDir(string $dir): self`** — fluent setter para o diretório destino. Default `sys_get_temp_dir()`
-- **`dryRun(bool $enabled = true): self`** — quando ligado, bypassa o exporter e devolve o mesmo payload com `'path' => 'dry-run'`. Útil para unit tests + previews sem I/O
-- Pest tests `tests/Unit/ExportActionExecuteTest.php` (9 cenários): CSV happy path com round-trip do header, XLSX/PDF skips se faltarem `ext-zip` / `\Dompdf\Dompdf`, dryRun não escreve, `null`/scalar → `InvalidArgumentException`, filename inclui extensão correta, columns vazias não quebram, `Illuminate\Support\Collection` é aceita como iterable
-- **Escopo reduzido propositalmente**: a spec original do EXPORT-005 também pedia (a) form-modal cross-package em `arqel/actions` para o user escolher format/columns em runtime, (b) heurística de queue threshold + `ProcessExportJob` dispatch, (c) flash notification + signed download URL. Esses três pedaços precisam dos models/jobs que ainda não existem — **deferred para EXPORT-006**. Documentado em docblock da classe (`TODO(EXPORT-006)`)
+- **`withColumns(array)`**, **`withDestinationDir(string)`**, **`dryRun(bool=true)`** — fluent setters. `dryRun` bypassa exporter e devolve `['path' => 'dry-run', ...]` para tests + previews
+- Pest tests `tests/Unit/ExportActionExecuteTest.php` (9 cenários)
+- **Form modal + queue threshold dispatch + signed URLs** deferred para EXPORT-006/008+
 
-**Por chegar (EXPORT-006..010):**
+**Entregue (EXPORT-006 — escopo reduzido):**
 
-- Form modal (escolha de format/columns em runtime) + queue threshold + `ProcessExportJob` dispatch + flash notification + signed URL — EXPORT-006
-- Override de template Blade (`Resource::pdfView()` + `Resource::pdfOrientation()`) — EXPORT-006
-- `Arqel\Export\Models\Export` + migration (`exports` table: `id`, `user_id`, `tenant_id`, `format`, `status`, `filename`, `mime_type`, `rows`, `bytes`, `disk`, `path`, `created_at`, `expires_at`) — EXPORT-006
-- `Arqel\Export\Jobs\ProcessExportJob` (queueable, idempotent, persiste `Export` model) — EXPORT-007
-- Download endpoint + signed URL helper — EXPORT-008
-- Cleanup scheduler (`exports:prune`) — EXPORT-009
+- **`Arqel\Export\Jobs\ProcessExportJob`** — `final class implements ShouldQueue` (uses `Dispatchable`, `InteractsWithQueue`, `Queueable`, `SerializesModels`). Construtor com props readonly: `string $exportId` (UUID injectado pelo caller), `ExportFormat $format`, `array $columns`, `class-string<RecordsResolver> $recordsResolverClass` e `?string $destinationDir = null`. `handle(ExportLogger $logger): void` resolve o resolver via container (`app($recordsResolverClass)`), valida `instanceof RecordsResolver`, escolhe o exporter por `match($format)`, garante o diretório (`mkdir` recursivo) e escreve `<dir>/export-<exportId>.<ext>`. Em sucesso chama `$logger->logCompleted(...)`; em qualquer `Throwable` chama `$logger->logFailed(...)` e re-lança
+- **`Arqel\Export\Contracts\RecordsResolver`** — interface single-method `resolve(): iterable`. **Trade-off chave:** o job armazena apenas a FQCN, NÃO a coleção serializada — evita payloads de fila gigantes
+- **`Arqel\Export\Contracts\ExportLogger`** — interface lifecycle (`logQueued`, `logCompleted`, `logFailed`). Default binding `NullExportLogger` via `singletonIf` — apps consumidoras sobrescrevem
+- **`Arqel\Export\Http\Controllers\ExportDownloadController`** — `download(string $exportId, Request)` faz `glob('<dir>/export-{exportId}.*')`, abort 400 UUID inválido, 404 se 0 ou >1 matches. Content-Type via `ExportFormat::tryFrom(...)?->mimeType()`. **Sem auth check** — consumer wraps com middleware própria
+- **Rota** `routes/admin.php` → `GET /admin/exports/{exportId}/download` (name `arqel.export.download`, where `[a-f0-9-]+`)
+- Tests: 6 ProcessExportJob + 4 ExportDownloadController + 1 ServiceProvider binding
+
+**Por chegar (EXPORT-007..010):**
+
+- Override de template Blade (`Resource::pdfView()` + `pdfOrientation()`) — EXPORT-007
+- Cleanup scheduler (`exports:prune`) — EXPORT-008
+- Signed URLs + ownership policy bundled — EXPORT-009
 - Suite full + SKILL.md final — EXPORT-010
 
 ## Conventions

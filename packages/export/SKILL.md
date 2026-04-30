@@ -41,14 +41,26 @@
 - **`dompdf/dompdf: ^3.0`** promovido de `suggest` para `require` — deixa de ser opcional. Apps que não exportam PDF continuam a poder excluir manualmente via `replace`/`exclude-from-classmap` se quiserem
 - Pest tests `tests/Unit/PdfExporterTest.php` (8 cenários) com guard `markTestSkipped` se `Dompdf\Dompdf` ou `ext-mbstring` não estiverem disponíveis. Cobertura: happy path com assertion dos 4 bytes mágicos `%PDF`, empty rows ainda gera PDF válido, `setOrientation`/`setPaperSize` fluentes e persistentes (via reflexão na property privada), `formatCell` para boolean/date/relationship/scalar (também via reflexão — mais barato que parsear o PDF). `ExportersTest` deixou de asserir RuntimeException — todos os 3 exporters são reais agora
 
-**Por chegar (EXPORT-005..010):**
+**Entregue (EXPORT-006 — escopo reduzido):**
 
-- Override de template Blade (`Resource::pdfView()` + `Resource::pdfOrientation()`) — EXPORT-005
-- `ExportAction::execute()` real — dispatcha `ProcessExportJob` e devolve notification + URL — EXPORT-005
-- `Arqel\Export\Models\Export` + migration (`exports` table: `id`, `user_id`, `tenant_id`, `format`, `status`, `filename`, `mime_type`, `rows`, `bytes`, `disk`, `path`, `created_at`, `expires_at`) — EXPORT-006
-- `Arqel\Export\Jobs\ProcessExportJob` (queueable, idempotent, persiste `Export` model) — EXPORT-007
-- Download endpoint + signed URL helper — EXPORT-008
-- Cleanup scheduler (`exports:prune`) — EXPORT-009
+- **`Arqel\Export\Jobs\ProcessExportJob`** — `final class implements ShouldQueue` (uses `Dispatchable`, `InteractsWithQueue`, `Queueable`, `SerializesModels`). Construtor com props readonly: `string $exportId` (UUID injectado pelo caller), `ExportFormat $format`, `array $columns`, `class-string<RecordsResolver> $recordsResolverClass` e `?string $destinationDir = null`. `handle(ExportLogger $logger): void` resolve o resolver via container (`app($recordsResolverClass)`), valida `instanceof RecordsResolver`, escolhe o exporter por `match($format)`, garante o diretório (`mkdir` recursivo se faltar — fallback `storage_path('app/arqel-exports')`) e escreve `<dir>/export-<exportId>.<ext>`. Em sucesso chama `$logger->logCompleted(...)`; em qualquer `Throwable` chama `$logger->logFailed(...)` e re-lança. Cleanup de arquivos antigos (>7 dias) ficou para um ticket futuro
+- **`Arqel\Export\Contracts\RecordsResolver`** — interface single-method `resolve(): iterable`. **Trade-off chave:** o job armazena apenas a FQCN, NÃO a coleção serializada — evita payloads de fila gigantes em datasets grandes. Implementações devem devolver streaming (lazy collection, generator, Eloquent cursor)
+- **`Arqel\Export\Contracts\ExportLogger`** — interface lifecycle (`logQueued`, `logCompleted`, `logFailed`). Default binding `Arqel\Export\Logging\NullExportLogger` via `singletonIf` no provider — apps consumidoras sobrescrevem para persistir tabela `exports` e/ou disparar Notifications. Mantém o pacote agnóstico de `User`, `Notification` e schema do `Export` model
+- **`Arqel\Export\Http\Controllers\ExportDownloadController`** — `final class` com `download(string $exportId, Request $request): BinaryFileResponse`. Faz `glob('<dir>/export-{exportId}.*')`, aborta 400 em UUID inválido (regex `/^[a-f0-9-]+$/`), 404 se 0 ou >1 matches. Content-Type derivado da extensão via `ExportFormat::tryFrom(...)?->mimeType()`. **Sem auth check** — consumer apps DEVEM envolver com middleware de autorização própria (`auth` + `can:download-exports` ou similar). Diretório resolvido via config `arqel-export.destination_dir` com fallback `storage_path('app/arqel-exports')`
+- **Rota** `routes/admin.php` → `GET /admin/exports/{exportId}/download` (name `arqel.export.download`, where `[a-f0-9-]+`) sob middleware `web` + `auth`. Wired no provider via `->hasRoute('admin')`
+- **Out of scope (escopo reduzido para este ticket):**
+  - User model + Notification dispatch + tabela `exports` + Export model — responsabilidade do consumer (wire via `ExportLogger` custom)
+  - Loading de records via `Resource::$model::whereIn(...)` — substituído pelo padrão `RecordsResolver` que desacopla o job do Resource API
+  - Cleanup scheduler (`exports:prune`) — adiado
+  - Signed URLs — adiado (endpoint atual é cookie-auth + middleware do consumer)
+- Tests: `Unit/Jobs/ProcessExportJobTest.php` (6 cenários — happy CSV, XLSX com guard ext-zip, PDF com guard `Dompdf`, criação recursiva de diretório, rejeição de classe que não implementa contrato, fallback null → `storage_path`), `Feature/ExportDownloadControllerTest.php` (4 cenários — happy 200, 400 UUID inválido, 404 not found, 404 ambíguo), `Feature/ExportServiceProviderBindingsTest.php` (1 — binding default = `NullExportLogger`)
+
+**Por chegar (EXPORT-007..010):**
+
+- `Arqel\Export\Models\Export` + migration (`exports` table) — fica no app consumer (e/ou ticket futuro do panel)
+- Override de template Blade (`Resource::pdfView()` + `Resource::pdfOrientation()`) — EXPORT-007
+- Cleanup scheduler (`exports:prune`) — EXPORT-008
+- Signed URLs + ownership policy bundled — EXPORT-009
 - Suite full + SKILL.md final — EXPORT-010
 
 ## Conventions

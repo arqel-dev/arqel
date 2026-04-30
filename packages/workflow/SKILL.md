@@ -36,7 +36,23 @@ A escolha é **integrar quando útil, sem amarrar**: a integração canônica é
   - `Unit/WorkflowDefinitionTest` (7): build fluent + rejeição de field vazio + lookup de metadata + fallbacks de label/color/icon + `toArray()` + rejeição de chaves não-string + rejeição de transitions inválidas.
   - **Total: 15 testes** (assumindo execução pós `composer install`).
 
-**Por chegar (WF-003+ — diferidos):**
+**Entregue (WF-004):**
+
+- **`Arqel\Workflow\Events\StateTransitioned`** (final) — evento Laravel disparado *após* uma transição bem-sucedida. Carrega `record: Model`, `from: string`, `to: string`, `userId: ?int`, `context: array<string,mixed>`. Implementa `Dispatchable` + `SerializesModels`. **Não** implementa `ShouldBroadcast` por design — broadcasting é opt-in via listener dedicado, mantendo `arqel/workflow` standalone.
+- **`Arqel\Workflow\Concerns\HasWorkflow::transitionTo(string $newState, array $context = [])`** — helper que captura state atual via `resolveStateKey`, delega à API spatie quando `state->transitionTo()` existir, ou faz attribute assignment + save direto. Após mutação, dispara `StateTransitioned` capturando `Auth::id()`. Suprime evento quando `arqel-workflow.audit.enabled === false` ou `audit.log_via !== 'event'` — útil para migrations / seeders.
+- **`Arqel\Workflow\Concerns\RecordsStateTransition`** trait opcional para classes spatie `Transition` que prefiram disparar o evento canônico no próprio `handle()`. Exemplo de listener registro em `EventServiceProvider`:
+  ```php
+  protected $listen = [
+      \Arqel\Workflow\Events\StateTransitioned::class => [
+          \App\Listeners\LogTransitionToAudit::class,
+          \App\Listeners\BroadcastTransition::class,
+      ],
+  ];
+  ```
+- **Config bloco `audit`** em `arqel-workflow.php`: `enabled` (env `ARQEL_WORKFLOW_AUDIT_ENABLED`, default `true`) + `log_via` (`'event'|'silent'`, default `'event'`).
+- **8 testes Pest** novos em `Feature/StateTransitionedEventTest`: dispatch happy path, context propagation, captura `Auth::id()`, fallback para `null`, audit disabled skip, log_via silent skip, persistência do state após transitionTo, trait `RecordsStateTransition` em fixture spatie-style.
+
+**Por chegar (WF-005+ — diferidos):**
 
 - `StateTransitionField` (Field Arqel para tabela/form) — render do select/dropdown de transições disponíveis no admin (depende do `arqel/fields` API estável).
 - `Http\Controllers\TransitionController` — endpoint `POST /admin/{resource}/{record}/transition/{transition}` que valida + dispara a transição (depende do registro `arqel/core` Resource + auth).

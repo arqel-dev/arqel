@@ -6,6 +6,7 @@ use Arqel\Core\CommandPalette\Command;
 use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Core\Tests\Fixtures\Resources\BrokenIconResource;
+use Arqel\Core\Tests\Fixtures\Resources\BrokenPluralLabelResource;
 use Arqel\Core\Tests\Fixtures\Resources\BrokenSlugResource;
 use Arqel\Core\Tests\Fixtures\Resources\PostResource;
 use Arqel\Core\Tests\Fixtures\Resources\UserResource;
@@ -58,6 +59,16 @@ it('still emits a command when getNavigationIcon throws (icon downgraded to null
 
 it('silently skips resources whose getSlug throws', function (): void {
     $this->registry->register(BrokenSlugResource::class);
+    $this->registry->register(UserResource::class);
+
+    $commands = $this->provider->provide(null, '');
+
+    expect($commands)->toHaveCount(1)
+        ->and($commands[0]->id)->toBe('nav:users');
+});
+
+it('silently skips resources whose getPluralLabel throws', function (): void {
+    $this->registry->register(BrokenPluralLabelResource::class);
     $this->registry->register(UserResource::class);
 
     $commands = $this->provider->provide(null, '');

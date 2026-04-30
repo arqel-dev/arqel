@@ -131,6 +131,23 @@ it('all() does not include commands produced by providers', function (): void {
     expect($this->registry->all())->toBe([]);
 });
 
+it('preserves static-before-provider order when scores tie (empty query)', function (): void {
+    $static = makeCommand('static', 'Static command');
+    $this->registry->register($static);
+
+    $this->registry->registerProvider(
+        fn (?Authenticatable $user, string $query): array => [makeCommand('lazy', 'Lazy command')],
+    );
+
+    $resolved = $this->registry->resolveFor(null, '');
+
+    // Both score 100 on an empty query; tie-break by insertion order
+    // means the static command must come first.
+    expect($resolved)->toHaveCount(2)
+        ->and($resolved[0]->id)->toBe('static')
+        ->and($resolved[1]->id)->toBe('lazy');
+});
+
 it('forwards user and query to providers', function (): void {
     $captured = (object) ['user' => 'untouched', 'query' => 'untouched'];
 

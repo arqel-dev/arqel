@@ -35,5 +35,10 @@ abstract class TestCase extends Orchestra
             'prefix' => '',
             'foreign_key_constraints' => true,
         ]);
+
+        // Stable, deterministic app key so HTTP feature tests can boot
+        // the encrypter (cookie middleware, session, etc.) without
+        // requiring a `.env` file.
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
     }
 }

@@ -27,6 +27,13 @@
 - `FieldSchemaSerializer` (CORE-010) — duck-typed contra `Arqel\Fields\Field`. Filtra fields por `canBeSeenBy(user, record)`, combina `isReadonly` com `canBeEditedBy` num único flag, emite `validation.{rules,messages,attribute}`, `visibility.{create,edit,detail,table,canSee}`, `dependsOn` e `props`. `stringifyRules` descarta Closures e converte rule objects para class-string.
 - `InertiaDataBuilder` (CORE-006 partial → CORE-010) — assembler dos payloads index/create/edit/show. `buildIndexData` paginate sanitizado; `buildCreateData/EditData/ShowData` retornam `{resource, record, recordTitle, recordSubtitle, fields}`. Detecta `Resource::table()` via duck-typing e roteia para `buildTableIndexData` (delega ao `Arqel\Table\TableQueryBuilder` via Reflection).
 - `arqel:install` extendido com auto-instalação frontend (CORE-016) — detecta package manager (`pnpm`/`yarn`/`npm`), instala `@arqel/{react,ui,hooks,fields,types}` + peer dev deps, scaffolda `resources/js/app.tsx` + `resources/css/app.css`. Flag `--no-frontend` para skip; `--force` re-escreve.
+- **Command Palette backend (CMDPAL-001 — escopo reduzido):**
+  - `Arqel\Core\CommandPalette\Command` — value-object readonly com `id/label/url/description/category/icon` e `toArray()` que devolve as 6 chaves (formato consumido pelo `<CommandPalette>` React, que chega num ticket posterior).
+  - `Arqel\Core\CommandPalette\CommandProvider` — contract com `provide(?Authenticatable $user, string $query): array<Command>` para fontes lazy.
+  - `Arqel\Core\CommandPalette\CommandRegistry` — singleton (`packageRegistered()`) com `register(Command)`, `registerProvider(CommandProvider|Closure)` (closures são embrulhadas num adapter anónimo), `resolveFor($user, $query)` (merge static + providers → fuzzy filter → cap em 20), `all()` (apenas commands estáticos), `clear()`.
+  - `Arqel\Core\CommandPalette\FuzzyMatcher` — scorer estático com buckets coarse: empty → 100, exact (case-insensitive) → 95, `str_contains` → 80, subsequence ordenada → 50 + bónus por runs consecutivos, miss → 0. `rank()` aplica `score()` ao label e à description, descarta zeros, ordena desc e corta no limit (default 20).
+  - `Arqel\Core\Http\Controllers\CommandPaletteController` — single-action invokable, lê `?q=`, chama `resolveFor($request->user(), $query)`, devolve `{ commands: [...] }`. Rota: `GET /admin/commands` (`web` + `auth`, name `arqel.commands`) registada via `hasRoute('admin')` em `routes/admin.php`.
+  - **Built-in providers (Navigation/Create/RecordSearch/Theme) ficam para CMDPAL-002** — dependem de introspecção de Resource API e Policy gates, ainda não disponíveis aqui.
 
 ## Key Contracts
 

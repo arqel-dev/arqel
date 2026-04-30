@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Core;
 
+use Arqel\Core\CommandPalette\CommandRegistry;
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
@@ -25,10 +26,19 @@ final class ArqelServiceProvider extends PackageServiceProvider
             ->hasConfigFile('arqel')
             ->hasViews('arqel')
             ->hasTranslations()
+            ->hasRoute('admin')
             ->hasCommands([
                 InstallCommand::class,
                 MakeResourceCommand::class,
             ]);
+    }
+
+    public function packageRegistered(): void
+    {
+        // Bind here so it is available before `packageBooted()` and
+        // before any application provider that may register commands
+        // or providers eagerly during boot.
+        $this->app->singleton(CommandRegistry::class);
     }
 
     public function packageBooted(): void

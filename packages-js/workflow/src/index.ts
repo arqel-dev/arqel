@@ -20,3 +20,14 @@ export {
   type StateTransitionProps,
   type StateTransitionRecord,
 } from './StateTransition.js';
+
+export {
+  buildMermaidSource,
+  slugifyStateId,
+  type WorkflowDefinitionShape,
+  WorkflowVisualizer,
+  type WorkflowVisualizerDirection,
+  type WorkflowVisualizerProps,
+  type WorkflowVisualizerStateShape,
+  type WorkflowVisualizerTransitionShape,
+} from './WorkflowVisualizer.js';

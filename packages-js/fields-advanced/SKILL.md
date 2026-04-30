@@ -17,6 +17,10 @@
 - `src/shared/types.ts` re-exporta `FieldRendererProps` de `@arqel/ui/form` para imports ergonômicos
 - 1 teste Vitest valida que `import('../src/register.js')` não lança e que os 8 nomes ficam disponíveis em `getFieldComponent()`
 
+### Coverage
+
+- Total: 81 testes Vitest passando (smoke do `register.ts` cobre os 8 slots + dynamic-import individual de cada módulo lazy)
+
 **Por chegar (FIELDS-ADV-010..017):**
 
 - `RichTextInput` real (Tiptap + extensões)

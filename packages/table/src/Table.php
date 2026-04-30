@@ -32,6 +32,10 @@ final class Table
 
     public const string DIRECTION_DESC = 'desc';
 
+    public const string MOBILE_MODE_STACKED = 'stacked';
+
+    public const string MOBILE_MODE_SCROLL = 'scroll';
+
     /** @var array<int, mixed> */
     protected array $columns = [];
 
@@ -69,6 +73,8 @@ final class Table
     protected bool $striped = false;
 
     protected bool $compact = false;
+
+    protected string $mobileMode = self::MOBILE_MODE_STACKED;
 
     protected ?string $groupBy = null;
 
@@ -191,6 +197,29 @@ final class Table
         $this->compact = $compact;
 
         return $this;
+    }
+
+    /**
+     * Configure mobile rendering mode.
+     *
+     * Unknown values fall back to {@see self::MOBILE_MODE_STACKED}
+     * defensively — this flag is read by the React layer to decide
+     * between stacked-card layout and horizontal scroll. Throwing
+     * here would crash Inertia render for a typo; the default is
+     * the safe choice.
+     */
+    public function mobileMode(string $mode): self
+    {
+        $this->mobileMode = in_array($mode, [self::MOBILE_MODE_STACKED, self::MOBILE_MODE_SCROLL], true)
+            ? $mode
+            : self::MOBILE_MODE_STACKED;
+
+        return $this;
+    }
+
+    public function getMobileMode(): string
+    {
+        return $this->mobileMode;
     }
 
     public function groupBy(string $field, ?Closure $labelResolver = null): self
@@ -408,6 +437,7 @@ final class Table
                 'selectable' => $this->selectable,
                 'striped' => $this->striped,
                 'compact' => $this->compact,
+                'mobileMode' => $this->mobileMode,
             ],
             'emptyState' => $this->emptyStateHeading !== null ? [
                 'heading' => $this->emptyStateHeading,

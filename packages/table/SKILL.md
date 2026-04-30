@@ -60,6 +60,13 @@
 - **`toArray()`** mescla `{groupBy, summaries: [...summary.toArray()]}` ao payload Inertia (groups são computados em render time).
 - 16 testes (9 Summaries + 6 Grouping + 141 total table). React rendering (sticky headers + summary rows) deferida para TABLE-JS-XXX.
 
+**Entregue (TABLE-V2-007 — PHP slice):**
+
+- **`Table::mobileMode(string)`** + 2 constantes: `Table::MOBILE_MODE_STACKED = 'stacked'` (default) e `Table::MOBILE_MODE_SCROLL = 'scroll'`. Getter `getMobileMode(): string`. `toArray()` mescla `config.mobileMode`.
+- **Defensivo**: valor desconhecido (typo, string vazia, etc.) cai silenciosamente para `'stacked'` — não throw, porque um typo não deve crashar o render do Inertia. O default é a opção segura.
+- 7 unit tests em `tests/Unit/Table/MobileModeTest.php`.
+- **Diferido para `@arqel/ui`**: rendering real de stacked-cards no `<DataTable>` (detect breakpoint via `useBreakpoint()`, em `sm` ou menor renderiza cards com `Card`/checkbox/actions per record). `'scroll'` mantém a tabela horizontal com overflow. Esta PHP slice é só o config flag que o React lê.
+
 **Diferido para tickets follow-up cross-package:**
 
 - **`POST {panel}/{resource}/{id}/inline-update` controller** (TABLE-V2-002) — depende de `arqel/core` para policy authorization + `ResourceRegistry::findBySlug()`

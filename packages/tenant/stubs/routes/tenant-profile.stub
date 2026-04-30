@@ -1,0 +1,6 @@
+use App\Http\Controllers\TenantSettingsController;
+
+Route::middleware(['web', 'auth'])->prefix('admin/settings')->group(function () {
+    Route::get('tenant', [TenantSettingsController::class, 'edit'])->name('tenant.settings.edit');
+    Route::put('tenant', [TenantSettingsController::class, 'update'])->name('tenant.settings.update');
+});

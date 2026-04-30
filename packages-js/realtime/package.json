@@ -1,0 +1,65 @@
+{
+  "name": "@arqel/realtime",
+  "version": "0.10.0-rc.1",
+  "description": "Laravel Echo + Reverb setup helper para Arqel — bootstrap WebSocket realtime pipeline.",
+  "license": "MIT",
+  "homepage": "https://arqel.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arqel/arqel.git",
+    "directory": "packages-js/realtime"
+  },
+  "keywords": [
+    "arqel",
+    "laravel",
+    "inertia",
+    "react",
+    "realtime",
+    "echo",
+    "reverb",
+    "websocket"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check --diagnostic-level=error src tests",
+    "format": "biome format --write src tests",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "laravel-echo": "^2.0.0",
+    "pusher-js": "^8.4.0"
+  },
+  "peerDependencies": {
+    "@inertiajs/react": "^3.0.0",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

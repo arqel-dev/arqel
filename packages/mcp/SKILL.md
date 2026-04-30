@@ -57,17 +57,26 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 
 **Entregue (MCP-006):**
 
-- **`Tools\RunTestTool` (final)** — quarta tool exposta; wrapper de Pest/PHPUnit para fluxo TDD com o LLM no loop. `schema()` devolve `name=run_test`, `description="Run Pest or PHPUnit tests with optional filter"`, `inputSchema={type:object, properties:{filter:string, path:string, coverage:boolean (default false)}}` — **sem chave `required`** (todos os parâmetros são opcionais). `__invoke(array)` monta `cmd = ['./vendor/bin/pest']`, anexa `--filter={value}` se `filter` for string não-vazia, anexa `path` posicional, anexa `--coverage` se a flag for `true`, e devolve payload `{exitCode, output, errorOutput, success, command}` (`success === exitCode === 0`; `command` é o `implode(' ', $cmd)` para introspecção do LLM)
-- **Validação de segurança do `path`**: rejeita paths absolutos (`str_starts_with($path, '/')`) e qualquer `..` (`str_contains($path, '..')`) com `InvalidArgumentException("path must be relative and may not contain '..'")`. Bloqueia escape do diretório do projeto antes mesmo de invocar o runner — o LLM não consegue chamar `pest /etc/passwd` nem `pest ../../outro-projeto`
-- **Timeout clamp**: parâmetro `timeout` (segundos) é clampado ao intervalo inclusivo `[1, 600]`; default 300s (cinco minutos, conforme spec). Não-int é tratado como default. Garante que um LLM não consiga rodar a suite indefinidamente nem com timeout zero (que travaria o Process)
-- **Closure runner (testabilidade)**: construtor aceita `?Closure $runner = null` com signature `(array<int, string> $cmd, int $timeoutSeconds): array{exitCode, output, errorOutput}` — testes unitários injetam closure que captura `$cmd`/`$timeout` e devolve resultado mock. Default runner (apenas em produção/dogfooding) instancia `Symfony\Component\Process\Process($cmd)`, chama `setTimeout($timeout)` + `run()`, e devolve os outputs. Mesmo padrão dos outros 3 tools
-- **Auto-registro**: `McpServiceProvider::packageBooted()` agora registra **4 tools** built-in (`list_resources`, `describe_resource`, `generate_resource`, `run_test`), todas via mesmo padrão `$server->registerTool($name, $description, $inputSchema, $handler)`
-- **10 testes novos** (9 unit + 1 feature): schema canônico (incluindo ausência de `required`), happy path com captura de cmd + timeout default 300, passthrough de `filter`/`path`/`coverage`, dois casos de path traversal (`..` e absoluto), clamp de timeout high (`999` → `600`) e low (`0` → `1`), failure path (`exitCode=1` → `success=false` + `errorOutput` propagado), auto-registro das 4 tools no boot
+- **`Tools\RunTestTool` (final)** — quarta tool exposta; wrapper de Pest/PHPUnit para fluxo TDD com o LLM no loop. `schema()` devolve `name=run_test`, `description="Run Pest or PHPUnit tests with optional filter"`, `inputSchema={type:object, properties:{filter:string, path:string, coverage:boolean (default false)}}` — **sem chave `required`** (todos os parâmetros são opcionais). `__invoke(array)` monta `cmd = ['./vendor/bin/pest']`, anexa `--filter={value}` se `filter` for string não-vazia, anexa `path` posicional, anexa `--coverage` se a flag for `true`, e devolve payload `{exitCode, output, errorOutput, success, command}`
+- **Validação de segurança do `path`**: rejeita paths absolutos (`str_starts_with($path, '/')`) e qualquer `..` (`str_contains($path, '..')`) com `InvalidArgumentException`. Bloqueia escape do diretório do projeto antes mesmo de invocar o runner
+- **Timeout clamp**: parâmetro `timeout` (segundos) é clampado ao intervalo inclusivo `[1, 600]`; default 300s
+- **Closure runner**: construtor aceita `?Closure $runner = null` para testabilidade. Default runner usa `Symfony\Component\Process\Process`. Mesmo padrão dos outros 3 tools
+- **Auto-registro**: `McpServiceProvider::packageBooted()` agora registra **4 tools** built-in (`list_resources`, `describe_resource`, `generate_resource`, `run_test`)
+- **10 testes novos** (9 unit + 1 feature)
 
-**Por chegar (MCP-007..010):**
+**Entregue (MCP-007):**
+
+- **`Resources\SkillResource` (final)** — primeiro MCP Resource exposto. URI scheme: `arqel-skill://<package>` onde `<package>` casa `[a-z0-9-]+` e referencia uma pasta sob `packages/` no monorepo (ex.: `arqel-skill://core` → `packages/core/SKILL.md`). API:
+  - `list(): array` — devolve lista de entries `{uri, name, description, mimeType: 'text/markdown'}`, uma por package descoberto
+  - `read(string $uri): array` — valida URI via regex `^arqel-skill://([a-z0-9-]+)$` (uppercase, slashes ou outros caracteres → `RuntimeException('Invalid URI: ...')`), lê o `SKILL.md` correspondente e devolve no envelope MCP `{contents: [{uri, mimeType, text}]}`. Erro de leitura é re-embrulhado como `RuntimeException('SKILL.md not found for arqel/<package>')`
+- **Closure injection (testabilidade)**: construtor aceita `?Closure $packagesResolver = null` e `?Closure $contentReader = null` — testes injetam closures e bypassam filesystem. Default discover via `glob(<root>/packages/*/SKILL.md)`
+- **Path resolution**: tenta `Container::getInstance()->make('path.base')` primeiro e cai para `realpath(__DIR__/../../../..)` quando o `base_path` do host não tiver `packages/`. Permite dogfooding do monorepo sem config manual
+- **Auto-registro pre-flattened**: `packageBooted()` chama `SkillResource::list()` UMA vez no boot e registra cada entry como resource individual no `McpServer`. Restart necessário se SKILL.md são adicionados em runtime
+- **11 testes novos** (9 unit + 2 feature)
+
+**Por chegar (MCP-008..010):**
 
 - Artisan `arqel:mcp:serve` envolvendo `McpServer::serve()` — followup de MCP-002
-- Resource: `arqel_skill` (expor SKILL.md de cada pacote) — MCP-007
 - Auth (token bearer + tenant scoping via `arqel/tenant`) — MCP-008
 - Streaming responses para tools de longa duração — MCP-009
 - Manifest publishing (`mcp.json` para Claude Desktop autoinstall) — MCP-010

@@ -34,6 +34,25 @@ A escolha é **integrar, não reinventar**: ActivityLog do Spatie é maduro, bem
   - `Unit/LogsActivityFetchTest` (2): paginator default + `perPage` honrado
   - **Total acumulado: 18 testes passando**
 
+**Entregue (AUDIT-003 — escopo reduzido / "scoped"):**
+
+- **`Arqel\Audit\Http\Controllers\GlobalActivityLogController`** (final) — endpoint global filtrável `index(Request): JsonResponse`. Constrói `Activity::query()->with('causer')->latest('created_at')` e aplica filtros opcionais via `when()`. Devolve mesmo shape do `RecordActivityController` para o React poder reaproveitar o renderer.
+  - Query params suportados (8):
+    - `log_name` — string filter exato
+    - `event` — string em whitelist `['created','updated','deleted','restored']`. Valor fora da lista → HTTP 400 `{error: 'invalid_event'}`
+    - `causer_type` — FQCN do model causador
+    - `causer_id` — int|string (cast automático)
+    - `from` — ISO 8601, range `created_at >= from`
+    - `to` — ISO 8601, range `created_at <= to`. Quando `from` + `to` ambos presentes, usa `whereBetween('created_at', [from, to])`. Parse via `Carbon::parse` defensivo; `Throwable` → HTTP 400 `{error: 'invalid_date'}`
+    - `per_page` — int, clampado em `1..200`, default 20
+- **Rota** `GET /admin/audit/activity` registrada em `routes/admin.php` (middleware `['web', 'auth']`, name `arqel.audit.activity-log`)
+- **Config `config/audit.php`** carregado via `->hasConfigFile('audit')` no `AuditServiceProvider`. Chaves: `global_log_url` (default `/admin/audit/activity`), `navigation_label` (`Activity Log`), `navigation_group` (`Settings`), `navigation_icon` (`activity`). Servem como contrato estável para o futuro `ActivityLogResource` consumir
+- **Decisão de escopo:** o spec original do AUDIT-003 monta `ActivityLogResource extends Resource` com `table()`/`filters()` apoiados em `arqel/core` Resource API + `arqel/table` Column/Filter API. Essas APIs ainda não são consumíveis a partir de `arqel/audit` sem coupling indesejado, então a integração na nav do panel + a página Inertia ficam **diferidas para um ticket cross-package follow-up**. O controller + rota + config flags entregues aqui dão a base estável que essa Resource futura vai consumir
+- Testes adicionados:
+  - `Feature/GlobalActivityLogControllerTest` (11): happy path com 3 fixtures (sort desc) + filter `log_name` + filter `event` + 400 em `event` inválido + filter `causer_type+causer_id` + 3 cenários de date range (from, to, both) + 400 em data inválida + clamp `per_page=999→200` + clamp `per_page=0→1`
+  - `Feature/AuditConfigTest` (2): config `audit` carregado + `global_log_url` aponta para a rota
+  - **Total acumulado: 31 testes passando**
+
 **Por chegar (cross-package + JS):**
 
 - React `ActivityTimeline` component (FIELDS-JS / ticket JS dedicado) — render bonito com diff, avatar do causer, timestamps relativos, filtros

@@ -31,6 +31,7 @@
         "arqel/table": "@dev",
         "arqel/tenant": "@dev",
         "arqel/widgets": "@dev",
+        "arqel/workflow": "@dev",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29"
     },

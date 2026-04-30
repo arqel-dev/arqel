@@ -1,0 +1,22 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    excludePaths:
+        analyseAndScan:
+            - vendor/*
+    tmpDir: .phpstan.cache
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # The HasWorkflow trait is only consumed by user-land Eloquent
+        # models — PHPStan cannot see a concrete consumer in our analysed
+        # paths and reports `trait.unused`. Tests use it via fixtures
+        # under `tests/Fixtures/`.
+        -
+            identifier: trait.unused
+            path: src/Concerns/HasWorkflow.php

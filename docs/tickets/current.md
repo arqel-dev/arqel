@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..015 ✅ · WIDGETS-001..009 + 013..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 + 019/020 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001/002/005 ✅) + 9 bugs do dogfooding fechados + Batch #1..#19 paralelos completos.** Próximo natural: DOCS-V2-001 (docs guides), DOCS-V2-002 (migration guides), GOV-V2 (release pipeline), CMDPAL-003/004 (React side), FIELDS-ADV-010..017 (React fields).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..015 ✅ · WIDGETS-001..009 + 013..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 + 019/020 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001/002/005 ✅ · DOCS-V2-001/002 ✅ · GOV-V2-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#20 paralelos completos.** Próximo natural: React side (FIELDS-ADV-010..017, CMDPAL-003/004, WIDGETS-010..012), real release tag v0.8.0-rc.1 seguindo `docs/release-checklist-v0.8.md`.
 
 **Fase:** 1 (MVP)
 

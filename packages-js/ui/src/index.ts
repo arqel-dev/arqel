@@ -65,5 +65,8 @@ export type { LoadingSkeletonProps, SkeletonVariant } from './utility/LoadingSke
 export { LoadingSkeleton } from './utility/LoadingSkeleton.js';
 export type { PageHeaderProps } from './utility/PageHeader.js';
 export { PageHeader } from './utility/PageHeader.js';
-
 export { cn } from './utils/cn.js';
+export type { StatCardColor, StatCardProps, StatCardWidget } from './widgets/StatCard.js';
+export { StatCard } from './widgets/StatCard.js';
+export type { WidgetWrapperProps } from './widgets/WidgetWrapper.js';
+export { WidgetWrapper } from './widgets/WidgetWrapper.js';

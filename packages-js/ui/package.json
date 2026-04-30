@@ -71,6 +71,10 @@
       "types": "./dist/palette.d.ts",
       "import": "./dist/palette.js"
     },
+    "./widgets": {
+      "types": "./dist/widgets.d.ts",
+      "import": "./dist/widgets.js"
+    },
     "./styles.css": "./src/styles/globals.css"
   },
   "files": [

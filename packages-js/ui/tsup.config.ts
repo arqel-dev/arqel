@@ -14,6 +14,7 @@ export default defineConfig({
     utils: 'src/utils/index.ts',
     pages: 'src/pages/index.ts',
     palette: 'src/palette/index.ts',
+    widgets: 'src/widgets/index.ts',
   },
   format: ['esm'],
   dts: true,

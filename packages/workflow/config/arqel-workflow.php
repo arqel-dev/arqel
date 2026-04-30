@@ -43,4 +43,26 @@ return [
     ],
 
     'broadcast_transitions' => env('ARQEL_WORKFLOW_BROADCAST', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authorization (WF-006)
+    |--------------------------------------------------------------------------
+    |
+    | `TransitionAuthorizer` decide se uma transition é permitida para um
+    | par (user, record) via:
+    |   1. método `authorizeFor($user, $record): bool` na transition class
+    |   2. `Gate::allows("transition-{from}-to-{to}", $record)` quando a
+    |      ability está registrada
+    |   3. fallback controlado por `deny_when_undefined`.
+    |
+    | `deny_when_undefined => true` (default) **nega** transitions quando
+    | nem `authorizeFor` nem Gate estão configurados — postura segura por
+    | padrão. Apps em migração que dependiam do comportamento WF-003
+    | (autorizar tudo na ausência de Gate) podem definir `false` para
+    | reverter ao legacy mode.
+    */
+    'authorization' => [
+        'deny_when_undefined' => env('ARQEL_WORKFLOW_DENY_WHEN_UNDEFINED', true),
+    ],
 ];

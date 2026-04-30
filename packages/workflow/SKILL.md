@@ -52,7 +52,15 @@ A escolha é **integrar quando útil, sem amarrar**: a integração canônica é
 - **Config bloco `audit`** em `arqel-workflow.php`: `enabled` (env `ARQEL_WORKFLOW_AUDIT_ENABLED`, default `true`) + `log_via` (`'event'|'silent'`, default `'event'`).
 - **8 testes Pest** novos em `Feature/StateTransitionedEventTest`: dispatch happy path, context propagation, captura `Auth::id()`, fallback para `null`, audit disabled skip, log_via silent skip, persistência do state após transitionTo, trait `RecordsStateTransition` em fixture spatie-style.
 
-**Por chegar (WF-005+ — diferidos):**
+**Entregue (WF-006):**
+
+- **`Arqel\Workflow\Authorization\TransitionAuthorizer`** (final readonly) — autorização central. 3 camadas em ordem de precedência: (1) `authorizeFor(?Authenticatable $user, mixed $record): bool` na transition class (estático ou instância — preferido); (2) Gate `transition-{fromSlug}-to-{toSlug}`; (3) **deny by default** — flag opt-out via `arqel-workflow.authorization.deny_when_undefined => false` (preserva legado WF-003). Exceções no `authorizeFor` degradam para `false` (fail closed).
+- Helper público `TransitionAuthorizer::slugifyState(string $stateClassOrKey): string` — kebab-case do segmento final do FQCN, sufixos `State` removidos. Útil para gerar Gate names manualmente.
+- **`StateTransitionField::resolveAvailableTransitions()`** atualizado para delegar ao `TransitionAuthorizer`. Payload `transitions[].authorized` reflete o resultado das 3 camadas.
+- **Breaking change vs WF-003**: `StateTransitionField` original retornava `true` quando nenhuma Gate estava registrada. Agora deny-by-default — defina a flag `deny_when_undefined => false` para opt-out.
+- **10 Pest tests** novos (8 unit + 2 feature integration).
+
+**Por chegar (WF-007+ — diferidos):**
 
 - `StateTransitionField` (Field Arqel para tabela/form) — render do select/dropdown de transições disponíveis no admin (depende do `arqel/fields` API estável).
 - `Http\Controllers\TransitionController` — endpoint `POST /admin/{resource}/{record}/transition/{transition}` que valida + dispara a transição (depende do registro `arqel/core` Resource + auth).

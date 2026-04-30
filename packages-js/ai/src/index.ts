@@ -13,3 +13,10 @@ export {
   type AiTextInputProps,
   default,
 } from './AiTextInput.js';
+
+export {
+  AiTranslateInput,
+  type AiTranslateInputFieldProps,
+  type AiTranslateInputProps,
+  type AiTranslateValue,
+} from './AiTranslateInput.js';

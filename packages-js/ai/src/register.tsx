@@ -1,22 +1,27 @@
 /**
- * Side-effect import that registers `<AiTextInput>` into `@arqel/ui`'s
- * FieldRegistry, lazily.
+ * Side-effect import que registra os componentes do `@arqel/ai` no
+ * FieldRegistry do `@arqel/ui`, lazily.
  *
  *   import '@arqel/ai/register';
  *
- * The component name (`AiTextInput`) matches the value emitted by
- * `Arqel\Ai\Fields\AiTextField::component()` server-side. Apps may
- * re-register their own component under the same key to override the
- * default.
+ * Os component names (`AiTextInput`, `AiTranslateInput`) batem com o
+ * que o PHP retorna em `getComponent()`. Apps podem re-registrar seus
+ * próprios componentes sob a mesma chave para sobrescrever o default.
  *
- * `<AiTextInput>` takes a domain-specific prop shape; the registry
- * expects a generic `{ field, value }` adapter, so we wrap here.
+ * Os componentes têm shapes de props específicos do domínio; o
+ * registry espera um adapter genérico `{ field, value }`, então cada
+ * um é envolvido aqui.
  */
 
 import type { FieldSchema } from '@arqel/types/fields';
 import { registerField } from '@arqel/ui/form';
 import { type ComponentType, lazy, type ReactElement } from 'react';
 import type { AiTextInputFieldProps, AiTextInputProps } from './AiTextInput.js';
+import type {
+  AiTranslateInputFieldProps,
+  AiTranslateInputProps,
+  AiTranslateValue,
+} from './AiTranslateInput.js';
 
 interface RegistryFieldProps {
   field: FieldSchema;
@@ -49,9 +54,53 @@ function adaptToAiTextInput(
   };
 }
 
+function adaptToAiTranslateInput(
+  Component: ComponentType<AiTranslateInputProps>,
+): ComponentType<RegistryFieldProps> {
+  return function AiTranslateInputAdapter(registryProps: RegistryFieldProps): ReactElement {
+    const { field, value, onChange, resource, csrfToken } = registryProps;
+    const fieldProps = (field as unknown as { props?: AiTranslateInputFieldProps }).props;
+    // O FieldRegistry tipa `onChange` como `(value: string) => void`,
+    // mas este field emite um `Record<string, string>`; o cast é
+    // compatível em runtime e mantém o registry agnóstico ao shape.
+    const onChangeAdapted =
+      onChange !== undefined
+        ? (next: AiTranslateValue) => {
+            (onChange as unknown as (v: AiTranslateValue) => void)(next);
+          }
+        : undefined;
+
+    const objectValue: AiTranslateValue | null =
+      value !== null && typeof value === 'object' && !Array.isArray(value)
+        ? (value as AiTranslateValue)
+        : null;
+
+    return (
+      <Component
+        name={field.name}
+        value={objectValue}
+        props={fieldProps}
+        {...(onChangeAdapted !== undefined ? { onChange: onChangeAdapted } : {})}
+        {...(resource !== undefined ? { resource } : {})}
+        field={field.name}
+        {...(csrfToken !== undefined ? { csrfToken } : {})}
+      />
+    );
+  };
+}
+
 const LazyAiTextInput = lazy(async () => {
   const mod = await import('./AiTextInput.js');
   return { default: adaptToAiTextInput(mod.AiTextInput) };
 });
 
+const LazyAiTranslateInput = lazy(async () => {
+  const mod = await import('./AiTranslateInput.js');
+  return { default: adaptToAiTranslateInput(mod.AiTranslateInput) };
+});
+
 registerField('AiTextInput', LazyAiTextInput as unknown as Parameters<typeof registerField>[1]);
+registerField(
+  'AiTranslateInput',
+  LazyAiTranslateInput as unknown as Parameters<typeof registerField>[1],
+);

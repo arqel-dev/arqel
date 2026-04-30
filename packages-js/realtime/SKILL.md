@@ -90,9 +90,45 @@ function getEcho(): EchoLike | null {
 - Trocar o `broadcaster` para algo diferente de `'reverb'` neste helper —
   se precisar Pusher direto, instancie Echo manualmente.
 
+## Connection resilience (RT-010)
+
+Além do `setupEcho`, o pacote expõe três utilitários para UX graceful
+quando o WebSocket cai:
+
+- `useConnectionStatus()` — hook que devolve
+  `{ status, lastConnectedAt, retryCount }` lendo os eventos do
+  `window.Echo.connector.pusher.connection`. SSR-safe (degrada para
+  `'unavailable'` quando `window.Echo` não aparece em até ~5s).
+- `useFallbackPolling({ enabled, intervalMs, only })` — quando
+  `enabled` é `true`, dispara `router.reload({ only })` periodicamente.
+  Útil para acionar durante disconnect e manter "near-realtime".
+- `<ConnectionStatusBanner />` — componente que combina ambos. Renderiza
+  `null` para `connected` e `unavailable`; em `disconnected` /
+  `connecting` / `failed` mostra um banner inline com `role="status"`
+  e `aria-live="polite"`.
+
+Exemplo típico no layout do panel:
+
+```tsx
+import { ConnectionStatusBanner } from '@arqel/realtime';
+
+export function PanelLayout({ children }: { children: ReactNode }) {
+  return (
+    <>
+      <ConnectionStatusBanner pollOnDisconnect pollOnly={['records']} />
+      {children}
+    </>
+  );
+}
+```
+
+`pollOnDisconnect` ativa o fallback Inertia apenas durante o estado
+`'disconnected'` (em `'connecting'` o Pusher já está negociando; em
+`'failed'` polling não resolve — usuário precisa de refresh).
+
 ## Related
 
-- Ticket: `PLANNING/10-fase-3-avancadas.md` → RT-008.
+- Tickets: `PLANNING/10-fase-3-avancadas.md` → RT-008, RT-010.
 - Hooks consumidores: `packages-js/hooks/src/useResource*` e
   `useAction*`.
 - PHP backend: `packages/realtime` (RT-001 — broadcasting service

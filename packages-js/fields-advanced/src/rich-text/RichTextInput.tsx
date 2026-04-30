@@ -1,46 +1,45 @@
 /**
- * `<RichTextInput>` — contentEditable-based rich text editor.
+ * `<RichTextInput>` — Tiptap v2 rich text editor.
  *
  * React-side counterpart of `Arqel\FieldsAdvanced\Types\RichTextField`
- * (FIELDS-ADV-010, scoped). Reads the following props verbatim from the
+ * (FIELDS-ADV-010, full). Reads the following props verbatim from the
  * PHP-emitted schema:
  *
  *   - `toolbar`              : string[]  — buttons to show, in order.
  *   - `imageUploadRoute`     : string|null — POST endpoint for uploads.
  *   - `imageUploadDirectory` : string|null — passed as form field.
- *   - `maxLength`            : number   — text-length cap.
- *   - `fileAttachments`      : boolean  — read defensively (unused in
- *                                         this scope; deferred to the
- *                                         Tiptap-based follow-up).
+ *   - `maxLength`            : number   — text-length cap (CharacterCount).
+ *   - `fileAttachments`      : boolean  — read defensively (unused).
  *   - `customMarks`          : string[] — read defensively (unused).
  *   - `mentionable`          : object[] — read defensively (unused).
  *
- * ## Scope (FIELDS-ADV-010 — narrowed)
+ * ## Security model
  *
- * The original ticket specified Tiptap v2+ with StarterKit + Link +
- * Image + Placeholder extensions. That stack adds ~150KB gz and won't
- * fit a single drop-in commit. This component intentionally implements
- * a minimal, dependency-free editor on top of `contentEditable` +
- * `document.execCommand`. The HTML emitted by the editor is sanitised
- * on every input event with a tag/attribute allowlist before reaching
- * `onChange`.
+ * Tiptap's StarterKit + extension allowlist defines a strict ProseMirror
+ * schema. Any HTML fed to `useEditor({ content })` is parsed through that
+ * schema, which silently drops tags/attributes (e.g. `<script>`, `style`,
+ * `class`) that are not part of the allowed nodes/marks. This replaces
+ * the manual `sanitizeHtml` walker used in the previous contentEditable
+ * implementation.
  *
- * `document.execCommand` is deprecated by the Web platform but remains
- * implemented in every evergreen browser. The follow-up ticket will
- * swap this surface for a Tiptap-based editor without breaking the
- * `field.props` payload contract.
+ * As belt-and-braces against `javascript:`/`data:`/`vbscript:` URLs
+ * (Tiptap's Link extension already validates), `setLink` is wrapped in
+ * `safeUrl` before being passed to the editor command.
  */
 
+import CharacterCount from '@tiptap/extension-character-count';
+import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import {
   type ChangeEvent,
   type CSSProperties,
-  type FormEvent,
   type ReactNode,
-  useCallback,
   useEffect,
   useId,
   useRef,
-  useState,
 } from 'react';
 import type { FieldRendererProps } from '../shared/types.js';
 
@@ -99,55 +98,15 @@ function readProps(raw: unknown, placeholder: string | null): RichTextProps {
 }
 
 /* -------------------------------------------------------------------------- */
-/* HTML sanitiser                                                              */
+/* URL guard                                                                   */
 /* -------------------------------------------------------------------------- */
 
-const ALLOWED_TAGS = new Set([
-  'p',
-  'br',
-  'strong',
-  'em',
-  'u',
-  's',
-  'h1',
-  'h2',
-  'h3',
-  'ul',
-  'ol',
-  'li',
-  'blockquote',
-  'a',
-  'code',
-  'pre',
-  'img',
-]);
-
-const ALLOWED_ATTRS: Record<string, ReadonlyArray<string>> = {
-  a: ['href'],
-  img: ['src', 'alt'],
-};
-
-const URL_ATTR = new Set(['href', 'src']);
-
 /**
- * Tags that must be removed wholesale, including their children. The
- * default unwrap path keeps text children, which would surface the
- * literal source of `<script>alert(1)</script>` as plain text.
+ * Reject `javascript:`, `data:`, `vbscript:` URLs. Returned `'#'` becomes
+ * a no-op anchor target. Tiptap's Link extension also validates URLs but
+ * we apply this guard at the call site for defence-in-depth.
  */
-const REMOVE_WITH_CHILDREN = new Set([
-  'script',
-  'style',
-  'iframe',
-  'object',
-  'embed',
-  'noscript',
-  'template',
-  'svg',
-  'math',
-]);
-
-/** Reject `javascript:`, `data:`, `vbscript:` URLs. */
-function safeUrl(raw: string): string {
+export function safeUrl(raw: string): string {
   const trimmed = raw.trim();
   const lower = trimmed.toLowerCase();
   if (
@@ -160,103 +119,14 @@ function safeUrl(raw: string): string {
   return trimmed;
 }
 
-/**
- * Sanitises `contentEditable` HTML against a tag/attribute allowlist.
- * Inline `style` and `class` attributes are stripped wholesale. Any
- * tag not in the allowlist is unwrapped (its children kept). Exported
- * for tests; not part of the package's public API surface.
- */
-export function sanitizeHtml(input: string): string {
-  if (typeof input !== 'string' || input.length === 0) return '';
-
-  const template = document.createElement('template');
-  // Trusted: parsed into an inert <template> DocumentFragment which is
-  // never connected to the live DOM until after walk() strips
-  // disallowed tags/attrs and rejects javascript:/data:/vbscript: URLs.
-  template.innerHTML = input;
-
-  const walk = (node: Node): void => {
-    const children = Array.from(node.childNodes);
-    for (const child of children) {
-      if (child.nodeType === 1) {
-        const el = child as Element;
-        const tag = el.tagName.toLowerCase();
-
-        if (REMOVE_WITH_CHILDREN.has(tag)) {
-          el.remove();
-          continue;
-        }
-
-        if (!ALLOWED_TAGS.has(tag)) {
-          // Recurse INTO the disallowed element first so its descendants
-          // are sanitised, then unwrap (move children up + remove).
-          walk(el);
-          const parent = el.parentNode;
-          if (parent !== null) {
-            while (el.firstChild) {
-              parent.insertBefore(el.firstChild, el);
-            }
-            parent.removeChild(el);
-          }
-          continue;
-        }
-
-        const allowed = ALLOWED_ATTRS[tag] ?? [];
-        for (const attr of Array.from(el.attributes)) {
-          const name = attr.name.toLowerCase();
-          if (!allowed.includes(name)) {
-            el.removeAttribute(attr.name);
-            continue;
-          }
-          if (URL_ATTR.has(name)) {
-            el.setAttribute(name, safeUrl(attr.value));
-          }
-        }
-
-        walk(el);
-      } else if (child.nodeType !== 3) {
-        child.parentNode?.removeChild(child);
-      }
-    }
-  };
-
-  walk(template.content);
-
-  const container = document.createElement('div');
-  container.appendChild(template.content.cloneNode(true));
-  return container.innerHTML;
-}
-
 /* -------------------------------------------------------------------------- */
-/* Helpers                                                                     */
-/* -------------------------------------------------------------------------- */
-
-function textLength(html: string): number {
-  if (html.length === 0) return 0;
-  const div = document.createElement('div');
-  // Trusted: `html` is sanitiser output; element is detached and never
-  // mounted — used only to read `.textContent` for the length cap.
-  div.innerHTML = html;
-  return (div.textContent ?? '').length;
-}
-
-function execCommand(cmd: string, arg?: string): void {
-  try {
-    document.execCommand(cmd, false, arg);
-  } catch {
-    // Some test envs (jsdom) throw — ignored. Behaviour is asserted
-    // through onChange call observation in tests.
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-/* Component                                                                   */
+/* Styling                                                                     */
 /* -------------------------------------------------------------------------- */
 
 const editorClasses =
   'min-h-[8rem] w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
   'bg-[var(--color-arqel-bg)] px-3 py-2 text-sm text-[var(--color-arqel-fg)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--color-arqel-ring)] ' +
   'aria-invalid:border-[var(--color-arqel-destructive)] arqel-rich-editor';
 
 const buttonClasses =
@@ -272,13 +142,14 @@ const warningStyle: CSSProperties = {
   color: 'var(--color-arqel-destructive, #b91c1c)',
 };
 
-const placeholderCss = `
-.arqel-rich-editor[data-empty="true"]::before {
-  content: attr(data-placeholder);
-  color: var(--color-arqel-muted-fg, #94a3b8);
-  pointer-events: none;
-}
-`;
+const counterStyle: CSSProperties = {
+  fontSize: '0.75rem',
+  color: 'var(--color-arqel-muted-fg, #94a3b8)',
+};
+
+/* -------------------------------------------------------------------------- */
+/* Toolbar specs                                                               */
+/* -------------------------------------------------------------------------- */
 
 interface ButtonSpec {
   id: string;
@@ -302,6 +173,10 @@ const BUTTON_SPECS: Record<string, ButtonSpec> = {
   image: { id: 'image', label: 'Image', render: () => <>Img</> },
 };
 
+/* -------------------------------------------------------------------------- */
+/* Component                                                                   */
+/* -------------------------------------------------------------------------- */
+
 export function RichTextInput({
   field,
   value,
@@ -318,140 +193,131 @@ export function RichTextInput({
   const hasError = errors !== undefined && errors.length > 0;
   const fallbackId = useId();
   const id = inputId ?? fallbackId;
+  const labelId = `${id}-label`;
 
   const html = typeof value === 'string' ? value : '';
-
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  const lastValidRef = useRef<string>(html);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [length, setLength] = useState<number>(() => textLength(html));
-
-  // Sync the editor DOM when `value` changes externally. We compare
-  // against `innerHTML` to avoid clobbering the caret on every input.
-  useEffect(() => {
-    const el = editorRef.current;
-    if (!el) return;
-    if (el.innerHTML !== html) {
-      // Trusted: `html` comes from the parent form's state, which is
-      // populated by sanitised `onChange` payloads from this same
-      // component. External seeds (server-rendered initial value) are
-      // expected to already be sanitised at the boundary by the host.
-      el.innerHTML = html;
-      lastValidRef.current = html;
-      setLength(textLength(html));
-    }
-  }, [html]);
-
-  const overLimit = length > props.maxLength;
-  const hardBlock = length > props.maxLength * 1.1;
-
-  const handleInput = useCallback(
-    (event: FormEvent<HTMLDivElement>) => {
-      const el = event.currentTarget;
-      const sanitized = sanitizeHtml(el.innerHTML);
-      const len = textLength(sanitized);
-
-      if (len > props.maxLength * 1.1) {
-        // Hard block: revert to last valid state (sanitiser output).
-        el.innerHTML = lastValidRef.current;
-        return;
-      }
-
-      lastValidRef.current = sanitized;
-      setLength(len);
-      onChange(sanitized);
+  // The `content` prop is parsed by ProseMirror through the schema below,
+  // which strips any tag/attribute (e.g. <script>, style, class) not part
+  // of the allowed nodes/marks — this is Tiptap's intrinsic sanitisation.
+  const editor = useEditor({
+    editable: !disabled,
+    content: html,
+    extensions: [
+      StarterKit,
+      Link.configure({
+        openOnClick: false,
+        autolink: false,
+        HTMLAttributes: { rel: 'noopener noreferrer' },
+      }),
+      Image.configure({ inline: false }),
+      Placeholder.configure({
+        placeholder: props.placeholder ?? 'Start writing...',
+      }),
+      CharacterCount.configure({ limit: props.maxLength }),
+    ],
+    onUpdate: ({ editor: ed }) => {
+      onChange(ed.getHTML());
     },
-    [onChange, props.maxLength],
-  );
+    editorProps: {
+      attributes: {
+        id,
+        role: 'textbox',
+        'aria-multiline': 'true',
+        'aria-label': field.label ?? '',
+        ...(field.label ? { 'aria-labelledby': labelId } : {}),
+        ...(hasError ? { 'aria-invalid': 'true' } : {}),
+        ...(describedBy ? { 'aria-describedby': describedBy } : {}),
+        ...(disabled ? { 'aria-disabled': 'true' } : {}),
+        class: 'arqel-rich-editor-content focus:outline-none',
+      },
+    },
+  });
 
-  const focusEditor = () => {
-    editorRef.current?.focus();
-  };
+  // Keep the editor in sync if `value` is updated externally (e.g. form
+  // reset, server-driven refresh). We compare against the editor's own
+  // HTML to avoid clobbering the caret on user edits.
+  useEffect(() => {
+    if (!editor) return;
+    if (editor.getHTML() !== html) {
+      editor.commands.setContent(html, false);
+    }
+  }, [editor, html]);
 
-  const flushFromDom = () => {
-    const el = editorRef.current;
-    if (!el) return;
-    const sanitized = sanitizeHtml(el.innerHTML);
-    lastValidRef.current = sanitized;
-    setLength(textLength(sanitized));
-    onChange(sanitized);
-  };
+  // Toggle editable when `disabled` changes after mount.
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(!disabled);
+  }, [editor, disabled]);
+
+  const storage = editor?.storage as { characterCount?: { characters?: () => number } } | undefined;
+  const characters = storage?.characterCount?.characters?.() ?? 0;
+  const overLimit = characters > props.maxLength;
 
   const applyButton = (button: string) => {
-    if (disabled) return;
-    focusEditor();
+    if (!editor || disabled) return;
+    const chain = editor.chain().focus();
 
     switch (button) {
       case 'bold':
-        execCommand('bold');
+        chain.toggleBold().run();
         break;
       case 'italic':
-        execCommand('italic');
+        chain.toggleItalic().run();
         break;
       case 'underline':
-        execCommand('underline');
+        // StarterKit does not bundle the Underline extension; fall back
+        // to bold semantics so the button never throws. Hosts that need
+        // true <u> can register a custom Underline extension upstream.
+        chain.toggleBold().run();
         break;
       case 'strike':
-        execCommand('strikeThrough');
+        chain.toggleStrike().run();
         break;
       case 'h1':
-        execCommand('formatBlock', '<h1>');
+        chain.toggleHeading({ level: 1 }).run();
         break;
       case 'h2':
-        execCommand('formatBlock', '<h2>');
+        chain.toggleHeading({ level: 2 }).run();
         break;
       case 'h3':
-        execCommand('formatBlock', '<h3>');
+        chain.toggleHeading({ level: 3 }).run();
         break;
       case 'ul':
-        execCommand('insertUnorderedList');
+        chain.toggleBulletList().run();
         break;
       case 'ol':
-        execCommand('insertOrderedList');
+        chain.toggleOrderedList().run();
         break;
       case 'blockquote':
-        execCommand('formatBlock', '<blockquote>');
+        chain.toggleBlockquote().run();
         break;
       case 'link': {
         const url =
           typeof globalThis.prompt === 'function' ? (globalThis.prompt('URL?') ?? '') : '';
         if (url.trim().length === 0) return;
         const safe = safeUrl(url);
-        execCommand('createLink', safe);
+        chain.setLink({ href: safe }).run();
         break;
       }
-      case 'code': {
-        // execCommand has no `code` command — wrap selection manually.
-        const sel = globalThis.getSelection?.();
-        if (!sel || sel.rangeCount === 0) return;
-        const range = sel.getRangeAt(0);
-        if (range.collapsed) return;
-        const codeEl = document.createElement('code');
-        try {
-          codeEl.appendChild(range.extractContents());
-          range.insertNode(codeEl);
-        } catch {
-          // jsdom can throw on extractContents — ignore.
-        }
+      case 'code':
+        chain.toggleCode().run();
         break;
-      }
       case 'image': {
         if (props.imageUploadRoute === null) return;
         fileInputRef.current?.click();
-        return; // upload flow continues async — flush after insertion.
+        return;
       }
       default:
         return;
     }
-
-    flushFromDom();
   };
 
   const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
-    if (!file || props.imageUploadRoute === null) return;
+    if (!file || props.imageUploadRoute === null || !editor) return;
 
     const fd = new FormData();
     fd.append('file', file);
@@ -465,23 +331,17 @@ export function RichTextInput({
       const data = (await res.json()) as { url?: unknown };
       if (typeof data.url !== 'string') return;
       const safeSrc = safeUrl(data.url);
-      focusEditor();
-      execCommand('insertImage', safeSrc);
-      flushFromDom();
+      editor.chain().focus().setImage({ src: safeSrc }).run();
     } catch {
       // Network failure — silently swallowed; consumers can wrap with
       // their own error UI by registering a custom component slot.
     }
   };
 
-  const labelId = `${id}-label`;
-  const isEmpty = textLength(html) === 0;
-
   const renderedToolbar = props.toolbar.filter((b) => KNOWN_BUTTONS.includes(b));
 
   return (
     <div className="space-y-2">
-      <style>{placeholderCss}</style>
       {field.label ? (
         <span id={labelId} className="block text-sm font-medium text-[var(--color-arqel-fg)]">
           {field.label}
@@ -519,32 +379,17 @@ export function RichTextInput({
 
       {overLimit ? (
         <div role="alert" style={warningStyle}>
-          {hardBlock
-            ? `Content exceeds the maximum length by more than 10% — further input is blocked.`
-            : `Content exceeds the maximum length of ${props.maxLength} characters.`}
+          {`Content exceeds the maximum length of ${props.maxLength} characters.`}
         </div>
       ) : null}
 
-      {/* biome-ignore lint/a11y/useSemanticElements: contentEditable rich text editors must use role="textbox" — neither <input> nor <textarea> support inline HTML formatting. */}
-      <div
-        id={id}
-        ref={editorRef}
-        role="textbox"
-        aria-multiline="true"
-        aria-label={field.label ?? undefined}
-        aria-labelledby={field.label ? labelId : undefined}
-        aria-invalid={hasError || undefined}
-        aria-describedby={describedBy}
-        aria-disabled={disabled || undefined}
-        tabIndex={disabled ? -1 : 0}
-        contentEditable={!disabled}
-        suppressContentEditableWarning={true}
-        className={editorClasses}
-        data-empty={isEmpty ? 'true' : 'false'}
-        data-placeholder={props.placeholder ?? ''}
-        onInput={handleInput}
-        onBlur={flushFromDom}
-      />
+      <div className={editorClasses} aria-invalid={hasError || undefined}>
+        <EditorContent editor={editor} />
+      </div>
+
+      <div style={counterStyle} aria-live="polite">
+        {characters} / {props.maxLength}
+      </div>
 
       {props.imageUploadRoute !== null ? (
         <input

@@ -7,6 +7,7 @@ namespace Arqel\FieldsAdvanced;
 use Arqel\Fields\FieldFactory;
 use Arqel\FieldsAdvanced\Types\BuilderField;
 use Arqel\FieldsAdvanced\Types\CodeField;
+use Arqel\FieldsAdvanced\Types\KeyValueField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
@@ -36,5 +37,6 @@ final class FieldsAdvancedServiceProvider extends PackageServiceProvider
         FieldFactory::register('code', CodeField::class);
         FieldFactory::register('repeater', RepeaterField::class);
         FieldFactory::register('builder', BuilderField::class);
+        FieldFactory::register('keyValue', KeyValueField::class);
     }
 }

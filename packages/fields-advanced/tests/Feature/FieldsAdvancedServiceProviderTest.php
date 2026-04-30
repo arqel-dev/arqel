@@ -6,6 +6,7 @@ use Arqel\Fields\FieldFactory;
 use Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider;
 use Arqel\FieldsAdvanced\Types\BuilderField;
 use Arqel\FieldsAdvanced\Types\CodeField;
+use Arqel\FieldsAdvanced\Types\KeyValueField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
 use Arqel\FieldsAdvanced\Types\RichTextField;
@@ -64,4 +65,13 @@ it('registers the builder macro on the FieldFactory', function (): void {
 
     expect($field)->toBeInstanceOf(BuilderField::class)
         ->and($field->getName())->toBe('content');
+});
+
+it('registers the keyValue macro on the FieldFactory', function (): void {
+    expect(FieldFactory::hasType('keyValue'))->toBeTrue();
+
+    $field = FieldFactory::keyValue('headers');
+
+    expect($field)->toBeInstanceOf(KeyValueField::class)
+        ->and($field->getName())->toBe('headers');
 });

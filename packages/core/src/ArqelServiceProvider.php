@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Arqel\Core;
 
 use Arqel\Core\CommandPalette\CommandRegistry;
+use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
+use Arqel\Core\CommandPalette\Providers\ThemeCommandProvider;
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
@@ -58,6 +60,27 @@ final class ArqelServiceProvider extends PackageServiceProvider
         });
 
         $this->registerResourceRoutes();
+        $this->registerBuiltInCommandProviders();
+    }
+
+    /**
+     * Wire the built-in command palette providers (CMDPAL-002).
+     *
+     * - {@see NavigationCommandProvider} — emits one Command per
+     *   registered Resource. Reads the registry on every request via
+     *   `provide()`, so it picks up resources synced post-boot.
+     * - {@see ThemeCommandProvider} — three static theme-switch
+     *   commands.
+     *
+     * `CreateCommandProvider` and `RecordSearchProvider` are
+     * deferred: both need policy authorisation + Resource model
+     * traversal that lives in follow-up work.
+     */
+    protected function registerBuiltInCommandProviders(): void
+    {
+        $registry = $this->app->make(CommandRegistry::class);
+        $registry->registerProvider($this->app->make(NavigationCommandProvider::class));
+        $registry->registerProvider($this->app->make(ThemeCommandProvider::class));
     }
 
     protected function registerResourceRegistry(): void

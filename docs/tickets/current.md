@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..011 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..008 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..005 ✅ · AUDIT-001..003 ✅) + 9 bugs do dogfooding fechados + Batch #1..#11 de sub-agentes paralelos completos.** Próximo natural: WIDGETS-010 (React side em @arqel/ui/widgets), MCP-009 (testes + integration Claude Code), EXPORT-006 (ProcessExportJob queued), TENANT-012 (white-labeling CSS vars), TENANT-014 (testes completos do tenant).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..012 + 014 ✅ · WIDGETS-001..009 + 013 ✅ · MCP-001..008 ✅ · FIELDS-ADV-001..009 ✅ · EXPORT-001..006 ✅ · AUDIT-001..003 ✅) + 9 bugs do dogfooding fechados + Batch #1..#12 de sub-agentes paralelos completos + 2ª rodada de bug fixes do dogfooding (script, tailwindcss devDep, public/hot, login route stub).** Próximo natural: WIDGETS-010 (React widgets em @arqel/ui), MCP-009 (testes integration), TENANT-013 (Laravel Cashier opcional), AUDIT-004 (cobertura final), EXPORT-007 (Blade pdf template).
 
 **Fase:** 1 (MVP)
 

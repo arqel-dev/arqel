@@ -4,33 +4,46 @@
  * block's own sub-form schema in line.
  *
  * React-side counterpart of `Arqel\FieldsAdvanced\Types\BuilderField`
- * (FIELDS-ADV-014, scoped). Reads the following props verbatim from
- * the PHP-emitted schema (see `BuilderField::getTypeSpecificProps()`):
+ * (FIELDS-ADV-014). Reads the following props verbatim from the
+ * PHP-emitted schema (see `BuilderField::getTypeSpecificProps()`):
  *
  *   - `blocks`       : Record<string, { type, label, icon?, schema }>
  *                      Map of block-type → metadata + sub-form schema.
  *   - `minItems`     : ?number  — floor for the block count.
  *   - `maxItems`     : ?number  — ceiling for the block count.
- *   - `reorderable`  : boolean  — whether up/down move buttons show.
+ *   - `reorderable`  : boolean  — whether the drag handle and up/down
+ *                                 move buttons show.
  *   - `collapsible`  : boolean  — whether the collapse toggle shows.
  *   - `cloneable`    : boolean  — whether the clone button shows.
  *   - `itemLabel`    : ?string  — `{{key}}`-templated header per block.
  *
- * ## Scope (FIELDS-ADV-014 — narrowed)
+ * ## Reordering (FIELDS-ADV-014 — full)
  *
- * The original spec used `@dnd-kit/sortable` for drag-drop reorder and
- * a Base UI Dialog for the block picker. To keep this drop-in free of
- * new deps, this iteration ships:
- *
- *   - "Move up" / "Move down" buttons (no dnd-kit), mirroring
- *     `RepeaterInput`.
- *   - A self-managed `role="menu"` dropdown (no Dialog) with backdrop
- *     and ESC dismissal + arrow-key navigation between menuitems.
- *
- * Both deferrals are tracked as follow-ups that introduce the
- * respective dependencies.
+ * Mirrors `<RepeaterInput>`: `@dnd-kit/sortable` drag-drop on a
+ * dedicated handle (PointerSensor 5px activation + KeyboardSensor for
+ * Space/Arrow/Space) plus the redundant "Move up" / "Move down" icon
+ * buttons as a keyboard-only a11y fallback. The block picker still
+ * uses a self-managed `role="menu"` dropdown (Base UI Dialog
+ * migration is a separate follow-up).
  */
 
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { FieldRendererProps } from '../shared/types.js';
 
@@ -105,6 +118,14 @@ const iconButtonClasses =
   'hover:bg-[var(--color-arqel-muted)] ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
+
+const dragHandleClasses =
+  'inline-flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
+  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
+  'text-sm text-[var(--color-arqel-muted-fg)] ' +
+  'hover:bg-[var(--color-arqel-muted)] ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'active:cursor-grabbing';
 
 const menuItemClasses =
   'flex w-full items-center gap-2 rounded-[var(--radius-arqel-sm)] px-3 py-2 text-left text-sm ' +
@@ -413,6 +434,37 @@ function BlockPicker({ blocks, onSelect, onClose }: BlockPickerProps) {
   );
 }
 
+interface SortableRowProps {
+  id: string;
+  reorderable: boolean;
+  index: number;
+  children: (handleProps: {
+    listeners: ReturnType<typeof useSortable>['listeners'];
+    attributes: ReturnType<typeof useSortable>['attributes'];
+  }) => React.ReactNode;
+}
+
+function SortableRow({ id, reorderable, index, children }: SortableRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    disabled: !reorderable,
+  });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+    zIndex: isDragging ? 1 : undefined,
+    position: 'relative',
+  };
+
+  return (
+    <li ref={setNodeRef} style={style} data-block-index={index}>
+      {children({ listeners, attributes })}
+    </li>
+  );
+}
+
 export function BuilderInput({
   field,
   value,
@@ -431,9 +483,23 @@ export function BuilderInput({
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => new Set());
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
   const updateItems = (next: InternalItem[]) => {
     setItems(next);
     onChange(emit(next));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = items.findIndex((it) => it.__id === active.id);
+    const newIndex = items.findIndex((it) => it.__id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    updateItems(arrayMove(items, oldIndex, newIndex));
   };
 
   const updateItemField = (id: string, name: string, next: unknown) => {
@@ -515,116 +581,146 @@ export function BuilderInput({
         </legend>
       ) : null}
 
-      <ol className="list-none space-y-2 pl-0">
-        {items.map((item, index) => {
-          const itemTitleId = `${baseId}-item-${index}-title`;
-          const block = props.blocks[item.type];
-          const blockLabel = block?.label ?? item.type;
-          const fallbackLabel = `Block ${index + 1} — ${blockLabel}`;
-          const labelText =
-            resolveLabel(props.itemLabel, item.data, fallbackLabel) || fallbackLabel;
-          const isCollapsed = props.collapsible && collapsedIds.has(item.__id);
-          const subSchema = block?.schema ?? [];
-          return (
-            <li key={item.__id}>
-              <article
-                aria-labelledby={itemTitleId}
-                data-block-type={item.type}
-                className="rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] p-3"
-              >
-                <header className="flex items-center justify-between gap-2">
-                  <h3 id={itemTitleId} className="text-sm font-medium text-[var(--color-arqel-fg)]">
-                    {labelText}
-                  </h3>
-                  <div className="flex items-center gap-1">
-                    {props.collapsible ? (
-                      <button
-                        type="button"
-                        className={iconButtonClasses}
-                        aria-label={
-                          isCollapsed ? `Expand block ${index + 1}` : `Collapse block ${index + 1}`
-                        }
-                        aria-expanded={!isCollapsed}
-                        onClick={() => toggleCollapsed(item.__id)}
-                      >
-                        {isCollapsed ? '▸' : '▾'}
-                      </button>
-                    ) : null}
-                    {props.reorderable ? (
-                      <>
-                        <button
-                          type="button"
-                          className={iconButtonClasses}
-                          aria-label={`Move block ${index + 1} up`}
-                          disabled={index === 0}
-                          onClick={() => moveItem(index, -1)}
-                        >
-                          ↑
-                        </button>
-                        <button
-                          type="button"
-                          className={iconButtonClasses}
-                          aria-label={`Move block ${index + 1} down`}
-                          disabled={index === items.length - 1}
-                          onClick={() => moveItem(index, 1)}
-                        >
-                          ↓
-                        </button>
-                      </>
-                    ) : null}
-                    {props.cloneable ? (
-                      <button
-                        type="button"
-                        className={iconButtonClasses}
-                        aria-label={`Clone block ${index + 1}`}
-                        disabled={atMax}
-                        onClick={() => cloneItem(item.__id)}
-                      >
-                        ⎘
-                      </button>
-                    ) : null}
-                    <button
-                      type="button"
-                      className={iconButtonClasses}
-                      aria-label={`Remove block ${index + 1}`}
-                      disabled={atMin}
-                      onClick={() => removeItem(item.__id)}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={items.map((i) => i.__id)} strategy={verticalListSortingStrategy}>
+          <ol className="list-none space-y-2 pl-0">
+            {items.map((item, index) => {
+              const itemTitleId = `${baseId}-item-${index}-title`;
+              const block = props.blocks[item.type];
+              const blockLabel = block?.label ?? item.type;
+              const fallbackLabel = `Block ${index + 1} — ${blockLabel}`;
+              const labelText =
+                resolveLabel(props.itemLabel, item.data, fallbackLabel) || fallbackLabel;
+              const isCollapsed = props.collapsible && collapsedIds.has(item.__id);
+              const subSchema = block?.schema ?? [];
+              return (
+                <SortableRow
+                  key={item.__id}
+                  id={item.__id}
+                  reorderable={props.reorderable}
+                  index={index}
+                >
+                  {({ listeners, attributes }) => (
+                    <article
+                      aria-labelledby={itemTitleId}
+                      data-block-type={item.type}
+                      className="rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] p-3"
                     >
-                      ×
-                    </button>
-                  </div>
-                </header>
-
-                {!isCollapsed ? (
-                  <div className="mt-3 grid grid-cols-1 gap-3">
-                    {subSchema.map((sub) => {
-                      const subId = `${baseId}-item-${index}-${sub.name}`;
-                      const subLabel = sub.label ?? sub.name;
-                      return (
-                        <div key={sub.name} className="grid gap-1">
-                          <label
-                            htmlFor={subId}
-                            className="text-xs font-medium text-[var(--color-arqel-muted-fg)]"
+                      <header className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {props.reorderable ? (
+                            <button
+                              type="button"
+                              className={dragHandleClasses}
+                              aria-label={`Drag to reorder block ${index + 1}`}
+                              data-testid={`builder-drag-handle-${index}`}
+                              {...attributes}
+                              {...listeners}
+                            >
+                              ≡
+                            </button>
+                          ) : null}
+                          <h3
+                            id={itemTitleId}
+                            className="text-sm font-medium text-[var(--color-arqel-fg)]"
                           >
-                            {subLabel}
-                          </label>
-                          <SubFieldInput
-                            field={sub}
-                            value={item.data[sub.name]}
-                            onChange={(next) => updateItemField(item.__id, sub.name, next)}
-                            disabled={disabled}
-                            inputId={subId}
-                          />
+                            {labelText}
+                          </h3>
                         </div>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </article>
-            </li>
-          );
-        })}
-      </ol>
+                        <div className="flex items-center gap-1">
+                          {props.collapsible ? (
+                            <button
+                              type="button"
+                              className={iconButtonClasses}
+                              aria-label={
+                                isCollapsed
+                                  ? `Expand block ${index + 1}`
+                                  : `Collapse block ${index + 1}`
+                              }
+                              aria-expanded={!isCollapsed}
+                              onClick={() => toggleCollapsed(item.__id)}
+                            >
+                              {isCollapsed ? '▸' : '▾'}
+                            </button>
+                          ) : null}
+                          {props.reorderable ? (
+                            <>
+                              <button
+                                type="button"
+                                className={iconButtonClasses}
+                                aria-label={`Move block ${index + 1} up`}
+                                disabled={index === 0}
+                                onClick={() => moveItem(index, -1)}
+                              >
+                                ↑
+                              </button>
+                              <button
+                                type="button"
+                                className={iconButtonClasses}
+                                aria-label={`Move block ${index + 1} down`}
+                                disabled={index === items.length - 1}
+                                onClick={() => moveItem(index, 1)}
+                              >
+                                ↓
+                              </button>
+                            </>
+                          ) : null}
+                          {props.cloneable ? (
+                            <button
+                              type="button"
+                              className={iconButtonClasses}
+                              aria-label={`Clone block ${index + 1}`}
+                              disabled={atMax}
+                              onClick={() => cloneItem(item.__id)}
+                            >
+                              ⎘
+                            </button>
+                          ) : null}
+                          <button
+                            type="button"
+                            className={iconButtonClasses}
+                            aria-label={`Remove block ${index + 1}`}
+                            disabled={atMin}
+                            onClick={() => removeItem(item.__id)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </header>
+
+                      {!isCollapsed ? (
+                        <div className="mt-3 grid grid-cols-1 gap-3">
+                          {subSchema.map((sub) => {
+                            const subId = `${baseId}-item-${index}-${sub.name}`;
+                            const subLabel = sub.label ?? sub.name;
+                            return (
+                              <div key={sub.name} className="grid gap-1">
+                                <label
+                                  htmlFor={subId}
+                                  className="text-xs font-medium text-[var(--color-arqel-muted-fg)]"
+                                >
+                                  {subLabel}
+                                </label>
+                                <SubFieldInput
+                                  field={sub}
+                                  value={item.data[sub.name]}
+                                  onChange={(next) => updateItemField(item.__id, sub.name, next)}
+                                  disabled={disabled}
+                                  inputId={subId}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </article>
+                  )}
+                </SortableRow>
+              );
+            })}
+          </ol>
+        </SortableContext>
+      </DndContext>
 
       <div className="relative inline-block">
         <button

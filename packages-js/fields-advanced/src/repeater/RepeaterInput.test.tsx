@@ -12,6 +12,50 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { RepeaterInput } from './RepeaterInput.js';
 
+// Capture the latest `onDragEnd` handler and `items[]` passed to
+// <DndContext> / <SortableContext> so the test can simulate a drag-drop
+// reorder without relying on jsdom's (incomplete) pointer/keyboard event
+// support for dnd-kit's sensors.
+type DndEndHandler = (e: { active: { id: string }; over: { id: string } | null }) => void;
+const capturedDnd: {
+  onDragEnd: DndEndHandler | null;
+  items: ReadonlyArray<string> | null;
+} = { onDragEnd: null, items: null };
+
+vi.mock('@dnd-kit/core', async () => {
+  const actual = await vi.importActual<typeof import('@dnd-kit/core')>('@dnd-kit/core');
+  return {
+    ...actual,
+    DndContext: ({
+      children,
+      onDragEnd,
+    }: {
+      children: React.ReactNode;
+      onDragEnd: DndEndHandler;
+    }) => {
+      capturedDnd.onDragEnd = onDragEnd;
+      return <>{children}</>;
+    },
+  };
+});
+
+vi.mock('@dnd-kit/sortable', async () => {
+  const actual = await vi.importActual<typeof import('@dnd-kit/sortable')>('@dnd-kit/sortable');
+  return {
+    ...actual,
+    SortableContext: ({
+      children,
+      items,
+    }: {
+      children: React.ReactNode;
+      items: ReadonlyArray<string>;
+    }) => {
+      capturedDnd.items = items;
+      return <>{children}</>;
+    },
+  };
+});
+
 interface SubField {
   name: string;
   type: string;
@@ -240,6 +284,63 @@ describe('<RepeaterInput>', () => {
 
     expect(screen.queryByLabelText('Name')).toBeNull();
     expect(screen.getByRole('button', { name: 'Expand item 1' })).toBeInTheDocument();
+  });
+
+  it('renders a drag handle for each item when reorderable=true', () => {
+    const onChange = vi.fn();
+    render(
+      <RepeaterInput
+        field={buildField()}
+        value={[{ name: 'A' }, { name: 'B' }]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.getByLabelText('Drag to reorder item 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Drag to reorder item 2')).toBeInTheDocument();
+  });
+
+  it('hides the drag handle when reorderable=false', () => {
+    const onChange = vi.fn();
+    render(
+      <RepeaterInput
+        field={buildField({ reorderable: false })}
+        value={[{ name: 'A' }, { name: 'B' }]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.queryByLabelText('Drag to reorder item 1')).toBeNull();
+    expect(screen.queryByLabelText('Drag to reorder item 2')).toBeNull();
+    // up/down buttons are also hidden when reorderable=false (current behavior).
+    expect(screen.queryByRole('button', { name: 'Move up' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Move down' })).toBeNull();
+  });
+
+  it('reorders items when dnd-kit fires onDragEnd', () => {
+    const onChange = vi.fn();
+    render(
+      <RepeaterInput
+        field={buildField()}
+        value={[{ name: 'A' }, { name: 'B' }, { name: 'C' }]}
+        onChange={onChange}
+      />,
+    );
+
+    const ids = capturedDnd.items;
+    const onDragEnd = capturedDnd.onDragEnd;
+    if (!ids || !onDragEnd) throw new Error('dnd-kit not captured');
+    expect(ids).toHaveLength(3);
+
+    // Simulate dragging the first item over the last item: dnd-kit's
+    // PointerSensor or KeyboardSensor would emit this same event shape
+    // (active = item being dragged, over = drop target).
+    onDragEnd({
+      active: { id: ids[0] as string },
+      over: { id: ids[2] as string },
+    });
+
+    expect(onChange).toHaveBeenLastCalledWith([{ name: 'B' }, { name: 'C' }, { name: 'A' }]);
   });
 
   it('renders a select sub-field with the schema-supplied options', async () => {

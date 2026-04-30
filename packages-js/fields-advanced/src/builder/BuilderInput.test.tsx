@@ -9,6 +9,49 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { BuilderInput } from './BuilderInput.js';
 
+// See `RepeaterInput.test.tsx` for the rationale: capture the dnd-kit
+// callbacks so the test can drive a drag-end without relying on jsdom's
+// pointer/keyboard sensor support.
+type DndEndHandler = (e: { active: { id: string }; over: { id: string } | null }) => void;
+const capturedDnd: {
+  onDragEnd: DndEndHandler | null;
+  items: ReadonlyArray<string> | null;
+} = { onDragEnd: null, items: null };
+
+vi.mock('@dnd-kit/core', async () => {
+  const actual = await vi.importActual<typeof import('@dnd-kit/core')>('@dnd-kit/core');
+  return {
+    ...actual,
+    DndContext: ({
+      children,
+      onDragEnd,
+    }: {
+      children: React.ReactNode;
+      onDragEnd: DndEndHandler;
+    }) => {
+      capturedDnd.onDragEnd = onDragEnd;
+      return <>{children}</>;
+    },
+  };
+});
+
+vi.mock('@dnd-kit/sortable', async () => {
+  const actual = await vi.importActual<typeof import('@dnd-kit/sortable')>('@dnd-kit/sortable');
+  return {
+    ...actual,
+    SortableContext: ({
+      children,
+      items,
+    }: {
+      children: React.ReactNode;
+      items: ReadonlyArray<string>;
+    }) => {
+      capturedDnd.items = items;
+      return <>{children}</>;
+    },
+  };
+});
+
 interface SubField {
   name: string;
   type: string;
@@ -293,6 +336,70 @@ describe('<BuilderInput>', () => {
     await user.keyboard('{Escape}');
 
     expect(screen.queryByRole('menu', { name: 'Add block' })).toBeNull();
+  });
+
+  it('renders a drag handle for each block when reorderable=true', () => {
+    const onChange = vi.fn();
+    render(
+      <BuilderInput
+        field={buildField()}
+        value={[
+          { type: 'heading', data: { text: 'A' } },
+          { type: 'heading', data: { text: 'B' } },
+        ]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.getByLabelText('Drag to reorder block 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Drag to reorder block 2')).toBeInTheDocument();
+  });
+
+  it('hides the drag handle when reorderable=false', () => {
+    const onChange = vi.fn();
+    render(
+      <BuilderInput
+        field={buildField({ reorderable: false })}
+        value={[
+          { type: 'heading', data: { text: 'A' } },
+          { type: 'heading', data: { text: 'B' } },
+        ]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.queryByLabelText('Drag to reorder block 1')).toBeNull();
+    expect(screen.queryByLabelText('Drag to reorder block 2')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Move block 1 up' })).toBeNull();
+  });
+
+  it('reorders blocks when dnd-kit fires onDragEnd', () => {
+    const onChange = vi.fn();
+    render(
+      <BuilderInput
+        field={buildField()}
+        value={[
+          { type: 'heading', data: { text: 'A' } },
+          { type: 'paragraph', data: { body: 'B' } },
+        ]}
+        onChange={onChange}
+      />,
+    );
+
+    const ids = capturedDnd.items;
+    const onDragEnd = capturedDnd.onDragEnd;
+    if (!ids || !onDragEnd) throw new Error('dnd-kit not captured');
+    expect(ids).toHaveLength(2);
+
+    onDragEnd({
+      active: { id: ids[0] as string },
+      over: { id: ids[1] as string },
+    });
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      { type: 'paragraph', data: { body: 'B' } },
+      { type: 'heading', data: { text: 'A' } },
+    ]);
   });
 
   it('closes the picker when the backdrop is clicked', async () => {

@@ -34,5 +34,8 @@ export default defineConfig({
     '@tiptap/extension-character-count',
     '@tiptap/core',
     '@tiptap/pm',
+    '@dnd-kit/core',
+    '@dnd-kit/sortable',
+    '@dnd-kit/utilities',
   ],
 });

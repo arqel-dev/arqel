@@ -29,6 +29,23 @@ it('exposes a fluent format setter', function (): void {
     expect($action->getFormat())->toBe(ExportFormat::XLSX);
 });
 
-it('throws RuntimeException when execute is invoked (wired in EXPORT-005)', function (): void {
-    ExportAction::make('export')->execute();
-})->throws(RuntimeException::class, 'Wired in EXPORT-005');
+it('exposes a fluent withColumns setter', function (): void {
+    $action = ExportAction::make('export');
+    $returned = $action->withColumns([['name' => 'id']]);
+
+    expect($returned)->toBe($action);
+});
+
+it('exposes a fluent withDestinationDir setter', function (): void {
+    $action = ExportAction::make('export');
+    $returned = $action->withDestinationDir('/tmp');
+
+    expect($returned)->toBe($action);
+});
+
+it('exposes a fluent dryRun setter', function (): void {
+    $action = ExportAction::make('export');
+    $returned = $action->dryRun();
+
+    expect($returned)->toBe($action);
+});

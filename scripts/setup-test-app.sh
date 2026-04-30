@@ -115,6 +115,11 @@ ARQEL_PHP_PACKAGES=(
   "arqel/auth:dev-main"
   "arqel/nav:dev-main"
   "arqel/tenant:dev-main"
+  "arqel/widgets:dev-main"
+  "arqel/fields-advanced:dev-main"
+  "arqel/mcp:dev-main"
+  "arqel/audit:dev-main"
+  "arqel/export:dev-main"
 )
 
 # Determine which packages still need installing — composer is slow, so
@@ -128,7 +133,7 @@ for spec in "${ARQEL_PHP_PACKAGES[@]}"; do
 done
 
 if [ ${#MISSING_PHP[@]} -eq 0 ]; then
-  ok "All 8 Arqel PHP packages already required"
+  ok "All 13 Arqel PHP packages already required"
 else
   warn "Adding ${#MISSING_PHP[@]} missing package(s)…"
   composer require "${MISSING_PHP[@]}" --no-interaction
@@ -182,6 +187,11 @@ NEEDED_DEPS=(
   "react-dom"
   "@types/react"
   "@types/react-dom"
+  "@base-ui-components/react"
+  "@tanstack/react-table"
+  "lucide-react"
+  "tailwindcss"
+  "@tailwindcss/vite"
 )
 
 MISSING_NPM=()
@@ -204,7 +214,11 @@ fi
 log "Configuring resources/js/app.tsx"
 
 APP_TSX="$TARGET_APP/resources/js/app.tsx"
-APP_TSX_MARKER="@arqel/ui/styles.css"
+# Marker MUST cover the canonical wiring (arqelPages merge, not just the
+# styles import) — older versions of this script only checked for
+# styles.css, which left apps stuck with the pre-arqelPages template
+# even after re-running. Bumping the marker forces a rewrite.
+APP_TSX_MARKER="from '@arqel/ui/pages'"
 
 if [ -f "$APP_TSX" ] && grep -q "$APP_TSX_MARKER" "$APP_TSX"; then
   ok "app.tsx already wired"
@@ -228,6 +242,18 @@ createArqelApp({
 TSX
   ok "app.tsx written"
 fi
+
+# Clean up the workaround Pages/arqel/* and Pages/Arqel/* stubs from
+# earlier dogfooding (Bug 3 era). Now that app.tsx merges arqelPages,
+# the canonical pages live in @arqel/ui/dist/pages.js — any leftover
+# user-side stubs override them and resurrect the bug.
+PAGES_DIR="$TARGET_APP/resources/js/Pages"
+for legacy in "$PAGES_DIR/arqel" "$PAGES_DIR/Arqel"; do
+  if [ -d "$legacy" ]; then
+    rm -rf "$legacy"
+    ok "Removed legacy stub directory: $(basename "$legacy")/"
+  fi
+done
 
 log "Configuring resources/css/app.css"
 
@@ -414,7 +440,17 @@ else
   ok "bootstrap/providers.php patched (.bak left as backup)"
 fi
 
-# ---------- 11. migrate + final hint ------------------------------
+# ---------- 11. publish vendor migrations + run migrate -----------
+
+# arqel/audit hard-deps spatie/laravel-activitylog. Its migrations are
+# distributed as `.stub` files and need vendor:publish before they will
+# run. Idempotent — Laravel's publisher skips already-published files.
+log "Publishing vendor migrations (spatie/laravel-activitylog)"
+php artisan vendor:publish \
+  --tag=activitylog-migrations \
+  --no-interaction 2>/dev/null \
+  && ok "activitylog migrations published" \
+  || warn "activitylog publish failed (already published or arqel/audit not installed yet)"
 
 log "Running migrations"
 php artisan migrate --force --no-interaction || warn "migrate failed — re-run manually"

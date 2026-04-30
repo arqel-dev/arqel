@@ -14,7 +14,7 @@ use Arqel\Ai\Exceptions\AiException;
  * prompt + options unchanged. `embed()` returns a deterministic
  * fixed-size vector so consumers can assert on length.
  */
-final class FakeProvider implements AiProvider
+class FakeProvider implements AiProvider
 {
     public int $completeCalls = 0;
 

@@ -34,9 +34,17 @@ Entregue em AI-006:
 - `AiServiceProvider::packageRegistered()` instancia singleton `AiManager` resolvendo cada entry de `arqel-ai.providers` lazily via container (`$app->make($driver, $args)`); entries com `class_exists($driver) === false` são silenciosamente ignoradas.
 - **27 Pest tests** novos (10 AiManager + 6 CostTracker + 3 AiCache + recovery dos existentes).
 
+Entregue em AI-007 (PHP slice — componente React `AiTextInput.tsx` fica para batch futuro):
+
+- **`Arqel\Ai\Fields\AiTextField`** (final, estende `Arqel\Fields\Types\TextareaField`) — geração de texto via AI a partir de prompt template. Setters fluentes `prompt(string|Closure)`, `provider(?string)`, `aiOptions(array)`, `contextFields(array)`, `maxLength(int)`, `buttonLabel(string)`. Método `generate(array $formData): string` resolve placeholders `{fieldName}`, chama `AiManager::complete()` e trunca quando excede `maxLength`. `getTypeSpecificProps()` **NUNCA** expõe o prompt template ao cliente (segurança/IP).
+- **`Arqel\Ai\Http\Controllers\AiGenerateController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/generate` (named `arqel.ai.generate`, middleware `web,auth`). Resolve o `Resource` via `ResourceRegistry::findBySlug()`, encontra o `AiTextField` pelo nome em `Resource::fields()` e devolve `{text: string}`. Authorization: Gate `use-ai` opt-in — quando não definida, allow por default.
+- `arqel/fields` adicionado ao `composer.json` (path repo + `@dev`).
+- 8 testes unit + 3 testes feature.
+
 Por chegar:
 
-- **AI-007..AI-011** os 5 field types (`AiTextField`/`AiTranslateField`/`AiSelectField`/`AiExtractField`/`AiImageField`).
+- **AI-007 React** componente `AiTextInput.tsx` (botão Generate + estado loading + replace value).
+- **AI-008..AI-011** os 4 field types restantes (`AiTranslateField`/`AiSelectField`/`AiExtractField`/`AiImageField`).
 - **AI-012** prompt library reutilizável.
 - **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).
 
@@ -94,6 +102,32 @@ final class MyCustomProvider implements AiProvider
     // ... chat / embed / stream / name / supports*
 }
 ```
+
+### AiTextField (AI-007)
+
+```php
+use Arqel\Ai\Fields\AiTextField;
+
+public function fields(): array
+{
+    return [
+        Field::text('title')->required(),
+
+        (new AiTextField('summary'))
+            ->prompt('Resume em 1 frase o post intitulado "{title}".')
+            ->contextFields(['title'])
+            ->provider('claude')
+            ->aiOptions(['temperature' => 0.4])
+            ->maxLength(280)
+            ->buttonLabel('Gerar resumo'),
+    ];
+}
+```
+
+O placeholder `{title}` é resolvido server-side em `generate()` com o
+`formData` que o cliente envia para `POST /admin/{slug}/fields/summary/generate`.
+O prompt template **não trafega** para o cliente — apps com prompts que
+contêm regras de negócio podem mantê-los privados.
 
 ### Consumir um result
 

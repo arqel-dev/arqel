@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Fields\FieldFactory;
 use Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider;
+use Arqel\FieldsAdvanced\Types\BuilderField;
 use Arqel\FieldsAdvanced\Types\CodeField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
@@ -54,4 +55,13 @@ it('registers the repeater macro on the FieldFactory', function (): void {
 
     expect($field)->toBeInstanceOf(RepeaterField::class)
         ->and($field->getName())->toBe('addresses');
+});
+
+it('registers the builder macro on the FieldFactory', function (): void {
+    expect(FieldFactory::hasType('builder'))->toBeTrue();
+
+    $field = FieldFactory::builder('content');
+
+    expect($field)->toBeInstanceOf(BuilderField::class)
+        ->and($field->getName())->toBe('content');
 });

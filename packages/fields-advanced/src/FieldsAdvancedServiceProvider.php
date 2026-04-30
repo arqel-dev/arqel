@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\FieldsAdvanced;
 
 use Arqel\Fields\FieldFactory;
+use Arqel\FieldsAdvanced\Types\BuilderField;
 use Arqel\FieldsAdvanced\Types\CodeField;
 use Arqel\FieldsAdvanced\Types\MarkdownField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
@@ -34,5 +35,6 @@ final class FieldsAdvancedServiceProvider extends PackageServiceProvider
         FieldFactory::register('markdown', MarkdownField::class);
         FieldFactory::register('code', CodeField::class);
         FieldFactory::register('repeater', RepeaterField::class);
+        FieldFactory::register('builder', BuilderField::class);
     }
 }

@@ -7,6 +7,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+_Placeholder para próximo ciclo (pós v0.8.0-rc.1). Adicionar entradas conforme novos batches forem mesclados._
+
+---
+
+## [0.8.0-rc.1 — pendente de tag]
+
+> Conteúdo abaixo será movido para a seção `## [0.8.0-rc.1] - YYYY-MM-DD` no momento da tag, conforme `docs/release-checklist-v0.8.md`.
+
 ### Added
 
 - **Batch paralelo #19** (3 sub-agentes, merged 2026-04-30): FIELDS-ADV-019 PHP slice (6 cross-field coverage tests em `tests/Unit/Coverage/CrossFieldCoverageTest.php` — invariants partilhados entre os 8 field types: every extends Field, getTypeSpecificProps array non-null, type/component non-empty strings, payload JSON-encodable (catches resource/closure leaks), make() returns same-class with correct name, RichText imageUploadDisk verbatim propagation; 130 testes total fields-advanced), FIELDS-ADV-020 (SKILL.md restruturado canonical layout — 9 verbose entries → 5 grouped feature areas Setup/Rich content/Dynamic structure/Map-list/Multi-step + Coverage + Por chegar; 4 examples; preservou conventions + anti-patterns críticos), MCP-009 scoped (`McpServer::serveStreams(input, output)` testable loop helper extraído de `serve()`; `McpConversationTest` simula full Claude Desktop conversations via `php://memory` — initialize→tools/list→tools/call, resources/read, prompts/get, malformed input handling; 93 testes total mcp). **2/3 entregues auto (B19+A19); C19 stopped before commit, fechado manualmente.**

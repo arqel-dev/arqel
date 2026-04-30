@@ -27,7 +27,7 @@ return [
         'openai' => [
             'driver' => 'Arqel\\Ai\\Providers\\OpenAiProvider',
             'api_key' => env('OPENAI_API_KEY'),
-            'model' => env('ARQEL_AI_OPENAI_MODEL', 'gpt-5'),
+            'model' => env('ARQEL_AI_OPENAI_MODEL', 'gpt-4o-mini'),
             'max_tokens' => 4096,
         ],
         'ollama' => [

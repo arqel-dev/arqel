@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{namespace}};
+
+use Arqel\Widgets\StatWidget;
+
+final class {{class}} extends StatWidget
+{
+    public function __construct()
+    {
+        parent::__construct('{{snakeName}}');
+
+        $this
+            ->heading('{{class}}')
+            ->value(fn (): int => 0)
+            ->color(StatWidget::COLOR_PRIMARY);
+    }
+}

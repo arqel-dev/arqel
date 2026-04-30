@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Arqel\Widgets;
 
+use Arqel\Widgets\Commands\MakeDashboardCommand;
+use Arqel\Widgets\Commands\MakeWidgetCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -26,7 +28,9 @@ final class WidgetsServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('arqel-widgets')
-            ->hasRoute('admin');
+            ->hasRoute('admin')
+            ->hasCommand(MakeWidgetCommand::class)
+            ->hasCommand(MakeDashboardCommand::class);
     }
 
     public function packageRegistered(): void

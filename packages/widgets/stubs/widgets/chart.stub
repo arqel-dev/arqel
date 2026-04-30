@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{namespace}};
+
+use Arqel\Widgets\ChartWidget;
+
+final class {{class}} extends ChartWidget
+{
+    public function __construct()
+    {
+        parent::__construct('{{snakeName}}');
+
+        $this
+            ->heading('{{class}}')
+            ->chartType(ChartWidget::CHART_LINE)
+            ->chartData([
+                'labels' => [],
+                'datasets' => [],
+            ]);
+    }
+}

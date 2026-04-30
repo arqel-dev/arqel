@@ -23,13 +23,15 @@
 - **`Arqel\Widgets\Filters\Filter`** (abstract, WIDGETS-009) — base declarativa. Construtor `(string $name)`; factory `Filter::make($name)`. Setters fluentes `label(string)`, `default(mixed)`. Subclasses declaram `$type` + `$component` e implementam `getTypeSpecificProps(): array`. `toArray()` emite `{name, type, component, label, default, ...typeSpecificProps}`. Label fallback: `Str::of($name)->snake()->replace('_',' ')->title()`.
 - **`Arqel\Widgets\Filters\DateRangeFilter`** (final, WIDGETS-009) — `type='date_range'`, `component='DateRangeFilter'`. `defaultRange(?DateTimeInterface, ?DateTimeInterface)` armazena `['from' => ?DateTime, 'to' => ?DateTime]`.
 - **`Arqel\Widgets\Filters\SelectFilter`** (final, WIDGETS-009) — `type='select'`, `component='SelectFilter'`. `options(array|Closure)` (Closure lazy), `multiple(bool=true)`. `getTypeSpecificProps` retorna `{options, multiple}`.
-- **Testes Pest:** ~117 testes (adicionados aos 116 prévios: 8 `FilterTest` + 7 `DashboardFilterPropagationTest`). Inclui fixture `EchoFiltersWidget` que ecoa o filter map via `data()` — usado por WIDGETS-008 (passthrough request-time) e WIDGETS-009 (propagação dashboard defaults).
+- **`Arqel\Widgets\Commands\MakeWidgetCommand`** (final, WIDGETS-013) — `arqel:widget <Name> --type=stat|chart|table|custom --force`. Stub-based generator escreve em `app/Widgets/<Name>.php`; snake_case do nome de classe vira o construtor `name` arg (ex: `TotalUsers` → `'total_users'`). Idempotente (skip sem `--force`). 4 stubs em `stubs/widgets/{stat,chart,table,custom}.stub`.
+- **`Arqel\Widgets\Commands\MakeDashboardCommand`** (final, WIDGETS-013) — `arqel:dashboard <Name> --id=<custom> --force`. Gera `app/Dashboards/<Name>.php` com factory static `make(): Dashboard`. `--id` default = snake_case do nome; `label` = humanised. Stub em `stubs/dashboards/dashboard.stub`. Mesma posture idempotente.
+- **Testes Pest:** ~139 testes (adicionados aos 131 prévios: 5 `MakeWidgetCommandTest` + 3 `MakeDashboardCommandTest` cobrindo all 4 widget types + idempotence + `--force` + invalid type rejection + `--id` override). Fixture `EchoFiltersWidget` usado por WIDGETS-008/009.
 
 **Por chegar (WIDGETS-010..015):**
 
 - React components em `@arqel/ui/widgets` (incluindo `DateRangeFilter` / `SelectFilter` JS-side, `WidgetDataController` polling/deferred client) — WIDGETS-010..012
 - Filters URL sync + refetch on change — WIDGETS-011..012
-- Suite full de testes + SKILL.md final + dashboard demo — WIDGETS-013..015
+- Suite full de testes + SKILL.md final + dashboard demo — WIDGETS-014..015
 
 ## Conventions
 

@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{namespace}};
+
+use Arqel\Widgets\Dashboard;
+
+final class {{class}}
+{
+    public static function make(): Dashboard
+    {
+        return Dashboard::make('{{id}}', '{{label}}')
+            ->columns(2)
+            ->widgets([
+                // Add widgets here, e.g.:
+                // \App\Widgets\TotalUsers::class,
+            ]);
+    }
+}

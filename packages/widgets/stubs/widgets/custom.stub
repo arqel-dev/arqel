@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{namespace}};
+
+use Arqel\Widgets\CustomWidget;
+
+final class {{class}} extends CustomWidget
+{
+    public function __construct()
+    {
+        parent::__construct('{{snakeName}}', '{{class}}');
+
+        $this
+            ->heading('{{class}}')
+            ->withData([]);
+    }
+}

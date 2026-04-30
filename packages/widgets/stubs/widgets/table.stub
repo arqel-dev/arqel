@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{namespace}};
+
+use Arqel\Widgets\TableWidget;
+
+final class {{class}} extends TableWidget
+{
+    public function __construct()
+    {
+        parent::__construct('{{snakeName}}');
+
+        $this
+            ->heading('{{class}}')
+            ->limit(10);
+
+        // TODO: configure ->query(fn () => YourModel::query()->latest())
+        // and ->columns([...]) once the underlying model exists.
+    }
+}

@@ -74,10 +74,21 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 - **Auto-registro pre-flattened**: `packageBooted()` chama `SkillResource::list()` UMA vez no boot e registra cada entry como resource individual no `McpServer`. Restart necessário se SKILL.md são adicionados em runtime
 - **11 testes novos** (9 unit + 2 feature)
 
-**Por chegar (MCP-008..010):**
+**Entregue (MCP-008):**
+
+- **`Prompts\MigrateFilamentResourcePrompt` (final)** e **`Prompts\ReviewResourcePrompt` (final)** — primeiros MCP Prompts expostos. Templates pré-construídos que ajudam o LLM a (1) migrar uma Resource Filament para Arqel e (2) revisar uma Resource Arqel buscando code smells, missing fields/actions/policies, riscos de N+1, gaps de validação e relacionamentos faltando. API:
+  - `schema(): array` — devolve `{name, description, arguments: [{name, description, required: true}]}`. Argumentos: `filament_file` (migrate) e `resource_file` (review), ambos paths relativos à raiz do projeto
+  - `generate(array $args): array` — devolve `{description, messages: [{role: 'user', content: [{type: 'text', text: <prompt>}]}]}`. Inlina o conteúdo do PHP source dentro de um fenced code block ` ```php ... ``` ` seguido das diretrizes de migração/review
+- **Closure injection (testabilidade)**: construtor aceita `?Closure $fileReader = null` com signature `(string $relativePath): string`. Testes injetam closures que devolvem fixtures inline; default reader resolve via `Container::getInstance()->make('path.base').'/'.$relativePath` + `realpath` + `file_get_contents`. Mesmo padrão de `Resources\SkillResource` (MCP-007) e dos 4 tools (MCP-003..006)
+- **Path traversal guard**: `str_contains($relativePath, '..')` → `InvalidArgumentException` ANTES de qualquer chamada ao reader. Argumento ausente, vazio ou não-string também → `InvalidArgumentException`. Erros do reader são propagados (RuntimeException com path na mensagem)
+- **Auto-registro**: `McpServiceProvider::packageBooted()` instancia ambos prompts e chama `$server->registerPrompt($schema['name'], $schema['description'], $schema['arguments'], static fn (array $args) => $prompt->generate($args)['messages'])`. Note que `McpServer::handleRequest('prompts/get')` já wrapa `{description, messages}` automaticamente — o closure registado devolve apenas o `messages` array
+- **Total de built-ins** após MCP-008: **4 tools** (`list_resources`, `describe_resource`, `generate_resource`, `run_test`) + **N skill resources** (1 por package com SKILL.md) + **2 prompts** (`migrate_filament_resource`, `review_resource`)
+- **15 testes novos** (13 unit em `tests/Unit/Prompts/` + 3 feature em `tests/Feature/PromptsRegistrationTest.php`); suite total agora **83 testes**, 258 asserções
+
+**Por chegar (MCP-009..010):**
 
 - Artisan `arqel:mcp:serve` envolvendo `McpServer::serve()` — followup de MCP-002
-- Auth (token bearer + tenant scoping via `arqel/tenant`) — MCP-008
+- Auth (token bearer + tenant scoping via `arqel/tenant`) — MCP-009
 - Streaming responses para tools de longa duração — MCP-009
 - Manifest publishing (`mcp.json` para Claude Desktop autoinstall) — MCP-010
 

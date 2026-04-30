@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Arqel\Mcp;
 
+use Arqel\Mcp\Prompts\MigrateFilamentResourcePrompt;
+use Arqel\Mcp\Prompts\ReviewResourcePrompt;
 use Arqel\Mcp\Resources\SkillResource;
 use Arqel\Mcp\Tools\DescribeResourceTool;
 use Arqel\Mcp\Tools\GenerateResourceTool;
@@ -91,5 +93,26 @@ final class McpServiceProvider extends PackageServiceProvider
                 },
             );
         }
+
+        // Register MCP prompts. Each prompt's `generate(array)` takes the
+        // call arguments and returns the `{description, messages}` envelope;
+        // the service-provider closure forwards the args verbatim.
+        $migratePrompt = new MigrateFilamentResourcePrompt;
+        $migrateSchema = $migratePrompt->schema();
+        $server->registerPrompt(
+            $migrateSchema['name'],
+            $migrateSchema['description'],
+            $migrateSchema['arguments'],
+            static fn (array $args): array => $migratePrompt->generate($args)['messages'],
+        );
+
+        $reviewPrompt = new ReviewResourcePrompt;
+        $reviewSchema = $reviewPrompt->schema();
+        $server->registerPrompt(
+            $reviewSchema['name'],
+            $reviewSchema['description'],
+            $reviewSchema['arguments'],
+            static fn (array $args): array => $reviewPrompt->generate($args)['messages'],
+        );
     }
 }

@@ -65,3 +65,28 @@ export type { PageHeaderProps } from './utility/PageHeader.js';
 export { PageHeader } from './utility/PageHeader.js';
 
 export { cn } from './utils/cn.js';
+
+export type { ChartCardProps } from './widgets/ChartCard.js';
+export { ChartCard } from './widgets/ChartCard.js';
+export type {
+  DashboardFilterPayload,
+  DashboardFiltersProps,
+  DateRangeFilterPayload,
+  SelectFilterPayload,
+} from './widgets/DashboardFilters.js';
+export { DashboardFilters } from './widgets/DashboardFilters.js';
+export type { DashboardGridProps, DashboardPayload } from './widgets/DashboardGrid.js';
+export { DashboardGrid } from './widgets/DashboardGrid.js';
+export type { StatCardProps } from './widgets/StatCard.js';
+export { StatCard } from './widgets/StatCard.js';
+export type {
+  TableCardColumn,
+  TableCardProps,
+  TableCardRecord,
+  TableCardWidget,
+} from './widgets/TableCard.js';
+export { TableCard } from './widgets/TableCard.js';
+export type { WidgetPayload, WidgetRendererProps } from './widgets/WidgetRenderer.js';
+export { WidgetRenderer } from './widgets/WidgetRenderer.js';
+export type { WidgetWrapperProps } from './widgets/WidgetWrapper.js';
+export { WidgetWrapper } from './widgets/WidgetWrapper.js';

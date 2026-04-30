@@ -53,9 +53,9 @@ final class WorkflowDefinition
     /**
      * Register the state map.
      *
-     * @param array<string, array{label?: string, color?: string, icon?: string}> $states
-     *                                                                                    Keys are state identifiers — typically `class-string<State>` from
-     *                                                                                    spatie/laravel-model-states, but any non-empty string works.
+     * @param  array<string, array{label?: string, color?: string, icon?: string}>  $states
+     *                                                                                       Keys are state identifiers — typically `class-string<State>` from
+     *                                                                                       spatie/laravel-model-states, but any non-empty string works.
      */
     public function states(array $states): self
     {
@@ -95,7 +95,7 @@ final class WorkflowDefinition
     /**
      * Register the transition class list.
      *
-     * @param list<class-string> $transitions
+     * @param  list<class-string>  $transitions
      */
     public function transitions(array $transitions): self
     {

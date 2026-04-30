@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Arqel\Workflow\Concerns;
 
+use Arqel\Workflow\Events\StateTransitioned;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -86,6 +88,61 @@ trait HasWorkflow
     }
 
     /**
+     * Transition the model to a new state and fire `StateTransitioned`.
+     *
+     * Captures the current state key (resolved via {@see resolveStateKey()}),
+     * delegates the actual mutation to spatie's `transitionTo()` if it exists
+     * on the underlying state object, otherwise assigns the new value directly
+     * to the workflow field. Emits `StateTransitioned` so user-land listeners
+     * can run audit log + notifications + broadcast (WF-004).
+     *
+     * The audit event is suppressed when `arqel-workflow.audit.enabled` is
+     * `false`, allowing apps to opt-out per environment.
+     *
+     * @param  string  $newState  FQCN of the new state class, an enum value or a slug.
+     * @param  array<string, mixed>  $context  Arbitrary metadata propagated to listeners.
+     */
+    public function transitionTo(string $newState, array $context = []): void
+    {
+        $definition = $this->arqelWorkflow();
+        $field = $definition->getField();
+
+        /** @var mixed $currentValue */
+        $currentValue = $this->{$field} ?? null;
+        $fromKey = self::resolveStateKey($currentValue) ?? '';
+
+        // Prefer the state object's own `transitionTo()` (spatie API) when
+        // available — keeps spatie guards/casts intact. Otherwise fall back
+        // to a plain attribute assignment so the trait stays standalone.
+        assert($this instanceof Model);
+
+        if (is_object($currentValue) && method_exists($currentValue, 'transitionTo')) {
+            $currentValue->transitionTo($newState);
+        } else {
+            $this->{$field} = $newState;
+            $this->save();
+        }
+
+        if (config('arqel-workflow.audit.enabled', true) === false) {
+            return;
+        }
+
+        if (config('arqel-workflow.audit.log_via', 'event') !== 'event') {
+            return;
+        }
+
+        $userId = Auth::id();
+
+        event(new StateTransitioned(
+            record: $this,
+            from: $fromKey,
+            to: $newState,
+            userId: is_int($userId) ? $userId : null,
+            context: $context,
+        ));
+    }
+
+    /**
      * Resolve the canonical key for a state value:
      * - object → its FQCN (matches spatie/laravel-model-states which
      *   keys metadata by `State::class`)
@@ -115,7 +172,7 @@ trait HasWorkflow
      * `from()` method is considered always-available; otherwise the
      * current state key must appear in its `from()` list.
      *
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionApplies(string $transition, ?string $current): bool
     {

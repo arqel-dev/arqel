@@ -1,0 +1,4 @@
+use App\Http\Controllers\TenantRegistrationController;
+
+Route::get('/register-tenant', [TenantRegistrationController::class, 'showForm'])->name('tenant.register.show');
+Route::post('/register-tenant', [TenantRegistrationController::class, 'register'])->name('tenant.register.store');

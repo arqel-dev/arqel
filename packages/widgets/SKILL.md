@@ -1,60 +1,141 @@
 # SKILL.md — arqel/widgets
 
-> Contexto canónico para AI agents.
+> Contexto canónico para AI agents a trabalhar no pacote `arqel/widgets`.
 
 ## Purpose
 
-`arqel/widgets` entrega o sistema de **widgets de dashboard** para Arqel: cards de KPI (Stat), charts (Chart), tabelas (Table) e widgets custom (Custom). Cada widget é uma classe PHP declarativa que expõe um React component name + payload `data` per-render. Suporta polling (refresh automático), deferred loading (lazy fetch para widgets pesados) e visibility per-user.
+`arqel/widgets` entrega o sistema de **widgets de dashboard** para Arqel: cards de KPI (Stat), charts (Chart), mini-tabelas (Table) e widgets custom (escape-hatch). Cada widget é uma classe PHP declarativa que expõe um React component name + payload `data` per-render.
+
+Suporta polling (refresh automático), deferred loading (lazy fetch para widgets pesados), visibility per-user (`canSee`) e filtros declarativos partilhados entre widgets do mesmo Dashboard. Dashboards são compostos por uma lista de widgets + grid columns responsivo + filtros.
 
 ## Status
 
-**Entregue (WIDGETS-001..009):**
+**Base (WIDGETS-001..006):**
 
-- Esqueleto do pacote `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo
-- **`Arqel\Widgets\Widget`** abstract base com fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case identifier) + `protected string $component` (PascalCase React component name) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload canônico para Inertia; `data: null` quando deferred. `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)` oracle (default true). **`filterValue(string $name, mixed $default = null)`** (WIDGETS-009) lê do filter map merged. **`getFilters(): array`** (WIDGETS-009) exposto para inspeção.
-- **`Arqel\Widgets\Dashboard`** (refatorado em WIDGETS-006): construtor `(string $id, string $label, ?string $path = null)` com props readonly; factory `Dashboard::make($id, $label, $path = null)`. `widgets(array)` aceita Widget instances **e** `class-string<Widget>` (resolução via container deferida para `resolve()`); filtra non-Widget/non-class-string silently. `addWidget(Widget|class-string<Widget>)`. `columns(int|array)` aceita int (clamp 1..12) ou mapa responsivo. Setters `heading`, `description`, `canSee(Closure)`. **`filters(array)` dual-mode** (WIDGETS-009): aceita `array<string, mixed>` legado (passthrough — BC mantida) **OU** `list<Filter>` (novo). Detecção por presença de qualquer instância `Filter`. Em modo declarativo armazena `$declaredFilters` + `$filterDefaults`. Getters `getDeclaredFilters()` + `getFilterDefaults()`. **`resolve(?Authenticatable)`** é o serializador canônico: instancia class-strings, filtra por `canBeSeenBy`, sort por `getSort()`, e para cada widget aplica `array_merge($dashboardFilterDefaults, $widget->getFilters())` antes de serializar (request-time values vencem dashboard defaults).
-- **`Arqel\Widgets\DashboardRegistry`** (final, singleton, WIDGETS-006) `register(Dashboard)` keyed por `$dashboard->id` (lança `InvalidArgumentException` em duplicata); `has`/`get`/`all`/`clear`. Singleton bound em `WidgetsServiceProvider::packageRegistered`.
-- **`Arqel\Widgets\WidgetRegistry`** (final, singleton) `register(type, class-string<Widget>)` valida `is_subclass_of(Widget)` (lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`.
-- **`Arqel\Widgets\WidgetsServiceProvider`** auto-discovered; `packageRegistered()` faz singletons; `configurePackage()` chama `->hasRoute('admin')`.
-- **`Arqel\Widgets\StatWidget`**, **`ChartWidget`**, **`TableWidget`**, **`CustomWidget`** (WIDGETS-002..005) — KPI/Recharts/mini-tabela/escape-hatch. Cada um final com fluent API documentada nos tests (16 + 14 + 10 + 10 testes). `TableWidget` sem hard dep em `arqel/table` (duck-typing).
-- **`Arqel\Widgets\Http\Controllers\DashboardController`** (final, WIDGETS-007) — `show(Request, DashboardRegistry, ?string $dashboardId = null): Inertia\Response`. Default `'main'`. 404 quando ausente, render `'arqel::dashboard'` com `dashboard` + `filterValues`. Rotas `GET /admin` + `GET /admin/dashboards/{dashboardId}` em `routes/admin.php`, middleware `web` + `auth`.
-- **`Dashboard::findWidget(string $widgetId): ?Widget`** (WIDGETS-008) — lookup por id com class-string resolution; refator extracted private `resolveEntry()` helper partilhado com `resolve()`. **Auth não enforced** — caller distingue 404 vs 403.
-- **`Arqel\Widgets\Http\Controllers\WidgetDataController`** (final, WIDGETS-008) — `show(Request, DashboardRegistry, string $dashboardId, string $widgetId): JsonResponse`. 404 dashboard/widget desconhecido, 403 `canBeSeenBy` reject. Aplica `$widget->filters($request->input('filters'))` quando array, retorna `{data: $widget->data()}`. Rota `GET /admin/dashboards/{dashboardId}/widgets/{widgetId}/data` (`arqel.dashboard.widget-data`). Cobre RF-W-04 (Polling) + RF-W-05 (Deferred).
-- **`Arqel\Widgets\Filters\Filter`** (abstract, WIDGETS-009) — base declarativa. Construtor `(string $name)`; factory `Filter::make($name)`. Setters fluentes `label(string)`, `default(mixed)`. Subclasses declaram `$type` + `$component` e implementam `getTypeSpecificProps(): array`. `toArray()` emite `{name, type, component, label, default, ...typeSpecificProps}`. Label fallback: `Str::of($name)->snake()->replace('_',' ')->title()`.
-- **`Arqel\Widgets\Filters\DateRangeFilter`** (final, WIDGETS-009) — `type='date_range'`, `component='DateRangeFilter'`. `defaultRange(?DateTimeInterface, ?DateTimeInterface)` armazena `['from' => ?DateTime, 'to' => ?DateTime]`.
-- **`Arqel\Widgets\Filters\SelectFilter`** (final, WIDGETS-009) — `type='select'`, `component='SelectFilter'`. `options(array|Closure)` (Closure lazy), `multiple(bool=true)`. `getTypeSpecificProps` retorna `{options, multiple}`.
-- **`Arqel\Widgets\Commands\MakeWidgetCommand`** (final, WIDGETS-013) — `arqel:widget <Name> --type=stat|chart|table|custom --force`. Stub-based generator escreve em `app/Widgets/<Name>.php`; snake_case do nome de classe vira o construtor `name` arg (ex: `TotalUsers` → `'total_users'`). Idempotente (skip sem `--force`). 4 stubs em `stubs/widgets/{stat,chart,table,custom}.stub`.
-- **`Arqel\Widgets\Commands\MakeDashboardCommand`** (final, WIDGETS-013) — `arqel:dashboard <Name> --id=<custom> --force`. Gera `app/Dashboards/<Name>.php` com factory static `make(): Dashboard`. `--id` default = snake_case do nome; `label` = humanised. Stub em `stubs/dashboards/dashboard.stub`. Mesma posture idempotente.
-- **Testes Pest:** ~139 testes (adicionados aos 131 prévios: 5 `MakeWidgetCommandTest` + 3 `MakeDashboardCommandTest` cobrindo all 4 widget types + idempotence + `--force` + invalid type rejection + `--id` override). Fixture `EchoFiltersWidget` usado por WIDGETS-008/009.
+- Esqueleto `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo.
+- `Arqel\Widgets\Widget` (abstract) — fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case) + `protected string $component` (PascalCase) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload Inertia (`data: null` quando deferred). `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)`, `filterValue(string, mixed=null)`, `getFilters(): array`.
+- `Arqel\Widgets\Dashboard` — `(string $id, string $label, ?string $path = null)` props readonly; factory `Dashboard::make(...)`. `widgets(array)` aceita Widget instances **e** `class-string<Widget>` (resolvidos via container em `resolve()`); silently filtra entradas inválidas. `addWidget()`, `columns(int|array)` (clamp 1..12 ou mapa responsivo), `heading`, `description`, `canSee`. `findWidget(string $widgetId): ?Widget` (sem auth — caller distingue 404 vs 403).
+- `Arqel\Widgets\DashboardRegistry` (final, singleton) — `register(Dashboard)` keyed por id (duplicata lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`.
+- `Arqel\Widgets\WidgetRegistry` (final, singleton) — `register(type, class-string<Widget>)` valida `is_subclass_of(Widget)`; `has`/`get`/`all`/`clear`.
+- `Arqel\Widgets\WidgetsServiceProvider` auto-discovered; binds singletons em `packageRegistered`; `configurePackage()` chama `->hasRoute('admin')`.
 
-**Por chegar (WIDGETS-010..015):**
+**Concrete widget types (WIDGETS-002..005):**
 
-- React components em `@arqel/ui/widgets` (incluindo `DateRangeFilter` / `SelectFilter` JS-side, `WidgetDataController` polling/deferred client) — WIDGETS-010..012
-- Filters URL sync + refetch on change — WIDGETS-011..012
-- Suite full de testes + SKILL.md final + dashboard demo — WIDGETS-014..015
+- `StatWidget` (final) — KPI card; setters value/description/icon/color/trend.
+- `ChartWidget` (final) — config Recharts serializada (sem hard dep em libs JS).
+- `TableWidget` (final) — mini-tabela; sem hard dep em `arqel/table` (duck-typing).
+- `CustomWidget` (final) — escape-hatch para componentes React arbitrários.
+
+**HTTP layer (WIDGETS-007..008):**
+
+- `Http\Controllers\DashboardController` (final) — `show(Request, DashboardRegistry, ?string $dashboardId='main'): Inertia\Response`. 404 quando ausente; render `'arqel::dashboard'` com `dashboard` + `filterValues`.
+- `Http\Controllers\WidgetDataController` (final) — `show(Request, DashboardRegistry, string $dashboardId, string $widgetId): JsonResponse`. 404 dashboard/widget desconhecido, 403 `canBeSeenBy` reject. Aplica `$widget->filters($request->input('filters'))` quando array; retorna `{data: $widget->data()}`. Cobre RF-W-04 (Polling) + RF-W-05 (Deferred).
+- Rotas em `routes/admin.php` (middleware `web` + `auth`): `GET /admin`, `GET /admin/dashboards/{dashboardId}`, `GET /admin/dashboards/{dashboardId}/widgets/{widgetId}/data` (`arqel.dashboard.widget-data`).
+
+**Filters (WIDGETS-009):**
+
+- `Filters\Filter` (abstract) — `(string $name)`; factory `Filter::make($name)`. Setters `label(string)`, `default(mixed)`. Subclasses declaram `$type` + `$component` e implementam `getTypeSpecificProps(): array`. `toArray()` emite `{name, type, component, label, default, ...}`. Label fallback via `Str::of($name)->snake()->replace('_',' ')->title()`.
+- `Filters\DateRangeFilter` (final) — `type='date_range'`, `component='DateRangeFilter'`. `defaultRange(?DateTimeInterface, ?DateTimeInterface)`.
+- `Filters\SelectFilter` (final) — `type='select'`, `component='SelectFilter'`. `options(array|Closure)` (Closure lazy), `multiple(bool=true)`.
+- **`Dashboard::filters()` dual-mode** — aceita `array<string, mixed>` legado (passthrough, BC) **OU** `list<Filter>` (declarativo). Detecção por presença de qualquer `Filter`. Em modo declarativo armazena `$declaredFilters` + `$filterDefaults`; getters `getDeclaredFilters()`/`getFilterDefaults()`.
+- **Propagação:** `Dashboard::resolve(?Authenticatable)` instancia class-strings, filtra por `canBeSeenBy`, ordena por `getSort()`, e para cada widget aplica `array_merge($dashboardFilterDefaults, $widget->getFilters())` antes de serializar — request-time values vencem dashboard defaults.
+
+**Scaffolders (WIDGETS-013):**
+
+- `Commands\MakeWidgetCommand` (final) — `arqel:widget <Name> --type=stat|chart|table|custom --force`. Gera `app/Widgets/<Name>.php`; snake_case do class name vira o `name` arg do construtor (e.g. `TotalUsers` → `'total_users'`). Idempotente (skip sem `--force`). Stubs em `stubs/widgets/{stat,chart,table,custom}.stub`.
+- `Commands\MakeDashboardCommand` (final) — `arqel:dashboard <Name> --id=<custom> --force`. Gera `app/Dashboards/<Name>.php` com factory static `make(): Dashboard`. `--id` default = snake_case; `label` humanised. Stub em `stubs/dashboards/dashboard.stub`.
+
+**Coverage:** ~139 testes Pest passando. Fixture `EchoFiltersWidget` usada em WIDGETS-008/009.
+
+**Por chegar (WIDGETS-010..012, 014..015):**
+
+- React side em `@arqel/ui/widgets` — components Stat/Chart/Table/Custom, `DateRangeFilter`/`SelectFilter` JS, polling/deferred client (WIDGETS-010..012).
+- Filters URL sync + refetch on filter change (WIDGETS-011..012).
+- E2E + dashboard demo + 90% coverage target (WIDGETS-014..015).
 
 ## Conventions
 
-- `declare(strict_types=1)` obrigatório
-- Subclasses `Widget`/`Filter` são `final` por convenção; bases são `abstract`
-- **Sem hard dep** em libs de chart (Recharts é JS-side; ChartWidget só serializa config)
-- `columnSpan(int)` 1..12 default; `columnSpan(string)` atalhos (`'full'`, `'1/2'`)
-- `deferred` widgets devem ter um `WidgetDataController` endpoint para fetch — entregue em WIDGETS-008
+- `declare(strict_types=1)` obrigatório; bases `abstract`, subclasses (`Widget`, `Filter`) `final`.
+- **Sem hard dep** em libs de chart (Recharts é JS-side; `ChartWidget` só serializa config).
+- `columnSpan(int)` 1..12; `columnSpan(string)` aceita atalhos (`'full'`, `'1/2'`).
+- `deferred` widgets devem ter um `WidgetDataController` endpoint para fetch (entregue em WIDGETS-008).
+- Filters propagam via merge: `dashboard defaults` ← `widget filters(request values)` (request wins).
 
 ## Anti-patterns
 
-- ❌ **Lógica pesada em `data()`** — SQL N+1, chamadas externas síncronas. Use `deferred(true)` + queue jobs
-- ❌ **`columnSpan(13+)`** — grid base é 12
-- ❌ **Polling agressivo** (`poll(1)`) — mínimo 30s; realtime via Reverb (Phase 4)
-- ❌ **Widget sem `canSee` em payload sensível** — abilities explicit no servidor; UI-only filtering é UX (ADR-017)
-- ❌ **Custom Widget como `<iframe>`** — quebra single-page navigation
+- Lógica pesada em `data()` (SQL N+1, chamadas externas síncronas) — usa `deferred(true)` + queue jobs.
+- `columnSpan(13+)` — grid base é 12.
+- Polling agressivo (`poll(1)`) — mínimo prático 30s; realtime via Reverb é Phase 4.
+- Widget sem `canSee` em payload sensível — server é fonte da verdade; UI-only filtering é UX (ADR-017).
+- `CustomWidget` como `<iframe>` — quebra single-page navigation.
+
+## Examples
+
+`StatWidget` declarativo:
+
+```php
+use Arqel\Widgets\StatWidget;
+
+final class TotalUsersWidget extends StatWidget
+{
+    public function __construct()
+    {
+        parent::__construct('total_users');
+        $this->heading('Total users')->columnSpan(3)->poll(60);
+    }
+
+    public function data(): array
+    {
+        return ['value' => User::count()];
+    }
+}
+```
+
+Composição de Dashboard com filtros declarativos:
+
+```php
+use Arqel\Widgets\Dashboard;
+use Arqel\Widgets\Filters\{DateRangeFilter, SelectFilter};
+
+return Dashboard::make('main', 'Overview')
+    ->columns(['default' => 1, 'md' => 2, 'lg' => 4])
+    ->filters([
+        DateRangeFilter::make('period'),
+        SelectFilter::make('status')->options(['active' => 'Active', 'archived' => 'Archived']),
+    ])
+    ->widgets([
+        TotalUsersWidget::class,
+        RevenueChartWidget::class,
+    ]);
+```
+
+Widget deferred com leitura de filtro:
+
+```php
+final class RevenueChartWidget extends ChartWidget
+{
+    public function __construct()
+    {
+        parent::__construct('revenue');
+        $this->heading('Revenue')->deferred(true)->columnSpan('full');
+    }
+
+    public function data(): array
+    {
+        $period = $this->filterValue('period', ['from' => null, 'to' => null]);
+        return Order::query()
+            ->whereBetween('created_at', [$period['from'], $period['to']])
+            ->sum('total');
+    }
+}
+```
 
 ## Related
 
+- Source: [`packages/widgets/src/`](./src/)
+- Testes: [`packages/widgets/tests/`](./tests/)
 - Tickets: [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §WIDGETS-001..015
 - API: [`PLANNING/05-api-php.md`](../../PLANNING/05-api-php.md) §Widgets
-- Source: [`packages/widgets/src/`](./src/)
-- Tests: [`packages/widgets/tests/`](./tests/)
 - ADRs:
   - [ADR-001](../../PLANNING/03-adrs.md) — Inertia-only
   - [ADR-008](../../PLANNING/03-adrs.md) — Pest 3

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..015 ✅ · WIDGETS-001..009 + 013..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 + 015/016/018/019/020 ✅ — JS scaffold + KeyValueInput + TagsInput · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001/002/005 ✅ · DOCS-V2-001/002 ✅ · GOV-V2-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#21 paralelos completos.** Próximo natural: FIELDS-ADV-010..014/017 (React components — RichTextInput Tiptap, MarkdownInput CodeMirror, CodeInput Shiki, RepeaterInput dnd-kit, BuilderInput, WizardInput); CMDPAL-003/004 (React palette), WIDGETS-010..012 (React widgets).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..015 ✅ · WIDGETS-001..009 + 013..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..009 + 011/015/016/018/019/020 ✅ — JS scaffold + Markdown/KeyValue/Tags React · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001..005 ✅ — incluindo React palette · DOCS-V2-001/002 ✅ · GOV-V2-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#22 paralelos completos.** Próximo natural: FIELDS-ADV-010 (RichTextInput Tiptap), FIELDS-ADV-012 (CodeInput Shiki), FIELDS-ADV-013/014/017 (Repeater/Builder/Wizard React), WIDGETS-010..012 (React widgets em @arqel/ui).
 
 **Fase:** 1 (MVP)
 

@@ -13,6 +13,7 @@
  */
 
 import type { ReactNode } from 'react';
+import { CommandPalette } from '../palette/CommandPalette.js';
 import { cn } from '../utils/cn.js';
 
 export type AppShellVariant = 'sidebar-left' | 'sidebar-right' | 'topbar-only' | 'full-width';
@@ -43,6 +44,7 @@ export function AppShell({
           className,
         )}
       >
+        <CommandPalette />
         {children}
       </div>
     );
@@ -57,6 +59,7 @@ export function AppShell({
           className,
         )}
       >
+        <CommandPalette />
         {topbar}
         <main className="flex-1">{children}</main>
         {footer}
@@ -76,6 +79,7 @@ export function AppShell({
         className,
       )}
     >
+      <CommandPalette />
       {sidebar}
       <div className="flex min-w-0 flex-1 flex-col">
         {topbar}

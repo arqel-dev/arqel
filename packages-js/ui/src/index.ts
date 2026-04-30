@@ -33,6 +33,8 @@ export type { FormActionsProps } from './form/FormActions.js';
 export { FormActions } from './form/FormActions.js';
 export type { FormRendererProps } from './form/FormRenderer.js';
 export { FormRenderer } from './form/FormRenderer.js';
+export type { CommandPaletteProps, PaletteCommand } from './palette/CommandPalette.js';
+export { CommandPalette } from './palette/CommandPalette.js';
 export type { ResourceIndexUIProps } from './resource/ResourceIndex.js';
 export { ResourceIndex } from './resource/ResourceIndex.js';
 export type { AppShellProps, AppShellVariant } from './shell/AppShell.js';

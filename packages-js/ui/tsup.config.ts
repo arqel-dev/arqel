@@ -13,6 +13,7 @@ export default defineConfig({
     utility: 'src/utility/index.ts',
     utils: 'src/utils/index.ts',
     pages: 'src/pages/index.ts',
+    palette: 'src/palette/index.ts',
   },
   format: ['esm'],
   dts: true,

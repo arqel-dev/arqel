@@ -67,6 +67,10 @@
       "types": "./dist/pages.d.ts",
       "import": "./dist/pages.js"
     },
+    "./palette": {
+      "types": "./dist/palette.d.ts",
+      "import": "./dist/palette.js"
+    },
     "./styles.css": "./src/styles/globals.css"
   },
   "files": [

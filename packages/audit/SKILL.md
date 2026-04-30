@@ -53,6 +53,14 @@ A escolha é **integrar, não reinventar**: ActivityLog do Spatie é maduro, bem
   - `Feature/AuditConfigTest` (2): config `audit` carregado + `global_log_url` aponta para a rota
   - **Total acumulado: 31 testes passando**
 
+**Entregue (AUDIT-004 — escopo reduzido):**
+
+- 5 testes novos em `tests/Unit/Coverage/` cobrindo gaps identificados:
+  - `LogsActivityOptionsCanonicalTest` (2 testes): valida que `getActivitylogOptions()` produz `LogOptions` com **todos os 4 defaults** simultaneamente (`logOnlyDirty=true`, `submitEmptyLogs=false`, `logName=class basename` sem FQCN, `logAttributes` não vazio); verifica fallback do log name para basename.
+  - `RecordActivityCauserSerialisationTest` (3 testes): `stringAttr()` defensivo retorna null quando attribute ausente no causer (id-only causer model); retorna string quando presente; retorna null quando non-string (array). Garante que o controller serializa causer com schemas variados sem 500.
+- **Total acumulado: 36 testes**
+- **Deferred**: E2E timeline UI tests (precisam React component que ainda não existe), retention policy / `audit:prune` command (infra work cron-bound).
+
 **Por chegar (cross-package + JS):**
 
 - React `ActivityTimeline` component (FIELDS-JS / ticket JS dedicado) — render bonito com diff, avatar do causer, timestamps relativos, filtros

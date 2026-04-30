@@ -27,6 +27,7 @@
         "arqel/form": "@dev",
         "arqel/mcp": "@dev",
         "arqel/nav": "@dev",
+        "arqel/realtime": "@dev",
         "arqel/table": "@dev",
         "arqel/tenant": "@dev",
         "arqel/widgets": "@dev",

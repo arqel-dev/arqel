@@ -17,6 +17,27 @@
 - **Per-row authorization de actions** (TABLE-007) — implementado em `arqel/core` (`InertiaDataBuilder::resolveVisibleActionNames`): cada record carrega `arqel.actions: ['view', 'edit']` (lista de **nomes** das row actions visíveis para `(user, record)`); o React filtra a lista global pelo nome. Avalia `Action::isVisibleFor($record)` + `Action::canBeExecutedBy($user, $record)` duck-typed
 - **Bulk actions endpoint** (TABLE-008) — `POST {panel}/{resource}/bulk-actions/{action}` em `arqel/actions`, recebe `ids[]`, fetcha records via `whereIn(getKeyName, ids)`, delega para `BulkAction::execute(Collection)` que **chunka automaticamente** via `chunkSize(int)` (default 100, clamp ≥ 1) — chama callback uma vez por chunk. `deselectRecordsAfterCompletion(bool)` controla UX pós-execução
 
+**Entregue (TABLE-V2-004 — PHP slice):**
+
+- **Column visibility flags** — três flags fluentes na base `Column`:
+  - `togglable(bool $enable = true)` — marca a coluna como controlável pelo usuário (futuro dropdown de visibilidade no header).
+  - `hiddenByDefault(bool $hidden = true)` — coluna começa escondida até o usuário togglar. **Auto-enables `togglable=true`** quando `$hidden=true` (uma coluna escondida sem toggle seria invisível para sempre). `togglable` permanece a fonte da verdade final — chamar `togglable(false)` depois de `hiddenByDefault()` desliga o toggle mesmo com `hiddenByDefault=true`.
+  - `hiddenOnMobile(bool $hidden = true)` — esconde no breakpoint mobile (independente das outras flags).
+- Getters: `isTogglable()`, `isHiddenByDefault()`, `isHiddenOnMobile()`.
+- `toArray()` expõe as três chaves (`togglable`, `hiddenByDefault`, `hiddenOnMobile`) no payload Inertia.
+
+```php
+TextColumn::make('email')->togglable(),
+TextColumn::make('phone')->togglable()->hiddenByDefault(),
+TextColumn::make('description')->hiddenOnMobile(),
+```
+
+**Adiado (TABLE-V2-004 — restante):**
+
+- React dropdown de column visibility (icon button no header + checkbox list).
+- Endpoint `POST /admin/user-settings/tables/{resource}` + persistência cross-package (trait `HasArqelSettings` ou coluna JSON `settings` em `users`).
+- Auto-save debounced via Inertia + propagação em shared props (`user.settings.tables[slug].visible_columns`).
+
 **Adiados:**
 
 - TABLE-009..013 (advanced filters: relationship-based, range numeric, computed) — Phase 2

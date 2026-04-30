@@ -27,6 +27,9 @@
         "pestphp/pest": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.0"
     },
+    "suggest": {
+        "laravel/cashier-stripe": "Required for the optional billing scaffold (composer require laravel/cashier-stripe ^15)."
+    },
     "autoload": {
         "psr-4": {
             "Arqel\\Tenant\\": "src/"

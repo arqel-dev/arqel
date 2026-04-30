@@ -1,0 +1,6 @@
+use App\Http\Controllers\BillingController;
+
+Route::middleware(['web', 'auth'])->prefix('admin/billing')->group(function () {
+    Route::get('/', [BillingController::class, 'show'])->name('tenant.billing.show');
+    Route::post('checkout', [BillingController::class, 'checkout'])->name('tenant.billing.checkout');
+});

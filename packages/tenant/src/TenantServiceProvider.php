@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Arqel\Tenant;
 
+use Arqel\Tenant\Commands\ScaffoldBillingCommand;
 use Arqel\Tenant\Commands\ScaffoldProfileCommand;
 use Arqel\Tenant\Commands\ScaffoldRegistrationCommand;
 use Arqel\Tenant\Contracts\TenantResolver;
+use Arqel\Tenant\Middleware\RequireTenantFeature;
 use Arqel\Tenant\Middleware\ResolveTenantMiddleware;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -39,7 +41,8 @@ final class TenantServiceProvider extends PackageServiceProvider
             ->name('arqel-tenant')
             ->hasRoute('admin')
             ->hasCommand(ScaffoldRegistrationCommand::class)
-            ->hasCommand(ScaffoldProfileCommand::class);
+            ->hasCommand(ScaffoldProfileCommand::class)
+            ->hasCommand(ScaffoldBillingCommand::class);
     }
 
     public function packageRegistered(): void
@@ -71,6 +74,7 @@ final class TenantServiceProvider extends PackageServiceProvider
 
         if ($router instanceof Router) {
             $router->aliasMiddleware('arqel.tenant', ResolveTenantMiddleware::class);
+            $router->aliasMiddleware('arqel.tenant.feature', RequireTenantFeature::class);
         }
     }
 

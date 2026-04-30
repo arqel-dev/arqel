@@ -10,7 +10,7 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 
 ## Status
 
-**Entregue (TENANT-001..012, 014):**
+**Entregue (TENANT-001..014):**
 
 - Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\Tenant\` → `src/`, dep em `arqel/core` via path repo)
 - `TenantServiceProvider` registado via auto-discovery (`extra.laravel.providers`)
@@ -39,9 +39,10 @@ A escolha é **não reinventar**: oferecer uma abstração leve que cobre 80% do
 
 - **TENANT-014 — Coverage gaps + SKILL polish (escopo reduzido)**: 9 testes novos em `tests/Unit/Coverage/` cobrindo 3 gaps de alto valor identificados pela auditoria. **(1) `TenantManager::runFor` exception path** (3 testes em `TenantManagerRunForExceptionTest.php`): restore tanto de `currentTenant` quanto da flag `resolved` quando o callback lança; nested `runFor` desempilha em LIFO; outer context preservado quando inner throws. **(2) `ResolveTenantMiddleware` MODE_OPTIONAL** (2 testes em `MiddlewareOptionalModeTest.php`): unresolved request flui através do `next` cleanly; aceita case-insensitive (`OPTIONAL`/`Optional`/`optional`/com whitespace). **(3) `AbstractTenantResolver::availableFor` defaults** (4 testes em `AbstractResolverAvailableForTest.php`): non-Model Authenticatable → `[]`; missing relation method → `[]`; Collection mixed-type filtra para `modelClass` only; plain array property também aceita. **140 testes total** (era 131). Cross-tenant data leak tests + Stancl integration tests deferidos — precisam DB schema setup mais pesado que testbench resolve cleanly.
 
-**Por chegar (TENANT-013, 015):**
+- **TENANT-013 — Feature gates + billing scaffolder (escopo reduzido)**: trait `Arqel\Tenant\Concerns\HasFeatures` com `hasFeature/enableFeature/disableFeature/getFeatures` (defensive non-array handling, dedup on enable, recomenda `$casts = ['features' => 'array']`); middleware `Arqel\Tenant\Middleware\RequireTenantFeature` (alias `arqel.tenant.feature` registado no `packageBooted` — uso `->middleware('arqel.tenant.feature:analytics')`; 404 se sem tenant, 500 actionable se model não tem `hasFeature`, 402 JSON `{error: 'feature_not_available', feature, message}` se disabled, else `next()`); artisan `arqel:tenant:scaffold-billing` (mirror exato do TENANT-010/011 — 3 stubs `BillingController.stub`/`Billing.tsx.stub`/`billing.stub`, idempotente, `--force`, `setBasePath()` test hook). `laravel/cashier-stripe` adicionado em `suggest:` — apps fazem opt-in via `composer require` próprio. **17 testes** novos (8 trait + 5 middleware + 4 command), 157 total tenant. **Cashier wiring real adiado** — consumer customiza o BillingController gerado.
 
-- Integração opcional com Laravel Cashier (billing/subscriptions) — TENANT-013
+**Por chegar (TENANT-015):**
+
 - SKILL.md final + docs guides — TENANT-015
 - Tenant switcher panel UI + flow de registro + profile + white-labeling — TENANT-009..012
 - Integração opcional com `Laravel Cashier` para billing — TENANT-013

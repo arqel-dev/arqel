@@ -32,8 +32,9 @@ return [
         ],
         'ollama' => [
             'driver' => 'Arqel\\Ai\\Providers\\OllamaProvider',
-            'base_url' => env('OLLAMA_BASE_URL', 'http://localhost:11434'),
+            'base_url' => env('ARQEL_AI_OLLAMA_URL', 'http://localhost:11434'),
             'model' => env('ARQEL_AI_OLLAMA_MODEL', 'llama3.1'),
+            'embedding_model' => env('ARQEL_AI_OLLAMA_EMBEDDING_MODEL', 'nomic-embed-text'),
         ],
     ],
 

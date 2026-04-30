@@ -27,8 +27,8 @@ final class StateTransitioned
     use SerializesModels;
 
     /**
-     * @param array<string, mixed> $context Payload arbitrário propagado
-     *                                      do call-site da transição.
+     * @param  array<string, mixed>  $context  Payload arbitrário propagado
+     *                                         do call-site da transição.
      */
     public function __construct(
         public readonly Model $record,

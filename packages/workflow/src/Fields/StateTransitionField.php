@@ -289,7 +289,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transitionClass
+     * @param  class-string  $transitionClass
      */
     private function isAuthorized(string $transitionClass): bool
     {
@@ -311,8 +311,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
-     *
+     * @param  class-string  $transition
      * @return list<string>|null
      */
     private static function transitionFroms(string $transition): ?array
@@ -350,7 +349,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionTo(string $transition): string
     {
@@ -375,7 +374,7 @@ final class StateTransitionField extends Field
     }
 
     /**
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionLabel(string $transition): string
     {

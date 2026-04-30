@@ -8,8 +8,9 @@ use Arqel\Widgets\Widget;
 
 /**
  * Test-only widget whose `data()` payload echoes the current filter
- * map — lets feature tests assert filter passthrough without a real
- * data source.
+ * map back. Used by both `WidgetDataControllerTest` (asserting
+ * request-time filter passthrough) and `DashboardFilterPropagationTest`
+ * (asserting declared dashboard defaults are merged into each widget).
  */
 final class EchoFiltersWidget extends Widget
 {
@@ -19,6 +20,6 @@ final class EchoFiltersWidget extends Widget
 
     public function data(): array
     {
-        return ['filters' => $this->filters];
+        return ['filters' => $this->getFilters()];
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Widgets;
 
+use Arqel\Widgets\Filters\Filter;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -36,6 +37,12 @@ final class Dashboard
 
     /** @var array<string, mixed> */
     private array $filters = [];
+
+    /** @var list<Filter> */
+    private array $declaredFilters = [];
+
+    /** @var array<string, mixed> */
+    private array $filterDefaults = [];
 
     private ?Closure $canSee = null;
 
@@ -144,13 +151,52 @@ final class Dashboard
 
     /**
      * Filter declarations rendered by the React side (e.g., date
-     * range, dropdown). Stored as opaque metadata; consumers
-     * interpret the shape.
+     * range, dropdown). Two modes are supported:
      *
-     * @param array<string, mixed> $filters
+     * 1. Legacy `array<string, mixed>` — passthrough metadata
+     *    propagated as-is to widgets (kept for BC).
+     * 2. Declarative `list<Filter>` — each `Filter` instance is
+     *    serialised on the React side and its `default` is merged
+     *    into every widget's filter map at `resolve()` time.
+     *
+     * Detection: any element being a `Filter` instance switches
+     * the call into declarative mode.
+     *
+     * @param array<int|string, mixed> $filters
      */
     public function filters(array $filters): self
     {
+        $hasFilterInstance = false;
+        foreach ($filters as $entry) {
+            if ($entry instanceof Filter) {
+                $hasFilterInstance = true;
+
+                break;
+            }
+        }
+
+        if ($hasFilterInstance) {
+            $declared = [];
+            $defaults = [];
+            foreach ($filters as $entry) {
+                if (! $entry instanceof Filter) {
+                    continue;
+                }
+                $declared[] = $entry;
+                $defaults[$entry->getName()] = $entry->getDefault();
+            }
+
+            $this->declaredFilters = $declared;
+            $this->filterDefaults = $defaults;
+            $this->filters = $defaults;
+
+            return $this;
+        }
+
+        // Legacy passthrough mode.
+        /** @var array<string, mixed> $filters */
+        $this->declaredFilters = [];
+        $this->filterDefaults = [];
         $this->filters = $filters;
 
         return $this;
@@ -200,6 +246,18 @@ final class Dashboard
         return $this->filters;
     }
 
+    /** @return list<Filter> */
+    public function getDeclaredFilters(): array
+    {
+        return $this->declaredFilters;
+    }
+
+    /** @return array<string, mixed> */
+    public function getFilterDefaults(): array
+    {
+        return $this->filterDefaults;
+    }
+
     /**
      * Canonical serialiser for the dashboard schema. Resolves
      * class-string widget entries through the container, filters
@@ -219,6 +277,14 @@ final class Dashboard
 
             if (! $widget->canBeSeenBy($user)) {
                 continue;
+            }
+
+            // Merge dashboard filter values into the widget. Request-time
+            // values already set on the widget (e.g. by WidgetDataController)
+            // win over the dashboard's declared defaults.
+            $merged = array_merge($this->filters, $widget->getFilters());
+            if ($merged !== []) {
+                $widget->filters($merged);
             }
 
             $resolved[] = $widget;

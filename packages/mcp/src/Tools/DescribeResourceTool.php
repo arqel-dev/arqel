@@ -41,7 +41,7 @@ final class DescribeResourceTool
     private ?Closure $resolver;
 
     /**
-     * @param  (Closure(string): ?class-string)|null  $resolver
+     * @param (Closure(string): ?class-string)|null $resolver
      */
     public function __construct(?Closure $resolver = null)
     {
@@ -49,7 +49,8 @@ final class DescribeResourceTool
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array{class: string, model: string, slug: string, label: string|null, pluralLabel: string|null, navigationIcon: string|null, navigationGroup: string|null, navigationSort: int|string|null}
      */
     public function __invoke(array $params): array
@@ -109,7 +110,7 @@ final class DescribeResourceTool
     /**
      * Run a non-nullable accessor; on failure return the exception message.
      *
-     * @param  Closure(): string  $callable
+     * @param Closure(): string $callable
      */
     private function safeString(Closure $callable): string
     {
@@ -123,7 +124,7 @@ final class DescribeResourceTool
     /**
      * Run a nullable accessor; on failure return null.
      *
-     * @param  Closure(): (string|int|null)  $callable
+     * @param Closure(): (string|int|null) $callable
      */
     private function safeNullable(Closure $callable): string|int|null
     {

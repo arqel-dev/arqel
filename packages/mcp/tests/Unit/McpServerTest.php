@@ -311,6 +311,68 @@ it('returns [] for notifications even when the method errors', function (): void
     expect($response)->toBe([]);
 });
 
+it('returns -32600 when method is not a string (e.g. integer or array)', function (): void {
+    $r1 = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 200,
+        'method' => 42,
+    ]);
+    $r2 = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 201,
+        'method' => ['tools/list'],
+    ]);
+
+    expect($r1['error']['code'])->toBe(-32600)
+        ->and($r1['error']['message'])->toBe('Invalid Request')
+        ->and($r2['error']['code'])->toBe(-32600)
+        ->and($r2['error']['message'])->toBe('Invalid Request');
+});
+
+it('returns [] for a notification with a malformed envelope (no id, missing method)', function (): void {
+    $response = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+    ]);
+
+    expect($response)->toBe([]);
+});
+
+it('coerces non-array params into an empty array (tools/call with string params surfaces -32602)', function (): void {
+    $response = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 202,
+        'method' => 'tools/call',
+        'params' => 'not-an-array',
+    ]);
+
+    expect($response['error']['code'])->toBe(-32602)
+        ->and($response['error']['message'])->toBe('Tool not found: ');
+});
+
+it('coerces non-array tool arguments into an empty array before calling the handler', function (): void {
+    $captured = null;
+    $this->server->registerTool(
+        'capture',
+        'Capture',
+        ['type' => 'object'],
+        function (array $args) use (&$captured): string {
+            $captured = $args;
+
+            return 'ok';
+        },
+    );
+
+    $response = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 203,
+        'method' => 'tools/call',
+        'params' => ['name' => 'capture', 'arguments' => 'not-an-array'],
+    ]);
+
+    expect($response['result']['content'][0]['text'])->toBe('ok')
+        ->and($captured)->toBe([]);
+});
+
 it('preserves the request id (string and integer) on every response', function (): void {
     $r1 = $this->server->handleRequest([
         'jsonrpc' => '2.0', 'id' => 'abc-123', 'method' => 'initialize',

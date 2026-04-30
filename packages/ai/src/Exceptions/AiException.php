@@ -6,4 +6,4 @@ namespace Arqel\Ai\Exceptions;
 
 use RuntimeException;
 
-final class AiException extends RuntimeException {}
+class AiException extends RuntimeException {}

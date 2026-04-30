@@ -17,12 +17,25 @@ Entregue em AI-001 + AI-002:
 - `Arqel\Ai\Exceptions\AiException` — base RuntimeException para erros de provider (network, auth, rate-limit, content-policy).
 - Suite Pest com Orchestra Testbench (3 unit + 3 feature).
 
+Entregue em AI-003..AI-005:
+
+- **`Arqel\Ai\Providers\ClaudeProvider`** via `Http` facade (`api.anthropic.com/v1/messages`, header `anthropic-version`); pricing Opus 4.7 ($15/$75 MTok); `embed()`/`stream()` lançam `AiException`.
+- **`Arqel\Ai\Providers\OpenAiProvider`** via `Http` (`/v1/chat/completions` + `/v1/embeddings`); `system` via `array_unshift`; JSON mode (`response_format: {type:'json_object'}`); embeddings 1536d (`text-embedding-3-small`); pricing gpt-4o-mini.
+- **`Arqel\Ai\Providers\OllamaProvider`** via `Http` (`/api/generate` + `/api/chat` + `/api/embeddings`); cost SEMPRE 0.0; embedding model `nomic-embed-text` por default.
+
+Entregue em AI-006:
+
+- **`Arqel\Ai\AiManager`** (final) — front-door para todas as chamadas. Resolve provider por nome (`config('arqel-ai.default_provider')` ou `options.provider`), aplica cache, enforça `CostTracker::assertWithinLimit(Auth::id())`, persiste a chamada via `CostTracker::record`, dispara `AiCompletionGenerated`. `embed()` bypassa cache (vetores são leves de re-gerar).
+- **`Arqel\Ai\CostTracker`** (final) — wrapper Eloquent sobre `ai_usage`. Limites configurados em `arqel-ai.cost_tracking.{daily_limit_usd, per_user_limit_usd}` — `null` ou `<= 0` é tratado como **ilimitado** (útil em dev). Lança `DailyLimitExceeded` / `UserLimitExceeded` (subclasses de `AiException`).
+- **`Arqel\Ai\AiCache`** (final) — wrapper sobre `Cache::store()`. Key determinística `arqel-ai:{md5(json_encode([prompt, options]))}`. TTL de `arqel-ai.caching.ttl` (default 3600s). Desativado quando `arqel-ai.caching.enabled === false` (útil para apps que escolheram cache layer próprio).
+- **`Arqel\Ai\Models\AiUsage`** (final Eloquent) — tabela `ai_usage` (`user_id`, `provider`, `model`, `input_tokens`, `output_tokens`, `cost_usd`, `prompt_hash`, timestamps + index em `created_at`).
+- **`Arqel\Ai\Events\AiCompletionGenerated`** (final) — Dispatchable+SerializesModels com `result, providerName, userId`. Listeners user-land podem persistir métricas customizadas, alertar, ou invalidate cache externos.
+- Migration `2026_05_01_000000_create_ai_usage_table` auto-discovered via `hasMigration('create_ai_usage_table')` no provider.
+- `AiServiceProvider::packageRegistered()` instancia singleton `AiManager` resolvendo cada entry de `arqel-ai.providers` lazily via container (`$app->make($driver, $args)`); entries com `class_exists($driver) === false` são silenciosamente ignoradas.
+- **27 Pest tests** novos (10 AiManager + 6 CostTracker + 3 AiCache + recovery dos existentes).
+
 Por chegar:
 
-- **AI-003** `ClaudeProvider` (HTTP direto via `Illuminate\Support\Facades\Http` — SDK Anthropic PHP ainda em flux em Abril/2026).
-- **AI-004** `OpenAiProvider` via `openai-php/client`.
-- **AI-005** `OllamaProvider` para LLM local.
-- **AI-006** `AiManager` singleton + rate limiting + cost tracking + caching.
 - **AI-007..AI-011** os 5 field types (`AiTextField`/`AiTranslateField`/`AiSelectField`/`AiExtractField`/`AiImageField`).
 - **AI-012** prompt library reutilizável.
 - **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).

@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..015 ✅ · WIDGETS-001..015 ✅ — incluindo React StatCard/ChartCard/TableCard/DashboardGrid · MCP-001..010 ✅ · FIELDS-ADV-001..009 + 011/015/016/018/019/020 ✅ · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001..005 ✅ · DOCS-V2-001/002 ✅ · GOV-V2-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#23 paralelos completos.** Próximo natural: FIELDS-ADV-010 (RichTextInput Tiptap), FIELDS-ADV-012 (CodeInput Shiki), FIELDS-ADV-013/014/017 (Repeater/Builder/Wizard React).
+**Fase 1 100% fechada + Fase 2 progredindo (TENANT-001..015 ✅ · WIDGETS-001..015 ✅ · MCP-001..010 ✅ · FIELDS-ADV-001..013 + 015/016/018..020 ✅ — RichText/Markdown/Code/Repeater/KeyValue/Tags React shipped (scoped); Builder/Wizard React + Tiptap/Shiki/dnd-kit deferred · EXPORT-001..006 ✅ · AUDIT-001..004 ✅ · TABLE-V2-002..010 PHP slices ✅ · CMDPAL-001..005 ✅ · DOCS-V2-001/002 ✅ · GOV-V2-001 ✅) + 9 bugs do dogfooding fechados + Batch #1..#24 paralelos completos.** Próximo natural: FIELDS-ADV-014 (BuilderInput), FIELDS-ADV-017 (WizardInput), e seguir com Phase 3 ou backlog leftover.
 
 **Fase:** 1 (MVP)
 

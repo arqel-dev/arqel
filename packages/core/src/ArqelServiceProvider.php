@@ -9,6 +9,7 @@ use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
 use Arqel\Core\CommandPalette\Providers\ThemeCommandProvider;
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
+use Arqel\Core\Console\DoctorCommand;
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
 use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\ResourceRegistry;
@@ -32,6 +33,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 InstallCommand::class,
                 MakeResourceCommand::class,
+                DoctorCommand::class,
             ]);
     }
 

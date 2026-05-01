@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Resolve autoloader whether installed globally or via path repository.
+$autoloads = [
+    __DIR__ . '/../../../autoload.php', // global vendor when installed via composer global
+    __DIR__ . '/../vendor/autoload.php', // standalone clone
+];
+
+$loaded = false;
+foreach ($autoloads as $path) {
+    if (file_exists($path)) {
+        require $path;
+        $loaded = true;
+        break;
+    }
+}
+
+if (! $loaded) {
+    fwrite(STDERR, "arqel/cli: could not locate Composer autoloader. Did you run `composer install`?\n");
+    exit(1);
+}
+
+use Arqel\Cli\Application;
+
+exit((new Application())->run());

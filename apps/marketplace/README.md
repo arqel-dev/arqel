@@ -91,7 +91,25 @@ do `<PluginCard />` quando o plugin tem `publisher` snapshot anexado.
 Schema novo: tabela `arqel_publishers` (ver `packages/marketplace/database/migrations/2026_05_08_000000_create_arqel_publishers.php`)
 e coluna `arqel_plugins.publisher_id` (FK lógica nullable).
 
+## Checkout flow (MKTPLC-004-checkout)
+
+Fluxo completo de compra de plugins premium dentro do site público — usa `arqel/marketplace`
+`PaymentGateway` (Mock/Stripe via DI) e `LicenseKeyGenerator`.
+
+Rotas (todas em `web,auth`):
+
+- `GET  /checkout/{slug}` — página de resumo (`Marketplace/Checkout`) com preço, taxa estimada
+  da plataforma e total. 422 se plugin é free ou se o usuário já comprou.
+- `POST /checkout/{slug}/initiate` — cria/atualiza `PluginPurchase` em `pending` e faz redirect
+  externo para a `url` da `CheckoutSession` retornada pelo gateway.
+- `GET  /checkout/{slug}/success?session_id=...` — verifica pagamento, gera license key
+  `ARQ-XXXX-XXXX-XXXX-XXXX`, dispara `PluginPurchased`, e renderiza `Marketplace/CheckoutSuccess`
+  com botão de copiar a chave + link de download.
+- `GET  /checkout/{slug}/cancel` — `Marketplace/CheckoutCancelled` com botão "Tentar novamente".
+
+Na página `/plugins/{slug}` aparece um botão "Comprar agora" quando o plugin é premium e o
+usuário ainda não comprou. Quando já é dono, aparece um badge "Você já tem esse plugin".
+
 ## Deferido
 
-- Payment checkout UI (paid plugins) → `MKTPLC-004-checkout`
 - SSR / Open Graph dinâmico → `MKTPLC-004-ssr`

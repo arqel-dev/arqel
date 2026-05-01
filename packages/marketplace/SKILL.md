@@ -358,6 +358,19 @@ Revenue share padrão é `80%` para o publisher / `20%` para Arqel (configuráve
   `PublisherProfileControllerTest` (5) no app, Vitest `PublisherBadge` (3) +
   `PublisherProfile` (4).
 
+**Entregue (MKTPLC-004-checkout):** Payment checkout UI no marketplace site público.
+
+- **`Events\PluginPurchased`** — `final` Dispatchable + SerializesModels com `Plugin` + `PluginPurchase`. Disparado quando um pagamento é confirmado via fluxo do site (não via API JSON).
+- **App marketplace (`apps/marketplace`)** ganha 4 rotas Inertia auth-gated (`web,auth`):
+  - `GET  /checkout/{slug}` — `CheckoutController::start` valida `is_premium` + idempotência (já comprou → 422), renderiza `Marketplace/Checkout` com `summary {price_cents, currency, fee_estimate_cents, total_cents}`. Fee estimate = `price_cents * (100 - revenue_share_percent) / 100`.
+  - `POST /checkout/{slug}/initiate` — cria/atualiza `PluginPurchase` em `pending` + faz **redirect externo** (`RedirectResponse`) para `CheckoutSession::url` retornada pelo gateway.
+  - `GET  /checkout/{slug}/success?session_id=...` — verifica via `PaymentGateway::verifyPayment`, marca `completed`, gera license_key via `LicenseKeyGenerator`, dispatch `PluginPurchased`. Renderiza `Marketplace/CheckoutSuccess` com `{plugin, license_key, download_url}`. 422 quando `session_id` ausente, purchase não encontrada ou status != completed.
+  - `GET  /checkout/{slug}/cancel` — render `Marketplace/CheckoutCancelled` com retry + voltar.
+- **`PluginDetailController`** estendido — passa `has_purchase: bool` (true só quando `Auth::check()` + purchase completed). `PluginDetail.tsx` mostra botão "Comprar agora" quando `price_cents > 0 && !has_purchase`, ou badge "Você já tem esse plugin" quando owned.
+- **Páginas Inertia novas** (`resources/js/Pages/Marketplace/`): `Checkout.tsx`, `CheckoutSuccess.tsx` (com copy-to-clipboard), `CheckoutCancelled.tsx`.
+- **9 testes Pest novos** em `apps/marketplace/tests/Feature/CheckoutControllerTest.php` cobrindo summary, idempotência, free-plugin guard, redirect, unauth 401, success/cancel render, gateway non-completed.
+- **9 testes Vitest novos** em `resources/js/__tests__/Checkout*.test.tsx` cobrindo summary card, fee, copy button, download link, retry link.
+
 **Por chegar:**
 
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).

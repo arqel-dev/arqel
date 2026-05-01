@@ -1,5 +1,6 @@
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { CompareTable } from '../../Components/Marketplace/CompareTable';
+import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { useCompareSlugs } from '../../hooks/useCompareSlugs';
 import type { Plugin } from '../../types';
 
@@ -23,7 +24,14 @@ export default function Compare({ plugins, notFound }: Props): JSX.Element {
 
   return (
     <>
-      <Head title="Comparar plugins — Arqel Marketplace" />
+      <MetaTags
+        title={
+          plugins.length > 0
+            ? `Comparar ${plugins.map((p) => p.name).join(' vs ')} — Arqel Marketplace`
+            : 'Comparar plugins — Arqel Marketplace'
+        }
+        description="Comparação side-by-side de plugins do Arqel Marketplace — preço, downloads, estrelas, licença e mais."
+      />
       <main className="mx-auto max-w-7xl px-4 py-12">
         <h1 className="mb-2 text-3xl font-bold">Comparar plugins</h1>
         <p className="mb-6 text-sm text-neutral-600">

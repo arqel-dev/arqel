@@ -1,3 +1,4 @@
+import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { PluginList } from '../../Components/Marketplace/PluginList';
 import type { Plugin, Publisher, PublisherStats } from '../../types';
 
@@ -22,7 +23,22 @@ export default function PublisherProfile({ publisher, plugins, stats }: Props): 
     .toUpperCase();
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <>
+      <MetaTags
+        title={`${publisher.name} — Arqel Marketplace publisher`}
+        description={
+          publisher.bio !== null && publisher.bio !== undefined && publisher.bio !== ''
+            ? publisher.bio.slice(0, 160)
+            : `Plugins publicados por ${publisher.name} no Arqel Marketplace.`
+        }
+        ogImage={
+          publisher.avatar_url !== null && publisher.avatar_url !== undefined && publisher.avatar_url !== ''
+            ? publisher.avatar_url
+            : null
+        }
+        ogType="profile"
+      />
+      <main className="mx-auto max-w-5xl px-4 py-8">
       <header className="flex flex-col gap-4 border-b border-neutral-200 pb-6 sm:flex-row sm:items-start">
         {publisher.avatar_url ? (
           <img
@@ -140,5 +156,6 @@ export default function PublisherProfile({ publisher, plugins, stats }: Props): 
         </div>
       </section>
     </main>
+    </>
   );
 }

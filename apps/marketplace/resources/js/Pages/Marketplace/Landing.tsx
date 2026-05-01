@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { PluginList } from '../../Components/Marketplace/PluginList';
 import type { Plugin, PluginCategory } from '../../types';
 
@@ -17,7 +18,11 @@ export default function Landing({
 }: Props): JSX.Element {
   return (
     <>
-      <Head title="Arqel Marketplace" />
+      <MetaTags
+        title="Arqel Marketplace — Plugins for Laravel admin panels"
+        description="Descubra plugins community para estender seu admin panel Arqel. Fields, widgets, integrações e themes em um só lugar."
+        ogImage="/images/og/marketplace-landing.png"
+      />
       <main className="mx-auto max-w-7xl px-4 py-12">
         <section className="mb-12 text-center">
           <h1 className="text-4xl font-bold tracking-tight text-neutral-900">Arqel Marketplace</h1>

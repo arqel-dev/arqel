@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\SeoData;
 use Arqel\Marketplace\Models\Plugin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -48,6 +50,16 @@ final class PluginCompareController
             ->map(static fn (string $slug) => $plugins->firstWhere('slug', $slug))
             ->filter()
             ->values();
+
+        $names = $ordered->pluck('name')->filter()->all();
+        $title = count($names) > 0
+            ? 'Comparar '.implode(' vs ', $names).' — Arqel Marketplace'
+            : 'Comparar plugins — Arqel Marketplace';
+
+        View::share('seo', new SeoData(
+            title: $title,
+            description: 'Comparação side-by-side de plugins do Arqel Marketplace — preço, downloads, estrelas, licença e mais.',
+        ));
 
         return Inertia::render('Marketplace/Compare', [
             'plugins' => $ordered,

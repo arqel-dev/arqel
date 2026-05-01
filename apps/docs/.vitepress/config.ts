@@ -46,6 +46,7 @@ export default defineConfig({
       { text: 'API', link: '/reference/php-overview', activeMatch: '/reference/' },
       { text: 'Avançado', link: '/advanced/custom-fields', activeMatch: '/advanced/' },
       { text: 'Exemplos', link: '/examples/blog-admin', activeMatch: '/examples/' },
+      { text: 'Marketplace', link: '/marketplace/', activeMatch: '/marketplace/' },
       {
         text: 'v0.0',
         items: [
@@ -158,6 +159,19 @@ export default defineConfig({
         {
           text: 'Exemplos',
           items: [{ text: 'Blog admin', link: '/examples/blog-admin' }],
+        },
+      ],
+      '/marketplace/': [
+        {
+          text: 'Marketplace',
+          items: [
+            { text: 'Visão geral', link: '/marketplace/' },
+            { text: 'Encontrando plugins', link: '/marketplace/finding-plugins' },
+            { text: 'Publicando plugins', link: '/marketplace/publishing' },
+            { text: 'Tutorial de desenvolvimento', link: '/marketplace/development-tutorial' },
+            { text: 'Boas práticas de segurança', link: '/marketplace/security-best-practices' },
+            { text: 'Pagamentos & licenças', link: '/marketplace/payments-and-licensing' },
+          ],
         },
       ],
     },

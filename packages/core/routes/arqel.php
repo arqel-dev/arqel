@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 // Reserved sub-paths that Arqel itself owns under the panel prefix
 // (e.g. /admin/login, /admin/logout from arqel/auth) must not be
 // captured by the polymorphic `{resource}` slug.
-$reservedSlugs = '^(?!login$|logout$|register$|forgot-password$|reset-password$).+$';
+$reservedSlugs = '(?!(?:login|logout|register|forgot-password|reset-password|email)(?:/|$))[^/]+';
 
 Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
     Route::get('{resource}', [ResourceController::class, 'index'])

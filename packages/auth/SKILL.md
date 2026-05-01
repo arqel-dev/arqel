@@ -36,6 +36,25 @@ User escreve as Policies (Laravel-native). Arqel apenas verifica existência, au
 - `Panel::login()/loginUrl()/afterLoginRedirectTo()/registration()/withoutDefaultAuth()/loginEnabled()/registrationEnabled()` — fluent API opt-in
 - Pacote npm `@arqel/auth` com componente `<LoginPage />` Inertia-React
 
+**Entregue (AUTH-007):**
+
+- `Arqel\Auth\Http\Controllers\RegisterController` — GET renderiza Inertia `arqel/auth/Register`; POST cria User via `config('auth.providers.users.model')`, dispara `Registered` event, faz auto-login e redireciona
+- `Arqel\Auth\Http\Requests\RegisterRequest` — rules name/email/password com `confirmed`, rate-limit 3 registros/IP/hora
+- `Arqel\Auth\Http\Controllers\EmailVerificationController` — `notice` (Inertia notice page), `verify` (signed URL handler que dispara `Verified`), `resend` (reenvio com flash status)
+- `Arqel\Auth\Routes::registerRegistration()` e `registerEmailVerification()` — registos idempotentes, opt-in via `Panel::registration()` e `Panel::emailVerification()`
+- `Panel::emailVerification()/emailVerificationEnabled()/registrationFields()/getRegistrationFields()` — fluent API opt-in
+- Componentes npm `<RegisterPage />` e `<VerifyEmailNoticePage />` em `@arqel/auth`
+- Reservou `email/` no `routes/arqel.php` `$reservedSlugs` para não colidir com `{resource}` polymórfico
+
+Exemplo de uso:
+
+```php
+$panel = Panel::configure()
+    ->login()
+    ->registration()
+    ->emailVerification();
+```
+
 **Por chegar:**
 
 - Integração com `arqel/core` `ArqelServiceProvider::packageBooted` para chamar `PolicyDiscovery::autoRegisterPoliciesFor(ResourceRegistry::all())` automaticamente (AUTH-005 wrap-up)

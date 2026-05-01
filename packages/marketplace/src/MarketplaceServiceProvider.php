@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Arqel\Marketplace;
 
+use Arqel\Marketplace\Contracts\PaymentGateway;
 use Arqel\Marketplace\Contracts\VulnerabilityDatabase;
+use Arqel\Marketplace\Services\Payments\MockPaymentGateway;
 use Arqel\Marketplace\Services\StaticVulnerabilityDatabase;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -35,12 +37,14 @@ final class MarketplaceServiceProvider extends PackageServiceProvider
             ->hasMigration('add_submission_columns_to_arqel_plugins')
             ->hasMigration('add_categories_and_trending')
             ->hasMigration('add_security_scans')
+            ->hasMigration('add_paid_plugins')
             ->hasRoute('api');
     }
 
     public function packageRegistered(): void
     {
         $this->app->bind(VulnerabilityDatabase::class, StaticVulnerabilityDatabase::class);
+        $this->app->bind(PaymentGateway::class, MockPaymentGateway::class);
     }
 
     public function packageBooted(): void

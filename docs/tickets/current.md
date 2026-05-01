@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 + Fase 2 + Fase 3 + Fase 4 100% FECHADAS + dívidas técnicas resolvidas (Batches #27..#50): TODAS as 4 fases concluídas + Ollama llava vision real + Stripe Connect real + Workflow→Realtime broadcast cross-package. Total ≈ 221 core + 181 ai + 70 auth + 59 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 157 marketplace + 10 marketplace app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink = ~1.184 testes diretos.** Próximas slices: MKTPLC-004 expansion (compare side-by-side, publisher profile, payment checkout UI), RT-005 Yjs full sync com Reverb, polish + audit final, prep para tag v0.8.0-rc.1.
+**Fase 1 + Fase 2 + Fase 3 + Fase 4 + dívidas técnicas + MKTPLC-004 expansion FECHADAS (Batches #27..#51): MKTPLC-004 100% completo (compare side-by-side + publisher profile + checkout flow). Total ≈ 221 core + 181 ai + 70 auth + 59 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 30 marketplace app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + ~30 marketplace JS (compare/publisher/checkout vitest) = ~1.240 testes diretos.** Restante: SSR / Open Graph dinâmico (`MKTPLC-004-ssr`), RT-005 Yjs full sync, polish final, prep tag v0.8.0-rc.1.
 
 **Fase:** 1 (MVP)
 

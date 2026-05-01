@@ -33,26 +33,48 @@
 - Hooks reusáveis em `@arqel/hooks` (HOOKS-001+)
 - UI components em `@arqel/ui` (UI-001+)
 
-## DevTools hook (DEVTOOLS-002)
+## DevTools hook (DEVTOOLS-002 + DEVTOOLS-003)
 
 Em modo desenvolvimento, `@arqel/react` expõe um hook em
 `window.__ARQEL_DEVTOOLS_HOOK__` para a extensão de browser
 (`@arqel/devtools-extension`) inspecionar o estado do panel/resource.
 
 ```ts
-import { installDevToolsHook } from '@arqel/react/devtools';
+import { installDevToolsHook, installInertiaBridge } from '@arqel/react/devtools';
 
-installDevToolsHook('0.8.0-rc.1');
-// → cria { version, getState(), subscribe(cb) } só quando import.meta.env.DEV
+const hook = installDevToolsHook('0.10.0-rc.1');
+// → cria { version, getState(), subscribe(cb), setPageProps(...), recordNavigation(...) }
+//   apenas quando import.meta.env.DEV.
+
+if (hook) {
+  installInertiaBridge(hook, inertiaRouter); // captura page props + history
+}
 ```
 
-Em produção, `installDevToolsHook` é um no-op total: Vite avalia
-`import.meta.env.DEV` como `false` e elimina o branch via dead-code
-elimination, então nem o objeto nem o módulo aparecem no bundle final.
+`ArqelDevToolsState` agora carrega:
 
-`createArqelApp` já chama `installDevToolsHook` por você, então apps que usam
-o bootstrap padrão recebem a integração de graça. Não há nada para configurar
-em produção — a hook simplesmente desaparece.
+- `panel`/`resource` — id ativo
+- `sharedProps` — Record canônico (auth, flash, errors, csrf_token, arqel)
+- `pageProps` — payload completo do `<Page>` Inertia ativo
+- `currentPath` — `page.url`
+- `navigationHistory` — ring buffer de até `NAVIGATION_HISTORY_LIMIT` (20) entradas, cada uma com `{ path, timestamp, durationMs? }`
+
+Métodos novos no hook:
+
+- `setPageProps(pageProps, sharedProps, currentPath)` — invocado pelo bridge a cada `navigate`
+- `recordNavigation(entry)` — append no ring buffer; entradas mais antigas saem na ordem de inserção
+
+`installInertiaBridge(hook, router, { now? })` ouve `start` (para medir
+duração) e `navigate` (para popular `setPageProps` + `recordNavigation`).
+Retorna teardown.
+
+Em produção, tudo desaparece: `installDevToolsHook` retorna `undefined`,
+o branch é eliminado pelo Vite, e a extensão simplesmente não detecta o
+runtime.
+
+`createArqelApp` já chama `installDevToolsHook` + `installInertiaBridge`
+por você quando o hook for instalado — apps com o bootstrap padrão
+recebem a integração de graça.
 
 ## Key Contracts
 

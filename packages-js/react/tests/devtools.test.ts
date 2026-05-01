@@ -4,6 +4,7 @@ import {
   type ArqelDevToolsState,
   createDevToolsHook,
   installDevToolsHook,
+  NAVIGATION_HISTORY_LIMIT,
 } from '../src/devtools/devtools.js';
 
 afterEach(() => {
@@ -27,6 +28,9 @@ describe('installDevToolsHook (DEV mode)', () => {
       panel: null,
       resource: null,
       sharedProps: {},
+      pageProps: null,
+      currentPath: '',
+      navigationHistory: [],
     });
   });
 
@@ -61,6 +65,9 @@ describe('createDevToolsHook subscribe/notify', () => {
       panel: 'admin',
       resource: 'users',
       sharedProps: { auth: { id: 1 } },
+      pageProps: { foo: 1 },
+      currentPath: '/admin/users',
+      navigationHistory: [],
     };
     hook.__setState(next);
     expect(calls).toHaveLength(1);
@@ -68,7 +75,14 @@ describe('createDevToolsHook subscribe/notify', () => {
     expect(hook.getState()).toEqual(next);
 
     unsubscribe();
-    hook.__setState({ panel: null, resource: null, sharedProps: {} });
+    hook.__setState({
+      panel: null,
+      resource: null,
+      sharedProps: {},
+      pageProps: null,
+      currentPath: '',
+      navigationHistory: [],
+    });
     expect(calls).toHaveLength(1);
   });
 
@@ -78,8 +92,57 @@ describe('createDevToolsHook subscribe/notify', () => {
     const b = vi.fn();
     hook.subscribe(a);
     hook.subscribe(b);
-    hook.__setState({ panel: 'p', resource: null, sharedProps: {} });
+    hook.__setState({
+      panel: 'p',
+      resource: null,
+      sharedProps: {},
+      pageProps: null,
+      currentPath: '',
+      navigationHistory: [],
+    });
     expect(a).toHaveBeenCalledTimes(1);
     expect(b).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('createDevToolsHook setPageProps / recordNavigation (DEVTOOLS-003)', () => {
+  it('setPageProps merges pageProps/sharedProps/currentPath and notifies subscribers', () => {
+    const hook = createDevToolsHook('test');
+    const calls: ArqelDevToolsState[] = [];
+    hook.subscribe((s) => calls.push(s));
+
+    hook.setPageProps({ users: [1, 2] }, { auth: { id: 7 } }, '/admin/users');
+
+    expect(calls).toHaveLength(1);
+    const state = hook.getState();
+    expect(state.pageProps).toEqual({ users: [1, 2] });
+    expect(state.sharedProps).toEqual({ auth: { id: 7 } });
+    expect(state.currentPath).toBe('/admin/users');
+    // panel/resource preserved from prior state
+    expect(state.panel).toBeNull();
+    expect(state.navigationHistory).toEqual([]);
+  });
+
+  it('recordNavigation appends entries with timestamp + duration', () => {
+    const hook = createDevToolsHook('test');
+    hook.recordNavigation({ path: '/a', timestamp: 100 });
+    hook.recordNavigation({ path: '/b', timestamp: 200, durationMs: 42 });
+
+    const history = hook.getState().navigationHistory;
+    expect(history).toHaveLength(2);
+    expect(history[0]).toEqual({ path: '/a', timestamp: 100 });
+    expect(history[1]).toEqual({ path: '/b', timestamp: 200, durationMs: 42 });
+  });
+
+  it('navigationHistory ring buffer caps at NAVIGATION_HISTORY_LIMIT', () => {
+    const hook = createDevToolsHook('test');
+    for (let i = 0; i < NAVIGATION_HISTORY_LIMIT + 5; i++) {
+      hook.recordNavigation({ path: `/p${i}`, timestamp: i });
+    }
+    const history = hook.getState().navigationHistory;
+    expect(history).toHaveLength(NAVIGATION_HISTORY_LIMIT);
+    // Oldest entries dropped — first should be /p5.
+    expect(history[0]?.path).toBe('/p5');
+    expect(history[history.length - 1]?.path).toBe(`/p${NAVIGATION_HISTORY_LIMIT + 4}`);
   });
 });

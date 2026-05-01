@@ -70,4 +70,33 @@ describe('createBackground', () => {
     expect(setIcon).not.toHaveBeenCalled();
     expect(Array.from(bg.state.keys())).toHaveLength(0);
   });
+
+  it('caches arqel.state messages per tab and exposes via getTabArqelState', () => {
+    const bg = createBackground({ setIcon: vi.fn() });
+    bg.handleMessage({ type: 'arqel.state', state: { panel: 'admin' } } as never, {
+      tab: { id: 5 },
+    });
+    expect(bg.getTabArqelState(5)).toEqual({ panel: 'admin' });
+  });
+
+  it('forwards cached state to newly registered panel ports', () => {
+    const bg = createBackground({ setIcon: vi.fn() });
+    bg.setTabArqelState(11, { foo: 1 });
+    const postMessage = vi.fn();
+    const port = {
+      postMessage,
+      onDisconnect: { addListener: vi.fn() },
+    };
+    bg.registerPanelPort(11, port);
+    expect(postMessage).toHaveBeenCalledWith({ type: 'arqel.state', state: { foo: 1 } });
+    expect(bg.panelPortCount(11)).toBe(1);
+  });
+
+  it('broadcasts subsequent state updates to active ports', () => {
+    const bg = createBackground({ setIcon: vi.fn() });
+    const postMessage = vi.fn();
+    bg.registerPanelPort(22, { postMessage, onDisconnect: { addListener: vi.fn() } });
+    bg.setTabArqelState(22, { ping: true });
+    expect(postMessage).toHaveBeenCalledWith({ type: 'arqel.state', state: { ping: true } });
+  });
 });

@@ -1,8 +1,9 @@
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router as inertiaRouter } from '@inertiajs/react';
 import type { ComponentType, ReactNode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
-import { installDevToolsHook } from '../devtools/index.js';
+import { installDevToolsHook, installInertiaBridge } from '../devtools/index.js';
+import type { InertiaRouterLike } from '../devtools/inertia-bridge.js';
 import { ArqelProvider } from '../providers/ArqelProvider.js';
 import type { Theme } from '../providers/ThemeProvider.js';
 import { type PageRegistry, resolveArqelPage } from './resolvePage.js';
@@ -59,7 +60,12 @@ export async function createArqelApp(options: ArqelAppOptions = {}): Promise<unk
   // Install the DevTools hook before Inertia boots. The call is a no-op
   // in production builds (Vite's `import.meta.env.DEV` is `false`), so
   // shipped apps never expose `window.__ARQEL_DEVTOOLS_HOOK__`.
-  installDevToolsHook(ARQEL_REACT_VERSION);
+  const devtoolsHook = installDevToolsHook(ARQEL_REACT_VERSION);
+  if (devtoolsHook !== undefined) {
+    // Inertia's `router` exposes `on(event, cb)` that returns an
+    // unsubscribe — structurally compatible with `InertiaRouterLike`.
+    installInertiaBridge(devtoolsHook, inertiaRouter as unknown as InertiaRouterLike);
+  }
 
   return createInertiaApp({
     title: title ?? ((current: string) => (current ? `${current} — ${appName}` : appName)),

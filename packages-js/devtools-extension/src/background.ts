@@ -63,10 +63,27 @@ export interface BackgroundController {
   removeTab(tabId: number): void;
   /** Read-only snapshot for tests. */
   getTabState(tabId: number): TabDetectionState | undefined;
+  /** DEVTOOLS-003: cache last Arqel state per tab and relay to panel ports. */
+  setTabArqelState(tabId: number, arqelState: unknown): void;
+  getTabArqelState(tabId: number): unknown;
+  registerPanelPort(tabId: number, port: PanelPort): () => void;
+  /** Read-only snapshot of registered panel ports per tab (for tests). */
+  panelPortCount(tabId: number): number;
+}
+
+/**
+ * Minimal subset of `chrome.runtime.Port` we depend on. Kept structural
+ * so tests can supply lightweight fakes.
+ */
+export interface PanelPort {
+  postMessage(message: unknown): void;
+  onDisconnect: { addListener(cb: () => void): void };
 }
 
 export function createBackground(deps: BackgroundDeps = {}): BackgroundController {
   const state = new Map<number, TabDetectionState>();
+  const arqelStates = new Map<number, unknown>();
+  const panelPorts = new Map<number, Set<PanelPort>>();
   const activePaths = deps.activeIconPaths ?? DEFAULT_ACTIVE_ICONS;
   const inactivePaths = deps.inactiveIconPaths ?? DEFAULT_INACTIVE_ICONS;
   const setIcon =
@@ -104,11 +121,66 @@ export function createBackground(deps: BackgroundDeps = {}): BackgroundControlle
         applyIcon(tabId, detected);
       }
     }
+    if (message.type === 'arqel.state') {
+      const tabId = sender?.tab?.id;
+      if (typeof tabId === 'number') {
+        const arqelState = (message as ArqelMessage & { state?: unknown }).state;
+        setTabArqelState(tabId, arqelState);
+      }
+    }
     return { ok: true, type: message.type };
   }
 
   function removeTab(tabId: number): void {
     state.delete(tabId);
+    arqelStates.delete(tabId);
+    panelPorts.delete(tabId);
+  }
+
+  function setTabArqelState(tabId: number, arqelState: unknown): void {
+    arqelStates.set(tabId, arqelState);
+    const ports = panelPorts.get(tabId);
+    if (ports) {
+      for (const port of ports) {
+        try {
+          port.postMessage({ type: 'arqel.state', state: arqelState });
+        } catch (error) {
+          console.warn('[arqel-devtools] panel port postMessage failed', error);
+        }
+      }
+    }
+  }
+
+  function getTabArqelState(tabId: number): unknown {
+    return arqelStates.get(tabId);
+  }
+
+  function registerPanelPort(tabId: number, port: PanelPort): () => void {
+    let bucket = panelPorts.get(tabId);
+    if (!bucket) {
+      bucket = new Set();
+      panelPorts.set(tabId, bucket);
+    }
+    bucket.add(port);
+    port.onDisconnect.addListener(() => {
+      bucket?.delete(port);
+    });
+    // Push current snapshot immediately if available.
+    const snapshot = arqelStates.get(tabId);
+    if (snapshot !== undefined) {
+      try {
+        port.postMessage({ type: 'arqel.state', state: snapshot });
+      } catch (error) {
+        console.warn('[arqel-devtools] initial port snapshot failed', error);
+      }
+    }
+    return () => {
+      bucket?.delete(port);
+    };
+  }
+
+  function panelPortCount(tabId: number): number {
+    return panelPorts.get(tabId)?.size ?? 0;
   }
 
   return {
@@ -118,6 +190,10 @@ export function createBackground(deps: BackgroundDeps = {}): BackgroundControlle
     getTabState(tabId): TabDetectionState | undefined {
       return state.get(tabId);
     },
+    setTabArqelState,
+    getTabArqelState,
+    registerPanelPort,
+    panelPortCount,
   };
 }
 
@@ -155,6 +231,24 @@ if (!isTest && runtime) {
   if (typeof chrome !== 'undefined' && chrome.tabs?.onRemoved) {
     chrome.tabs.onRemoved.addListener((tabId: number) => {
       controller.removeTab(tabId);
+    });
+  }
+
+  // DEVTOOLS-003: long-lived port from each DevTools panel instance. The
+  // panel must announce its target tabId on first message because port
+  // senders inside DevTools don't carry a `tab.id`.
+  if (runtime.onConnect) {
+    runtime.onConnect.addListener((port: chrome.runtime.Port) => {
+      if (port.name !== 'arqel-devtools-panel') return;
+      let registered = false;
+      const initListener = (msg: unknown) => {
+        const m = msg as { type?: string; tabId?: number };
+        if (!registered && m?.type === 'arqel.panel.hello' && typeof m.tabId === 'number') {
+          controller.registerPanelPort(m.tabId, port);
+          registered = true;
+        }
+      };
+      port.onMessage.addListener(initListener);
     });
   }
 }

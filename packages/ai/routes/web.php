@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Ai\Http\Controllers\AiClassifyController;
+use Arqel\Ai\Http\Controllers\AiExtractController;
 use Arqel\Ai\Http\Controllers\AiGenerateController;
 use Arqel\Ai\Http\Controllers\AiTranslateController;
 use Illuminate\Support\Facades\Route;
@@ -18,3 +19,7 @@ Route::post('/admin/{resource}/fields/{field}/translate', AiTranslateController:
 Route::post('/admin/{resource}/fields/{field}/classify', AiClassifyController::class)
     ->middleware(['web', 'auth'])
     ->name('arqel.ai.classify');
+
+Route::post('/admin/{resource}/fields/{field}/extract', AiExtractController::class)
+    ->middleware(['web', 'auth'])
+    ->name('arqel.ai.extract');

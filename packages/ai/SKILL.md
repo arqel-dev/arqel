@@ -53,12 +53,16 @@ Entregue em AI-009 (PHP slice — componente React `AiSelectInput.tsx` fica para
 - **`Arqel\Ai\Http\Controllers\AiClassifyController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/classify` (named `arqel.ai.classify`, middleware `web,auth`). Aceita `{formData}` e devolve `{key, label}` (ambos `null` quando AI inválida e sem fallback). 404 quando resource ausente, 422 quando field não é `AiSelectField`.
 - 8 testes unit + 3 testes feature.
 
+Entregue em AI-010 (PHP slice — componente React `AiExtractInput.tsx` fica para batch futuro):
+
+- **`Arqel\Ai\Fields\AiExtractField`** (final, estende `Arqel\Fields\Field`) — extrai dados estruturados de um texto livre via JSON. Setters fluentes `sourceField(string)`, `extractTo(array<string,string>)` (key=>description), `usingJsonMode(bool)`, `provider`, `aiOptions`, `buttonLabel`. Método `extract(string $sourceText): array<string,mixed>` constrói prompt enumerando keys+descriptions, instrui o modelo a responder com JSON puro, chama `AiManager::complete($prompt, $jsonMode ? ['json_mode'=>true] : [])`. **Robustness:** parse via `json_decode`, com fallback regex `\{[\s\S]*\}` (extrai a primeira object literal mesmo quando há prosa antes/depois). Filtra a saída para conter apenas keys declaradas em `extractTo` e injeta `null` para keys ausentes (consumidor distingue "AI omitiu" de "key não esperada"). Falha de parse → `AiException`. `getTypeSpecificProps()` expõe `sourceField/targetFields/buttonLabel/usingJsonMode/provider` — **as descrições** em `extractTo` ficam server-side (parte do prompt, não vazam para o cliente).
+- **`Arqel\Ai\Http\Controllers\AiExtractController`** (single-action) registrado como `POST /admin/{resource}/fields/{field}/extract` (named `arqel.ai.extract`, middleware `web,auth`). Aceita `{sourceText}` e devolve `{extracted: array<string,mixed>}`. `AiException` (parse failure) → 422 com `message`. 404 quando resource ausente, 422 quando field não é `AiExtractField`, 403 quando Gate `use-ai` nega.
+- 9 testes unit + 4 testes feature.
+
 Por chegar:
 
-- **AI-007 React** componente `AiTextInput.tsx` (botão Generate + estado loading + replace value).
-- **AI-008 React** componente `AiTranslateInput.tsx` (tabs por idioma + botão Auto-translate).
-- **AI-009 React** componente `AiSelectInput.tsx` (select + botão Classify with AI).
-- **AI-010..AI-011** os 2 field types restantes (`AiExtractField`/`AiImageField`).
+- **AI-010 React** componente `AiExtractInput.tsx` (botão Extract + populate em multiple form fields).
+- **AI-011** field type restante (`AiImageField`).
 - **AI-012** prompt library reutilizável.
 - **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).
 

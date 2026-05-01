@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 FECHADA (Batches #27..#40): AI-003..015 PHP + AI-007..011 React ✅ · RT-003..012 ✅ · WF-003..010 ✅ · VERS-001..008 ✅. Fase 4 ARRANCADA: CLI-TUI-004 ✅ (`arqel:doctor` Artisan command em arqel/core). Total Fase 3+4 start ≈ 169 core + 153 ai + 46 realtime + 67 workflow PHP + 58 versioning PHP + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS = ~602 testes diretos.** Próximo: Fase 4 — DEVTOOLS-001 (Chrome/Firefox extension scaffold), CLI-TUI-001 (project scaffolder interactivo), MKTPLC-001 (marketplace backend), e qualquer follow-up Fase 3 (AI vision/stream real, Yjs collab RT-005).
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 FECHADA + Fase 4 EM ANDAMENTO (Batches #27..#41): Fase 3 toda ✅ + Fase 4 = CLI-TUI-004 doctor ✅, DEVTOOLS-001 extension scaffold ✅, CLI-TUI-001 NewCommand ✅, MKTPLC-001 marketplace REST API ✅. Total ≈ 169 core + 153 ai + 46 realtime + 67 workflow PHP + 58 versioning PHP + 12 cli + 18 marketplace + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 17 devtools-extension = ~649 testes diretos.** Próximo: DEVTOOLS-002 detection real, CLI-TUI-002 Resource generator, MKTPLC-002 submission workflow, e tickets restantes Fase 4 (DEVTOOLS-003..008, CLI-TUI-003/005, MKTPLC-003+).
 
 **Fase:** 1 (MVP)
 

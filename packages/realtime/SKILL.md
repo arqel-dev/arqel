@@ -86,6 +86,20 @@ O endpoint REST cobre o caso *snapshot persistence*: o cliente envia `{state, ve
 
 **Optimistic concurrency**: cliente armazena última `version` recebida; ao gravar, envia `{state: base64(Y.encodeStateAsUpdate(doc)), version: lastSeenVersion}`. Server retorna `{version: newVersion}` ou `409`. Em conflito, cliente faz GET fresco, aplica sua merge local via `Y.mergeUpdates`, refaz o POST.
 
+### Workflow integration (RT-cross)
+
+Quando `arqel/workflow` está presente no autoload, o `RealtimeServiceProvider` registra automaticamente o listener `Workflow\BroadcastStateTransitionListener` para o evento `Arqel\Workflow\Events\StateTransitioned`. A cada transição de state bem-sucedida, o listener despacha um `Events\ResourceUpdated` carregando o mesmo `record` + `userId` do evento de origem. Os canais resultantes são derivados pelo `ResourceUpdated::broadcastOn()` a partir do FQCN do model (`arqel.{slug}` + `arqel.{slug}.{id}`), de modo que toda UI já assinante de um Resource cuja Eloquent model use `HasWorkflow` recebe a notificação sem código adicional.
+
+A direção da dependência é `realtime → workflow` (apenas `realtime` "sabe" da existência opcional de `workflow`); o pacote `arqel/workflow` permanece standalone e ignora `realtime`. A wiring é defensiva: o listener é registrado somente se `class_exists('Arqel\\Workflow\\Events\\StateTransitioned')` retornar `true`, e o `handle()` aceita `mixed $event` para nunca quebrar quando a class não está carregada.
+
+**Como desativar.** Defina `ARQEL_REALTIME_WORKFLOW_BROADCAST=false` no `.env`, ou em runtime:
+
+```php
+config()->set('arqel-realtime.workflow.broadcast_state_transitions', false);
+```
+
+Útil para suprimir broadcasts em jobs de migração ou seeders que disparam muitas transições em cascata. A configuração não desregistra o listener — apenas o curto-circuita no início do `handle()`.
+
 ### Por chegar (fora do escopo deste batch)
 
 - **RT-003** — React hook `useResourceUpdates` + Inertia `router.reload` (camada `react`, `@arqel/realtime`).

@@ -61,4 +61,22 @@ return [
         'channel_pattern' => 'arqel.presence.{resource}.{recordId}',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Workflow integration (RT-cross)
+    |--------------------------------------------------------------------------
+    |
+    | Quando `arqel/workflow` está instalado, o `RealtimeServiceProvider`
+    | registra automaticamente o listener `BroadcastStateTransitionListener`
+    | para o evento `Arqel\Workflow\Events\StateTransitioned`. Cada transição
+    | dispara um `ResourceUpdated` broadcast, levando a UI a refrescar via
+    | os canais `arqel.{slug}` / `arqel.{slug}.{id}`. Defina como `false`
+    | para desativar globalmente (e.g. para isolar broadcasts em jobs/queue
+    | workers).
+    |
+    */
+    'workflow' => [
+        'broadcast_state_transitions' => env('ARQEL_REALTIME_WORKFLOW_BROADCAST', true),
+    ],
+
 ];

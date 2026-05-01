@@ -17,6 +17,11 @@
 import type { FieldSchema } from '@arqel/types/fields';
 import { registerField } from '@arqel/ui/form';
 import { type ComponentType, lazy, type ReactElement } from 'react';
+import type {
+  AiExtractInputFieldProps,
+  AiExtractInputProps,
+  AiExtractValue,
+} from './AiExtractInput.js';
 import type { AiSelectInputFieldProps, AiSelectInputProps } from './AiSelectInput.js';
 import type { AiTextInputFieldProps, AiTextInputProps } from './AiTextInput.js';
 import type {
@@ -124,6 +129,42 @@ function adaptToAiSelectInput(
   };
 }
 
+function adaptToAiExtractInput(
+  Component: ComponentType<AiExtractInputProps>,
+): ComponentType<RegistryFieldProps> {
+  return function AiExtractInputAdapter(registryProps: RegistryFieldProps): ReactElement {
+    const { field, value, onChange, resource, formData, csrfToken } = registryProps;
+    const fieldProps = (field as unknown as { props?: AiExtractInputFieldProps }).props;
+    // O FieldRegistry tipa `onChange` como `(value: string) => void`,
+    // mas este field emite um `Record<string, unknown>`; o cast é
+    // compatível em runtime e mantém o registry agnóstico ao shape.
+    const onChangeAdapted =
+      onChange !== undefined
+        ? (next: AiExtractValue) => {
+            (onChange as unknown as (v: AiExtractValue) => void)(next);
+          }
+        : undefined;
+
+    const objectValue: AiExtractValue | null =
+      value !== null && typeof value === 'object' && !Array.isArray(value)
+        ? (value as AiExtractValue)
+        : null;
+
+    return (
+      <Component
+        name={field.name}
+        value={objectValue}
+        props={fieldProps}
+        {...(onChangeAdapted !== undefined ? { onChange: onChangeAdapted } : {})}
+        {...(resource !== undefined ? { resource } : {})}
+        field={field.name}
+        {...(formData !== undefined ? { formData } : {})}
+        {...(csrfToken !== undefined ? { csrfToken } : {})}
+      />
+    );
+  };
+}
+
 const LazyAiTextInput = lazy(async () => {
   const mod = await import('./AiTextInput.js');
   return { default: adaptToAiTextInput(mod.AiTextInput) };
@@ -139,9 +180,18 @@ const LazyAiSelectInput = lazy(async () => {
   return { default: adaptToAiSelectInput(mod.AiSelectInput) };
 });
 
+const LazyAiExtractInput = lazy(async () => {
+  const mod = await import('./AiExtractInput.js');
+  return { default: adaptToAiExtractInput(mod.AiExtractInput) };
+});
+
 registerField('AiTextInput', LazyAiTextInput as unknown as Parameters<typeof registerField>[1]);
 registerField(
   'AiTranslateInput',
   LazyAiTranslateInput as unknown as Parameters<typeof registerField>[1],
 );
 registerField('AiSelectInput', LazyAiSelectInput as unknown as Parameters<typeof registerField>[1]);
+registerField(
+  'AiExtractInput',
+  LazyAiExtractInput as unknown as Parameters<typeof registerField>[1],
+);

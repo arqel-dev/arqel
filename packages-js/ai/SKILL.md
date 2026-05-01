@@ -250,6 +250,81 @@ import { AiSelectInput } from '@arqel/ai';
 />;
 ```
 
+## AiExtractInput (AI-010 React)
+
+Componente React que fecha o slice React do ticket AI-010 — o slice
+PHP foi mergeado no batch #35 (`Arqel\Ai\Fields\AiExtractField`,
+component string `AiExtractInput`).
+
+```ts
+interface AiExtractInputProps {
+  name: string;
+  value: Record<string, unknown> | null;
+  onChange?: (value: Record<string, unknown>) => void;
+  props: {
+    sourceField: string;
+    targetFields: string[];
+    buttonLabel: string;
+    usingJsonMode: boolean;
+    provider?: string | null;
+  } | undefined;
+  resource?: string;
+  field?: string;
+  formData?: Record<string, unknown>;
+  extractUrl?: string;
+  csrfToken?: string;
+  onPopulateField?: (targetField: string, value: unknown) => void;
+}
+```
+
+Render:
+
+- Label `Source: {sourceField}` indicando o campo do formulário usado
+  como texto-fonte.
+- Botão `Extract with AI` (label vem de `props.buttonLabel`); spinner
+  inline + `disabled` durante o `fetch`.
+- Empty state `No extraction yet — click button to start` antes da
+  primeira extração.
+- Após sucesso: `<dl>` preview com cada `targetField: extractedValue`;
+  cada entry tem botão `Apply` individual + toolbar `Apply all`.
+- `Apply` chama `onPopulateField?.(targetField, value)` quando provido,
+  caso contrário emite `onChange({ [target]: value })` ou
+  `onChange(extracted)` para `Apply all`.
+- Banner `role="alert"` quando o `fetch` falha; usa `message` da
+  response 422 quando disponível, senão fallback genérico com HTTP
+  code.
+
+Rota canônica: `POST /admin/{resource}/fields/{field}/extract`
+(override via `extractUrl`). Body: `{ sourceText }` (lido de
+`formData?.[sourceField]`). Resposta esperada:
+`{ extracted: Record<string, unknown> }` (200) ou `{ message }` (422).
+
+### Uso direto
+
+```tsx
+import { AiExtractInput } from '@arqel/ai';
+
+<AiExtractInput
+  name="contact"
+  value={form.contact}
+  onChange={(v) => setForm((f) => ({ ...f, contact: v }))}
+  props={{
+    sourceField: 'rawText',
+    targetFields: ['name', 'email', 'phone'],
+    buttonLabel: 'Extract contact info',
+    usingJsonMode: true,
+    provider: 'claude',
+  }}
+  resource="contacts"
+  field="contact"
+  formData={form}
+  csrfToken={csrfToken}
+  onPopulateField={(target, value) =>
+    setForm((f) => ({ ...f, [target]: value }))
+  }
+/>;
+```
+
 ## Anti-patterns
 
 - Trazer o prompt template para o cliente — segurança/IP. O backend

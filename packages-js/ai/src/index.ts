@@ -8,6 +8,12 @@
  */
 
 export {
+  AiExtractInput,
+  type AiExtractInputFieldProps,
+  type AiExtractInputProps,
+  type AiExtractValue,
+} from './AiExtractInput.js';
+export {
   AiSelectInput,
   type AiSelectInputFieldProps,
   type AiSelectInputProps,

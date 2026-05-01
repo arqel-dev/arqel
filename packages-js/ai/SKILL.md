@@ -325,6 +325,87 @@ import { AiExtractInput } from '@arqel/ai';
 />;
 ```
 
+## AiImageInput (AI-011 React)
+
+Componente React que fecha o slice React do ticket AI-011 — o slice
+PHP foi mergeado no batch #36 (`Arqel\Ai\Fields\AiImageField`,
+component string `AiImageInput`).
+
+```ts
+interface AiImageInputProps {
+  name: string;
+  value: string | null;
+  onChange?: (value: string) => void;
+  props: {
+    analyses: string[];
+    populateFields: Record<string, string>;
+    provider?: string | null;
+    acceptedMimes: string[];
+    maxFileSize: number;
+    buttonLabel: string;
+  } | undefined;
+  resource?: string;
+  field?: string;
+  analyzeUrl?: string;
+  csrfToken?: string;
+  onPopulateField?: (targetField: string, value: string) => void;
+}
+```
+
+Render:
+
+- `<input type="file">` escondido + `<label>` clicável formando o
+  drop-zone visual; `accept` é o `props.acceptedMimes.join(',')`.
+- Preview da imagem após selecionar (via `URL.createObjectURL`, só
+  chamado dentro do change handler — render path SSR-safe).
+- Validação client-side: arquivos maiores que `props.maxFileSize`
+  (em bytes) viram banner `role="alert"` + botão fica `disabled`.
+- Botão `Analyze with AI` (label vem de `props.buttonLabel`); spinner
+  inline + `disabled` durante o `fetch`. Sem arquivo selecionado o
+  botão também fica `disabled`.
+- Após sucesso: `<dl>` preview com cada `analysis_key: value`; cada
+  entry com mapping em `populateFields` mostra botão `Apply`
+  individual; toolbar mostra `Apply all` que itera todas as analyses
+  com mapping.
+- `Apply` chama `onPopulateField?.(target, value)` usando o
+  mapeamento `populateFields[analysisKey]` (ou `populateMapping`
+  vindo da response, que tem precedência se presente).
+- Banner `role="alert"` quando o `fetch` falha; usa `message` da
+  response 422 quando disponível, senão fallback genérico com HTTP
+  code.
+
+Rota canônica: `POST /admin/{resource}/fields/{field}/analyze-image`
+(override via `analyzeUrl`). Body: `{ imageBase64 }` (data URI
+completo, produzido por `FileReader.readAsDataURL`). Resposta
+esperada: `{ analyses: Record<string,string>, populateMapping:
+Record<string,string> }` (200) ou `{ message }` (422).
+
+### Uso direto
+
+```tsx
+import { AiImageInput } from '@arqel/ai';
+
+<AiImageInput
+  name="cover"
+  value={form.cover}
+  onChange={(v) => setForm((f) => ({ ...f, cover: v }))}
+  props={{
+    analyses: ['alt_text', 'tags'],
+    populateFields: { alt_text: 'cover_alt', tags: 'cover_tags' },
+    provider: 'claude',
+    acceptedMimes: ['image/jpeg', 'image/png', 'image/webp'],
+    maxFileSize: 10_485_760,
+    buttonLabel: 'Analyze with AI',
+  }}
+  resource="posts"
+  field="cover"
+  csrfToken={csrfToken}
+  onPopulateField={(target, value) =>
+    setForm((f) => ({ ...f, [target]: value }))
+  }
+/>;
+```
+
 ## Anti-patterns
 
 - Trazer o prompt template para o cliente — segurança/IP. O backend

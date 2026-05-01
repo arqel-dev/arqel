@@ -22,6 +22,7 @@ import type {
   AiExtractInputProps,
   AiExtractValue,
 } from './AiExtractInput.js';
+import type { AiImageInputFieldProps, AiImageInputProps } from './AiImageInput.js';
 import type { AiSelectInputFieldProps, AiSelectInputProps } from './AiSelectInput.js';
 import type { AiTextInputFieldProps, AiTextInputProps } from './AiTextInput.js';
 import type {
@@ -185,6 +186,32 @@ const LazyAiExtractInput = lazy(async () => {
   return { default: adaptToAiExtractInput(mod.AiExtractInput) };
 });
 
+function adaptToAiImageInput(
+  Component: ComponentType<AiImageInputProps>,
+): ComponentType<RegistryFieldProps> {
+  return function AiImageInputAdapter(registryProps: RegistryFieldProps): ReactElement {
+    const { field, value, onChange, resource, csrfToken } = registryProps;
+    const fieldProps = (field as unknown as { props?: AiImageInputFieldProps }).props;
+    const stringValue: string | null = typeof value === 'string' && value !== '' ? value : null;
+    return (
+      <Component
+        name={field.name}
+        value={stringValue}
+        props={fieldProps}
+        {...(onChange !== undefined ? { onChange } : {})}
+        {...(resource !== undefined ? { resource } : {})}
+        field={field.name}
+        {...(csrfToken !== undefined ? { csrfToken } : {})}
+      />
+    );
+  };
+}
+
+const LazyAiImageInput = lazy(async () => {
+  const mod = await import('./AiImageInput.js');
+  return { default: adaptToAiImageInput(mod.AiImageInput) };
+});
+
 registerField('AiTextInput', LazyAiTextInput as unknown as Parameters<typeof registerField>[1]);
 registerField(
   'AiTranslateInput',
@@ -195,3 +222,4 @@ registerField(
   'AiExtractInput',
   LazyAiExtractInput as unknown as Parameters<typeof registerField>[1],
 );
+registerField('AiImageInput', LazyAiImageInput as unknown as Parameters<typeof registerField>[1]);

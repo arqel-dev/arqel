@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Cli\Application;
+use Arqel\Cli\Commands\NewCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 
 function arqelTmpDir(string $suffix): string
@@ -128,3 +129,31 @@ it('produces a .ps1 file when platform=windows is forced', function (): void {
         ->toContain('composer require arqel/tenant');
     expect($tester->getDisplay())->toContain('powershell -File arqel-setup-winapp.ps1');
 });
+
+it('skips interactive prompts and warns when TTY does not support stty', function (): void {
+    $cwd = arqelTmpDir('tty-fallback');
+    $previous = getcwd();
+    chdir($cwd);
+
+    try {
+        $tester = new CommandTester((new Application)->find('new'));
+        $tester->setInputs([]);
+        // interactive=true triggers the prompt branch; CommandTester runs without
+        // a /dev/tty so ttySupportsPrompts() must short-circuit it.
+        $exit = $tester->execute(['name' => 'tty-app'], ['interactive' => true]);
+    } finally {
+        if ($previous !== false) {
+            chdir($previous);
+        }
+    }
+
+    expect($exit)->toBe(0);
+    expect($tester->getDisplay())
+        ->toContain('Non-POSIX TTY detected')
+        ->toContain('Generated arqel-setup-tty-app.sh');
+    expect(file_exists($cwd.'/arqel-setup-tty-app.sh'))->toBeTrue();
+});
+
+it('ttySupportsPrompts returns false in CI/test environments without /dev/tty', function (): void {
+    expect(NewCommand::ttySupportsPrompts())->toBeFalse();
+})->skipOnWindows();

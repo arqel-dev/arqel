@@ -53,6 +53,10 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Validações pós-fixes:** `pest packages/core` 113/113 ✅ · `pest packages/tenant` 95/95 ✅ · `pest packages/widgets` 29/29 ✅ · `pest packages/actions` 49/49 ✅ · `pnpm build @arqel/ui` 11 ESM entries + dts ✅ · `pnpm test @arqel/ui` 70/70 ✅ · phpstan + pint todos limpos.
 
+### Bug fix — `arqel new` interativo em TTY não-POSIX (2026-05-01)
+
+**Bug 10 (high)** — `arqel new <app>` quebra com `stty: invalid argument '6d02:5:f04bf:...'` ao entrar no segundo prompt (Tenancy strategy?), mesmo que o primeiro tenha funcionado. Causa raiz: `laravel/prompts` chama `stty -g` para salvar o estado do TTY, mas terminais embedded (Claude Code, alguns Docker `-it`, certos CIs) expõem um pseudo-TTY que passa `posix_isatty(STDIN)` mas emite output não-POSIX que `stty <mode>` rejeita. Fix em `NewCommand::execute`: novo método estático `ttySupportsPrompts()` que faz probe via `fopen('/dev/tty')` + `proc_open('stty -g')` + valida formato POSIX do output via regex; quando falha, força `--no-prompts` e emite warning explicando flags disponíveis. Funciona normalmente em terminais reais (xterm, kitty, alacritty, gnome-terminal). 2 testes Pest novos (`tty-fallback` + probe estático), suite `packages/cli` 68/68 ✅ · pint + phpstan limpos nos arquivos tocados.
+
 ### Batch paralelo #1 — WIDGETS-003/004/005 + MCP-001 + FIELDS-ADV-001/002 (2026-04-29)
 
 **Modelo:** primeira execução paralela com 3 sub-agentes em git worktrees isolados, eu (orquestrador) coordenando merge final. Total: 6 tickets, 6 commits dos agentes + 3 merge commits + 1 commit consolidando root configs.

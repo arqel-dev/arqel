@@ -120,6 +120,12 @@ ARQEL_PHP_PACKAGES=(
   "arqel/mcp:dev-main"
   "arqel/audit:dev-main"
   "arqel/export:dev-main"
+  "arqel/cli:dev-main"
+  "arqel/marketplace:dev-main"
+  "arqel/realtime:dev-main"
+  "arqel/versioning:dev-main"
+  "arqel/workflow:dev-main"
+  "arqel/ai:dev-main"
 )
 
 # Determine which packages still need installing — composer is slow, so
@@ -133,10 +139,10 @@ for spec in "${ARQEL_PHP_PACKAGES[@]}"; do
 done
 
 if [ ${#MISSING_PHP[@]} -eq 0 ]; then
-  ok "All 13 Arqel PHP packages already required"
+  ok "All 19 Arqel PHP packages already required"
 else
   warn "Adding ${#MISSING_PHP[@]} missing package(s)…"
-  composer require "${MISSING_PHP[@]}" --no-interaction --ignore-platform-req=ext-zip
+  composer require "${MISSING_PHP[@]}" -W --no-interaction --ignore-platform-req=ext-zip
   ok "composer require done"
 fi
 

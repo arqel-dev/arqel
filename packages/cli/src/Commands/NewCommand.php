@@ -54,7 +54,14 @@ final class NewCommand extends Command
         $darkMode = (bool) $input->getOption('dark-mode');
         $mcp = (bool) $input->getOption('mcp');
 
-        if (! $input->getOption('no-prompts') && $input->isInteractive()) {
+        $promptsEnabled = ! $input->getOption('no-prompts') && $input->isInteractive();
+
+        if ($promptsEnabled && ! self::ttySupportsPrompts()) {
+            $output->writeln('<comment>Non-POSIX TTY detected (stty unsupported); skipping interactive prompts. Use --starter, --tenancy, --first-resource, --dark-mode/--no-dark-mode, --mcp/--no-mcp to customize.</comment>');
+            $promptsEnabled = false;
+        }
+
+        if ($promptsEnabled) {
             $starter = self::coerceString(select(
                 label: 'Starter kit?',
                 options: SetupScriptGenerator::STARTERS,
@@ -134,6 +141,57 @@ final class NewCommand extends Command
         }
 
         return '';
+    }
+
+    /**
+     * Probe whether the current TTY supports `stty` round-trips, which laravel/prompts
+     * requires for interactive selects/confirms. Some embedded terminals (e.g. Claude
+     * Code, certain Docker setups) expose a pseudo-TTY that passes posix_isatty but
+     * makes `stty -g` emit non-POSIX output that `stty <mode>` then rejects.
+     */
+    public static function ttySupportsPrompts(): bool
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return true;
+        }
+
+        // posix_isatty(STDIN) is the cheapest gate; without a real TTY behind STDIN,
+        // /dev/tty is either absent or unopenable for this process.
+        if (function_exists('posix_isatty') && ! @posix_isatty(STDIN)) {
+            return false;
+        }
+
+        $tty = @fopen('/dev/tty', 'r');
+        if ($tty === false) {
+            return false;
+        }
+        fclose($tty);
+
+        $process = @proc_open('stty -g 2>/dev/null', [
+            0 => ['file', '/dev/tty', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ], $pipes);
+
+        if (! is_resource($process)) {
+            return false;
+        }
+
+        $stdout = stream_get_contents($pipes[1]) ?: '';
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $code = proc_close($process);
+
+        if ($code !== 0) {
+            return false;
+        }
+
+        $mode = trim($stdout);
+        if ($mode === '') {
+            return false;
+        }
+
+        return preg_match('/^[a-zA-Z0-9 :=,\-]+$/', $mode) === 1;
     }
 
     private function resolvePlatform(string $forced): string

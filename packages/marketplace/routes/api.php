@@ -2,15 +2,22 @@
 
 declare(strict_types=1);
 
+use Arqel\Marketplace\Http\Controllers\CategoryListController;
+use Arqel\Marketplace\Http\Controllers\FeaturedPluginsController;
+use Arqel\Marketplace\Http\Controllers\MostPopularPluginsController;
+use Arqel\Marketplace\Http\Controllers\NewPluginsController;
 use Arqel\Marketplace\Http\Controllers\PluginAdminListController;
 use Arqel\Marketplace\Http\Controllers\PluginAdminReviewController;
 use Arqel\Marketplace\Http\Controllers\PluginDetailController;
+use Arqel\Marketplace\Http\Controllers\PluginFeatureController;
 use Arqel\Marketplace\Http\Controllers\PluginListController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewListController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewModerationController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewVoteController;
+use Arqel\Marketplace\Http\Controllers\PluginsByCategoryController;
 use Arqel\Marketplace\Http\Controllers\PluginSubmissionController;
+use Arqel\Marketplace\Http\Controllers\TrendingPluginsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +55,24 @@ Route::middleware('api')->prefix($prefix)->group(static function (): void {
 
     Route::get('plugins/{slug}/reviews', PluginReviewListController::class)
         ->name('arqel.marketplace.plugins.reviews.index');
+
+    Route::get('categories', CategoryListController::class)
+        ->name('arqel.marketplace.categories.index');
+
+    Route::get('categories/{slug}/plugins', PluginsByCategoryController::class)
+        ->name('arqel.marketplace.categories.plugins');
+
+    Route::get('featured', FeaturedPluginsController::class)
+        ->name('arqel.marketplace.featured');
+
+    Route::get('trending', TrendingPluginsController::class)
+        ->name('arqel.marketplace.trending');
+
+    Route::get('new', NewPluginsController::class)
+        ->name('arqel.marketplace.new');
+
+    Route::get('popular', MostPopularPluginsController::class)
+        ->name('arqel.marketplace.popular');
 });
 
 Route::middleware($reviewMiddleware)->prefix($prefix)->group(static function (): void {
@@ -77,4 +102,7 @@ Route::middleware($reviewMiddleware)->prefix($prefix)->group(static function ():
     Route::post('admin/reviews/{reviewId}/moderate', [PluginReviewModerationController::class, 'moderate'])
         ->whereNumber('reviewId')
         ->name('arqel.marketplace.admin.reviews.moderate');
+
+    Route::post('admin/plugins/{slug}/feature', PluginFeatureController::class)
+        ->name('arqel.marketplace.admin.plugins.feature');
 });

@@ -8,128 +8,92 @@ O pacote é provider-agnóstico por design: o consumidor escolhe `claude`, `open
 
 ## Status
 
-Entregue em AI-001 + AI-002:
+### Entregue
 
+**AI-001 + AI-002 — Bootstrap + contratos**
 - `composer.json` com `arqel/core` em `require` e SDKs nativos (`anthropic/anthropic-php`, `openai-php/client`, `ollama-laravel`) em `suggest:` — apps opt-in apenas para o provider que vão usar.
 - `Arqel\Ai\AiServiceProvider` auto-discovered + publica `config/arqel-ai.php` via `vendor:publish --tag=arqel-ai-config`.
 - `Arqel\Ai\Contracts\AiProvider` — métodos `complete`, `chat`, `embed`, `stream`, `name`, `supportsEmbeddings`, `supportsStreaming`.
 - `Arqel\Ai\AiCompletionResult` — final readonly value-object com `text`, `inputTokens`, `outputTokens`, `estimatedCost`, `model`, `raw` + helper `totalTokens()`.
 - `Arqel\Ai\Exceptions\AiException` — base RuntimeException para erros de provider (network, auth, rate-limit, content-policy).
-- Suite Pest com Orchestra Testbench (3 unit + 3 feature).
 
-Entregue em AI-003..AI-005:
+**AI-003..AI-005 — Providers**
+- **`Arqel\Ai\Providers\ClaudeProvider`** via `Http` facade (`api.anthropic.com/v1/messages`, header `anthropic-version`); pricing Opus 4.7 ($15/$75 MTok); `embed()` lança `AiException` (Anthropic não tem embeddings nativos); `stream()` parseia SSE Anthropic (`event: content_block_delta` → `delta.text`).
+- **`Arqel\Ai\Providers\OpenAiProvider`** via `Http` (`/v1/chat/completions` + `/v1/embeddings`); `system` injetado via `array_unshift` apenas quando `options.system` está presente; JSON mode (`response_format: {type:'json_object'}`); embeddings 1536d (`text-embedding-3-small`); pricing gpt-4o-mini ($0.15/$0.60 MTok); SSE `data: {…}` → `choices[0].delta.content`.
+- **`Arqel\Ai\Providers\OllamaProvider`** via `Http` (`/api/generate` + `/api/chat` + `/api/embeddings`); cost SEMPRE 0.0 (execução local); embedding model `nomic-embed-text` por default; `eval_count`/`prompt_eval_count` ausentes caem em 0; streaming NDJSON (`{"response": "...chunk...", "done": false}\n`).
 
-- **`Arqel\Ai\Providers\ClaudeProvider`** via `Http` facade (`api.anthropic.com/v1/messages`, header `anthropic-version`); pricing Opus 4.7 ($15/$75 MTok); `embed()`/`stream()` lançam `AiException`.
-- **`Arqel\Ai\Providers\OpenAiProvider`** via `Http` (`/v1/chat/completions` + `/v1/embeddings`); `system` via `array_unshift`; JSON mode (`response_format: {type:'json_object'}`); embeddings 1536d (`text-embedding-3-small`); pricing gpt-4o-mini.
-- **`Arqel\Ai\Providers\OllamaProvider`** via `Http` (`/api/generate` + `/api/chat` + `/api/embeddings`); cost SEMPRE 0.0; embedding model `nomic-embed-text` por default.
-
-Entregue em AI-006:
-
-- **`Arqel\Ai\AiManager`** (final) — front-door para todas as chamadas. Resolve provider por nome (`config('arqel-ai.default_provider')` ou `options.provider`), aplica cache, enforça `CostTracker::assertWithinLimit(Auth::id())`, persiste a chamada via `CostTracker::record`, dispara `AiCompletionGenerated`. `embed()` bypassa cache (vetores são leves de re-gerar).
-- **`Arqel\Ai\CostTracker`** (final) — wrapper Eloquent sobre `ai_usage`. Limites configurados em `arqel-ai.cost_tracking.{daily_limit_usd, per_user_limit_usd}` — `null` ou `<= 0` é tratado como **ilimitado** (útil em dev). Lança `DailyLimitExceeded` / `UserLimitExceeded` (subclasses de `AiException`).
-- **`Arqel\Ai\AiCache`** (final) — wrapper sobre `Cache::store()`. Key determinística `arqel-ai:{md5(json_encode([prompt, options]))}`. TTL de `arqel-ai.caching.ttl` (default 3600s). Desativado quando `arqel-ai.caching.enabled === false` (útil para apps que escolheram cache layer próprio).
+**AI-006 — Manager + Cost + Cache**
+- **`Arqel\Ai\AiManager`** (final) — front-door para todas as chamadas. Resolve provider por nome (`config('arqel-ai.default_provider')` ou `options.provider`), aplica cache, enforça `CostTracker::assertWithinLimit(Auth::id())`, persiste a chamada via `CostTracker::record`, dispara `AiCompletionGenerated`. `embed()` bypassa cache (vetores são leves de re-gerar). Lança `InvalidArgumentException` quando provider não existe ou default é null.
+- **`Arqel\Ai\CostTracker`** (final) — wrapper Eloquent sobre `ai_usage`. Limites em `arqel-ai.cost_tracking.{daily_limit_usd, per_user_limit_usd}` — `null` ou `<= 0` é tratado como **ilimitado** (útil em dev). Lança `DailyLimitExceeded` / `UserLimitExceeded` (subclasses de `AiException`). `getCostSince()`/`getCostForUserSince()` filtram via `Carbon::today()` por default.
+- **`Arqel\Ai\AiCache`** (final) — wrapper sobre `Cache::store()`. Key determinística `arqel-ai:{md5(json_encode([prompt, options]))}` — mesmo prompt + options idênticos → mesma key (regression-tested). TTL `arqel-ai.caching.ttl` (default 3600s). Desativado quando `arqel-ai.caching.enabled === false`.
 - **`Arqel\Ai\Models\AiUsage`** (final Eloquent) — tabela `ai_usage` (`user_id`, `provider`, `model`, `input_tokens`, `output_tokens`, `cost_usd`, `prompt_hash`, timestamps + index em `created_at`).
-- **`Arqel\Ai\Events\AiCompletionGenerated`** (final) — Dispatchable+SerializesModels com `result, providerName, userId`. Listeners user-land podem persistir métricas customizadas, alertar, ou invalidate cache externos.
+- **`Arqel\Ai\Events\AiCompletionGenerated`** (final) — Dispatchable+SerializesModels com `result, providerName, userId`. Listeners user-land podem persistir métricas customizadas, alertar, ou invalidar cache externos.
 - Migration `2026_05_01_000000_create_ai_usage_table` auto-discovered via `hasMigration('create_ai_usage_table')` no provider.
-- `AiServiceProvider::packageRegistered()` instancia singleton `AiManager` resolvendo cada entry de `arqel-ai.providers` lazily via container (`$app->make($driver, $args)`); entries com `class_exists($driver) === false` são silenciosamente ignoradas.
-- **27 Pest tests** novos (10 AiManager + 6 CostTracker + 3 AiCache + recovery dos existentes).
 
-Entregue em AI-007 (PHP slice — componente React `AiTextInput.tsx` fica para batch futuro):
+**AI-007..AI-011 — Fields (PHP slice)**
 
-- **`Arqel\Ai\Fields\AiTextField`** (final, estende `Arqel\Fields\Types\TextareaField`) — geração de texto via AI a partir de prompt template. Setters fluentes `prompt(string|Closure)`, `provider(?string)`, `aiOptions(array)`, `contextFields(array)`, `maxLength(int)`, `buttonLabel(string)`. Método `generate(array $formData): string` resolve placeholders `{fieldName}`, chama `AiManager::complete()` e trunca quando excede `maxLength`. `getTypeSpecificProps()` **NUNCA** expõe o prompt template ao cliente (segurança/IP).
-- **`Arqel\Ai\Http\Controllers\AiGenerateController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/generate` (named `arqel.ai.generate`, middleware `web,auth`). Resolve o `Resource` via `ResourceRegistry::findBySlug()`, encontra o `AiTextField` pelo nome em `Resource::fields()` e devolve `{text: string}`. Authorization: Gate `use-ai` opt-in — quando não definida, allow por default.
-- `arqel/fields` adicionado ao `composer.json` (path repo + `@dev`).
-- 8 testes unit + 3 testes feature.
+| Field | Action principal | Rota | React |
+|---|---|---|---|
+| `AiTextField` (estende `TextField`) | `generate(formData): string` — placeholders `{name}` resolvidos server-side, trunca por `maxLength` | `POST /admin/{r}/fields/{f}/generate` | entregue |
+| `AiTranslateField` | `translate(text, target, ?source)`, `translateAll(translations, source)` — só preenche idiomas vazios, nunca sobrescreve traduções manuais | `POST .../translate` | follow-up |
+| `AiSelectField` | `classify(formData): ?string` — normaliza output (trim/lower/strip) e valida contra `options`, cai em `fallbackOption` quando inválido | `POST .../classify` | follow-up |
+| `AiExtractField` | `extract(sourceText): array` — JSON mode opcional, fallback regex `\{[\s\S]*\}` para prosa misturada, filtra keys extras, injeta `null` para keys ausentes | `POST .../extract` | follow-up |
+| `AiImageField` | `analyze(imageUrlOrBase64): array<key,string>` — uma chamada por análise declarada via `aiAnalysis`, `populateFields` mapeia para form fields | `POST .../analyze-image` | entregue (`AiImageInput.tsx`) |
 
-Entregue em AI-008 (PHP slice — componente React `AiTranslateInput.tsx` fica para batch futuro):
+Convenções compartilhadas dos fields:
+- Prompt template / descriptions **nunca** trafegam para o cliente (segurança/IP). `getTypeSpecificProps()` expõe apenas metadados estruturais (lista de keys, provider, button label, etc.).
+- Setters fluentes: `provider(?string)`, `aiOptions(array)`, `buttonLabel(string)` (quando aplicável).
+- Authorization: Gate `use-ai` opt-in — quando não definida, allow por default; quando definida e nega, controllers respondem 403.
+- Controllers single-action retornam 404 para resource ausente, 422 para field do tipo errado, 422 para `AiException` (parse failure, vision unsupported, etc.).
+- `ConfigurableFakeProvider` (test fixture) suporta `textsToReturn[]` (FIFO) + `promptHistory[]` + `optionsHistory[]` para asserts em testes que disparam múltiplas chamadas sequenciais.
 
-- **`Arqel\Ai\Fields\AiTranslateField`** (final, estende `Arqel\Fields\Field`) — armazena `{languageCode => text}` para conteúdo multi-idioma. Setters fluentes `languages(array)`, `defaultLanguage(string)`, `autoTranslate(bool)`, `provider(?string)`, `aiOptions(array)`. Métodos `translate(sourceText, targetLanguage, ?sourceLanguage): string` (chama `AiManager::complete()` com prompt construído server-side) e `translateAll(translations, sourceLanguage): array` (preenche apenas idiomas ausentes ou vazios, nunca sobrescreve traduções manuais, pula o `sourceLanguage`). `defaultLanguage()` lança `InvalidArgumentException` quando o código não está em `languages()`. O prompt **nunca** é exposto via `getTypeSpecificProps()` (consistente com AI-007).
-- **`Arqel\Ai\Http\Controllers\AiTranslateController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/translate` (named `arqel.ai.translate`, middleware `web,auth`). Aceita `{sourceLanguage, targetLanguages, sourceText}` e devolve `{translations: {<lang>: <text>}}`. `ResourceRegistry` é resolvido por FQCN string (`Arqel\\Core\\Resources\\ResourceRegistry`) com fallback 404 quando ausente. 422 quando o field não é `AiTranslateField`.
-- 8 testes unit + 3 testes feature.
-
-Entregue em AI-009 (PHP slice — componente React `AiSelectInput.tsx` fica para batch futuro):
-
-- **`Arqel\Ai\Fields\AiSelectField`** (final, estende `Arqel\Fields\Field`) — classifica `formData` em uma das opções via AI. Setters fluentes `options(array)`, `classifyFromFields(array)`, `prompt(string|Closure)`, `provider(?string)`, `aiOptions(array)`, `fallbackOption(?string)`. Método `classify(array $formData): ?string` resolve placeholders `{fieldName}` no prompt template, anexa lista `key: label` das categorias disponíveis, chama `AiManager::complete()`, normaliza o output (trim + lowercase + strip de aspas/pontuação) e valida contra `options`. Output inválido cai em `fallbackOption()` (default `null`). O prompt template **nunca** é exposto via `getTypeSpecificProps()`.
-- **`Arqel\Ai\Http\Controllers\AiClassifyController`** (single-action) registrado em `routes/web.php` como `POST /admin/{resource}/fields/{field}/classify` (named `arqel.ai.classify`, middleware `web,auth`). Aceita `{formData}` e devolve `{key, label}` (ambos `null` quando AI inválida e sem fallback). 404 quando resource ausente, 422 quando field não é `AiSelectField`.
-- 8 testes unit + 3 testes feature.
-
-Entregue em AI-010 (PHP slice — componente React `AiExtractInput.tsx` fica para batch futuro):
-
-- **`Arqel\Ai\Fields\AiExtractField`** (final, estende `Arqel\Fields\Field`) — extrai dados estruturados de um texto livre via JSON. Setters fluentes `sourceField(string)`, `extractTo(array<string,string>)` (key=>description), `usingJsonMode(bool)`, `provider`, `aiOptions`, `buttonLabel`. Método `extract(string $sourceText): array<string,mixed>` constrói prompt enumerando keys+descriptions, instrui o modelo a responder com JSON puro, chama `AiManager::complete($prompt, $jsonMode ? ['json_mode'=>true] : [])`. **Robustness:** parse via `json_decode`, com fallback regex `\{[\s\S]*\}` (extrai a primeira object literal mesmo quando há prosa antes/depois). Filtra a saída para conter apenas keys declaradas em `extractTo` e injeta `null` para keys ausentes (consumidor distingue "AI omitiu" de "key não esperada"). Falha de parse → `AiException`. `getTypeSpecificProps()` expõe `sourceField/targetFields/buttonLabel/usingJsonMode/provider` — **as descrições** em `extractTo` ficam server-side (parte do prompt, não vazam para o cliente).
-- **`Arqel\Ai\Http\Controllers\AiExtractController`** (single-action) registrado como `POST /admin/{resource}/fields/{field}/extract` (named `arqel.ai.extract`, middleware `web,auth`). Aceita `{sourceText}` e devolve `{extracted: array<string,mixed>}`. `AiException` (parse failure) → 422 com `message`. 404 quando resource ausente, 422 quando field não é `AiExtractField`, 403 quando Gate `use-ai` nega.
-- 9 testes unit + 4 testes feature.
-
-Entregue em AI-011 (PHP slice — componente React `AiImageInput.tsx` e suporte vision real nos providers ficam para batch futuro):
-
-- **`Arqel\Ai\Fields\AiImageField`** (final, estende `Arqel\Fields\Field`) — análise de imagem via vision models. Setters fluentes `aiAnalysis(array<string,string>)` (`analysis_key => prompt_description`), `populateFields(array<string,string>)` (`analysis_key => target_form_field`), `provider(?string)`, `aiOptions(array)`, `acceptedMimes(array)` (default `['image/jpeg','image/png','image/webp']`), `maxFileSize(int)` (default 10MB), `buttonLabel(string)` (default `'Analyze with AI'`). Método `analyze(string $imageUrlOrBase64): array<string,string>` itera cada análise declarada, monta `options['image']` e chama `AiManager::complete()` uma vez por análise — devolve `analysis_key => trim(text)`. Os **prompt descriptions ficam server-side**: `getTypeSpecificProps()` expõe apenas `analyses` (keys), `populateFields`, `provider`, `acceptedMimes`, `maxFileSize`, `buttonLabel`.
-- **`Arqel\Ai\Http\Controllers\AiAnalyzeImageController`** (single-action) registrado como `POST /admin/{resource}/fields/{field}/analyze-image` (named `arqel.ai.analyzeImage`, middleware `web,auth`). Aceita `{imageUrl?, imageBase64?}` e devolve `{analyses: <key=>result>, populateMapping: <key=>target>}`. 422 quando ambos `imageUrl`/`imageBase64` vazios; 404 resource ausente; 422 field não-`AiImageField`; 403 quando Gate `use-ai` nega; 422 em `AiException`.
-- **Vision support nos providers:** o suporte real ao envio da imagem (multipart/data-URI nativo de cada provider) entra em **AI-011 follow-up**. Hoje o `AiImageField` repassa `options['image']` para `AiManager::complete()` — providers que não saibam interpretar o option ignoram ou retornam erro. O contrato server-side está pronto para receber o suporte vision sem mudança de API pública.
-- `ConfigurableFakeProvider` ganhou `textsToReturn[]` (FIFO, fallback para `textToReturn`), `promptHistory[]` e `optionsHistory[]` para asserts em testes que disparam múltiplas chamadas sequenciais.
-- 7 testes unit + 5 testes feature.
-
-Entregue em AI-012:
-
-- **`Arqel\Ai\Prompts\PromptLibrary`** (final) — biblioteca de prompt templates reutilizáveis. Métodos estáticos puros que retornam strings (não invocam o provider): `summarize($text, $maxWords=100)`, `translate($text, $targetLanguage, ?$sourceLanguage=null)`, `classify($text, $categories)` (aceita lista simples OU mapa `key=>label`), `extractJson($text, $schema)` (`field=>description`), `generateSlug($title)`, `keywordExtract($text, $count=5)`, `tone($text, $tone='professional')`, `proofread($text)`. Caller passa o resultado para `AiManager::complete()` quando quiser executar.
+**AI-012 — PromptLibrary**
+- **`Arqel\Ai\Prompts\PromptLibrary`** (final) — biblioteca de prompt templates reutilizáveis. Métodos estáticos puros que retornam strings (não invocam o provider): `summarize($text, $maxWords=100)`, `translate($text, $target, ?$source=null)`, `classify($text, $categories)` (lista simples OU mapa `key=>label`), `extractJson($text, $schema)` (`field=>description`), `generateSlug($title)`, `keywordExtract($text, $count=5)`, `tone($text, $tone='professional')`, `proofread($text)`. Caller passa o resultado para `AiManager::complete()` quando quiser executar.
 - **Custom prompts em runtime** via static map: `register(string $name, Closure $template)` (sobre-escreve silenciosamente), `resolve(string $name, array $data=[])` (lança `InvalidArgumentException` se nome não existe), `has(string $name)`, `clear()` (útil em tests). O closure recebe `array<string,mixed> $data` e retorna `string`.
 - **Sem binding no `AiServiceProvider`** — toda a API é estática.
-- 16 testes unit (`tests/Unit/Prompts/PromptLibraryTest.php`).
 
-Por chegar:
+**AI-013 — MCP tools AI-generated**
+- Tools registradas em `arqel/mcp` que invocam `AiManager` internamente — primeiro alvo: `generate_resource_from_description` (input: `description, model_name`; output: `resource_code, suggested_path`). Caller é Claude Code/Desktop via MCP server expondo Resources/Forms como tools.
+- Cross-package — implementação concreta vive em `arqel/mcp`, mas o contrato de prompt e o uso de `AiManager::complete()` segue as mesmas convenções deste pacote (Gate `use-ai`, cost enforcement, cache opcional).
 
-- **AI-010 React** componente `AiExtractInput.tsx` (botão Extract + populate em multiple form fields).
-- **AI-011 React** componente `AiImageInput.tsx` (upload + preview + Analyze + populate cross-field).
-- **AI-011 vision providers** suporte real a vision em `ClaudeProvider` (messages com `image` blocks) e `OpenAiProvider` (image_url / base64 em `chat/completions`).
-## MCP integration (AI-013)
+**AI-014 — Coverage gaps**
+- `tests/Unit/Coverage/AiCoverageGapsTest.php` cobre branches que não eram exercitados pelos testes feature/unit existentes: `AiManager::resolveProvider()` com default null; cache hit que **não** chama provider; determinismo de `AiCache::key()`; `CostTracker::record()` com `cost null`; filtro temporal de `getCostSince()`; `ClaudeProvider::estimateCost(0,0) === 0.0`; `OpenAiProvider::chat()` sem system; `OllamaProvider::chat()` sem `eval_count`; `AiTextField::generate()` propagando `AiException`; `AiSelectField` com prosa AI → fallback; `AiTranslateField::translateAll()` no-op quando todas as línguas presentes; `AiExtractField` filtrando keys extras; `PromptLibrary::extractJson([])` com schema vazio.
 
-`arqel/ai` expõe 3 tools MCP que **usam AI internamente** para apoiar workflows de scaffolding e análise no Claude Code / Claude Desktop. Os tools vivem em `src/Mcp/Tools/` e são auto-registados no `Arqel\Mcp\McpServer` via `AiServiceProvider::packageBooted()`.
+**AI-015 — SKILL canônico**
+- Este arquivo reorganizado para layout canônico (`Purpose / Status / Conventions / Anti-patterns / Examples / Related`) preservando todos os exemplos PT-BR existentes.
 
-**Defensivo por design**: `arqel/ai` **não** declara hard-dep em `arqel/mcp`. O registo só dispara quando a class `Arqel\Mcp\McpServer` existe e está bound no container — instalações que só usam AI fields continuam a bootar normalmente.
+### Por chegar
 
-Tools expostos:
-
-| Nome | Input | Output |
-|---|---|---|
-| `generate_resource_from_description` | `description`, `model_name`, `provider?` | `{resource_code, suggested_path, model_name}` |
-| `analyze_resource` | `resource_slug`, `provider?` | `{resource_slug, summary}` |
-| `suggest_fields` | `model_name`, `model_fields`, `provider?` | `{model_name, suggestions}` |
-
-Exemplo de invocação via Claude Code MCP client:
-
-```jsonc
-// Claude pede ao servidor MCP local:
-{
-  "method": "tools/call",
-  "params": {
-    "name": "generate_resource_from_description",
-    "arguments": {
-      "description": "A blog post resource with title, slug, body and author relation.",
-      "model_name": "BlogPost"
-    }
-  }
-}
-```
-
-Resposta: bloco PHP pronto a copiar para `app/Arqel/Resources/BlogPostResource.php`. A tool **nunca toca o filesystem** — a escrita fica do lado do humano (ou do agente que está a operar o MCP).
+- **AI-014 follow-up — Vision real nos providers**: suporte nativo a vision em `ClaudeProvider` (image blocks Anthropic) e `OpenAiProvider` (image_url/base64 em chat completions) tem ground-work no worktree (data URI + URL HTTP); falta o consolidado + testes Http::fake em vision flow ponta-a-ponta.
+- **AI-015 follow-up — Docs site**: capítulo "AI fields" em `arqel.dev/docs/ai` cobrindo cada field + anti-patterns. Hoje a doc vive aqui em SKILL.md e nos exemplos PT-BR abaixo.
+- **AI-016+ — Streaming SSE end-to-end**: providers já implementam `stream()` (Anthropic SSE, OpenAI SSE, Ollama NDJSON). Falta a ponte React/Inertia para receber chunks num `AiTextField` (provavelmente via endpoint dedicado fora do ciclo Inertia, exposto como rota tipo `text/event-stream`).
+- **Fields React follow-up**: `AiTranslateInput.tsx`, `AiSelectInput.tsx`, `AiExtractInput.tsx` (componentes shadcn-styled com botão "Generate" + populate cross-field).
 
 ## Conventions
 
 - **Nunca invocar provider sem confirmação do user**. AI tem custo monetário — toda operação iniciada por um field deve passar pelo `confirm` do Action ou flash de "preview before commit". O cost runaway é o anti-padrão #1 deste pacote.
 - **Tokens são contabilizados pelo provider, não estimados localmente**. `AiCompletionResult::$inputTokens` / `$outputTokens` vêm da API response. `estimatedCost` é null se o provider não expõe pricing.
 - **Provider FQCN guardados como string** em `config/arqel-ai.php` (não `::class`) para evitar resolução eager antes dos concretes existirem.
-- **`raw` carrega o payload bruto**. Streaming, tool calls e finish_reason ficam aí — não inventamos campos no value-object.
-- Embedding-only ou streaming-only providers DEVEM lançar `AiException` em métodos não suportados E reportar `supportsEmbeddings()` / `supportsStreaming()` corretamente. Caller usa `supports*` para gated fluxo.
+- **`raw` carrega o payload bruto** do provider. Streaming, tool calls e `finish_reason` ficam aí — não inventamos campos no value-object.
+- **Embedding-only ou streaming-only providers DEVEM lançar `AiException`** em métodos não suportados E reportar `supportsEmbeddings()` / `supportsStreaming()` corretamente. Caller usa `supports*` para gated fluxo.
+- **Prompt templates ficam server-side**. `getTypeSpecificProps()` nunca expõe a string completa — apenas metadados estruturais (lista de keys, button label, provider). Apps com prompts contendo regras de negócio mantêm-nos privados.
+- **Authorization em controllers AI** segue Gate `use-ai` (opt-in). Não definida → allow; definida e nega → 403. Sempre middleware `web,auth`.
+- **`AiException` é base RuntimeException** — apps DEVEM capturar e flash ao usuário, nunca deixar vazar 500.
 
 ## Anti-patterns
 
-- ❌ Hard-depender de SDKs de provider — todos em `suggest:`.
-- ❌ Chamar AI em hot paths sem cache (`config('arqel-ai.caching.enabled')` é `true` por default — TTL 3600s).
-- ❌ Aceitar prompt completo do user sem template/sanitização (futuro AI-012 cobre prompt injection guard).
-- ❌ Esquecer rate limiting per-user — `cost_tracking.per_user_limit_usd` é hard limit, não advisory.
+- ❌ **Cost runaway**: chamar AI em hot paths sem cache (`config('arqel-ai.caching.enabled')` é `true` por default) ou esquecer `cost_tracking.per_user_limit_usd`. Limit é hard, não advisory.
+- ❌ **Expor prompt template ao client**: `getTypeSpecificProps()` retornar a string completa do prompt vaza IP/regras de negócio. Sempre filtre — apenas metadados estruturais devem cruzar a fronteira PHP↔React.
+- ❌ **Depender de provider-specific options sem `supports*` check**: invocar `embed()` direto sem checar `supportsEmbeddings()` (Claude lança `AiException`); invocar `stream()` sem checar `supportsStreaming()`. Use os flags do contrato.
+- ❌ **Esquecer Gate `use-ai`**: rotas AI ficam abertas a qualquer user autenticado por default. Em produção, registre a Gate (`Gate::define('use-ai', fn (User $u) => $u->hasRole('editor'))`) ou aceite que todo authenticated pode gastar.
+- ❌ **Não capturar `AiException` em UI**: callers que invocam `generate()`/`classify()`/`extract()` direto em controllers user-land devem catch — o pacote nunca esconde a exception, deixar vazar resulta em 500 + page error genérica.
+- ❌ Hard-depender de SDKs de provider — todos em `suggest:`, providers usam apenas o `Http` facade do Laravel.
+- ❌ Aceitar prompt completo do user sem template/sanitização (prompt injection guard fica no template — `PromptLibrary` é o ponto canônico).
 - ❌ Mutar `AiCompletionResult` — é `final readonly`. Faça `new AiCompletionResult(...)` se precisar de uma cópia transformada.
 
 ## Examples
 
-### Configurar provider default
+### Setup providers + custo
 
 ```php
 // config/arqel-ai.php
@@ -144,10 +108,18 @@ return [
         ],
         // ...
     ],
+    'cost_tracking' => [
+        'daily_limit_usd' => 50.0,        // null|<=0 ⇒ ilimitado
+        'per_user_limit_usd' => 5.0,      // hard limit por user/dia
+    ],
+    'caching' => [
+        'enabled' => true,
+        'ttl' => 3600,                    // segundos
+    ],
 ];
 ```
 
-### Implementar um provider customizado (future-facing)
+Implementar provider customizado:
 
 ```php
 namespace App\Ai;
@@ -166,7 +138,7 @@ final class MyCustomProvider implements AiProvider
 }
 ```
 
-### AiTextField (AI-007)
+### Field AiText
 
 ```php
 use Arqel\Ai\Fields\AiTextField;
@@ -192,7 +164,7 @@ O placeholder `{title}` é resolvido server-side em `generate()` com o
 O prompt template **não trafega** para o cliente — apps com prompts que
 contêm regras de negócio podem mantê-los privados.
 
-### AiTranslateField (AI-008)
+### Field AiTranslate
 
 ```php
 use Arqel\Ai\Fields\AiTranslateField;
@@ -222,13 +194,13 @@ protected function casts(): array
 }
 ```
 
-Quando `autoTranslate()` está ativo, o React (AI-008 React, batch futuro)
-dispara `POST /admin/{slug}/fields/description/translate` com o texto do
+Quando `autoTranslate()` está ativo, o React (follow-up) dispara
+`POST /admin/{slug}/fields/description/translate` com o texto do
 `defaultLanguage` e os idiomas restantes; o backend chama `translate()`
 para cada idioma alvo. Traduções manuais já preenchidas **não são
 sobrescritas** por `translateAll()` — só os campos vazios são gerados.
 
-### AiSelectField (AI-009)
+### Field AiSelect classify
 
 ```php
 use Arqel\Ai\Fields\AiSelectField;
@@ -253,14 +225,34 @@ public function fields(): array
 }
 ```
 
-O React (AI-009 React, batch futuro) dispara
-`POST /admin/{slug}/fields/category/classify` com o `formData` atual; o
-backend chama `classify()` e devolve `{key, label}`. Quando a AI retorna
-uma key fora do set declarado, o resultado cai em `fallbackOption` —
-sem `fallbackOption()`, o response é `{key: null, label: null}` e o
-select fica sem seleção.
+O React (follow-up) dispara `POST /admin/{slug}/fields/category/classify`
+com o `formData` atual; o backend chama `classify()` e devolve
+`{key, label}`. Quando a AI retorna uma key fora do set declarado, o
+resultado cai em `fallbackOption` — sem `fallbackOption()`, o response
+é `{key: null, label: null}` e o select fica sem seleção.
 
-### PromptLibrary (AI-012)
+### Field AiExtract JSON mode
+
+```php
+use Arqel\Ai\Fields\AiExtractField;
+
+(new AiExtractField('extracted'))
+    ->sourceField('raw_text')
+    ->extractTo([
+        'total' => 'Valor total com símbolo da moeda',
+        'due_date' => 'Data de vencimento em ISO',
+        'invoice_number' => 'Número da nota fiscal — pode estar ausente',
+    ])
+    ->usingJsonMode()                  // OpenAI: response_format=json_object
+    ->provider('openai');
+```
+
+`extract($sourceText)` devolve um array com **apenas** as keys declaradas em
+`extractTo`; keys extras vindas da AI são filtradas, keys ausentes recebem
+`null` (consumidor distingue "AI omitiu" de "key não esperada"). Falha de
+parse mesmo após o fallback regex `\{[\s\S]*\}` lança `AiException`.
+
+### PromptLibrary custom register
 
 Templates reutilizáveis built-in (não invocam o provider — retornam apenas a string do prompt):
 
@@ -308,6 +300,48 @@ $prompt = PromptLibrary::resolve('company_bio', [
 `resolve()` lança `InvalidArgumentException` quando o nome não está registrado;
 `has()` faz a checagem prévia. `clear()` é útil para isolamento entre testes.
 
+### MCP tool integration
+
+`arqel/mcp` registra tools que chamam `AiManager` internamente. O exemplo
+canônico (AI-013) é "gerar Resource a partir de descrição":
+
+```php
+final class GenerateResourceFromDescriptionTool
+{
+    public function schema(): array
+    {
+        return [
+            'name' => 'generate_resource_from_description',
+            'description' => 'Generate an Arqel Resource class from natural language description',
+            'inputSchema' => [
+                'type' => 'object',
+                'properties' => [
+                    'description' => ['type' => 'string'],
+                    'model_name' => ['type' => 'string'],
+                ],
+                'required' => ['description', 'model_name'],
+            ],
+        ];
+    }
+
+    /** @param array{description: string, model_name: string} $params */
+    public function __invoke(array $params): array
+    {
+        $prompt = $this->buildPrompt($params['description'], $params['model_name']);
+        $result = app(\Arqel\Ai\AiManager::class)->complete($prompt);
+
+        return [
+            'resource_code' => $result->text,
+            'suggested_path' => "app/Arqel/Resources/{$params['model_name']}Resource.php",
+        ];
+    }
+}
+```
+
+A chamada respeita as mesmas convenções deste pacote: Gate `use-ai`, cost
+tracking, cache opcional. Caller (Claude Code/Desktop via MCP) recebe o
+código gerado e decide se grava no path sugerido.
+
 ### Consumir um result
 
 ```php
@@ -326,4 +360,4 @@ logger()->info('AI call', [
 - `arqel/core` — `Resource` lifecycle hooks que vão dispatch AI calls de afterCreate/afterUpdate (futuro).
 - `arqel/fields` — base `Field` que `AiTextField` etc. estendem.
 - `arqel/mcp` — AI-013 expõe Resource analysis como MCP tools para Claude Desktop / Claude Code.
-- PLANNING/10-fase-3-avancadas.md §2 (AI fields) — roadmap completo.
+- `PLANNING/10-fase-3-avancadas.md` §2 (AI fields) — roadmap completo + tickets AI-001..AI-016.

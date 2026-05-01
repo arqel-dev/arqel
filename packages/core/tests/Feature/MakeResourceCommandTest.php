@@ -15,6 +15,8 @@ beforeEach(function (): void {
     $this->cleanup = [
         app_path('Arqel'),
         app_path('Policies'),
+        app_path('Http/Requests'),
+        base_path('tests/Feature/Admin'),
     ];
 
     foreach ($this->cleanup as $path) {
@@ -31,6 +33,7 @@ afterEach(function (): void {
 it('generates a Resource file at the configured path', function (): void {
     $exit = Artisan::call('arqel:resource', [
         'model' => User::class,
+        '--no-interaction' => true,
     ]);
 
     $target = app_path('Arqel/Resources/UserResource.php');
@@ -51,6 +54,7 @@ it('generates a Resource file at the configured path', function (): void {
 it('resolves a short model name against App\\Models', function (): void {
     $exit = Artisan::call('arqel:resource', [
         'model' => 'Missing',
+        '--no-interaction' => true,
     ]);
 
     expect($exit)->toBe(1)
@@ -60,15 +64,17 @@ it('resolves a short model name against App\\Models', function (): void {
 it('returns failure for an unknown FQN model', function (): void {
     $exit = Artisan::call('arqel:resource', [
         'model' => 'App\\Nope\\Ghost',
+        '--no-interaction' => true,
     ]);
 
     expect($exit)->toBe(1);
 });
 
-it('runs make:policy when --with-policy is passed', function (): void {
+it('generates a Policy when --with-policy is passed', function (): void {
     Artisan::call('arqel:resource', [
         'model' => User::class,
         '--with-policy' => true,
+        '--no-interaction' => true,
     ]);
 
     $policy = app_path('Policies/UserPolicy.php');
@@ -94,6 +100,7 @@ it('overwrites an existing Resource when --force is used', function (): void {
     Artisan::call('arqel:resource', [
         'model' => User::class,
         '--force' => true,
+        '--no-interaction' => true,
     ]);
 
     expect((string) $this->files->get($target))
@@ -109,6 +116,7 @@ it('honours arqel.resources.path/namespace overrides', function (): void {
 
     Artisan::call('arqel:resource', [
         'model' => User::class,
+        '--no-interaction' => true,
     ]);
 
     $target = app_path('Custom/Place/UserResource.php');
@@ -116,4 +124,48 @@ it('honours arqel.resources.path/namespace overrides', function (): void {
     expect($this->files->exists($target))->toBeTrue()
         ->and((string) $this->files->get($target))
         ->toContain('namespace App\\Custom\\Place;');
+});
+
+it('writes label, group and icon metadata when options are provided', function (): void {
+    Artisan::call('arqel:resource', [
+        'model' => User::class,
+        '--label' => 'Account',
+        '--group' => 'Admin',
+        '--icon' => 'user',
+        '--no-interaction' => true,
+    ]);
+
+    $contents = (string) $this->files->get(app_path('Arqel/Resources/UserResource.php'));
+
+    expect($contents)
+        ->toContain("public static ?string \$label = 'Account';")
+        ->toContain("public static ?string \$navigationGroup = 'Admin';")
+        ->toContain("public static ?string \$navigationIcon = 'user';");
+});
+
+it('generates FormRequest classes when --with-form-requests is passed', function (): void {
+    Artisan::call('arqel:resource', [
+        'model' => User::class,
+        '--with-form-requests' => true,
+        '--no-interaction' => true,
+    ]);
+
+    expect($this->files->exists(app_path('Http/Requests/StoreUserRequest.php')))->toBeTrue()
+        ->and($this->files->exists(app_path('Http/Requests/UpdateUserRequest.php')))->toBeTrue()
+        ->and((string) $this->files->get(app_path('Http/Requests/StoreUserRequest.php')))
+        ->toContain('final class StoreUserRequest extends FormRequest');
+});
+
+it('generates Pest test scaffold when --tests=pest is passed', function (): void {
+    Artisan::call('arqel:resource', [
+        'model' => User::class,
+        '--tests' => 'pest',
+        '--no-interaction' => true,
+    ]);
+
+    $target = base_path('tests/Feature/Admin/UserResourceTest.php');
+
+    expect($this->files->exists($target))->toBeTrue()
+        ->and((string) $this->files->get($target))
+        ->toContain('it(\'registers the User resource class\'');
 });

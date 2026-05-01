@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Versioning;
 
+use Arqel\Versioning\Console\PruneVersionsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -16,9 +17,11 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
  *   audit.
  * - migration `arqel_versions` carregada automaticamente.
  *
+ * VERS-005 adiciona o endpoint `restore` (rotas em `routes/web.php`).
+ * VERS-006 adiciona o comando `arqel:versions:prune`.
+ *
  * O pacote NÃO depende de `spatie/laravel-eventsourcing` — design intent
- * é standalone com snapshots Eloquent puros. UI / restore action /
- * diff viewer chegam em VERS-003+.
+ * é standalone com snapshots Eloquent puros.
  */
 final class VersioningServiceProvider extends PackageServiceProvider
 {
@@ -27,6 +30,8 @@ final class VersioningServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel-versioning')
             ->hasConfigFile('arqel-versioning')
-            ->hasMigration('create_arqel_versions_table');
+            ->hasMigration('create_arqel_versions_table')
+            ->hasRoute('web')
+            ->hasCommand(PruneVersionsCommand::class);
     }
 }

@@ -10,7 +10,7 @@ posteriores.
 
 ## Status
 
-### Entregue (VERS-001 + VERS-002)
+### Entregue (VERS-001 + VERS-002 + VERS-005 + VERS-006)
 
 - Esqueleto completo do pacote `arqel/versioning` com auto-discovery
   do `VersioningServiceProvider`.
@@ -33,10 +33,54 @@ posteriores.
 
 - **VERS-003** — Resource version history tab (PHP + React).
 - **VERS-004** — Diff viewer component (React).
-- **VERS-005** — Restore action com confirmation modal.
-- **VERS-006** — Retention policy + cleanup job (estratégia 'time').
 - **VERS-007** — Testes E2E + cobertura ≥85%.
 - **VERS-008** — Docs comparativo: versioning vs activity log.
+
+## Restore endpoint (VERS-005)
+
+Endpoint single-action `POST /admin/{resource}/{id}/versions/{versionId}/restore`
+exposto pelo `VersionRestoreController`. Resolve `ResourceRegistry` por
+slug, verifica que o model usa `Versionable`, autoriza via `Gate::authorize('update', $record)`
+quando definida e invoca `restoreToVersion()`. Retorna JSON
+`{"restored": bool, "new_version_id": int|null}`.
+
+Códigos HTTP:
+
+- `200` — restore bem-sucedido (o JSON traz o id da nova Version criada).
+- `403` — Gate `update` registrada e nega o usuário corrente.
+- `404` — slug desconhecido, record ausente ou version não pertence ao record.
+- `422` — model alvo não usa o trait `Versionable`.
+- `500` — falha não esperada (logada via `Log::error`).
+
+```php
+// Restore via cliente HTTP autenticado
+Http::asJson()->post(route('arqel.versioning.restore', [
+    'resource'  => 'articles',
+    'id'        => 42,
+    'versionId' => 7,
+]));
+```
+
+## Retention policy (VERS-006)
+
+Comando Artisan `arqel:versions:prune` apoia retention além do `keep`
+automático do trait. Suporta dois critérios combináveis:
+
+- `--days=N` — apaga versions com `created_at < now() - N days`.
+- `--keep=N` — mantém top-N mais recentes por `(versionable_type, versionable_id)`.
+- sem flags — usa `arqel-versioning.keep_versions` como `--keep` default.
+- `--dry-run` — mostra a contagem sem apagar.
+
+O comando é idempotente (rodar duas vezes é seguro). Para queue/scheduler
+existe `Jobs\PruneOldVersionsJob` que apenas invoca o comando.
+
+```php
+// app/Console/Kernel.php
+$schedule->command('arqel:versions:prune --days=90')->weekly();
+
+// ou via job (queue)
+$schedule->job(new PruneOldVersionsJob(days: 90))->weekly();
+```
 
 ## Conventions
 

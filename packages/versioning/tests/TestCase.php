@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Versioning\Tests;
 
+use Arqel\Core\ArqelServiceProvider;
 use Arqel\Versioning\VersioningServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
@@ -33,6 +34,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
+            ArqelServiceProvider::class,
             VersioningServiceProvider::class,
         ];
     }

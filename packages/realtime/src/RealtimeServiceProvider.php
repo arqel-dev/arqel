@@ -30,7 +30,9 @@ final class RealtimeServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel-realtime')
             ->hasConfigFile('arqel-realtime')
-            ->hasRoute('channels');
+            ->hasRoute('channels')
+            ->hasRoute('api')
+            ->hasMigration('2026_05_06_000000_create_yjs_documents');
     }
 
     /**

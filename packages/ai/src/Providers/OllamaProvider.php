@@ -70,6 +70,16 @@ final class OllamaProvider implements AiProvider
 
     public function chat(array $messages, array $options = []): AiCompletionResult
     {
+        if (
+            isset($options['image'])
+            || isset($options['imageUrl'])
+            || isset($options['imageBase64'])
+        ) {
+            throw new AiException(
+                'Ollama vision (llava model) requires separate SDK; consider using ClaudeProvider or OpenAiProvider for vision tasks',
+            );
+        }
+
         $payloadMessages = $messages;
 
         if (isset($options['system']) && is_string($options['system'])) {

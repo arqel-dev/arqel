@@ -27,6 +27,8 @@ final class ClaudeProvider implements AiProvider
 
     private const PRICING_OUTPUT_PER_MTOK = 75.0;
 
+    private const VISION_BETA_HEADER = 'vision-2024-04-20';
+
     public function __construct(
         private readonly string $apiKey,
         private readonly string $model = 'claude-opus-4-7',
@@ -42,6 +44,12 @@ final class ClaudeProvider implements AiProvider
 
     public function chat(array $messages, array $options = []): AiCompletionResult
     {
+        $visionPayload = $this->extractVisionPayload($options);
+
+        if ($visionPayload !== null) {
+            $messages = $this->injectVisionBlock($messages, $visionPayload);
+        }
+
         $payload = [
             'model' => $options['model'] ?? $this->model,
             'max_tokens' => $options['max_tokens'] ?? $this->maxTokens,
@@ -56,11 +64,17 @@ final class ClaudeProvider implements AiProvider
             $payload['temperature'] = $options['temperature'];
         }
 
-        $response = Http::withHeaders([
+        $headers = [
             'x-api-key' => $this->apiKey,
             'anthropic-version' => self::API_VERSION,
             'content-type' => 'application/json',
-        ])->post(self::API_ENDPOINT, $payload);
+        ];
+
+        if ($visionPayload !== null) {
+            $headers['anthropic-beta'] = self::VISION_BETA_HEADER;
+        }
+
+        $response = Http::withHeaders($headers)->post(self::API_ENDPOINT, $payload);
 
         if ($response->failed()) {
             throw new AiException(
@@ -119,8 +133,94 @@ final class ClaudeProvider implements AiProvider
     }
 
     /**
+     * Extract vision payload from options (supports `image`, `imageUrl`, `imageBase64`).
+     *
+     * Returns `['type' => 'url', 'url' => ...]` ou `['type' => 'base64',
+     * 'media_type' => ..., 'data' => ...]`. `null` quando nenhuma image option.
+     *
+     * @param  array<string, mixed>  $options
+     * @return array{type: string, url?: string, media_type?: string, data?: string}|null
+     */
+    private function extractVisionPayload(array $options): ?array
+    {
+        $url = $options['imageUrl'] ?? null;
+        $base64 = $options['imageBase64'] ?? null;
+        $generic = $options['image'] ?? null;
+
+        if (! is_string($url) && ! is_string($base64) && is_string($generic)) {
+            if (str_starts_with($generic, 'data:image')) {
+                $base64 = $generic;
+            } else {
+                $url = $generic;
+            }
+        }
+
+        if (is_string($url) && $url !== '') {
+            return ['type' => 'url', 'url' => $url];
+        }
+
+        if (is_string($base64) && $base64 !== '') {
+            $mediaType = 'image/jpeg';
+            $data = $base64;
+            if (preg_match('/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/', $base64, $matches) === 1) {
+                $mediaType = $matches[1];
+                $data = $matches[2];
+            }
+
+            return ['type' => 'base64', 'media_type' => $mediaType, 'data' => $data];
+        }
+
+        return null;
+    }
+
+    /**
+     * Convert the last `user` message to multimodal content with the image block appended.
+     *
+     * Claude vision counts approximately 1100 tokens per image at the base
+     * input rate; ver Anthropic pricing page para detalhes atualizados.
+     *
+     * @param  array<int, array{role: string, content: mixed}>  $messages
+     * @param  array{type: string, url?: string, media_type?: string, data?: string}  $vision
+     * @return array<int, array{role: string, content: mixed}>
+     */
+    private function injectVisionBlock(array $messages, array $vision): array
+    {
+        for ($i = count($messages) - 1; $i >= 0; $i--) {
+            if (($messages[$i]['role'] ?? null) !== 'user') {
+                continue;
+            }
+
+            $original = $messages[$i]['content'] ?? '';
+            $textBlock = is_string($original)
+                ? ['type' => 'text', 'text' => $original]
+                : null;
+
+            $imageBlock = $vision['type'] === 'url'
+                ? ['type' => 'image', 'source' => ['type' => 'url', 'url' => $vision['url'] ?? '']]
+                : ['type' => 'image', 'source' => [
+                    'type' => 'base64',
+                    'media_type' => $vision['media_type'] ?? 'image/jpeg',
+                    'data' => $vision['data'] ?? '',
+                ]];
+
+            if ($textBlock !== null) {
+                $messages[$i]['content'] = [$textBlock, $imageBlock];
+            } elseif (is_array($original)) {
+                $original[] = $imageBlock;
+                $messages[$i]['content'] = $original;
+            } else {
+                $messages[$i]['content'] = [$imageBlock];
+            }
+            break;
+        }
+
+        return $messages;
+    }
+
+    /**
      * Compute USD cost rounded to 6 decimals using Claude Opus 4.7 list pricing
-     * ($15/MTok input, $75/MTok output).
+     * ($15/MTok input, $75/MTok output). Vision images count ~1100 tokens at the
+     * input rate — caller deve ajustar budget se necessário.
      */
     private function estimateCost(int $inputTokens, int $outputTokens): float
     {

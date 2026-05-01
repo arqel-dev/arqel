@@ -44,6 +44,16 @@ final class OpenAiProvider implements AiProvider
 
     public function chat(array $messages, array $options = []): AiCompletionResult
     {
+        $imageUrl = $this->resolveVisionImageUrl($options);
+
+        if ($imageUrl !== null) {
+            $effectiveModel = (string) ($options['model'] ?? $this->model);
+            if (! $this->modelSupportsVision($effectiveModel)) {
+                throw new AiException("model {$effectiveModel} does not support vision");
+            }
+            $messages = $this->injectVisionContent($messages, $imageUrl);
+        }
+
         $payloadMessages = $messages;
 
         if (isset($options['system']) && is_string($options['system'])) {
@@ -145,6 +155,84 @@ final class OpenAiProvider implements AiProvider
     public function supportsStreaming(): bool
     {
         return true;
+    }
+
+    /**
+     * Resolve a URL/data-URI a usar no bloco multimodal `image_url`.
+     *
+     * Aceita `imageUrl`, `imageBase64` ou `image` (fallback genérico que
+     * espelha o option do `AiManager`). Retorna `null` quando nenhuma
+     * image option foi enviada.
+     *
+     * @param  array<string, mixed>  $options
+     */
+    private function resolveVisionImageUrl(array $options): ?string
+    {
+        $url = $options['imageUrl'] ?? null;
+        if (is_string($url) && $url !== '') {
+            return $url;
+        }
+
+        $base64 = $options['imageBase64'] ?? null;
+        if (is_string($base64) && $base64 !== '') {
+            return str_starts_with($base64, 'data:') ? $base64 : 'data:image/png;base64,'.$base64;
+        }
+
+        $generic = $options['image'] ?? null;
+        if (is_string($generic) && $generic !== '') {
+            return $generic;
+        }
+
+        return null;
+    }
+
+    /**
+     * Verifica se o modelo escolhido suporta vision. Modelos legados
+     * (`gpt-3.5-turbo`, `gpt-4` non-`o`) não aceitam image_url blocks.
+     */
+    private function modelSupportsVision(string $model): bool
+    {
+        $needle = strtolower($model);
+
+        return str_contains($needle, 'gpt-4o')
+            || str_contains($needle, 'gpt-4.1')
+            || str_contains($needle, 'gpt-5')
+            || str_contains($needle, 'o1')
+            || str_contains($needle, 'vision');
+    }
+
+    /**
+     * Converte o último message `user` em conteúdo multimodal
+     * `[{type:text, text}, {type:image_url, image_url:{url}}]`.
+     *
+     * @param  array<int, array{role: string, content: mixed}>  $messages
+     * @return array<int, array{role: string, content: mixed}>
+     */
+    private function injectVisionContent(array $messages, string $imageUrl): array
+    {
+        for ($i = count($messages) - 1; $i >= 0; $i--) {
+            if (($messages[$i]['role'] ?? null) !== 'user') {
+                continue;
+            }
+
+            $original = $messages[$i]['content'] ?? '';
+            $imageBlock = ['type' => 'image_url', 'image_url' => ['url' => $imageUrl]];
+
+            if (is_string($original)) {
+                $messages[$i]['content'] = [
+                    ['type' => 'text', 'text' => $original],
+                    $imageBlock,
+                ];
+            } elseif (is_array($original)) {
+                $original[] = $imageBlock;
+                $messages[$i]['content'] = $original;
+            } else {
+                $messages[$i]['content'] = [$imageBlock];
+            }
+            break;
+        }
+
+        return $messages;
     }
 
     /**

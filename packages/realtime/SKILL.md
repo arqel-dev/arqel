@@ -50,11 +50,47 @@ Cada método encapsula a lógica em `try/catch \Throwable` e regista via `Log::w
 
 PHPStan level max clean. Pint clean.
 
+### Collaborative editing (RT-005 scaffold)
+
+`arqel/realtime` ganhou um **scaffold inicial** para edição colaborativa baseado em Yjs (`Y.Doc`). **Estado atual: scaffold apenas — não inclui o sync delta-by-delta via WebSocket**, que fica para um follow-up que agregue um cliente JS dedicado (`@arqel/realtime`) consumindo `y-protocols/awareness` + `y-websocket` apontando para um endpoint Reverb. O que está entregue:
+
+| Componente | Descrição |
+| --- | --- |
+| Migration `2026_05_06_000000_create_yjs_documents` | Tabela `arqel_yjs_documents` com unique `(model_type, model_id, field)` + colunas `state` (longBlob), `version` (uint), `last_user_id` (nullable), `updated_at`. |
+| `Collab\YjsDocument` (final Eloquent) | Model que persiste o snapshot do Y.Doc. `morphedModel()` devolve `MorphTo` para o source model. Casts `version => int`, `updated_at => datetime`. |
+| `Http\Controllers\CollabDocumentController` (final) | Métodos `show()` / `store()` para `GET|POST /admin/{resource}/{id}/collab/{field}`. Optimistic concurrency via `version`: requests com `version < current` recebem `409 {message, serverVersion}`. State sempre transitado em base64. |
+| `routes/api.php` | Registra os endpoints com middleware `web,auth`. |
+
+**Fluxo de integração esperado** (user-land, futuro `<CollabRichTextField />`):
+
+```tsx
+// Pseudo-API — virá com o cliente @arqel/realtime + Yjs.
+import * as Y from 'yjs';
+import { WebsocketProvider } from 'y-websocket';
+
+export function CollabRichTextField({ resource, recordId, field }: Props) {
+    const doc = new Y.Doc();
+    // Snapshot inicial via REST scaffold:
+    fetch(`/admin/${resource}/${recordId}/collab/${field}`)
+        .then((r) => r.json())
+        .then(({ state, version }) => {
+            if (state) Y.applyUpdate(doc, base64ToBytes(state));
+            // Live sync por WebSocket (Reverb) fica fora deste scaffold.
+            new WebsocketProvider(`wss://reverb.example.com`, `arqel.collab.${resource}.${recordId}.${field}`, doc);
+        });
+    // ... bind doc.getText('content') ao editor (TipTap/ProseMirror).
+}
+```
+
+O endpoint REST cobre o caso *snapshot persistence*: o cliente envia `{state, version}` ao consolidar (debounced, ~ a cada 5s ou no `beforeunload`); o servidor rejeita escritas obsoletas. **Sync delta-by-delta** (cada keystroke) fica por conta do WebSocket layer — Yjs trata merge de updates concorrentes via CRDT, então o snapshot persistido é seguro mesmo com múltiplos editores ativos.
+
+**Optimistic concurrency**: cliente armazena última `version` recebida; ao gravar, envia `{state: base64(Y.encodeStateAsUpdate(doc)), version: lastSeenVersion}`. Server retorna `{version: newVersion}` ou `409`. Em conflito, cliente faz GET fresco, aplica sua merge local via `Y.mergeUpdates`, refaz o POST.
+
 ### Por chegar (fora do escopo deste batch)
 
 - **RT-003** — React hook `useResourceUpdates` + Inertia `router.reload` (camada `react`, `@arqel/realtime`).
 - **RT-004 React slice** — hook `useResourcePresence` (bind a Echo presence channels usando o nome derivado de `PresenceChannelResolver`).
-- **RT-005** — Yjs / collaborative editing integration.
+- **RT-005 follow-up** — `<CollabRichTextField />` React + WebSocket provider apontando para canal Reverb dedicado; integração Yjs-aware no `<RichTextField />`.
 - **RT-007** — progress streaming (`arqel.action.{jobId}` payload format + React subscriber).
 - **RT-008** — connection resilience banner (Echo `connecting`/`reconnecting` + `<RealtimeStatus />` no Panel chrome).
 - **E2E real com Reverb** — requer infra (Redis + Reverb worker no CI). Hoje todos os testes rodam com `BROADCAST_CONNECTION=null` + `Event::fake()`.

@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use Arqel\Marketplace\Http\Controllers\PluginAdminListController;
+use Arqel\Marketplace\Http\Controllers\PluginAdminReviewController;
 use Arqel\Marketplace\Http\Controllers\PluginDetailController;
 use Arqel\Marketplace\Http\Controllers\PluginListController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewController;
+use Arqel\Marketplace\Http\Controllers\PluginSubmissionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,4 +47,13 @@ Route::middleware('api')->prefix($prefix)->group(static function (): void {
 Route::middleware($reviewMiddleware)->prefix($prefix)->group(static function (): void {
     Route::post('plugins/{slug}/reviews', PluginReviewController::class)
         ->name('arqel.marketplace.plugins.reviews.store');
+
+    Route::post('plugins/submit', PluginSubmissionController::class)
+        ->name('arqel.marketplace.submit');
+
+    Route::get('admin/plugins', PluginAdminListController::class)
+        ->name('arqel.marketplace.admin.list');
+
+    Route::post('admin/plugins/{slug}/review', PluginAdminReviewController::class)
+        ->name('arqel.marketplace.admin.review');
 });

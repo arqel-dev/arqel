@@ -28,6 +28,12 @@ use Illuminate\Support\Carbon;
  * @property array<int, string>|null $screenshots
  * @property string|null $latest_version
  * @property string $status
+ * @property array<string, mixed>|null $submission_metadata
+ * @property int|null $submitted_by_user_id
+ * @property Carbon|null $submitted_at
+ * @property int|null $reviewed_by_user_id
+ * @property Carbon|null $reviewed_at
+ * @property string|null $rejection_reason
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -51,6 +57,12 @@ final class Plugin extends Model
         'screenshots',
         'latest_version',
         'status',
+        'submission_metadata',
+        'submitted_by_user_id',
+        'submitted_at',
+        'reviewed_by_user_id',
+        'reviewed_at',
+        'rejection_reason',
     ];
 
     /**
@@ -61,6 +73,9 @@ final class Plugin extends Model
         return [
             'screenshots' => 'array',
             'status' => 'string',
+            'submission_metadata' => 'array',
+            'submitted_at' => 'datetime',
+            'reviewed_at' => 'datetime',
         ];
     }
 

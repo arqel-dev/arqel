@@ -31,6 +31,7 @@ final class MarketplaceServiceProvider extends PackageServiceProvider
             ->name('arqel-marketplace')
             ->hasConfigFile('arqel-marketplace')
             ->hasMigration('create_arqel_marketplace_tables')
+            ->hasMigration('add_submission_columns_to_arqel_plugins')
             ->hasRoute('api');
     }
 }

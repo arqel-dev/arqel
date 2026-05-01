@@ -44,9 +44,47 @@ A decisão arquitetural é entregar como **pacote embeddable** em vez de app Lar
   - `Unit/PluginScopeTest` (4): scopePublished, scopeOfType, scopeSearch, scopePositive.
   - `Feature/MarketplaceServiceProviderTest` (2): boot do provider + config publishable.
 
+**Entregue (MKTPLC-002):**
+
+- **Migration** `2026_05_02_000000_add_submission_columns_to_arqel_plugins.php` adiciona `submission_metadata` (JSON), `submitted_by_user_id`, `submitted_at`, `reviewed_by_user_id`, `reviewed_at`, `rejection_reason` na tabela `arqel_plugins` (com índices em `submitted_by_user_id` e `reviewed_by_user_id`).
+- **Plugin model** estendido com fillable + casts (`submission_metadata => array`, `submitted_at|reviewed_at => datetime`).
+- **`SubmitPluginRequest`** (`Http/Requests/`) — FormRequest com regras: `composer_package` regex `vendor/package`, `github_url` URL, `type` in enum, `name` 3-100, `description` 20-2000, `screenshots[]` URLs, `slug` derivado de name via `Str::slug` quando ausente + uniqueness check em `arqel_plugins`.
+- **`PluginAutoChecker`** (`Services/`, `final readonly`) — 5 checks defensivos (sem rede): `composer_package_format` (fail se regex inválida), `github_url_format` (fail se host != github.com), `description_length` (warn se < 50), `screenshots_count` (warn se 0), `name_uniqueness` (warn se duplicate). Retorna `{checks: [...], passed: bool}`.
+- **`PluginSubmissionController`** (`POST {prefix}/plugins/submit`, single-action `__invoke`) — cria Plugin com `status=pending`, `submitted_by_user_id=auth()->id()`, `submitted_at=now()`, roda `PluginAutoChecker` e popula `submission_metadata`. Dispara `PluginSubmitted`.
+- **`PluginAdminReviewController`** (`POST {prefix}/admin/plugins/{slug}/review`) — Gate `marketplace.review` (403 sem ability). Action `approve` → `published` + `PluginApproved` event. Action `reject` → `archived` + `rejection_reason` + `PluginRejected` event.
+- **`PluginAdminListController`** (`GET {prefix}/admin/plugins?status=pending`) — Gate-protected admin queue com paginação `per_page` clamp [1, 100].
+- **Events** (`Events/`): `PluginSubmitted`, `PluginApproved`, `PluginRejected` (todos final + Dispatchable + SerializesModels). Email notifications reais ficam para integration posterior.
+- **19 testes Pest novos** (37 totais no pacote): Feature submission (6), Feature admin review (5), Feature admin list (3), Unit AutoChecker (5).
+
+### Submission workflow (MKTPLC-002)
+
+Fluxo state-machine: `pending` (após `POST /plugins/submit`) → `published` (após `approve`) ou `archived` (após `reject` com `rejection_reason`).
+
+Exemplo de payload de submissão:
+
+```php
+Http::withToken($token)
+    ->post('https://arqel.dev/api/marketplace/plugins/submit', [
+        'composer_package' => 'acme/awesome-plugin',
+        'github_url' => 'https://github.com/acme/awesome-plugin',
+        'type' => 'widget',
+        'name' => 'Awesome Plugin',
+        'description' => 'Plugin que resolve X de forma elegante para admin panels Arqel.',
+        'screenshots' => ['https://example.com/screen-1.png'],
+    ]);
+```
+
+Resposta `201` traz `{plugin: {...}, checks: {checks: [...], passed: bool}}`. Para aprovação admin (Gate `marketplace.review`):
+
+```php
+Http::withToken($adminToken)
+    ->post('https://arqel.dev/api/marketplace/admin/plugins/awesome-plugin/review', [
+        'action' => 'approve',
+    ]);
+```
+
 **Por chegar:**
 
-- **MKTPLC-002** — Plugin submission workflow (state machine draft → pending → published, validation no GitHub URL, screenshots upload, review queue).
 - **MKTPLC-003** — Ratings/reviews avançado (média ponderada de stars, update permitido, anti-spam, helpful votes).
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).
 - **MKTPLC-005+** — Admin panel (Arqel-powered) para publishers + moderação.

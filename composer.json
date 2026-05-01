@@ -20,6 +20,7 @@
         "arqel/ai": "@dev",
         "arqel/audit": "@dev",
         "arqel/auth": "@dev",
+        "arqel/cli": "@dev",
         "arqel/core": "@dev",
         "arqel/export": "@dev",
         "arqel/fields": "@dev",

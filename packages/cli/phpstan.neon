@@ -1,0 +1,32 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    excludePaths:
+        analyseAndScan:
+            - vendor/*
+    tmpDir: .phpstan.cache
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # Pest's `expect(...)->not->toContain(...)` chain: PHPStan sees `not`
+        # as undefined on the Expectation generic and downstream calls as
+        # `mixed`. Same pattern accepted by other Arqel packages.
+        -
+            identifier: property.notFound
+            path: tests/*
+        -
+            identifier: property.nonObject
+            path: tests/*
+        -
+            identifier: method.nonObject
+            path: tests/*
+        # `getcwd()` returns `string|false`; tests narrow at runtime via
+        # `chdir()`. PHPStan's flow analysis cannot follow the static helper.
+        -
+            identifier: binaryOp.invalid
+            path: tests/Feature/*
+        -
+            identifier: missingType.iterableValue
+            path: tests/Feature/*

@@ -13,6 +13,7 @@ const scopes = [
   'form',
   'actions',
   'auth',
+  'cli',
   'nav',
   'tenant',
   'ai',

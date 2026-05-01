@@ -1,0 +1,94 @@
+<?php
+
+declare(strict_types=1);
+
+use Arqel\Cli\Generators\SetupScriptGenerator;
+
+it('renders a bash script with the expected baseline commands', function (): void {
+    $script = (new SetupScriptGenerator(
+        appName: 'my-app',
+        starter: 'breeze',
+        tenancy: 'none',
+    ))->forBash();
+
+    expect($script)
+        ->toContain('#!/usr/bin/env bash')
+        ->toContain('set -euo pipefail')
+        ->toContain('laravel new my-app --breeze')
+        ->toContain('cd my-app')
+        ->toContain('composer require arqel/arqel')
+        ->toContain('php artisan arqel:install')
+        ->toContain('pnpm install')
+        ->not->toContain('stancl/tenancy')
+        ->not->toContain('arqel/mcp');
+});
+
+it('adds stancl/tenancy when tenancy is stancl', function (): void {
+    $script = (new SetupScriptGenerator(
+        appName: 'rentals',
+        starter: 'none',
+        tenancy: 'stancl',
+    ))->forBash();
+
+    expect($script)
+        ->toContain('composer require stancl/tenancy')
+        ->toContain('laravel new rentals')
+        ->not->toContain('--breeze')
+        ->not->toContain('--jet');
+});
+
+it('uses --jet for jetstream starter and adds spatie multitenancy', function (): void {
+    $script = (new SetupScriptGenerator(
+        appName: 'crm',
+        starter: 'jetstream',
+        tenancy: 'spatie',
+        firstResource: 'Customer',
+        darkMode: false,
+        mcpIntegration: true,
+    ))->forBash();
+
+    expect($script)
+        ->toContain('laravel new crm --jet')
+        ->toContain('composer require spatie/laravel-multitenancy')
+        ->toContain('php artisan arqel:resource Customer')
+        ->toContain('composer require arqel/mcp')
+        ->toContain('php artisan arqel:mcp:install')
+        ->not->toContain('Dark mode preset');
+});
+
+it('renders a PowerShell script with the expected commands', function (): void {
+    $script = (new SetupScriptGenerator(
+        appName: 'win-app',
+        starter: 'breeze',
+        tenancy: 'simple',
+    ))->forPowershell();
+
+    expect($script)
+        ->toContain('$ErrorActionPreference = "Stop"')
+        ->toContain('Set-Location win-app')
+        ->toContain('Write-Host "==> Installing arqel/arqel"')
+        ->toContain('composer require arqel/tenant')
+        ->toContain('laravel new win-app --breeze');
+});
+
+it('rejects invalid app names and unknown enums', function (): void {
+    expect(fn () => new SetupScriptGenerator(appName: ''))
+        ->toThrow(InvalidArgumentException::class);
+
+    expect(fn () => new SetupScriptGenerator(appName: '123-bad'))
+        ->toThrow(InvalidArgumentException::class);
+
+    expect(fn () => new SetupScriptGenerator(appName: 'ok', starter: 'sail'))
+        ->toThrow(InvalidArgumentException::class);
+
+    expect(fn () => new SetupScriptGenerator(appName: 'ok', tenancy: 'wild'))
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('emits dark-mode hint only when enabled', function (): void {
+    $on = (new SetupScriptGenerator(appName: 'dm', darkMode: true))->forBash();
+    $off = (new SetupScriptGenerator(appName: 'dm', darkMode: false))->forBash();
+
+    expect($on)->toContain('Dark mode preset enabled');
+    expect($off)->not->toContain('Dark mode preset');
+});

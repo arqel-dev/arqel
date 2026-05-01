@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Versioning\Tests;
 
+use Arqel\Core\ArqelServiceProvider;
 use Arqel\Versioning\VersioningServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
@@ -25,6 +26,14 @@ abstract class TestCase extends Orchestra
                 $table->timestamps();
             });
         }
+
+        if (! Schema::hasTable('versioning_plain_articles')) {
+            Schema::create('versioning_plain_articles', static function (Blueprint $table): void {
+                $table->id();
+                $table->string('title');
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -33,6 +42,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
+            ArqelServiceProvider::class,
             VersioningServiceProvider::class,
         ];
     }
@@ -40,6 +50,7 @@ abstract class TestCase extends Orchestra
     protected function defineEnvironment($app): void
     {
         /** @var Application $app */
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',

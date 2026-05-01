@@ -29,9 +29,31 @@ posteriores.
   `keep_versions`, `prune_strategy`, `audit_user`, `user_model`.
 - Suite Pest + PHPStan level max + Pint clean.
 
+### Entregue (VERS-003 — slice PHP)
+
+- `Http\Controllers\VersionHistoryController` single-action que serve
+  `GET /admin/{resource}/{id}/versions` (rota nomeada
+  `arqel.versioning.history`, middleware `web,auth`).
+- `VersionPresenter` final readonly que serializa cada `Version` para
+  payload JSON-friendly (`id`, `created_at` ISO 8601, `changes_summary`,
+  `changes`, `user`, `is_initial`, e `payload` apenas mediante
+  `?include=payload`).
+- Resolução defensiva do `ResourceRegistry` por FQCN-string —
+  devolve 404 quando o `arqel/core` não está bound em runtime.
+- Validação por `class_uses_recursive` que o model alvo usa o trait
+  `Versionable` (devolve 422 caso contrário).
+- Eager-load condicional do user: `Version::user()` é `?BelongsTo` por
+  design e o controller só anexa `with('user')` quando a relação é
+  resolvível.
+- Pagination: `?per_page=20` (default), max `100`. Resposta inclui
+  `meta.keep_versions` e `meta.total`.
+- Suite Pest cobre 8 cenários (200 happy path, 404 sem registry/slug/record,
+  422 sem trait, paginação, include=payload, meta).
+
 ### Por chegar
 
-- **VERS-003** — Resource version history tab (PHP + React).
+- **VERS-003** — Slice React (B39): tab `History` no Resource Detail
+  page consumindo este endpoint via Inertia.
 - **VERS-004** — Diff viewer component (React).
 - **VERS-005** — Restore action com confirmation modal.
 - **VERS-006** — Retention policy + cleanup job (estratégia 'time').
@@ -66,6 +88,48 @@ posteriores.
   migrations bulk.
 - **Não desligue `keep_versions=0` em produção** sem cleanup job — o
   storage cresce sem limite (GB por milhão de records).
+
+## History endpoint (VERS-003)
+
+A rota `arqel.versioning.history` expõe o histórico paginado de um
+record. Exemplo de chamada:
+
+```http
+GET /admin/articles/42/versions?per_page=20 HTTP/1.1
+Accept: application/json
+```
+
+Resposta (`200 OK`):
+
+```json
+{
+  "versions": {
+    "data": [
+      {
+        "id": 87,
+        "created_at": "2026-05-01T12:34:56+00:00",
+        "changes_summary": "Changed 2 fields: title, body",
+        "changes": {
+          "title": ["Hello", "Hello v2"],
+          "body":  ["...", "Updated body"]
+        },
+        "user": { "id": 7, "name": "Diogo" },
+        "is_initial": false
+      }
+    ],
+    "current_page": 1,
+    "last_page": 1,
+    "per_page": 20,
+    "total": 1
+  },
+  "meta": { "keep_versions": 50, "total": 1 }
+}
+```
+
+Para incluir o `payload` completo do snapshot, passe
+`?include=payload`. Por default ele é omitido — payloads podem conter
+PII e segredos do model. O componente React (B39) consome esta rota
+para popular a tab "History".
 
 ## Examples
 

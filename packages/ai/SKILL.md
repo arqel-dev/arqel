@@ -79,7 +79,37 @@ Por chegar:
 - **AI-010 React** componente `AiExtractInput.tsx` (botão Extract + populate em multiple form fields).
 - **AI-011 React** componente `AiImageInput.tsx` (upload + preview + Analyze + populate cross-field).
 - **AI-011 vision providers** suporte real a vision em `ClaudeProvider` (messages com `image` blocks) e `OpenAiProvider` (image_url / base64 em `chat/completions`).
-- **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).
+## MCP integration (AI-013)
+
+`arqel/ai` expõe 3 tools MCP que **usam AI internamente** para apoiar workflows de scaffolding e análise no Claude Code / Claude Desktop. Os tools vivem em `src/Mcp/Tools/` e são auto-registados no `Arqel\Mcp\McpServer` via `AiServiceProvider::packageBooted()`.
+
+**Defensivo por design**: `arqel/ai` **não** declara hard-dep em `arqel/mcp`. O registo só dispara quando a class `Arqel\Mcp\McpServer` existe e está bound no container — instalações que só usam AI fields continuam a bootar normalmente.
+
+Tools expostos:
+
+| Nome | Input | Output |
+|---|---|---|
+| `generate_resource_from_description` | `description`, `model_name`, `provider?` | `{resource_code, suggested_path, model_name}` |
+| `analyze_resource` | `resource_slug`, `provider?` | `{resource_slug, summary}` |
+| `suggest_fields` | `model_name`, `model_fields`, `provider?` | `{model_name, suggestions}` |
+
+Exemplo de invocação via Claude Code MCP client:
+
+```jsonc
+// Claude pede ao servidor MCP local:
+{
+  "method": "tools/call",
+  "params": {
+    "name": "generate_resource_from_description",
+    "arguments": {
+      "description": "A blog post resource with title, slug, body and author relation.",
+      "model_name": "BlogPost"
+    }
+  }
+}
+```
+
+Resposta: bloco PHP pronto a copiar para `app/Arqel/Resources/BlogPostResource.php`. A tool **nunca toca o filesystem** — a escrita fica do lado do humano (ou do agente que está a operar o MCP).
 
 ## Conventions
 

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Arqel\Ai;
 
 use Arqel\Ai\Contracts\AiProvider;
+use Arqel\Ai\Mcp\Tools\AnalyzeResourceTool;
+use Arqel\Ai\Mcp\Tools\GenerateResourceFromDescriptionTool;
+use Arqel\Ai\Mcp\Tools\SuggestFieldsTool;
 use Illuminate\Contracts\Foundation\Application;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -69,5 +72,51 @@ final class AiServiceProvider extends PackageServiceProvider
                 cache: $app->make(AiCache::class),
             );
         });
+    }
+
+    /**
+     * Cross-package hook: when `arqel/mcp` está presente e o `McpServer`
+     * está bound no container, regista as 3 tools AI-MCP (AI-013).
+     *
+     * Defensive: nunca adicionamos `arqel/mcp` como hard-dep — o registo
+     * é silenciosamente ignorado se o pacote não estiver instalado ou se
+     * algo na introspecção falhar. Idempotente: chamar múltiplas vezes
+     * sobrescreve com o mesmo nome.
+     */
+    public function packageBooted(): void
+    {
+        $mcpServerClass = 'Arqel\\Mcp\\McpServer';
+
+        if (! class_exists($mcpServerClass) || ! $this->app->bound($mcpServerClass)) {
+            return;
+        }
+
+        try {
+            $server = $this->app->make($mcpServerClass);
+
+            if (! is_object($server) || ! method_exists($server, 'registerTool')) {
+                return;
+            }
+
+            $manager = $this->app->make(AiManager::class);
+
+            foreach ([
+                new GenerateResourceFromDescriptionTool($manager),
+                new AnalyzeResourceTool($manager),
+                new SuggestFieldsTool($manager),
+            ] as $tool) {
+                $schema = $tool->schema();
+                $server->registerTool(
+                    $schema['name'],
+                    $schema['description'],
+                    $schema['inputSchema'],
+                    $tool,
+                );
+            }
+        } catch (Throwable $e) {
+            if (function_exists('logger')) {
+                logger()->warning('arqel/ai: failed to register MCP tools: '.$e->getMessage());
+            }
+        }
     }
 }

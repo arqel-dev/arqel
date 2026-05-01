@@ -221,6 +221,19 @@ Resposta (`200 OK`):
 Para incluir o snapshot completo: `?include=payload`. Por default ele é
 omitido — payloads podem conter PII e segredos do model.
 
+### Cenários completos (VERS-008)
+
+Ver `../../docs/examples/versioning/`:
+
+- [`README.md`](../../docs/examples/versioning/README.md) — comparativo
+  versioning vs `arqel/audit`, decision tree e anti-patterns.
+- [`cms-articles.md`](../../docs/examples/versioning/cms-articles.md) —
+  CMS com restore de artigos, schedule de prune e UI React.
+- [`ecommerce-orders.md`](../../docs/examples/versioning/ecommerce-orders.md) —
+  por que **NÃO** versionar pedidos, com aritmética de storage.
+- [`legal-contracts.md`](../../docs/examples/versioning/legal-contracts.md) —
+  versioning + audit combinados para compliance legal-tech.
+
 ### Restore via UI
 
 ```php

@@ -17,6 +17,7 @@ use Arqel\Marketplace\Http\Controllers\PluginReviewModerationController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewVoteController;
 use Arqel\Marketplace\Http\Controllers\PluginsByCategoryController;
 use Arqel\Marketplace\Http\Controllers\PluginSubmissionController;
+use Arqel\Marketplace\Http\Controllers\SecurityScanListController;
 use Arqel\Marketplace\Http\Controllers\TrendingPluginsController;
 use Illuminate\Support\Facades\Route;
 
@@ -105,4 +106,7 @@ Route::middleware($reviewMiddleware)->prefix($prefix)->group(static function ():
 
     Route::post('admin/plugins/{slug}/feature', PluginFeatureController::class)
         ->name('arqel.marketplace.admin.plugins.feature');
+
+    Route::get('admin/security-scans', SecurityScanListController::class)
+        ->name('arqel.marketplace.admin.security-scans.index');
 });

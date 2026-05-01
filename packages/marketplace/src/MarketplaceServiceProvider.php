@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Arqel\Marketplace;
 
+use Arqel\Marketplace\Contracts\VulnerabilityDatabase;
+use Arqel\Marketplace\Services\StaticVulnerabilityDatabase;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -32,7 +34,13 @@ final class MarketplaceServiceProvider extends PackageServiceProvider
             ->hasMigration('create_arqel_marketplace_tables')
             ->hasMigration('add_submission_columns_to_arqel_plugins')
             ->hasMigration('add_categories_and_trending')
+            ->hasMigration('add_security_scans')
             ->hasRoute('api');
+    }
+
+    public function packageRegistered(): void
+    {
+        $this->app->bind(VulnerabilityDatabase::class, StaticVulnerabilityDatabase::class);
     }
 
     public function packageBooted(): void
@@ -41,6 +49,7 @@ final class MarketplaceServiceProvider extends PackageServiceProvider
             $this->commands([
                 Console\PluginListCommand::class,
                 Console\RecalculateTrendingScoresCommand::class,
+                Console\ScanPluginsCommand::class,
             ]);
         }
     }

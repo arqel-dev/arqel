@@ -214,6 +214,49 @@ Http::withToken($adminToken)
     ]);
 ```
 
+**Entregue (MKTPLC-009):** Security scanning + auto-delist para findings críticos.
+
+- **Migration** `2026_05_05_000000_add_security_scans.php` cria `arqel_plugin_security_scans` (`plugin_id` FK cascade, `scan_started_at`, `scan_completed_at`, `status` enum string `pending|running|passed|flagged|failed`, `findings` JSON, `severity` string nullable, `scanner_version` string default `1.0`, timestamps + index `(plugin_id, scan_started_at)`).
+- **`SecurityScan` model** (`final`) — fillable + casts (`scan_started_at`/`scan_completed_at` datetime, `findings` array). Relation `plugin()`.
+- **`Contracts\VulnerabilityDatabase`** — interface com `lookup(string $package, string $ecosystem): array<int, Advisory>`. Bind default no service provider para `StaticVulnerabilityDatabase`.
+- **`Contracts\Advisory`** (`final readonly`) — value-object (`id`, `severity`, `summary`, `fixedIn`).
+- **`Services\StaticVulnerabilityDatabase`** (`final readonly`) — implementação default que retorna lista vazia. Integração concreta com GitHub Advisory Database é TBD; host apps podem rebindar via container.
+- **`Services\SecurityScanner`** (`final readonly`) — `scan(Plugin)`:
+  1. Cria `SecurityScan` em `running`.
+  2. Vulnerability lookup nos pacotes composer + npm via `VulnerabilityDatabase`.
+  3. License check contra allow-list (`MIT`, `Apache-2.0`, `BSD-2-Clause`, `BSD-3-Clause`) → `low` warning quando fora.
+  4. Suspicious patterns → `TODO MKTPLC-009-static-analysis` (esta versão retorna empty).
+  5. Severity rollup pega o máximo. `critical` → `failed` + auto-delist (`status=archived`) + dispatch `PluginAutoDelistedEvent`. `high|medium` → `flagged`. `low|nenhum` → `passed`.
+- **`Console\ScanPluginsCommand`** — `arqel:marketplace:scan {--plugin=} {--dry-run}`. Sem `--plugin` scaneia todos `published`. Output: `Scanned N plugins. Findings: X critical, Y high, Z medium, W low.`. Apps host devem agendar `Schedule::command('arqel:marketplace:scan')->daily()`.
+- **`Events\PluginAutoDelistedEvent`** — `final` Dispatchable + SerializesModels com `Plugin` + `SecurityScan`.
+- **`Http\Controllers\SecurityScanListController`** — `GET {prefix}/admin/security-scans?status=flagged` paginado com Gate `marketplace.security-scans` (403 sem ability).
+- **17 testes Pest novos** (140 totais no pacote): Unit `SecurityScannerTest` (8), Unit `StaticVulnerabilityDatabaseTest` (2), Feature `ScanPluginsCommandTest` (4), Feature `SecurityScanListControllerTest` (3).
+
+### Security scanning (MKTPLC-009)
+
+A vulnerability DB é **injetada via DI** (interface `VulnerabilityDatabase`) — assim mocks ficam triviais e o pacote não acopla a nenhum provider externo por default. Para usar GitHub Advisory Database real, host apps rebindam:
+
+```php
+// app/Providers/AppServiceProvider.php
+public function register(): void
+{
+    $this->app->bind(
+        \Arqel\Marketplace\Contracts\VulnerabilityDatabase::class,
+        \App\Security\GitHubAdvisoryDatabase::class,
+    );
+}
+```
+
+Auto-delist policy: somente plugins atualmente `published` com finding `critical` são movidos para `archived`. Plugins já `archived` ou `draft` não disparam o evento (evita spam).
+
+```bash
+# Scan all published plugins (sugestão: agendar daily)
+php artisan arqel:marketplace:scan
+
+# Scan único + dry-run para inspeção
+php artisan arqel:marketplace:scan --plugin=acme-stripe --dry-run
+```
+
 **Por chegar:**
 
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).

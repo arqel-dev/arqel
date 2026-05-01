@@ -139,6 +139,6 @@ Quando esses tickets shiparem, `composer require arqel/arqel` + `php artisan arq
 
 ## Referências
 
-- [`packages/auth/SKILL.md`](../../packages/auth/SKILL.md) — authorization layer canônica.
-- [`docs/devtools-extension/install.md`](../devtools-extension/install.md) — DevTools extension.
+- [Auth (authorization)](./auth.md) — Policies, Gates e abilities.
+- [DevTools extension install](../devtools-extension/install.md) — DevTools extension.
 - [Laravel Breeze docs](https://laravel.com/docs/breeze) · [Jetstream](https://jetstream.laravel.com) · [Fortify](https://laravel.com/docs/fortify)

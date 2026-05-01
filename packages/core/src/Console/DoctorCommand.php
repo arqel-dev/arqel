@@ -448,7 +448,7 @@ final class DoctorCommand extends Command
             return [
                 'name' => 'auth.starter_kit_detected',
                 'status' => self::STATUS_WARN,
-                'message' => 'No Laravel auth starter kit detected. Arqel does not ship login/register pages — install Breeze, Jetstream, or Fortify. See docs/getting-started/authentication.md.',
+                'message' => 'No Laravel auth starter kit detected. Arqel does not ship login/register pages — install Breeze, Jetstream, or Fortify. See apps/docs/guide/authentication.md.',
                 'details' => ['kits' => []],
             ];
         } catch (Throwable $e) {

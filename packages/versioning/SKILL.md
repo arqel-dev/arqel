@@ -223,15 +223,15 @@ omitido — payloads podem conter PII e segredos do model.
 
 ### Cenários completos (VERS-008)
 
-Ver `../../docs/examples/versioning/`:
+Ver `../../apps/docs/examples/versioning/`:
 
-- [`README.md`](../../docs/examples/versioning/README.md) — comparativo
+- [`README.md`](../../apps/docs/examples/versioning/README.md) — comparativo
   versioning vs `arqel/audit`, decision tree e anti-patterns.
-- [`cms-articles.md`](../../docs/examples/versioning/cms-articles.md) —
+- [`cms-articles.md`](../../apps/docs/examples/versioning/cms-articles.md) —
   CMS com restore de artigos, schedule de prune e UI React.
-- [`ecommerce-orders.md`](../../docs/examples/versioning/ecommerce-orders.md) —
+- [`ecommerce-orders.md`](../../apps/docs/examples/versioning/ecommerce-orders.md) —
   por que **NÃO** versionar pedidos, com aritmética de storage.
-- [`legal-contracts.md`](../../docs/examples/versioning/legal-contracts.md) —
+- [`legal-contracts.md`](../../apps/docs/examples/versioning/legal-contracts.md) —
   versioning + audit combinados para compliance legal-tech.
 
 ### Restore via UI

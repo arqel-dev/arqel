@@ -76,7 +76,8 @@ export default defineConfig({
             { text: 'Fields', link: '/guide/fields' },
             { text: 'Tables & Forms', link: '/guide/tables-forms' },
             { text: 'Actions', link: '/guide/actions' },
-            { text: 'Auth', link: '/guide/auth' },
+            { text: 'Authentication (login/registro)', link: '/guide/authentication' },
+            { text: 'Auth (authorization)', link: '/guide/auth' },
           ],
         },
         {

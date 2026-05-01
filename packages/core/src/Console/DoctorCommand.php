@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Console;
 
+use Arqel\Core\Cloud\CloudDetector;
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
@@ -38,6 +39,8 @@ final class DoctorCommand extends Command
 
     private const string STATUS_FAIL = 'fail';
 
+    private const string STATUS_NEUTRAL = 'neutral';
+
     /** @var string */
     protected $signature = 'arqel:doctor {--json : Output as JSON} {--strict : Exit non-zero on warnings}';
 
@@ -58,6 +61,8 @@ final class DoctorCommand extends Command
             $this->checkStorageWritable(),
             $this->checkCacheDriver(),
             $this->checkSessionDriver(),
+            $this->checkCloudDetected(),
+            $this->checkCloudAutoConfigure(),
         ];
 
         $summary = $this->summarise($checks);
@@ -350,6 +355,62 @@ final class DoctorCommand extends Command
         }
     }
 
+    /**
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkCloudDetected(): array
+    {
+        try {
+            $detector = $this->getLaravel()->make(CloudDetector::class);
+            assert($detector instanceof CloudDetector);
+            $detected = $detector->isLaravelCloud();
+
+            return [
+                'name' => 'cloud.detected',
+                'status' => $detected ? self::STATUS_OK : self::STATUS_NEUTRAL,
+                'message' => $detected
+                    ? "Laravel Cloud detected (platform: {$detector->description()})."
+                    : 'No cloud platform detected (running on a generic host).',
+                'details' => ['platform' => $detector->description()],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('cloud.detected', $e);
+        }
+    }
+
+    /**
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkCloudAutoConfigure(): array
+    {
+        try {
+            $detector = $this->getLaravel()->make(CloudDetector::class);
+            assert($detector instanceof CloudDetector);
+            $enabled = $detector->autoConfigureEnabled();
+            $isProduction = $this->getLaravel()->environment('production');
+
+            if (! $enabled && $isProduction) {
+                return [
+                    'name' => 'cloud.auto_configure',
+                    'status' => self::STATUS_WARN,
+                    'message' => 'Cloud auto-configure is disabled in production — driver tuning will not be applied.',
+                    'details' => ['enabled' => false],
+                ];
+            }
+
+            return [
+                'name' => 'cloud.auto_configure',
+                'status' => self::STATUS_OK,
+                'message' => $enabled
+                    ? 'Cloud auto-configure is enabled.'
+                    : 'Cloud auto-configure is disabled (non-production environment).',
+                'details' => ['enabled' => $enabled],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('cloud.auto_configure', $e);
+        }
+    }
+
     // ---------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------
@@ -370,14 +431,17 @@ final class DoctorCommand extends Command
     /**
      * @param list<array{name: string, status: string, message: string, details?: mixed}> $checks
      *
-     * @return array{ok: int, warn: int, fail: int}
+     * @return array{ok: int, warn: int, fail: int, neutral: int}
      */
     private function summarise(array $checks): array
     {
-        $summary = ['ok' => 0, 'warn' => 0, 'fail' => 0];
+        $summary = ['ok' => 0, 'warn' => 0, 'fail' => 0, 'neutral' => 0];
         foreach ($checks as $check) {
             $key = $check['status'];
-            if ($key === self::STATUS_OK || $key === self::STATUS_WARN || $key === self::STATUS_FAIL) {
+            if ($key === self::STATUS_OK
+                || $key === self::STATUS_WARN
+                || $key === self::STATUS_FAIL
+                || $key === self::STATUS_NEUTRAL) {
                 $summary[$key]++;
             }
         }
@@ -387,7 +451,7 @@ final class DoctorCommand extends Command
 
     /**
      * @param list<array{name: string, status: string, message: string, details?: mixed}> $checks
-     * @param array{ok: int, warn: int, fail: int} $summary
+     * @param array{ok: int, warn: int, fail: int, neutral: int} $summary
      */
     private function renderHuman(array $checks, array $summary): void
     {
@@ -399,6 +463,7 @@ final class DoctorCommand extends Command
                 self::STATUS_OK => '<fg=green>[ok]</>   ✅',
                 self::STATUS_WARN => '<fg=yellow>[warn]</> ⚠️ ',
                 self::STATUS_FAIL => '<fg=red>[fail]</> ❌',
+                self::STATUS_NEUTRAL => '<fg=gray>[info]</> ℹ️ ',
                 default => '[?]',
             };
 
@@ -407,10 +472,11 @@ final class DoctorCommand extends Command
 
         $this->line('');
         $this->line(sprintf(
-            '<options=bold>Summary:</> %d ok • %d warn • %d fail',
+            '<options=bold>Summary:</> %d ok • %d warn • %d fail • %d info',
             $summary['ok'],
             $summary['warn'],
             $summary['fail'],
+            $summary['neutral'],
         ));
     }
 }

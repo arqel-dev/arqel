@@ -43,8 +43,17 @@ parameters:
             identifier: method.nonObject
             path: tests/Unit/*
         -
+            identifier: property.notFound
+            path: tests/Unit/*
+        -
+            identifier: property.nonObject
+            path: tests/Unit/*
+        -
             identifier: missingType.iterableValue
             path: tests/Unit/*
         -
             identifier: argument.type
+            path: tests/Unit/*
+        -
+            identifier: offsetAccess.nonOffsetAccessible
             path: tests/Unit/*

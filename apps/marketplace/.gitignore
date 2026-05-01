@@ -1,0 +1,15 @@
+/vendor
+/node_modules
+/public/build
+/public/hot
+/storage/*.key
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+.phpunit.cache
+npm-debug.log
+yarn-error.log
+.idea
+.vscode
+*.swp

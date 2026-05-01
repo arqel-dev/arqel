@@ -4,9 +4,10 @@
  *
  *   import '@arqel/ai/register';
  *
- * Os component names (`AiTextInput`, `AiTranslateInput`) batem com o
- * que o PHP retorna em `getComponent()`. Apps podem re-registrar seus
- * próprios componentes sob a mesma chave para sobrescrever o default.
+ * Os component names (`AiTextInput`, `AiTranslateInput`,
+ * `AiSelectInput`) batem com o que o PHP retorna em `getComponent()`.
+ * Apps podem re-registrar seus próprios componentes sob a mesma chave
+ * para sobrescrever o default.
  *
  * Os componentes têm shapes de props específicos do domínio; o
  * registry espera um adapter genérico `{ field, value }`, então cada
@@ -16,6 +17,7 @@
 import type { FieldSchema } from '@arqel/types/fields';
 import { registerField } from '@arqel/ui/form';
 import { type ComponentType, lazy, type ReactElement } from 'react';
+import type { AiSelectInputFieldProps, AiSelectInputProps } from './AiSelectInput.js';
 import type { AiTextInputFieldProps, AiTextInputProps } from './AiTextInput.js';
 import type {
   AiTranslateInputFieldProps,
@@ -89,6 +91,39 @@ function adaptToAiTranslateInput(
   };
 }
 
+function adaptToAiSelectInput(
+  Component: ComponentType<AiSelectInputProps>,
+): ComponentType<RegistryFieldProps> {
+  return function AiSelectInputAdapter(registryProps: RegistryFieldProps): ReactElement {
+    const { field, value, onChange, resource, formData, csrfToken } = registryProps;
+    const fieldProps = (field as unknown as { props?: AiSelectInputFieldProps }).props;
+    // O FieldRegistry tipa `onChange` como `(value: string) => void`,
+    // mas o select pode emitir `null` ao limpar a seleção; o cast é
+    // compatível em runtime com o registry genérico.
+    const onChangeAdapted =
+      onChange !== undefined
+        ? (next: string | null) => {
+            (onChange as unknown as (v: string | null) => void)(next);
+          }
+        : undefined;
+
+    const stringValue: string | null = typeof value === 'string' && value !== '' ? value : null;
+
+    return (
+      <Component
+        name={field.name}
+        value={stringValue}
+        props={fieldProps}
+        {...(onChangeAdapted !== undefined ? { onChange: onChangeAdapted } : {})}
+        {...(resource !== undefined ? { resource } : {})}
+        field={field.name}
+        {...(formData !== undefined ? { formData } : {})}
+        {...(csrfToken !== undefined ? { csrfToken } : {})}
+      />
+    );
+  };
+}
+
 const LazyAiTextInput = lazy(async () => {
   const mod = await import('./AiTextInput.js');
   return { default: adaptToAiTextInput(mod.AiTextInput) };
@@ -99,8 +134,14 @@ const LazyAiTranslateInput = lazy(async () => {
   return { default: adaptToAiTranslateInput(mod.AiTranslateInput) };
 });
 
+const LazyAiSelectInput = lazy(async () => {
+  const mod = await import('./AiSelectInput.js');
+  return { default: adaptToAiSelectInput(mod.AiSelectInput) };
+});
+
 registerField('AiTextInput', LazyAiTextInput as unknown as Parameters<typeof registerField>[1]);
 registerField(
   'AiTranslateInput',
   LazyAiTranslateInput as unknown as Parameters<typeof registerField>[1],
 );
+registerField('AiSelectInput', LazyAiSelectInput as unknown as Parameters<typeof registerField>[1]);

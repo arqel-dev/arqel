@@ -34,6 +34,10 @@
       "types": "./dist/context.d.ts",
       "import": "./dist/context.js"
     },
+    "./devtools": {
+      "types": "./dist/devtools.d.ts",
+      "import": "./dist/devtools.js"
+    },
     "./utils": {
       "types": "./dist/utils.d.ts",
       "import": "./dist/utils.js"

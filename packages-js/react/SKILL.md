@@ -21,10 +21,38 @@
 - `indexFieldsByName(fields)` / `fieldsVisibleIn(fields, context)`
 - 20 testes Vitest passando (jsdom + @testing-library/react)
 
+**Entregue (DEVTOOLS-002):**
+
+- Subpath `@arqel/react/devtools` exporta `installDevToolsHook(version)`,
+  `createDevToolsHook`, `ArqelDevToolsHook`, `ArqelDevToolsState`.
+- `createArqelApp` chama `installDevToolsHook` automaticamente no bootstrap.
+- 5 testes Vitest adicionais cobrindo install/no-op/idempotência/subscribe.
+
 **Por chegar:**
 
 - Hooks reusáveis em `@arqel/hooks` (HOOKS-001+)
 - UI components em `@arqel/ui` (UI-001+)
+
+## DevTools hook (DEVTOOLS-002)
+
+Em modo desenvolvimento, `@arqel/react` expõe um hook em
+`window.__ARQEL_DEVTOOLS_HOOK__` para a extensão de browser
+(`@arqel/devtools-extension`) inspecionar o estado do panel/resource.
+
+```ts
+import { installDevToolsHook } from '@arqel/react/devtools';
+
+installDevToolsHook('0.8.0-rc.1');
+// → cria { version, getState(), subscribe(cb) } só quando import.meta.env.DEV
+```
+
+Em produção, `installDevToolsHook` é um no-op total: Vite avalia
+`import.meta.env.DEV` como `false` e elimina o branch via dead-code
+elimination, então nem o objeto nem o módulo aparecem no bundle final.
+
+`createArqelApp` já chama `installDevToolsHook` por você, então apps que usam
+o bootstrap padrão recebem a integração de graça. Não há nada para configurar
+em produção — a hook simplesmente desaparece.
 
 ## Key Contracts
 

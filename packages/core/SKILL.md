@@ -193,6 +193,46 @@ em vez de obter erros opacos no controller.
 2. Registar em `ArqelServiceProvider::boot()` via `Route::middlewareGroup('arqel', [...])`
 3. Testar acesso via `actingAs($user)->get('/arqel/...')`
 
+## Diagnóstico (CLI-TUI-004 / Doctor)
+
+Comando Artisan `arqel:doctor` (em `src/Console/DoctorCommand.php`) faz um health-check **read-only e idempotente** da app: nunca escreve no disco, nunca corre migrations, nunca toca em estado. Cada check captura `Throwable` e degrada para `warn` em vez de fazer crash do report inteiro.
+
+**10 checks executados:**
+
+1. `php.version` — `PHP >= 8.3` (fail caso contrário)
+2. `laravel.version` — `Laravel >= 12.0` (fail caso contrário)
+3. `php.extensions` — `json`, `pdo`, `mbstring`, `tokenizer`, `openssl`
+4. `arqel.core.version` — via `Composer\InstalledVersions::getVersion('arqel/core')` (warn se desconhecida — path repo / dev install)
+5. `arqel.provider` — `ArqelServiceProvider` está em `app->getLoadedProviders()`
+6. `arqel.config` — namespace `config('arqel')` está populado
+7. `database.migrations` — inspecciona o `Migrator` directamente (não corre `migrate:status` aninhado, evita corromper o buffer da Artisan); warn se há migrations pendentes ou se a tabela `migrations` ainda não existe
+8. `storage.writable` — `storage_path('app')` é `is_writable`
+9. `cache.driver` — warn quando driver é `'array'` (volátil)
+10. `session.driver` — warn quando driver é `'array'`
+
+**Modos:**
+
+- Default — saída human-readable com emoji + cores ANSI + summary final.
+- `--json` — emite uma única linha `{checks: [...], summary: {ok, warn, fail}}`.
+- `--strict` — força exit code 1 quando há `warn`s (default só falha em `fail`).
+
+**Exemplo (default):**
+
+```
+Arqel Doctor — diagnostic report
+
+[ok]   ✅ php.version — PHP 8.3.12 satisfies >= 8.3.
+[ok]   ✅ laravel.version — Laravel 12.5.0 satisfies >= 12.0.
+[ok]   ✅ php.extensions — All required PHP extensions are loaded.
+[ok]   ✅ arqel.provider — ArqelServiceProvider is registered.
+[warn] ⚠️  cache.driver — Cache driver is 'array' — values are not persisted.
+...
+
+Summary: 8 ok • 2 warn • 0 fail
+```
+
+**Exit code:** `0` se nenhum `fail` (e em `--strict`, também sem `warn`); `1` caso contrário. Usável directamente em pipelines de deploy e em healthcheck endpoints.
+
 ## Anti-patterns
 
 - ❌ **Depender directamente de pacotes descendentes** (`arqel/fields`, `arqel/table`, ...). Core é a base; inversão de dependência. Se precisas de algo de `fields`, expõe um contract em `core` que `fields` implementa.

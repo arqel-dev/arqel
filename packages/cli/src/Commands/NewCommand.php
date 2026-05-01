@@ -35,7 +35,8 @@ final class NewCommand extends Command
             ->addOption('dark-mode', null, InputOption::VALUE_NEGATABLE, 'Enable dark-mode preset.', true)
             ->addOption('mcp', null, InputOption::VALUE_NEGATABLE, 'Wire arqel/mcp integration.', false)
             ->addOption('no-prompts', null, InputOption::VALUE_NONE, 'Skip interactive prompts.')
-            ->addOption('platform', null, InputOption::VALUE_REQUIRED, 'Force script platform (bash|powershell).');
+            ->addOption('platform', null, InputOption::VALUE_REQUIRED, 'Force script platform (bash|powershell).')
+            ->addOption('monorepo-path', null, InputOption::VALUE_REQUIRED, 'Path to a local Arqel monorepo. When set, the generated script wires a path repository and installs arqel/* as :dev-main, instead of pulling arqel/arqel from Packagist.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -79,6 +80,11 @@ final class NewCommand extends Command
             $mcp = confirm(label: 'Wire arqel/mcp integration?', default: $mcp);
         }
 
+        $monorepoPathRaw = $input->getOption('monorepo-path');
+        $monorepoPath = is_string($monorepoPathRaw) && $monorepoPathRaw !== ''
+            ? (realpath($monorepoPathRaw) ?: $monorepoPathRaw)
+            : null;
+
         try {
             $generator = new SetupScriptGenerator(
                 appName: $name,
@@ -87,6 +93,7 @@ final class NewCommand extends Command
                 firstResource: $firstResource,
                 darkMode: $darkMode,
                 mcpIntegration: $mcp,
+                monorepoPath: $monorepoPath,
             );
         } catch (InvalidArgumentException $e) {
             $output->writeln('<error>'.$e->getMessage().'</error>');

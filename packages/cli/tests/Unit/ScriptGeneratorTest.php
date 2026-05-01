@@ -57,6 +57,34 @@ it('legacy "jetstream" alias resolves to react and adds spatie multitenancy', fu
         ->not->toContain('Dark mode preset');
 });
 
+it('rejects monorepoPath when target does not contain packages/core/composer.json', function (): void {
+    expect(fn () => new SetupScriptGenerator(appName: 'app', monorepoPath: '/tmp'))
+        ->toThrow(InvalidArgumentException::class, 'Invalid monorepoPath');
+});
+
+it('emits path-repo wiring + dev-main requires when monorepoPath is set', function (): void {
+    $monorepo = realpath(__DIR__.'/../../../..');
+    expect($monorepo)->not->toBeFalse();
+    expect(is_file($monorepo.'/packages/core/composer.json'))->toBeTrue();
+
+    $script = (new SetupScriptGenerator(
+        appName: 'local-app',
+        starter: 'react',
+        tenancy: 'simple',
+        monorepoPath: $monorepo,
+    ))->forBash();
+
+    expect($script)
+        ->toContain('composer config repositories.arqel')
+        ->toContain('"type":"path"')
+        ->toContain($monorepo.'/packages/*')
+        ->toContain('composer config minimum-stability dev')
+        ->toContain('arqel/core:dev-main')
+        ->toContain('arqel/fields:dev-main')
+        ->toContain('arqel/tenant:dev-main') // simple tenancy -> arqel/tenant gets the suffix
+        ->not->toContain('composer require arqel/arqel');
+});
+
 it('legacy "breeze" alias resolves to react', function (): void {
     $script = (new SetupScriptGenerator(
         appName: 'legacy-app',

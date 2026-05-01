@@ -342,6 +342,51 @@ Mostra plataforma detectada, status do auto-configure e os drivers efectivos. Ú
 
 **Doctor checks:** `arqel:doctor` inclui dois checks novos: `cloud.detected` (`ok` em cloud, `neutral` em host genérico) e `cloud.auto_configure` (`warn` se desabilitado em production, `ok` caso contrário).
 
+## Monitoring (LCLOUD-003)
+
+`arqel/core` regista cards e recorders no dashboard do **Laravel Pulse** quando o pacote `laravel/pulse` está instalado na app. **Sem hard-dep**: apps sem Pulse continuam a funcionar — toda a integração é guardada por `class_exists(\Laravel\Pulse\Pulse::class)`.
+
+**Como instalar Pulse:**
+
+```bash
+composer require laravel/pulse
+php artisan vendor:publish --tag=pulse-config
+php artisan migrate
+```
+
+**Cards disponíveis** (auto-registados no boot):
+
+- `arqel-resources-card` — total de Resource classes registadas no panel.
+- `arqel-top-actions-card` — top 10 actions Arqel por execuções nas últimas 24h (lê `arqel_audit`).
+- `arqel-ai-tokens-card` — tokens AI consumidos hoje + custo USD (lê `arqel_ai_usage`).
+- `arqel-job-metrics-card` — pending/failed jobs filtrados por `Arqel\\*` (lê `jobs` + `failed_jobs`).
+- `arqel-slow-queries-card` — placeholder; integração com Pulse Slow Queries em follow-up.
+
+**Como customizar o dashboard:**
+
+```blade
+<x-pulse>
+    <livewire:arqel-resources-card cols="4" />
+    <livewire:arqel-top-actions-card cols="8" />
+    <livewire:arqel-ai-tokens-card cols="6" />
+    <livewire:arqel-job-metrics-card cols="6" />
+</x-pulse>
+```
+
+**Recorders** (subscritos quando os eventos correspondentes existem):
+
+- `ArqelActionRecorder` — escuta `Arqel\Actions\Events\ActionExecuted` → `Pulse::record('arqel_action', $name)->count()`.
+- `ArqelAiUsageRecorder` — escuta `Arqel\Ai\Events\AiCompletionGenerated` → `Pulse::record('arqel_ai_tokens', $provider, $tokens)->sum()`.
+
+**Comando de diagnóstico:**
+
+```bash
+php artisan arqel:pulse:info          # output humano
+php artisan arqel:pulse:info --json   # output JSON (deploy hooks / CI)
+```
+
+Mostra versão do Pulse, cards/recorders registados e amostras (tokens hoje, distinct actions). `arqel:doctor` inclui o check `monitoring.pulse_detected` (neutral quando ausente).
+
 ## Anti-patterns
 
 - ❌ **Depender directamente de pacotes descendentes** (`arqel/fields`, `arqel/table`, ...). Core é a base; inversão de dependência. Se precisas de algo de `fields`, expõe um contract em `core` que `fields` implementa.

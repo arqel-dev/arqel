@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Ai\Http\Controllers\AiAnalyzeImageController;
 use Arqel\Ai\Http\Controllers\AiClassifyController;
 use Arqel\Ai\Http\Controllers\AiExtractController;
 use Arqel\Ai\Http\Controllers\AiGenerateController;
@@ -23,3 +24,7 @@ Route::post('/admin/{resource}/fields/{field}/classify', AiClassifyController::c
 Route::post('/admin/{resource}/fields/{field}/extract', AiExtractController::class)
     ->middleware(['web', 'auth'])
     ->name('arqel.ai.extract');
+
+Route::post('/admin/{resource}/fields/{field}/analyze-image', AiAnalyzeImageController::class)
+    ->middleware(['web', 'auth'])
+    ->name('arqel.ai.analyzeImage');

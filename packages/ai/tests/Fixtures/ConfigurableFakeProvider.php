@@ -23,6 +23,15 @@ class ConfigurableFakeProvider implements AiProvider
 
     public string $textToReturn = '';
 
+    /** @var array<int, string> */
+    public array $textsToReturn = [];
+
+    /** @var array<int, string> */
+    public array $promptHistory = [];
+
+    /** @var array<int, array<string, mixed>> */
+    public array $optionsHistory = [];
+
     public function __construct(
         private readonly string $name = 'fake',
         private readonly float $costPerCall = 0.001,
@@ -32,8 +41,14 @@ class ConfigurableFakeProvider implements AiProvider
     {
         $this->completeCalls++;
         $this->lastPrompt = $prompt;
+        $this->promptHistory[] = $prompt;
+        $this->optionsHistory[] = $options;
 
-        return new AiCompletionResult($this->textToReturn, 5, 5, $this->costPerCall, 'fake-model', []);
+        $text = $this->textsToReturn !== []
+            ? (string) array_shift($this->textsToReturn)
+            : $this->textToReturn;
+
+        return new AiCompletionResult($text, 5, 5, $this->costPerCall, 'fake-model', []);
     }
 
     public function chat(array $messages, array $options = []): AiCompletionResult

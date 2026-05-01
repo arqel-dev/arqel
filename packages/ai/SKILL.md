@@ -59,10 +59,19 @@ Entregue em AI-010 (PHP slice — componente React `AiExtractInput.tsx` fica par
 - **`Arqel\Ai\Http\Controllers\AiExtractController`** (single-action) registrado como `POST /admin/{resource}/fields/{field}/extract` (named `arqel.ai.extract`, middleware `web,auth`). Aceita `{sourceText}` e devolve `{extracted: array<string,mixed>}`. `AiException` (parse failure) → 422 com `message`. 404 quando resource ausente, 422 quando field não é `AiExtractField`, 403 quando Gate `use-ai` nega.
 - 9 testes unit + 4 testes feature.
 
+Entregue em AI-011 (PHP slice — componente React `AiImageInput.tsx` e suporte vision real nos providers ficam para batch futuro):
+
+- **`Arqel\Ai\Fields\AiImageField`** (final, estende `Arqel\Fields\Field`) — análise de imagem via vision models. Setters fluentes `aiAnalysis(array<string,string>)` (`analysis_key => prompt_description`), `populateFields(array<string,string>)` (`analysis_key => target_form_field`), `provider(?string)`, `aiOptions(array)`, `acceptedMimes(array)` (default `['image/jpeg','image/png','image/webp']`), `maxFileSize(int)` (default 10MB), `buttonLabel(string)` (default `'Analyze with AI'`). Método `analyze(string $imageUrlOrBase64): array<string,string>` itera cada análise declarada, monta `options['image']` e chama `AiManager::complete()` uma vez por análise — devolve `analysis_key => trim(text)`. Os **prompt descriptions ficam server-side**: `getTypeSpecificProps()` expõe apenas `analyses` (keys), `populateFields`, `provider`, `acceptedMimes`, `maxFileSize`, `buttonLabel`.
+- **`Arqel\Ai\Http\Controllers\AiAnalyzeImageController`** (single-action) registrado como `POST /admin/{resource}/fields/{field}/analyze-image` (named `arqel.ai.analyzeImage`, middleware `web,auth`). Aceita `{imageUrl?, imageBase64?}` e devolve `{analyses: <key=>result>, populateMapping: <key=>target>}`. 422 quando ambos `imageUrl`/`imageBase64` vazios; 404 resource ausente; 422 field não-`AiImageField`; 403 quando Gate `use-ai` nega; 422 em `AiException`.
+- **Vision support nos providers:** o suporte real ao envio da imagem (multipart/data-URI nativo de cada provider) entra em **AI-011 follow-up**. Hoje o `AiImageField` repassa `options['image']` para `AiManager::complete()` — providers que não saibam interpretar o option ignoram ou retornam erro. O contrato server-side está pronto para receber o suporte vision sem mudança de API pública.
+- `ConfigurableFakeProvider` ganhou `textsToReturn[]` (FIFO, fallback para `textToReturn`), `promptHistory[]` e `optionsHistory[]` para asserts em testes que disparam múltiplas chamadas sequenciais.
+- 7 testes unit + 5 testes feature.
+
 Por chegar:
 
 - **AI-010 React** componente `AiExtractInput.tsx` (botão Extract + populate em multiple form fields).
-- **AI-011** field type restante (`AiImageField`).
+- **AI-011 React** componente `AiImageInput.tsx` (upload + preview + Analyze + populate cross-field).
+- **AI-011 vision providers** suporte real a vision em `ClaudeProvider` (messages com `image` blocks) e `OpenAiProvider` (image_url / base64 em `chat/completions`).
 - **AI-012** prompt library reutilizável.
 - **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).
 

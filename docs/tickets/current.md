@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 + Fase 2 + Fase 3 fechadas, Fase 4 quase fechada, e AUTH-006/007/008 shipados — fechando a lacuna de DX vs Filament/Nova (Batches #27..#47): Fase 3 toda ✅ · CLI-TUI-001/002/004/005 ✅ · DEVTOOLS-001..008 ✅ · MKTPLC-001/002/003/005/006/007/008/009 ✅ · LCLOUD-001/002 ✅ · AUTH-006 login/logout + AUTH-007 registration + email verification + AUTH-008 forgot/reset password ✅ (Inertia-React opt-in via `Panel::configure()->login()->registration()->emailVerification()->passwordReset()`). Total ≈ 209 core + 153 ai + 70 auth + 46 realtime + 67 workflow PHP + 58 versioning PHP + 66 cli + 146 marketplace + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS = ~1.070 testes diretos.** Próximo: MKTPLC-004 frontend marketplace site (XL), MKTPLC-010 publisher docs, LCLOUD-003 monitoring (Pulse), CLI-TUI-003 Ink rich UI.
+**Fase 1 + Fase 2 + Fase 3 fechadas, Fase 4 fechada exceto MKTPLC-004 (Batches #27..#48): AUTH-006/007/008 ✅ · CLI-TUI-001/002/003/004/005 ✅ · DEVTOOLS-001..008 ✅ · MKTPLC-001/002/003/005/006/007/008/009/010 ✅ · LCLOUD-001/002/003 ✅. Total ≈ 221 core + 153 ai + 70 auth + 46 realtime + 67 workflow PHP + 58 versioning PHP + 66 cli + 146 marketplace + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink = ~1.104 testes diretos.** Restante Fase 4: **MKTPLC-004** frontend marketplace site (XL — app Inertia-Arqel-powered) + LCLOUD-004 one-click deploy + LCLOUD-005 docs case study.
 
 **Fase:** 1 (MVP)
 

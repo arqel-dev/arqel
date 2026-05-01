@@ -31,6 +31,7 @@ describe('installDevToolsHook (DEV mode)', () => {
       pageProps: null,
       currentPath: '',
       navigationHistory: [],
+      devToolsPayload: null,
     });
   });
 
@@ -68,6 +69,7 @@ describe('createDevToolsHook subscribe/notify', () => {
       pageProps: { foo: 1 },
       currentPath: '/admin/users',
       navigationHistory: [],
+      devToolsPayload: null,
     };
     hook.__setState(next);
     expect(calls).toHaveLength(1);
@@ -82,6 +84,7 @@ describe('createDevToolsHook subscribe/notify', () => {
       pageProps: null,
       currentPath: '',
       navigationHistory: [],
+      devToolsPayload: null,
     });
     expect(calls).toHaveLength(1);
   });
@@ -99,6 +102,7 @@ describe('createDevToolsHook subscribe/notify', () => {
       pageProps: null,
       currentPath: '',
       navigationHistory: [],
+      devToolsPayload: null,
     });
     expect(a).toHaveBeenCalledTimes(1);
     expect(b).toHaveBeenCalledTimes(1);

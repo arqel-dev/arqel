@@ -10,7 +10,7 @@
  * succeeded (i.e. only in dev builds — Vite then drops the whole branch).
  */
 
-import type { ArqelDevToolsHook, NavigationEntry } from './devtools.js';
+import type { ArqelDevToolsHook, ArqelDevToolsPayload, NavigationEntry } from './devtools.js';
 
 /**
  * Minimal subset of the Inertia router surface that we need. Kept
@@ -73,6 +73,7 @@ export function installInertiaBridge(
     const sharedProps = pickSharedProps(props);
 
     hook.setPageProps(props, sharedProps, url);
+    hook.setDevToolsPayload(extractDevToolsPayload(props));
 
     const timestamp = now();
     const entry: NavigationEntry =
@@ -99,4 +100,32 @@ function pickSharedProps(props: Record<string, unknown>): Record<string, unknown
     }
   }
   return out;
+}
+
+/**
+ * Extract the convention-reserved `__devtools` shared prop emitted by
+ * `arqel/core` in `local` environment (DEVTOOLS-004). Returns `null`
+ * when the key is missing or shaped unexpectedly — production builds
+ * never populate it.
+ */
+function extractDevToolsPayload(props: Record<string, unknown>): ArqelDevToolsPayload | null {
+  const candidate = props['__devtools'];
+  if (candidate === null || candidate === undefined) {
+    return null;
+  }
+  if (typeof candidate !== 'object') {
+    return null;
+  }
+  const bag = candidate as Record<string, unknown>;
+  const policyLog = Array.isArray(bag['policyLog'])
+    ? (bag['policyLog'] as ReadonlyArray<unknown>)
+    : [];
+  const queryCount = typeof bag['queryCount'] === 'number' ? bag['queryCount'] : 0;
+  const memoryUsage = typeof bag['memoryUsage'] === 'number' ? bag['memoryUsage'] : 0;
+
+  return {
+    policyLog: policyLog as ArqelDevToolsPayload['policyLog'],
+    queryCount,
+    memoryUsage,
+  };
 }

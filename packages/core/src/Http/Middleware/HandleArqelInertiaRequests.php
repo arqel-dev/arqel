@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Http\Middleware;
 
+use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -85,7 +86,29 @@ final class HandleArqelInertiaRequests extends Middleware
             'arqel' => [
                 'version' => is_string($configVersion) ? $configVersion : '0.1.0',
             ],
+            '__devtools' => fn () => $this->devToolsPayload(),
         ]);
+    }
+
+    /**
+     * Build the `__devtools` shared prop. Returns `null` outside the
+     * `local` environment — see {@see DevToolsPayloadBuilder}.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function devToolsPayload(): ?array
+    {
+        if (! app()->bound(DevToolsPayloadBuilder::class)) {
+            return null;
+        }
+
+        $builder = app(DevToolsPayloadBuilder::class);
+
+        if (! $builder instanceof DevToolsPayloadBuilder) {
+            return null;
+        }
+
+        return $builder->build();
     }
 
     /**

@@ -67,12 +67,18 @@ Entregue em AI-011 (PHP slice — componente React `AiImageInput.tsx` e suporte 
 - `ConfigurableFakeProvider` ganhou `textsToReturn[]` (FIFO, fallback para `textToReturn`), `promptHistory[]` e `optionsHistory[]` para asserts em testes que disparam múltiplas chamadas sequenciais.
 - 7 testes unit + 5 testes feature.
 
+Entregue em AI-012:
+
+- **`Arqel\Ai\Prompts\PromptLibrary`** (final) — biblioteca de prompt templates reutilizáveis. Métodos estáticos puros que retornam strings (não invocam o provider): `summarize($text, $maxWords=100)`, `translate($text, $targetLanguage, ?$sourceLanguage=null)`, `classify($text, $categories)` (aceita lista simples OU mapa `key=>label`), `extractJson($text, $schema)` (`field=>description`), `generateSlug($title)`, `keywordExtract($text, $count=5)`, `tone($text, $tone='professional')`, `proofread($text)`. Caller passa o resultado para `AiManager::complete()` quando quiser executar.
+- **Custom prompts em runtime** via static map: `register(string $name, Closure $template)` (sobre-escreve silenciosamente), `resolve(string $name, array $data=[])` (lança `InvalidArgumentException` se nome não existe), `has(string $name)`, `clear()` (útil em tests). O closure recebe `array<string,mixed> $data` e retorna `string`.
+- **Sem binding no `AiServiceProvider`** — toda a API é estática.
+- 16 testes unit (`tests/Unit/Prompts/PromptLibraryTest.php`).
+
 Por chegar:
 
 - **AI-010 React** componente `AiExtractInput.tsx` (botão Extract + populate em multiple form fields).
 - **AI-011 React** componente `AiImageInput.tsx` (upload + preview + Analyze + populate cross-field).
 - **AI-011 vision providers** suporte real a vision em `ClaudeProvider` (messages com `image` blocks) e `OpenAiProvider` (image_url / base64 em `chat/completions`).
-- **AI-012** prompt library reutilizável.
 - **AI-013** MCP tools AI-generated (cross-package com `arqel/mcp`).
 
 ## Conventions
@@ -223,6 +229,54 @@ backend chama `classify()` e devolve `{key, label}`. Quando a AI retorna
 uma key fora do set declarado, o resultado cai em `fallbackOption` —
 sem `fallbackOption()`, o response é `{key: null, label: null}` e o
 select fica sem seleção.
+
+### PromptLibrary (AI-012)
+
+Templates reutilizáveis built-in (não invocam o provider — retornam apenas a string do prompt):
+
+```php
+use Arqel\Ai\Prompts\PromptLibrary;
+
+$prompt = PromptLibrary::summarize($post->body, maxWords: 80);
+$result = app(\Arqel\Ai\AiManager::class)->complete($prompt);
+
+// Tradução com par explícito
+$prompt = PromptLibrary::translate($text, targetLanguage: 'pt-BR', sourceLanguage: 'en');
+
+// Classificação com mapa key=>label (modelo retorna a key)
+$prompt = PromptLibrary::classify($body, [
+    'tech' => 'Technology',
+    'finance' => 'Finance',
+]);
+
+// Extração JSON estruturada
+$prompt = PromptLibrary::extractJson($invoiceText, [
+    'total' => 'Total amount with currency symbol',
+    'due_date' => 'Due date in ISO format',
+]);
+
+// Outros built-ins
+PromptLibrary::generateSlug('Hello World!');
+PromptLibrary::keywordExtract($text, count: 7);
+PromptLibrary::tone($text, tone: 'casual');
+PromptLibrary::proofread($text);
+```
+
+Custom prompts registráveis em runtime (ex.: em um `ServiceProvider::boot()`):
+
+```php
+PromptLibrary::register('company_bio', function (array $data): string {
+    return "Write a 2-paragraph bio for {$data['company_name']} in {$data['industry']}.";
+});
+
+$prompt = PromptLibrary::resolve('company_bio', [
+    'company_name' => 'Arqel',
+    'industry' => 'Developer Tools',
+]);
+```
+
+`resolve()` lança `InvalidArgumentException` quando o nome não está registrado;
+`has()` faz a checagem prévia. `clear()` é útil para isolamento entre testes.
 
 ### Consumir um result
 

@@ -1,0 +1,5 @@
+[
+  { "slug": "users", "label": "Users", "count": 1240, "description": "Application users." },
+  { "slug": "posts", "label": "Posts", "count": 580, "description": "Blog posts." },
+  { "slug": "tags", "label": "Tags", "count": 92 }
+]

@@ -102,6 +102,40 @@ Quando o Arqel for promovido a 1.0, podemos espelhar o conteúdo
 para um template repo dedicado via splitsh; o command continua
 sendo o caminho canônico para gerar a estrutura.
 
+### Entregue (LCLOUD-004 + LCLOUD-005)
+
+- `Arqel\Cli\Commands\CloudDeployLinkCommand` (signature
+  `cloud:deploy-link {github-repo} {--region=auto} {--name=}`):
+  gera URL canônica `https://cloud.laravel.com/deploy?...` com
+  `repo`, `region` e `name` pré-preenchidos. Tenta copiar a URL
+  para o clipboard via `pbcopy`/`xclip`/`wl-copy` (defensivo —
+  ignora falhas silenciosamente). Sob testes, `ARQEL_CLI_NO_CLIPBOARD=1`
+  desliga a tentativa.
+- `Arqel\Cli\Services\DeployLinkBuilder` (`final readonly`): valida
+  `owner/name` (regex GitHub-compat), allowlist de regiões
+  (`auto|us-east|us-west|eu-central|eu-west|ap-southeast|sa-east`),
+  validação de `name` (`[a-zA-Z][a-zA-Z0-9_-]*`, ≤40 chars).
+  Usa `http_build_query` com `PHP_QUERY_RFC3986` para escape
+  determinístico.
+- Suíte Pest acrescenta **13 testes** (8 unit `DeployLinkBuilderTest`
+  + 5 feature `CloudDeployLinkCommandTest`).
+- Decisão arquitetural: o ticket original sugeria integração via
+  Laravel Cloud API + GitHub OAuth, mas a API pública estável ainda
+  não existe (abr/2026). A entrega aqui é o link "one-click" que o
+  Laravel Cloud já reconhece + docs explicando o fluxo manual.
+- Docs case study em `apps/docs/laravel-cloud/`: `README.md` (índice),
+  `deploy-guide.md` (passo-a-passo end-to-end), `auto-scaling.md`
+  (recomendações por tamanho), `cost-estimation.md` (calculadora
+  e tiers), `comparison-other-hosts.md` (Fly/Render/DO/AWS).
+- VitePress sidebar atualizada (`apps/docs/.vitepress/config.ts`)
+  com grupo "Laravel Cloud" no nav e sidebar `/laravel-cloud/`.
+
+```bash
+arqel cloud:deploy-link arqel/laravel-cloud-template
+# => https://cloud.laravel.com/deploy?repo=https%3A%2F%2Fgithub.com%2Farqel%2Flaravel-cloud-template&region=auto
+arqel cloud:deploy-link owner/meu-painel --region=us-east --name=meu-painel
+```
+
 ### Por chegar
 
 - **CLI-TUI-002** — Resource generator interactivo. Reside em `arqel/core`

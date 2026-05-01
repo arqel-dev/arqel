@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Cli;
 
+use Arqel\Cli\Commands\CloudDeployLinkCommand;
 use Arqel\Cli\Commands\CloudExportCommand;
 use Arqel\Cli\Commands\InstallCommand;
 use Arqel\Cli\Commands\NewCommand;
@@ -22,5 +23,6 @@ final class Application extends BaseApplication
         $this->addCommand(new NewCommand);
         $this->addCommand(new InstallCommand);
         $this->addCommand(new CloudExportCommand);
+        $this->addCommand(new CloudDeployLinkCommand);
     }
 }

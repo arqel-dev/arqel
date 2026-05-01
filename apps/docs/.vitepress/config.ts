@@ -47,6 +47,7 @@ export default defineConfig({
       { text: 'Avançado', link: '/advanced/custom-fields', activeMatch: '/advanced/' },
       { text: 'Exemplos', link: '/examples/blog-admin', activeMatch: '/examples/' },
       { text: 'Marketplace', link: '/marketplace/', activeMatch: '/marketplace/' },
+      { text: 'Laravel Cloud', link: '/laravel-cloud/', activeMatch: '/laravel-cloud/' },
       {
         text: 'v0.0',
         items: [
@@ -171,6 +172,18 @@ export default defineConfig({
             { text: 'Tutorial de desenvolvimento', link: '/marketplace/development-tutorial' },
             { text: 'Boas práticas de segurança', link: '/marketplace/security-best-practices' },
             { text: 'Pagamentos & licenças', link: '/marketplace/payments-and-licensing' },
+          ],
+        },
+      ],
+      '/laravel-cloud/': [
+        {
+          text: 'Laravel Cloud',
+          items: [
+            { text: 'Visão geral', link: '/laravel-cloud/' },
+            { text: 'Deploy guide', link: '/laravel-cloud/deploy-guide' },
+            { text: 'Auto-scaling', link: '/laravel-cloud/auto-scaling' },
+            { text: 'Estimativa de custos', link: '/laravel-cloud/cost-estimation' },
+            { text: 'Comparação com outros hosts', link: '/laravel-cloud/comparison-other-hosts' },
           ],
         },
       ],

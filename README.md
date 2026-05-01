@@ -7,9 +7,9 @@
 
 ## Status
 
-🚧 **Em desenvolvimento inicial.** Não pronto para produção.
+🚧 **Em desenvolvimento.** Não pronto para produção.
 
-Fase atual: **Sprint 0 (Setup)** — a bootstrapar infraestrutura do monorepo.
+Fases 1, 2 e 3 fechadas. Fase 4 em andamento (DevTools extension, CLI, marketplace, Laravel Cloud). Ver `docs/tickets/current.md` para o snapshot atual.
 
 ## O que é Arqel
 
@@ -33,6 +33,8 @@ Ver `PLANNING/01-spec-tecnica.md` para spec completa.
 - GitHub Actions · splitsh/lite para monorepo
 
 ## Começar
+
+> ⚠️ **Autenticação não vem incluída.** Arqel **não publica** páginas de `/login`/`/register` por design — você usa um starter kit Laravel (Breeze, Jetstream ou Fortify) ou implementa o seu próprio. Recomendado: **Breeze + React + Inertia**, que é o que `arqel new` instala por default. Ver [`docs/getting-started/authentication.md`](docs/getting-started/authentication.md). _Nota: estamos planeando shipar um fluxo Inertia-React opt-in dentro do `arqel/auth` — tickets AUTH-006/007/008 (TBD)._
 
 ### Pré-requisitos
 

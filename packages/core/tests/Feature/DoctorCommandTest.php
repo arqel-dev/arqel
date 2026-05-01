@@ -93,3 +93,25 @@ it('reports the ArqelServiceProvider as loaded', function (): void {
     expect($providerCheck)->not->toBeNull();
     expect($providerCheck['status'])->toBe('ok');
 });
+
+it('warns when no Laravel auth starter kit is detected', function (): void {
+    Artisan::call('arqel:doctor', ['--json' => true]);
+    $output = trim(Artisan::output());
+
+    $lines = array_values(array_filter(
+        preg_split("/\r?\n/", $output) ?: [],
+        static fn (string $line): bool => trim($line) !== '',
+    ));
+    $jsonLine = end($lines);
+
+    /** @var array{checks: list<array{name: string, status: string, message: string}>} $decoded */
+    $decoded = json_decode((string) $jsonLine, true);
+
+    $kitCheck = collect($decoded['checks'])
+        ->firstWhere('name', 'auth.starter_kit_detected');
+
+    expect($kitCheck)->not->toBeNull();
+    // Testbench runtime has no Breeze/Jetstream/Fortify, so we expect warn.
+    expect($kitCheck['status'])->toBe('warn');
+    expect($kitCheck['message'])->toContain('No Laravel auth starter kit');
+});

@@ -4,13 +4,15 @@
 
 ## Purpose
 
-`arqel/auth` é a fina camada de authorization que envolve Laravel Policies + Gate com conveniences específicas para Arqel:
+`arqel/auth` é a fina camada de **authorization** (não authentication) que envolve Laravel Policies + Gate com conveniences específicas para Arqel:
 
 - **`PolicyDiscovery`** — verifica/auto-registra Policies para Resources, com warning quando ausentes e suporte a override via `$policy` estático
 - **`AbilityRegistry`** — catálogo de abilities globais (resolvidas via Gate) + computed (closures arbitrárias) que são serializadas em shared props (`auth.can.*`) para o lado React
 - **`ArqelGate`** — facade conveniente sobre Laravel Gate integrada com o `AbilityRegistry`
 
 User escreve as Policies (Laravel-native). Arqel apenas verifica existência, auto-registra com `Gate::policy(...)` e resolve abilities globais por user.
+
+> **Authentication (login/registro/forgot-password) não está incluída neste pacote.** Decisão de design: Arqel hoje delega ao starter kit Laravel (Breeze/Jetstream/Fortify) — o `arqel new` CLI instala Breeze + React + Inertia por default. Para apps que rodaram só `composer require arqel/arqel`, é necessário instalar manualmente um starter kit. Ver `docs/getting-started/authentication.md`. _Tickets AUTH-006/007/008 (TBD) preveem shipar páginas Inertia-React opt-in dentro deste pacote, equivalente ao que Filament/Nova oferecem out-of-the-box._
 
 ## Status
 

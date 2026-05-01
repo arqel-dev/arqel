@@ -63,6 +63,7 @@ final class DoctorCommand extends Command
             $this->checkSessionDriver(),
             $this->checkCloudDetected(),
             $this->checkCloudAutoConfigure(),
+            $this->checkAuthStarterKit(),
         ];
 
         $summary = $this->summarise($checks);
@@ -408,6 +409,50 @@ final class DoctorCommand extends Command
             ];
         } catch (Throwable $e) {
             return $this->fromThrowable('cloud.auto_configure', $e);
+        }
+    }
+
+    /**
+     * Detecta se a app instalou um Laravel starter kit (Breeze, Jetstream
+     * ou Fortify). Arqel não publica login/register hoje — delega ao
+     * starter kit. Apps que rodaram só `composer require arqel/arqel`
+     * sem CLI ficam sem essas páginas.
+     *
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkAuthStarterKit(): array
+    {
+        try {
+            $candidates = [
+                'breeze' => 'Laravel\\Breeze\\BreezeServiceProvider',
+                'jetstream' => 'Laravel\\Jetstream\\JetstreamServiceProvider',
+                'fortify' => 'Laravel\\Fortify\\FortifyServiceProvider',
+            ];
+
+            $found = [];
+            foreach ($candidates as $name => $providerClass) {
+                if (class_exists($providerClass)) {
+                    $found[] = $name;
+                }
+            }
+
+            if (count($found) > 0) {
+                return [
+                    'name' => 'auth.starter_kit_detected',
+                    'status' => self::STATUS_OK,
+                    'message' => 'Auth starter kit detected: '.implode(', ', $found).'.',
+                    'details' => ['kits' => $found],
+                ];
+            }
+
+            return [
+                'name' => 'auth.starter_kit_detected',
+                'status' => self::STATUS_WARN,
+                'message' => 'No Laravel auth starter kit detected. Arqel does not ship login/register pages — install Breeze, Jetstream, or Fortify. See docs/getting-started/authentication.md.',
+                'details' => ['kits' => []],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('auth.starter_kit_detected', $e);
         }
     }
 

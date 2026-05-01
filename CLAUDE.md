@@ -215,6 +215,20 @@ pnpm build                      # Build todos pacotes
 ./scripts/next-ticket.sh        # Ver próximo ticket
 ```
 
+## Convenções de comandos shell (evitar prompts de segurança)
+
+Para não disparar guards de segurança do Claude Code que exigem aprovação manual mesmo em modo autonomous:
+
+1. **Nunca usar `cd <path> && git ...`** — usar `git -C <path> <comando>` em vez disso.
+   - ❌ `cd packages/core && git log -1`
+   - ✅ `git -C packages/core log -1`
+
+2. **Nunca combinar `cd` com redirecionamentos (`>`, `>>`, `2>/dev/null`, `2>&1`) num comando composto** — usar paths absolutos.
+   - ❌ `cd worktrees/agent-x && ls docs/ 2>/dev/null`
+   - ✅ `ls /caminho/absoluto/worktrees/agent-x/docs/ 2>/dev/null`
+
+3. **Preferir comandos atómicos a chains com `&&`/`;`** — facilita matching da allowlist e evita guards compostos.
+
 ## Slash commands (Claude Code)
 
 Custom commands disponíveis em `.claude/commands/`:

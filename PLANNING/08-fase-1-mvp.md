@@ -4647,6 +4647,140 @@ Ponte server-side para authorization check usado em React `<CanAccess>`. Cobre R
 
 ---
 
+### [AUTH-006] Páginas Inertia-React de login + logout opt-in
+
+**Tipo:** feat • **Prioridade:** P0 • **Estimativa:** M • **Camada:** php + react • **Depende de:** [AUTH-002, CORE-007]
+
+**Contexto**
+
+Hoje Arqel não publica `/login`/`/logout`, delegando a Breeze/Jetstream/Fortify. Apps que rodaram só `composer require arqel/arqel` (sem `arqel new`) ficam sem essas páginas — quebra de DX comparado a Filament e Nova, que oferecem login pronto out-of-the-box.
+
+Aqui shipamos páginas Inertia-React de login/logout dentro de `arqel/auth`, opt-in via `Panel::configure()->login()`. Compatível com starter kits já instalados (não conflita) e independente deles quando ativo.
+
+**Descrição técnica**
+
+```php
+// app/Providers/Filament/AdminPanelProvider.php (estilo Filament para Arqel)
+$panel
+    ->login()              // ativa /admin/login + /admin/logout
+    ->loginUrl('/admin/login')
+    ->afterLoginRedirectTo('/admin');
+```
+
+PHP:
+- `Arqel\Auth\Http\Controllers\LoginController` (single-action invokable + showForm via Inertia render).
+- `Arqel\Auth\Http\Controllers\LogoutController` POST.
+- `Arqel\Auth\Http\Requests\LoginRequest` com rate-limiting via `RateLimiter` (5 tentativas / minuto / IP).
+- `Arqel\Auth\Routes::register($panel)` registra rotas condicionalmente quando `$panel->loginEnabled()`.
+- `Panel::configure()->login()/loginUrl()/afterLoginRedirectTo()/withoutDefaultAuth()`.
+
+React (`@arqel/auth` novo pacote npm OU dentro de `@arqel/ui/auth`):
+- `<LoginPage />` Inertia page com email + password + remember + submit.
+- Validação inline via `useForm()` Inertia.
+- "Forgot password?" link condicional (visível se AUTH-008 ativo).
+- Estilo casa com painel via tokens compartilhados.
+
+Authentication backend usa `Auth::attempt()` Laravel-native, lê de `App\Models\User` + tabela `users` padrão. Não inventa schema novo.
+
+**Critérios de aceite**
+
+- [ ] `Panel::configure()->login()` ativa rotas
+- [ ] `/admin/login` renderiza Inertia React
+- [ ] Rate-limiting funcional (5/min/IP)
+- [ ] Logout invalida sessão + CSRF rotaciona
+- [ ] Compatibilidade preservada com Breeze/Jetstream (não conflita)
+- [ ] `Panel::configure()->withoutDefaultAuth()` opt-out limpo
+- [ ] Pest feature: login happy path, falha credenciais, rate-limit
+- [ ] Vitest: render LoginPage, validation errors, submit
+
+**Notas de implementação**
+
+- Driver Auth padrão Laravel — não inventamos `arqel.auth` driver.
+- Reuse `App\Models\User` se existir; senão documentação aponta para criar.
+
+---
+
+### [AUTH-007] Registration opt-in + email verification
+
+**Tipo:** feat • **Prioridade:** P1 • **Estimativa:** M • **Camada:** php + react • **Depende de:** [AUTH-006]
+
+**Contexto**
+
+Apps SaaS frequentemente querem self-service signup. Arqel oferece via `Panel::configure()->registration()`, opt-in. Apps internas (admin staff-only, estilo Nova) deixam desligado.
+
+**Descrição técnica**
+
+```php
+$panel
+    ->registration()        // ativa /admin/register
+    ->emailVerification()   // exige verificação antes de acesso
+    ->registrationFields(fn () => [
+        Field::text('name')->required(),
+        Field::email('email')->required()->unique('users'),
+        Field::password('password')->required()->confirmed()->min(8),
+    ]);
+```
+
+PHP:
+- `RegisterController` cria `User`, dispara `Registered` event.
+- Email verification usa Laravel `MustVerifyEmail` interface — apps que registraram via Breeze/Jetstream já têm; senão documentação ensina add.
+- Rate-limit (3 registros/IP/hora).
+
+React:
+- `<RegisterPage />` Inertia.
+- `<VerifyEmailPage />` para resend link.
+
+**Critérios de aceite**
+
+- [ ] `registration()` ativa rota
+- [ ] Email verification trigger funcional (envia email)
+- [ ] Validation rules customizáveis via `registrationFields()`
+- [ ] Pest: registro happy, email verification, rate-limit
+- [ ] Vitest: render Register + Verify, validation errors
+
+---
+
+### [AUTH-008] Forgot password + reset token flow
+
+**Tipo:** feat • **Prioridade:** P1 • **Estimativa:** M • **Camada:** php + react • **Depende de:** [AUTH-006]
+
+**Contexto**
+
+Recovery flow completo: request reset link, email com token, reset form, validation expiration.
+
+**Descrição técnica**
+
+```php
+$panel
+    ->passwordReset()       // ativa /admin/forgot-password + /admin/reset-password/{token}
+    ->passwordResetExpirationMinutes(60);
+```
+
+PHP:
+- `ForgotPasswordController` gera token + envia notification (Laravel `Password::sendResetLink`).
+- `ResetPasswordController` valida token + atualiza `password_hash`.
+- Schema: tabela `password_reset_tokens` (Laravel default — geralmente já existe).
+- Rate-limit (3 requests/IP/hora).
+
+React:
+- `<ForgotPasswordPage />` — só email input + submit.
+- `<ResetPasswordPage />` — email pré-preenchido (read-only via query param) + nova password + confirm.
+- Mensagens de sucesso/erro consistentes.
+
+**Critérios de aceite**
+
+- [ ] `passwordReset()` ativa 2 rotas
+- [ ] Email enviado com link válido por 60min (configurável)
+- [ ] Reset atualiza password e invalida tokens existentes
+- [ ] Pest: full flow request → email → reset → login com nova senha
+- [ ] Vitest: render ambas pages, validation
+
+**Notas de implementação**
+
+- AUTH-006/007/008 juntos fecham a lacuna de DX vs Filament/Nova. Após shipados, `composer require arqel/arqel` + `php artisan arqel:install` é suficiente; starter kit deixa de ser obrigatório.
+
+---
+
 ## 9. Pacote NAV
 
 ### [NAV-001] Esqueleto do pacote `arqel/nav`
@@ -6134,7 +6268,7 @@ Devido a dependências entre tickets, a ordem de trabalho é constrained. Segue 
 
 **1 dev PHP segundo (paralelo):**
 
-1. AUTH-001 → AUTH-002 → AUTH-003 → AUTH-004 → AUTH-005
+1. AUTH-001 → AUTH-002 → AUTH-003 → AUTH-004 → AUTH-005 (entregue) → AUTH-006 → AUTH-007 → AUTH-008 (DX-parity com Filament/Nova)
 2. NAV-001 → NAV-002 → NAV-003 → NAV-004 → NAV-005
 
 **1 dev JS:**

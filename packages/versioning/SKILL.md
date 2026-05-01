@@ -1,142 +1,190 @@
 # SKILL.md — arqel/versioning
 
+> Contexto canônico para AI agents trabalhando no pacote `arqel/versioning`.
+
 ## Purpose
 
 Time-travel para Eloquent records do Arqel (cobre RF-IN-05). O pacote
 adiciona um trait `Versionable` que grava snapshots completos de cada
-mudança em `arqel_versions`, com diff por campo e suporte a restore
-não-destrutivo. UI / diff viewer / restore action ficam para tickets
-posteriores.
+mudança em `arqel_versions`, com diff por campo, restore não-destrutivo,
+endpoints HTTP de history/restore e retention via Artisan command + Job
+queueable.
+
+A integração com `arqel/core` é **opcional** — o trait funciona standalone
+e os controllers degradam para `404` quando o `ResourceRegistry` não está
+bound. Sem hard-dep em `spatie/laravel-eventsourcing`.
 
 ## Status
 
-### Entregue (VERS-001 + VERS-002 + VERS-005 + VERS-006)
+### Entregue (VERS-001..VERS-007)
 
-- Esqueleto completo do pacote `arqel/versioning` com auto-discovery
-  do `VersioningServiceProvider`.
-- Migration `arqel_versions` (morphs `versionable`, JSON `payload`,
-  JSON `changes`, `created_by_user_id`, `reason`, `created_at`).
-- `Models\Version` final, append-only (`$timestamps = false`), com
-  `versionable(): MorphTo` e `user(): ?BelongsTo` defensivo.
-- `Concerns\Versionable` trait com:
-  - hook `static::saved(...)` que grava snapshots em insert/update
-    com idempotência (`wasChanged()` + flag `enabled`).
-  - `versions(): MorphMany`, `currentVersion(): ?Version`.
-  - `restoreToVersion(int|Version $version): bool` não-destrutivo —
-    cria nova Version (permite "undo restore").
-  - `pruneOldVersions(): int` com estratégia 'count'.
-- Config publicável `arqel-versioning.php` com `enabled`,
-  `keep_versions`, `prune_strategy`, `audit_user`, `user_model`.
-- Suite Pest + PHPStan level max + Pint clean.
+**Schema + Service Provider (VERS-001).** `VersioningServiceProvider`
+auto-discovered via `extra.laravel.providers`. Migration
+`create_arqel_versions_table` cria `arqel_versions` com `morphs('versionable')`,
+JSON `payload`, JSON `changes`, `created_by_user_id` (indexed),
+nullable `reason`, `created_at`. Config publicável `arqel-versioning.php`
+expõe `enabled`, `keep_versions`, `prune_strategy`, `audit_user`, `user_model`.
 
-### Entregue (VERS-003 — slice PHP)
+**Model + Relations (VERS-001/002).** `Models\Version` (final,
+`$timestamps = false`, append-only). Casts `payload`/`changes` → `array`,
+`created_at` → `datetime`. `versionable(): MorphTo` para o source model.
+`user(): ?BelongsTo` defensivo — lê `arqel-versioning.user_model`
+(default `App\\Models\\User`); devolve `null` quando a classe não existe
+ou não é Eloquent `Model` (apps minimalistas / testes).
 
-- `Http\Controllers\VersionHistoryController` single-action que serve
-  `GET /admin/{resource}/{id}/versions` (rota nomeada
-  `arqel.versioning.history`, middleware `web,auth`).
-- `VersionPresenter` final readonly que serializa cada `Version` para
-  payload JSON-friendly (`id`, `created_at` ISO 8601, `changes_summary`,
-  `changes`, `user`, `is_initial`, e `payload` apenas mediante
-  `?include=payload`).
-- Resolução defensiva do `ResourceRegistry` por FQCN-string —
-  devolve 404 quando o `arqel/core` não está bound em runtime.
-- Validação por `class_uses_recursive` que o model alvo usa o trait
-  `Versionable` (devolve 422 caso contrário).
-- Eager-load condicional do user: `Version::user()` é `?BelongsTo` por
-  design e o controller só anexa `with('user')` quando a relação é
-  resolvível.
-- Pagination: `?per_page=20` (default), max `100`. Resposta inclui
-  `meta.keep_versions` e `meta.total`.
-- Suite Pest cobre 8 cenários (200 happy path, 404 sem registry/slug/record,
-  422 sem trait, paginação, include=payload, meta).
+**Trait + Hooks (VERS-002).** `Concerns\Versionable` (consumido por
+user-land Eloquent models):
+
+- `bootVersionable()` registra três hooks: `created` grava snapshot
+  inicial; `updating` captura diff dirty (filtra `created_at`/`updated_at`)
+  em `self::$arqelVersioningPendingDiff[spl_object_id($model)]`;
+  `updated` consome o diff e grava nova `Version`. Idempotência: diff
+  vazio → early-return (saves só de timestamps, e.g. `touch()`, não
+  geram version). Master switch `arqel-versioning.enabled === false`
+  desliga todos os hooks.
+- `versions(): MorphMany<Version>` ordenado por `created_at desc, id desc`.
+- `currentVersion(): ?Version` atalho para `versions()->first()`.
+- `restoreToVersion(int|Version): bool` — não-destrutivo (faz `forceFill`
+  + `save`, dispara hook, gera nova Version, permite "undo restore").
+  Defensive cross-record: devolve `false` quando version não pertence
+  ao record.
+- `pruneOldVersions(): int` aplica retention 'count' por record;
+  invocado automaticamente após cada `writeVersion`. Suporta `strategy
+  != 'count'` (early-return 0) e `keep=0` (unbounded).
+- `resolveAuditUserId()` privado: resolve callable string em
+  `arqel-versioning.audit_user` (`'FQCN::method'` ou
+  `'callable_string'`); fallback `Auth::id()`; ambos null → `null`.
+
+**History endpoint (VERS-003 — slice PHP).**
+`Http\Controllers\VersionHistoryController` single-action,
+`GET /admin/{resource}/{id}/versions` (rota `arqel.versioning.history`,
+middleware `web,auth`). Resolve `ResourceRegistry` por FQCN-string e
+devolve `404` quando ele não está bound. Valida via
+`class_uses_recursive` que o model alvo usa o trait (`422` caso
+contrário). Honra Gate `view` quando registrada (`403` se nega).
+Pagination: `?per_page=20` default, **clamped a `[1, 100]`**. Eager-load
+`with('user')` apenas quando `Version::user()` resolve. Resposta inclui
+`meta.keep_versions` e `meta.total`. Slice React (B39) consome esta
+rota para popular a tab "History".
+
+**VersionPresenter (VERS-003).** `final readonly class` que serializa
+`Version` para payload JSON-friendly: `id`, `created_at` ISO 8601,
+`changes_summary`, `changes`, `user`, `is_initial`, opcional `payload`.
+Resumos: `null` → `"Created"`; `[]` → `"No changes"`; 1 field → singular
+(`"Changed 1 field: title"`); N+ fields → plural (`"Changed 5 fields:
+a, b, c, d, e"`). `payload` **não é exposto por default** — pode conter
+PII / segredos; controller só inclui mediante `?include=payload`.
+
+**Restore endpoint (VERS-005).** `Http\Controllers\VersionRestoreController`
+single-action, `POST /admin/{resource}/{id}/versions/{versionId}/restore`.
+Mesma resolução defensiva do registry. Valida trait (`422`); autoriza
+via `Gate::authorize('update', $record)` quando registrada (`403` no
+deny). `404` para slug/record/version desconhecida ou cross-record.
+Sucesso → `200 {restored: true, new_version_id: <int>}`. Falha
+inesperada → `Log::error('arqel.versioning.restore_failed', …)` +
+`500 {restored: false, message: …}`.
+
+**Retention (VERS-006).** `Console\PruneVersionsCommand`
+(`arqel:versions:prune`) com flags combináveis:
+
+- `--days=N` — apaga rows com `created_at < now() - N days`.
+- `--keep=N` — mantém top-N por `(versionable_type, versionable_id)`.
+- sem flags — usa `arqel-versioning.keep_versions` como `--keep` default.
+- `--dry-run` — emite `[DRY RUN] would delete <N> rows.` sem deletar.
+- happy path emite `Pruned <N> version rows.` (verbose).
+
+Idempotente — rodar duas vezes é safe. `Jobs\PruneOldVersionsJob`
+(`ShouldQueue` + `Dispatchable` + `SerializesModels`) é wrapper para
+schedulers/queue: `__construct(?int $days, ?int $keep)`,
+`Artisan::call('arqel:versions:prune', $params)` em `handle()`.
+Round-trip serialize/unserialize preserva props.
+
+**Coverage gaps + canonical SKILL (VERS-007).** Suite Pest 3 com 58
+testes (44 do trait/controllers/command/presenter + 14 cobertura
+adicional em `tests/Unit/Coverage/VersioningCoverageGapsTest.php`).
+PHPStan level max clean. Coverage extra cobre: `audit_user` callable
+resolver (int, non-int, ausência), `prune_strategy != 'count'`,
+`keep_versions=0` unbounded, save sem mudanças efetivas (`touch()`),
+`Version::user()` com classe não-Model, `VersionPresenter::summarize()`
+(1 field, 5 fields, empty array), `per_page` clamp acima do max (100)
+e abaixo do mínimo (default 20), `Pruned` verbose output, e
+serialização do `PruneOldVersionsJob`.
 
 ### Por chegar
 
-- **VERS-003** — Slice React (B39): tab `History` no Resource Detail
-  page consumindo este endpoint via Inertia.
-- **VERS-004** — Diff viewer component (React).
-- **VERS-007** — Testes E2E + cobertura ≥85%.
-- **VERS-008** — Docs comparativo: versioning vs activity log.
-
-## Restore endpoint (VERS-005)
-
-Endpoint single-action `POST /admin/{resource}/{id}/versions/{versionId}/restore`
-exposto pelo `VersionRestoreController`. Resolve `ResourceRegistry` por
-slug, verifica que o model usa `Versionable`, autoriza via `Gate::authorize('update', $record)`
-quando definida e invoca `restoreToVersion()`. Retorna JSON
-`{"restored": bool, "new_version_id": int|null}`.
-
-Códigos HTTP:
-
-- `200` — restore bem-sucedido (o JSON traz o id da nova Version criada).
-- `403` — Gate `update` registrada e nega o usuário corrente.
-- `404` — slug desconhecido, record ausente ou version não pertence ao record.
-- `422` — model alvo não usa o trait `Versionable`.
-- `500` — falha não esperada (logada via `Log::error`).
-
-```php
-// Restore via cliente HTTP autenticado
-Http::asJson()->post(route('arqel.versioning.restore', [
-    'resource'  => 'articles',
-    'id'        => 42,
-    'versionId' => 7,
-]));
-```
-
-## Retention policy (VERS-006)
-
-Comando Artisan `arqel:versions:prune` apoia retention além do `keep`
-automático do trait. Suporta dois critérios combináveis:
-
-- `--days=N` — apaga versions com `created_at < now() - N days`.
-- `--keep=N` — mantém top-N mais recentes por `(versionable_type, versionable_id)`.
-- sem flags — usa `arqel-versioning.keep_versions` como `--keep` default.
-- `--dry-run` — mostra a contagem sem apagar.
-
-O comando é idempotente (rodar duas vezes é seguro). Para queue/scheduler
-existe `Jobs\PruneOldVersionsJob` que apenas invoca o comando.
-
-```php
-// app/Console/Kernel.php
-$schedule->command('arqel:versions:prune --days=90')->weekly();
-
-// ou via job (queue)
-$schedule->job(new PruneOldVersionsJob(days: 90))->weekly();
-```
+- **VERS-008** — Docs comparativo: versioning vs activity log
+  (`arqel/audit`).
+- Time-based prune **strategy** dentro do trait (atualmente só o
+  Artisan command suporta `--days`).
+- Version **comparison API** (diff entre duas versions arbitrárias,
+  além do diff incremental `[old, new]` por save).
+- React `DiffViewer` component reutilizável (slice futura).
 
 ## Conventions
 
-- Trait é **opt-in** — só os models que usam `Versionable` geram
-  snapshots. Não há behavior global.
+- Trait é **opt-in** — só os models com `use Versionable` geram
+  snapshots. Sem behavior global.
 - Snapshots gravam o resultado de `$model->getAttributes()` (payload
-  completo), e `changes` traz apenas o diff (`[old, new]` por campo).
-- Restore é **versionado** — chamar `restoreToVersion()` faz `save()`,
-  o que dispara o hook e cria nova Version. Defensivo cross-record:
-  devolve `false` se a version não pertence ao record.
+  completo); `changes` traz só o diff (`[old, new]` por campo).
+- Restore é **versionado** — `restoreToVersion()` faz `save()` que
+  dispara o hook e cria nova Version (permite undo).
+- Append-only: `Version` tem `$timestamps = false`; única write é o
+  insert no hook + delete via prune. Nunca update.
 - Prune por contagem: ao gravar, qualquer version além de
   `keep_versions` (mais antigas) é deletada. `0` = unbounded.
-- Audit user: `auth()->id()` por padrão; pode ser sobrescrito por um
-  callable em `arqel-versioning.audit_user` (útil em CLI/jobs).
-- Sem hard-dep em `spatie/laravel-eventsourcing` — pacote standalone.
+  `strategy != 'count'` é no-op (até time-based ganhar trait support).
+- Audit user: `auth()->id()` por padrão; sobrescrita por callable
+  string (`'FQCN::method'`) em `arqel-versioning.audit_user` — útil
+  em CLI/jobs onde `Auth` não está hidratado.
+- `payload` privado por default na API HTTP — exige `?include=payload`
+  explicitamente (PII guard).
+- `declare(strict_types=1)` obrigatório. `Version`, `VersionPresenter`,
+  controllers, command, job são `final`. `Versionable` é trait.
 
 ## Anti-patterns
 
-- **Não use `Versionable` para auditoria de leitura** — só capta
-  writes. Para audit log de acessos use `arqel/audit`.
-- **Não use para campos voláteis de alta frequência** (ex.: `last_seen_at`
-  atualizado a cada request) — vai inflar a tabela. Considere ignorar
-  esses campos antes do save (`->timestamps = false` no model alvo ou
-  excluir explicitamente do update).
-- **Não chame `restoreToVersion()` num loop** — cada chamada cria nova
-  Version e dispara prune; prefira manipular a tabela diretamente para
-  migrations bulk.
-- **Não desligue `keep_versions=0` em produção** sem cleanup job — o
-  storage cresce sem limite (GB por milhão de records).
+- **Versionar sem prune em produção** (`keep_versions=0` + sem
+  `arqel:versions:prune` agendado) → storage cresce sem limite (GB
+  por milhão de records).
+- **Expor `payload` sem filtros sensíveis** — snapshots contêm tudo
+  do `getAttributes()`, incluindo password hashes/tokens. Front-end
+  só deve pedir `?include=payload` em telas internas e/ou após filtrar
+  campos sensíveis no consumer.
+- **Restore destrutivo / em loop** — cada `restoreToVersion()` cria
+  nova Version e dispara prune. Para migrations bulk, manipule a
+  tabela diretamente em vez de iterar restores.
+- **`audit_user` callable que acessa `Request`/`session()` fora de
+  HTTP** — o resolver é invocado também em CLI/queue/jobs onde esses
+  serviços não estão hidratados. Use `Auth::id()` ou injete via
+  config/binding.
+- **Aplicar `Versionable` em campos voláteis de alta frequência**
+  (`last_seen_at`, contadores tickeados a cada request) — vai inflar
+  a tabela. Filtre os campos antes do save ou desligue versioning
+  pontual com `config(['arqel-versioning.enabled' => false])`.
 
-## History endpoint (VERS-003)
+## Examples
 
-A rota `arqel.versioning.history` expõe o histórico paginado de um
-record. Exemplo de chamada:
+### Setup mínimo + trait
+
+```php
+use Arqel\Versioning\Concerns\Versionable;
+use Illuminate\Database\Eloquent\Model;
+
+final class Article extends Model
+{
+    use Versionable;
+
+    protected $fillable = ['title', 'body', 'status'];
+}
+
+$article = Article::create(['title' => 'Hello', 'body' => '...', 'status' => 'draft']);
+$article->update(['title' => 'Hello v2']);
+
+$article->versions()->count();   // 2
+$article->currentVersion();       // Version do último save
+```
+
+### History endpoint via Inertia
 
 ```http
 GET /admin/articles/42/versions?per_page=20 HTTP/1.1
@@ -170,34 +218,10 @@ Resposta (`200 OK`):
 }
 ```
 
-Para incluir o `payload` completo do snapshot, passe
-`?include=payload`. Por default ele é omitido — payloads podem conter
-PII e segredos do model. O componente React (B39) consome esta rota
-para popular a tab "History".
+Para incluir o snapshot completo: `?include=payload`. Por default ele é
+omitido — payloads podem conter PII e segredos do model.
 
-## Examples
-
-### Setup mínimo
-
-```php
-use Arqel\Versioning\Concerns\Versionable;
-use Illuminate\Database\Eloquent\Model;
-
-final class Article extends Model
-{
-    use Versionable;
-
-    protected $fillable = ['title', 'body', 'status'];
-}
-
-$article = Article::create(['title' => 'Hello', 'body' => '...', 'status' => 'draft']);
-$article->update(['title' => 'Hello v2']);
-
-$article->versions()->count();   // 2
-$article->currentVersion();       // Version do último save
-```
-
-### Restore via UI (preview do que VERS-005 vai expor)
+### Restore via UI
 
 ```php
 $article = Article::find($id);
@@ -208,24 +232,79 @@ if ($article->restoreToVersion($target)) {
 }
 ```
 
-### Pruning automático
+Ou diretamente via HTTP autenticado:
+
+```php
+Http::asJson()->post(route('arqel.versioning.restore', [
+    'resource'  => 'articles',
+    'id'        => 42,
+    'versionId' => 7,
+]));
+// → {"restored": true, "new_version_id": 88}
+```
+
+### Pruning automático scheduler
 
 ```php
 // config/arqel-versioning.php
-'keep_versions' => 20,    // mantém só as 20 mais recentes por record
+'keep_versions' => 20,
 'prune_strategy' => 'count',
 ```
 
-A poda corre automaticamente após cada novo snapshot. Para forçar
-manualmente (ex.: cleanup job):
+Poda corre automaticamente após cada novo snapshot. Para retention
+cross-record (`--days`) ou agendado, use o Artisan command + Job:
+
+```php
+// app/Console/Kernel.php
+$schedule->command('arqel:versions:prune --days=90')->weekly();
+
+// ou via job (queue)
+$schedule->job(new PruneOldVersionsJob(days: 90))->weekly();
+
+// Manual / dry-run
+php artisan arqel:versions:prune --keep=20 --dry-run
+```
+
+Forçar manual num record único:
 
 ```php
 $article->pruneOldVersions();   // devolve número de rows deletadas
 ```
 
+### Custom audit_user resolver
+
+Útil em CLI, queues ou apps multi-tenant onde `Auth::id()` não reflete
+o autor real:
+
+```php
+// config/arqel-versioning.php
+'audit_user' => \App\Versioning\AuditUser::class . '::resolve',
+```
+
+```php
+namespace App\Versioning;
+
+final class AuditUser
+{
+    public static function resolve(): ?int
+    {
+        // Ex.: contexto injetado por job middleware
+        return app('current.actor.id');
+    }
+}
+```
+
+`null` ou retorno não-int → grava `created_by_user_id = null`.
+
 ## Related
 
-- `PLANNING/10-fase-3-avancadas.md` § "5. Record versioning (VERS)"
-- RF-IN-05 (time-travel para records)
-- `arqel/audit` — audit log complementar (eventos vs snapshots)
-- `arqel/workflow` — pacote vizinho com layout de scaffold idêntico
+- Source: [`packages/versioning/src/`](./src/)
+- Testes: [`packages/versioning/tests/`](./tests/)
+- Tickets: [`PLANNING/10-fase-3-avancadas.md`](../../PLANNING/10-fase-3-avancadas.md) §VERS-001..VERS-007
+- API: [`PLANNING/05-api-php.md`](../../PLANNING/05-api-php.md) §Versioning
+- ADRs:
+  - [ADR-001](../../PLANNING/03-adrs.md) — Inertia-only
+  - [ADR-008](../../PLANNING/03-adrs.md) — Pest 3 + tests-first
+- Pacotes vizinhos:
+  - `arqel/audit` — audit log complementar (eventos vs snapshots).
+  - `arqel/workflow` — layout de scaffold idêntico (state machines).

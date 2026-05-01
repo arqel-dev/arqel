@@ -31,7 +31,7 @@ describe('chrome manifest', () => {
     expect(chromeManifest.content_scripts).toHaveLength(1);
     const [entry] = chromeManifest.content_scripts;
     expect(entry?.matches).toEqual(['<all_urls>']);
-    expect(entry?.run_at).toBe('document_start');
+    expect(entry?.run_at).toBe('document_idle');
     expect(entry?.js).toEqual(['content-script.js']);
   });
 });

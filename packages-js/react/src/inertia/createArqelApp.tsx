@@ -2,9 +2,16 @@ import { createInertiaApp } from '@inertiajs/react';
 import type { ComponentType, ReactNode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
+import { installDevToolsHook } from '../devtools/index.js';
 import { ArqelProvider } from '../providers/ArqelProvider.js';
 import type { Theme } from '../providers/ThemeProvider.js';
 import { type PageRegistry, resolveArqelPage } from './resolvePage.js';
+
+/**
+ * Version reported to the DevTools hook. Kept in sync with `package.json`.
+ * (Duplicated here to avoid pulling the root barrel into the inertia entry.)
+ */
+const ARQEL_REACT_VERSION = '0.8.0-rc.1';
 
 export interface ArqelAppOptions {
   /** Customise the document title. Default: `${page} — ${appName}`. */
@@ -48,6 +55,11 @@ export async function createArqelApp(options: ArqelAppOptions = {}): Promise<unk
     defaultTheme = 'system',
     progress = true,
   } = options;
+
+  // Install the DevTools hook before Inertia boots. The call is a no-op
+  // in production builds (Vite's `import.meta.env.DEV` is `false`), so
+  // shipped apps never expose `window.__ARQEL_DEVTOOLS_HOOK__`.
+  installDevToolsHook(ARQEL_REACT_VERSION);
 
   return createInertiaApp({
     title: title ?? ((current: string) => (current ? `${current} — ${appName}` : appName)),

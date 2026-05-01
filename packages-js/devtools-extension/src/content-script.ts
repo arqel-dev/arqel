@@ -1,10 +1,14 @@
 /**
- * Arqel DevTools — content script.
+ * Arqel DevTools — content script (DEVTOOLS-002).
  *
- * Looks for the `window.__ARQEL_DEVTOOLS_HOOK__` marker that the runtime will
- * expose (DEVTOOLS-002) and reports the result to the background worker.
+ * Manifest V3 isolates content scripts from the page's JavaScript
+ * context: `window` here is a *different* `window` than the one
+ * `@arqel/react` writes to. We bridge the two worlds by injecting a
+ * tiny inline `<script>` into the page DOM that probes the real
+ * `window.__ARQEL_DEVTOOLS_HOOK__` and relays the result back via a
+ * `CustomEvent`. The content script listens for that event and
+ * forwards the payload to the background service worker.
  */
-
 export interface ArqelDevtoolsHook {
   version: string;
 }
@@ -15,6 +19,19 @@ declare global {
   }
 }
 
+export interface DetectMessage {
+  type: 'arqel.detected';
+  detected: boolean;
+  version: string | null;
+}
+
+export const PROBE_EVENT = 'arqel-devtools-probe';
+
+/**
+ * Direct (same-world) probe — used in unit tests and as a fallback
+ * when the page-world script cannot be injected (e.g. CSP blocks
+ * inline scripts).
+ */
 export function detectArqel(target: Window | undefined = globalThis.window): boolean {
   if (!target) {
     return false;
@@ -23,22 +40,106 @@ export function detectArqel(target: Window | undefined = globalThis.window): boo
   return Boolean(hook && typeof hook.version === 'string' && hook.version.length > 0);
 }
 
-export interface DetectMessage {
-  type: 'arqel.detect';
-  detected: boolean;
-  version: string | null;
-}
-
 export function buildDetectMessage(target: Window | undefined = globalThis.window): DetectMessage {
   const detected = detectArqel(target);
   const version = detected ? (target?.__ARQEL_DEVTOOLS_HOOK__?.version ?? null) : null;
-  return { type: 'arqel.detect', detected, version };
+  return { type: 'arqel.detected', detected, version };
 }
 
-if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+/**
+ * Build the inline source that runs in the page world. It dispatches a
+ * `CustomEvent` carrying `{detected, version}` so the isolated content
+ * script can read it.
+ */
+export function buildProbeSource(eventName: string = PROBE_EVENT): string {
+  return `(() => {
   try {
-    chrome.runtime.sendMessage(buildDetectMessage());
+    const hook = window.__ARQEL_DEVTOOLS_HOOK__;
+    const detected = Boolean(hook && typeof hook.version === 'string' && hook.version.length > 0);
+    const version = detected ? hook.version : null;
+    window.dispatchEvent(new CustomEvent(${JSON.stringify(eventName)}, { detail: { detected, version } }));
   } catch (error) {
-    console.warn('[arqel-devtools] failed to dispatch detect message', error);
+    window.dispatchEvent(new CustomEvent(${JSON.stringify(eventName)}, { detail: { detected: false, version: null } }));
   }
+})();`;
+}
+
+export interface ProbeBridgeOptions {
+  target?: Window;
+  doc?: Document;
+  send?: (message: DetectMessage) => void;
+  /**
+   * When `false`, skip injecting the inline page-world script and only
+   * wire up the listener. Useful for tests that want to dispatch the
+   * `CustomEvent` manually without jsdom firing the probe first.
+   */
+  inject?: boolean;
+}
+
+/**
+ * Wire up the probe bridge: listens for the page-world CustomEvent
+ * once, forwards the payload to `send` (defaults to
+ * `chrome.runtime.sendMessage`), and injects the inline probe.
+ *
+ * Returns a teardown function that removes the listener.
+ */
+export function installProbeBridge(options: ProbeBridgeOptions = {}): () => void {
+  const target = options.target ?? globalThis.window;
+  const doc = options.doc ?? globalThis.document;
+  const send =
+    options.send ??
+    ((message: DetectMessage): void => {
+      if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+        try {
+          chrome.runtime.sendMessage(message);
+        } catch (error) {
+          console.warn('[arqel-devtools] failed to dispatch detect message', error);
+        }
+      }
+    });
+
+  if (!target || !doc) {
+    return () => {};
+  }
+
+  const handler = (event: Event): void => {
+    const detail = (event as CustomEvent<{ detected: boolean; version: string | null }>).detail;
+    const detected = Boolean(detail?.detected);
+    const version = detail?.version ?? null;
+    send({ type: 'arqel.detected', detected, version: detected ? version : null });
+  };
+
+  target.addEventListener(PROBE_EVENT, handler, { once: true });
+
+  if (options.inject === false) {
+    return () => {
+      target.removeEventListener(PROBE_EVENT, handler);
+    };
+  }
+
+  // Inject the page-world probe. `script.textContent` runs synchronously
+  // when appended; we drop the node afterwards to keep the DOM clean.
+  try {
+    const script = doc.createElement('script');
+    script.textContent = buildProbeSource(PROBE_EVENT);
+    (doc.head ?? doc.documentElement).appendChild(script);
+    script.remove();
+  } catch (error) {
+    console.warn('[arqel-devtools] failed to inject page-world probe', error);
+    // Fallback: same-world probe (useful when CSP blocks inline scripts).
+    send(buildDetectMessage(target));
+  }
+
+  return () => {
+    target.removeEventListener(PROBE_EVENT, handler);
+  };
+}
+
+// Auto-run when loaded as a real content script (skipped under Vitest,
+// which sets `import.meta.env.MODE === 'test'`).
+const env = (import.meta as ImportMeta & { env?: { MODE?: string; VITEST?: boolean } }).env;
+const isTest = env?.MODE === 'test' || env?.VITEST === true;
+
+if (!isTest && typeof chrome !== 'undefined' && chrome.runtime) {
+  installProbeBridge();
 }

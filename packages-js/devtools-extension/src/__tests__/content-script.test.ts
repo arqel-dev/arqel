@@ -24,7 +24,7 @@ describe('detectArqel', () => {
 describe('buildDetectMessage', () => {
   it('reports inactive state when no hook is present', () => {
     expect(buildDetectMessage(window)).toEqual({
-      type: 'arqel.detect',
+      type: 'arqel.detected',
       detected: false,
       version: null,
     });
@@ -33,7 +33,7 @@ describe('buildDetectMessage', () => {
   it('reports the runtime version when the hook is present', () => {
     window.__ARQEL_DEVTOOLS_HOOK__ = { version: '0.10.0' };
     expect(buildDetectMessage(window)).toEqual({
-      type: 'arqel.detect',
+      type: 'arqel.detected',
       detected: true,
       version: '0.10.0',
     });

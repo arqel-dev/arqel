@@ -17,7 +17,7 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content-script.js"],
-      "run_at": "document_start"
+      "run_at": "document_idle"
     }
   ],
   "devtools_page": "devtools.html",

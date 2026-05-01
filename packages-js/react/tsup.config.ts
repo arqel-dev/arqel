@@ -6,6 +6,7 @@ export default defineConfig({
     inertia: 'src/inertia/index.ts',
     providers: 'src/providers/index.ts',
     context: 'src/context/index.ts',
+    devtools: 'src/devtools/index.ts',
     utils: 'src/utils/index.ts',
   },
   format: ['esm'],

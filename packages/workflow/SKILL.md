@@ -54,6 +54,14 @@ A escolha é **integrar quando útil, sem amarrar**: a integração canônica é
 
 ## Examples
 
+### Exemplos completos (WF-010)
+
+Três workflows reais, com diagrama Mermaid, model Eloquent, Resource, transitions, Gate/`authorizeFor`, `StateFilter` e listeners — em [`docs/examples/workflows/`](../../docs/examples/workflows/README.md):
+
+- [`order-states.md`](../../docs/examples/workflows/order-states.md) — pedidos e-commerce: autorização por papel, webhook de transportadora, "any-to-Cancelled".
+- [`article-states.md`](../../docs/examples/workflows/article-states.md) — CMS editorial: rejeição com feedback, autorização 100% via Gate, integração com `arqel/versioning`.
+- [`subscription-states.md`](../../docs/examples/workflows/subscription-states.md) — SaaS billing: webhooks Stripe, side-effects em cache/quotas, idempotência via `metadata->webhook_event_id`.
+
 ### Setup mínimo de workflow
 
 ```php

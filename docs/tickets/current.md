@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27..#35): AI-003..010 PHP + AI-007/008/009 React ✅ · RT-003/004/008/009/010 ✅ · WF-003..009 (incl. coverage gaps + canonical SKILL) ✅. Total Fase 3 ≈ 97 ai + 35 realtime + 67 workflow PHP + 17 workflow JS + 19 realtime JS + 33 ai JS = ~268 testes diretos.** Próximo: AI-011 AiImageField (vision) + AI-012 PromptLibrary, RT-011 testes E2E + RT-012 SKILL canonical, AiExtractInput React.
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27..#36): AI-003..011 PHP + AI-007/008/009/010 React ✅ · RT-003/004/008/009/010/011/012 (incl. coverage + canonical SKILL) ✅ · WF-003..009 ✅. Total Fase 3 ≈ 109 ai + 46 realtime + 67 workflow PHP + 17 workflow JS + 19 realtime JS + 44 ai JS = ~302 testes diretos.** Próximo: AI-012 PromptLibrary + AI-013 MCP cross-package, AiImageInput React, WF-010 docs example workflows.
 
 **Fase:** 1 (MVP)
 

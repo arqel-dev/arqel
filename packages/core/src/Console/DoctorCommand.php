@@ -63,6 +63,7 @@ final class DoctorCommand extends Command
             $this->checkSessionDriver(),
             $this->checkCloudDetected(),
             $this->checkCloudAutoConfigure(),
+            $this->checkPulseDetected(),
             $this->checkAuthStarterKit(),
         ];
 
@@ -409,6 +410,31 @@ final class DoctorCommand extends Command
             ];
         } catch (Throwable $e) {
             return $this->fromThrowable('cloud.auto_configure', $e);
+        }
+    }
+
+    /**
+     * Detecta se Laravel Pulse está instalado (LCLOUD-003). Pulse é
+     * opcional — `arqel/core` expõe cards quando presente, mas roda
+     * standalone caso contrário.
+     *
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkPulseDetected(): array
+    {
+        try {
+            $detected = class_exists(\Laravel\Pulse\Pulse::class);
+
+            return [
+                'name' => 'monitoring.pulse_detected',
+                'status' => $detected ? self::STATUS_OK : self::STATUS_NEUTRAL,
+                'message' => $detected
+                    ? 'Laravel Pulse detected — Arqel cards are auto-registered.'
+                    : 'Laravel Pulse not installed (optional).',
+                'details' => ['detected' => $detected],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('monitoring.pulse_detected', $e);
         }
     }
 

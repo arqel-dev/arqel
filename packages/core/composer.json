@@ -30,7 +30,10 @@
     "autoload": {
         "psr-4": {
             "Arqel\\Core\\": "src/"
-        }
+        },
+        "files": [
+            "src/Pulse/stubs.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

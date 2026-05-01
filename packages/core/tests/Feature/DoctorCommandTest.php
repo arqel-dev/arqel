@@ -94,6 +94,31 @@ it('reports the ArqelServiceProvider as loaded', function (): void {
     expect($providerCheck['status'])->toBe('ok');
 });
 
+it('reports monitoring.pulse_detected as neutral when Pulse is absent', function (): void {
+    if (class_exists(\Laravel\Pulse\Pulse::class)) {
+        $this->markTestSkipped('Laravel Pulse is unexpectedly present.');
+    }
+
+    Artisan::call('arqel:doctor', ['--json' => true]);
+    $output = trim(Artisan::output());
+
+    $lines = array_values(array_filter(
+        preg_split("/\r?\n/", $output) ?: [],
+        static fn (string $line): bool => trim($line) !== '',
+    ));
+    $jsonLine = end($lines);
+
+    /** @var array{checks: list<array{name: string, status: string, message: string}>} $decoded */
+    $decoded = json_decode((string) $jsonLine, true);
+
+    $pulseCheck = collect($decoded['checks'])
+        ->firstWhere('name', 'monitoring.pulse_detected');
+
+    expect($pulseCheck)->not->toBeNull();
+    expect($pulseCheck['status'])->toBe('neutral');
+    expect($pulseCheck['message'])->toContain('Laravel Pulse not installed');
+});
+
 it('warns when no Laravel auth starter kit is detected', function (): void {
     Artisan::call('arqel:doctor', ['--json' => true]);
     $output = trim(Artisan::output());

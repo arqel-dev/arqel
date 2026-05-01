@@ -13,6 +13,8 @@ use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
 use Arqel\Core\Console\CloudInfoCommand;
 use Arqel\Core\Console\DoctorCommand;
+use Arqel\Core\Console\PulseInfoCommand;
+use Arqel\Core\Pulse\PulseIntegration;
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\DevTools\PolicyLogCollector;
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
@@ -43,6 +45,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
                 MakeResourceCommand::class,
                 DoctorCommand::class,
                 CloudInfoCommand::class,
+                PulseInfoCommand::class,
             ]);
     }
 
@@ -54,6 +57,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $this->app->singleton(CommandRegistry::class);
         $this->app->singleton(CloudDetector::class);
         $this->app->singleton(CloudConfigurator::class);
+        $this->app->singleton(PulseIntegration::class);
     }
 
     public function packageBooted(): void
@@ -78,7 +82,29 @@ final class ArqelServiceProvider extends PackageServiceProvider
 
         $this->app->booted(function (): void {
             $this->applyCloudAutoConfigure();
+            $this->registerPulseIntegration();
         });
+    }
+
+    /**
+     * Wire the Laravel Pulse integration (LCLOUD-003).
+     *
+     * The integration is no-op when `laravel/pulse` is not installed,
+     * so this is safe to call unconditionally. Wrapped in try/catch
+     * so a misbehaving Pulse install never blocks app boot.
+     */
+    protected function registerPulseIntegration(): void
+    {
+        try {
+            $integration = $this->app->make(PulseIntegration::class);
+            assert($integration instanceof PulseIntegration);
+            $integration->register($this->app);
+        } catch (Throwable $e) {
+            Log::warning('Arqel Pulse integration failed to register', [
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

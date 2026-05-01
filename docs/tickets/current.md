@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 PRATICAMENTE FECHADA (Batches #27..#38): AI-003..014/015 PHP completo (incl. AI-013 MCP cross-package + coverage gaps + canonical SKILL) + AI-007..011 React ✅ · RT-003..012 ✅ · WF-003..010 ✅ · VERS-001/002 ✅ (scaffold arqel/versioning + Versionable trait). Total Fase 3 ≈ 153 ai + 46 realtime + 67 workflow PHP + 18 versioning + 17 workflow JS + 19 realtime JS + 56 ai JS = ~376 testes diretos.** Próximo: VERS-003+ (UI versions + restore action + diff renderer), AI vision real follow-up nos providers (HTTP fake), e Fase 4 (`PLANNING/11-fase-4-ecossistema.md` — 45 tickets ecosystem).
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 PRATICAMENTE FECHADA (Batches #27..#39): AI-003..015 PHP + AI-007..011 React ✅ · RT-003..012 ✅ · WF-003..010 ✅ · VERS-001..006 ✅ (scaffold + trait + history endpoint + restore endpoint + prune command + React @arqel/versioning npm package). Total Fase 3 ≈ 153 ai + 46 realtime + 67 workflow PHP + 44 versioning PHP + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS = ~419 testes diretos.** Próximo: VERS-007 testes coverage + VERS-008 docs (when versioning vs audit log), AI vision/stream follow-up nos providers, Fase 4 (`PLANNING/11-fase-4-ecossistema.md` — 45 tickets ecosystem).
 
 **Fase:** 1 (MVP)
 

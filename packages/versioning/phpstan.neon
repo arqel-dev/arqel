@@ -20,3 +20,10 @@ parameters:
         -
             identifier: trait.unused
             path: src/Concerns/Versionable.php
+        # `Version::user()` is intentionally `?BelongsTo` (returns null when
+        # the configured user_model is missing). Larastan rejects nullable
+        # relation methods for `with('user')`; the controller eager-loads it
+        # only after a runtime null-check.
+        -
+            identifier: larastan.relationExistence
+            path: src/Http/Controllers/VersionHistoryController.php

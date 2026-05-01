@@ -27,6 +27,7 @@ final class VersioningServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel-versioning')
             ->hasConfigFile('arqel-versioning')
-            ->hasMigration('create_arqel_versions_table');
+            ->hasMigration('create_arqel_versions_table')
+            ->hasRoute('web');
     }
 }

@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { useCompareSlugs } from '../../hooks/useCompareSlugs';
 import type { Plugin } from '../../types';
 
 type Props = {
@@ -12,6 +13,21 @@ function formatInstallCount(count: number): string {
 }
 
 export function PluginCard({ plugin }: Props): JSX.Element {
+  const { slugs, addSlug, removeSlug, isFull } = useCompareSlugs();
+  const inCompare = slugs.includes(plugin.slug);
+
+  function handleToggleCompare(event: React.MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (inCompare) {
+      removeSlug(plugin.slug);
+    } else {
+      addSlug(plugin.slug);
+    }
+  }
+
+  const disabled = !inCompare && isFull;
+
   return (
     <article className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm transition hover:shadow-md">
       <Link href={`/plugins/${plugin.slug}`} className="block">
@@ -32,6 +48,28 @@ export function PluginCard({ plugin }: Props): JSX.Element {
           {typeof plugin.stars === 'number' && <span data-testid="stars">⭐ {plugin.stars}</span>}
         </footer>
       </Link>
+      <div className="mt-3 border-t border-neutral-100 pt-3">
+        <button
+          type="button"
+          onClick={handleToggleCompare}
+          disabled={disabled}
+          data-testid="add-to-compare"
+          aria-pressed={inCompare}
+          className={`w-full rounded px-2 py-1 text-xs font-medium transition ${
+            inCompare
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : disabled
+                ? 'cursor-not-allowed bg-neutral-100 text-neutral-400'
+                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+          }`}
+        >
+          {inCompare
+            ? 'Remover de comparar'
+            : disabled
+              ? 'Limite (3) atingido'
+              : 'Adicionar a comparar'}
+        </button>
+      </div>
     </article>
   );
 }

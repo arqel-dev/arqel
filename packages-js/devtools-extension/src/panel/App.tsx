@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { type FieldSchema, FieldsInspector } from './FieldsInspector.js';
 import { InertiaInspector } from './InertiaInspector.js';
 import { PolicyDebugger, type PolicyLogEntry } from './PolicyDebugger.js';
 
@@ -11,9 +12,15 @@ export interface AppProps {
    * background-port plumbing.
    */
   policyEntries?: ReadonlyArray<PolicyLogEntry>;
+  /**
+   * Optional field schema entries (DEVTOOLS-005). Tests inject this
+   * to render the Fields inspector without the background-port
+   * plumbing.
+   */
+  fields?: ReadonlyArray<FieldSchema>;
 }
 
-type Tab = 'inertia' | 'policies';
+type Tab = 'inertia' | 'policies' | 'fields';
 
 /**
  * Panel shell rendered inside the "Arqel" DevTools tab.
@@ -22,7 +29,7 @@ type Tab = 'inertia' | 'policies';
  *   - Inertia State Inspector (DEVTOOLS-003).
  *   - Policies (DEVTOOLS-004).
  */
-export function App({ version = null, policyEntries = [] }: AppProps) {
+export function App({ version = null, policyEntries = [], fields = [] }: AppProps) {
   const connected = typeof version === 'string' && version.length > 0;
   const label = connected
     ? `Arqel DevTools — Connected (v${version})`
@@ -54,8 +61,19 @@ export function App({ version = null, policyEntries = [] }: AppProps) {
             >
               Policies
             </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'fields'}
+              data-testid="top-tab-fields"
+              onClick={() => setTab('fields')}
+            >
+              Fields
+            </button>
           </div>
-          {tab === 'inertia' ? <InertiaInspector /> : <PolicyDebugger entries={policyEntries} />}
+          {tab === 'inertia' && <InertiaInspector />}
+          {tab === 'policies' && <PolicyDebugger entries={policyEntries} />}
+          {tab === 'fields' && <FieldsInspector fields={fields} />}
         </>
       ) : (
         <p>Open a page running an Arqel admin panel to activate DevTools.</p>

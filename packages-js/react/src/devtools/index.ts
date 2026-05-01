@@ -3,6 +3,8 @@ export {
   type ArqelDevToolsPayload,
   type ArqelDevToolsState,
   createDevToolsHook,
+  extractFieldsSchema,
+  type FieldSchema,
   installDevToolsHook,
   NAVIGATION_HISTORY_LIMIT,
   type NavigationEntry,

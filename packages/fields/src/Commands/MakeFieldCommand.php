@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Fields\Commands;
 
+use Arqel\Core\Support\InteractiveTerminal;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
+use function Laravel\Prompts\warning;
 
 final class MakeFieldCommand extends Command
 {
@@ -83,6 +85,12 @@ final class MakeFieldCommand extends Command
     {
         if ($this->option('force')) {
             return true;
+        }
+
+        if (! InteractiveTerminal::supportsPrompts()) {
+            warning("{$this->relative($target)} already exists. Skipping (use --force to overwrite).");
+
+            return false;
         }
 
         return confirm(

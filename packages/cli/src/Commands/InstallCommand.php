@@ -10,6 +10,7 @@ use Arqel\Cli\Generators\InstallScriptGenerator;
 use Arqel\Cli\Models\PluginMetadata;
 use Arqel\Cli\Services\CompatibilityChecker;
 use Arqel\Cli\Services\MarketplaceClient;
+use Arqel\Cli\Support\InteractiveTerminal;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -64,7 +65,13 @@ final class InstallCommand extends Command
         $client = $this->client ?? new MarketplaceClient($marketplaceUrl);
         $compat = $this->compat ?? new CompatibilityChecker;
 
-        $interactive = ! $input->getOption('no-prompts') && $input->isInteractive();
+        $interactive = ! $input->getOption('no-prompts')
+            && $input->isInteractive()
+            && InteractiveTerminal::supportsPrompts();
+
+        if (! $interactive && $input->isInteractive() && ! $input->getOption('no-prompts')) {
+            $output->writeln('<comment>Non-POSIX TTY detected; running with default flags. Use --no-installer / --migrate / --platform to customize.</comment>');
+        }
 
         try {
             $metadata = $client->fetchPlugin($package);

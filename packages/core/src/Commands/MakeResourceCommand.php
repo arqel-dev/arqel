@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Core\Commands;
 
 use Arqel\Core\Generators\ResourceGenerator;
+use Arqel\Core\Support\InteractiveTerminal;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -55,7 +56,10 @@ final class MakeResourceCommand extends Command
         }
 
         if ($modelArg === '') {
-            error('Model argument is required when running non-interactively.');
+            $reason = $this->input->isInteractive() && ! InteractiveTerminal::supportsPrompts()
+                ? 'Interactive wizard unavailable in this terminal (non-POSIX TTY). Pass the model argument and use flags (--label, --group, --icon, --with-policy, --with-form-requests, --tests).'
+                : 'Model argument is required when running non-interactively.';
+            error($reason);
 
             return self::FAILURE;
         }
@@ -69,9 +73,7 @@ final class MakeResourceCommand extends Command
             return false;
         }
 
-        $input = $this->input;
-
-        return $input->isInteractive();
+        return $this->input->isInteractive() && InteractiveTerminal::supportsPrompts();
     }
 
     private function runDirect(Filesystem $files, string $modelArg): int

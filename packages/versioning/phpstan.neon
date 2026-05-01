@@ -27,3 +27,13 @@ parameters:
         -
             identifier: larastan.relationExistence
             path: src/Http/Controllers/VersionHistoryController.php
+        # Pest tests use `$this->postJson(...)`, `$this->artisan(...)` and
+        # similar helpers exposed via `Orchestra\Testbench\TestCase`. PHPStan
+        # cannot resolve those on the wrapped `PHPUnit\Framework\TestCase`
+        # type that Pest emits for closures.
+        -
+            identifier: method.notFound
+            path: tests/Feature/*
+        -
+            identifier: method.nonObject
+            path: tests/Feature/*

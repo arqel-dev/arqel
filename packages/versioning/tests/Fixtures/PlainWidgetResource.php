@@ -7,16 +7,12 @@ namespace Arqel\Versioning\Tests\Fixtures;
 use Arqel\Core\Resources\Resource;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Resource fixture mínimo que cobre o trait `Versionable`.
- * Usado em `VersionHistoryControllerTest` e `VersionRestoreControllerTest`.
- */
-final class ArticleResource extends Resource
+final class PlainWidgetResource extends Resource
 {
     /** @var class-string<Model> */
-    public static string $model = Article::class;
+    public static string $model = PlainWidget::class;
 
-    public static ?string $slug = 'articles';
+    public static ?string $slug = 'plain-widgets';
 
     /**
      * @return array<int, mixed>

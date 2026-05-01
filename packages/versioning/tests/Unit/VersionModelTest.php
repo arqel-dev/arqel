@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Versioning\Models\Version;
 use Arqel\Versioning\Tests\Fixtures\Article;
+use Illuminate\Support\Carbon;
 
 it('casts payload and changes as arrays and created_at as datetime', function (): void {
     $article = Article::create(['title' => 'Cast', 'body' => 'b', 'status' => 'draft']);
@@ -14,7 +15,7 @@ it('casts payload and changes as arrays and created_at as datetime', function ()
 
     expect($version->payload)->toBeArray();
     expect($version->changes)->toBeArray();
-    expect($version->created_at)->toBeInstanceOf(Illuminate\Support\Carbon::class);
+    expect($version->created_at)->toBeInstanceOf(Carbon::class);
 });
 
 it('resolves the morphTo relationship back to the source model', function (): void {

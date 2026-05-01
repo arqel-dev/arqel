@@ -1,0 +1,58 @@
+{
+  "name": "@arqel/devtools-extension",
+  "version": "0.10.0-rc.1",
+  "private": true,
+  "description": "Arqel DevTools — browser extension (Chrome/Firefox/Edge) for inspecting Arqel admin panels at runtime.",
+  "license": "MIT",
+  "homepage": "https://arqel.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arqel/arqel.git",
+    "directory": "packages-js/devtools-extension"
+  },
+  "keywords": [
+    "arqel",
+    "laravel",
+    "inertia",
+    "devtools",
+    "browser-extension",
+    "chrome",
+    "firefox"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run build:chrome && pnpm run build:firefox",
+    "build:chrome": "vite build --mode chrome",
+    "build:firefox": "vite build --mode firefox",
+    "dev": "vite build --watch --mode chrome",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check --diagnostic-level=error src",
+    "format": "biome format --write src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "webextension-polyfill": "^0.10.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/chrome": "^0.0.287",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/webextension-polyfill": "^0.10.7",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

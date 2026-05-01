@@ -176,6 +176,80 @@ import { AiTranslateInput } from '@arqel/ai';
 />;
 ```
 
+## AiSelectInput (AI-009 React)
+
+Componente React que fecha o slice React do ticket AI-009 — o slice
+PHP foi mergeado no batch #34 (`Arqel\Ai\Fields\AiSelectField`,
+component string `AiSelectInput`).
+
+```ts
+interface AiSelectInputProps {
+  name: string;
+  value: string | null;
+  onChange?: (value: string | null) => void;
+  props: {
+    options: Record<string, string>;
+    classifyFromFields: string[];
+    provider?: string | null;
+    fallbackOption?: string | null;
+    hasContextFields: boolean;
+  } | undefined;
+  resource?: string;
+  field?: string;
+  formData?: Record<string, unknown>;
+  classifyUrl?: string;
+  csrfToken?: string;
+}
+```
+
+Render:
+
+- `<select>` controlado (uncontrolled fallback se `onChange` for
+  omitido) com `<option value="">Select...</option>` mais uma
+  `<option key={k} value={k}>{label}</option>` por entry de
+  `props.options`.
+- Botão `Classify with AI` ao lado do select. `disabled` quando
+  `hasContextFields` é `false` (com `title` explicando o motivo —
+  exibido como tooltip nativo).
+- Loading state: spinner SVG inline + botão `disabled` durante o
+  `fetch`.
+- Em sucesso (`key !== null`): `onChange(key)` é chamado e um banner
+  sutil `Suggested by AI` aparece com botões `Accept` e `Pick another`
+  (ambos apenas dismissam o banner — o valor já está aplicado no
+  state).
+- Em sucesso com `key: null` + `fallbackOption` configurado: aplica o
+  fallback e mostra o banner `Used fallback`.
+- Em sucesso com `key: null` sem fallback: banner `role="alert"` com
+  `Could not classify`.
+- Em falha HTTP: banner `role="alert"` com o status code visível.
+
+Rota canônica: `POST /admin/{resource}/fields/{field}/classify`
+(override via `classifyUrl`). Body: `{ formData }`. Resposta esperada:
+`{ key: string | null, label: string | null }`.
+
+### Uso direto
+
+```tsx
+import { AiSelectInput } from '@arqel/ai';
+
+<AiSelectInput
+  name="priority"
+  value={form.priority}
+  onChange={(v) => setForm((f) => ({ ...f, priority: v }))}
+  props={{
+    options: { low: 'Low', medium: 'Medium', high: 'High' },
+    classifyFromFields: ['title', 'body'],
+    provider: 'claude',
+    fallbackOption: 'low',
+    hasContextFields: true,
+  }}
+  resource="tickets"
+  field="priority"
+  formData={form}
+  csrfToken={csrfToken}
+/>;
+```
+
 ## Anti-patterns
 
 - Trazer o prompt template para o cliente — segurança/IP. O backend

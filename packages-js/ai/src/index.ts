@@ -8,12 +8,16 @@
  */
 
 export {
+  AiSelectInput,
+  type AiSelectInputFieldProps,
+  type AiSelectInputProps,
+} from './AiSelectInput.js';
+export {
   AiTextInput,
   type AiTextInputFieldProps,
   type AiTextInputProps,
   default,
 } from './AiTextInput.js';
-
 export {
   AiTranslateInput,
   type AiTranslateInputFieldProps,

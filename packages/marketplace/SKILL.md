@@ -115,6 +115,56 @@ if (! $result->passed) {
 }
 ```
 
+**Entregue (MKTPLC-006):** Reviews + ratings system com helpful votes, sort options, verified-purchaser flag e moderation queue.
+
+- **Migration** `2026_05_03_000000_extend_plugin_reviews.php` — adiciona `verified_purchaser`, `helpful_count`, `unhelpful_count`, `status` (`pending`/`published`/`hidden`, default `pending`), `moderation_reason` na tabela `arqel_plugin_reviews`. Cria nova tabela `arqel_plugin_review_votes` com unique `(review_id, user_id)`.
+- **`PluginReview` model** — fillable + casts estendidos; relação `votes()` HasMany; scopes `scopePublished`, `scopePending`, `scopeHidden`, `scopeMostHelpful` (helpful_count desc → score desc), `scopeMostRecent`, `scopeHighestRated`.
+- **`PluginReviewVote` model** (`final`) — fillable `review_id, user_id, vote`; relações `review()` BelongsTo + `user()` BelongsTo defensiva (resolve via `auth.providers.users.model`).
+- **`PluginReviewVoteController`** — `store()` cria/atualiza voto via lookup `(review_id, user_id)` em transaction, recalcula counters; `destroy()` remove voto e decrementa.
+- **`PluginReviewListController`** single-action — `GET {prefix}/plugins/{slug}/reviews?sort=helpful|recent|rating` lista apenas reviews `published` com sort default `helpful`.
+- **`PluginReviewModerationController`** — `index()` lista reviews por status (Gate `marketplace.moderate-reviews`); `moderate()` aplica `publish` ou `hide` (com reason obrigatória).
+- **`PluginReviewController`** — agora seta `status=pending` ao criar review (idempotência preservada).
+- **`PluginDetailController`** — agora retorna apenas reviews `published` ordenadas por `mostHelpful`.
+- **Routes novas**: 5 endpoints (`GET .../reviews`, `POST/DELETE .../reviews/{id}/vote`, `GET admin/reviews`, `POST admin/reviews/{id}/moderate`).
+- **22 testes Pest novos**: Feature vote (6) + Feature list (4) + Feature moderation (5) + Unit scopes (4) + Unit vote model (2) + 1 atualização do detail test.
+
+### Reviews + ratings (MKTPLC-006)
+
+Sort options expostos via query string `?sort=`:
+
+- `helpful` (default) — ordena por `helpful_count` desc, score (`helpful − unhelpful`) desc.
+- `recent` — `created_at` desc.
+- `rating` — `stars` desc.
+
+Exemplo de payload de voto:
+
+```php
+Http::withToken($token)
+    ->post("https://arqel.dev/api/marketplace/plugins/{$slug}/reviews/{$reviewId}/vote", [
+        'vote' => 'helpful', // ou 'unhelpful'
+    ]);
+
+Http::withToken($token)
+    ->delete("https://arqel.dev/api/marketplace/plugins/{$slug}/reviews/{$reviewId}/vote");
+```
+
+Moderation (Gate `marketplace.moderate-reviews`):
+
+```php
+Http::withToken($adminToken)
+    ->post("https://arqel.dev/api/marketplace/admin/reviews/{$reviewId}/moderate", [
+        'action' => 'publish',
+    ]);
+
+Http::withToken($adminToken)
+    ->post("https://arqel.dev/api/marketplace/admin/reviews/{$reviewId}/moderate", [
+        'action' => 'hide',
+        'reason' => 'Spam content',
+    ]);
+```
+
+`verified_purchaser` é column placeholder (default `false`) — preparação para paid plugins; ainda não populada por nenhum fluxo.
+
 **Por chegar:**
 
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).

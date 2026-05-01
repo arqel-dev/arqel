@@ -31,8 +31,8 @@ final class PluginDetailController
 
         $reviews = PluginReview::query()
             ->where('plugin_id', $plugin->id)
-            ->orderByDesc('created_at')
-            ->orderByDesc('id')
+            ->published()
+            ->mostHelpful()
             ->limit(5)
             ->get();
 

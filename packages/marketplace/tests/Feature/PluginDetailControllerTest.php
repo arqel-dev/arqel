@@ -37,6 +37,7 @@ it('returns plugin with versions and reviews', function (): void {
         'user_id' => 42,
         'stars' => 5,
         'comment' => 'great',
+        'status' => 'published',
     ]);
 
     $response = $this->getJson('/api/marketplace/plugins/happy');

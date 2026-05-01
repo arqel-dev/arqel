@@ -167,14 +167,36 @@ final class NewCommand extends Command
         }
         fclose($tty);
 
-        $process = @proc_open('stty -g 2>/dev/null', [
+        // Probe with a full round-trip: capture `stty -g` and feed it back to
+        // `stty <mode>`. If the terminal is POSIX-compliant, this is a no-op
+        // and exits 0; embedded pseudo-TTYs (Claude Code, some CIs) emit a
+        // non-POSIX serialization that hex-matches but `stty <mode>` rejects.
+        $mode = self::execAgainstTty('stty -g');
+        if ($mode === null || $mode === '') {
+            return false;
+        }
+
+        // Use shell escape to keep the value verbatim through the shell.
+        $escaped = escapeshellarg($mode);
+        $roundTrip = self::execAgainstTty('stty '.$escaped);
+
+        return $roundTrip !== null;
+    }
+
+    /**
+     * Run a shell command with /dev/tty as stdin; return stdout on exit 0,
+     * null on any failure (proc_open error, non-zero exit, stderr noise).
+     */
+    private static function execAgainstTty(string $command): ?string
+    {
+        $process = @proc_open($command.' 2>/dev/null', [
             0 => ['file', '/dev/tty', 'r'],
             1 => ['pipe', 'w'],
             2 => ['pipe', 'w'],
         ], $pipes);
 
         if (! is_resource($process)) {
-            return false;
+            return null;
         }
 
         $stdout = stream_get_contents($pipes[1]) ?: '';
@@ -183,15 +205,10 @@ final class NewCommand extends Command
         $code = proc_close($process);
 
         if ($code !== 0) {
-            return false;
+            return null;
         }
 
-        $mode = trim($stdout);
-        if ($mode === '') {
-            return false;
-        }
-
-        return preg_match('/^[a-zA-Z0-9 :=,\-]+$/', $mode) === 1;
+        return trim($stdout);
     }
 
     private function resolvePlatform(string $forced): string

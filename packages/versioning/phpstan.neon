@@ -1,0 +1,22 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    excludePaths:
+        analyseAndScan:
+            - vendor/*
+    tmpDir: .phpstan.cache
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # The Versionable trait is consumed by user-land Eloquent models;
+        # PHPStan cannot see a concrete consumer in the analysed paths and
+        # would report `trait.unused`. Tests use it via fixtures under
+        # `tests/Fixtures/`.
+        -
+            identifier: trait.unused
+            path: src/Concerns/Versionable.php

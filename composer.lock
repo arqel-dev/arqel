@@ -4,12 +4,12 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1928df55c742884a2c8d60ca20cb8d97",
+    "content-hash": "920e5287a9fcc29862753ac8f6e77f09",
     "packages": [],
     "packages-dev": [
         {
             "name": "arqel/actions",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/actions",
@@ -85,7 +85,7 @@
         },
         {
             "name": "arqel/ai",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/ai",
@@ -168,7 +168,7 @@
         },
         {
             "name": "arqel/audit",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/audit",
@@ -246,7 +246,7 @@
         },
         {
             "name": "arqel/auth",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/auth",
@@ -325,7 +325,7 @@
         },
         {
             "name": "arqel/core",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
@@ -401,7 +401,7 @@
         },
         {
             "name": "arqel/export",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/export",
@@ -483,7 +483,7 @@
         },
         {
             "name": "arqel/fields",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/fields",
@@ -558,7 +558,7 @@
         },
         {
             "name": "arqel/fields-advanced",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/fields-advanced",
@@ -635,7 +635,7 @@
         },
         {
             "name": "arqel/form",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/form",
@@ -710,7 +710,7 @@
         },
         {
             "name": "arqel/mcp",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
@@ -786,7 +786,7 @@
         },
         {
             "name": "arqel/nav",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/nav",
@@ -862,7 +862,7 @@
         },
         {
             "name": "arqel/realtime",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/realtime",
@@ -948,7 +948,7 @@
         },
         {
             "name": "arqel/table",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/table",
@@ -1023,7 +1023,7 @@
         },
         {
             "name": "arqel/tenant",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/tenant",
@@ -1101,8 +1101,89 @@
             }
         },
         {
+            "name": "arqel/versioning",
+            "version": "dev-worktree-agent-c38",
+            "dist": {
+                "type": "path",
+                "url": "packages/versioning",
+                "reference": "81c34ca8b1eeb6c08de4e0a573d5280c7039e611"
+            },
+            "require": {
+                "arqel/core": "@dev",
+                "illuminate/support": "^12.0|^13.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.9",
+                "laravel/pint": "^1.29",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "suggest": {
+                "spatie/laravel-eventsourcing": "Optional — pair with arqel/versioning when migrating to a full event-sourced model (^7.0)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Versioning\\VersioningServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Versioning\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Versioning\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse src tests"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Time-travel record versioning for Arqel — Versionable trait + version snapshots with diff tracking and pruning.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "audit",
+                "laravel",
+                "time-travel",
+                "versioning"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel/arqel/issues",
+                "source": "https://github.com/arqel/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "arqel/widgets",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/widgets",
@@ -1178,7 +1259,7 @@
         },
         {
             "name": "arqel/workflow",
-            "version": "dev-main",
+            "version": "dev-worktree-agent-c38",
             "dist": {
                 "type": "path",
                 "url": "packages/workflow",
@@ -8025,6 +8106,7 @@
         "arqel/realtime": 20,
         "arqel/table": 20,
         "arqel/tenant": 20,
+        "arqel/versioning": 20,
         "arqel/widgets": 20,
         "arqel/workflow": 20
     },

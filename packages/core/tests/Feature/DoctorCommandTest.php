@@ -59,7 +59,7 @@ it('emits a parseable JSON document with --json', function (): void {
 
     foreach ($decoded['checks'] as $check) {
         expect($check)->toHaveKeys(['name', 'status', 'message']);
-        expect($check['status'])->toBeIn(['ok', 'warn', 'fail']);
+        expect($check['status'])->toBeIn(['ok', 'warn', 'fail', 'neutral']);
     }
 });
 

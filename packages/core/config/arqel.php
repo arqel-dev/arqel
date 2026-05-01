@@ -25,4 +25,16 @@ return [
             'resources/js/app.tsx',
         ],
     ],
+
+    // Laravel Cloud auto-configure (LCLOUD-002).
+    //
+    // Quando a app roda em Laravel Cloud, o `CloudConfigurator` ajusta
+    // drivers de filesystem/cache/queue/session/broadcasting/logging
+    // para os valores recomendados pela plataforma. O comportamento é
+    // opt-in via env (`LARAVEL_CLOUD=true`) e pode ser desabilitado
+    // explicitamente com `ARQEL_CLOUD_AUTO_CONFIGURE=false`.
+    'cloud' => [
+        'enabled' => env('LARAVEL_CLOUD', false),
+        'auto_configure' => env('ARQEL_CLOUD_AUTO_CONFIGURE', true),
+    ],
 ];

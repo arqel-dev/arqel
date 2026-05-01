@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Arqel\Core;
 
+use Arqel\Core\Cloud\CloudConfigurator;
+use Arqel\Core\Cloud\CloudDetector;
 use Arqel\Core\CommandPalette\CommandRegistry;
 use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
 use Arqel\Core\CommandPalette\Providers\ThemeCommandProvider;
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
+use Arqel\Core\Console\CloudInfoCommand;
 use Arqel\Core\Console\DoctorCommand;
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\DevTools\PolicyLogCollector;
@@ -17,6 +20,7 @@ use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Core\Support\InertiaDataBuilder;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -38,6 +42,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
                 InstallCommand::class,
                 MakeResourceCommand::class,
                 DoctorCommand::class,
+                CloudInfoCommand::class,
             ]);
     }
 
@@ -47,6 +52,8 @@ final class ArqelServiceProvider extends PackageServiceProvider
         // before any application provider that may register commands
         // or providers eagerly during boot.
         $this->app->singleton(CommandRegistry::class);
+        $this->app->singleton(CloudDetector::class);
+        $this->app->singleton(CloudConfigurator::class);
     }
 
     public function packageBooted(): void
@@ -68,6 +75,37 @@ final class ArqelServiceProvider extends PackageServiceProvider
 
         $this->registerResourceRoutes();
         $this->registerBuiltInCommandProviders();
+
+        $this->app->booted(function (): void {
+            $this->applyCloudAutoConfigure();
+        });
+    }
+
+    /**
+     * Apply Laravel Cloud-friendly defaults at runtime (LCLOUD-002).
+     *
+     * Runs after the application has booted so all providers had a
+     * chance to publish their config. The configurator is itself a
+     * no-op when the host is not Laravel Cloud or when auto-configure
+     * is disabled, so this is safe everywhere.
+     */
+    protected function applyCloudAutoConfigure(): void
+    {
+        try {
+            if (! $this->app->resolved('config')) {
+                return;
+            }
+
+            $configurator = $this->app->make(CloudConfigurator::class);
+            assert($configurator instanceof CloudConfigurator);
+            $changed = $configurator->configure();
+
+            if ($changed !== [] && $this->app->environment('local')) {
+                Log::info('Arqel Cloud auto-configure applied', ['changed' => $changed]);
+            }
+        } catch (Throwable) {
+            // Never let cloud auto-configure block app boot.
+        }
     }
 
     /**

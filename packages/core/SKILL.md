@@ -299,6 +299,49 @@ Skip explícito: `--no-interaction` desactiva o wizard e exige `model` como argu
 
 **Coverage**: 9 testes feature em `tests/Feature/MakeResourceCommandTest.php` + 8 testes unit em `tests/Unit/Generators/ResourceGeneratorTest.php`.
 
+## Laravel Cloud auto-configure (LCLOUD-002)
+
+Quando o app roda em Laravel Cloud, o `ArqelServiceProvider` aplica defaults adequados à plataforma sem exigir configuração manual.
+
+**Como funciona:**
+
+1. `Arqel\Core\Cloud\CloudDetector` detecta o ambiente via 3 sinais defensivos: env `LARAVEL_CLOUD`, env `CLOUD_ENVIRONMENT` ou ficheiro `/var/run/laravel-cloud`.
+2. Após `app->booted()`, o `Arqel\Core\Cloud\CloudConfigurator` ajusta drivers que ainda estejam nos defaults locais:
+   - `filesystems.default`: `local` → `s3`
+   - `cache.default`: `array`/`file` → `redis`
+   - `queue.default`: `sync` → `redis`
+   - `session.driver`: `file` → `redis`
+   - `broadcasting.default`: `*` → `reverb` (apenas se `REVERB_HOST` estiver definido)
+   - `logging.default`: `*` → `stderr` (Laravel Cloud captura stdout/stderr)
+3. Drivers já personalizados pelo app são respeitados — o configurator nunca sobrescreve um driver não-default.
+4. Cada update é envolto em `try/catch`; falhas viram `Log::warning` mas nunca quebram o boot.
+
+**Opt-out explícito:**
+
+```env
+ARQEL_CLOUD_AUTO_CONFIGURE=false
+```
+
+Ou via config publicada (`config/arqel.php`):
+
+```php
+'cloud' => [
+    'enabled' => env('LARAVEL_CLOUD', false),
+    'auto_configure' => env('ARQEL_CLOUD_AUTO_CONFIGURE', true),
+],
+```
+
+**Comando de diagnóstico:**
+
+```bash
+php artisan arqel:cloud:info          # output humano
+php artisan arqel:cloud:info --json   # output JSON (deploy hooks / CI)
+```
+
+Mostra plataforma detectada, status do auto-configure e os drivers efectivos. Útil em deploy hooks para verificar que o runtime captou as variáveis cloud correctamente.
+
+**Doctor checks:** `arqel:doctor` inclui dois checks novos: `cloud.detected` (`ok` em cloud, `neutral` em host genérico) e `cloud.auto_configure` (`warn` se desabilitado em production, `ok` caso contrário).
+
 ## Anti-patterns
 
 - ❌ **Depender directamente de pacotes descendentes** (`arqel/fields`, `arqel/table`, ...). Core é a base; inversão de dependência. Se precisas de algo de `fields`, expõe um contract em `core` que `fields` implementa.

@@ -1,0 +1,16 @@
+name: {{APP_NAME}}
+
+services:
+  web:
+    image: php:8.3
+    env:
+      - APP_ENV=production
+      - APP_NAME={{APP_NAME}}
+  redis:
+    enabled: true
+  postgres:
+    version: 16
+    extensions:
+      - pgvector
+  reverb:
+    enabled: true

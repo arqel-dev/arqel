@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Cli;
 
+use Arqel\Cli\Commands\CloudExportCommand;
 use Arqel\Cli\Commands\InstallCommand;
 use Arqel\Cli\Commands\NewCommand;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -20,5 +21,6 @@ final class Application extends BaseApplication
 
         $this->addCommand(new NewCommand);
         $this->addCommand(new InstallCommand);
+        $this->addCommand(new CloudExportCommand);
     }
 }

@@ -42,6 +42,7 @@ use Illuminate\Support\Carbon;
  * @property int $price_cents
  * @property string $currency
  * @property int|null $publisher_user_id
+ * @property string|null $publisher_stripe_account_id
  * @property int $revenue_share_percent
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -79,6 +80,7 @@ final class Plugin extends Model
         'price_cents',
         'currency',
         'publisher_user_id',
+        'publisher_stripe_account_id',
         'revenue_share_percent',
     ];
 

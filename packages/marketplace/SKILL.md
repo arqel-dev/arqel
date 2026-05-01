@@ -269,7 +269,7 @@ php artisan arqel:marketplace:scan --plugin=acme-stripe --dry-run
 - **`Contracts\PaymentGateway`** — strategy interface (`createCheckoutSession`, `verifyPayment`, `processRefund`).
 - **`Contracts\CheckoutSession`** + **`PaymentResult`** — DTOs `final readonly`.
 - **`Services\Payments\MockPaymentGateway`** (`final readonly`) — default. URL stub `/marketplace/mock-checkout/{slug}`, `sessionId` prefixado `mock_`. Refunds só passam para purchases `completed`.
-- **`Services\Payments\StripeConnectGateway`** (`final readonly`) — placeholder; todos métodos lançam `RuntimeException("TODO MKTPLC-008-stripe-real: integrate stripe-php SDK")`. Stripe real fica para follow-up (legal/tax review pendente).
+- **`Services\Payments\StripeConnectGateway`** (`final readonly`) — integração real com Stripe Connect via SDK `stripe/stripe-php` (declarado em `suggest`, não `require`). Constructor instancia `\Stripe\StripeClient` quando o SDK está disponível; lança `RuntimeException` orientativa quando ausente. `createCheckoutSession` cria Stripe Checkout Session com `application_fee_amount` + `transfer_data.destination` quando o `Plugin` tem `publisher_stripe_account_id`. Todos os métodos envolvem `\Stripe\Exception\ApiErrorException` em `MarketplaceException` (verify/checkout) ou retornam `false` + log warning (refund).
 - **`Services\LicenseKeyGenerator`** (`final readonly`) — `generate()` retorna `ARQ-XXXX-XXXX-XXXX-XXXX` (4 grupos hex de 4 chars via `random_bytes(8)`); `verify()` valida formato + match + status `completed`, usando `hash_equals` para timing safety.
 - **Controllers**:
   - `PluginPurchaseController::initiate` — `POST {prefix}/plugins/{slug}/purchase` (auth, 422 free, 401 unauth, 404). Reusa pending; retorna `already_owned: true` se já houver purchase completed.
@@ -282,15 +282,30 @@ php artisan arqel:marketplace:scan --plugin=acme-stripe --dry-run
 
 ### Premium plugins (MKTPLC-008)
 
-A integração Stripe real fica para follow-up dedicado — exige revisão legal/fiscal, escolha entre Stripe Connect Standard vs Express, plus setup de webhooks idempotentes. Por enquanto o default é `MockPaymentGateway` (testes/dev) e `StripeConnectGateway` é placeholder que lança `RuntimeException`.
+O default é `MockPaymentGateway` (testes/dev) e `StripeConnectGateway` real está disponível como gateway opt-in via config + SDK adicional.
 
-Para ativar Stripe real (futuro), host app rebinda no provider:
+**Setup Stripe** (host apps que querem cobrar plugins reais):
+
+```bash
+composer require stripe/stripe-php
+```
+
+```env
+ARQEL_MARKETPLACE_PAYMENT_GATEWAY=stripe
+STRIPE_SECRET=sk_live_...
+STRIPE_PLATFORM_ACCOUNT_ID=acct_platform_xxx
+STRIPE_PLATFORM_FEE_PERCENT=20
+```
+
+Quando `payment_gateway=stripe` mas o SDK ausente, o provider faz fallback para `MockPaymentGateway` e loga warning (não quebra o app). Migração `2026_05_07_000000_add_publisher_stripe_to_arqel_plugins.php` adiciona `publisher_stripe_account_id` em `arqel_plugins` — quando preenchido, checkout dispara split via `application_fee_amount` + `transfer_data`. Sem essa coluna preenchida, todo o pagamento fica na conta da plataforma (útil para plugins próprios da Arqel).
+
+Host apps que precisam de gateway customizado podem rebindar:
 
 ```php
 // app/Providers/AppServiceProvider.php
 $this->app->bind(
     \Arqel\Marketplace\Contracts\PaymentGateway::class,
-    \App\Marketplace\StripeConnectGateway::class,
+    \App\Marketplace\CustomGateway::class,
 );
 ```
 
@@ -323,7 +338,7 @@ Revenue share padrão é `80%` para o publisher / `20%` para Arqel (configuráve
 
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).
 - **MKTPLC-005+** — Admin panel (Arqel-powered) para publishers + moderação.
-- **MKTPLC-008-stripe-real** — Integração Stripe Connect real + webhooks + payouts cron.
+- **MKTPLC-008-stripe-webhooks** — Webhooks idempotentes (Stripe Connect transfers, refund.updated, payment_intent.succeeded) + payouts cron job mensal.
 
 ## Conventions
 

@@ -12,7 +12,8 @@ Esta página cobre o ciclo financeiro completo de um plugin pago — do `price_c
 | `MockPaymentGateway` (default para dev/test) | ✅ Entregue |
 | `LicenseKeyGenerator` formato `ARQ-XXXX-XXXX-XXXX-XXXX` | ✅ Entregue |
 | Endpoints `purchase` / `confirm` / `download` / `refund` | ✅ Entregue |
-| `StripeConnectGateway` real | ⏳ Placeholder (lança `RuntimeException`) — depende de revisão legal/fiscal |
+| `StripeConnectGateway` real | ✅ Entregue — opt-in via `composer require stripe/stripe-php` + config `payment_gateway=stripe` |
+| Webhooks Stripe (idempotência, refund.updated) | ⏳ Próximo follow-up |
 | Payouts cron job (mensal, threshold $50) | ⏳ Schema pronto, scheduler é TODO follow-up |
 | Tax invoicing | ⏳ Out of scope da Arqel — publisher é responsável |
 
@@ -28,6 +29,128 @@ public function register(): void
     );
 }
 ```
+
+## Configurando Stripe Connect
+
+O `StripeConnectGateway` real é opt-in — apps que querem cobrar plugins reais ativam o gateway via dependência adicional + config. O SDK `stripe/stripe-php` adiciona ~200KB ao vendor, então o pacote `arqel/marketplace` declara em `suggest` (não `require`). Apps que usam apenas plugins gratuitos não pagam o custo.
+
+### Pré-requisitos
+
+1. **Conta Stripe ativa** com Connect habilitado. Acesse [dashboard.stripe.com/connect](https://dashboard.stripe.com/connect/overview) e siga o onboarding de plataforma. Cobertura: USD, BRL, EUR, GBP e mais 130 currencies.
+2. **Plano de Connect** — Standard, Express ou Custom. Para o marketplace Arqel padrão, recomendamos **Express** (menor friction de onboarding para publishers; Stripe hostea o KYC).
+3. **Webhook endpoint público** — Stripe entrega eventos via HTTPS. Se você está em dev, use [Stripe CLI](https://stripe.com/docs/stripe-cli) (`stripe listen --forward-to localhost:8000/stripe/webhook`).
+
+### Instalação
+
+```bash
+composer require stripe/stripe-php
+```
+
+Verifique a instalação:
+
+```bash
+composer show stripe/stripe-php
+# stripe/stripe-php  v16.x.x  Stripe PHP Library
+```
+
+### Config + env vars
+
+No `.env` da app:
+
+```env
+# Driver de gateway
+ARQEL_MARKETPLACE_PAYMENT_GATEWAY=stripe
+
+# Credenciais Stripe (use sk_test_... em dev)
+STRIPE_SECRET=sk_live_51xxxxx
+STRIPE_PLATFORM_ACCOUNT_ID=acct_platformxxxxxx
+STRIPE_PLATFORM_FEE_PERCENT=20
+
+# URLs de retorno (Stripe Checkout redireciona pra cá após pagamento)
+STRIPE_SUCCESS_URL=https://arqel.dev/marketplace/checkout/success?session_id={CHECKOUT_SESSION_ID}
+STRIPE_CANCEL_URL=https://arqel.dev/marketplace/checkout/cancel
+```
+
+O `MarketplaceServiceProvider` lê esses valores em `register()` e instancia `StripeConnectGateway` automaticamente. Se `ARQEL_MARKETPLACE_PAYMENT_GATEWAY=stripe` mas o SDK não estiver instalado, o provider faz fallback para `MockPaymentGateway` e loga um warning — assim a app não quebra em CI/dev sem o SDK.
+
+### Onboarding de publishers (Connect)
+
+Cada publisher que quer vender plugins precisa de uma **Connect account** vinculada à sua conta de plataforma. O fluxo recomendado é Express (Stripe-hosted):
+
+1. Publisher clica em "Set up payouts" no admin do Arqel.
+2. App cria uma Connect Express account via Stripe API:
+
+   ```php
+   use Stripe\StripeClient;
+
+   $stripe = new StripeClient(config('arqel-marketplace.stripe.secret'));
+   $account = $stripe->accounts->create([
+       'type' => 'express',
+       'country' => 'BR',
+       'email' => $publisher->email,
+       'capabilities' => [
+           'card_payments' => ['requested' => true],
+           'transfers' => ['requested' => true],
+       ],
+   ]);
+   ```
+
+3. App cria account link e redireciona o publisher para Stripe-hosted onboarding:
+
+   ```php
+   $link = $stripe->accountLinks->create([
+       'account' => $account->id,
+       'refresh_url' => 'https://arqel.dev/publisher/stripe/refresh',
+       'return_url' => 'https://arqel.dev/publisher/stripe/return',
+       'type' => 'account_onboarding',
+   ]);
+
+   return redirect($link->url);
+   ```
+
+4. Após onboarding, persista o `account->id` em `arqel_plugins.publisher_stripe_account_id` (column adicionada pela migration `2026_05_07_000000_add_publisher_stripe_to_arqel_plugins.php`). A partir daí, todo checkout do plugin dispara `application_fee_amount` (Arqel cut, default 20%) + `transfer_data.destination` (publisher account).
+
+> Plugins **sem** `publisher_stripe_account_id` preenchido continuam funcionando — o pagamento todo fica na plataforma. Útil para plugins próprios da Arqel ou enquanto o publisher ainda não completou onboarding.
+
+### Testando com test cards
+
+Em dev/staging use `STRIPE_SECRET=sk_test_...`. Stripe oferece test cards previsíveis para simular cenários:
+
+| Número | Resultado |
+|---|---|
+| `4242 4242 4242 4242` | Success |
+| `4000 0000 0000 0002` | Generic decline |
+| `4000 0025 0000 3155` | Authentication required (3D Secure) |
+| `4000 0000 0000 9995` | Insufficient funds |
+
+Use qualquer CVC de 3 dígitos, qualquer ZIP de 5 dígitos, qualquer data futura. Lista completa em [stripe.com/docs/testing](https://stripe.com/docs/testing#cards).
+
+Fluxo end-to-end em dev:
+
+```bash
+# Terminal 1: forward webhooks
+stripe listen --forward-to localhost:8000/stripe/webhook
+
+# Terminal 2: app rodando
+php artisan serve
+
+# No app:
+# 1. Inicie purchase (POST /api/marketplace/plugins/{slug}/purchase)
+# 2. Use a checkout.url retornada — Stripe vai mostrar form de teste
+# 3. Cole 4242 4242 4242 4242 + qualquer CVC/ZIP/data futura
+# 4. Stripe redireciona para STRIPE_SUCCESS_URL com session_id
+# 5. App chama POST /api/marketplace/plugins/{slug}/purchase/confirm
+```
+
+### Troubleshooting comum
+
+| Sintoma | Causa | Solução |
+|---|---|---|
+| `RuntimeException: stripe/stripe-php SDK not installed` | SDK não instalado mas gateway ativado | `composer require stripe/stripe-php` |
+| Provider bind cai pra Mock + log warning | `payment_gateway=stripe` mas `class_exists(StripeClient)` false | Idem acima — verifique `composer show stripe/stripe-php` |
+| `MarketplaceException: Failed to create Stripe checkout session` | Erro upstream do Stripe (auth, currency inválida, etc.) | Cheque logs em `storage/logs/laravel.log` — exception original vai como `previous` |
+| Checkout não redireciona para publisher account | `publisher_stripe_account_id` null no plugin | Complete onboarding Connect; persista a column |
+| Application fee parece errada | `STRIPE_PLATFORM_FEE_PERCENT` não bate com o esperado | Cast é `(int)`; valor é % do `price_cents`. Para 15% use `STRIPE_PLATFORM_FEE_PERCENT=15` |
 
 ## Pricing de um plugin
 

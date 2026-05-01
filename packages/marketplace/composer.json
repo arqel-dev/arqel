@@ -24,9 +24,14 @@
     "require-dev": {
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29",
+        "mockery/mockery": "^1.6",
         "orchestra/testbench": "^9.0|^10.0",
         "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0"
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "stripe/stripe-php": "^15.0|^16.0"
+    },
+    "suggest": {
+        "stripe/stripe-php": "Required to enable StripeConnectGateway for premium plugins (composer require stripe/stripe-php)."
     },
     "autoload": {
         "psr-4": {

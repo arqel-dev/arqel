@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 FECHADA + Fase 4 EM ANDAMENTO (Batches #27..#45): Fase 3 toda ✅ + Fase 4 = CLI-TUI-001/002/004/005 + LCLOUD-001 ✅ · DEVTOOLS-001/002/003/004/005/008 ✅ · MKTPLC-001/002/003/005/006/007 ✅. Total ≈ 189 core + 153 ai + 46 realtime + 67 workflow PHP + 58 versioning PHP + 66 cli + 106 marketplace + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 61 devtools-extension + 43 react = ~898 testes diretos.** Próximo: DEVTOOLS-006 time-travel debugging, DEVTOOLS-007 performance metrics, MKTPLC-004 frontend marketplace site (XL), MKTPLC-008 paid plugins, MKTPLC-009 security scanning, MKTPLC-010 publisher docs, LCLOUD-002 cloud optimizations.
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 FECHADA + Fase 4 QUASE FECHADA (Batches #27..#46): Fase 3 toda ✅ + Fase 4 = CLI-TUI-001/002/004/005 ✅ · DEVTOOLS-001..008 ✅ · MKTPLC-001/002/003/005/006/007/009 ✅ · LCLOUD-001/002 ✅. Total ≈ 208 core + 153 ai + 46 realtime + 67 workflow PHP + 58 versioning PHP + 66 cli + 123 marketplace + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react = ~951 testes diretos.** Próximo: MKTPLC-004 frontend marketplace site (XL), MKTPLC-008 paid plugins (Stripe), MKTPLC-010 publisher docs, LCLOUD-003 monitoring (Pulse), CLI-TUI-003 Ink rich UI.
 
 **Fase:** 1 (MVP)
 

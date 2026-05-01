@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27..#36): AI-003..011 PHP + AI-007/008/009/010 React ✅ · RT-003/004/008/009/010/011/012 (incl. coverage + canonical SKILL) ✅ · WF-003..009 ✅. Total Fase 3 ≈ 109 ai + 46 realtime + 67 workflow PHP + 17 workflow JS + 19 realtime JS + 44 ai JS = ~302 testes diretos.** Próximo: AI-012 PromptLibrary + AI-013 MCP cross-package, AiImageInput React, WF-010 docs example workflows.
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 EM ANDAMENTO (Batches #27..#37): AI-003..012 PHP + AI-007..011 React ✅ · RT-003..012 ✅ · WF-003..010 ✅ (3 example workflow docs). Total Fase 3 ≈ 125 ai + 46 realtime + 67 workflow PHP + 17 workflow JS + 19 realtime JS + 56 ai JS = ~330 testes diretos.** Próximo: AI-013 MCP cross-package + qualquer AI follow-up (vision real nos providers, AI-007 stream SSE), WF-010 já entregue, demais Fase 3 quase encerrada — passar para Fase 4 (`PLANNING/11-fase-4-ecossistema.md`).
 
 **Fase:** 1 (MVP)
 

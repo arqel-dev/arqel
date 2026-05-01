@@ -1,0 +1,50 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    excludePaths:
+        analyseAndScan:
+            - vendor/*
+    tmpDir: .phpstan.cache
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # Pest closures are bound to a wrapped TestCase; testbench helpers
+        # like getJson/postJson/actingAs aren't visible to PHPStan.
+        -
+            identifier: method.notFound
+            path: tests/Feature/*
+        -
+            identifier: method.nonObject
+            path: tests/Feature/*
+        -
+            identifier: property.notFound
+            path: tests/Feature/*
+        -
+            identifier: property.nonObject
+            path: tests/Feature/*
+        -
+            identifier: missingType.iterableValue
+            path: tests/Feature/*
+        -
+            identifier: argument.type
+            path: tests/Feature/*
+        -
+            identifier: offsetAccess.nonOffsetAccessible
+            path: tests/Feature/*
+        -
+            identifier: method.notFound
+            path: tests/Unit/*
+        -
+            identifier: method.nonObject
+            path: tests/Unit/*
+        -
+            identifier: missingType.iterableValue
+            path: tests/Unit/*
+        -
+            identifier: argument.type
+            path: tests/Unit/*

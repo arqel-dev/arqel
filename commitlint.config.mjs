@@ -21,6 +21,7 @@ const scopes = [
   'fields-advanced',
   'audit',
   'export',
+  'marketplace',
   'versioning',
   'workflow',
   'realtime',

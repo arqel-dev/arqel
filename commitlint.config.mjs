@@ -30,6 +30,7 @@ const scopes = [
   'ui',
   'hooks',
   'types',
+  'devtools',
   // transversais
   'infra',
   'gov',

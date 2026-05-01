@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["chrome", "vitest/globals"],
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "noEmit": true,
+    "composite": false,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "vite.config.ts", "vitest.config.ts", "scripts/**/*"],
+  "exclude": ["dist", "node_modules"]
+}

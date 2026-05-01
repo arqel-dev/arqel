@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 FECHADA + Fase 4 EM ANDAMENTO (Batches #27..#41): Fase 3 toda ✅ + Fase 4 = CLI-TUI-004 doctor ✅, DEVTOOLS-001 extension scaffold ✅, CLI-TUI-001 NewCommand ✅, MKTPLC-001 marketplace REST API ✅. Total ≈ 169 core + 153 ai + 46 realtime + 67 workflow PHP + 58 versioning PHP + 12 cli + 18 marketplace + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 17 devtools-extension = ~649 testes diretos.** Próximo: DEVTOOLS-002 detection real, CLI-TUI-002 Resource generator, MKTPLC-002 submission workflow, e tickets restantes Fase 4 (DEVTOOLS-003..008, CLI-TUI-003/005, MKTPLC-003+).
+**Fase 1 100% fechada + Fase 2 COMPLETA + Fase 3 FECHADA + Fase 4 EM ANDAMENTO (Batches #27..#42): Fase 3 toda ✅ + Fase 4 = CLI-TUI-001/002/004 ✅ · DEVTOOLS-001/002 ✅ · MKTPLC-001/002 ✅. Total ≈ 180 core + 153 ai + 46 realtime + 67 workflow PHP + 58 versioning PHP + 12 cli + 37 marketplace + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 27 devtools-extension + 26 react = ~715 testes diretos.** Próximo: DEVTOOLS-003 inertia state inspector, CLI-TUI-003 Ink rich UI, MKTPLC-003+ ratings/stats, DEVTOOLS-004..008 painéis adicionais.
 
 **Fase:** 1 (MVP)
 

@@ -6,6 +6,7 @@ namespace Arqel\Marketplace\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -43,6 +44,7 @@ use Illuminate\Support\Carbon;
  * @property string $currency
  * @property int|null $publisher_user_id
  * @property string|null $publisher_stripe_account_id
+ * @property int|null $publisher_id
  * @property int $revenue_share_percent
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -81,6 +83,7 @@ final class Plugin extends Model
         'currency',
         'publisher_user_id',
         'publisher_stripe_account_id',
+        'publisher_id',
         'revenue_share_percent',
     ];
 
@@ -110,6 +113,14 @@ final class Plugin extends Model
     public function isPremium(): bool
     {
         return $this->price_cents > 0;
+    }
+
+    /**
+     * @return BelongsTo<Publisher, $this>
+     */
+    public function publisher(): BelongsTo
+    {
+        return $this->belongsTo(Publisher::class, 'publisher_id');
     }
 
     /**

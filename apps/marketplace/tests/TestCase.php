@@ -8,6 +8,7 @@ use App\Http\Controllers\BrowseController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PluginCompareController;
 use App\Http\Controllers\PluginDetailController;
+use App\Http\Controllers\PublisherProfileController;
 use Arqel\Core\ArqelServiceProvider;
 use Arqel\Marketplace\MarketplaceServiceProvider;
 use Illuminate\Foundation\Application;
@@ -63,5 +64,6 @@ abstract class TestCase extends Orchestra
         Route::get('/browse', BrowseController::class)->name('browse');
         Route::get('/compare', PluginCompareController::class)->name('compare');
         Route::get('/plugins/{slug}', PluginDetailController::class)->name('plugin.detail');
+        Route::get('/publishers/{slug}', PublisherProfileController::class)->name('publisher.profile');
     }
 }

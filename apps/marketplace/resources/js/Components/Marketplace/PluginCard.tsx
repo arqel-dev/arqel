@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { useCompareSlugs } from '../../hooks/useCompareSlugs';
 import type { Plugin } from '../../types';
+import { PublisherBadge } from './PublisherBadge';
 
 type Props = {
   plugin: Plugin;
@@ -48,6 +49,11 @@ export function PluginCard({ plugin }: Props): JSX.Element {
           {typeof plugin.stars === 'number' && <span data-testid="stars">⭐ {plugin.stars}</span>}
         </footer>
       </Link>
+      {plugin.publisher !== null && plugin.publisher !== undefined && (
+        <div className="mt-2">
+          <PublisherBadge publisher={plugin.publisher} showLink={false} />
+        </div>
+      )}
       <div className="mt-3 border-t border-neutral-100 pt-3">
         <button
           type="button"

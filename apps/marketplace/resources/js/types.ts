@@ -1,3 +1,25 @@
+export type PublisherSnapshot = {
+  id: number;
+  slug: string;
+  name: string;
+  avatar_url?: string | null;
+  verified?: boolean;
+};
+
+export type Publisher = PublisherSnapshot & {
+  bio?: string | null;
+  website_url?: string | null;
+  github_url?: string | null;
+  twitter_handle?: string | null;
+  user_id?: number | null;
+};
+
+export type PublisherStats = {
+  plugins_count: number;
+  total_downloads: number;
+  avg_rating: number;
+};
+
 export type Plugin = {
   id: number;
   slug: string;
@@ -17,6 +39,7 @@ export type Plugin = {
   currency?: string;
   reviews_count?: number;
   updated_at?: string | null;
+  publisher?: PublisherSnapshot | null;
 };
 
 export type PluginCategory = {

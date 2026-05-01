@@ -58,6 +58,7 @@ final class PluginReviewController
             [
                 'stars' => $data['stars'],
                 'comment' => $data['comment'] ?? null,
+                'status' => 'pending',
             ],
         );
 
@@ -68,6 +69,7 @@ final class PluginReviewController
                 'user_id' => $review->user_id,
                 'stars' => $review->stars,
                 'comment' => $review->comment,
+                'status' => $review->status,
                 'created_at' => $review->created_at?->toIso8601String(),
             ],
         ], 201);

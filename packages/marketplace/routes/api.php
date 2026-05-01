@@ -7,6 +7,9 @@ use Arqel\Marketplace\Http\Controllers\PluginAdminReviewController;
 use Arqel\Marketplace\Http\Controllers\PluginDetailController;
 use Arqel\Marketplace\Http\Controllers\PluginListController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewController;
+use Arqel\Marketplace\Http\Controllers\PluginReviewListController;
+use Arqel\Marketplace\Http\Controllers\PluginReviewModerationController;
+use Arqel\Marketplace\Http\Controllers\PluginReviewVoteController;
 use Arqel\Marketplace\Http\Controllers\PluginSubmissionController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +45,9 @@ Route::middleware('api')->prefix($prefix)->group(static function (): void {
 
     Route::get('plugins/{slug}', PluginDetailController::class)
         ->name('arqel.marketplace.plugins.show');
+
+    Route::get('plugins/{slug}/reviews', PluginReviewListController::class)
+        ->name('arqel.marketplace.plugins.reviews.index');
 });
 
 Route::middleware($reviewMiddleware)->prefix($prefix)->group(static function (): void {
@@ -56,4 +62,19 @@ Route::middleware($reviewMiddleware)->prefix($prefix)->group(static function ():
 
     Route::post('admin/plugins/{slug}/review', PluginAdminReviewController::class)
         ->name('arqel.marketplace.admin.review');
+
+    Route::post('plugins/{slug}/reviews/{reviewId}/vote', [PluginReviewVoteController::class, 'store'])
+        ->whereNumber('reviewId')
+        ->name('arqel.marketplace.plugins.reviews.vote.store');
+
+    Route::delete('plugins/{slug}/reviews/{reviewId}/vote', [PluginReviewVoteController::class, 'destroy'])
+        ->whereNumber('reviewId')
+        ->name('arqel.marketplace.plugins.reviews.vote.destroy');
+
+    Route::get('admin/reviews', [PluginReviewModerationController::class, 'index'])
+        ->name('arqel.marketplace.admin.reviews.index');
+
+    Route::post('admin/reviews/{reviewId}/moderate', [PluginReviewModerationController::class, 'moderate'])
+        ->whereNumber('reviewId')
+        ->name('arqel.marketplace.admin.reviews.moderate');
 });

@@ -9,11 +9,18 @@ type Props = {
   versions: PluginVersion[];
   reviews: Paginator<PluginReview>;
   related: Plugin[];
+  has_purchase?: boolean;
 };
 
 type Tab = 'readme' | 'versions' | 'reviews';
 
-export default function PluginDetail({ plugin, versions, reviews, related }: Props): JSX.Element {
+export default function PluginDetail({
+  plugin,
+  versions,
+  reviews,
+  related,
+  has_purchase = false,
+}: Props): JSX.Element {
   const [tab, setTab] = useState<Tab>('readme');
 
   const installCommand = plugin.composer_package
@@ -82,6 +89,23 @@ export default function PluginDetail({ plugin, versions, reviews, related }: Pro
           </section>
 
           <aside className="space-y-4">
+            {plugin.price_cents != null && plugin.price_cents > 0 && !has_purchase && (
+              <a
+                href={`/checkout/${plugin.slug}`}
+                data-testid="buy-now"
+                className="block rounded-lg bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Comprar agora
+              </a>
+            )}
+            {plugin.price_cents != null && plugin.price_cents > 0 && has_purchase && (
+              <div
+                data-testid="owned-badge"
+                className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-center text-sm font-semibold text-green-800"
+              >
+                Você já tem esse plugin
+              </div>
+            )}
             {installCommand && (
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
                 <h3 className="mb-2 text-sm font-semibold">Instalação</h3>

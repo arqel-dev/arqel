@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Arqel\Marketplace\Models\Plugin;
+use Arqel\Marketplace\Models\PluginPurchase;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -39,11 +41,26 @@ final class PluginDetailController
             ->limit(5)
             ->get();
 
+        $hasPurchase = false;
+        if (Auth::check()) {
+            $authId = Auth::id();
+            $userId = is_numeric($authId) ? (int) $authId : 0;
+
+            if ($userId !== 0) {
+                $hasPurchase = PluginPurchase::query()
+                    ->where('plugin_id', $plugin->id)
+                    ->where('buyer_user_id', $userId)
+                    ->where('status', 'completed')
+                    ->exists();
+            }
+        }
+
         return Inertia::render('Marketplace/PluginDetail', [
             'plugin' => $plugin,
             'versions' => $versions,
             'reviews' => $reviews,
             'related' => $related,
+            'has_purchase' => $hasPurchase,
         ]);
     }
 }

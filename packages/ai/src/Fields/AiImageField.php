@@ -193,8 +193,13 @@ final class AiImageField extends Field
         $manager = app(AiManager::class);
         $results = [];
 
+        $isBase64 = str_starts_with($imageUrlOrBase64, 'data:image');
+        $imageOptionKey = $isBase64 ? 'imageBase64' : 'imageUrl';
+
         foreach ($this->aiAnalysis as $key => $description) {
             $options = $this->aiOptions;
+            $options[$imageOptionKey] = $imageUrlOrBase64;
+            // Backwards-compat: providers que ainda lêem `image` continuam a funcionar.
             $options['image'] = $imageUrlOrBase64;
             if ($this->providerName !== null && ! isset($options['provider'])) {
                 $options['provider'] = $this->providerName;

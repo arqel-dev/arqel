@@ -23,8 +23,8 @@ use InvalidArgumentException;
 final class StateFilterFactory
 {
     /**
-     * @param class-string<Model> $modelClass
-     * @param string|null $field Override opcional; se omitido, lê do `WorkflowDefinition`.
+     * @param  class-string<Model>  $modelClass
+     * @param  string|null  $field  Override opcional; se omitido, lê do `WorkflowDefinition`.
      */
     public static function forResource(string $modelClass, ?string $field = null): StateFilter
     {

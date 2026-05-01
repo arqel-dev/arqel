@@ -108,7 +108,7 @@ final readonly class TransitionAuthorizer
     /**
      * Tenta `authorizeFor` (estático ou de instância) na transition.
      *
-     * @param class-string $transitionClass
+     * @param  class-string  $transitionClass
      */
     private static function callAuthorizeFor(string $transitionClass, ?Authenticatable $user, mixed $record): ?bool
     {
@@ -142,7 +142,7 @@ final readonly class TransitionAuthorizer
      * Resolve o primeiro `from()` da transition (igual `HasWorkflow::transitionApplies`).
      * Retorna `null` quando ausente — abilities ficam com `*` no slot from.
      *
-     * @param class-string $transitionClass
+     * @param  class-string  $transitionClass
      */
     private static function resolveFrom(string $transitionClass): ?string
     {
@@ -180,7 +180,7 @@ final readonly class TransitionAuthorizer
      * Resolve o `to` da transition. Tenta método estático `to()`; se ausente,
      * deriva do nome da classe via convenção `XxxToYyy`.
      *
-     * @param class-string $transitionClass
+     * @param  class-string  $transitionClass
      */
     private static function resolveTo(string $transitionClass): string
     {

@@ -101,8 +101,8 @@ trait HasWorkflow
      * The audit event is suppressed when `arqel-workflow.audit.enabled` is
      * `false`, allowing apps to opt-out per environment.
      *
-     * @param string $newState FQCN of the new state class, an enum value or a slug.
-     * @param array<string, mixed> $context Arbitrary metadata propagated to listeners.
+     * @param  string  $newState  FQCN of the new state class, an enum value or a slug.
+     * @param  array<string, mixed>  $context  Arbitrary metadata propagated to listeners.
      */
     public function transitionTo(string $newState, array $context = []): void
     {
@@ -195,7 +195,7 @@ trait HasWorkflow
      * `from()` method is considered always-available; otherwise the
      * current state key must appear in its `from()` list.
      *
-     * @param class-string $transition
+     * @param  class-string  $transition
      */
     private static function transitionApplies(string $transition, ?string $current): bool
     {

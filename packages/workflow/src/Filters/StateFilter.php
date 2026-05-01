@@ -24,8 +24,8 @@ use InvalidArgumentException;
 final readonly class StateFilter
 {
     /**
-     * @param string $field Coluna Eloquent que persiste a state (e.g. `order_state`).
-     * @param class-string<Model> $modelClass Eloquent model que usa o trait `HasWorkflow`.
+     * @param  string  $field  Coluna Eloquent que persiste a state (e.g. `order_state`).
+     * @param  class-string<Model>  $modelClass  Eloquent model que usa o trait `HasWorkflow`.
      */
     public function __construct(
         public string $field,
@@ -51,7 +51,7 @@ final readonly class StateFilter
     }
 
     /**
-     * @param class-string<Model> $modelClass
+     * @param  class-string<Model>  $modelClass
      */
     public static function make(string $field, string $modelClass): self
     {

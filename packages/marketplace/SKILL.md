@@ -358,6 +358,17 @@ $response = Http::withToken($token)
     ]);
 ```
 
+### Documentação pública (MKTPLC-010)
+
+Docs PT-BR para usuários e publishers em `apps/docs/marketplace/`:
+
+- [Visão geral](../../apps/docs/marketplace/README.md) — index com decision tree e comparação Composer/npm vs marketplace.
+- [Encontrando plugins](../../apps/docs/marketplace/finding-plugins.md) — busca, filtros, badges de segurança, instalação.
+- [Publicando plugins](../../apps/docs/marketplace/publishing.md) — submission, auto-checks, security scan, manual review, releases.
+- [Tutorial de desenvolvimento](../../apps/docs/marketplace/development-tutorial.md) — passo a passo do field-pack `acme/stripe-card`.
+- [Boas práticas de segurança](../../apps/docs/marketplace/security-best-practices.md) — vulnerabilities, license obligations, disclosure.
+- [Pagamentos & licenças](../../apps/docs/marketplace/payments-and-licensing.md) — pricing, license keys, payouts, refunds.
+
 ## Related
 
 - `arqel/core` — `Resource` API que MKTPLC-005 vai consumir para Arqel-powered admin do marketplace.

@@ -4,136 +4,57 @@
 
 ## Purpose
 
-`arqel/workflow` entrega o sistema de **state machines** do Arqel: define os estados possíveis de um model Eloquent, suas metadatas de UI (label/color/icon) e a lista de transições válidas entre eles. Cobre RF-IN-06.
+`arqel/workflow` entrega o sistema de **state machines** do Arqel: define os estados possíveis de um model Eloquent, suas metadatas de UI (label/color/icon), a lista de transições válidas entre eles, eventos de auditoria, autorização central e histórico append-only. Cobre RF-IN-06.
 
 A escolha é **integrar quando útil, sem amarrar**: a integração canônica é com [`spatie/laravel-model-states`](https://spatie.be/docs/laravel-model-states) (state classes + transition classes), mas o pacote é totalmente *duck-typed* — funciona também com PHP enums, slugs string ou tokens custom. `spatie/laravel-model-states` fica em `suggest:` no composer.json, nunca em `require`.
 
 ## Status
 
-**Entregue (WF-001):**
+### Entregue (WF-001 .. WF-009)
 
-- Esqueleto do pacote `arqel/workflow` com PSR-4 `Arqel\Workflow\` → `src/`, autoload-dev `Arqel\Workflow\Tests\` → `tests/`.
-- Path repository para `arqel/core` em `composer.json`; root `composer.json` adicionou `arqel/workflow: "@dev"` em `require-dev` (alfabético).
-- **`Arqel\Workflow\WorkflowServiceProvider`** auto-discovered via `extra.laravel.providers`. Boota via `Spatie\LaravelPackageTools\PackageServiceProvider` (`name('arqel-workflow')`, `hasConfigFile('arqel-workflow')`).
-- **`config/arqel-workflow.php`** publicável com chaves `default_color` (`'secondary'`) e `default_icon` (`'circle'`) — fallbacks que o futuro visualizer React (WF-005) consome quando uma state declara metadata parcial.
+**Definition + Trait (WF-001/002).** `WorkflowDefinition` (final) é o builder fluent: `make(string $field)` valida campo não-vazio; `states(array)` aceita `array<string, {label?, color?, icon?}>` com chaves tipicamente `class-string<State>` (ou enum value/slug arbitrário); `transitions(list<class-string>)` registra a lista de transições. Labels ausentes derivam do PascalCase final do FQCN (`OrderState\PendingPayment` → `Pending Payment`); `color`/`icon` ausentes caem em `'secondary'`/`'circle'`. `getStateMetadata()`, `getStates()`, `getTransitions()`, e `toArray()` (`{field, states, transitions}`) servem o React. `HasWorkflow` é o trait consumido por user-land Eloquent models — declara `arqelWorkflow(): WorkflowDefinition` e expõe `getCurrentStateMetadata()`, `getAvailableTransitions()` (filtra por `from()` estático ou trata como sempre-aberta quando ausente), e `transitionTo()`. A resolução de chave (`resolveStateKey`) é polimórfica: objetos → `::class`, `BackedEnum` → `value`, string → ela mesma, resto → `null`.
 
-**Entregue (WF-002):**
+**Service Provider + Config.** `WorkflowServiceProvider` é auto-discovered via `extra.laravel.providers`, boota via `Spatie\LaravelPackageTools\PackageServiceProvider` (`name('arqel-workflow')`, `hasConfigFile('arqel-workflow')` + `hasMigrations(...)`), e registra o listener canônico de história. `config/arqel-workflow.php` expõe blocos `audit`, `authorization`, `history`, `user_model`.
 
-- **`Arqel\Workflow\WorkflowDefinition`** (final) — fluent builder:
-  - `make(string $field): self` — factory; lança `InvalidArgumentException` se vazio.
-  - `states(array): self` — recebe `array<string, array{label?, color?, icon?}>`. As chaves são tipicamente `class-string<State>` do spatie, mas qualquer string não-vazia funciona (PHP enum value, slug). Labels ausentes são derivadas via PascalCase → "Pending Payment". `color`/`icon` ausentes caem em `'secondary'`/`'circle'`.
-  - `transitions(array $classes): self` — recebe `list<class-string>`.
-  - `getField(): string`, `getStates(): array`, `getTransitions(): array`, `getStateMetadata(string): ?array`.
-  - `toArray(): array` — payload `{field, states, transitions}` para serialização Inertia/React.
-- **`Arqel\Workflow\Concerns\HasWorkflow`** — trait consumido por user-land Eloquent models:
-  - método abstrato esperado: `arqelWorkflow(): WorkflowDefinition` (declarado via `@method` no doc-block + chamado dinamicamente).
-  - `getCurrentStateMetadata(): ?array` — lê `$this->{$definition->getField()}`, resolve a chave (FQCN para objetos, `value` para `BackedEnum`, string própria para strings) e devolve `getStateMetadata(...)`. Retorna `null` quando o campo está vazio ou a state não está registrada.
-  - `getAvailableTransitions(): list<class-string>` — itera `$definition->getTransitions()` e inclui cada transição que: (a) não tem `from()` estático (sempre disponível), ou (b) tem `from(): array` cujo retorno contém o key da state atual. Resolução de classes ausentes (`class_exists` falha) → exclui silenciosamente.
-- **Fixtures de teste** (`tests/Fixtures/`): `PendingState`/`PaidState`/`ShippedState`/`CancelledState` (stubs neutros, NÃO estendem nenhuma classe spatie) + `PendingToPaid`/`PaidToShipped`/`AnyToCancelled` (transições com/sem `from()`) + `WorkflowOrder` (Eloquent model usando o trait).
-- **Testes Pest 3** (Orchestra Testbench, sqlite in-memory):
-  - `Feature/WorkflowServiceProviderTest` (2): provider boota + config carregado com defaults.
-  - `Feature/HasWorkflowTest` (6): metadata da state atual + null gracioso (campo vazio + state não registrada) + transições filtradas por `from()` + transições sempre-abertas mesmo com state null.
-  - `Unit/WorkflowDefinitionTest` (7): build fluent + rejeição de field vazio + lookup de metadata + fallbacks de label/color/icon + `toArray()` + rejeição de chaves não-string + rejeição de transitions inválidas.
-  - **Total: 15 testes** (assumindo execução pós `composer install`).
+**Eventos (WF-004).** `Events\StateTransitioned` (final) é disparado *após* uma transição bem-sucedida. Carrega `record: Model`, `from: string`, `to: string`, `userId: ?int`, `context: array<string,mixed>`. Implementa `Dispatchable` + `SerializesModels`. **Não** implementa `ShouldBroadcast` por design — broadcasting é opt-in via listener dedicado. `HasWorkflow::transitionTo($newState, array $context = [])` captura state atual, delega à API spatie quando o state object atual tem `transitionTo()`, ou faz attribute assignment + save direto, e em seguida dispara o evento (capturando `Auth::id()`). Suprime quando `arqel-workflow.audit.enabled === false` ou `audit.log_via !== 'event'` — útil para migrations/seeders. O trait opcional `Concerns\RecordsStateTransition` permite que classes spatie `Transition` despachem o evento canônico do próprio `handle()`.
 
-**Entregue (WF-004):**
+**Authorization (WF-006).** `Authorization\TransitionAuthorizer` (final readonly) decide `(transitionClass, ?Authenticatable $user, mixed $record)` em 3 camadas: (1) `authorizeFor(?Authenticatable, mixed): bool` na transition (estático ou instância — preferido); (2) Gate `transition-{fromSlug}-to-{toSlug}` quando registrada; (3) **deny by default** — flag opt-out via `arqel-workflow.authorization.deny_when_undefined => false` (preserva legado WF-003). Exceções no `authorizeFor` degradam para `false` (fail closed). O helper `slugifyState(string)` gera kebab-case do segmento final do FQCN, removendo sufixo `State` (`'PendingPayment'` → `'pending-payment'`, `'PaidState'` → `'paid'`, `''`/`'*'` → `'*'`).
 
-- **`Arqel\Workflow\Events\StateTransitioned`** (final) — evento Laravel disparado *após* uma transição bem-sucedida. Carrega `record: Model`, `from: string`, `to: string`, `userId: ?int`, `context: array<string,mixed>`. Implementa `Dispatchable` + `SerializesModels`. **Não** implementa `ShouldBroadcast` por design — broadcasting é opt-in via listener dedicado, mantendo `arqel/workflow` standalone.
-- **`Arqel\Workflow\Concerns\HasWorkflow::transitionTo(string $newState, array $context = [])`** — helper que captura state atual via `resolveStateKey`, delega à API spatie quando `state->transitionTo()` existir, ou faz attribute assignment + save direto. Após mutação, dispara `StateTransitioned` capturando `Auth::id()`. Suprime evento quando `arqel-workflow.audit.enabled === false` ou `audit.log_via !== 'event'` — útil para migrations / seeders.
-- **`Arqel\Workflow\Concerns\RecordsStateTransition`** trait opcional para classes spatie `Transition` que prefiram disparar o evento canônico no próprio `handle()`. Exemplo de listener registro em `EventServiceProvider`:
-  ```php
-  protected $listen = [
-      \Arqel\Workflow\Events\StateTransitioned::class => [
-          \App\Listeners\LogTransitionToAudit::class,
-          \App\Listeners\BroadcastTransition::class,
-      ],
-  ];
-  ```
-- **Config bloco `audit`** em `arqel-workflow.php`: `enabled` (env `ARQEL_WORKFLOW_AUDIT_ENABLED`, default `true`) + `log_via` (`'event'|'silent'`, default `'event'`).
-- **8 testes Pest** novos em `Feature/StateTransitionedEventTest`: dispatch happy path, context propagation, captura `Auth::id()`, fallback para `null`, audit disabled skip, log_via silent skip, persistência do state após transitionTo, trait `RecordsStateTransition` em fixture spatie-style.
+**Histórico append-only (WF-007).** `Models\StateTransition` (final, `$timestamps = false`, `metadata` cast `array`, `created_at` cast `datetime`) persiste cada transição. Migration `2026_05_01_000000_create_arqel_state_transitions_table` cria `arqel_state_transitions` com `morphs('model')`, `from_state` (nullable), `to_state`, `transitioned_by_user_id` (indexed), `metadata` (JSON), `created_at` com `useCurrent()` (sem `updated_at` — append-only). `Listeners\PersistStateTransitionToHistory` (auto-registado pelo provider) escuta `StateTransitioned` e grava — skip silencioso quando `arqel-workflow.history.enabled === false`; captura `Throwable` para não bloquear a transição do domínio. `HasWorkflow::stateTransitions(): MorphMany` ordena por `created_at desc, id desc`. `StateTransition::user()` retorna `?BelongsTo` defensivo (lê `arqel-workflow.user_model`, default `App\\Models\\User`; `null` quando ausente). `Fields\StateTransitionField::resolveHistory()` lê o histórico real filtrado por `(model_type, model_id)` com limit configurável (`arqel-workflow.history.limit`, default 50) — best-effort com `Throwable` capturado.
 
-**Entregue (WF-006):**
+**Field React-bound (WF-005/006).** `Fields\StateTransitionField` (extends `Arqel\Fields\Field`) serializa `currentState: {name, label, color, icon}|null`, `transitions: list<{from, to, label, authorized}>` (delegando ao `TransitionAuthorizer`) e `history` (vinda de `StateTransition`). Métodos fluentes: `showDescription()`, `showHistory()`, `transitionsAttribute()`, `record()`. O componente React `arqel/workflow/StateTransition` (slice C29) consome estes props.
 
-- **`Arqel\Workflow\Authorization\TransitionAuthorizer`** (final readonly) — autorização central. 3 camadas em ordem de precedência: (1) `authorizeFor(?Authenticatable $user, mixed $record): bool` na transition class (estático ou instância — preferido); (2) Gate `transition-{fromSlug}-to-{toSlug}`; (3) **deny by default** — flag opt-out via `arqel-workflow.authorization.deny_when_undefined => false` (preserva legado WF-003). Exceções no `authorizeFor` degradam para `false` (fail closed).
-- Helper público `TransitionAuthorizer::slugifyState(string $stateClassOrKey): string` — kebab-case do segmento final do FQCN, sufixos `State` removidos. Útil para gerar Gate names manualmente.
-- **`StateTransitionField::resolveAvailableTransitions()`** atualizado para delegar ao `TransitionAuthorizer`. Payload `transitions[].authorized` reflete o resultado das 3 camadas.
-- **Breaking change vs WF-003**: `StateTransitionField` original retornava `true` quando nenhuma Gate estava registrada. Agora deny-by-default — defina a flag `deny_when_undefined => false` para opt-out.
-- **10 Pest tests** novos (8 unit + 2 feature integration).
+**Filter standalone (WF-008).** `Filters\StateFilter` (final readonly) extrai automaticamente as options do `WorkflowDefinition` de um model com `HasWorkflow`. Construtor valida classe + trait (lança `InvalidArgumentException`). `make($field, $modelClass)`, `toArray(): {field, type: 'state', label, options}`, `optionsArray(): array<string, {value, label, color, icon}>`, `apply(Builder, mixed)` — string → `where`, array → `whereIn` (filtra valores não-string/vazios), `null`/empty → no-op. `Filters\StateFilterFactory::forResource($modelClass, ?$field)` resolve o field via `arqelWorkflow()->getField()` quando omitido. **Sem hard-dep em `arqel/table`** por design — o user-land pluga `StateFilter::toArray()` em `Table::filters([...])`.
 
-**Entregue (WF-007):**
+**Cobertura de testes (WF-009).** 67 testes Pest 3 (Orchestra Testbench + sqlite in-memory): `WorkflowDefinitionTest` (7), `HasWorkflowTest` (6), `StateTransitionedEventTest` (8), `StateTransitionHistoryTest` (7), `WorkflowServiceProviderTest` (2), `StateTransitionFieldTest` (~10), `TransitionAuthorizerTest` (10), `StateFilterTest` (12), e o novo `Unit/Coverage/CoverageGapsTest` (9 cobrindo edge-cases de `guessLabel`, ordem de `getTransitions`, replace vs merge em `states()`, `slugifyState` para wildcard/digits/bare strings, `apply()` com array misto, defaults em `optionsArray`, round-trip de cast `metadata`, MorphTo `model()`, e ordem em `resolveAvailableTransitions`). PHPStan level max clean.
 
-- **Migration `2026_05_01_000000_create_arqel_state_transitions_table`** — cria a tabela append-only `arqel_state_transitions` com `morphs('model')`, `from_state` (nullable), `to_state`, `transitioned_by_user_id` (indexed), `metadata` (JSON), `created_at` com `useCurrent()`. Sem `updated_at` por design (audit é append-only).
-- **`Arqel\Workflow\Models\StateTransition`** (final) — Eloquent model com `$timestamps = false`, casts `metadata => array` + `created_at => datetime`. Relacionamentos: `model(): MorphTo` (polimórfico) e `user(): ?BelongsTo` (defensive — lê `arqel-workflow.user_model` default `App\\Models\\User`, retorna `null` se a classe não existir/não for `Model`).
-- **`Arqel\Workflow\Listeners\PersistStateTransitionToHistory`** (final) — listener auto-registado pelo `WorkflowServiceProvider::packageBooted()` via `Event::listen(StateTransitioned::class, ...)`. Persiste cada transição em `arqel_state_transitions` com `model_type`, `model_id`, `from_state` (null se vazio), `to_state`, `transitioned_by_user_id`, `metadata` (null se context vazio). Skip silencioso quando `arqel-workflow.history.enabled === false`. Captura `Throwable` defensivamente — falha de persistência não impede a transição do domínio.
-- **`HasWorkflow::stateTransitions()`** — `MorphMany<StateTransition, $this>` retornando o histórico do record ordenado por `created_at desc, id desc` (sqlite second-level ties resolvidos pelo id auto-increment). Uso direto em UIs de timeline: `$order->stateTransitions()->latest()->first()`.
-- **`StateTransitionField::resolveHistory()`** — agora retorna entries reais filtradas por `(model_type, model_id)` (limit configurável via `arqel-workflow.history.limit`, default 50). Cada row: `{from, to, at (ISO 8601), by, metadata}`. Best-effort: captura `Throwable` e retorna `[]` se a tabela não foi migrada.
-- **Config bloco `history`** em `arqel-workflow.php`: `enabled` (env `ARQEL_WORKFLOW_HISTORY_ENABLED`, default `true`) + `limit` (env `ARQEL_WORKFLOW_HISTORY_LIMIT`, default `50`).
-- **`tests/TestCase.php`** carrega migrações do pacote via `defineDatabaseMigrations()` (pattern alinhado com `arqel/ai`).
-- **7 testes Pest** novos em `Feature/StateTransitionHistoryTest`: persistência (model_type/model_id/from/to/userId/metadata) + JSON cast + relacionamento `stateTransitions()` + skip quando `history.enabled=false` + 2 transições sequenciais em ordem desc + `StateTransitionField::resolveHistory()` non-empty + `[]` quando record não está bound. **Total acumulado: 46 testes**.
+### Por chegar (diferidos para Fase 3 follow-up)
 
-Exemplo de consumo:
-
-```php
-// Latest transition de um order
-$last = $order->stateTransitions()->first();
-// StateTransition { from_state: 'Pending', to_state: 'Paid', metadata: [...], created_at }
-
-// Timeline completo
-foreach ($order->stateTransitions as $entry) {
-    echo "{$entry->from_state} → {$entry->to_state} at {$entry->created_at}\n";
-}
-
-// Disabled em jobs / seeders
-config()->set('arqel-workflow.history.enabled', false);
-$order->transitionTo(NewState::class); // não grava em arqel_state_transitions
-```
-
-**Entregue (WF-008):**
-
-- **`Arqel\Workflow\Filters\StateFilter`** (final readonly) — filtro standalone que extrai automaticamente as options do `WorkflowDefinition` de um Eloquent model com trait `HasWorkflow`. Construtor recebe `(string $field, class-string<Model> $modelClass)` e valida defensivamente que a classe existe + usa o trait (lança `InvalidArgumentException` caso contrário). Métodos:
-  - `make($field, $modelClass): self` — factory.
-  - `toArray(): array{field, type: 'state', label: 'State', options}` — payload pronto para Inertia / consumo do `arqel/table` no user-land.
-  - `optionsArray(): array<string, {value, label, color, icon}>` — keyed pelo state class/token, com metadata derivada de `WorkflowDefinition::getStateMetadata()`.
-  - `apply(Builder $query, mixed $value): void` — string aplica `where`, array aplica `whereIn`, null/empty/array vazio é no-op silencioso.
-- **`Arqel\Workflow\Filters\StateFilterFactory::forResource($modelClass, ?$field = null)`** — helper que resolve o `field` automaticamente via `arqelWorkflow()->getField()` quando o segundo argumento é omitido. Mesma validação defensiva.
-- **Sem hard-dep em `arqel/table`** — design intent. O `arqel/workflow` continua standalone; integração com `arqel/table` é responsabilidade do user-land (plug `StateFilter::toArray()` em `Table::filters([...])` ou exponha o `apply()` callback diretamente).
-- **12 Pest tests** novos em `tests/Unit/Filters/StateFilterTest.php`: factory, shape do `toArray()`, `optionsArray()` por state, `apply()` com string/array/null/empty/array vazio, defensive throws (sem trait, classe inexistente, field vazio), `StateFilterFactory::forResource()` resolve field e respeita override. **Total acumulado: 58 testes**.
-
-Exemplo de integração com `arqel/table` no user-land:
-
-```php
-use Arqel\Workflow\Filters\StateFilter;
-use Arqel\Workflow\Filters\StateFilterFactory;
-
-Table::make()->filters([
-    StateFilter::make('order_state', Order::class),
-    // ou via factory (resolve o field automaticamente):
-    StateFilterFactory::forResource(Order::class),
-]);
-```
-
-**Por chegar (WF-009+ — diferidos):**
-
-- `Http\Controllers\TransitionController` — endpoint `POST /admin/{resource}/{record}/transition/{transition}` que valida + dispara a transição (depende do registro `arqel/core` Resource + auth).
-- `WorkflowVisualizer` React component — diagrama interativo do workflow (states + transitions) consumindo `WorkflowDefinition::toArray()`.
-- Integração canônica com `spatie/laravel-model-states` — guard helpers + casts + transition events; o suggest entra em `require` quando o usuário opta in.
+- **WF-010** — `Http\Controllers\TransitionController`: endpoint `POST /admin/{resource}/{record}/transition/{transition}` que valida + dispara a transição (depende do registro `arqel/core` Resource + auth).
+- **WorkflowVisualizer React component** — diagrama interativo do workflow (states + transitions) consumindo `WorkflowDefinition::toArray()`.
+- **Integração canônica com `spatie/laravel-model-states`** — guard helpers + casts + transition events; o suggest entra em `require` quando o usuário opta in.
 
 ## Conventions
 
 - `declare(strict_types=1)` obrigatório em todos os arquivos PHP.
-- `WorkflowDefinition` é `final`; `HasWorkflow` é trait (consumida por user-land Eloquent models, portanto não pode ser final).
-- **Sem hard dep em `spatie/laravel-model-states`** — design intent. O pacote roda standalone com qualquer representação de state (FQCN, enum, string slug). A dep só é declarada como `suggest:` no `composer.json`.
-- Resolução de chave de state (`HasWorkflow::resolveStateKey`):
-  - objeto → `::class` (alinhado com spatie/laravel-model-states que indexa por FQCN)
-  - `BackedEnum` → `value`
-  - string não-vazia → ela mesma
-  - resto → `null` (graceful)
-- Transições sem `from()` são tratadas como **sempre disponíveis** (pattern "any-to-X", e.g. `Cancel`).
-- Labels ausentes em `states()` são derivadas pela última parte do FQCN, com PascalCase splitado por espaço (`PendingPayment` → `Pending Payment`).
+- `WorkflowDefinition`, `StateFilter`, `TransitionAuthorizer`, `StateTransition`, `Listeners\PersistStateTransitionToHistory`, `Events\StateTransitioned` são `final`. `HasWorkflow` e `RecordsStateTransition` são traits (consumidos por user-land, portanto não-final).
+- Resolução de chave de state (`HasWorkflow::resolveStateKey`): objeto → `::class` (alinhado com spatie), `BackedEnum` → `value`, string não-vazia → ela mesma, resto → `null` (graceful).
+- Transições sem `from()` estático são tratadas como **sempre disponíveis** (pattern "any-to-X", e.g. `Cancel`).
+- Labels ausentes derivam pela última parte do FQCN, com PascalCase splitado por espaço.
+- Authorization é **deny-by-default** (WF-006). Apps em migração que precisem do legado preservado definem `arqel-workflow.authorization.deny_when_undefined => false`.
+- Audit/history toleram falha — listeners capturam `Throwable` para não impedir a transição de domínio.
+
+## Anti-patterns
+
+- **Adicionar `spatie/laravel-model-states` em `require`** do pacote — quebra o design *suggest-only*. Cast spatie é declarado em `require` da **app**, não do pacote.
+- **Chamar API spatie diretamente do trait** (`->canTransitionTo(...)`, `transitionTo(...)` sem checagem de `method_exists`) — quebra duck-typing.
+- **Usar `getAvailableTransitions()` como autorização** — é metadata para UI. Authorization real fica em `TransitionAuthorizer` (ADR-017).
+- **Mutar state dentro de listener de `StateTransitioned`** — listeners devem ser side-effect only (audit, notify, broadcast). Mutar state cria loops e quebra a invariante append-only do histórico.
+- **Registrar a mesma state em chaves diferentes** (`OrderState\Paid::class` + `'paid'`) — `getCurrentStateMetadata()` resolve para uma chave canônica; entradas duplicadas vão silently miss.
 
 ## Examples
 
-Definição declarativa em um Eloquent Model:
+### Setup mínimo de workflow
 
 ```php
 use Arqel\Workflow\Concerns\HasWorkflow;
@@ -183,19 +104,77 @@ $payload = $order->arqelWorkflow()->toArray();
 // {field, states, transitions} — pronto para Inertia props
 ```
 
-## Anti-patterns
+### Listener de auditoria custom
 
-- Adicionar `spatie/laravel-model-states` em `require` do `arqel/workflow` — quebra o design *suggest-only*. Se você precisa do cast spatie, declare em `require` da sua **app**, não do pacote.
-- Chamar métodos específicos da spatie (`->canTransitionTo(...)`, `transitionTo(...)`) dentro do trait — quebra o duck-typing. Esse acoplamento entra apenas em WF-003+ (cross-package, opt-in).
-- Usar `getAvailableTransitions()` como autorização — é metadata para UI. Authorization real fica nos `Transition::class::canTransition()` da spatie ou em `Gate::allows()` no controller (ADR-017).
-- Registrar a mesma state em chaves diferentes (`OrderState\Paid::class` + `'paid'`) — `getCurrentStateMetadata()` resolve para uma chave canônica; entradas duplicadas vão silently miss.
-- `WorkflowDefinition::make('')` ou state map com chave vazia — lançam `InvalidArgumentException`.
+```php
+// EventServiceProvider
+protected $listen = [
+    \Arqel\Workflow\Events\StateTransitioned::class => [
+        \App\Listeners\LogTransitionToAudit::class,
+        \App\Listeners\BroadcastTransition::class,
+    ],
+];
+```
+
+Histórico nativo (WF-007) já é persistido pelo listener `PersistStateTransitionToHistory` registrado pelo provider. Para timeline:
+
+```php
+// Latest transition de um order
+$last = $order->stateTransitions()->first();
+
+// Timeline completo
+foreach ($order->stateTransitions as $entry) {
+    echo "{$entry->from_state} → {$entry->to_state} at {$entry->created_at}\n";
+}
+
+// Disabled em jobs / seeders
+config()->set('arqel-workflow.history.enabled', false);
+$order->transitionTo(NewState::class); // não grava em arqel_state_transitions
+```
+
+### Filter por state em Table
+
+```php
+use Arqel\Workflow\Filters\StateFilter;
+use Arqel\Workflow\Filters\StateFilterFactory;
+
+Table::make()->filters([
+    StateFilter::make('order_state', Order::class),
+    // ou via factory (resolve o field automaticamente):
+    StateFilterFactory::forResource(Order::class),
+]);
+```
+
+### Authorization com authorizeFor
+
+```php
+final class PaidToShipped
+{
+    /** @return list<class-string> */
+    public static function from(): array
+    {
+        return [OrderState\Paid::class];
+    }
+
+    public static function authorizeFor(?Authenticatable $user, mixed $record): bool
+    {
+        return $user !== null && $user->can('ship-orders', $record);
+    }
+}
+```
+
+Ou via Gate registrada em `AuthServiceProvider`:
+
+```php
+Gate::define('transition-paid-to-shipped', fn ($user, Order $order): bool
+    => $user->can('ship-orders', $order));
+```
 
 ## Related
 
 - Source: [`packages/workflow/src/`](./src/)
 - Testes: [`packages/workflow/tests/`](./tests/)
-- Tickets: [`PLANNING/10-fase-3-avancadas.md`](../../PLANNING/10-fase-3-avancadas.md) §WF-001..006
+- Tickets: [`PLANNING/10-fase-3-avancadas.md`](../../PLANNING/10-fase-3-avancadas.md) §WF-001..WF-009
 - API: [`PLANNING/05-api-php.md`](../../PLANNING/05-api-php.md) §Workflow
 - ADRs:
   - [ADR-001](../../PLANNING/03-adrs.md) — Inertia-only

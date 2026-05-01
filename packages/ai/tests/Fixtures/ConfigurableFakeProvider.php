@@ -80,4 +80,9 @@ class ConfigurableFakeProvider implements AiProvider
     {
         return false;
     }
+
+    public function supportsVision(): bool
+    {
+        return false;
+    }
 }

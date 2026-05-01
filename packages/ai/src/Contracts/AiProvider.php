@@ -42,4 +42,6 @@ interface AiProvider
     public function supportsEmbeddings(): bool;
 
     public function supportsStreaming(): bool;
+
+    public function supportsVision(): bool;
 }

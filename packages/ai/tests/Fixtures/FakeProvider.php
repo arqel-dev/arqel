@@ -70,4 +70,9 @@ class FakeProvider implements AiProvider
     {
         return false;
     }
+
+    public function supportsVision(): bool
+    {
+        return false;
+    }
 }

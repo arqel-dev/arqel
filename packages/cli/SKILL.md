@@ -17,7 +17,7 @@ e segue o mesmo idioma do Filament installer.
 
 ## Status
 
-### Entregue (CLI-TUI-001 + CLI-TUI-005)
+### Entregue (CLI-TUI-001 + CLI-TUI-005 + MKTPLC-005)
 
 - Scaffold do pacote: `composer.json` com `bin/arqel`, deps mínimas
   (`symfony/console ^7.0`, `laravel/prompts ^0.3`).
@@ -35,6 +35,19 @@ e segue o mesmo idioma do Filament installer.
   cobrindo nomes inválidos com whitespace/dot/slash/ASCII estendido,
   tenancy=spatie, mcpIntegration, sintaxe PowerShell e regression do
   registry de comandos).
+- `Arqel\Cli\Commands\InstallCommand` (`MKTPLC-005`) — signature
+  `install {package} {--marketplace-url=} {--no-prompts} {--platform=}
+  {--no-installer} {--migrate}`. Faz fetch de metadata via
+  `MarketplaceClient` (HTTP fetcher injectável p/ testes), valida
+  compat via `CompatibilityChecker` (subset Composer semver: caret,
+  tilde, `>=`/`<=`/`>`/`<`/`=`, exato, composto), e gera script
+  `arqel-install-{slug}.{sh|ps1}` na CWD via
+  `InstallScriptGenerator`. Mesma filosofia do `NewCommand`: o script
+  é revisável, nunca executado pelo CLI.
+- Suíte Pest agora com **53 testes** (4 unit MarketplaceClient + 10
+  unit CompatibilityChecker + 4 unit PluginMetadata + 6 unit
+  InstallScriptGenerator + 6 feature InstallCommand, somados aos
+  tests pré-existentes).
 - PHPStan level max limpo.
 
 ### Por chegar
@@ -105,6 +118,22 @@ bash arqel-setup-my-admin.sh
 arqel new my-admin
 # Prompts guiam starter / tenancy / first resource / dark mode / mcp.
 ```
+
+### Instalação de plugin do marketplace
+
+```bash
+# Dentro de uma app Arqel já scaffolded:
+arqel install acme/arqel-stripe-fields --no-prompts
+# => arqel-install-acme-arqel-stripe-fields.sh gerado na CWD.
+# Revisar e rodar:
+bash arqel-install-acme-arqel-stripe-fields.sh
+```
+
+O script contém `composer require`, `npm install` (se aplicável),
+`php artisan {plugin}:install` (se o plugin declara `installerCommand`)
+e opcionalmente `php artisan migrate` (`--migrate`). Antes de gerar,
+o CLI valida `compat.arqel` do plugin contra a versão atual do CLI
+(subset semver: `^1.0`, `~2.5`, `>=1.0`, etc.).
 
 ### Forçando plataforma (útil em testes / cross-OS)
 

@@ -15,6 +15,8 @@ export type Plugin = {
   stars?: number;
   price_cents?: number;
   currency?: string;
+  reviews_count?: number;
+  updated_at?: string | null;
 };
 
 export type PluginCategory = {

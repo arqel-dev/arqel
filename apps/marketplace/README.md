@@ -53,9 +53,27 @@ apps/marketplace/
 - Browse (filtros type/category + paginação)
 - Plugin Detail (header + tabs README/Versões/Reviews + sidebar install)
 
+## Compare side-by-side
+
+A rota `/compare?slugs=foo,bar,baz` renderiza uma comparação side-by-side de até 3
+plugins (mínimo 2). Plugins não publicados ou inexistentes aparecem em `notFound`,
+enquanto os encontrados são exibidos em `<CompareTable />` com destaque visual nas
+linhas em que os valores diferem entre colunas (preço, downloads, estrelas, tipo,
+versão, licença, último release, reviews).
+
+A seleção é mantida em `localStorage` (chave `arqel:compare:slugs`, máx 3) através
+do hook `useCompareSlugs`. Em `PluginCard` há o botão "Adicionar a comparar" e a
+barra flutuante `<CompareFloatingBar />` (renderizada globalmente) liga para
+`/compare` com os slugs selecionados.
+
+Comportamentos:
+
+- 422 quando a query string traz menos de 2 ou mais de 3 slugs.
+- Slugs não publicados são reportados em `notFound` (sem 404).
+- Ordem dos plugins na tabela respeita a ordem da query string.
+
 ## Deferido
 
-- Compare side-by-side de plugins → `MKTPLC-004-compare`
 - Publisher profile pages → `MKTPLC-004-publisher`
 - Payment checkout UI (paid plugins) → `MKTPLC-004-checkout`
 - SSR / Open Graph dinâmico → `MKTPLC-004-ssr`

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Commands;
 
+use Arqel\Core\Support\InteractiveTerminal;
 use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -129,6 +130,7 @@ final class InstallCommand extends Command
 
         $packageManager = $this->detectPackageManager($files);
         $shouldInstall = $this->option('force')
+            || ! InteractiveTerminal::supportsPrompts()
             || confirm(
                 label: "Install Arqel frontend packages with {$packageManager}?",
                 default: true,
@@ -154,6 +156,10 @@ final class InstallCommand extends Command
 
         if ($files->exists(base_path('package-lock.json'))) {
             return 'npm';
+        }
+
+        if (! InteractiveTerminal::supportsPrompts()) {
+            return 'pnpm';
         }
 
         return (string) select(
@@ -318,6 +324,12 @@ final class InstallCommand extends Command
     {
         if ($this->option('force')) {
             return true;
+        }
+
+        if (! InteractiveTerminal::supportsPrompts()) {
+            warning("{$this->relative($target)} already exists. Skipping (use --force to overwrite).");
+
+            return false;
         }
 
         return confirm(

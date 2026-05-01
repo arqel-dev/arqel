@@ -28,6 +28,26 @@ A escolha é **integrar quando útil, sem amarrar**: a integração canônica é
 
 **Cobertura de testes (WF-009).** 67 testes Pest 3 (Orchestra Testbench + sqlite in-memory): `WorkflowDefinitionTest` (7), `HasWorkflowTest` (6), `StateTransitionedEventTest` (8), `StateTransitionHistoryTest` (7), `WorkflowServiceProviderTest` (2), `StateTransitionFieldTest` (~10), `TransitionAuthorizerTest` (10), `StateFilterTest` (12), e o novo `Unit/Coverage/CoverageGapsTest` (9 cobrindo edge-cases de `guessLabel`, ordem de `getTransitions`, replace vs merge em `states()`, `slugifyState` para wildcard/digits/bare strings, `apply()` com array misto, defaults em `optionsArray`, round-trip de cast `metadata`, MorphTo `model()`, e ordem em `resolveAvailableTransitions`). PHPStan level max clean.
 
+### Real-time broadcasting (RT-cross)
+
+`arqel/workflow` permanece standalone — o pacote *não* depende de `arqel/realtime`. Porém, quando `arqel/realtime` está instalado na app, seu service provider registra automaticamente um listener default (`Arqel\Realtime\Workflow\BroadcastStateTransitionListener`) para o evento `Events\StateTransitioned`. Cada transição se torna um `Arqel\Realtime\Events\ResourceUpdated` broadcastado nos canais `arqel.{slug}` e `arqel.{slug}.{id}` do model em transição — sem código manual.
+
+Setup:
+
+```bash
+composer require arqel/realtime
+```
+
+Depois disso, qualquer `transitionTo()` num model com `HasWorkflow` propaga via WebSocket para a UI do Resource. Para opt-out global (e.g. import em massa):
+
+```php
+config()->set('arqel-realtime.workflow.broadcast_state_transitions', false);
+// ou no .env:
+// ARQEL_REALTIME_WORKFLOW_BROADCAST=false
+```
+
+A direção da dep é `realtime → workflow`: este pacote nunca importa nada de `arqel/realtime`. A wiring é por listener Laravel padrão, então user-land pode adicionar listeners adicionais (audit, notify) sem conflito.
+
 ### Por chegar (diferidos para Fase 3 follow-up)
 
 - **WF-010** — `Http\Controllers\TransitionController`: endpoint `POST /admin/{resource}/{record}/transition/{transition}` que valida + dispara a transição (depende do registro `arqel/core` Resource + auth).

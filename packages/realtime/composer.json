@@ -28,6 +28,8 @@
         "spatie/laravel-package-tools": "^1.16"
     },
     "require-dev": {
+        "arqel/fields": "@dev",
+        "arqel/workflow": "@dev",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29",
         "orchestra/testbench": "^9.0|^10.0",
@@ -35,6 +37,7 @@
         "pestphp/pest-plugin-laravel": "^3.0"
     },
     "suggest": {
+        "arqel/workflow": "@dev — install to broadcast workflow StateTransitioned events as ResourceUpdated automatically",
         "laravel/reverb": "^1.0 — first-party Laravel WebSocket server to deliver these broadcast events"
     },
     "autoload": {
@@ -64,6 +67,20 @@
         {
             "type": "path",
             "url": "../core",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../fields",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../workflow",
             "options": {
                 "symlink": true
             }

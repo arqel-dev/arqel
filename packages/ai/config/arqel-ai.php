@@ -35,6 +35,7 @@ return [
             'base_url' => env('ARQEL_AI_OLLAMA_URL', 'http://localhost:11434'),
             'model' => env('ARQEL_AI_OLLAMA_MODEL', 'llama3.1'),
             'embedding_model' => env('ARQEL_AI_OLLAMA_EMBEDDING_MODEL', 'nomic-embed-text'),
+            'vision_model' => env('ARQEL_AI_OLLAMA_VISION_MODEL', 'llava'),
         ],
     ],
 

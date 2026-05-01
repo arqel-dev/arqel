@@ -62,9 +62,11 @@ Convenções compartilhadas dos fields:
 **AI-015 — SKILL canônico**
 - Este arquivo reorganizado para layout canônico (`Purpose / Status / Conventions / Anti-patterns / Examples / Related`) preservando todos os exemplos PT-BR existentes.
 
-### Por chegar
+**AI-013-ollama — Vision real no OllamaProvider (llava)**
+- Ollama agora suporta vision nativa via modelos `llava` / `bakllava` / `llama3.2-vision`. `chat()` envia `messages[].images: [base64,...]` (base64 puro, sem prefixo `data:image/...;base64,`) para `/api/chat`. URLs são baixadas defensivamente via `Http::timeout(5)->get($url)` e convertidas para base64 — falha de download lança `AiException`. Quando há image option mas o `model` configurado é não-vision, o provider faz fallback automático para `visionModel` (default `llava`, override via `ARQEL_AI_OLLAMA_VISION_MODEL` ou parâmetro construtor).
+- **`AiProvider::supportsVision(): bool`** adicionado ao contrato. Claude/OpenAi/Ollama retornam `true`; fakes default `false`. Caller usa o flag para gated UI antes de injectar `imageUrl`/`imageBase64` em `options`.
 
-- **AI-014 follow-up — Vision real nos providers**: suporte nativo a vision em `ClaudeProvider` (image blocks Anthropic) e `OpenAiProvider` (image_url/base64 em chat completions) tem ground-work no worktree (data URI + URL HTTP); falta o consolidado + testes Http::fake em vision flow ponta-a-ponta.
+### Por chegar
 - **AI-015 follow-up — Docs site**: capítulo "AI fields" em `arqel.dev/docs/ai` cobrindo cada field + anti-patterns. Hoje a doc vive aqui em SKILL.md e nos exemplos PT-BR abaixo.
 - **AI-016+ — Streaming SSE end-to-end**: providers já implementam `stream()` (Anthropic SSE, OpenAI SSE, Ollama NDJSON). Falta a ponte React/Inertia para receber chunks num `AiTextField` (provavelmente via endpoint dedicado fora do ciclo Inertia, exposto como rota tipo `text/event-stream`).
 - **Fields React follow-up**: `AiTranslateInput.tsx`, `AiSelectInput.tsx`, `AiExtractInput.tsx` (componentes shadcn-styled com botão "Generate" + populate cross-field).
@@ -341,6 +343,33 @@ final class GenerateResourceFromDescriptionTool
 A chamada respeita as mesmas convenções deste pacote: Gate `use-ai`, cost
 tracking, cache opcional. Caller (Claude Code/Desktop via MCP) recebe o
 código gerado e decide se grava no path sugerido.
+
+### Vision com Ollama (llava local)
+
+```php
+use Arqel\Ai\Providers\OllamaProvider;
+
+// Por URL — provider baixa via Http::timeout(5) e converte para base64
+app(OllamaProvider::class)->chat([
+    ['role' => 'user', 'content' => 'What animal is in this image?'],
+], ['imageUrl' => 'https://example.com/cat.jpg']);
+
+// Por base64 (data URI ou base64 puro — provider faz strip do prefixo)
+app(OllamaProvider::class)->chat([
+    ['role' => 'user', 'content' => 'Describe this'],
+], ['imageBase64' => 'data:image/png;base64,iVBORw0KGgo...']);
+
+// Override explícito do model vision
+app(OllamaProvider::class)->chat($messages, [
+    'imageUrl' => 'https://example.com/x.jpg',
+    'model' => 'llama3.2-vision:latest',
+]);
+```
+
+Quando `chat()` recebe vision option mas o model configurado é não-vision (ex.:
+`llama3.1`), o provider faz fallback automático para o `visionModel`
+(default `llava`). Configure via `ARQEL_AI_OLLAMA_VISION_MODEL` ou parâmetro
+do construtor `visionModel:`.
 
 ### Consumir um result
 

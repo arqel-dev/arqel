@@ -157,6 +157,11 @@ final class OpenAiProvider implements AiProvider
         return true;
     }
 
+    public function supportsVision(): bool
+    {
+        return true;
+    }
+
     /**
      * Resolve a URL/data-URI a usar no bloco multimodal `image_url`.
      *

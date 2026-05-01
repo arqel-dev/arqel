@@ -132,6 +132,11 @@ final class ClaudeProvider implements AiProvider
         return true;
     }
 
+    public function supportsVision(): bool
+    {
+        return true;
+    }
+
     /**
      * Extract vision payload from options (supports `image`, `imageUrl`, `imageBase64`).
      *

@@ -7,6 +7,7 @@ namespace App\Tests;
 use App\Http\Controllers\BrowseController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PluginDetailController;
+use App\Http\Controllers\PublisherProfileController;
 use Arqel\Core\ArqelServiceProvider;
 use Arqel\Marketplace\MarketplaceServiceProvider;
 use Illuminate\Foundation\Application;
@@ -61,5 +62,6 @@ abstract class TestCase extends Orchestra
         Route::get('/', LandingController::class)->name('landing');
         Route::get('/browse', BrowseController::class)->name('browse');
         Route::get('/plugins/{slug}', PluginDetailController::class)->name('plugin.detail');
+        Route::get('/publishers/{slug}', PublisherProfileController::class)->name('publisher.profile');
     }
 }

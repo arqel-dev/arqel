@@ -334,6 +334,30 @@ $response = Http::withToken($token)
 
 Revenue share padrão é `80%` para o publisher / `20%` para Arqel (configurável por plugin via `revenue_share_percent`). Payouts são gerados em batch (cron job futuro) — esta fase entrega apenas a estrutura + endpoint de listagem.
 
+**Entregue (MKTPLC-004-publisher):** Publisher profile pages no app `apps/marketplace/`.
+
+- **Migration** `2026_05_08_000000_create_arqel_publishers.php` cria a tabela
+  `arqel_publishers` (slug unique, user_id nullable indexed, name, bio, avatar_url,
+  website_url, github_url, twitter_handle, verified bool default false, timestamps,
+  index `(verified, created_at)`) e adiciona `publisher_id` nullable indexed em
+  `arqel_plugins`.
+- **`Publisher` model** (`final`) — fillable + cast `verified => bool`. Relations:
+  `plugins()` HasMany via `publisher_id`. Scopes: `scopeVerified`, `scopeWithPlugins`
+  (publishers com ≥1 plugin published). Método `aggregateStats()` retorna
+  `{plugins_count, total_downloads, avg_rating}` baseado em plugins `status=published`,
+  `arqel_plugin_installations` e reviews `status=published`.
+- **`Plugin` model** estendido — `publisher_id` em fillable + relação `publisher()`
+  BelongsTo.
+- **App** `apps/marketplace/`: rota `GET /publishers/{slug}` →
+  `PublisherProfileController` (single-action `__invoke`, 404 quando slug não existe).
+  Inertia render `Marketplace/PublisherProfile` com `{publisher, plugins, stats}`.
+- **React** — `<PublisherBadge />` (avatar/initials fallback + nome + checkmark
+  "Verified") reutilizado em `<PluginCard />`. Página `PublisherProfile.tsx` com
+  header + bio + social links + KPIs + grid de plugins (empty state PT-BR).
+- **Testes**: Unit `Models/PublisherTest` (6) no pacote, Feature
+  `PublisherProfileControllerTest` (5) no app, Vitest `PublisherBadge` (3) +
+  `PublisherProfile` (4).
+
 **Por chegar:**
 
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).

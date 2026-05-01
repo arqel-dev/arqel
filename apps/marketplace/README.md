@@ -53,9 +53,27 @@ apps/marketplace/
 - Browse (filtros type/category + paginação)
 - Plugin Detail (header + tabs README/Versões/Reviews + sidebar install)
 
+## Publisher profiles (MKTPLC-004-publisher)
+
+Cada publisher tem uma página pública em `/publishers/{slug}` renderizada pelo
+`PublisherProfileController`. A página agrega:
+
+- Header com avatar (ou fallback de iniciais), nome, badge "Verificado" e bio.
+- Links sociais (`website_url`, `github_url`, `twitter_handle`) — renderizados apenas
+  quando preenchidos.
+- 3 KPIs: total de plugins published, total de downloads (instalações) e rating médio
+  (de reviews `published`).
+- Grid `<PluginList />` com os plugins published do publisher, ordenados por
+  `created_at` desc. Empty state em PT-BR quando o publisher ainda não tem plugins.
+
+O `<PublisherBadge />` (avatar + nome + checkmark verificado) é reutilizado dentro
+do `<PluginCard />` quando o plugin tem `publisher` snapshot anexado.
+
+Schema novo: tabela `arqel_publishers` (ver `packages/marketplace/database/migrations/2026_05_08_000000_create_arqel_publishers.php`)
+e coluna `arqel_plugins.publisher_id` (FK lógica nullable).
+
 ## Deferido
 
 - Compare side-by-side de plugins → `MKTPLC-004-compare`
-- Publisher profile pages → `MKTPLC-004-publisher`
 - Payment checkout UI (paid plugins) → `MKTPLC-004-checkout`
 - SSR / Open Graph dinâmico → `MKTPLC-004-ssr`

@@ -2,7 +2,11 @@ import { createInertiaApp, router as inertiaRouter } from '@inertiajs/react';
 import type { ComponentType, ReactNode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
-import { installDevToolsHook, installInertiaBridge } from '../devtools/index.js';
+import {
+  installDevToolsHook,
+  installInertiaBridge,
+  installPerformanceObserver,
+} from '../devtools/index.js';
 import type { InertiaRouterLike } from '../devtools/inertia-bridge.js';
 import { ArqelProvider } from '../providers/ArqelProvider.js';
 import type { Theme } from '../providers/ThemeProvider.js';
@@ -65,6 +69,9 @@ export async function createArqelApp(options: ArqelAppOptions = {}): Promise<unk
     // Inertia's `router` exposes `on(event, cb)` that returns an
     // unsubscribe — structurally compatible with `InertiaRouterLike`.
     installInertiaBridge(devtoolsHook, inertiaRouter as unknown as InertiaRouterLike);
+    if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
+      installPerformanceObserver(devtoolsHook);
+    }
   }
 
   return createInertiaApp({

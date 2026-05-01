@@ -13,6 +13,43 @@
 /** Maximum number of navigation entries kept in the ring buffer. */
 export const NAVIGATION_HISTORY_LIMIT = 20;
 
+/** Maximum number of full navigation snapshots kept (DEVTOOLS-006). */
+export const SNAPSHOT_HISTORY_LIMIT = 50;
+
+/**
+ * Full navigation snapshot used for time-travel debugging
+ * (DEVTOOLS-006). Captured by the inertia bridge on every `navigate`.
+ */
+export interface NavigationSnapshot {
+  readonly id: string;
+  readonly timestamp: number;
+  readonly url: string;
+  readonly pageProps: unknown;
+  readonly sharedProps: Readonly<Record<string, unknown>>;
+  readonly durationMs?: number;
+}
+
+/**
+ * Web Vitals metrics captured by the in-page performance observer
+ * (DEVTOOLS-007). Values are `null` until the corresponding
+ * `PerformanceObserver` reports an entry.
+ */
+export interface PerformanceMetrics {
+  readonly lcp: number | null;
+  readonly inp: number | null;
+  readonly fid: number | null;
+  readonly cls: number | null;
+  readonly navigationTime: number | null;
+}
+
+const EMPTY_PERFORMANCE: PerformanceMetrics = Object.freeze({
+  lcp: null,
+  inp: null,
+  fid: null,
+  cls: null,
+  navigationTime: null,
+});
+
 export interface NavigationEntry {
   readonly path: string;
   readonly timestamp: number;
@@ -52,6 +89,8 @@ export interface ArqelDevToolsState {
   readonly navigationHistory: ReadonlyArray<NavigationEntry>;
   readonly devToolsPayload: ArqelDevToolsPayload | null;
   readonly fieldsSchema: ReadonlyArray<FieldSchema>;
+  readonly snapshots: ReadonlyArray<NavigationSnapshot>;
+  readonly performanceMetrics: PerformanceMetrics;
 }
 
 /**
@@ -89,6 +128,17 @@ export interface ArqelDevToolsHook {
    * Returns `[]` if nothing matches.
    */
   getFieldsSchema(): ReadonlyArray<FieldSchema>;
+  /** Push a navigation snapshot into the ring buffer (DEVTOOLS-006). */
+  pushSnapshot(snapshot: NavigationSnapshot): void;
+  /**
+   * Returns the recorded snapshots in reverse chronological order
+   * (most recent first). Capped at {@link SNAPSHOT_HISTORY_LIMIT}.
+   */
+  getSnapshots(): ReadonlyArray<NavigationSnapshot>;
+  /** Update a single Web Vital / navigation timing value (DEVTOOLS-007). */
+  recordPerformanceMetric(name: keyof PerformanceMetrics, value: number): void;
+  /** Returns the latest captured performance metrics (DEVTOOLS-007). */
+  getPerformanceMetrics(): PerformanceMetrics;
 }
 
 declare global {
@@ -111,6 +161,8 @@ const EMPTY_STATE: ArqelDevToolsState = Object.freeze({
   navigationHistory: Object.freeze([]),
   devToolsPayload: null,
   fieldsSchema: Object.freeze([]),
+  snapshots: Object.freeze([]),
+  performanceMetrics: EMPTY_PERFORMANCE,
 });
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -237,10 +289,41 @@ export function createDevToolsHook(version: string): InternalHook {
     getFieldsSchema(): ReadonlyArray<FieldSchema> {
       return state.fieldsSchema;
     },
+    pushSnapshot(snapshot: NavigationSnapshot): void {
+      const next = state.snapshots.slice();
+      next.push(snapshot);
+      while (next.length > SNAPSHOT_HISTORY_LIMIT) {
+        next.shift();
+      }
+      state = {
+        ...state,
+        snapshots: Object.freeze(next),
+      };
+      notify();
+    },
+    getSnapshots(): ReadonlyArray<NavigationSnapshot> {
+      // Reverse chronological — most recent first.
+      return Object.freeze(state.snapshots.slice().reverse());
+    },
+    recordPerformanceMetric(name: keyof PerformanceMetrics, value: number): void {
+      state = {
+        ...state,
+        performanceMetrics: Object.freeze({
+          ...state.performanceMetrics,
+          [name]: value,
+        }),
+      };
+      notify();
+    },
+    getPerformanceMetrics(): PerformanceMetrics {
+      return state.performanceMetrics;
+    },
     __setState(next: ArqelDevToolsState): void {
       state = {
         ...next,
         fieldsSchema: next.fieldsSchema ?? extractFieldsSchema(next.pageProps),
+        snapshots: next.snapshots ?? Object.freeze([]),
+        performanceMetrics: next.performanceMetrics ?? EMPTY_PERFORMANCE,
       };
       notify();
     },

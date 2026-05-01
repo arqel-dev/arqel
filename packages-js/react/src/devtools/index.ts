@@ -8,7 +8,10 @@ export {
   installDevToolsHook,
   NAVIGATION_HISTORY_LIMIT,
   type NavigationEntry,
+  type NavigationSnapshot,
+  type PerformanceMetrics,
   type PolicyLogEntry,
+  SNAPSHOT_HISTORY_LIMIT,
 } from './devtools.js';
 export {
   type InertiaRouterEvent,
@@ -16,3 +19,7 @@ export {
   type InstallInertiaBridgeOptions,
   installInertiaBridge,
 } from './inertia-bridge.js';
+export {
+  installPerformanceObserver,
+  type PerformanceObserverDisposer,
+} from './performance.js';

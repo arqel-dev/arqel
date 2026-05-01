@@ -33,7 +33,7 @@
 - Hooks reusáveis em `@arqel/hooks` (HOOKS-001+)
 - UI components em `@arqel/ui` (UI-001+)
 
-## DevTools hook (DEVTOOLS-002 + DEVTOOLS-003)
+## DevTools hook (DEVTOOLS-002 + DEVTOOLS-003 + DEVTOOLS-006 + DEVTOOLS-007)
 
 Em modo desenvolvimento, `@arqel/react` expõe um hook em
 `window.__ARQEL_DEVTOOLS_HOOK__` para a extensão de browser
@@ -75,6 +75,46 @@ runtime.
 `createArqelApp` já chama `installDevToolsHook` + `installInertiaBridge`
 por você quando o hook for instalado — apps com o bootstrap padrão
 recebem a integração de graça.
+
+### Snapshots para time-travel (DEVTOOLS-006)
+
+A cada `navigate` do Inertia o bridge faz `pushSnapshot` com o payload
+completo (`pageProps`, `sharedProps`, `url`, `durationMs?`). O hook
+mantém um ring buffer de até `SNAPSHOT_HISTORY_LIMIT` (50) entradas e
+expõe `getSnapshots()` em ordem reverso-cronológica (mais recente
+primeiro). A extensão consome via `hook.getSnapshots()` e renderiza
+timeline + replay.
+
+```ts
+hook.pushSnapshot({
+  id: 'snap-1700000000-1',
+  timestamp: 1_700_000_000,
+  url: '/admin/users',
+  pageProps: { users: [...] },
+  sharedProps: { auth: { id: 1 } },
+  durationMs: 42,
+});
+hook.getSnapshots()[0]?.url; // '/admin/users'
+```
+
+### Performance metrics (DEVTOOLS-007)
+
+`installPerformanceObserver(hook)` registra `PerformanceObserver`s para
+`largest-contentful-paint`, `first-input`, `event` (INP), `layout-shift`
+e `paint`. SSR-safe (no-op quando `window` ou `PerformanceObserver`
+ausentes). `createArqelApp` chama automaticamente se o hook está
+instalado e `'PerformanceObserver' in window`.
+
+```ts
+import { installPerformanceObserver } from '@arqel/react/devtools';
+
+installPerformanceObserver(hook);
+hook.getPerformanceMetrics();
+// → { lcp, inp, fid, cls, navigationTime } — todos number | null
+```
+
+`hook.recordPerformanceMetric(name, value)` permite custom telemetry
+(testes, fallbacks).
 
 ## Key Contracts
 

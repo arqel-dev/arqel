@@ -10,7 +10,12 @@
  * succeeded (i.e. only in dev builds — Vite then drops the whole branch).
  */
 
-import type { ArqelDevToolsHook, ArqelDevToolsPayload, NavigationEntry } from './devtools.js';
+import type {
+  ArqelDevToolsHook,
+  ArqelDevToolsPayload,
+  NavigationEntry,
+  NavigationSnapshot,
+} from './devtools.js';
 
 /**
  * Minimal subset of the Inertia router surface that we need. Kept
@@ -81,6 +86,25 @@ export function installInertiaBridge(
         ? { path: url, timestamp, durationMs: timestamp - visitStartedAt }
         : { path: url, timestamp };
     hook.recordNavigation(entry);
+
+    const snapshot: NavigationSnapshot =
+      entry.durationMs !== undefined
+        ? {
+            id: makeSnapshotId(timestamp),
+            timestamp,
+            url,
+            pageProps: props,
+            sharedProps,
+            durationMs: entry.durationMs,
+          }
+        : {
+            id: makeSnapshotId(timestamp),
+            timestamp,
+            url,
+            pageProps: props,
+            sharedProps,
+          };
+    hook.pushSnapshot(snapshot);
     visitStartedAt = null;
   });
 
@@ -91,6 +115,12 @@ export function installInertiaBridge(
 }
 
 const SHARED_PROP_KEYS = ['auth', 'flash', 'errors', 'csrf_token', 'arqel'] as const;
+
+let snapshotCounter = 0;
+function makeSnapshotId(timestamp: number): string {
+  snapshotCounter = (snapshotCounter + 1) % Number.MAX_SAFE_INTEGER;
+  return `snap-${timestamp}-${snapshotCounter}`;
+}
 
 function pickSharedProps(props: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};

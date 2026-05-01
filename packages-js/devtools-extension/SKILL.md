@@ -35,9 +35,9 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
   `docs/devtools-extension/install.md`, suíte de coverage gaps cobrindo
   idempotência do bridge, lifecycle de tab, sanity de probe source,
   null-version handling e resiliência do painel a inputs estranhos.
-- Suíte Vitest: 56 testes em 10 files (manifests, content-script,
-  background, painel — Inertia inspector + Policy debugger, coverage
-  gaps).
+- Suíte Vitest: 69 testes em 13 files (manifests, content-script,
+  background, painel — Inertia inspector, Policy debugger, Fields,
+  Time Travel, Performance Metrics, coverage gaps).
 - **Policy debugger (DEVTOOLS-004):** nova top-tab "Policies" no
   painel renderiza a shared prop `__devtools.policyLog` que o
   `arqel/core` emite em `app()->environment('local')`. Tabela com
@@ -61,10 +61,28 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
   `<JsonNode>` reusable para o meta completo. Empty state quando
   `fields=[]`.
 
+- **Time-travel debugging (DEVTOOLS-006):** nova top-tab "Time Travel"
+  consome o ring buffer de até 50 `NavigationSnapshot`s capturado pelo
+  hook em `@arqel/react`. Cada snapshot inclui `id` (único por
+  navegação), `timestamp`, `url`, `pageProps` (full payload), `sharedProps`
+  e `durationMs?`. Painel renderiza timeline com path + relative
+  timestamp + duration badge (vermelho quando ≥100ms). Click expande
+  detalhe via `<JsonNode>` reusable mostrando pageProps e sharedProps.
+  Botão "Replay" dispara `chrome.runtime.sendMessage({ type:
+  'arqel.replay' })` + `CustomEvent('arqel-devtools-replay')` para o
+  painel — handler runtime-side fica para futuro.
+- **Performance metrics dashboard (DEVTOOLS-007):** nova top-tab
+  "Performance" renderiza dashboard com 4 tiles (LCP, INP/FID, CLS,
+  navigation time). Color coding good / needs-improvement / poor com
+  thresholds canônicos do Web Vitals. Hook `@arqel/react` instala
+  `PerformanceObserver` automaticamente em `createArqelApp` quando
+  `'PerformanceObserver' in window`. SSR-safe: bail-out quando `window`
+  ausente. Footer mostra `queryCount` + `memoryUsage` da shared prop
+  `__devtools` server-side. Empty state quando nenhuma métrica
+  capturada.
+
 ### Por chegar
 
-- **DEVTOOLS-006** — Time-travel para Inertia history navigation.
-- **DEVTOOLS-007** — Performance metrics (render time, prop diff size).
 - Submissão a Chrome Web Store e Firefox Add-ons.
 
 ## Conventions

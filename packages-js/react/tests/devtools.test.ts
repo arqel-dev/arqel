@@ -33,6 +33,14 @@ describe('installDevToolsHook (DEV mode)', () => {
       navigationHistory: [],
       devToolsPayload: null,
       fieldsSchema: [],
+      snapshots: [],
+      performanceMetrics: {
+        lcp: null,
+        inp: null,
+        fid: null,
+        cls: null,
+        navigationTime: null,
+      },
     });
   });
 
@@ -72,6 +80,14 @@ describe('createDevToolsHook subscribe/notify', () => {
       navigationHistory: [],
       devToolsPayload: null,
       fieldsSchema: [],
+      snapshots: [],
+      performanceMetrics: {
+        lcp: null,
+        inp: null,
+        fid: null,
+        cls: null,
+        navigationTime: null,
+      },
     };
     hook.__setState(next);
     expect(calls).toHaveLength(1);
@@ -88,6 +104,14 @@ describe('createDevToolsHook subscribe/notify', () => {
       navigationHistory: [],
       devToolsPayload: null,
       fieldsSchema: [],
+      snapshots: [],
+      performanceMetrics: {
+        lcp: null,
+        inp: null,
+        fid: null,
+        cls: null,
+        navigationTime: null,
+      },
     });
     expect(calls).toHaveLength(1);
   });
@@ -107,6 +131,14 @@ describe('createDevToolsHook subscribe/notify', () => {
       navigationHistory: [],
       devToolsPayload: null,
       fieldsSchema: [],
+      snapshots: [],
+      performanceMetrics: {
+        lcp: null,
+        inp: null,
+        fid: null,
+        cls: null,
+        navigationTime: null,
+      },
     });
     expect(a).toHaveBeenCalledTimes(1);
     expect(b).toHaveBeenCalledTimes(1);

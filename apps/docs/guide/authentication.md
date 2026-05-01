@@ -80,10 +80,10 @@ Você implementa as views React/Inertia manualmente. Útil para apps SaaS onboar
 
 | Aspecto | Breeze + React | Jetstream Inertia | Fortify | Arqel-nativo (TBD) |
 |---|---|---|---|---|
-| Login | ✅ | ✅ | ✅ (backend) | ✅ (planejado) |
-| Register | ✅ | ✅ | ✅ (backend) | ✅ opt-in (planejado) |
+| Login | ✅ | ✅ | ✅ (backend) | ✅ (AUTH-006) |
+| Register | ✅ | ✅ | ✅ (backend) | ✅ opt-in (AUTH-007) |
 | Forgot password | ✅ | ✅ | ✅ (backend) | ✅ opt-in (planejado) |
-| Email verification | ⚠️ opt-in | ✅ | ✅ opt-in | ✅ opt-in (planejado) |
+| Email verification | ⚠️ opt-in | ✅ | ✅ opt-in | ✅ opt-in (AUTH-007) |
 | 2FA | ❌ | ✅ | ✅ | ❌ (futuro) |
 | Teams | ❌ | ✅ | ❌ | ❌ |
 | Profile page | ✅ | ✅ | ❌ | ✅ (planejado) |
@@ -129,13 +129,78 @@ A partir de AUTH-005-doctor (planejado), o command vai detectar:
 - Se há um starter kit instalado (Breeze, Jetstream ou Fortify) — warn quando ausente.
 - Se as rotas `/login` e `/admin` estão registradas.
 
+## Habilitando registration (AUTH-007)
+
+Com AUTH-007 entregue, basta ativar o flag `registration()` no `Panel`:
+
+```php
+use Arqel\Core\Panel\Panel;
+
+$panel = Panel::configure()
+    ->login()
+    ->registration();
+```
+
+Isso registra automaticamente:
+
+- `GET /admin/register` — página Inertia `arqel/auth/Register` (componente `<RegisterPage />` do pacote `@arqel/auth`).
+- `POST /admin/register` — cria o `User` via `config('auth.providers.users.model')`, dispara `Illuminate\Auth\Events\Registered` e faz auto-login.
+
+Validação default: `name` (2–100 chars), `email` (único na tabela), `password` (mínimo 8 chars, com `password_confirmation`). Rate-limit: 3 registros por IP por hora.
+
+Para customizar os campos de registro, use o builder `registrationFields()`:
+
+```php
+$panel->registration()->registrationFields(fn () => [
+    ['name' => 'name', 'type' => 'text', 'label' => 'Nome completo', 'required' => true],
+    ['name' => 'email', 'type' => 'email', 'label' => 'E-mail corporativo', 'required' => true],
+    ['name' => 'password', 'type' => 'password', 'label' => 'Senha', 'required' => true],
+    ['name' => 'password_confirmation', 'type' => 'password', 'label' => 'Confirmar senha', 'required' => true],
+]);
+```
+
+## Email verification (AUTH-007)
+
+Para habilitar verificação de e-mail (opt-in, segue o contrato `MustVerifyEmail` do Laravel):
+
+```php
+$panel = Panel::configure()
+    ->login()
+    ->registration()
+    ->emailVerification();
+```
+
+Isso registra:
+
+- `GET /admin/email/verify` — notice page Inertia `arqel/auth/VerifyEmailNotice`.
+- `GET /admin/email/verify/{id}/{hash}` — handler signed (com middleware `signed` + `throttle:6,1`), dispara `Verified` event ao confirmar.
+- `POST /admin/email/verify/resend` — reenvia o link via `sendEmailVerificationNotification()`.
+
+Pré-requisitos no model `User`:
+
+```php
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable implements MustVerifyEmail
+{
+    use Notifiable;
+    // ...
+}
+```
+
+E proteja as rotas autenticadas com `verified` middleware quando quiser exigir verificação:
+
+```php
+$panel->middleware(['web', 'auth', 'verified']);
+```
+
 ## Próximos passos planejados
 
-- **AUTH-006** — Login + logout Inertia-React páginas opt-in via `Panel::configure()->login()`.
-- **AUTH-007** — Registration opt-in + email verification opt-in.
 - **AUTH-008** — Forgot-password + reset token flow.
 
-Quando esses tickets shiparem, `composer require arqel/arqel` + `php artisan arqel:install` será suficiente — sem starter kit obrigatório.
+Quando esse ticket shipar, `composer require arqel/arqel` + `php artisan arqel:install` será suficiente — sem starter kit obrigatório.
 
 ## Referências
 

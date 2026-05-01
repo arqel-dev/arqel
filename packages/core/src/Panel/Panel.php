@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Core\Panel;
 
 use Arqel\Core\Contracts\HasResource;
+use Closure;
 
 /**
  * Fluent builder for an admin panel definition.
@@ -55,6 +56,10 @@ final class Panel
     private string $afterLoginUrl = '/admin';
 
     private bool $registrationEnabled = false;
+
+    private bool $emailVerificationEnabled = false;
+
+    private ?Closure $registrationFieldsFactory = null;
 
     private bool $defaultAuth = true;
 
@@ -120,6 +125,44 @@ final class Panel
     public function registrationEnabled(): bool
     {
         return $this->registrationEnabled;
+    }
+
+    public function emailVerification(bool $enabled = true): self
+    {
+        $this->emailVerificationEnabled = $enabled;
+
+        return $this;
+    }
+
+    public function emailVerificationEnabled(): bool
+    {
+        return $this->emailVerificationEnabled;
+    }
+
+    public function registrationFields(Closure $factory): self
+    {
+        $this->registrationFieldsFactory = $factory;
+
+        return $this;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getRegistrationFields(): array
+    {
+        if ($this->registrationFieldsFactory !== null) {
+            $result = ($this->registrationFieldsFactory)();
+
+            return is_array($result) ? $result : [];
+        }
+
+        return [
+            ['name' => 'name', 'type' => 'text', 'label' => 'Name', 'required' => true],
+            ['name' => 'email', 'type' => 'email', 'label' => 'Email', 'required' => true],
+            ['name' => 'password', 'type' => 'password', 'label' => 'Password', 'required' => true],
+            ['name' => 'password_confirmation', 'type' => 'password', 'label' => 'Confirm password', 'required' => true],
+        ];
     }
 
     public function defaultAuthEnabled(): bool

@@ -7,7 +7,7 @@
 Pacote standalone, instalado via `composer global require arqel/cli`,
 expõe o binário `arqel` com subcomandos meta (não rodam dentro de uma
 app Arqel — orquestram a criação delas). O comando flagship é `arqel new`,
-um scaffolder interactivo que cobre o ticket CLI-TUI-001 da Fase 4.
+um scaffolder interactivo entregue por CLI-TUI-001 da Fase 4.
 
 A decisão arquitetural-chave: o comando **gera um script bash/PowerShell
 revisável** ao invés de executar `laravel new`/`composer require`
@@ -17,7 +17,7 @@ e segue o mesmo idioma do Filament installer.
 
 ## Status
 
-### Entregue (CLI-TUI-001)
+### Entregue (CLI-TUI-001 + CLI-TUI-005)
 
 - Scaffold do pacote: `composer.json` com `bin/arqel`, deps mínimas
   (`symfony/console ^7.0`, `laravel/prompts ^0.3`).
@@ -30,17 +30,23 @@ e segue o mesmo idioma do Filament installer.
 - `Arqel\Cli\Generators\SetupScriptGenerator` (`final readonly`):
   isola a lógica de renderização para Bash e PowerShell. Validação
   de nome no construtor (`/^[a-zA-Z][a-zA-Z0-9_-]*$/`).
-- Testes Pest: 6 unit (`ScriptGeneratorTest`) + 6 feature
-  (`NewCommandTest` via `Symfony\Console\Tester\CommandTester`).
+- Suíte Pest: 23 testes (6 unit `ScriptGeneratorTest` + 6 feature
+  `NewCommandTest` + 11 coverage gaps em `Tests\Unit\Coverage\CliCoverageGapsTest`,
+  cobrindo nomes inválidos com whitespace/dot/slash/ASCII estendido,
+  tenancy=spatie, mcpIntegration, sintaxe PowerShell e regression do
+  registry de comandos).
+- PHPStan level max limpo.
 
 ### Por chegar
 
-- **CLI-TUI-002** — Resource generator interactivo
-  (`arqel resource:make`), com previews de fields/columns.
+- **CLI-TUI-002** — Resource generator interactivo. Reside em `arqel/core`
+  como `php artisan arqel:resource:make` (Artisan command, não comando
+  do binário global). **Não confundir com este pacote.**
 - **CLI-TUI-003** — Camada Ink-equivalente (rich UI com TUI completa,
   provavelmente via `chewie` ou wrapper próprio sobre Prompts).
-- **CLI-TUI-005** — Polish final de docs + SKILL + cookbook
-  e empacotamento para Packagist.
+- **CLI-TUI-004** — Doctor command (`arqel doctor`) verificando versões
+  de PHP/Node/Composer.
+- Empacotamento final para Packagist (publicação 0.1.0).
 
 ## Conventions
 
@@ -55,6 +61,9 @@ e segue o mesmo idioma do Filament installer.
   (essencial para testes determinísticos).
 - O script gerado **nunca** é executado pelo CLI; o usuário roda
   manualmente. Mensagem final imprime o comando a digitar.
+- Validação de `appName` é compartilhada entre `NewCommand` (defesa
+  rasa, mensagem amigável) e `SetupScriptGenerator` (defesa profunda,
+  exceção com regex documentado).
 
 ## Anti-patterns
 
@@ -67,21 +76,41 @@ e segue o mesmo idioma do Filament installer.
 - **Não** usar `dd()`, `var_dump()`, `Symfony\…\OutputInterface::write`
   com cores hard-coded. Confiar nos tags `<info>`/`<error>` do Symfony
   Console que respeitam `--no-ansi`.
+- **Não** aceitar nomes de app com whitespace, dot, slash, ou caracteres
+  ASCII estendidos. Causaria diretórios mal-formados ou paths quebrados
+  no `cd`/`Set-Location` gerado.
 
 ## Examples
 
-Modo não-interactivo (CI / scripts):
+### Instalação global
+
+```bash
+composer global require arqel/cli
+# Garantir que ~/.composer/vendor/bin está no PATH:
+export PATH="$PATH:$HOME/.composer/vendor/bin"
+arqel --version
+```
+
+### Geração não-interactiva (CI / scripts)
 
 ```bash
 arqel new my-admin --no-prompts --starter=breeze --tenancy=stancl --mcp
 # => arqel-setup-my-admin.sh gerado na CWD; revisar e rodar com bash.
+bash arqel-setup-my-admin.sh
 ```
 
-Modo interactivo (humano):
+### Geração interactiva (humano)
 
 ```bash
 arqel new my-admin
 # Prompts guiam starter / tenancy / first resource / dark mode / mcp.
+```
+
+### Forçando plataforma (útil em testes / cross-OS)
+
+```bash
+arqel new my-admin --no-prompts --platform=powershell
+# => arqel-setup-my-admin.ps1 mesmo em Linux, para auditar o script Windows.
 ```
 
 ## Related

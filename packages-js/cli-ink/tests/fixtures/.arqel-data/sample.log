@@ -1,0 +1,5 @@
+2026-04-30 12:00:01 INFO Application booted
+2026-04-30 12:00:02 DEBUG Cache warmup begin
+2026-04-30 12:00:03 WARN Slow query detected on users table
+2026-04-30 12:00:04 ERROR Failed to send notification
+2026-04-30 12:00:05 INFO Request handled in 12ms

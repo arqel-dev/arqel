@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Marketplace\Http\Controllers\AdminRefundController;
 use Arqel\Marketplace\Http\Controllers\CategoryListController;
 use Arqel\Marketplace\Http\Controllers\FeaturedPluginsController;
 use Arqel\Marketplace\Http\Controllers\MostPopularPluginsController;
@@ -9,14 +10,17 @@ use Arqel\Marketplace\Http\Controllers\NewPluginsController;
 use Arqel\Marketplace\Http\Controllers\PluginAdminListController;
 use Arqel\Marketplace\Http\Controllers\PluginAdminReviewController;
 use Arqel\Marketplace\Http\Controllers\PluginDetailController;
+use Arqel\Marketplace\Http\Controllers\PluginDownloadController;
 use Arqel\Marketplace\Http\Controllers\PluginFeatureController;
 use Arqel\Marketplace\Http\Controllers\PluginListController;
+use Arqel\Marketplace\Http\Controllers\PluginPurchaseController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewListController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewModerationController;
 use Arqel\Marketplace\Http\Controllers\PluginReviewVoteController;
 use Arqel\Marketplace\Http\Controllers\PluginsByCategoryController;
 use Arqel\Marketplace\Http\Controllers\PluginSubmissionController;
+use Arqel\Marketplace\Http\Controllers\PublisherPayoutsController;
 use Arqel\Marketplace\Http\Controllers\SecurityScanListController;
 use Arqel\Marketplace\Http\Controllers\TrendingPluginsController;
 use Illuminate\Support\Facades\Route;
@@ -109,4 +113,20 @@ Route::middleware($reviewMiddleware)->prefix($prefix)->group(static function ():
 
     Route::get('admin/security-scans', SecurityScanListController::class)
         ->name('arqel.marketplace.admin.security-scans.index');
+
+    Route::post('plugins/{slug}/purchase', [PluginPurchaseController::class, 'initiate'])
+        ->name('arqel.marketplace.plugins.purchase.initiate');
+
+    Route::post('plugins/{slug}/purchase/confirm', [PluginPurchaseController::class, 'confirm'])
+        ->name('arqel.marketplace.plugins.purchase.confirm');
+
+    Route::get('plugins/{slug}/download', PluginDownloadController::class)
+        ->name('arqel.marketplace.plugins.download');
+
+    Route::get('publisher/payouts', PublisherPayoutsController::class)
+        ->name('arqel.marketplace.publisher.payouts');
+
+    Route::post('admin/plugins/{slug}/refund/{purchaseId}', AdminRefundController::class)
+        ->whereNumber('purchaseId')
+        ->name('arqel.marketplace.admin.plugins.refund');
 });

@@ -257,10 +257,73 @@ php artisan arqel:marketplace:scan
 php artisan arqel:marketplace:scan --plugin=acme-stripe --dry-run
 ```
 
+**Entregue (MKTPLC-008):** Premium (paid) plugins com license keys e gateway de pagamento abstrato.
+
+- **Migration** `2026_05_06_000000_add_paid_plugins.php`:
+  - Em `arqel_plugins` adiciona `price_cents` (default `0` = free), `currency` (default `USD`), `publisher_user_id` nullable indexed, `revenue_share_percent` (default `80`).
+  - Cria `arqel_plugin_purchases` (`plugin_id` FK cascade, `buyer_user_id` indexed, `license_key` unique, `amount_cents`, `currency`, `payment_id` nullable, `status` enum string `pending|completed|refunded|failed` default `pending`, `purchased_at`, `refunded_at`, timestamps + index `(plugin_id, status)`).
+  - Cria `arqel_plugin_payouts` (`plugin_id` FK cascade, `publisher_user_id` indexed, `amount_cents`, `currency`, `status` enum string `pending|paid|failed`, `period_start`, `period_end`, timestamps).
+- **Plugin model** estendido com fillable + casts (`price_cents` int, `revenue_share_percent` int), accessor `isPremium(): bool` (`price_cents > 0`), relations `purchases()` + `payouts()`.
+- **`PluginPurchase` model** (`final`) — fillable + casts, relations `plugin()` + `buyer()` defensiva, scopes `scopeCompleted/scopePending/scopeRefunded`.
+- **`PluginPayout` model** (`final`) — fillable + casts, relations `plugin()` + `publisher()`.
+- **`Contracts\PaymentGateway`** — strategy interface (`createCheckoutSession`, `verifyPayment`, `processRefund`).
+- **`Contracts\CheckoutSession`** + **`PaymentResult`** — DTOs `final readonly`.
+- **`Services\Payments\MockPaymentGateway`** (`final readonly`) — default. URL stub `/marketplace/mock-checkout/{slug}`, `sessionId` prefixado `mock_`. Refunds só passam para purchases `completed`.
+- **`Services\Payments\StripeConnectGateway`** (`final readonly`) — placeholder; todos métodos lançam `RuntimeException("TODO MKTPLC-008-stripe-real: integrate stripe-php SDK")`. Stripe real fica para follow-up (legal/tax review pendente).
+- **`Services\LicenseKeyGenerator`** (`final readonly`) — `generate()` retorna `ARQ-XXXX-XXXX-XXXX-XXXX` (4 grupos hex de 4 chars via `random_bytes(8)`); `verify()` valida formato + match + status `completed`, usando `hash_equals` para timing safety.
+- **Controllers**:
+  - `PluginPurchaseController::initiate` — `POST {prefix}/plugins/{slug}/purchase` (auth, 422 free, 401 unauth, 404). Reusa pending; retorna `already_owned: true` se já houver purchase completed.
+  - `PluginPurchaseController::confirm` — `POST {prefix}/plugins/{slug}/purchase/confirm` body `{paymentId}`; verifica via gateway, marca `completed`, gera license key. Idempotente em re-confirm.
+  - `PluginDownloadController` — `GET {prefix}/plugins/{slug}/download` (auth). Free → libera; premium → exige purchase completed (403 sem).
+  - `PublisherPayoutsController` — `GET {prefix}/publisher/payouts?per_page=` filtrado por `publisher_user_id = auth()->id()`, paginado clamp [1, 100].
+  - `AdminRefundController` — `POST {prefix}/admin/plugins/{slug}/refund/{purchaseId}` Gate `marketplace.refund`. 422 quando já refunded ou não-completed.
+- **Service provider** — bind default `PaymentGateway => MockPaymentGateway`. Host apps rebindam para Stripe/etc.
+- **23 testes Pest novos**: Unit `LicenseKeyGenerator` (4), Unit `Services/Payments/MockPaymentGateway` (4), Feature `PluginPurchase` (5), Feature `PluginDownload` (4), Feature `PublisherPayouts` (3), Feature `AdminRefund` (3).
+
+### Premium plugins (MKTPLC-008)
+
+A integração Stripe real fica para follow-up dedicado — exige revisão legal/fiscal, escolha entre Stripe Connect Standard vs Express, plus setup de webhooks idempotentes. Por enquanto o default é `MockPaymentGateway` (testes/dev) e `StripeConnectGateway` é placeholder que lança `RuntimeException`.
+
+Para ativar Stripe real (futuro), host app rebinda no provider:
+
+```php
+// app/Providers/AppServiceProvider.php
+$this->app->bind(
+    \Arqel\Marketplace\Contracts\PaymentGateway::class,
+    \App\Marketplace\StripeConnectGateway::class,
+);
+```
+
+Fluxo de compra:
+
+```php
+// 1. Initiate (auth required)
+$response = Http::withToken($token)
+    ->post("https://arqel.dev/api/marketplace/plugins/{$slug}/purchase");
+// → { purchase: {...}, checkout: { url, session_id } }
+
+// 2. Redirect user para checkout.url. Após pagamento, gateway chama de volta com paymentId.
+
+// 3. Confirm
+$response = Http::withToken($token)
+    ->post("https://arqel.dev/api/marketplace/plugins/{$slug}/purchase/confirm", [
+        'paymentId' => $sessionId,
+    ]);
+// → { purchase: { status: 'completed', license_key: 'ARQ-...' } }
+
+// 4. Download (auth + license)
+$response = Http::withToken($token)
+    ->get("https://arqel.dev/api/marketplace/plugins/{$slug}/download");
+// → { download_url: 'https://arqel.dev/marketplace/download/{slug}/latest.zip' }
+```
+
+Revenue share padrão é `80%` para o publisher / `20%` para Arqel (configurável por plugin via `revenue_share_percent`). Payouts são gerados em batch (cron job futuro) — esta fase entrega apenas a estrutura + endpoint de listagem.
+
 **Por chegar:**
 
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).
 - **MKTPLC-005+** — Admin panel (Arqel-powered) para publishers + moderação.
+- **MKTPLC-008-stripe-real** — Integração Stripe Connect real + webhooks + payouts cron.
 
 ## Conventions
 

@@ -39,6 +39,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $featured_at
  * @property float $trending_score
  * @property Carbon|null $trending_score_updated_at
+ * @property int $price_cents
+ * @property string $currency
+ * @property int|null $publisher_user_id
+ * @property int $revenue_share_percent
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -72,6 +76,10 @@ final class Plugin extends Model
         'featured_at',
         'trending_score',
         'trending_score_updated_at',
+        'price_cents',
+        'currency',
+        'publisher_user_id',
+        'revenue_share_percent',
     ];
 
     /**
@@ -89,7 +97,33 @@ final class Plugin extends Model
             'featured_at' => 'datetime',
             'trending_score' => 'float',
             'trending_score_updated_at' => 'datetime',
+            'price_cents' => 'integer',
+            'revenue_share_percent' => 'integer',
         ];
+    }
+
+    /**
+     * Indica se o plugin é premium (preço > 0).
+     */
+    public function isPremium(): bool
+    {
+        return $this->price_cents > 0;
+    }
+
+    /**
+     * @return HasMany<PluginPurchase, $this>
+     */
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(PluginPurchase::class);
+    }
+
+    /**
+     * @return HasMany<PluginPayout, $this>
+     */
+    public function payouts(): HasMany
+    {
+        return $this->hasMany(PluginPayout::class);
     }
 
     /**

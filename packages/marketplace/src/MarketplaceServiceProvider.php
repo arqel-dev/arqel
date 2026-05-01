@@ -31,6 +31,7 @@ final class MarketplaceServiceProvider extends PackageServiceProvider
             ->hasConfigFile('arqel-marketplace')
             ->hasMigration('create_arqel_marketplace_tables')
             ->hasMigration('add_submission_columns_to_arqel_plugins')
+            ->hasMigration('add_categories_and_trending')
             ->hasRoute('api');
     }
 
@@ -39,6 +40,7 @@ final class MarketplaceServiceProvider extends PackageServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Console\PluginListCommand::class,
+                Console\RecalculateTrendingScoresCommand::class,
             ]);
         }
     }

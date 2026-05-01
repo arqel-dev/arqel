@@ -6,6 +6,7 @@ namespace Arqel\Marketplace\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
@@ -34,6 +35,10 @@ use Illuminate\Support\Carbon;
  * @property int|null $reviewed_by_user_id
  * @property Carbon|null $reviewed_at
  * @property string|null $rejection_reason
+ * @property bool $featured
+ * @property Carbon|null $featured_at
+ * @property float $trending_score
+ * @property Carbon|null $trending_score_updated_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -63,6 +68,10 @@ final class Plugin extends Model
         'reviewed_by_user_id',
         'reviewed_at',
         'rejection_reason',
+        'featured',
+        'featured_at',
+        'trending_score',
+        'trending_score_updated_at',
     ];
 
     /**
@@ -76,6 +85,10 @@ final class Plugin extends Model
             'submission_metadata' => 'array',
             'submitted_at' => 'datetime',
             'reviewed_at' => 'datetime',
+            'featured' => 'boolean',
+            'featured_at' => 'datetime',
+            'trending_score' => 'float',
+            'trending_score_updated_at' => 'datetime',
         ];
     }
 
@@ -101,6 +114,19 @@ final class Plugin extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(PluginReview::class);
+    }
+
+    /**
+     * @return BelongsToMany<PluginCategory, $this>
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            PluginCategory::class,
+            'arqel_plugin_category_assignments',
+            'plugin_id',
+            'category_id',
+        );
     }
 
     /**
@@ -142,5 +168,53 @@ final class Plugin extends Model
             $sub->where('name', 'like', $like)
                 ->orWhere('description', 'like', $like);
         });
+    }
+
+    /**
+     * Plugins marcados como `featured` (editor's picks).
+     *
+     * @param Builder<Plugin> $query
+     *
+     * @return Builder<Plugin>
+     */
+    public function scopeFeatured(Builder $query): Builder
+    {
+        return $query->where('featured', true);
+    }
+
+    /**
+     * Ordena por `trending_score` desc.
+     *
+     * @param Builder<Plugin> $query
+     *
+     * @return Builder<Plugin>
+     */
+    public function scopeTrending(Builder $query): Builder
+    {
+        return $query->orderBy('trending_score', 'desc');
+    }
+
+    /**
+     * Plugins criados nos últimos 7 dias.
+     *
+     * @param Builder<Plugin> $query
+     *
+     * @return Builder<Plugin>
+     */
+    public function scopeNewThisWeek(Builder $query): Builder
+    {
+        return $query->where('created_at', '>=', now()->subWeek());
+    }
+
+    /**
+     * Plugins com mais instalações all-time.
+     *
+     * @param Builder<Plugin> $query
+     *
+     * @return Builder<Plugin>
+     */
+    public function scopeMostPopular(Builder $query): Builder
+    {
+        return $query->withCount('installations')->orderBy('installations_count', 'desc');
     }
 }

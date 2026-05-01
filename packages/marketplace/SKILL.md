@@ -165,6 +165,55 @@ Http::withToken($adminToken)
 
 `verified_purchaser` é column placeholder (default `false`) — preparação para paid plugins; ainda não populada por nenhum fluxo.
 
+**Entregue (MKTPLC-007):** Categorization + trending + featured (editor's picks).
+
+- **Migration** `2026_05_04_000000_add_categories_and_trending.php` cria:
+  - `arqel_plugin_categories` — slug unique, name, description, sort_order, parent_id self-referencing.
+  - Pivot `arqel_plugin_category_assignments` (`plugin_id`+`category_id` PK composto, FK cascade).
+  - Colunas em `arqel_plugins`: `featured` (bool), `featured_at`, `trending_score` (float, cached), `trending_score_updated_at`.
+  - Seed default de 5 categorias (`fields`, `widgets`, `themes`, `integrations`, `utilities`).
+- **`PluginCategory` model** (`final`) — fillable + casts; relations `plugins()`, `parent()`, `children()`; scopes `scopeRoot`, `scopeOrdered`.
+- **Plugin model estendido** — fillable + casts para `featured`/`featured_at`/`trending_score`; relação `categories()`; scopes `scopeFeatured`, `scopeTrending`, `scopeNewThisWeek`, `scopeMostPopular` (via `withCount('installations')`).
+- **`TrendingScoreCalculator`** (`Services/`, `final readonly`) — `calculate(Plugin)` retorna `installations_last_7d * 1.0 + recent_positive_reviews(≥4 stars, últimos 30d) * 5.0`, arredondado em 2 casas. `recalculateAll()` itera `Plugin::published()` e persiste `trending_score` + `trending_score_updated_at`.
+- **`RecalculateTrendingScoresCommand`** — `arqel:marketplace:trending`, log `Updated N plugins.`. Apps host devem agendar via `Schedule::command('arqel:marketplace:trending')->daily()`.
+- **Controllers REST novos** (todos single-action `final`):
+  - `CategoryListController` — `GET {prefix}/categories[?root=1]` lista categorias (raiz + children eager-loaded).
+  - `PluginsByCategoryController` — `GET {prefix}/categories/{slug}/plugins` paginado, 404 quando categoria inexistente.
+  - `FeaturedPluginsController` — `GET {prefix}/featured` lista featured published ordenados por `featured_at` desc.
+  - `TrendingPluginsController` — `GET {prefix}/trending` ordenado por `trending_score` desc, limit 20.
+  - `NewPluginsController` — `GET {prefix}/new?days=7` (default 7, clamp [1, 90]).
+  - `MostPopularPluginsController` — `GET {prefix}/popular` por contagem all-time de instalações, limit 20.
+  - `PluginFeatureController` — `POST {prefix}/admin/plugins/{slug}/feature` body `{featured: bool}`, Gate `marketplace.feature` (403/422/404).
+- **28 testes Pest novos** (106 totais no pacote): Feature CategoryList (3), PluginsByCategory (3), Featured (2), Trending (2), New (3), MostPopular (2), Feature toggle (4), Recalculate command (2), Unit TrendingScoreCalculator (4), PluginCategoryScopes (3).
+
+### Categorization + trending (MKTPLC-007)
+
+Heurística de score: o peso `5x` em reviews positivas reflete que sinal social vale mais que install count cru. Janela `7d` para installations ajuda categorias frescas a aparecer no trending; `30d` para reviews evita drop instantâneo após picos.
+
+Schedule do recálculo deve ser **diário** — recalcular em cada request seria custoso e o trending por natureza é caching-friendly:
+
+```php
+// In your application's app/Console/Kernel.php or routes/console.php
+Schedule::command('arqel:marketplace:trending')->daily();
+```
+
+Exemplo de discovery:
+
+```php
+Http::get('https://arqel.dev/api/marketplace/categories?root=1');
+Http::get('https://arqel.dev/api/marketplace/categories/widgets/plugins');
+Http::get('https://arqel.dev/api/marketplace/featured');
+Http::get('https://arqel.dev/api/marketplace/trending');
+Http::get('https://arqel.dev/api/marketplace/new?days=14');
+Http::get('https://arqel.dev/api/marketplace/popular');
+
+// Admin (Gate marketplace.feature):
+Http::withToken($adminToken)
+    ->post("https://arqel.dev/api/marketplace/admin/plugins/{$slug}/feature", [
+        'featured' => true,
+    ]);
+```
+
 **Por chegar:**
 
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).

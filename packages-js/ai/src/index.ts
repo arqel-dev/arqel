@@ -14,6 +14,11 @@ export {
   type AiExtractValue,
 } from './AiExtractInput.js';
 export {
+  AiImageInput,
+  type AiImageInputFieldProps,
+  type AiImageInputProps,
+} from './AiImageInput.js';
+export {
   AiSelectInput,
   type AiSelectInputFieldProps,
   type AiSelectInputProps,

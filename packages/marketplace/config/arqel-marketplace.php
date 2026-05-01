@@ -44,4 +44,29 @@ return [
     | implementa o submission workflow que consome esta flag.
     */
     'submission_review_required' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment gateway
+    |--------------------------------------------------------------------------
+    |
+    | `mock` (default) usa `MockPaymentGateway` — checkout stub, ideal para dev/test.
+    | `stripe` ativa `StripeConnectGateway` real — exige `composer require stripe/stripe-php`
+    | + env vars `STRIPE_SECRET` e `STRIPE_PLATFORM_ACCOUNT_ID`.
+    |
+    | Se `stripe` for selecionado mas o SDK não estiver instalado, o provider
+    | faz fallback para `MockPaymentGateway` e loga um warning.
+    */
+    'payment_gateway' => env('ARQEL_MARKETPLACE_PAYMENT_GATEWAY', 'mock'),
+
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'platform_account_id' => env('STRIPE_PLATFORM_ACCOUNT_ID'),
+        'platform_fee_percent' => (int) env('STRIPE_PLATFORM_FEE_PERCENT', 20),
+        'success_url' => env(
+            'STRIPE_SUCCESS_URL',
+            'https://arqel.dev/marketplace/checkout/success?session_id={CHECKOUT_SESSION_ID}',
+        ),
+        'cancel_url' => env('STRIPE_CANCEL_URL', 'https://arqel.dev/marketplace/checkout/cancel'),
+    ],
 ];

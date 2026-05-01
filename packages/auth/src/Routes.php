@@ -5,19 +5,22 @@ declare(strict_types=1);
 namespace Arqel\Auth;
 
 use Arqel\Auth\Http\Controllers\EmailVerificationController;
+use Arqel\Auth\Http\Controllers\ForgotPasswordController;
 use Arqel\Auth\Http\Controllers\LoginController;
 use Arqel\Auth\Http\Controllers\LogoutController;
 use Arqel\Auth\Http\Controllers\RegisterController;
+use Arqel\Auth\Http\Controllers\ResetPasswordController;
 use Arqel\Core\Panel\Panel;
 use Illuminate\Support\Facades\Route;
 
 /**
  * Registo idempotente das rotas bundled de auth.
  *
- * Cobre login + logout (AUTH-006) e registration + email verification
- * (AUTH-007), todos opt-in via flags no `Panel`. Skipa o registo de
- * login quando o app host já tem uma rota chamada `login`
- * (e.g. Breeze/Jetstream/Fortify), preservando compatibilidade.
+ * Cobre login + logout (AUTH-006), registration + email verification
+ * (AUTH-007), e forgot/reset password (AUTH-008), todos opt-in via
+ * flags no `Panel`. Skipa o registo de login quando o app host já
+ * tem uma rota chamada `login` (e.g. Breeze/Jetstream/Fortify),
+ * preservando compatibilidade.
  */
 final class Routes
 {
@@ -27,11 +30,14 @@ final class Routes
 
     private static bool $verificationRegistered = false;
 
+    private static bool $passwordResetRegistered = false;
+
     public static function register(?Panel $panel = null): void
     {
         self::registerLogin($panel);
         self::registerRegistration($panel);
         self::registerEmailVerification($panel);
+        self::registerPasswordReset($panel);
     }
 
     public static function registerLogin(?Panel $panel = null): void
@@ -130,6 +136,47 @@ final class Routes
     }
 
     /**
+     * Regista as rotas de forgot-password + reset-password (idempotente).
+     */
+    public static function registerPasswordReset(?Panel $panel = null): void
+    {
+        if (self::$passwordResetRegistered) {
+            return;
+        }
+
+        if (! ($panel?->passwordResetEnabled() ?? false)) {
+            return;
+        }
+
+        Route::getRoutes()->refreshNameLookups();
+        if (Route::has('password.request') || Route::has('password.reset')) {
+            self::$passwordResetRegistered = true;
+
+            return;
+        }
+
+        $base = self::deriveBasePath($panel?->getLoginUrl() ?? '/admin/login');
+
+        Route::get($base.'/forgot-password', [ForgotPasswordController::class, 'showForm'])
+            ->middleware(['web', 'guest'])
+            ->name('password.request');
+
+        Route::post($base.'/forgot-password', ForgotPasswordController::class)
+            ->middleware(['web', 'guest', 'throttle:6,1'])
+            ->name('password.email');
+
+        Route::post($base.'/reset-password', ResetPasswordController::class)
+            ->middleware(['web', 'guest', 'throttle:6,1'])
+            ->name('password.update');
+
+        Route::get($base.'/reset-password/{token}', [ResetPasswordController::class, 'showForm'])
+            ->middleware(['web', 'guest'])
+            ->name('password.reset');
+
+        self::$passwordResetRegistered = true;
+    }
+
+    /**
      * @internal Used by tests to reset the singleton flags.
      */
     public static function reset(): void
@@ -137,6 +184,7 @@ final class Routes
         self::$registered = false;
         self::$registrationRegistered = false;
         self::$verificationRegistered = false;
+        self::$passwordResetRegistered = false;
     }
 
     public static function isRegistered(): bool
@@ -152,6 +200,11 @@ final class Routes
     public static function isVerificationRegistered(): bool
     {
         return self::$verificationRegistered;
+    }
+
+    public static function isPasswordResetRegistered(): bool
+    {
+        return self::$passwordResetRegistered;
     }
 
     private static function deriveLogoutUrl(string $loginUrl): string
@@ -172,5 +225,14 @@ final class Routes
         }
 
         return rtrim($loginUrl, '/').$sibling;
+    }
+
+    private static function deriveBasePath(string $loginUrl): string
+    {
+        if (str_ends_with($loginUrl, '/login')) {
+            return rtrim(substr($loginUrl, 0, -6), '/');
+        }
+
+        return rtrim($loginUrl, '/');
     }
 }

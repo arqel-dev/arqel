@@ -7,14 +7,14 @@ use Arqel\Cli\Generators\SetupScriptGenerator;
 it('renders a bash script with the expected baseline commands', function (): void {
     $script = (new SetupScriptGenerator(
         appName: 'my-app',
-        starter: 'breeze',
+        starter: 'react',
         tenancy: 'none',
     ))->forBash();
 
     expect($script)
         ->toContain('#!/usr/bin/env bash')
         ->toContain('set -euo pipefail')
-        ->toContain('laravel new my-app --breeze')
+        ->toContain('laravel new my-app --react')
         ->toContain('cd my-app')
         ->toContain('composer require arqel/arqel')
         ->toContain('php artisan arqel:install')
@@ -33,11 +33,11 @@ it('adds stancl/tenancy when tenancy is stancl', function (): void {
     expect($script)
         ->toContain('composer require stancl/tenancy')
         ->toContain('laravel new rentals')
-        ->not->toContain('--breeze')
-        ->not->toContain('--jet');
+        ->not->toContain('--react')
+        ->not->toContain('--vue');
 });
 
-it('uses --jet for jetstream starter and adds spatie multitenancy', function (): void {
+it('legacy "jetstream" alias resolves to react and adds spatie multitenancy', function (): void {
     $script = (new SetupScriptGenerator(
         appName: 'crm',
         starter: 'jetstream',
@@ -48,18 +48,30 @@ it('uses --jet for jetstream starter and adds spatie multitenancy', function ():
     ))->forBash();
 
     expect($script)
-        ->toContain('laravel new crm --jet')
+        ->toContain('laravel new crm --react')
         ->toContain('composer require spatie/laravel-multitenancy')
         ->toContain('php artisan arqel:resource Customer')
         ->toContain('composer require arqel/mcp')
         ->toContain('php artisan arqel:mcp:install')
+        ->not->toContain('--jet')
         ->not->toContain('Dark mode preset');
+});
+
+it('legacy "breeze" alias resolves to react', function (): void {
+    $script = (new SetupScriptGenerator(
+        appName: 'legacy-app',
+        starter: 'breeze',
+    ))->forBash();
+
+    expect($script)
+        ->toContain('laravel new legacy-app --react')
+        ->not->toContain('--breeze');
 });
 
 it('renders a PowerShell script with the expected commands', function (): void {
     $script = (new SetupScriptGenerator(
         appName: 'win-app',
-        starter: 'breeze',
+        starter: 'react',
         tenancy: 'simple',
     ))->forPowershell();
 
@@ -68,7 +80,7 @@ it('renders a PowerShell script with the expected commands', function (): void {
         ->toContain('Set-Location win-app')
         ->toContain('Write-Host "==> Installing arqel/arqel"')
         ->toContain('composer require arqel/tenant')
-        ->toContain('laravel new win-app --breeze');
+        ->toContain('laravel new win-app --react');
 });
 
 it('rejects invalid app names and unknown enums', function (): void {

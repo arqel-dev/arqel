@@ -28,7 +28,7 @@ final class NewCommand extends Command
     {
         $this
             ->addArgument('name', InputArgument::REQUIRED, 'Project / directory name.')
-            ->addOption('starter', null, InputOption::VALUE_REQUIRED, 'Starter kit (breeze|jetstream|none).', 'breeze')
+            ->addOption('starter', null, InputOption::VALUE_REQUIRED, 'Starter kit (react|vue|livewire|none). Aliases: breeze, jetstream → react.', 'react')
             ->addOption('tenancy', null, InputOption::VALUE_REQUIRED, 'Tenancy stack (none|simple|stancl|spatie).', 'none')
             ->addOption('first-resource', null, InputOption::VALUE_REQUIRED, 'Optional first resource model name.')
             ->addOption('dark-mode', null, InputOption::VALUE_NEGATABLE, 'Enable dark-mode preset.', true)

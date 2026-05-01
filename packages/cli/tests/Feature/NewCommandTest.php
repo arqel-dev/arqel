@@ -33,11 +33,11 @@ function runNewCommand(array $input, ?string $cwd = null): array
     return [$exit, $tester, $cwd];
 }
 
-it('generates a bash script for a breeze + no-tenancy app', function (): void {
+it('generates a bash script for a react + no-tenancy app', function (): void {
     [$exit, $tester, $cwd] = runNewCommand([
         'name' => 'my-app',
         '--no-prompts' => true,
-        '--starter' => 'breeze',
+        '--starter' => 'react',
         '--tenancy' => 'none',
         '--platform' => 'bash',
     ]);
@@ -47,7 +47,7 @@ it('generates a bash script for a breeze + no-tenancy app', function (): void {
     expect(file_exists($path))->toBeTrue();
     $contents = (string) file_get_contents($path);
     expect($contents)
-        ->toContain('laravel new my-app --breeze')
+        ->toContain('laravel new my-app --react')
         ->toContain('composer require arqel/arqel')
         ->not->toContain('stancl/tenancy');
     expect($tester->getDisplay())->toContain('Generated arqel-setup-my-app.sh');
@@ -69,7 +69,7 @@ it('includes stancl/tenancy in the script when --tenancy=stancl', function (): v
         ->toContain('laravel new rental');
 });
 
-it('uses --jet flag when starter is jetstream', function (): void {
+it('legacy "jetstream" alias resolves to laravel new --react', function (): void {
     [$exit, , $cwd] = runNewCommand([
         'name' => 'crm',
         '--no-prompts' => true,
@@ -80,7 +80,9 @@ it('uses --jet flag when starter is jetstream', function (): void {
 
     expect($exit)->toBe(0);
     $contents = (string) file_get_contents($cwd.'/arqel-setup-crm.sh');
-    expect($contents)->toContain('laravel new crm --jet');
+    expect($contents)
+        ->toContain('laravel new crm --react')
+        ->not->toContain('--jet');
 });
 
 it('rejects invalid project names with non-zero exit', function (): void {
@@ -115,7 +117,7 @@ it('produces a .ps1 file when platform=windows is forced', function (): void {
     [$exit, $tester, $cwd] = runNewCommand([
         'name' => 'winapp',
         '--no-prompts' => true,
-        '--starter' => 'breeze',
+        '--starter' => 'react',
         '--tenancy' => 'simple',
         '--platform' => 'powershell',
     ]);

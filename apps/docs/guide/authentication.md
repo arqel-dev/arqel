@@ -196,9 +196,64 @@ E proteja as rotas autenticadas com `verified` middleware quando quiser exigir v
 $panel->middleware(['web', 'auth', 'verified']);
 ```
 
+## Forgot password (AUTH-008)
+
+A partir de AUTH-008, o pacote `arqel/auth` shipa o fluxo completo de recuperação de senha — sem Breeze, Fortify ou Jetstream necessários.
+
+### Como ativar
+
+No painel, use o fluent API:
+
+```php
+use Arqel\Core\Panel\PanelRegistry;
+
+app(PanelRegistry::class)
+    ->panel('admin')
+    ->login()
+    ->passwordReset()
+    ->passwordResetExpirationMinutes(120); // padrão 60
+```
+
+Isso registra automaticamente quatro rotas (idempotentes — não duplicam se o host já tiver `password.request`/`password.reset`):
+
+| Método | URL | Nome | Componente Inertia |
+|---|---|---|---|
+| GET | `/admin/forgot-password` | `password.request` | `arqel/auth/ForgotPassword` |
+| POST | `/admin/forgot-password` | `password.email` | — |
+| GET | `/admin/reset-password/{token}` | `password.reset` | `arqel/auth/ResetPassword` |
+| POST | `/admin/reset-password` | `password.update` | — |
+
+### Fluxo completo
+
+1. Usuário clica em **"Esqueci minha senha"** na `<LoginPage />` (link aparece automaticamente quando `passwordReset()` está ativo no painel).
+2. Inertia abre `arqel/auth/ForgotPassword`. Usuário digita o e-mail e submete.
+3. Backend chama `Password::sendResetLink(['email' => ...])` e retorna **flash genérico** — independente do e-mail existir ou não. Isso evita user enumeration.
+4. Se o e-mail existe, Laravel envia a notificação `ResetPassword` com link para `/admin/reset-password/{token}?email=...`.
+5. Usuário abre o link, Inertia renderiza `arqel/auth/ResetPassword` com `token` (rota) e `email` (query) pré-preenchidos.
+6. Submete nova senha + confirmação. Backend valida via `ResetPasswordRequest` (min:8 + confirmed), chama `Password::reset` e redireciona para `Panel::getLoginUrl()` com flash de sucesso.
+
+### Segurança e limites
+
+- **Rate-limit**: 3 requests por e-mail+IP por hora em `forgot-password` e `reset-password`. Excedido, retorna `422` com mensagem traduzida `auth.throttle`.
+- **Expiração de token**: `passwordResetExpirationMinutes(int)` ajusta `auth.passwords.users.expire` em runtime (default 60 minutos).
+- **CSRF**: rotas POST estão sob `web` middleware → token automático.
+- **Resposta genérica**: nunca revela se um e-mail está ou não cadastrado.
+
+### Custom views
+
+As páginas React vêm em `@arqel/auth`:
+
+```tsx
+import { ForgotPasswordPage, ResetPasswordPage } from '@arqel/auth';
+```
+
+Você pode trocar pelo seu próprio componente registrando o nome do componente Inertia (`arqel/auth/ForgotPassword`/`arqel/auth/ResetPassword`) com a sua versão no resolver Inertia do app host.
+
 ## Próximos passos planejados
 
-- **AUTH-008** — Forgot-password + reset token flow.
+- **AUTH-006** — Login + logout Inertia-React páginas opt-in via `Panel::configure()->login()` (entregue).
+- **AUTH-007** — Registration opt-in + email verification opt-in (entregue).
+- **AUTH-008** — Forgot-password + reset token flow (entregue).
 
 Quando esse ticket shipar, `composer require arqel/arqel` + `php artisan arqel:install` será suficiente — sem starter kit obrigatório.
 

@@ -29,13 +29,13 @@ it('rejects app names with whitespace, dots, slashes or extended ASCII', functio
 it('emits spatie/laravel-multitenancy in forBash() when tenancy is spatie', function (): void {
     $script = (new SetupScriptGenerator(
         appName: 'multi',
-        starter: 'breeze',
+        starter: 'react',
         tenancy: 'spatie',
     ))->forBash();
 
     expect($script)
         ->toContain('composer require spatie/laravel-multitenancy')
-        ->toContain('laravel new multi --breeze')
+        ->toContain('laravel new multi --react')
         ->not->toContain('stancl/tenancy')
         ->not->toContain('arqel/tenant');
 });

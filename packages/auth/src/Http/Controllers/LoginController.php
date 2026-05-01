@@ -39,8 +39,9 @@ final class LoginController
 
         return Inertia::render('arqel/auth/Login', [
             'canRegister' => $panel?->registrationEnabled() ?? false,
-            'canResetPassword' => false,
+            'canResetPassword' => $panel?->passwordResetEnabled() ?? false,
             'loginUrl' => $panel?->getLoginUrl() ?? '/admin/login',
+            'forgotPasswordUrl' => $panel?->getForgotPasswordUrl() ?? '/admin/forgot-password',
         ]);
     }
 

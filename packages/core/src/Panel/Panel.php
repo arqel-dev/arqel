@@ -61,6 +61,12 @@ final class Panel
 
     private ?Closure $registrationFieldsFactory = null;
 
+    private bool $passwordResetEnabled = false;
+
+    private int $passwordResetExpirationMinutes = 60;
+
+    private string $forgotPasswordUrl = '/admin/forgot-password';
+
     private bool $defaultAuth = true;
 
     public function __construct(public readonly string $id) {}
@@ -331,5 +337,51 @@ final class Panel
     public function getTenantScope(): ?string
     {
         return $this->tenantScope;
+    }
+
+    /**
+     * Habilita o fluxo bundled de forgot-password + reset (AUTH-008).
+     */
+    public function passwordReset(bool $enabled = true): self
+    {
+        $this->passwordResetEnabled = $enabled;
+
+        return $this;
+    }
+
+    public function passwordResetEnabled(): bool
+    {
+        return $this->passwordResetEnabled && $this->defaultAuth;
+    }
+
+    /**
+     * Configura a expiração (em minutos) do token de reset emitido pelo
+     * Laravel Password Broker. Atualiza `auth.passwords.users.expire` em
+     * runtime para que `Password::sendResetLink()` honre o valor.
+     */
+    public function passwordResetExpirationMinutes(int $minutes = 60): self
+    {
+        $this->passwordResetExpirationMinutes = max(1, $minutes);
+
+        config(['auth.passwords.users.expire' => $this->passwordResetExpirationMinutes]);
+
+        return $this;
+    }
+
+    public function getPasswordResetExpirationMinutes(): int
+    {
+        return $this->passwordResetExpirationMinutes;
+    }
+
+    public function forgotPasswordUrl(string $url = '/admin/forgot-password'): self
+    {
+        $this->forgotPasswordUrl = '/'.ltrim($url, '/');
+
+        return $this;
+    }
+
+    public function getForgotPasswordUrl(): string
+    {
+        return $this->forgotPasswordUrl;
     }
 }

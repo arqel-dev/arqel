@@ -14,13 +14,26 @@ use InvalidArgumentException;
  */
 final readonly class SetupScriptGenerator
 {
-    public const array STARTERS = ['breeze', 'jetstream', 'none'];
+    public const array STARTERS = ['react', 'vue', 'livewire', 'none'];
+
+    /**
+     * Legacy starter names kept for backwards-compat with older docs / CI configs.
+     * Maps to the closest current Laravel installer flag. `breeze` and `jetstream`
+     * were removed from `laravel new` in 2025 — both implied an Inertia + React
+     * setup with auth scaffolding, which is what `--react` provides today.
+     */
+    public const array STARTER_ALIASES = [
+        'breeze' => 'react',
+        'jetstream' => 'react',
+    ];
 
     public const array TENANCIES = ['none', 'simple', 'stancl', 'spatie'];
 
+    public string $starter;
+
     public function __construct(
         public string $appName,
-        public string $starter = 'breeze',
+        string $starter = 'react',
         public string $tenancy = 'none',
         public ?string $firstResource = null,
         public bool $darkMode = true,
@@ -32,9 +45,13 @@ final readonly class SetupScriptGenerator
             );
         }
 
-        if (! in_array($starter, self::STARTERS, true)) {
+        $resolved = self::STARTER_ALIASES[$starter] ?? $starter;
+
+        if (! in_array($resolved, self::STARTERS, true)) {
             throw new InvalidArgumentException("Unknown starter '{$starter}'.");
         }
+
+        $this->starter = $resolved;
 
         if (! in_array($tenancy, self::TENANCIES, true)) {
             throw new InvalidArgumentException("Unknown tenancy '{$tenancy}'.");
@@ -142,9 +159,10 @@ final readonly class SetupScriptGenerator
     private function laravelNewCommand(): string
     {
         return match ($this->starter) {
-            'jetstream' => "laravel new {$this->appName} --jet",
-            'breeze' => "laravel new {$this->appName} --breeze",
-            default => "laravel new {$this->appName}",
+            'react' => "laravel new {$this->appName} --react --pest --pnpm --no-interaction",
+            'vue' => "laravel new {$this->appName} --vue --pest --pnpm --no-interaction",
+            'livewire' => "laravel new {$this->appName} --livewire --pest --pnpm --no-interaction",
+            default => "laravel new {$this->appName} --pest --pnpm --no-interaction",
         };
     }
 

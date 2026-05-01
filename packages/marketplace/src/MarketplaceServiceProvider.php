@@ -20,8 +20,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
  * - rotas REST em `routes/api.php` com prefixo configurável.
  *
  * MKTPLC-002 adiciona o submission workflow.
- * MKTPLC-003 adiciona o ratings/reviews avançado.
- * MKTPLC-004 adiciona stats/analytics.
+ * MKTPLC-003 adiciona a plugin metadata convention + comando `arqel:plugin:list`.
  */
 final class MarketplaceServiceProvider extends PackageServiceProvider
 {
@@ -33,5 +32,14 @@ final class MarketplaceServiceProvider extends PackageServiceProvider
             ->hasMigration('create_arqel_marketplace_tables')
             ->hasMigration('add_submission_columns_to_arqel_plugins')
             ->hasRoute('api');
+    }
+
+    public function packageBooted(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Arqel\Marketplace\Console\PluginListCommand::class,
+            ]);
+        }
     }
 }

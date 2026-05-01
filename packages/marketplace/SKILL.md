@@ -83,9 +83,40 @@ Http::withToken($adminToken)
     ]);
 ```
 
+**Entregue (MKTPLC-003):**
+
+Plugin metadata convention + validator + comando Artisan `arqel:plugin:list`. Ver `docs/CONVENTION.md` para o schema completo.
+
+- **`PluginConventionValidator`** (`Services/PluginConventionValidator.php`, `final readonly`) — valida arrays decodificados de `composer.json` e `package.json` contra o schema. Em `composer.json` checa `type=arqel-plugin` (fail), `extra.arqel.plugin-type` no enum (`field-pack`, `widget-pack`, `theme`, `integration`, `language-pack`, `tool`) (fail), `extra.arqel.compat.arqel` como constraint semver válida (fail), `extra.arqel.category` non-empty (fail), `extra.arqel.installation-instructions` (warn se ausente), `keywords` contém `arqel`+`plugin` (warn). Em `package.json` aceita `arqel.plugin-type` no root OU `peerDependencies."@arqel/types"`. Não faz I/O — recebe arrays prontos.
+- **`ConventionValidationResult`** (`Services/ConventionValidationResult.php`, `final readonly`) — value-object com `checks`, `passed`, `warnings`, `errors`. Factories `success(checks)` e `failed(checks)`. Method `toArray()` para serialização.
+- **`PluginListCommand`** (`Console/PluginListCommand.php`, `final extends Command`) — signature `arqel:plugin:list {--validate}`. Descobre plugins via `Composer\InstalledVersions::getInstalledPackagesByType('arqel-plugin')`, lê o `composer.json` de cada install path, imprime tabela `Name | Version | Plugin Type | Category | Status`. Com `--validate` roda o validator e imprime checks detalhados.
+- **Service provider** — `MarketplaceServiceProvider::packageBooted()` registra o comando via `$this->commands(...)` quando `runningInConsole()`.
+- **Documentação** — `docs/CONVENTION.md` PT-BR com schema completo, plugin types, exemplo full de field-pack, e como usar `arqel:plugin:list --validate`.
+- **20 testes Pest novos**: Unit `Services/PluginConventionValidatorTest` (12), Unit `ConventionValidationResultTest` (4), Feature `PluginListCommandTest` (4).
+
+Exemplo de uso:
+
+```bash
+php artisan arqel:plugin:list           # tabela de plugins instalados
+php artisan arqel:plugin:list --validate # roda PluginConventionValidator em cada
+```
+
+```php
+use Arqel\Marketplace\Services\PluginConventionValidator;
+
+$validator = new PluginConventionValidator;
+$composer = json_decode(file_get_contents('composer.json'), true);
+$result = $validator->validateComposerJson($composer);
+
+if (! $result->passed) {
+    foreach ($result->errors as $error) {
+        echo "ERROR: {$error}\n";
+    }
+}
+```
+
 **Por chegar:**
 
-- **MKTPLC-003** — Ratings/reviews avançado (média ponderada de stars, update permitido, anti-spam, helpful votes).
 - **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).
 - **MKTPLC-005+** — Admin panel (Arqel-powered) para publishers + moderação.
 

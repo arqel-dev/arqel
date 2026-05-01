@@ -8,10 +8,18 @@ interface MockFormState {
   processing: boolean;
 }
 
+interface MockPageState {
+  props: Record<string, unknown>;
+}
+
 const mockState: MockFormState = {
   data: {},
   errors: {},
   processing: false,
+};
+
+const mockPage: MockPageState = {
+  props: { flash: {} },
 };
 
 export const postSpy = vi.fn();
@@ -20,10 +28,15 @@ export function setMockErrors(errors: Record<string, string>): void {
   mockState.errors = errors;
 }
 
+export function setMockPageProps(props: Record<string, unknown>): void {
+  mockPage.props = props;
+}
+
 export function resetMockForm(): void {
   mockState.data = {};
   mockState.errors = {};
   mockState.processing = false;
+  mockPage.props = { flash: {} };
   postSpy.mockReset();
 }
 
@@ -45,6 +58,7 @@ vi.mock('@inertiajs/react', () => ({
       reset: vi.fn(),
     };
   },
+  usePage: () => mockPage,
 }));
 
 afterEach(() => {

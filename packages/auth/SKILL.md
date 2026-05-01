@@ -27,6 +27,24 @@ User escreve as Policies (Laravel-native). Arqel apenas verifica existência, au
 - `arqel_can(string, mixed)` global helper: `AbilityRegistry` snapshot first, Gate fallback. Retorna false para guests
 - 28 testes Pest passando
 
+**Entregue (AUTH-008):**
+
+- `Arqel\Auth\Http\Controllers\ForgotPasswordController` — GET renderiza Inertia `arqel/auth/ForgotPassword`; POST valida e-mail, dispara `Password::sendResetLink`, retorna flash `status` genérico (não revela se e-mail existe). Rate-limit 3/email+IP/hora
+- `Arqel\Auth\Http\Controllers\ResetPasswordController` — GET renderiza `arqel/auth/ResetPassword` com `{token, email}`; POST valida via `ResetPasswordRequest` e processa `Password::reset`. Sucesso redireciona para `Panel::getLoginUrl()`
+- `Arqel\Auth\Http\Requests\ResetPasswordRequest` — rules `token+email+password(min:8 confirmed)+password_confirmation`; rate-limit 3/email+IP/hora
+- `Routes::registerPasswordReset(?Panel)` — registra `password.request`, `password.email`, `password.reset`, `password.update` (idempotente; pula se host já tem `password.request`/`password.reset`)
+- `Panel::passwordReset()/passwordResetEnabled()/passwordResetExpirationMinutes()/forgotPasswordUrl()` — fluent API opt-in. `passwordResetExpirationMinutes` ajusta `auth.passwords.users.expire` em runtime
+- Pacote npm `@arqel/auth` ganha `<ForgotPasswordPage />` e `<ResetPasswordPage />`
+
+Exemplo:
+
+```php
+$panel
+    ->login()
+    ->passwordReset()
+    ->passwordResetExpirationMinutes(120);
+```
+
 **Entregue (AUTH-006):**
 
 - `Arqel\Auth\Http\Controllers\LoginController` — GET renderiza Inertia `arqel/auth/Login`; POST autentica via `LoginRequest`, regenera sessão e redireciona para `Panel::getAfterLoginUrl()`

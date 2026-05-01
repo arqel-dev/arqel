@@ -17,7 +17,13 @@ use Illuminate\Support\Facades\Route;
 // Reserved sub-paths that Arqel itself owns under the panel prefix
 // (e.g. /admin/login, /admin/logout from arqel/auth) must not be
 // captured by the polymorphic `{resource}` slug.
-$reservedSlugs = '^(?!login$|logout$|register$|forgot-password$|reset-password$).+$';
+// Use lookahead with `(?:/|$)` so the exclusion fires even when the
+// reserved slug appears as the first segment of a multi-segment route
+// (e.g. `/admin/reset-password/{token}`). Anchoring with `$` alone only
+// catches single-segment URLs because the captured `{resource}` value
+// never includes a slash; multi-segment URLs end the captured group
+// before the `$` anchor would trigger.
+$reservedSlugs = '(?!(?:login|logout|register|forgot-password|reset-password)(?:/|$)).+';
 
 Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
     Route::get('{resource}', [ResourceController::class, 'index'])

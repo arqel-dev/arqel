@@ -37,3 +37,9 @@ parameters:
         -
             identifier: method.nonObject
             path: tests/Feature/*
+        -
+            identifier: method.notFound
+            path: tests/Unit/Coverage/*
+        -
+            identifier: method.nonObject
+            path: tests/Unit/Coverage/*

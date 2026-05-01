@@ -51,6 +51,23 @@ export interface ArqelDevToolsState {
   readonly currentPath: string;
   readonly navigationHistory: ReadonlyArray<NavigationEntry>;
   readonly devToolsPayload: ArqelDevToolsPayload | null;
+  readonly fieldsSchema: ReadonlyArray<FieldSchema>;
+}
+
+/**
+ * Normalized field schema entry surfaced by `getFieldsSchema()`
+ * (DEVTOOLS-005). Heuristics extract the raw shape from `pageProps`
+ * (`fields` / `resource.fields` / `form.fields`); missing keys fall
+ * back to safe defaults (`visible: true`, `required: false`).
+ */
+export interface FieldSchema {
+  readonly name: string;
+  readonly type: string;
+  readonly label?: string;
+  readonly required?: boolean;
+  readonly visible?: boolean;
+  readonly rules?: ReadonlyArray<string>;
+  readonly meta?: Readonly<Record<string, unknown>>;
 }
 
 export interface ArqelDevToolsHook {
@@ -65,6 +82,13 @@ export interface ArqelDevToolsHook {
   getDevToolsPayload(): ArqelDevToolsPayload | null;
   /** Replace the `__devtools` payload (DEVTOOLS-004). */
   setDevToolsPayload(payload: ArqelDevToolsPayload | null): void;
+  /**
+   * Extracts a normalized field schema list from the current
+   * `pageProps` (DEVTOOLS-005). Tries `pageProps.fields`,
+   * `pageProps.resource.fields`, then `pageProps.form.fields`.
+   * Returns `[]` if nothing matches.
+   */
+  getFieldsSchema(): ReadonlyArray<FieldSchema>;
 }
 
 declare global {
@@ -86,7 +110,68 @@ const EMPTY_STATE: ArqelDevToolsState = Object.freeze({
   currentPath: '',
   navigationHistory: Object.freeze([]),
   devToolsPayload: null,
+  fieldsSchema: Object.freeze([]),
 });
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Heuristic extraction of a field schema list from arbitrary
+ * `pageProps`. Tries the conventional Arqel paths and normalizes each
+ * entry to {@link FieldSchema}. Non-array sources or non-object items
+ * are skipped silently.
+ */
+export function extractFieldsSchema(pageProps: unknown): ReadonlyArray<FieldSchema> {
+  if (!isPlainObject(pageProps)) return [];
+  const candidates: unknown[] = [
+    pageProps['fields'],
+    isPlainObject(pageProps['resource']) ? pageProps['resource']['fields'] : undefined,
+    isPlainObject(pageProps['form']) ? pageProps['form']['fields'] : undefined,
+  ];
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return Object.freeze(
+        candidate
+          .filter((item): item is Record<string, unknown> => isPlainObject(item))
+          .map(normalizeField),
+      );
+    }
+  }
+  return [];
+}
+
+function normalizeField(raw: Record<string, unknown>): FieldSchema {
+  const name = typeof raw['name'] === 'string' ? raw['name'] : '';
+  const type = typeof raw['type'] === 'string' ? raw['type'] : 'unknown';
+  const result: {
+    name: string;
+    type: string;
+    label?: string;
+    required: boolean;
+    visible: boolean;
+    rules?: ReadonlyArray<string>;
+    meta?: Readonly<Record<string, unknown>>;
+  } = {
+    name,
+    type,
+    required: typeof raw['required'] === 'boolean' ? raw['required'] : false,
+    visible: typeof raw['visible'] === 'boolean' ? raw['visible'] : true,
+  };
+  if (typeof raw['label'] === 'string') {
+    result.label = raw['label'];
+  }
+  if (Array.isArray(raw['rules'])) {
+    result.rules = Object.freeze(
+      (raw['rules'] as unknown[]).filter((r): r is string => typeof r === 'string'),
+    );
+  }
+  if (isPlainObject(raw['meta'])) {
+    result.meta = Object.freeze({ ...raw['meta'] });
+  }
+  return Object.freeze(result);
+}
 
 /**
  * Internal factory — exported only for tests. Apps should call
@@ -123,6 +208,7 @@ export function createDevToolsHook(version: string): InternalHook {
         pageProps,
         sharedProps: Object.freeze({ ...sharedProps }),
         currentPath,
+        fieldsSchema: extractFieldsSchema(pageProps),
       };
       notify();
     },
@@ -148,8 +234,14 @@ export function createDevToolsHook(version: string): InternalHook {
       };
       notify();
     },
+    getFieldsSchema(): ReadonlyArray<FieldSchema> {
+      return state.fieldsSchema;
+    },
     __setState(next: ArqelDevToolsState): void {
-      state = next;
+      state = {
+        ...next,
+        fieldsSchema: next.fieldsSchema ?? extractFieldsSchema(next.pageProps),
+      };
       notify();
     },
   };

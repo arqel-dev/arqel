@@ -13,7 +13,7 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
 
 ## Status
 
-### Entregue (DEVTOOLS-001..004 + DEVTOOLS-008 polish)
+### Entregue (DEVTOOLS-001..005 + DEVTOOLS-008 polish)
 
 - **Scaffold (DEVTOOLS-001):** estrutura multi-entry com Vite (`background`,
   `content-script`, `devtools`, `panel`). Manifest V3 para Chrome/Edge e
@@ -49,10 +49,20 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
   leak. Captura via `@arqel/react` no inertia-bridge: extrai
   `props['__devtools']` e expõe no hook como `getDevToolsPayload()`.
 
+- **Field schema inspector (DEVTOOLS-005):** nova top-tab "Fields" no
+  painel renderiza schema normalizado a partir de `pageProps`. Hook
+  `@arqel/react` ganha `getFieldsSchema()` com heurística defensive
+  (`pageProps.fields` → `pageProps.resource.fields` →
+  `pageProps.form.fields`), normaliza para `FieldSchema[]` (defaults
+  `visible=true`, `required=false`). Painel: lista compacta com badge
+  de tipo, search por name, filter por type (dropdown), counter
+  `X visible / Y total`. Click expande detail view: validation rules
+  como `<ul>`, `meta.dependsOn`, `meta.visibleWhen` JSON-stringify e
+  `<JsonNode>` reusable para o meta completo. Empty state quando
+  `fields=[]`.
+
 ### Por chegar
 
-- **DEVTOOLS-005** — Field schema inspector (mostrar fields/types de
-  resources detectados).
 - **DEVTOOLS-006** — Time-travel para Inertia history navigation.
 - **DEVTOOLS-007** — Performance metrics (render time, prop diff size).
 - Submissão a Chrome Web Store e Firefox Add-ons.

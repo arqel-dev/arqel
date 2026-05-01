@@ -16,7 +16,7 @@
 - **Facade `Arqel`** (`src/Facades/Arqel.php`) com accessor `arqel` aliasado ao `PanelRegistry`
 - **Comandos Artisan**:
   - `arqel:install {--force}` — bootstrap pipeline com Laravel Prompts (publica config, faz scaffold de `app/Arqel`, `resources/js/Pages/Arqel`, gera provider/layout/`AGENTS.md`)
-  - `arqel:resource {model} {--with-policy} {--force}` — gera Resource em `app/Arqel/Resources` a partir de `stubs/resource.stub`. `--from-model`/`--from-migration` adiados até `Arqel\Fields\Field` existir
+  - `arqel:resource {model?} {--label=} {--group=} {--icon=} {--with-policy} {--with-form-requests} {--tests=none|pest} {--force}` — gera Resource em `app/Arqel/Resources` a partir de `stubs/resource.stub` (modo direto) ou via wizard interactivo Laravel Prompts (CLI-TUI-002) quando o argumento `model` é omitido num TTY. Geração delega ao `Arqel\Core\Generators\ResourceGenerator` (final readonly, retorna source PHP — não toca em disco)
 - **Blade root view** `arqel::app` (`resources/views/app.blade.php`) com `@inertia`, CSRF, FOUC guard de tema; publicada para `resources/views/vendor/arqel/`
 - **Traduções** (`resources/lang/{en,pt_BR}/`): `messages`, `actions`, `table`, `form`, `validation`. Acesso via `__('arqel::messages.actions.create')`
 
@@ -232,6 +232,33 @@ Summary: 8 ok • 2 warn • 0 fail
 ```
 
 **Exit code:** `0` se nenhum `fail` (e em `--strict`, também sem `warn`); `1` caso contrário. Usável directamente em pipelines de deploy e em healthcheck endpoints.
+
+## Resource generator interactivo (CLI-TUI-002)
+
+`arqel:resource` opera em dois modos:
+
+**Modo direto** — quando passas o model como argumento, geração é one-shot:
+
+```bash
+php artisan arqel:resource App\\Models\\Post --label='Post' --group='Content' --icon='file-text'
+php artisan arqel:resource User --with-policy --with-form-requests --tests=pest
+```
+
+**Modo interactivo (wizard)** — quando rodas `php artisan arqel:resource` sem argumentos num TTY, abre wizard Laravel Prompts:
+
+1. **Model class?** — `select` com modelos descobertos em `app/Models` (recursivo, filtra subclasses de `Eloquent\Model`). Se `app/Models` não existir, faz fallback para `text` aceitando FQN livre.
+2. **Resource label?** — default `Str::studly(class_basename($model))`.
+3. **Navigation group?** / **Navigation icon (Lucide)?** — `text` opcionais.
+4. **Field detection** — chama `inferFields($modelClass)` que lê o schema DB (`Schema::getColumnListing` + `Schema::getColumnType`), descarta colunas convencionais (`id`, `created_at`, `updated_at`, `deleted_at`, `remember_token`) e mapeia tipo de coluna → tipo de field (regras: `slug` → `slug`, `*_id` → `belongsTo`, `string/varchar` → `text`, `text/longtext` → `textarea`, `integer/bigint` → `number`, `boolean` → `toggle`, `date/datetime/timestamp` → `dateTime`, `json/jsonb` → `keyValue`, default → `text`). Mostra preview via `table()`.
+5. **Confirm**, **Generate Policy?**, **Generate FormRequest classes?**, **Tests? (pest|none)** — `confirm`/`select`.
+
+Skip explícito: `--no-interaction` desactiva o wizard e exige `model` como argumento.
+
+**Generator** (`Arqel\Core\Generators\ResourceGenerator`) é `final readonly`, recebe a config completa do wizard (ou da CLI direta) e expõe `generateResourceFile()`, `generatePolicyFile()`, `generateRequestFile('store'|'update')`, `generateTestFile()`. Retorna sempre source PHP — não escreve em disco. O `MakeResourceCommand` escreve, respeitando `--force` para overwrites.
+
+**Anti-overwrite**: sem `--force`, files existentes são pulados com `note()` (não falha o command).
+
+**Coverage**: 9 testes feature em `tests/Feature/MakeResourceCommandTest.php` + 8 testes unit em `tests/Unit/Generators/ResourceGeneratorTest.php`.
 
 ## Anti-patterns
 

@@ -35,6 +35,7 @@ const scopes = [
   'devtools',
   // transversais
   'infra',
+  'lcloud',
   'gov',
   'docs',
   'demo',

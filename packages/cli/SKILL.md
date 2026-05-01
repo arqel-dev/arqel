@@ -50,6 +50,58 @@ e segue o mesmo idioma do Filament installer.
   tests pré-existentes).
 - PHPStan level max limpo.
 
+### Entregue (LCLOUD-001)
+
+- `Arqel\Cli\Commands\CloudExportCommand` (signature
+  `cloud:export {target-dir} {--with-sample} {--app-name=}`):
+  copia o template `templates/laravel-cloud/` para o diretório
+  destino aplicando substituição de placeholder `{{APP_NAME}}` em
+  arquivos textuais. Recusa diretório destino não-vazio; cria
+  hierarquia se ausente. Mensagem final imprime instruções de
+  `git init`/`commit`/push + indicação de clicar no botão
+  "Deploy to Laravel Cloud" do README gerado.
+- `Arqel\Cli\Services\TemplateExporter` (`final readonly`): itera
+  recursivamente o `sourceDir`, preserva subdiretórios e
+  permissões, aplica `strtr()` nos arquivos textuais (allowlist
+  de extensões), copia binários (PNG, fontes, etc.) sem alterar.
+  Retorna lista ordenada de arquivos escritos. PHPStan max-safe.
+- Template `templates/laravel-cloud/`:
+  - `cloud.yml` provisionando PHP 8.3 + Postgres 16 + pgvector +
+    Redis + Reverb.
+  - `cloud.env.example` + `.env.production.example` com vars
+    Arqel essenciais.
+  - `composer.json` template (`your-org/{{APP_NAME}}`, type
+    `project`, deps `arqel/core`, `arqel/panel`, Reverb,
+    Inertia).
+  - `app/Providers/ArqelServiceProvider.php` stub.
+  - `README.md` PT-BR com botão "Deploy to Laravel Cloud",
+    pre-flight checklist, custom domain, troubleshooting.
+- Suite Pest acrescenta **13 testes** (7 feature
+  `CloudExportCommandTest` + 6 unit `TemplateExporterTest`).
+
+### Cloud template export
+
+Permite ao usuário gerar a estrutura de um repo deployável em
+Laravel Cloud sem clonar repositório externo:
+
+```bash
+# Dentro de qualquer pasta:
+arqel cloud:export ./my-arqel-app --app-name=myadmin
+
+# Saída: arquivos copiados, instruções:
+#   cd ./my-arqel-app
+#   git init && git add . && git commit -m 'Initial Arqel app'
+#   git push (para GitHub) e clicar no botão do README.
+```
+
+A decisão arquitetural é manter o template **dentro do monorepo
+arqel/cli** (em `templates/laravel-cloud/`) ao invés de
+`github.com/arqel/laravel-cloud-template` separado: isso evita
+um repo desincronizado e permite testar o template no mesmo CI.
+Quando o Arqel for promovido a 1.0, podemos espelhar o conteúdo
+para um template repo dedicado via splitsh; o command continua
+sendo o caminho canônico para gerar a estrutura.
+
 ### Por chegar
 
 - **CLI-TUI-002** — Resource generator interactivo. Reside em `arqel/core`

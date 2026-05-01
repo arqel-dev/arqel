@@ -39,11 +39,63 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
 - Suite Vitest sobe para ≥21 asserts (5 em `content-script-detect`, 5 em
   `background-state`, mais cobertura existente).
 
+**Entregue (DEVTOOLS-003 — Inertia state inspector):**
+
+- Painel React `<InertiaInspector />` com 3 tabs (Page Props / Shared
+  Props / Navigation History), filtro de busca compartilhado,
+  highlighting via `<mark>` e botão "Copy" que escreve `JSON.stringify(state, null, 2)`
+  no clipboard.
+- Componente reutilizável `<JsonNode />` recursivo: primitivos inline,
+  objetos/arrays expansíveis com toggle, busca por chave ou valor,
+  marcação `data-match=yes|no` para CSS opcional.
+- Background ganha `setTabArqelState` + `registerPanelPort` — relay
+  `chrome.runtime.connect({name: 'arqel-devtools-panel'})` long-lived
+  push do snapshot mais recente para cada panel conectado.
+- Content script ganha `installStateRelay()` — injeta page-world script
+  que escuta `CustomEvent('arqel-devtools-state-request')` e responde via
+  `'arqel-devtools-state-response'`. Polling a cada 500ms, encaminha cada
+  snapshot ao background como `{type: 'arqel.state', state}`.
+
 **Por chegar:**
 
-- DEVTOOLS-003 — Inertia inspector (props, page object, history).
 - DEVTOOLS-004 — Policy debugger (allow/deny por ação + Gate explain).
 - Submissão a Chrome Web Store e Firefox Add-ons.
+
+## Inertia state inspector (DEVTOOLS-003)
+
+O painel não tem acesso direto ao `window` da página inspecionada (cada
+contexto da extensão roda isolado). O fluxo de dados é:
+
+```
+[page world]                       [isolated content script]
+window.__ARQEL_DEVTOOLS_HOOK__  →  CustomEvent state-response
+                                          ↓
+                                   chrome.runtime.sendMessage({type: 'arqel.state'})
+                                          ↓
+                                   [background service worker]
+                                   setTabArqelState(tabId, state)
+                                          ↓
+                                   port.postMessage({type: 'arqel.state', state})
+                                          ↓
+                                   [DevTools panel]
+                                   chrome.runtime.connect({name: 'arqel-devtools-panel'})
+                                   useState(state) → re-render
+```
+
+Detalhes-chave:
+
+- **Page-world script injection** continua sendo a única forma de ler o
+  hook real do runtime; o relay reusa o mesmo padrão do
+  `installProbeBridge` (DEVTOOLS-002).
+- O panel envia `{type: 'arqel.panel.hello', tabId}` na primeira
+  mensagem do port para que o background saiba para qual aba registrar
+  o subscriber (DevTools panels não carregam `sender.tab.id` automaticamente).
+- O background mantém um cache `Map<tabId, unknown>` e re-publica o
+  snapshot atual para portas recém-conectadas, cobrindo o caso de o
+  panel abrir depois da página já estar respondendo aos polls.
+- Em testes (`MODE === 'test'`), tanto `installStateRelay` quanto o
+  `runtime.onConnect` listener ficam ociosos — todos os fluxos têm
+  exports puros para serem cobertos por Vitest sem `chrome` real.
 
 ## Hook injection — isolated world vs page world
 

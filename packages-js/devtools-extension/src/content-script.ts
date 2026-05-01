@@ -26,6 +26,30 @@ export interface DetectMessage {
 }
 
 export const PROBE_EVENT = 'arqel-devtools-probe';
+export const STATE_REQUEST_EVENT = 'arqel-devtools-state-request';
+export const STATE_RESPONSE_EVENT = 'arqel-devtools-state-response';
+
+/** Page-world script that responds to state-request events with hook state. */
+export function buildStateRelaySource(
+  requestEvent: string = STATE_REQUEST_EVENT,
+  responseEvent: string = STATE_RESPONSE_EVENT,
+): string {
+  return `(() => {
+  const REQ = ${JSON.stringify(requestEvent)};
+  const RES = ${JSON.stringify(responseEvent)};
+  window.addEventListener(REQ, () => {
+    try {
+      const hook = window.__ARQEL_DEVTOOLS_HOOK__;
+      const state = hook && typeof hook.getState === 'function' ? hook.getState() : null;
+      // Cycles/non-serialisable values are dropped via JSON round-trip.
+      const serialisable = state ? JSON.parse(JSON.stringify(state)) : null;
+      window.dispatchEvent(new CustomEvent(RES, { detail: { state: serialisable } }));
+    } catch (error) {
+      window.dispatchEvent(new CustomEvent(RES, { detail: { state: null } }));
+    }
+  });
+})();`;
+}
 
 /**
  * Direct (same-world) probe — used in unit tests and as a fallback
@@ -135,6 +159,74 @@ export function installProbeBridge(options: ProbeBridgeOptions = {}): () => void
   };
 }
 
+export interface StateRelayOptions {
+  target?: Window;
+  doc?: Document;
+  intervalMs?: number;
+  send?: (state: unknown) => void;
+  inject?: boolean;
+}
+
+/**
+ * DEVTOOLS-003 — install the state relay bridge.
+ *
+ * Periodically dispatches a state-request CustomEvent into the page
+ * world; the page-world script answers via state-response, which we
+ * forward to the background as `{type: 'arqel.state', state}`.
+ */
+export function installStateRelay(options: StateRelayOptions = {}): () => void {
+  const target = options.target ?? globalThis.window;
+  const doc = options.doc ?? globalThis.document;
+  const intervalMs = options.intervalMs ?? 500;
+  const send =
+    options.send ??
+    ((state: unknown): void => {
+      if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+        try {
+          chrome.runtime.sendMessage({ type: 'arqel.state', state });
+        } catch (error) {
+          console.warn('[arqel-devtools] failed to relay state', error);
+        }
+      }
+    });
+
+  if (!target || !doc) {
+    return () => {};
+  }
+
+  const handler = (event: Event): void => {
+    const detail = (event as CustomEvent<{ state: unknown }>).detail;
+    send(detail?.state ?? null);
+  };
+  target.addEventListener(STATE_RESPONSE_EVENT, handler);
+
+  if (options.inject !== false) {
+    try {
+      const script = doc.createElement('script');
+      script.textContent = buildStateRelaySource();
+      (doc.head ?? doc.documentElement).appendChild(script);
+      script.remove();
+    } catch (error) {
+      console.warn('[arqel-devtools] failed to inject state relay', error);
+    }
+  }
+
+  const tick = (): void => {
+    try {
+      target.dispatchEvent(new CustomEvent(STATE_REQUEST_EVENT));
+    } catch {
+      // ignore
+    }
+  };
+  tick();
+  const id = setInterval(tick, intervalMs);
+
+  return () => {
+    clearInterval(id);
+    target.removeEventListener(STATE_RESPONSE_EVENT, handler);
+  };
+}
+
 // Auto-run when loaded as a real content script (skipped under Vitest,
 // which sets `import.meta.env.MODE === 'test'`).
 const env = (import.meta as ImportMeta & { env?: { MODE?: string; VITEST?: boolean } }).env;
@@ -142,4 +234,5 @@ const isTest = env?.MODE === 'test' || env?.VITEST === true;
 
 if (!isTest && typeof chrome !== 'undefined' && chrome.runtime) {
   installProbeBridge();
+  installStateRelay();
 }

@@ -1,5 +1,5 @@
 /**
- * Arqel DevTools hook (DEVTOOLS-002).
+ * Arqel DevTools hook (DEVTOOLS-002 + DEVTOOLS-003).
  *
  * Exposes a `window.__ARQEL_DEVTOOLS_HOOK__` marker that the browser
  * extension content script probes to detect Arqel-powered pages.
@@ -10,16 +10,32 @@
  * bundles ship without the hook surface at all.
  */
 
+/** Maximum number of navigation entries kept in the ring buffer. */
+export const NAVIGATION_HISTORY_LIMIT = 20;
+
+export interface NavigationEntry {
+  readonly path: string;
+  readonly timestamp: number;
+  readonly durationMs?: number;
+}
+
 export interface ArqelDevToolsState {
   readonly panel: string | null;
   readonly resource: string | null;
   readonly sharedProps: Readonly<Record<string, unknown>>;
+  readonly pageProps: unknown;
+  readonly currentPath: string;
+  readonly navigationHistory: ReadonlyArray<NavigationEntry>;
 }
 
 export interface ArqelDevToolsHook {
   readonly version: string;
   getState(): ArqelDevToolsState;
   subscribe(callback: (state: ArqelDevToolsState) => void): () => void;
+  /** Replace pageProps/sharedProps/currentPath in one shot (DEVTOOLS-003). */
+  setPageProps(pageProps: unknown, sharedProps: Record<string, unknown>, currentPath: string): void;
+  /** Append a navigation entry to the ring buffer (DEVTOOLS-003). */
+  recordNavigation(entry: NavigationEntry): void;
 }
 
 declare global {
@@ -29,7 +45,7 @@ declare global {
 }
 
 interface InternalHook extends ArqelDevToolsHook {
-  /** Internal: replace state and notify subscribers (used by DEVTOOLS-003). */
+  /** Internal: replace state and notify subscribers (used by tests). */
   __setState(next: ArqelDevToolsState): void;
 }
 
@@ -37,6 +53,9 @@ const EMPTY_STATE: ArqelDevToolsState = Object.freeze({
   panel: null,
   resource: null,
   sharedProps: Object.freeze({}),
+  pageProps: null,
+  currentPath: '',
+  navigationHistory: Object.freeze([]),
 });
 
 /**
@@ -46,6 +65,12 @@ const EMPTY_STATE: ArqelDevToolsState = Object.freeze({
 export function createDevToolsHook(version: string): InternalHook {
   let state: ArqelDevToolsState = EMPTY_STATE;
   const listeners = new Set<(state: ArqelDevToolsState) => void>();
+
+  function notify(): void {
+    for (const listener of listeners) {
+      listener(state);
+    }
+  }
 
   return {
     version,
@@ -58,11 +83,34 @@ export function createDevToolsHook(version: string): InternalHook {
         listeners.delete(callback);
       };
     },
+    setPageProps(
+      pageProps: unknown,
+      sharedProps: Record<string, unknown>,
+      currentPath: string,
+    ): void {
+      state = {
+        ...state,
+        pageProps,
+        sharedProps: Object.freeze({ ...sharedProps }),
+        currentPath,
+      };
+      notify();
+    },
+    recordNavigation(entry: NavigationEntry): void {
+      const next = state.navigationHistory.slice();
+      next.push(entry);
+      while (next.length > NAVIGATION_HISTORY_LIMIT) {
+        next.shift();
+      }
+      state = {
+        ...state,
+        navigationHistory: Object.freeze(next),
+      };
+      notify();
+    },
     __setState(next: ArqelDevToolsState): void {
       state = next;
-      for (const listener of listeners) {
-        listener(state);
-      }
+      notify();
     },
   };
 }

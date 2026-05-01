@@ -27,6 +27,15 @@ User escreve as Policies (Laravel-native). Arqel apenas verifica existência, au
 - `arqel_can(string, mixed)` global helper: `AbilityRegistry` snapshot first, Gate fallback. Retorna false para guests
 - 28 testes Pest passando
 
+**Entregue (AUTH-006):**
+
+- `Arqel\Auth\Http\Controllers\LoginController` — GET renderiza Inertia `arqel/auth/Login`; POST autentica via `LoginRequest`, regenera sessão e redireciona para `Panel::getAfterLoginUrl()`
+- `Arqel\Auth\Http\Controllers\LogoutController` — invalida sessão, rotaciona CSRF, redireciona para `Panel::getLoginUrl()`
+- `Arqel\Auth\Http\Requests\LoginRequest` — rate-limit Laravel-native (5/min por email+IP), dispara `Lockout` event
+- `Arqel\Auth\Routes::register(?Panel)` — registo idempotente; pula quando o host já tem rota `login` (Breeze/Jetstream/Fortify)
+- `Panel::login()/loginUrl()/afterLoginRedirectTo()/registration()/withoutDefaultAuth()/loginEnabled()/registrationEnabled()` — fluent API opt-in
+- Pacote npm `@arqel/auth` com componente `<LoginPage />` Inertia-React
+
 **Por chegar:**
 
 - Integração com `arqel/core` `ArqelServiceProvider::packageBooted` para chamar `PolicyDiscovery::autoRegisterPoliciesFor(ResourceRegistry::all())` automaticamente (AUTH-005 wrap-up)

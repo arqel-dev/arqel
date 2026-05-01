@@ -48,7 +48,84 @@ final class Panel
 
     private ?string $tenantScope = null;
 
+    private bool $loginEnabled = false;
+
+    private string $loginUrl = '/admin/login';
+
+    private string $afterLoginUrl = '/admin';
+
+    private bool $registrationEnabled = false;
+
+    private bool $defaultAuth = true;
+
     public function __construct(public readonly string $id) {}
+
+    /**
+     * Enable Arqel's bundled Inertia-React login/logout pages.
+     */
+    public function login(bool $enabled = true): self
+    {
+        $this->loginEnabled = $enabled;
+
+        return $this;
+    }
+
+    public function loginUrl(string $url = '/admin/login'): self
+    {
+        $this->loginUrl = '/'.ltrim($url, '/');
+
+        return $this;
+    }
+
+    public function afterLoginRedirectTo(string $url = '/admin'): self
+    {
+        $this->afterLoginUrl = '/'.ltrim($url, '/');
+
+        return $this;
+    }
+
+    public function registration(bool $enabled = true): self
+    {
+        $this->registrationEnabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * Opt-out of Arqel's bundled login routes (use Breeze/Jetstream instead).
+     */
+    public function withoutDefaultAuth(): self
+    {
+        $this->defaultAuth = false;
+        $this->loginEnabled = false;
+
+        return $this;
+    }
+
+    public function loginEnabled(): bool
+    {
+        return $this->loginEnabled && $this->defaultAuth;
+    }
+
+    public function getLoginUrl(): string
+    {
+        return $this->loginUrl;
+    }
+
+    public function getAfterLoginUrl(): string
+    {
+        return $this->afterLoginUrl;
+    }
+
+    public function registrationEnabled(): bool
+    {
+        return $this->registrationEnabled;
+    }
+
+    public function defaultAuthEnabled(): bool
+    {
+        return $this->defaultAuth;
+    }
 
     public function path(string $path): self
     {

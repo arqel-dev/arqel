@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Auth;
 
+use Arqel\Core\Panel\PanelRegistry;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -26,5 +27,28 @@ final class AuthServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(AbilityRegistry::class);
         $this->app->singleton(PolicyDiscovery::class);
+
+        $this->bootBundledAuthRoutes();
+    }
+
+    /**
+     * Regista as rotas bundled de login/logout quando algum painel
+     * registou `Panel::configure()->login()`.
+     */
+    private function bootBundledAuthRoutes(): void
+    {
+        if (! $this->app->bound(PanelRegistry::class)) {
+            return;
+        }
+
+        /** @var PanelRegistry $registry */
+        $registry = $this->app->make(PanelRegistry::class);
+
+        foreach ($registry->all() as $panel) {
+            if ($panel->loginEnabled()) {
+                Routes::register($panel);
+                break;
+            }
+        }
     }
 }

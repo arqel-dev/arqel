@@ -10,13 +10,17 @@ use Arqel\Core\CommandPalette\Providers\ThemeCommandProvider;
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
 use Arqel\Core\Console\DoctorCommand;
+use Arqel\Core\DevTools\DevToolsPayloadBuilder;
+use Arqel\Core\DevTools\PolicyLogCollector;
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
 use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Core\Support\InertiaDataBuilder;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Throwable;
 
 final class ArqelServiceProvider extends PackageServiceProvider
 {
@@ -50,6 +54,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $this->registerResourceRegistry();
         $this->registerPanelRegistry();
         $this->registerInertiaDataBuilder();
+        $this->registerDevToolsServices();
         $this->registerFacade();
 
         // Apps register panels in their own ServiceProvider::boot, which
@@ -98,6 +103,51 @@ final class ArqelServiceProvider extends PackageServiceProvider
     protected function registerInertiaDataBuilder(): void
     {
         $this->app->singleton(InertiaDataBuilder::class);
+    }
+
+    /**
+     * Wire the DevTools services (DEVTOOLS-004).
+     *
+     * `PolicyLogCollector` is bound as a singleton so the request
+     * lifecycle accumulates `Gate::after` events into one buffer. The
+     * `Gate::after` listener is **only** registered when the app is
+     * running in `local` environment — the policy log carries
+     * argument values + stack traces that must never leak in
+     * staging/production responses.
+     */
+    protected function registerDevToolsServices(): void
+    {
+        $app = $this->app;
+        $app->singleton(PolicyLogCollector::class);
+        $app->singleton(DevToolsPayloadBuilder::class, function () use ($app): DevToolsPayloadBuilder {
+            $collector = $app->make(PolicyLogCollector::class);
+            assert($collector instanceof PolicyLogCollector);
+
+            return new DevToolsPayloadBuilder($app, $collector);
+        });
+
+        if (! $app->environment('local')) {
+            return;
+        }
+
+        Gate::after(function (mixed $user, string $ability, ?bool $result, array $arguments) use ($app): void {
+            try {
+                $collector = $app->make(PolicyLogCollector::class);
+                if (! $collector instanceof PolicyLogCollector) {
+                    return;
+                }
+                /** @var array<int, mixed> $args */
+                $args = array_values($arguments);
+                $collector->record(
+                    $ability,
+                    $args,
+                    (bool) $result,
+                    debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 8),
+                );
+            } catch (Throwable) {
+                // Never let DevTools instrumentation break Gate checks.
+            }
+        });
     }
 
     protected function registerFacade(): void

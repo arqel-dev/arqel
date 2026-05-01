@@ -19,6 +19,30 @@ export interface NavigationEntry {
   readonly durationMs?: number;
 }
 
+/**
+ * Convention-reserved `__devtools` shared prop emitted by
+ * `arqel/core` in `local` environment (DEVTOOLS-004). Always `null`
+ * in production builds — the PHP middleware refuses to populate it.
+ */
+export interface ArqelDevToolsPayload {
+  readonly policyLog: ReadonlyArray<PolicyLogEntry>;
+  readonly queryCount: number;
+  readonly memoryUsage: number;
+}
+
+export interface PolicyLogEntry {
+  readonly ability: string;
+  readonly arguments: ReadonlyArray<unknown>;
+  readonly result: boolean;
+  readonly backtrace: ReadonlyArray<{
+    readonly file: string | null;
+    readonly line: number | null;
+    readonly class: string | null;
+    readonly function: string | null;
+  }>;
+  readonly timestamp: number;
+}
+
 export interface ArqelDevToolsState {
   readonly panel: string | null;
   readonly resource: string | null;
@@ -26,6 +50,7 @@ export interface ArqelDevToolsState {
   readonly pageProps: unknown;
   readonly currentPath: string;
   readonly navigationHistory: ReadonlyArray<NavigationEntry>;
+  readonly devToolsPayload: ArqelDevToolsPayload | null;
 }
 
 export interface ArqelDevToolsHook {
@@ -36,6 +61,10 @@ export interface ArqelDevToolsHook {
   setPageProps(pageProps: unknown, sharedProps: Record<string, unknown>, currentPath: string): void;
   /** Append a navigation entry to the ring buffer (DEVTOOLS-003). */
   recordNavigation(entry: NavigationEntry): void;
+  /** Returns the latest `__devtools` payload (DEVTOOLS-004) or null. */
+  getDevToolsPayload(): ArqelDevToolsPayload | null;
+  /** Replace the `__devtools` payload (DEVTOOLS-004). */
+  setDevToolsPayload(payload: ArqelDevToolsPayload | null): void;
 }
 
 declare global {
@@ -56,6 +85,7 @@ const EMPTY_STATE: ArqelDevToolsState = Object.freeze({
   pageProps: null,
   currentPath: '',
   navigationHistory: Object.freeze([]),
+  devToolsPayload: null,
 });
 
 /**
@@ -105,6 +135,16 @@ export function createDevToolsHook(version: string): InternalHook {
       state = {
         ...state,
         navigationHistory: Object.freeze(next),
+      };
+      notify();
+    },
+    getDevToolsPayload(): ArqelDevToolsPayload | null {
+      return state.devToolsPayload;
+    },
+    setDevToolsPayload(payload: ArqelDevToolsPayload | null): void {
+      state = {
+        ...state,
+        devToolsPayload: payload,
       };
       notify();
     },

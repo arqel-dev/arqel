@@ -13,7 +13,7 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
 
 ## Status
 
-### Entregue (DEVTOOLS-001..003 + DEVTOOLS-008 polish)
+### Entregue (DEVTOOLS-001..004 + DEVTOOLS-008 polish)
 
 - **Scaffold (DEVTOOLS-001):** estrutura multi-entry com Vite (`background`,
   `content-script`, `devtools`, `panel`). Manifest V3 para Chrome/Edge e
@@ -35,12 +35,22 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
   `docs/devtools-extension/install.md`, suíte de coverage gaps cobrindo
   idempotência do bridge, lifecycle de tab, sanity de probe source,
   null-version handling e resiliência do painel a inputs estranhos.
-- Suíte Vitest: 36 testes em 7 files (manifests, content-script,
-  background, painel, coverage gaps).
+- Suíte Vitest: 56 testes em 10 files (manifests, content-script,
+  background, painel — Inertia inspector + Policy debugger, coverage
+  gaps).
+- **Policy debugger (DEVTOOLS-004):** nova top-tab "Policies" no
+  painel renderiza a shared prop `__devtools.policyLog` que o
+  `arqel/core` emite em `app()->environment('local')`. Tabela com
+  ability / arguments (JSON colapsado) / badge allow|deny / botão de
+  expand/collapse para o stack trace por linha. Filter por result
+  (`all|allow|deny`) + search por ability. Counter agregado no
+  header (`X allowed / Y denied`). Empty state quando log vazio.
+  Production builds sem `__devtools` ⇒ tab fica em empty state — sem
+  leak. Captura via `@arqel/react` no inertia-bridge: extrai
+  `props['__devtools']` e expõe no hook como `getDevToolsPayload()`.
 
 ### Por chegar
 
-- **DEVTOOLS-004** — Policy debugger (allow/deny por ação + Gate explain).
 - **DEVTOOLS-005** — Field schema inspector (mostrar fields/types de
   resources detectados).
 - **DEVTOOLS-006** — Time-travel para Inertia history navigation.

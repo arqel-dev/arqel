@@ -157,6 +157,45 @@ em vez de obter erros opacos no controller.
 - `Arqel\Core\Contracts\HasActions` — marker interface; assinaturas concretas chegam com `arqel/actions`
 - `Arqel\Core\Contracts\HasPolicies` — `getPolicy(): ?string` opcional; integra com Laravel Policies (ADR-017)
 
+## Policy debugger (DEVTOOLS-004)
+
+Em ambiente `local`, o `ArqelServiceProvider` regista um listener
+`Gate::after` que captura toda autorização verificada durante o
+request (ability + arguments + result + 8 frames de stack trace) e
+acumula num `Arqel\Core\DevTools\PolicyLogCollector` (singleton,
+request-scoped, hard-cap em 200 entries — FIFO).
+
+A shared prop `__devtools` é uma **convenção reservada**: só o
+runtime oficial Arqel deve emitir esta key. O `HandleArqelInertiaRequests`
+expõe-a via `Arqel\Core\DevTools\DevToolsPayloadBuilder::build()`,
+que retorna `null` fora de `app()->environment('local')`. O payload
+em local tem o formato:
+
+```php
+[
+    'policyLog' => [
+        ['ability' => 'view', 'arguments' => [...], 'result' => true, 'backtrace' => [...], 'timestamp' => 1700000000.123],
+        // ...
+    ],
+    'queryCount' => 12,
+    'memoryUsage' => 8388608,
+]
+```
+
+**Modelos Eloquent** em `arguments` são serializados como
+`['__model' => FQN, 'key' => mixed]` para evitar refs circulares e
+manter o payload JSON-safe. Outros objetos viram `['__object' => FQN]`.
+
+**Opt-out:** em `staging`/`production`/`testing` o listener nunca é
+registado e `__devtools` resolve para `null`. Para desativar
+manualmente em `local` (e.g. dev profiling), defina
+`APP_ENV=development` ou outro nome no `.env` antes do boot.
+
+A extensão DevTools (`@arqel/devtools-extension`) consome
+`__devtools.policyLog` na tab "Policies" para mostrar uma tabela
+filtrável allow/deny + busca por ability + expand/collapse de stack
+trace por linha.
+
 ## Conventions
 
 - **`declare(strict_types=1)`** em todos os ficheiros (enforçado por Pint — ver `pint.json` na raiz)

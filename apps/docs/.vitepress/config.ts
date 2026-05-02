@@ -91,6 +91,10 @@ export default defineConfig({
           items: [{ text: 'AGENTS.md (LLMs)', link: '/guide/agents' }],
         },
         {
+          text: 'Release',
+          items: [{ text: 'Release checklist', link: '/guide/release-checklist' }],
+        },
+        {
           text: 'Migração',
           items: [
             { text: 'Vindo de Filament', link: '/guide/migration/from-filament' },

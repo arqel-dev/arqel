@@ -32,6 +32,13 @@ Rodar a partir da raiz do monorepo:
 - [ ] `vendor/bin/phpstan analyse --memory-limit=2G` em cada pacote — `level: max` clean.
 - [ ] `vendor/bin/pint --test` — Pint clean (sem diff pendente).
 - [ ] `pnpm build` — todos os pacotes JS compilam sem erros.
+- [x] **`php artisan arqel:doctor --strict`** — comando ampliado com checks
+      `broadcasting.driver`, `queue.driver`, `ai.providers.configured` e
+      `marketplace.migrations` (batch B53).
+- [x] **`php artisan arqel:audit --strict`** — novo comando que valida
+      monorepo readiness (SKILL.md presente, composer.json válido,
+      CHANGELOG entry, layout canônico, suite size ≥ threshold)
+      (batch B53).
 - [ ] CI verde no último commit de `master` (consultar `gh run list --branch master --limit 1`).
 
 **Critério de bloqueio:** qualquer falha aqui aborta o release. Investigar antes de prosseguir.

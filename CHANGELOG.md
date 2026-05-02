@@ -9,11 +9,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 _Placeholder para próximo ciclo (pós v0.8.0-rc.1). Adicionar entradas conforme novos batches forem mesclados._
 
+### Added
+### Changed
+### Fixed
+### Removed
+
 ---
 
-## [0.8.0-rc.1 — pendente de tag]
-
-> Conteúdo abaixo será movido para a seção `## [0.8.0-rc.1] - YYYY-MM-DD` no momento da tag, conforme `docs/release-checklist-v0.8.md`.
+## [0.8.0-rc.1] - 2026-05-01
 
 ### Added
 
@@ -207,4 +210,17 @@ _Placeholder para próximo ciclo (pós v0.8.0-rc.1). Adicionar entradas conforme
 - Planejamento completo em `PLANNING/` (13 documentos, 328 tickets)
 - Convenções operacionais em `CLAUDE.md` e `AGENTS.md`
 
-[Unreleased]: https://github.com/arqel/arqel/compare/HEAD...HEAD
+### Changed
+
+- _Sem entradas — primeira release tagueada._
+
+### Fixed
+
+- _Sem entradas — primeira release tagueada._
+
+### Removed
+
+- _Sem entradas — primeira release tagueada._
+
+[Unreleased]: https://github.com/arqel/arqel/compare/v0.8.0-rc.1...HEAD
+[0.8.0-rc.1]: https://github.com/arqel/arqel/releases/tag/v0.8.0-rc.1

@@ -1,5 +1,6 @@
 {
     "name": "arqel/core",
+    "version": "0.8.0-rc.1",
     "description": "Core contracts, service provider, and primitives for Arqel.",
     "type": "library",
     "license": "MIT",

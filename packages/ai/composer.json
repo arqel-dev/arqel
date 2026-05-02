@@ -1,5 +1,6 @@
 {
     "name": "arqel/ai",
+    "version": "0.8.0-rc.1",
     "description": "AI-assisted fields for Arqel — translation, summarization, classification, extraction, generation. Provider-agnostic (Claude / OpenAI / Ollama).",
     "type": "library",
     "license": "MIT",

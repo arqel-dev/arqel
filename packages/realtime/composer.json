@@ -1,5 +1,6 @@
 {
     "name": "arqel/realtime",
+    "version": "0.8.0-rc.1",
     "description": "Realtime broadcasting integration for Arqel — Reverb-friendly events for Resource updates.",
     "type": "library",
     "license": "MIT",

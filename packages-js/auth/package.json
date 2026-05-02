@@ -1,6 +1,6 @@
 {
   "name": "@arqel/auth",
-  "version": "0.10.0-rc.1",
+  "version": "0.8.0-rc.1",
   "description": "Inertia-React login + logout pages for Arqel admin panels.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

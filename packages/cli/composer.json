@@ -1,5 +1,6 @@
 {
     "name": "arqel/cli",
+    "version": "0.8.0-rc.1",
     "description": "Standalone CLI for Arqel — interactive scaffolder (`arqel new`) and meta tooling.",
     "type": "library",
     "license": "MIT",

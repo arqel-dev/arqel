@@ -1,6 +1,6 @@
 {
   "name": "@arqel/ai",
-  "version": "0.10.0-rc.1",
+  "version": "0.8.0-rc.1",
   "description": "React components for Arqel AI — AiTextInput field renderer paired with Arqel\\Ai\\Fields\\AiTextField.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

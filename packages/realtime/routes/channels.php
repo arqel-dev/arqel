@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Realtime\Channels\ResourceChannelAuthorizer;
+use Arqel\Realtime\Collab\AwarenessChannelAuthorizer;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
@@ -43,6 +44,14 @@ Broadcast::channel(
     'arqel.action.{jobId}',
     static function (Authenticatable $user, string $jobId): bool {
         return ResourceChannelAuthorizer::authorizeActionJob($user, $jobId);
+    },
+);
+
+Broadcast::channel(
+    'arqel.collab.{modelType}.{modelId}.{field}',
+    static function (Authenticatable $user, string $modelType, int|string $modelId, string $field): bool {
+        return app(AwarenessChannelAuthorizer::class)
+            ->authorize($user, $modelType, $modelId, $field);
     },
 );
 

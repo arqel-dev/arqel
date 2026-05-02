@@ -50,9 +50,23 @@ Cada método encapsula a lógica em `try/catch \Throwable` e regista via `Log::w
 
 PHPStan level max clean. Pint clean.
 
-### Collaborative editing (RT-005 scaffold)
+### Collaborative editing (RT-005 + follow-up)
 
-`arqel/realtime` ganhou um **scaffold inicial** para edição colaborativa baseado em Yjs (`Y.Doc`). **Estado atual: scaffold apenas — não inclui o sync delta-by-delta via WebSocket**, que fica para um follow-up que agregue um cliente JS dedicado (`@arqel/realtime`) consumindo `y-protocols/awareness` + `y-websocket` apontando para um endpoint Reverb. O que está entregue:
+`arqel/realtime` entrega edição colaborativa baseada em Yjs (`Y.Doc`) com sync via Reverb. A integração tem dois lados:
+
+- **Server-side** (`arqel/realtime`): persistência de snapshot via REST + canal privado `arqel.collab.{modelType}.{modelId}.{field}` autorizado pelo `Collab\AwarenessChannelAuthorizer` + evento `Events\YjsUpdateReceived` (broadcastAs `collab.update`) disparado a cada POST de snapshot.
+- **Client-side** (`@arqel/realtime-collab`): hook `useYjsCollab()` cria um `Y.Doc` local e subscreve ao canal Echo; componente `<CollabRichTextField>` renderiza textarea controlled com debounce (default 2s) para POST de snapshots. Decoder/encoder base64 SSR-safe em `encoders.ts`.
+
+**Setup** (consumer Laravel app):
+
+```bash
+composer require laravel/reverb
+pnpm add @arqel/realtime-collab yjs
+```
+
+Configure Reverb (`php artisan reverb:install`) + `BROADCAST_CONNECTION=reverb` no `.env`. O `RealtimeServiceProvider` já registra o canal Yjs em `routes/channels.php`. Setup global de Echo via `@arqel/realtime` (`setupEcho`).
+
+O que está entregue:
 
 | Componente | Descrição |
 | --- | --- |
@@ -60,6 +74,10 @@ PHPStan level max clean. Pint clean.
 | `Collab\YjsDocument` (final Eloquent) | Model que persiste o snapshot do Y.Doc. `morphedModel()` devolve `MorphTo` para o source model. Casts `version => int`, `updated_at => datetime`. |
 | `Http\Controllers\CollabDocumentController` (final) | Métodos `show()` / `store()` para `GET|POST /admin/{resource}/{id}/collab/{field}`. Optimistic concurrency via `version`: requests com `version < current` recebem `409 {message, serverVersion}`. State sempre transitado em base64. |
 | `routes/api.php` | Registra os endpoints com middleware `web,auth`. |
+| `Collab\AwarenessChannelAuthorizer` (final readonly) | Autoriza o canal `arqel.collab.{modelType}.{modelId}.{field}`. Resolve o model via FQCN direto ou via `ResourceRegistry::all()` (defensive — denega quando registry unbound + FQCN não resolve). Honra Gate `view` quando definida; allow caso contrário. |
+| `Events\YjsUpdateReceived` (final, ShouldBroadcast) | Disparado em `CollabDocumentController::store` após persistir. `broadcastOn` = `[PrivateChannel("arqel.collab.{modelType}.{modelId}.{field}")]`, `broadcastAs` = `collab.update`, `broadcastWith` = `{state, version, by_user_id}` (state base64). |
+| `routes/channels.php` (atualizado) | Registra o canal `arqel.collab.{modelType}.{modelId}.{field}` delegando ao authorizer. |
+| `@arqel/realtime-collab` (npm) | Cliente JS: hook `useYjsCollab`, componente `<CollabRichTextField>`, helpers `encodeUpdate`/`decodeUpdate`. Subscreve ao canal Echo + persiste snapshots com debounce. SSR-safe. |
 
 **Fluxo de integração esperado** (user-land, futuro `<CollabRichTextField />`):
 

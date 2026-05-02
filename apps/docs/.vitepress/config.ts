@@ -87,6 +87,10 @@ export default defineConfig({
           items: [{ text: 'Primeiro CRUD completo', link: '/guide/tutorial-first-crud' }],
         },
         {
+          text: 'Realtime',
+          items: [{ text: 'Edição colaborativa (Yjs + Reverb)', link: '/guide/realtime-collab' }],
+        },
+        {
           text: 'Integrações',
           items: [{ text: 'AGENTS.md (LLMs)', link: '/guide/agents' }],
         },

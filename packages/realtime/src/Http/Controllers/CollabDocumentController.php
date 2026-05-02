@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Realtime\Http\Controllers;
 
 use Arqel\Realtime\Collab\YjsDocument;
+use Arqel\Realtime\Events\YjsUpdateReceived;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -83,6 +84,15 @@ final class CollabDocumentController
             $document->updated_at = now();
             $document->save();
 
+            YjsUpdateReceived::dispatch(
+                $resource,
+                (int) $id,
+                $field,
+                $rawState,
+                $document->version,
+                $document->last_user_id,
+            );
+
             return new JsonResponse([
                 'version' => $document->version,
             ], 201);
@@ -100,6 +110,15 @@ final class CollabDocumentController
         $document->last_user_id = $this->resolveUserId($request);
         $document->updated_at = now();
         $document->save();
+
+        YjsUpdateReceived::dispatch(
+            $resource,
+            (int) $id,
+            $field,
+            $rawState,
+            $document->version,
+            $document->last_user_id,
+        );
 
         return new JsonResponse([
             'version' => $document->version,

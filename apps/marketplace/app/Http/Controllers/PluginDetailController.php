@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\SeoData;
 use Arqel\Marketplace\Models\Plugin;
 use Arqel\Marketplace\Models\PluginPurchase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -54,6 +56,42 @@ final class PluginDetailController
                     ->exists();
             }
         }
+
+        $screenshots = $plugin->screenshots ?? [];
+        $ogImage = is_array($screenshots) && count($screenshots) > 0 && is_string($screenshots[0])
+            ? $screenshots[0]
+            : '/images/og/marketplace-default.png';
+
+        $price = $plugin->price_cents > 0
+            ? number_format($plugin->price_cents / 100, 2, '.', '')
+            : '0.00';
+
+        $jsonLd = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $plugin->name,
+            'description' => $plugin->description,
+            'brand' => [
+                '@type' => 'Brand',
+                'name' => $plugin->publisher?->name ?? 'Arqel',
+            ],
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => $price,
+                'priceCurrency' => $plugin->currency !== '' ? $plugin->currency : 'USD',
+                'availability' => 'https://schema.org/InStock',
+                'url' => url('/plugins/'.$plugin->slug),
+            ],
+        ];
+
+        View::share('seo', new SeoData(
+            title: "{$plugin->name} — Arqel Marketplace",
+            description: SeoData::truncate($plugin->description, 160),
+            ogImage: $ogImage,
+            ogType: 'product',
+            canonical: url('/plugins/'.$plugin->slug),
+            jsonLd: $jsonLd,
+        ));
 
         return Inertia::render('Marketplace/PluginDetail', [
             'plugin' => $plugin,

@@ -10,6 +10,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PluginCompareController;
 use App\Http\Controllers\PluginDetailController;
 use App\Http\Controllers\PublisherProfileController;
+use App\Http\Controllers\SitemapController;
 use App\Tests\Fixtures\TestUser;
 use Arqel\Core\ArqelServiceProvider;
 use Arqel\Marketplace\MarketplaceServiceProvider;
@@ -76,6 +77,7 @@ abstract class TestCase extends Orchestra
 
     protected function defineRoutes($router): void
     {
+        Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
         Route::get('/', LandingController::class)->name('landing');
         Route::get('/browse', BrowseController::class)->name('browse');
         Route::get('/compare', PluginCompareController::class)->name('compare');

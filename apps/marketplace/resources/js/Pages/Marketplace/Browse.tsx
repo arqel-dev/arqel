@@ -1,5 +1,6 @@
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { CategoryFilter } from '../../Components/Marketplace/CategoryFilter';
+import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { PluginList } from '../../Components/Marketplace/PluginList';
 import type { Paginator, Plugin, PluginCategory } from '../../types';
 
@@ -26,7 +27,16 @@ export default function Browse({ plugins, categories, filters }: Props): JSX.Ele
 
   return (
     <>
-      <Head title="Browse — Arqel Marketplace" />
+      <MetaTags
+        title="Browse plugins — Arqel Marketplace"
+        description={
+          filters.category !== null
+            ? `Browse plugins na categoria ${filters.category} — Arqel Marketplace.`
+            : filters.type !== null
+              ? `Browse plugins do tipo ${filters.type} — Arqel Marketplace.`
+              : 'Browse todos os plugins disponíveis no Arqel Marketplace — fields, widgets, integrações e themes.'
+        }
+      />
       <main className="mx-auto max-w-7xl px-4 py-12">
         <h1 className="mb-8 text-3xl font-bold">Explorar plugins</h1>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[220px_1fr]">

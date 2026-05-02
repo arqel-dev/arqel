@@ -1,5 +1,5 @@
-import { Head } from '@inertiajs/react';
 import { useState } from 'react';
+import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { PluginList } from '../../Components/Marketplace/PluginList';
 import { ReviewList } from '../../Components/Marketplace/ReviewList';
 import type { Paginator, Plugin, PluginReview, PluginVersion } from '../../types';
@@ -23,6 +23,39 @@ export default function PluginDetail({
 }: Props): JSX.Element {
   const [tab, setTab] = useState<Tab>('readme');
 
+  const truncatedDescription =
+    plugin.description.length > 160
+      ? `${plugin.description.slice(0, 159).trimEnd()}…`
+      : plugin.description;
+
+  const screenshots = (plugin as { screenshots?: string[] | null }).screenshots ?? null;
+  const ogImage =
+    Array.isArray(screenshots) && screenshots.length > 0 && typeof screenshots[0] === 'string'
+      ? screenshots[0]
+      : null;
+
+  const priceFormatted =
+    plugin.price_cents != null && plugin.price_cents > 0
+      ? (plugin.price_cents / 100).toFixed(2)
+      : '0.00';
+
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: plugin.name,
+    description: plugin.description,
+    brand: {
+      '@type': 'Brand',
+      name: plugin.publisher?.name ?? 'Arqel',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: priceFormatted,
+      priceCurrency: plugin.currency ?? 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+  };
+
   const installCommand = plugin.composer_package
     ? `composer require ${plugin.composer_package}`
     : plugin.npm_package
@@ -31,7 +64,13 @@ export default function PluginDetail({
 
   return (
     <>
-      <Head title={`${plugin.name} — Arqel Marketplace`} />
+      <MetaTags
+        title={`${plugin.name} — Arqel Marketplace`}
+        description={truncatedDescription}
+        ogImage={ogImage}
+        ogType="product"
+        jsonLd={jsonLd}
+      />
       <main className="mx-auto max-w-7xl px-4 py-12">
         <header className="mb-8 flex items-start justify-between gap-4">
           <div>

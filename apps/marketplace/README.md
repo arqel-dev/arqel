@@ -110,6 +110,33 @@ Rotas (todas em `web,auth`):
 Na página `/plugins/{slug}` aparece um botão "Comprar agora" quando o plugin é premium e o
 usuário ainda não comprou. Quando já é dono, aparece um badge "Você já tem esse plugin".
 
-## Deferido
+## SEO + Open Graph (MKTPLC-004-ssr)
 
-- SSR / Open Graph dinâmico → `MKTPLC-004-ssr`
+Não usamos full Inertia SSR (`@inertiajs/server`) — o overhead de Node service em
+produção não compensa para um site público de poucas páginas. Em vez disso, fazemos
+"partial SSR" focado em meta tags:
+
+- **Server-side via Blade** — `resources/views/app.blade.php` consome o value object
+  `App\Support\SeoData` (compartilhado por `View::share('seo', ...)` em cada controller)
+  para emitir `<title>`, `<meta name="description">`, Open Graph (`og:title`,
+  `og:description`, `og:image`, `og:type`), Twitter Card (`twitter:card`,
+  `twitter:title`, `twitter:description`, `twitter:image`) e JSON-LD Schema.org.
+  Crawlers (GoogleBot, BingBot) e social shares (Twitter/X, Slack, Discord, LinkedIn)
+  recebem HTML totalmente populado no primeiro byte.
+- **Client-side via `<MetaTags />`** — `resources/js/Components/Marketplace/MetaTags.tsx`
+  espelha a mesma informação usando `<Head>` do Inertia, garantindo que navegações
+  client-side (sem reload) atualizem `<title>` e Open Graph corretamente. Cada página
+  (`Landing`, `Browse`, `PluginDetail`, `Compare`, `PublisherProfile`) chama
+  `<MetaTags />` no topo do return.
+
+JSON-LD em `PluginDetail` segue Schema.org `Product` com `Offer`, brand do publisher
+e canonical URL — isso habilita rich results no Google (preço, disponibilidade,
+breadcrumbs visuais).
+
+### Sitemap + robots.txt
+
+- `GET /sitemap.xml` → `SitemapController` invokable. Inclui rotas estáticas
+  (landing, browse), todos os plugins `published` e todos os publishers. Cache de
+  1h em `cache()->remember('marketplace:sitemap', 3600, ...)` para amortecer
+  crawls agressivos.
+- `public/robots.txt` permite tudo, bloqueia `/checkout/` e aponta para o sitemap.

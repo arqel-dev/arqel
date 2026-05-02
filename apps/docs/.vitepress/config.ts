@@ -155,11 +155,33 @@ export default defineConfig({
             { text: 'Command palette', link: '/advanced/command-palette' },
           ],
         },
+        {
+          text: 'Ferramentas',
+          items: [{ text: 'DevTools extension (install)', link: '/devtools-extension/install' }],
+        },
       ],
       '/examples/': [
         {
           text: 'Exemplos',
           items: [{ text: 'Blog admin', link: '/examples/blog-admin' }],
+        },
+        {
+          text: 'Workflows',
+          items: [
+            { text: 'Visão geral', link: '/examples/workflows/' },
+            { text: 'Order states', link: '/examples/workflows/order-states' },
+            { text: 'Article states', link: '/examples/workflows/article-states' },
+            { text: 'Subscription states', link: '/examples/workflows/subscription-states' },
+          ],
+        },
+        {
+          text: 'Versioning',
+          items: [
+            { text: 'Visão geral', link: '/examples/versioning/' },
+            { text: 'CMS articles', link: '/examples/versioning/cms-articles' },
+            { text: 'E-commerce orders', link: '/examples/versioning/ecommerce-orders' },
+            { text: 'Legal contracts', link: '/examples/versioning/legal-contracts' },
+          ],
         },
       ],
       '/marketplace/': [

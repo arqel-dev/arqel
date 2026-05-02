@@ -371,9 +371,12 @@ Revenue share padrão é `80%` para o publisher / `20%` para Arqel (configuráve
 - **9 testes Pest novos** em `apps/marketplace/tests/Feature/CheckoutControllerTest.php` cobrindo summary, idempotência, free-plugin guard, redirect, unauth 401, success/cancel render, gateway non-completed.
 - **9 testes Vitest novos** em `resources/js/__tests__/Checkout*.test.tsx` cobrindo summary card, fee, copy button, download link, retry link.
 
-**Por chegar:**
+**Entregue (MKTPLC-001 → MKTPLC-010 + sub-tickets):**
 
-- **MKTPLC-004** — Stats/analytics (instalações por dia, top plugins, trending, search analytics).
+- **MKTPLC-004** — Compare side-by-side, Publisher profile, Checkout flow + SSR/SEO meta tags entregues nos batches #51 e #52.
+
+**Pendente:**
+
 - **MKTPLC-005+** — Admin panel (Arqel-powered) para publishers + moderação.
 - **MKTPLC-008-stripe-webhooks** — Webhooks idempotentes (Stripe Connect transfers, refund.updated, payment_intent.succeeded) + payouts cron job mensal.
 

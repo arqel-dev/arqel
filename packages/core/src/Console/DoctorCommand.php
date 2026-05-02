@@ -65,6 +65,10 @@ final class DoctorCommand extends Command
             $this->checkCloudAutoConfigure(),
             $this->checkPulseDetected(),
             $this->checkAuthStarterKit(),
+            $this->checkBroadcastingDriver(),
+            $this->checkQueueDriver(),
+            $this->checkAiProvidersConfigured(),
+            $this->checkMarketplaceMigrations(),
         ];
 
         $summary = $this->summarise($checks);
@@ -479,6 +483,175 @@ final class DoctorCommand extends Command
             ];
         } catch (Throwable $e) {
             return $this->fromThrowable('auth.starter_kit_detected', $e);
+        }
+    }
+
+    /**
+     * Avisa quando o driver de broadcasting é `log` em produção. O
+     * driver `log` apenas escreve eventos no canal de logs — útil em
+     * desenvolvimento, mas em produção significa que nenhum cliente
+     * real receberá broadcasts via WebSocket/Pusher/Reverb.
+     *
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkBroadcastingDriver(): array
+    {
+        try {
+            $driverRaw = config('broadcasting.default');
+            $driver = is_string($driverRaw) ? $driverRaw : 'unknown';
+            $isProduction = $this->getLaravel()->environment('production');
+            $isLog = $driver === 'log' || $driver === 'null';
+
+            if ($isLog && $isProduction) {
+                return [
+                    'name' => 'broadcasting.driver',
+                    'status' => self::STATUS_WARN,
+                    'message' => "Broadcasting driver is '{$driver}' in production — events will not reach real clients.",
+                    'details' => ['driver' => $driver],
+                ];
+            }
+
+            return [
+                'name' => 'broadcasting.driver',
+                'status' => self::STATUS_OK,
+                'message' => "Broadcasting driver is '{$driver}'.",
+                'details' => ['driver' => $driver],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('broadcasting.driver', $e);
+        }
+    }
+
+    /**
+     * Avisa quando o driver de queue é `sync` em produção. Apps que
+     * dependem de jobs em background (notificações, exports, AI calls)
+     * vão executar tudo no request thread se ficarem em `sync`.
+     *
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkQueueDriver(): array
+    {
+        try {
+            $driverRaw = config('queue.default');
+            $driver = is_string($driverRaw) ? $driverRaw : 'unknown';
+            $isProduction = $this->getLaravel()->environment('production');
+            $isSync = $driver === 'sync';
+
+            if ($isSync && $isProduction) {
+                return [
+                    'name' => 'queue.driver',
+                    'status' => self::STATUS_WARN,
+                    'message' => "Queue driver is 'sync' in production — jobs run inline and block requests.",
+                    'details' => ['driver' => $driver],
+                ];
+            }
+
+            return [
+                'name' => 'queue.driver',
+                'status' => self::STATUS_OK,
+                'message' => "Queue driver is '{$driver}'.",
+                'details' => ['driver' => $driver],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('queue.driver', $e);
+        }
+    }
+
+    /**
+     * Reporta quantos providers de AI estão configurados quando
+     * `arqel/ai` está instalado. Neutral quando o pacote não está
+     * presente — AI é opt-in.
+     *
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkAiProvidersConfigured(): array
+    {
+        try {
+            $installed = class_exists(InstalledVersions::class)
+                && InstalledVersions::isInstalled('arqel/ai');
+
+            if (! $installed) {
+                return [
+                    'name' => 'ai.providers.configured',
+                    'status' => self::STATUS_NEUTRAL,
+                    'message' => 'arqel/ai not installed (optional).',
+                    'details' => ['installed' => false],
+                ];
+            }
+
+            $providers = config('arqel-ai.providers');
+            $configured = is_array($providers)
+                ? array_values(array_filter(
+                    array_keys($providers),
+                    static function (mixed $key) use ($providers): bool {
+                        if (! is_string($key)) {
+                            return false;
+                        }
+                        $entry = $providers[$key] ?? null;
+
+                        return is_array($entry) && $entry !== [];
+                    },
+                ))
+                : [];
+
+            return [
+                'name' => 'ai.providers.configured',
+                'status' => count($configured) > 0 ? self::STATUS_OK : self::STATUS_WARN,
+                'message' => count($configured) > 0
+                    ? 'AI providers configured: '.implode(', ', $configured).'.'
+                    : 'arqel/ai installed but no provider configured — set ANTHROPIC_API_KEY / OPENAI_API_KEY / OLLAMA_HOST.',
+                'details' => ['providers' => $configured],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('ai.providers.configured', $e);
+        }
+    }
+
+    /**
+     * Verifica se as tabelas do marketplace foram migradas quando
+     * `arqel/marketplace` está instalado. Neutral quando o pacote não
+     * está presente — marketplace é opt-in.
+     *
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkMarketplaceMigrations(): array
+    {
+        try {
+            $installed = class_exists(InstalledVersions::class)
+                && InstalledVersions::isInstalled('arqel/marketplace');
+
+            if (! $installed) {
+                return [
+                    'name' => 'marketplace.migrations',
+                    'status' => self::STATUS_NEUTRAL,
+                    'message' => 'arqel/marketplace not installed (optional).',
+                    'details' => ['installed' => false],
+                ];
+            }
+
+            $app = $this->getLaravel();
+            if (! $app->bound('db')) {
+                return [
+                    'name' => 'marketplace.migrations',
+                    'status' => self::STATUS_NEUTRAL,
+                    'message' => 'Database is not bound — cannot inspect marketplace tables.',
+                ];
+            }
+
+            /** @var \Illuminate\Database\DatabaseManager $db */
+            $db = $app->make('db');
+            $hasTable = $db->connection()->getSchemaBuilder()->hasTable('arqel_plugins');
+
+            return [
+                'name' => 'marketplace.migrations',
+                'status' => $hasTable ? self::STATUS_OK : self::STATUS_WARN,
+                'message' => $hasTable
+                    ? 'Marketplace table arqel_plugins exists.'
+                    : 'arqel/marketplace installed but arqel_plugins table missing — run `php artisan migrate`.',
+                'details' => ['has_table' => $hasTable],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('marketplace.migrations', $e);
         }
     }
 

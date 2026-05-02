@@ -118,13 +118,16 @@ config()->set('arqel-realtime.workflow.broadcast_state_transitions', false);
 
 Útil para suprimir broadcasts em jobs de migração ou seeders que disparam muitas transições em cascata. A configuração não desregistra o listener — apenas o curto-circuita no início do `handle()`.
 
-### Por chegar (fora do escopo deste batch)
+### Entregue (RT-001 → RT-012)
 
-- **RT-003** — React hook `useResourceUpdates` + Inertia `router.reload` (camada `react`, `@arqel/realtime`).
-- **RT-004 React slice** — hook `useResourcePresence` (bind a Echo presence channels usando o nome derivado de `PresenceChannelResolver`).
-- **RT-005 follow-up** — `<CollabRichTextField />` React + WebSocket provider apontando para canal Reverb dedicado; integração Yjs-aware no `<RichTextField />`.
-- **RT-007** — progress streaming (`arqel.action.{jobId}` payload format + React subscriber).
-- **RT-008** — connection resilience banner (Echo `connecting`/`reconnecting` + `<RealtimeStatus />` no Panel chrome).
+- **RT-003** — React hook `useResourceUpdates` + Inertia `router.reload` em `@arqel/realtime`.
+- **RT-004** — hook `useResourcePresence` bindando Echo presence channels via `PresenceChannelResolver`.
+- **RT-005** — `<CollabRichTextField />` + Yjs sync sobre canal Reverb dedicado; integração Yjs-aware no `<RichTextField />`.
+- **RT-007** — progress streaming (`arqel.action.{jobId}` payload + React subscriber).
+- **RT-008** — connection resilience banner (`<RealtimeStatus />` no Panel chrome com states `connecting`/`reconnecting`).
+
+### Pendente
+
 - **E2E real com Reverb** — requer infra (Redis + Reverb worker no CI). Hoje todos os testes rodam com `BROADCAST_CONNECTION=null` + `Event::fake()`.
 - **`BroadcastAuthController`** — para apps que não usam o boilerplate `routes/channels.php` padrão.
 

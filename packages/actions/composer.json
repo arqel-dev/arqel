@@ -1,5 +1,6 @@
 {
     "name": "arqel/actions",
+    "version": "0.8.0-rc.1",
     "description": "Action invocation primitives for Arqel — row, bulk, toolbar, header actions with confirmation, forms, authorization.",
     "type": "library",
     "license": "MIT",

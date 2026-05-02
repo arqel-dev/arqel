@@ -1,6 +1,6 @@
 {
   "name": "@arqel/devtools-extension",
-  "version": "0.10.0-rc.1",
+  "version": "0.8.0-rc.1",
   "private": true,
   "description": "Arqel DevTools — browser extension (Chrome/Firefox/Edge) for inspecting Arqel admin panels at runtime.",
   "license": "MIT",

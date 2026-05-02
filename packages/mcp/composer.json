@@ -1,5 +1,6 @@
 {
     "name": "arqel/mcp",
+    "version": "0.8.0-rc.1",
     "description": "Model Context Protocol server for Arqel — exposes panel resources, fields, tables, and actions to MCP-compatible AI clients.",
     "type": "library",
     "license": "MIT",

@@ -1,5 +1,6 @@
 {
     "name": "arqel/form",
+    "version": "0.8.0-rc.1",
     "description": "Form builder for Arqel — sections, fieldsets, grids, tabs over Arqel Fields.",
     "type": "library",
     "license": "MIT",

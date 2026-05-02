@@ -2,7 +2,7 @@
   "name": "@arqel/marketplace-app",
   "private": true,
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.8.0-rc.1",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -1,5 +1,6 @@
 {
     "name": "arqel/fields",
+    "version": "0.8.0-rc.1",
     "description": "Field types for Arqel — declarative, validated, renderable.",
     "type": "library",
     "license": "MIT",

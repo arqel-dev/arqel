@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 1..4 + dívidas + MKTPLC-004 100% + MKTPLC-004-ssr FECHADOS (Batches #27..#52 — A52 entregue, B52/C52 cancelados pelo usuário): SSR partial via Blade + JSON-LD Schema.org + sitemap + robots.txt. Total ≈ 221 core + 181 ai + 70 auth + 59 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app (+9 SEO) + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + ~30 marketplace app JS = ~1.249 testes diretos.** Restante: RT-005 Yjs full sync (com Reverb real), audit final, prep tag v0.8.0-rc.1.
+**Tudo fechado para tag v0.8.0-rc.1 (Batches #27..#53): RT-005 Yjs full sync ✅ · audit final + arqel:audit + extended doctor ✅ · version alignment 0.8.0-rc.1 todos pacotes + apps ✅ · Web Store submission docs + privacy policy ✅ · scripts/release-prep.sh ✅. Total ≈ 232 core + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + ~30 marketplace app JS + 15 realtime-collab JS = ~1.290 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1` seguindo `apps/docs/guide/release-checklist.md`. Daí em diante, ciclos de manutenção + community feedback.
 
 **Fase:** 1 (MVP)
 

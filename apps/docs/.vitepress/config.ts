@@ -95,6 +95,10 @@ export default defineConfig({
           items: [{ text: 'AGENTS.md (LLMs)', link: '/guide/agents' }],
         },
         {
+          text: 'Acessibilidade',
+          items: [{ text: 'Guia a11y (WCAG 2.1 AA)', link: '/guide/a11y' }],
+        },
+        {
           text: 'Release',
           items: [{ text: 'Release checklist', link: '/guide/release-checklist' }],
         },

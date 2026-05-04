@@ -1,0 +1,110 @@
+# Configuração para actions/labeler@v5
+#
+# Aplica labels automaticamente em PRs com base nos paths alterados.
+# Regras manuais (ex: breaking-change) ainda podem ser aplicadas via heuristics
+# adicionais ou triagem humana.
+
+"package: core":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/core/**"
+
+"package: fields":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/fields/**"
+          - "packages-js/fields/**"
+
+"package: table":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/table/**"
+
+"package: form":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/form/**"
+
+"package: actions":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/actions/**"
+
+"package: auth":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/auth/**"
+
+"package: nav":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/nav/**"
+
+"package: ai":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/ai/**"
+          - "packages-js/ai/**"
+
+"package: marketplace":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/marketplace/**"
+          - "packages-js/marketplace/**"
+
+"package: realtime":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/realtime/**"
+          - "packages-js/realtime-collab/**"
+
+"package: react":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages-js/react/**"
+          - "packages-js/hooks/**"
+          - "packages-js/ui/**"
+          - "packages-js/types/**"
+
+"area: docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "apps/docs/**"
+          - "docs-content/**"
+          - "*.md"
+          - "PLANNING/**"
+
+"area: ci":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+          - ".husky/**"
+          - "scripts/**"
+
+"area: infra":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "composer.json"
+          - "package.json"
+          - "pnpm-workspace.yaml"
+          - "phpstan.neon"
+          - "pint.json"
+          - "biome.json"
+          - "tsconfig*.json"
+
+"area: examples":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "examples/**"
+
+"area: tests":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/tests/**"
+          - "**/*.test.ts"
+          - "**/*.test.tsx"
+          - "**/*Test.php"
+
+# Heurística para PRs com label `breaking-change` é manual via review.
+# Mantenedores podem habilitar regex check sobre title/body via Actions
+# customizadas se necessário.

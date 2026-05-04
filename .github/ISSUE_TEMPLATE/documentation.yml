@@ -1,0 +1,83 @@
+name: 📝 Documentação
+description: Reportar um problema na documentação ou propor melhoria
+title: "[DOCS] "
+labels: ["documentation", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar a melhorar a documentação do Arqel!
+
+        Para erros pequenos (typos, links quebrados), considere abrir um PR diretamente.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pré-verificações
+      options:
+        - label: Pesquisei issues abertas e fechadas e não encontrei duplicado.
+          required: true
+        - label: Verifiquei que o problema persiste na versão mais recente da documentação publicada.
+          required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Localização da documentação
+      description: "URL ou caminho do arquivo (ex: https://arqel.dev/guide/resources ou apps/docs/guide/resources.md)."
+      placeholder: https://arqel.dev/guide/...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Tipo de documentação
+      options:
+        - Guide (apps/docs/guide/)
+        - Reference (apps/docs/reference/)
+        - SKILL.md de pacote
+        - README.md raiz ou pacote
+        - PLANNING/
+        - Site público (arqel.dev)
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Natureza do problema
+      options:
+        - Conteúdo incorreto ou desatualizado
+        - Conteúdo ausente
+        - Exemplo de código quebrado
+        - Link quebrado
+        - Erro tipográfico ou gramatical
+        - Sugestão de melhoria
+        - Tradução PT-BR
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: O que está errado ou em falta
+      description: Descreva o problema de forma específica. Cole o trecho original se aplicável.
+      placeholder: |
+        A página X afirma que ... mas o comportamento real é ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Mudança proposta
+      description: Texto, exemplo ou estrutura que sugere para corrigir.
+      render: markdown
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Contexto adicional
+      description: Versão do Arqel, screenshots, ou qualquer outra informação útil.

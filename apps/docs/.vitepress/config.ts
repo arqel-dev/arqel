@@ -99,6 +99,10 @@ export default defineConfig({
           items: [{ text: 'Release checklist', link: '/guide/release-checklist' }],
         },
         {
+          text: 'Comunidade',
+          items: [{ text: 'Contribuir', link: '/guide/contributing' }],
+        },
+        {
           text: 'Migração',
           items: [
             { text: 'Vindo de Filament', link: '/guide/migration/from-filament' },

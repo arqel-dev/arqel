@@ -1,0 +1,59 @@
+# CODEOWNERS — Arqel
+#
+# Os grupos abaixo são PLACEHOLDERS que devem ser substituídos por usernames
+# reais (ou GitHub Teams existentes em github.com/arqel) antes de habilitar
+# branch protection com required reviews.
+#
+# Sintaxe: <padrão> <@user1> <@team1>. Última regra que faz match vence.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners
+
+# Default — todo arquivo pertence ao grupo de mantenedores core
+*                                  @arqel/maintainers
+
+# Documentação e site
+/apps/docs/                        @arqel/docs-maintainers
+/PLANNING/                         @arqel/maintainers
+*.md                               @arqel/docs-maintainers
+/CLAUDE.md                         @arqel/maintainers
+/AGENTS.md                         @arqel/maintainers
+
+# Governança (sensível — review estrito)
+/.github/                          @arqel/maintainers
+/CODE_OF_CONDUCT.md                @arqel/maintainers
+/CONTRIBUTING.md                   @arqel/maintainers
+/SECURITY.md                       @arqel/maintainers
+/LICENSE                           @arqel/maintainers
+
+# Pacotes PHP por área
+/packages/core/                    @arqel/maintainers
+/packages/fields/                  @arqel/maintainers
+/packages/table/                   @arqel/maintainers
+/packages/form/                    @arqel/maintainers
+/packages/actions/                 @arqel/maintainers
+/packages/auth/                    @arqel/maintainers
+/packages/nav/                     @arqel/maintainers
+
+# Pacotes verticais
+/packages/ai/                      @arqel/ai-maintainers
+/packages-js/ai/                   @arqel/ai-maintainers
+/packages/marketplace/             @arqel/marketplace-maintainers
+/packages-js/marketplace/          @arqel/marketplace-maintainers
+/packages/realtime/                @arqel/realtime-maintainers
+/packages-js/realtime-collab/      @arqel/realtime-maintainers
+
+# Pacotes JS core
+/packages-js/types/                @arqel/maintainers
+/packages-js/react/                @arqel/maintainers
+/packages-js/hooks/                @arqel/maintainers
+/packages-js/ui/                   @arqel/maintainers
+/packages-js/fields/               @arqel/maintainers
+
+# Infra/CI/Release
+/scripts/                          @arqel/maintainers
+/.husky/                           @arqel/maintainers
+/biome.json                        @arqel/maintainers
+/phpstan.neon                      @arqel/maintainers
+/pint.json                         @arqel/maintainers
+/composer.json                     @arqel/maintainers
+/package.json                      @arqel/maintainers
+/pnpm-workspace.yaml               @arqel/maintainers

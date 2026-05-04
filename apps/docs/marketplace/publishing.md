@@ -124,7 +124,7 @@ ou
 
 ```json
 {
-  "peerDependencies": { "@arqel/types": "^1.0" }
+  "peerDependencies": { "@arqel-dev/types": "^1.0" }
 }
 ```
 
@@ -195,7 +195,7 @@ GET /api/marketplace/publisher/plugins/{slug}/reviews
 GET /api/marketplace/publisher/payouts
 ```
 
-Cada um retorna métricas filtradas por `publisher_user_id = auth()->id()`. Detalhe completo de stats fica em [MKTPLC-004 — analytics](https://github.com/arqel/arqel/blob/main/PLANNING/11-fase-4-ecossistema.md) (entrega futura).
+Cada um retorna métricas filtradas por `publisher_user_id = auth()->id()`. Detalhe completo de stats fica em [MKTPLC-004 — analytics](https://github.com/arqel-dev/arqel/blob/main/PLANNING/11-fase-4-ecossistema.md) (entrega futura).
 
 Para plugins pagos, você também enxerga purchases agregadas + payouts pendentes:
 

@@ -11,7 +11,7 @@
  * Implemented with vanilla React only — no Headless UI / Combobox lib.
  */
 
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import {
   type KeyboardEvent as ReactKeyboardEvent,
   useEffect,

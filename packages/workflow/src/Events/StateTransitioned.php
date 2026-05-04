@@ -16,8 +16,8 @@ use Illuminate\Queue\SerializesModels;
  * Carrega o snapshot mínimo necessário para listeners user-land (audit log,
  * notificações, broadcast em tempo real, métricas). Permanece **desacoplado**
  * de `ShouldBroadcast` por design: broadcasting em tempo real é opt-in via
- * listener dedicado em user-land (ou no pacote `arqel/realtime`), mantendo
- * `arqel/workflow` standalone — alinhado com o duck-typing do trait.
+ * listener dedicado em user-land (ou no pacote `arqel-dev/realtime`), mantendo
+ * `arqel-dev/workflow` standalone — alinhado com o duck-typing do trait.
  *
  * @see HasWorkflow::transitionTo()
  */

@@ -80,7 +80,7 @@ rápidas como "Aprovar pedido".
 
 ### Concurrency em IA jobs
 
-Jobs do `@arqel/ai` (LLM calls via `ClaudeProvider` ou `OpenAIProvider`)
+Jobs do `@arqel-dev/ai` (LLM calls via `ClaudeProvider` ou `OpenAIProvider`)
 têm latência alta (2-30s) e custo por chamada. Limite com Laravel
 `RateLimited` middleware:
 

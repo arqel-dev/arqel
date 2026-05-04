@@ -1,6 +1,6 @@
 {
-  "name": "@arqel/docs",
-  "version": "0.8.0-rc.1",
+  "name": "@arqel-dev/docs",
+  "version": "0.8.0",
   "description": "Arqel documentation site (VitePress).",
   "private": true,
   "type": "module",

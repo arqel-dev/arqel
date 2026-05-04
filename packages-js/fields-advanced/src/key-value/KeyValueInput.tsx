@@ -16,8 +16,8 @@
  * dnd-kit integration is deferred to a follow-up ticket.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { useEffect, useId, useRef, useState } from 'react';
 
 interface KeyValueProps {

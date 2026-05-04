@@ -3,7 +3,7 @@
  * scoped — no dnd-kit, no Base UI Dialog).
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';

@@ -16,7 +16,7 @@ use Throwable;
  *
  * Diferente de `arqel:doctor` (que diagnostica a instalação local da
  * app hospedeira), este comando valida o **monorepo** em si: cada
- * pacote `arqel/*` precisa ter `SKILL.md` canônico, `composer.json`
+ * pacote `arqel-dev/*` precisa ter `SKILL.md` canônico, `composer.json`
  * válido, entrada no `CHANGELOG.md` raiz e o suite de testes precisa
  * estar acima de um threshold sanity. Os checks são read-only e
  * defensivos — qualquer falha individual degrada para `warn`.

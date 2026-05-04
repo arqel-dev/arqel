@@ -61,7 +61,7 @@ A arquitectura **não é SPA com API separada**. É **monolito Laravel com front
 | **Admin user** (developer ou end-user admin) | Usa browser React para CRUD via Arqel |
 | **Developer** | Instala via Composer + npm, define Resources em PHP |
 | **LLM providers** (Fase 3+) | Via AI fields para completion/generation |
-| **MCP clients** (Claude Code, Cursor) | Via `arqel/mcp` server para introspecção e geração de código |
+| **MCP clients** (Claude Code, Cursor) | Via `arqel-dev/mcp` server para introspecção e geração de código |
 
 ### Sistemas externos
 
@@ -85,8 +85,8 @@ A arquitectura **não é SPA com API separada**. É **monolito Laravel com front
 │  │  ┌────────────────┐  ┌──────────────┐  ┌─────────────────┐      │  │
 │  │  │ Arqel React    │  │  Inertia     │  │  ShadCN UI      │      │  │
 │  │  │ Components     │─▶│  Client      │◀─│  (user-owned    │      │  │
-│  │  │ (@arqel/ui,    │  │  (router,    │  │   copies)       │      │  │
-│  │  │  @arqel/fields)│  │   forms)     │  │                 │      │  │
+│  │  │ (@arqel-dev/ui,    │  │  (router,    │  │   copies)       │      │  │
+│  │  │  @arqel-dev/fields)│  │   forms)     │  │                 │      │  │
 │  │  └────────────────┘  └──────────────┘  └─────────────────┘      │  │
 │  │           │                   │                                   │  │
 │  │           └───────────┬───────┘                                  │  │
@@ -145,7 +145,7 @@ A arquitectura **não é SPA com API separada**. É **monolito Laravel com front
 | **Inertia Client** | `@inertiajs/react` v3 | Router, form handling, link prefetch, partial reloads |
 | **ShadCN UI (user-owned)** | React components copiados para `resources/js/components/ui` | Primitives visuais, editáveis pelo usuário |
 | **Laravel Application Server** | PHP 8.3+ + Laravel 12/13 + FPM/Octane | Servidor principal |
-| **Arqel Controllers** | PHP classes em `arqel/core` | Recebem requests, invocam Resource logic, retornam `Inertia::render()` |
+| **Arqel Controllers** | PHP classes em `arqel-dev/core` | Recebem requests, invocam Resource logic, retornam `Inertia::render()` |
 | **Resource Registry** | PHP Singleton | Mapeia Resource classes → rotas, URLs, navigation |
 | **Fields Schema** | PHP objects | Serialização dos Fields em array JSON-safe para Inertia |
 | **Policies Gate** | Laravel Gate + Policies | Authorization checks |
@@ -153,16 +153,16 @@ A arquitectura **não é SPA com API separada**. É **monolito Laravel com front
 | **Eloquent ORM** | Laravel Eloquent | CRUD, relationships, casts, scopes |
 | **Queue Worker** | Laravel Horizon ou queue:work | Bulk actions, exports, notifications |
 | **Broadcasting** | Laravel Reverb + Echo | Real-time updates (Fase 3) |
-| **MCP Server** | `arqel/mcp` package | Expõe introspection tools para LLMs |
+| **MCP Server** | `arqel-dev/mcp` package | Expõe introspection tools para LLMs |
 
 ## 4. C4 Level 3 — Components (Arqel packages internos)
 
 ### 4.1 Packages Composer
 
 ```
-arqel/arqel (meta-package)
+arqel-dev/arqel (meta-package)
     │
-    ├── arqel/core
+    ├── arqel-dev/core
     │     ├── ArqelServiceProvider
     │     ├── ResourceRegistry
     │     ├── Contracts/
@@ -173,71 +173,71 @@ arqel/arqel (meta-package)
     │     ├── Http/Middleware/HandleArqelInertiaRequests
     │     └── Concerns/ (traits)
     │
-    ├── arqel/fields
+    ├── arqel-dev/fields
     │     ├── Field (base class)
     │     ├── TextField, NumberField, SelectField, ...
     │     ├── FieldFactory (static fluent API)
     │     └── ValidationBridge (PHP rules → Zod schema)
     │
-    ├── arqel/table
+    ├── arqel-dev/table
     │     ├── Table
     │     ├── Column (text, badge, image, computed, ...)
     │     ├── Filter (select, dateRange, text, ...)
     │     └── TablePaginator (Eloquent paginator wrapper)
     │
-    ├── arqel/form
+    ├── arqel-dev/form
     │     ├── Form
     │     ├── FormSchema (ordered fields + layout)
     │     ├── Layout/ (Section, Fieldset, Grid, Tabs, Wizard)
     │     └── FormRequest (generator)
     │
-    ├── arqel/actions
+    ├── arqel-dev/actions
     │     ├── Action (base)
     │     ├── RowAction, BulkAction, ToolbarAction
     │     ├── ConfirmableAction trait
     │     └── ActionExecutor (jobs integration)
     │
-    ├── arqel/auth (authorization)
+    ├── arqel-dev/auth (authorization)
     │     ├── PolicyDiscovery
     │     └── Ability registry
     │
-    ├── arqel/nav
+    ├── arqel-dev/nav
     │     ├── Navigation (declarative builder)
     │     ├── NavigationItem
     │     └── NavigationGroup
     │
-    ├── arqel/tenant (Fase 2)
+    ├── arqel-dev/tenant (Fase 2)
     │     ├── TenantResolver
     │     ├── TenantScopedQuery (global scope)
     │     └── Integrations/ (stancl, spatie)
     │
-    ├── arqel/audit (Fase 2)
+    ├── arqel-dev/audit (Fase 2)
     │     └── (wraps spatie/laravel-activitylog)
     │
-    ├── arqel/versioning (Fase 3)
+    ├── arqel-dev/versioning (Fase 3)
     │     └── Versionable trait
     │
-    ├── arqel/workflow (Fase 3)
+    ├── arqel-dev/workflow (Fase 3)
     │     └── (wraps spatie/laravel-model-states)
     │
-    ├── arqel/realtime (Fase 3)
+    ├── arqel-dev/realtime (Fase 3)
     │     └── Reverb integration + Echo channels
     │
-    ├── arqel/mcp (Fase 2)
+    ├── arqel-dev/mcp (Fase 2)
     │     └── MCP server (stdio + HTTP)
     │
-    └── arqel/testing
+    └── arqel-dev/testing
           └── Pest + Testbench helpers
 ```
 
 ### 4.2 Packages npm
 
 ```
-@arqel/types        ← TypeScript types espelhando PHP schemas
-@arqel/hooks        ← React hooks: useResource, useArqelForm, useCanAccess
-@arqel/ui           ← AppShell, Sidebar, Topbar, DataTable, FormRenderer
-@arqel/fields       ← Field components React (TextInput, Select, ...)
-@arqel/react        ← Inertia bindings + utilities
+@arqel-dev/types        ← TypeScript types espelhando PHP schemas
+@arqel-dev/hooks        ← React hooks: useResource, useArqelForm, useCanAccess
+@arqel-dev/ui           ← AppShell, Sidebar, Topbar, DataTable, FormRenderer
+@arqel-dev/fields       ← Field components React (TextInput, Select, ...)
+@arqel-dev/react        ← Inertia bindings + utilities
 ```
 
 ## 5. Fluxos de dados críticos
@@ -257,7 +257,7 @@ arqel/arqel (meta-package)
    e. Serializa records via Resource::toArray() + field-level authorization
    f. Retorna Inertia::render('arqel::resources/index', [...])
 6. Inertia: serializa props JSON, envia resposta
-7. Browser: @arqel/ui renderiza <DataTable /> com props recebidos
+7. Browser: @arqel-dev/ui renderiza <DataTable /> com props recebidos
 ```
 
 ### 5.2 Fluxo: Submit form (POST /admin/users)
@@ -346,7 +346,7 @@ arqel/arqel (meta-package)
 
 **Decisão:** componentes visuais são distribuídos em **duas camadas**:
 
-1. **npm package `@arqel/ui`** — exporta componentes estruturais (AppShell, DataTable shell, FormRenderer).
+1. **npm package `@arqel-dev/ui`** — exporta componentes estruturais (AppShell, DataTable shell, FormRenderer).
 2. **ShadCN CLI v4 via `arqel.dev/r/*`** — componentes atómicos (Button, Input, Select, etc.) são copiados para `resources/js/components/ui/*` do user.
 
 **Porquê:**
@@ -356,7 +356,7 @@ arqel/arqel (meta-package)
 
 ### 6.5 Monorepo Composer + npm
 
-**Decisão:** um único Git repo (`github.com/arqel/arqel`) contém todos packages Composer e npm.
+**Decisão:** um único Git repo (`github.com/arqel-dev/arqel`) contém todos packages Composer e npm.
 
 **Porquê:**
 - Releases coordenados (PHP changes + TS types changes em mesmo PR).
@@ -378,7 +378,7 @@ arqel/arqel (meta-package)
 
 ### 6.7 MCP como first-class
 
-**Decisão:** `arqel/mcp` é um package Composer que expõe MCP tools (introspection + codegen) desde Fase 2.
+**Decisão:** `arqel-dev/mcp` é um package Composer que expõe MCP tools (introspection + codegen) desde Fase 2.
 
 **Porquê:**
 - Diferenciador forte vs Filament/Nova.
@@ -437,7 +437,7 @@ export interface UserRecord {
 }
 ```
 
-Usuários têm `@arqel/types` com shape genérico + types específicos gerados.
+Usuários têm `@arqel-dev/types` com shape genérico + types específicos gerados.
 
 ## 8. Estratégia de rendering
 
@@ -475,9 +475,9 @@ Vite config:
         rollupOptions: {
             output: {
                 manualChunks: {
-                    'arqel-core': ['@arqel/ui', '@arqel/react', '@inertiajs/react'],
-                    'arqel-table': ['@arqel/table', '@tanstack/react-table'],
-                    'arqel-form': ['@arqel/form', 'zod', 'react-hook-form'],
+                    'arqel-core': ['@arqel-dev/ui', '@arqel-dev/react', '@inertiajs/react'],
+                    'arqel-table': ['@arqel-dev/table', '@tanstack/react-table'],
+                    'arqel-form': ['@arqel-dev/form', 'zod', 'react-hook-form'],
                     'react-vendor': ['react', 'react-dom']
                 }
             }
@@ -583,7 +583,7 @@ Integration oficial — one-click deploy de Arqel apps para Laravel Cloud.
 - Todas as rotas Arqel atrás do middleware `arqel.auth`.
 - Policies enforced em toda operação mutadora.
 - Field-level auth serializado na resposta Inertia (removido antes de serializar).
-- Audit log opcional via `arqel/audit`.
+- Audit log opcional via `arqel-dev/audit`.
 
 ### 12.3 CSRF
 

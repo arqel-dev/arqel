@@ -66,7 +66,7 @@ return [
     | Workflow integration (RT-cross)
     |--------------------------------------------------------------------------
     |
-    | Quando `arqel/workflow` está instalado, o `RealtimeServiceProvider`
+    | Quando `arqel-dev/workflow` está instalado, o `RealtimeServiceProvider`
     | registra automaticamente o listener `BroadcastStateTransitionListener`
     | para o evento `Arqel\Workflow\Events\StateTransitioned`. Cada transição
     | dispara um `ResourceUpdated` broadcast, levando a UI a refrescar via

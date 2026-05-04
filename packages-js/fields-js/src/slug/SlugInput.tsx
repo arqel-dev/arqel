@@ -10,8 +10,8 @@
  * server-side via the Validator; the input itself just normalises.
  */
 
-import type { SlugFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { SlugFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { inputClasses } from '../shared/styles.js';
 
 export function SlugInput({

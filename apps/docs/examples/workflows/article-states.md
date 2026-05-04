@@ -1,10 +1,10 @@
 # Workflow de Artigos (CMS)
 
-> Exemplo de máquina de estados para artigos editoriais, demonstrando ramos de rejeição com feedback, autorização via Gate (sem `authorizeFor`) e integração com versionamento (`arqel/versioning`).
+> Exemplo de máquina de estados para artigos editoriais, demonstrando ramos de rejeição com feedback, autorização via Gate (sem `authorizeFor`) e integração com versionamento (`arqel-dev/versioning`).
 
 ## Visão geral
 
-CMS editorial é um caso de uso onde o **fluxo de revisão** é o coração do produto. Diferente de pedidos (onde o estado avança quase sempre por sistemas/eventos externos), aqui as transições são quase todas humanas: autor envia para revisão, editor aprova ou devolve com feedback, alguém arquiva quando o conteúdo perde relevância. A natureza colaborativa exige duas coisas que este exemplo destaca: (1) **feedback estruturado na rejeição** — o reviewer escreve um comentário que volta junto com o artigo para o autor; e (2) **histórico imutável** que o `arqel/workflow` grava por padrão, complementado por **versões do conteúdo** geradas pelo `arqel/versioning` em momentos-chave.
+CMS editorial é um caso de uso onde o **fluxo de revisão** é o coração do produto. Diferente de pedidos (onde o estado avança quase sempre por sistemas/eventos externos), aqui as transições são quase todas humanas: autor envia para revisão, editor aprova ou devolve com feedback, alguém arquiva quando o conteúdo perde relevância. A natureza colaborativa exige duas coisas que este exemplo destaca: (1) **feedback estruturado na rejeição** — o reviewer escreve um comentário que volta junto com o artigo para o autor; e (2) **histórico imutável** que o `arqel-dev/workflow` grava por padrão, complementado por **versões do conteúdo** geradas pelo `arqel-dev/versioning` em momentos-chave.
 
 O workflow é `Draft → InReview → Published → Archived`, com duas saídas alternativas: `InReview → Draft` (rejeição com motivo) e `Published → Archived` (sunset, qualquer pessoa autenticada). A decisão importante de design aqui é não usar `authorizeFor` em nenhuma transition — em vez disso, todas autorizam via Gate registrada em `AuthServiceProvider`. Isso facilita testes (Gates são fáceis de fakeAr com `Gate::shouldReceive`), mantém a lógica de autorização agrupada num único lugar e permite que o time de produto altere regras (por exemplo, "qualquer editor pode rejeitar, mas só o editor-chefe pode publicar") sem mexer em transition classes.
 
@@ -62,7 +62,7 @@ final class Article extends Model
         'published_at'  => 'datetime',
     ];
 
-    /** @var list<string> Atributos versionados pelo arqel/versioning. */
+    /** @var list<string> Atributos versionados pelo arqel-dev/versioning. */
     protected array $versionedAttributes = ['title', 'slug', 'body'];
 
     public function arqelWorkflow(): WorkflowDefinition
@@ -94,7 +94,7 @@ final class Article extends Model
 }
 ```
 
-`Versionable` cria entradas em `versions` automaticamente nos hooks `created`/`updating` — ver `arqel/versioning` SKILL.md. Aqui só listamos os atributos relevantes em `$versionedAttributes`; mudanças em `article_state` ou `editor_id` não geram nova versão (só alterações no conteúdo).
+`Versionable` cria entradas em `versions` automaticamente nos hooks `created`/`updating` — ver `arqel-dev/versioning` SKILL.md. Aqui só listamos os atributos relevantes em `$versionedAttributes`; mudanças em `article_state` ou `editor_id` não geram nova versão (só alterações no conteúdo).
 
 ## Resource
 
@@ -147,7 +147,7 @@ final class ArticleResource extends Resource
 }
 ```
 
-O campo `VersionHistory` (do `arqel/versioning`) renderiza um diff visual entre revisões — permite ao editor comparar a versão atual com a publicada e decidir se aprova mudanças.
+O campo `VersionHistory` (do `arqel-dev/versioning`) renderiza um diff visual entre revisões — permite ao editor comparar a versão atual com a publicada e decidir se aprova mudanças.
 
 ## Transition class — rejeição com feedback
 
@@ -330,7 +330,7 @@ final class NotifyEditorialBoard implements ShouldQueue
 
 Note como o listener é **um único** que faz `match()` no estado destino — alternativa a três listeners separados. Para listeners pequenos é mais legível; para listeners grandes ou com dependências distintas, separar em múltiplas classes (como em `order-states.md`) é melhor.
 
-## Integração com `arqel/versioning`
+## Integração com `arqel-dev/versioning`
 
 Quando o artigo entra em `Published`, o `Versionable` trait já cuida de criar uma versão com tag canônica:
 
@@ -359,4 +359,4 @@ A UI de `VersionHistory` filtra por tag `'published'` para mostrar uma timeline 
 - **Sem `authorizeFor` — só Gate**: regras editoriais mudam frequentemente; concentrá-las em `AuthServiceProvider` simplifica revisão.
 - **Sem `Archived → Draft`**: arquivamento é definitivo. Voltar editoria = duplicar.
 - **Feedback no `context` da transition**: usuário escreve no controller, vai para `metadata` do histórico, e também copia para `review_feedback` no model para fácil exibição.
-- **Versionamento ortogonal**: `arqel/versioning` cuida de snapshots; o workflow cuida do estado. Combinam mas não dependem.
+- **Versionamento ortogonal**: `arqel-dev/versioning` cuida de snapshots; o workflow cuida do estado. Combinam mas não dependem.

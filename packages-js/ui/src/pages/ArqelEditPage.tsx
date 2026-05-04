@@ -5,10 +5,10 @@
  * server-emitted `record`. Submission posts to PUT `/{slug}/{id}`.
  */
 
-import { useArqelForm } from '@arqel/hooks';
-import type { FieldSchema } from '@arqel/types/fields';
-import type { FormSchema } from '@arqel/types/forms';
-import type { RecordType, ResourceEditProps } from '@arqel/types/resources';
+import { useArqelForm } from '@arqel-dev/hooks';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import type { FormSchema } from '@arqel-dev/types/forms';
+import type { RecordType, ResourceEditProps } from '@arqel-dev/types/resources';
 import { router, usePage } from '@inertiajs/react';
 import type { FormEvent, JSX } from 'react';
 import { FormActions } from '../form/FormActions.js';

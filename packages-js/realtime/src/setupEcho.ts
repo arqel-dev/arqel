@@ -25,7 +25,7 @@ import type { EchoConfig, EchoLike } from './types';
 export function setupEcho(config: EchoConfig): void {
   if (typeof window === 'undefined') {
     // SSR: nada a fazer. Não usamos console.error pois não é erro real.
-    console.warn('[arqel/realtime] setupEcho called in SSR context — skipping.');
+    console.warn('[arqel-dev/realtime] setupEcho called in SSR context — skipping.');
     return;
   }
 
@@ -35,7 +35,7 @@ export function setupEcho(config: EchoConfig): void {
   };
 
   if (w.Echo) {
-    console.warn('[arqel/realtime] window.Echo already initialized — skipping setupEcho.');
+    console.warn('[arqel-dev/realtime] window.Echo already initialized — skipping setupEcho.');
     return;
   }
 

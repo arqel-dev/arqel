@@ -64,7 +64,7 @@ it('renders the Inertia forgot-password page on GET', function (): void {
 
     $response->assertOk();
     $payload = json_decode($response->getContent() ?: '', true);
-    expect($payload['component'] ?? null)->toBe('arqel/auth/ForgotPassword');
+    expect($payload['component'] ?? null)->toBe('arqel-dev/auth/ForgotPassword');
 });
 
 it('sends reset link notification for an existing email', function (): void {

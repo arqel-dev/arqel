@@ -6,7 +6,7 @@
  * lazy mounting or controlled mode.
  */
 
-import type { TabsProps } from '@arqel/types/forms';
+import type { TabsProps } from '@arqel-dev/types/forms';
 import { type ReactElement, type ReactNode, useId, useRef, useState } from 'react';
 import { cn } from '../utils/cn.js';
 

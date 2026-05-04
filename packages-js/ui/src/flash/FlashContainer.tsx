@@ -8,7 +8,7 @@
  * to relocate.
  */
 
-import { type FlashKind, useFlash } from '@arqel/hooks';
+import { type FlashKind, useFlash } from '@arqel-dev/hooks';
 import { useCallback, useState } from 'react';
 import { cn } from '../utils/cn.js';
 import { FlashToast } from './FlashToast.js';

@@ -20,7 +20,7 @@ function runDeployLink(array $input): array
 }
 
 it('prints a deploy URL and exits 0 with valid github-repo', function (): void {
-    [$exit, $display] = runDeployLink(['github-repo' => 'arqel/laravel-cloud-template']);
+    [$exit, $display] = runDeployLink(['github-repo' => 'arqel-dev/laravel-cloud-template']);
 
     expect($exit)->toBe(0)
         ->and($display)->toContain('Deploy to Laravel Cloud:')
@@ -38,7 +38,7 @@ it('fails with non-zero exit on invalid github-repo', function (): void {
 
 it('applies --region option', function (): void {
     [$exit, $display] = runDeployLink([
-        'github-repo' => 'arqel/template',
+        'github-repo' => 'arqel-dev/template',
         '--region' => 'us-west',
     ]);
 
@@ -48,7 +48,7 @@ it('applies --region option', function (): void {
 
 it('applies --name option', function (): void {
     [$exit, $display] = runDeployLink([
-        'github-repo' => 'arqel/template',
+        'github-repo' => 'arqel-dev/template',
         '--name' => 'acme',
     ]);
 
@@ -58,7 +58,7 @@ it('applies --name option', function (): void {
 
 it('rejects unknown --region', function (): void {
     [$exit, $display] = runDeployLink([
-        'github-repo' => 'arqel/template',
+        'github-repo' => 'arqel-dev/template',
         '--region' => 'mars-1',
     ]);
 

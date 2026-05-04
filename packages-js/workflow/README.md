@@ -1,4 +1,4 @@
-# @arqel/workflow
+# @arqel-dev/workflow
 
 Componentes React do Arqel Workflow.
 
@@ -9,16 +9,16 @@ para o contrato completo de props e exemplos.
 ## Instalação
 
 ```bash
-pnpm add @arqel/workflow
+pnpm add @arqel-dev/workflow
 ```
 
 ## Uso
 
 ```ts
-import '@arqel/workflow/register'; // registra no FieldRegistry de @arqel/ui
+import '@arqel-dev/workflow/register'; // registra no FieldRegistry de @arqel-dev/ui
 
 // ou import direto:
-import { StateTransition } from '@arqel/workflow';
+import { StateTransition } from '@arqel-dev/workflow';
 ```
 
 Licença: MIT.

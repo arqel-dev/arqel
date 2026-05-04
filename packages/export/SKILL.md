@@ -1,16 +1,16 @@
-# SKILL.md — arqel/export
+# SKILL.md — arqel-dev/export
 
 > Contexto canônico para AI agents.
 
 ## Purpose
 
-`arqel/export` entrega a pipeline de exportação do Arqel — converte a seleção de uma `Table` (ou um dataset arbitrário) em arquivos CSV, XLSX ou PDF. Cobre RF-T-14. O pacote é só o esqueleto (interfaces + enum + stubs); as implementações reais ficam atrás de `suggest:` em `composer.json` para que panels que não exportam nada não precisem instalar `spatie/simple-excel` nem `dompdf/dompdf`.
+`arqel-dev/export` entrega a pipeline de exportação do Arqel — converte a seleção de uma `Table` (ou um dataset arbitrário) em arquivos CSV, XLSX ou PDF. Cobre RF-T-14. O pacote é só o esqueleto (interfaces + enum + stubs); as implementações reais ficam atrás de `suggest:` em `composer.json` para que panels que não exportam nada não precisem instalar `spatie/simple-excel` nem `dompdf/dompdf`.
 
 ## Status
 
 **Entregue (EXPORT-001):**
 
-- Esqueleto do pacote `arqel/export` com PSR-4 `Arqel\Export\` → `src/`, deps em `arqel/core` e `arqel/actions` via path repo
+- Esqueleto do pacote `arqel-dev/export` com PSR-4 `Arqel\Export\` → `src/`, deps em `arqel-dev/core` e `arqel-dev/actions` via path repo
 - **`Arqel\Export\ExportFormat`** — enum `string` com casos `CSV`/`XLSX`/`PDF` + métodos `mimeType(): string` e `extension(): string`. Single source of truth para Content-Type headers e filenames
 - **`Arqel\Export\Contracts\Exporter`** — interface `export(iterable $rows, array $columns, string $destination): string` (retorna o path escrito)
 - **`Arqel\Export\Exporters\XlsxExporter|PdfExporter`** — `final class` implementando `Exporter`. Bodies lançam `RuntimeException` apontando para EXPORT-003/004 (CsvExporter já real — ver EXPORT-002 abaixo)

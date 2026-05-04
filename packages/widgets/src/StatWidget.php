@@ -10,7 +10,7 @@ use Closure;
  * KPI / "big number" widget — the most common dashboard primitive.
  *
  * Renders a `<StatWidget>` React component (shipped by
- * `@arqel/ui/widgets` in WIDGETS-007+). Apps configure via the
+ * `@arqel-dev/ui/widgets` in WIDGETS-007+). Apps configure via the
  * fluent API — no subclassing required for the common case:
  *
  *   StatWidget::make('total_users')

@@ -130,7 +130,7 @@ abstract class Resource implements HasActions, HasFields, HasResource
      * declarative columns/filters/actions.
      *
      * The return type is `mixed` (not `?Table`) to avoid making
-     * `arqel/core` depend on `arqel/table` — the controller duck-
+     * `arqel-dev/core` depend on `arqel-dev/table` — the controller duck-
      * types the result.
      */
     public function table(): mixed
@@ -145,7 +145,7 @@ abstract class Resource implements HasActions, HasFields, HasResource
      * of just the flat field list from `fields()`.
      *
      * The return type is `mixed` (not `?Form`) for the same reason
-     * as `table()` — `arqel/core` cannot depend on `arqel/form`.
+     * as `table()` — `arqel-dev/core` cannot depend on `arqel-dev/form`.
      * The InertiaDataBuilder duck-types the result against
      * `getFields()`/`getSchema()`/`toArray()`.
      */

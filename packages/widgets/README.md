@@ -1,4 +1,4 @@
-# arqel/widgets
+# arqel-dev/widgets
 
 Dashboard widgets for Arqel — Stat/Chart/Table/Custom widgets with deferred loading and polling.
 
@@ -8,10 +8,10 @@ Phase 2 scaffold (WIDGETS-001). Concrete widget types (StatWidget, ChartWidget, 
 
 ## Install
 
-In a Laravel app already running `arqel/core`:
+In a Laravel app already running `arqel-dev/core`:
 
 ```bash
-composer require arqel/widgets
+composer require arqel-dev/widgets
 ```
 
 The service provider is auto-discovered.

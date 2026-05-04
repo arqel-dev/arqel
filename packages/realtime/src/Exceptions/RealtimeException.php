@@ -7,7 +7,7 @@ namespace Arqel\Realtime\Exceptions;
 use RuntimeException;
 
 /**
- * Base runtime exception for `arqel/realtime`.
+ * Base runtime exception for `arqel-dev/realtime`.
  *
  * Thrown when callers misuse package APIs in ways that cannot be
  * recovered at runtime (e.g., requesting a presence channel while

@@ -1,14 +1,14 @@
 # MCP server
 
-> Pacote: [`arqel/mcp`](../../packages/mcp/) · Tickets: MCP-001..010
+> Pacote: [`arqel-dev/mcp`](../../packages/mcp/) · Tickets: MCP-001..010
 
 ## Purpose
 
-`arqel/mcp` expõe um servidor [Model Context Protocol](https://modelcontextprotocol.io) sobre os panels Arqel: **tools** (executar Actions, mutar Resources), **resources** (ler dados de Resource/Table/Widget), **prompts** (templates pré-construídos para fluxos comuns de admin).
+`arqel-dev/mcp` expõe um servidor [Model Context Protocol](https://modelcontextprotocol.io) sobre os panels Arqel: **tools** (executar Actions, mutar Resources), **resources** (ler dados de Resource/Table/Widget), **prompts** (templates pré-construídos para fluxos comuns de admin).
 
 Permite que clientes MCP — Claude Desktop, Cursor, Zed, agents customizados — operem o painel via JSON-RPC com a mesma autorização e validação que os usuários humanos vêem na UI Inertia.
 
-A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextprotocol.io`; o pacote é só a tradução PHP/Laravel das primitivas (Tool, Resource, Prompt) e o glue que descobre Resources/Actions já registrados em `arqel/core`.
+A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextprotocol.io`; o pacote é só a tradução PHP/Laravel das primitivas (Tool, Resource, Prompt) e o glue que descobre Resources/Actions já registrados em `arqel-dev/core`.
 
 ## Setup — Claude Desktop
 

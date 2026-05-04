@@ -13,8 +13,8 @@ use Inertia\Response;
 /**
  * Login bundled de Arqel.
  *
- * Renderiza o componente Inertia `arqel/auth/Login` (servido pelo
- * pacote npm `@arqel/auth`) e processa o submit via `LoginRequest`.
+ * Renderiza o componente Inertia `arqel-dev/auth/Login` (servido pelo
+ * pacote npm `@arqel-dev/auth`) e processa o submit via `LoginRequest`.
  */
 final class LoginController
 {
@@ -37,7 +37,7 @@ final class LoginController
     {
         $panel = $this->currentPanel();
 
-        return Inertia::render('arqel/auth/Login', [
+        return Inertia::render('arqel-dev/auth/Login', [
             'canRegister' => $panel?->registrationEnabled() ?? false,
             'canResetPassword' => $panel?->passwordResetEnabled() ?? false,
             'loginUrl' => $panel?->getLoginUrl() ?? '/admin/login',

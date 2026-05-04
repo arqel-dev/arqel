@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { CommandPaletteProps, PaletteCommand } from '../../src/palette/index.js';
 import { CommandPalette } from '../../src/palette/index.js';
 
-describe('@arqel/ui/palette — module surface', () => {
+describe('@arqel-dev/ui/palette — module surface', () => {
   it('exports CommandPalette as a function', () => {
     expect(typeof CommandPalette).toBe('function');
   });

@@ -58,7 +58,7 @@ export interface NavigationEntry {
 
 /**
  * Convention-reserved `__devtools` shared prop emitted by
- * `arqel/core` in `local` environment (DEVTOOLS-004). Always `null`
+ * `arqel-dev/core` in `local` environment (DEVTOOLS-004). Always `null`
  * in production builds — the PHP middleware refuses to populate it.
  */
 export interface ArqelDevToolsPayload {

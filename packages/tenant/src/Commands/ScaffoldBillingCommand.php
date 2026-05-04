@@ -17,7 +17,7 @@ use Throwable;
  *     `routes/web.php` when present)
  *   - `resources/js/Pages/Arqel/Billing.tsx`
  *
- * **Cashier itself is NOT a hard dependency of `arqel/tenant`.**
+ * **Cashier itself is NOT a hard dependency of `arqel-dev/tenant`.**
  * It lives in `composer.json` `suggest:` only — apps opt in by
  * running `composer require laravel/cashier-stripe` (or the
  * Paddle variant) and customising the generated controller to

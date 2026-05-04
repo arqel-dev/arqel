@@ -6,7 +6,7 @@ use Arqel\Form\FormRequestGenerator;
 
 /**
  * Hand-rolled fixture used by the generator tests so we don't
- * pull `arqel/core` Resource into form's unit tests. The generator
+ * pull `arqel-dev/core` Resource into form's unit tests. The generator
  * only relies on `class_exists` + class-basename derivation.
  */
 final class StubArticleResource

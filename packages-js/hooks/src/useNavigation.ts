@@ -5,7 +5,7 @@
  * normalises it to a `NavigationItem[]`-like shape callsites can render.
  */
 
-import type { SharedProps } from '@arqel/types/inertia';
+import type { SharedProps } from '@arqel-dev/types/inertia';
 import { usePage } from '@inertiajs/react';
 
 export interface NavigationItemPayload {

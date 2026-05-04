@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 /**
  * Resource subclass with a couple of "Field-like" objects to
  * exercise InertiaDataBuilder::serializeFields without requiring
- * arqel/fields as a hard dependency.
+ * arqel-dev/fields as a hard dependency.
  */
 final class FakeFieldedResource extends Resource
 {

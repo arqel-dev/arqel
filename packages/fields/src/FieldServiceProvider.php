@@ -33,7 +33,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Service provider for `arqel/fields`.
+ * Service provider for `arqel-dev/fields`.
  *
  * Registers the package with Spatie's package tools and binds the
  * built-in field types into the `FieldFactory` so apps can call

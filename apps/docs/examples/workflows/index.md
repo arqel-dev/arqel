@@ -1,6 +1,6 @@
-# Exemplos de Workflows — `arqel/workflow`
+# Exemplos de Workflows — `arqel-dev/workflow`
 
-Esta pasta contém três exemplos completos e comentados de máquinas de estado construídas com o pacote `arqel/workflow`. Cada um foi escolhido para exercitar um conjunto distinto de features do pacote, juntos eles cobrem ~todas as decisões de design que aparecem em apps Laravel reais.
+Esta pasta contém três exemplos completos e comentados de máquinas de estado construídas com o pacote `arqel-dev/workflow`. Cada um foi escolhido para exercitar um conjunto distinto de features do pacote, juntos eles cobrem ~todas as decisões de design que aparecem em apps Laravel reais.
 
 Use estes exemplos como ponto de partida quando for desenhar seu próprio workflow: copie a estrutura, adapte os estados/transições ao seu domínio, e remova o que não usar.
 
@@ -9,12 +9,12 @@ Use estes exemplos como ponto de partida quando for desenhar seu próprio workfl
 | Exemplo | Domínio | Foco principal |
 |---|---|---|
 | [`order-states.md`](./order-states.md) | E-commerce — pedidos | Autorização por papel (`authorizeFor` + Gate), webhooks de transportadora, transição "any-to" (`Cancelled`), idempotência via `metadata` |
-| [`article-states.md`](./article-states.md) | CMS editorial — artigos | Fluxo colaborativo humano, rejeição com feedback, autorização 100% via Gate, integração com `arqel/versioning` para snapshots de conteúdo |
+| [`article-states.md`](./article-states.md) | CMS editorial — artigos | Fluxo colaborativo humano, rejeição com feedback, autorização 100% via Gate, integração com `arqel-dev/versioning` para snapshots de conteúdo |
 | [`subscription-states.md`](./subscription-states.md) | SaaS billing — assinaturas | Transições disparadas por webhooks Stripe, side-effects em cache/quotas, sistema como ator (humanos têm acesso limitado), uso intensivo de `metadata` para auditoria |
 
 ## Tabela comparativa de features
 
-| Feature do `arqel/workflow` | order | article | subscription |
+| Feature do `arqel-dev/workflow` | order | article | subscription |
 |---|:---:|:---:|:---:|
 | `WorkflowDefinition` + `HasWorkflow` trait | sim | sim | sim |
 | `StateTransitionField` no Resource | sim | sim | sim |
@@ -28,7 +28,7 @@ Use estes exemplos como ponto de partida quando for desenhar seu próprio workfl
 | Idempotência via `metadata->webhook_event_id` | sim | — | sim (central) |
 | Sistema como ator (user `null`) | parcial (webhook delivery) | — | sim (Stripe webhooks) |
 | Estado terminal sem retorno | — | sim (`Archived`) | sim (`Canceled`) |
-| Integração com `arqel/versioning` | — | sim | — |
+| Integração com `arqel-dev/versioning` | — | sim | — |
 | `defaultFilters` na Table | — | sim | sim |
 | Validação de domínio na Gate (`filled(...)`) | sim (`refund_reason`) | — | — |
 

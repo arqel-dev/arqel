@@ -30,7 +30,7 @@ Esse arquivo gera index, create, edit, show, routes, validation rules e Inertia 
 
 ### 2. Inertia-only
 
-Arqel **proíbe** TanStack Query, SWR ou outras fetch libs no Resource CRUD ([ADR-001](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md)). Inertia props são o estado default. O resultado: zero impedance mismatch entre Laravel e React, navegação SSR-natural, e um modelo mental único — "props vêm do servidor, callbacks voltam pro servidor".
+Arqel **proíbe** TanStack Query, SWR ou outras fetch libs no Resource CRUD ([ADR-001](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md)). Inertia props são o estado default. O resultado: zero impedance mismatch entre Laravel e React, navegação SSR-natural, e um modelo mental único — "props vêm do servidor, callbacks voltam pro servidor".
 
 ### 3. Laravel-native
 
@@ -50,27 +50,27 @@ Policies, Gates, FormRequest, Eloquent — usados directamente. Arqel não tem `
 
 ## Pacotes
 
-### PHP (`composer require arqel/<pkg>`)
+### PHP (`composer require arqel-dev/<pkg>`)
 
 | Pacote | Responsabilidade |
 |---|---|
-| `arqel/core` | Resources, Panel, Inertia bridge, controller |
-| `arqel/fields` | 21 field types + ValidationBridge |
-| `arqel/table` | Table builder + Columns + Filters |
-| `arqel/form` | Form builder + Layout components + FormRequest gen |
-| `arqel/actions` | RowAction, BulkAction, ToolbarAction, HeaderAction |
-| `arqel/auth` | AbilityRegistry, EnsureUserCanAccessPanel, helpers |
-| `arqel/nav` | NavigationItem, NavigationGroup, BreadcrumbsBuilder |
+| `arqel-dev/core` | Resources, Panel, Inertia bridge, controller |
+| `arqel-dev/fields` | 21 field types + ValidationBridge |
+| `arqel-dev/table` | Table builder + Columns + Filters |
+| `arqel-dev/form` | Form builder + Layout components + FormRequest gen |
+| `arqel-dev/actions` | RowAction, BulkAction, ToolbarAction, HeaderAction |
+| `arqel-dev/auth` | AbilityRegistry, EnsureUserCanAccessPanel, helpers |
+| `arqel-dev/nav` | NavigationItem, NavigationGroup, BreadcrumbsBuilder |
 
-### JavaScript (`pnpm add @arqel/<pkg>`)
+### JavaScript (`pnpm add @arqel-dev/<pkg>`)
 
 | Pacote | Responsabilidade |
 |---|---|
-| `@arqel/types` | TypeScript types compartilhados (zero runtime) |
-| `@arqel/react` | `createArqelApp`, `<ArqelProvider>`, theme, contexts |
-| `@arqel/hooks` | `useResource`, `useArqelForm`, `useTable`, `useFlash`, `useCanAccess` |
-| `@arqel/ui` | AppShell, Sidebar, DataTable, FormRenderer, FlashContainer |
-| `@arqel/fields` | 21 rich inputs registrados via `FieldRegistry` |
+| `@arqel-dev/types` | TypeScript types compartilhados (zero runtime) |
+| `@arqel-dev/react` | `createArqelApp`, `<ArqelProvider>`, theme, contexts |
+| `@arqel-dev/hooks` | `useResource`, `useArqelForm`, `useTable`, `useFlash`, `useCanAccess` |
+| `@arqel-dev/ui` | AppShell, Sidebar, DataTable, FormRenderer, FlashContainer |
+| `@arqel-dev/fields` | 21 rich inputs registrados via `FieldRegistry` |
 
 ## Comparação com Filament e Nova
 
@@ -97,4 +97,4 @@ Arqel **não** vai entregar:
 - [Getting Started](/guide/getting-started) — setup em < 10 min
 - [Panels](/guide/panels) — multi-panel architecture
 - [Resources](/guide/resources) — declarar models
-- [Roadmap](https://github.com/arqel/arqel/blob/main/PLANNING/07-roadmap-fases.md) — 4 fases, 328 tickets
+- [Roadmap](https://github.com/arqel-dev/arqel/blob/main/PLANNING/07-roadmap-fases.md) — 4 fases, 328 tickets

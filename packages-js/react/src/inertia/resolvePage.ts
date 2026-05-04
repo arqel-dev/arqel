@@ -10,11 +10,11 @@ export type PageRegistry = Record<string, LazyPage>;
  * users see the typo at boot rather than a blank screen.
  *
  * Apps merge the built-in `arqel::*` page registry from
- * `@arqel/ui/pages` with their own glob output. Spread `arqelPages`
+ * `@arqel-dev/ui/pages` with their own glob output. Spread `arqelPages`
  * first so user pages can override per-resource (e.g. a custom
  * `Pages/Arqel/Posts/Index.tsx`):
  *
- *   import { arqelPages } from '@arqel/ui/pages';
+ *   import { arqelPages } from '@arqel-dev/ui/pages';
  *
  *   const userPages = import.meta.glob('./Pages/**\/*.tsx');
  *

@@ -1,10 +1,10 @@
-# SKILL.md — arqel/workflow
+# SKILL.md — arqel-dev/workflow
 
-> Contexto canônico para AI agents trabalhando no pacote `arqel/workflow`.
+> Contexto canônico para AI agents trabalhando no pacote `arqel-dev/workflow`.
 
 ## Purpose
 
-`arqel/workflow` entrega o sistema de **state machines** do Arqel: define os estados possíveis de um model Eloquent, suas metadatas de UI (label/color/icon), a lista de transições válidas entre eles, eventos de auditoria, autorização central e histórico append-only. Cobre RF-IN-06.
+`arqel-dev/workflow` entrega o sistema de **state machines** do Arqel: define os estados possíveis de um model Eloquent, suas metadatas de UI (label/color/icon), a lista de transições válidas entre eles, eventos de auditoria, autorização central e histórico append-only. Cobre RF-IN-06.
 
 A escolha é **integrar quando útil, sem amarrar**: a integração canônica é com [`spatie/laravel-model-states`](https://spatie.be/docs/laravel-model-states) (state classes + transition classes), mas o pacote é totalmente *duck-typed* — funciona também com PHP enums, slugs string ou tokens custom. `spatie/laravel-model-states` fica em `suggest:` no composer.json, nunca em `require`.
 
@@ -22,20 +22,20 @@ A escolha é **integrar quando útil, sem amarrar**: a integração canônica é
 
 **Histórico append-only (WF-007).** `Models\StateTransition` (final, `$timestamps = false`, `metadata` cast `array`, `created_at` cast `datetime`) persiste cada transição. Migration `2026_05_01_000000_create_arqel_state_transitions_table` cria `arqel_state_transitions` com `morphs('model')`, `from_state` (nullable), `to_state`, `transitioned_by_user_id` (indexed), `metadata` (JSON), `created_at` com `useCurrent()` (sem `updated_at` — append-only). `Listeners\PersistStateTransitionToHistory` (auto-registado pelo provider) escuta `StateTransitioned` e grava — skip silencioso quando `arqel-workflow.history.enabled === false`; captura `Throwable` para não bloquear a transição do domínio. `HasWorkflow::stateTransitions(): MorphMany` ordena por `created_at desc, id desc`. `StateTransition::user()` retorna `?BelongsTo` defensivo (lê `arqel-workflow.user_model`, default `App\\Models\\User`; `null` quando ausente). `Fields\StateTransitionField::resolveHistory()` lê o histórico real filtrado por `(model_type, model_id)` com limit configurável (`arqel-workflow.history.limit`, default 50) — best-effort com `Throwable` capturado.
 
-**Field React-bound (WF-005/006).** `Fields\StateTransitionField` (extends `Arqel\Fields\Field`) serializa `currentState: {name, label, color, icon}|null`, `transitions: list<{from, to, label, authorized}>` (delegando ao `TransitionAuthorizer`) e `history` (vinda de `StateTransition`). Métodos fluentes: `showDescription()`, `showHistory()`, `transitionsAttribute()`, `record()`. O componente React `arqel/workflow/StateTransition` (slice C29) consome estes props.
+**Field React-bound (WF-005/006).** `Fields\StateTransitionField` (extends `Arqel\Fields\Field`) serializa `currentState: {name, label, color, icon}|null`, `transitions: list<{from, to, label, authorized}>` (delegando ao `TransitionAuthorizer`) e `history` (vinda de `StateTransition`). Métodos fluentes: `showDescription()`, `showHistory()`, `transitionsAttribute()`, `record()`. O componente React `arqel-dev/workflow/StateTransition` (slice C29) consome estes props.
 
-**Filter standalone (WF-008).** `Filters\StateFilter` (final readonly) extrai automaticamente as options do `WorkflowDefinition` de um model com `HasWorkflow`. Construtor valida classe + trait (lança `InvalidArgumentException`). `make($field, $modelClass)`, `toArray(): {field, type: 'state', label, options}`, `optionsArray(): array<string, {value, label, color, icon}>`, `apply(Builder, mixed)` — string → `where`, array → `whereIn` (filtra valores não-string/vazios), `null`/empty → no-op. `Filters\StateFilterFactory::forResource($modelClass, ?$field)` resolve o field via `arqelWorkflow()->getField()` quando omitido. **Sem hard-dep em `arqel/table`** por design — o user-land pluga `StateFilter::toArray()` em `Table::filters([...])`.
+**Filter standalone (WF-008).** `Filters\StateFilter` (final readonly) extrai automaticamente as options do `WorkflowDefinition` de um model com `HasWorkflow`. Construtor valida classe + trait (lança `InvalidArgumentException`). `make($field, $modelClass)`, `toArray(): {field, type: 'state', label, options}`, `optionsArray(): array<string, {value, label, color, icon}>`, `apply(Builder, mixed)` — string → `where`, array → `whereIn` (filtra valores não-string/vazios), `null`/empty → no-op. `Filters\StateFilterFactory::forResource($modelClass, ?$field)` resolve o field via `arqelWorkflow()->getField()` quando omitido. **Sem hard-dep em `arqel-dev/table`** por design — o user-land pluga `StateFilter::toArray()` em `Table::filters([...])`.
 
 **Cobertura de testes (WF-009).** 67 testes Pest 3 (Orchestra Testbench + sqlite in-memory): `WorkflowDefinitionTest` (7), `HasWorkflowTest` (6), `StateTransitionedEventTest` (8), `StateTransitionHistoryTest` (7), `WorkflowServiceProviderTest` (2), `StateTransitionFieldTest` (~10), `TransitionAuthorizerTest` (10), `StateFilterTest` (12), e o novo `Unit/Coverage/CoverageGapsTest` (9 cobrindo edge-cases de `guessLabel`, ordem de `getTransitions`, replace vs merge em `states()`, `slugifyState` para wildcard/digits/bare strings, `apply()` com array misto, defaults em `optionsArray`, round-trip de cast `metadata`, MorphTo `model()`, e ordem em `resolveAvailableTransitions`). PHPStan level max clean.
 
 ### Real-time broadcasting (RT-cross)
 
-`arqel/workflow` permanece standalone — o pacote *não* depende de `arqel/realtime`. Porém, quando `arqel/realtime` está instalado na app, seu service provider registra automaticamente um listener default (`Arqel\Realtime\Workflow\BroadcastStateTransitionListener`) para o evento `Events\StateTransitioned`. Cada transição se torna um `Arqel\Realtime\Events\ResourceUpdated` broadcastado nos canais `arqel.{slug}` e `arqel.{slug}.{id}` do model em transição — sem código manual.
+`arqel-dev/workflow` permanece standalone — o pacote *não* depende de `arqel-dev/realtime`. Porém, quando `arqel-dev/realtime` está instalado na app, seu service provider registra automaticamente um listener default (`Arqel\Realtime\Workflow\BroadcastStateTransitionListener`) para o evento `Events\StateTransitioned`. Cada transição se torna um `Arqel\Realtime\Events\ResourceUpdated` broadcastado nos canais `arqel.{slug}` e `arqel.{slug}.{id}` do model em transição — sem código manual.
 
 Setup:
 
 ```bash
-composer require arqel/realtime
+composer require arqel-dev/realtime
 ```
 
 Depois disso, qualquer `transitionTo()` num model com `HasWorkflow` propaga via WebSocket para a UI do Resource. Para opt-out global (e.g. import em massa):
@@ -46,7 +46,7 @@ config()->set('arqel-realtime.workflow.broadcast_state_transitions', false);
 // ARQEL_REALTIME_WORKFLOW_BROADCAST=false
 ```
 
-A direção da dep é `realtime → workflow`: este pacote nunca importa nada de `arqel/realtime`. A wiring é por listener Laravel padrão, então user-land pode adicionar listeners adicionais (audit, notify) sem conflito.
+A direção da dep é `realtime → workflow`: este pacote nunca importa nada de `arqel-dev/realtime`. A wiring é por listener Laravel padrão, então user-land pode adicionar listeners adicionais (audit, notify) sem conflito.
 
 ### Entregue (WF-001 → WF-010)
 
@@ -82,7 +82,7 @@ A direção da dep é `realtime → workflow`: este pacote nunca importa nada de
 Três workflows reais, com diagrama Mermaid, model Eloquent, Resource, transitions, Gate/`authorizeFor`, `StateFilter` e listeners — em [`apps/docs/examples/workflows/`](../../apps/docs/examples/workflows/README.md):
 
 - [`order-states.md`](../../apps/docs/examples/workflows/order-states.md) — pedidos e-commerce: autorização por papel, webhook de transportadora, "any-to-Cancelled".
-- [`article-states.md`](../../apps/docs/examples/workflows/article-states.md) — CMS editorial: rejeição com feedback, autorização 100% via Gate, integração com `arqel/versioning`.
+- [`article-states.md`](../../apps/docs/examples/workflows/article-states.md) — CMS editorial: rejeição com feedback, autorização 100% via Gate, integração com `arqel-dev/versioning`.
 - [`subscription-states.md`](../../apps/docs/examples/workflows/subscription-states.md) — SaaS billing: webhooks Stripe, side-effects em cache/quotas, idempotência via `metadata->webhook_event_id`.
 
 ### Setup mínimo de workflow

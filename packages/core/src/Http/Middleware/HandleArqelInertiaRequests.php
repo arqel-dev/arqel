@@ -23,7 +23,7 @@ final class HandleArqelInertiaRequests extends Middleware
 {
     /**
      * The Blade root view. Defaults to `arqel::app` (the Inertia
-     * root template published by `arqel/core`) so apps don't need
+     * root template published by `arqel-dev/core`) so apps don't need
      * to publish their own. Override `arqel.inertia.root_view`
      * config to point at an app-owned view (e.g. `'app'` after
      * publishing the package's `app.blade.php` or a custom one).

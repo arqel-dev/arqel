@@ -1,4 +1,4 @@
-# SKILL.md — arqel/realtime (JS)
+# SKILL.md — arqel-dev/realtime (JS)
 
 ## Purpose
 
@@ -6,15 +6,15 @@ Bootstrap do pipeline realtime do Arqel. Expõe `setupEcho(config)` —
 helper que instancia o Laravel Echo apontando para o broadcaster
 **Reverb** e anexa Pusher no `window`. É a única peça que conhece os
 pacotes `laravel-echo` e `pusher-js`; consumidores (apps Inertia, hooks
-em `@arqel/hooks`) lidam apenas com o tipo `EchoLike`.
+em `@arqel-dev/hooks`) lidam apenas com o tipo `EchoLike`.
 
-O pacote **não** re-exporta hooks do `@arqel/hooks`. Mantemos separado
+O pacote **não** re-exporta hooks do `@arqel-dev/hooks`. Mantemos separado
 para code-splitting: quem só precisa de tipos não baixa Echo.
 
 ## Key Contracts
 
 ```ts
-import { setupEcho } from '@arqel/realtime';
+import { setupEcho } from '@arqel-dev/realtime';
 
 setupEcho({
   key: import.meta.env.VITE_REVERB_APP_KEY,
@@ -42,9 +42,9 @@ Tipos públicos exportados:
   com warning — não lança.
 - **Broadcaster fixo em `'reverb'`**: o helper foi desenhado para
   Reverb (que fala protocolo Pusher). Para usar Pusher hospedado direto,
-  consumidor pode instanciar Echo manualmente — `@arqel/realtime` é
+  consumidor pode instanciar Echo manualmente — `@arqel-dev/realtime` é
   intencionalmente opinionated.
-- **Sem hooks aqui**: hooks moram em `@arqel/hooks` para permitir que o
+- **Sem hooks aqui**: hooks moram em `@arqel-dev/hooks` para permitir que o
   bundle do app só importe `setupEcho` se quiser.
 - TypeScript strict, sem `any` (apenas asserts pontuais nos pontos onde
   o tipo do `laravel-echo` é overloaded e não casa com `EchoConfig`).
@@ -54,8 +54,8 @@ Tipos públicos exportados:
 
 ```tsx
 // resources/js/app.tsx
-import { createArqelApp } from '@arqel/react';
-import { setupEcho } from '@arqel/realtime';
+import { createArqelApp } from '@arqel-dev/react';
+import { setupEcho } from '@arqel-dev/realtime';
 
 setupEcho({
   key: import.meta.env.VITE_REVERB_APP_KEY,
@@ -71,7 +71,7 @@ createArqelApp();
 Consumir o `window.Echo` em um hook custom usando os tipos publicados:
 
 ```ts
-import type { EchoLike } from '@arqel/realtime';
+import type { EchoLike } from '@arqel-dev/realtime';
 
 function getEcho(): EchoLike | null {
   if (typeof window === 'undefined') return null;
@@ -86,7 +86,7 @@ function getEcho(): EchoLike | null {
 - Importar `laravel-echo` ou `pusher-js` diretamente em código de app —
   use o helper. Mantém upgrade path centralizado.
 - Re-exportar hooks aqui — quebra code-splitting; hooks ficam em
-  `@arqel/hooks`.
+  `@arqel-dev/hooks`.
 - Trocar o `broadcaster` para algo diferente de `'reverb'` neste helper —
   se precisar Pusher direto, instancie Echo manualmente.
 
@@ -110,7 +110,7 @@ quando o WebSocket cai:
 Exemplo típico no layout do panel:
 
 ```tsx
-import { ConnectionStatusBanner } from '@arqel/realtime';
+import { ConnectionStatusBanner } from '@arqel-dev/realtime';
 
 export function PanelLayout({ children }: { children: ReactNode }) {
   return (

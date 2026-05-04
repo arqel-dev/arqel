@@ -1,12 +1,12 @@
 {
-  "name": "@arqel/a11y",
-  "version": "0.8.0-rc.1",
+  "name": "@arqel-dev/a11y",
+  "version": "0.8.0",
   "description": "Accessibility helpers (focus trap, announcer, skip link) for Arqel admin panels.",
   "license": "MIT",
   "homepage": "https://arqel.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arqel/arqel.git",
+    "url": "https://github.com/arqel-dev/arqel.git",
     "directory": "packages-js/a11y"
   },
   "keywords": [

@@ -5,7 +5,7 @@
  * allowing toast-library integrations without leaking effects elsewhere.
  */
 
-import type { FlashPayload, SharedProps } from '@arqel/types/inertia';
+import type { FlashPayload, SharedProps } from '@arqel-dev/types/inertia';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 

@@ -54,7 +54,7 @@ Field::text('salary')
 `FieldSchemaSerializer` filtra o payload Inertia: fields que não passam em `canBeSeenBy` somem do JSON enviado ao client. `canBeEditedBy` flipa `readonly: true` — o input renderiza, mas é não-editável.
 
 ::: warning UX-only
-Field-level auth é **UX-only** ([ADR-017](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md)). O servidor sempre re-valida via `validated()` no controller. Se você precisa de hard auth, use Resource Policy `update()` com check fine-grained.
+Field-level auth é **UX-only** ([ADR-017](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md)). O servidor sempre re-valida via `validated()` no controller. Se você precisa de hard auth, use Resource Policy `update()` com check fine-grained.
 :::
 
 ## Action-level auth
@@ -89,7 +89,7 @@ Globals são resolvidas via `Gate::forUser($user)->allows($ability)`. Computed v
 No client:
 
 ```tsx
-import { useCanAccess } from '@arqel/hooks';
+import { useCanAccess } from '@arqel-dev/hooks';
 
 function ExportButton() {
   const canExport = useCanAccess('exportData');
@@ -117,7 +117,7 @@ Lookup order: `AbilityRegistry` snapshot (quando bound) primeiro, fallback para 
 Wrapper React idiomático:
 
 ```tsx
-import { CanAccess } from '@arqel/ui';
+import { CanAccess } from '@arqel-dev/ui';
 
 <CanAccess ability="manageBilling" fallback={<p>Nope.</p>}>
   <BillingSettings />
@@ -133,5 +133,5 @@ import { CanAccess } from '@arqel/ui';
 ## Próximos passos
 
 - [Resources](/guide/resources) — declarar models como CRUDs
-- API reference: [`packages/auth/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/auth/SKILL.md)
-- ADR: [ADR-017 Authorization is UX-only on the client](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md)
+- API reference: [`packages/auth/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/auth/SKILL.md)
+- ADR: [ADR-017 Authorization is UX-only on the client](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md)

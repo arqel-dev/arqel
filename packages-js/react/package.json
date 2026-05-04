@@ -1,12 +1,12 @@
 {
-  "name": "@arqel/react",
-  "version": "0.8.0-rc.1",
+  "name": "@arqel-dev/react",
+  "version": "0.8.0",
   "description": "React + Inertia bindings, providers, and utilities for Arqel.",
   "license": "MIT",
   "homepage": "https://arqel.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arqel/arqel.git",
+    "url": "https://github.com/arqel-dev/arqel.git",
     "directory": "packages-js/react"
   },
   "keywords": [
@@ -58,7 +58,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@arqel/types": "workspace:*"
+    "@arqel-dev/types": "workspace:*"
   },
   "peerDependencies": {
     "@inertiajs/react": "^2.0.0",

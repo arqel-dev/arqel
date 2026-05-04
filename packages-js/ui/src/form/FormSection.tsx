@@ -5,7 +5,7 @@
  * right) ships behind the `aside` prop so wide forms can read like docs.
  */
 
-import type { SectionProps } from '@arqel/types/forms';
+import type { SectionProps } from '@arqel-dev/types/forms';
 import { type ReactNode, useState } from 'react';
 import { cn } from '../utils/cn.js';
 

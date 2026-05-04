@@ -10,7 +10,7 @@ use Closure;
  * Chart widget — wraps a Recharts visualisation in the dashboard.
  *
  * The PHP side only serialises chart configuration + data; the
- * actual rendering happens client-side in `@arqel/ui` via Recharts.
+ * actual rendering happens client-side in `@arqel-dev/ui` via Recharts.
  *
  * Expected `chartData` shape:
  *   [

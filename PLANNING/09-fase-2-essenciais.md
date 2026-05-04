@@ -51,7 +51,7 @@
 
 ## 2. Multi-tenancy (TENANT)
 
-### [TENANT-001] Esqueleto do pacote `arqel/tenant`
+### [TENANT-001] Esqueleto do pacote `arqel-dev/tenant`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [CORE-008] (Fase 1)
 
@@ -63,7 +63,7 @@ Multi-tenancy é feature crítica para SaaS B2B. Cobre RF-MT-01 a RF-MT-11. Abor
 
 Estrutura `packages/tenant/`:
 
-- `composer.json` (dep: `arqel/core`)
+- `composer.json` (dep: `arqel-dev/core`)
 - `src/TenantManager.php` (singleton)
 - `src/TenantResolver.php` (interface + base implementations)
 - `src/Concerns/BelongsToTenant.php` (Eloquent trait)
@@ -77,7 +77,7 @@ Estrutura `packages/tenant/`:
 
 **Critérios de aceite**
 
-- [ ] `composer require arqel/tenant` (path) resolve sem erros
+- [ ] `composer require arqel-dev/tenant` (path) resolve sem erros
 - [ ] ServiceProvider discovered
 - [ ] SKILL.md esqueleto com estrutura canônica
 - [ ] Tests diretório estruturado
@@ -837,7 +837,7 @@ Server-side:
   ],
   ```
 
-Client-side em `@arqel/react`:
+Client-side em `@arqel-dev/react`:
 
 - `ArqelProvider` aplica CSS vars via `<style>` tag ou `document.documentElement.style.setProperty()`:
   ```typescript
@@ -961,11 +961,11 @@ Cobre RF-W-01 a RF-W-06. Dashboard é feature prime-time — primeiro contato fr
 
 **Descrição técnica**
 
-Widgets vivem dentro de `arqel/core` (sub-diretório `Widgets/`) ou como pacote separado `arqel/widgets`. **Decisão:** separar em `arqel/widgets` para isolamento e versioning.
+Widgets vivem dentro de `arqel-dev/core` (sub-diretório `Widgets/`) ou como pacote separado `arqel-dev/widgets`. **Decisão:** separar em `arqel-dev/widgets` para isolamento e versioning.
 
 Estrutura `packages/widgets/`:
 
-- `composer.json` (dep: `arqel/core`)
+- `composer.json` (dep: `arqel-dev/core`)
 - `src/Widget.php` (abstract base)
 - `src/StatWidget.php`
 - `src/ChartWidget.php`
@@ -1217,7 +1217,7 @@ Expected chart data shape:
 ]
 ```
 
-React side em `@arqel/ui/widgets/ChartWidget.tsx`: polymorphic renderer baseado em `chartType` usando Recharts LineChart, BarChart, AreaChart, PieChart.
+React side em `@arqel-dev/ui/widgets/ChartWidget.tsx`: polymorphic renderer baseado em `chartType` usando Recharts LineChart, BarChart, AreaChart, PieChart.
 
 **Critérios de aceite**
 
@@ -1380,7 +1380,7 @@ User registra componente React correspondente em registry (similar a custom Fiel
 
 ```typescript
 // resources/js/app.tsx
-import { registerWidget } from '@arqel/widgets'
+import { registerWidget } from '@arqel-dev/widgets'
 import { OnboardingProgressWidget } from './widgets/OnboardingProgressWidget'
 
 registerWidget('OnboardingProgressWidget', OnboardingProgressWidget)
@@ -1667,14 +1667,14 @@ Renderização React de cada widget type.
 
 **Descrição técnica**
 
-Em `@arqel/ui/widgets/`:
+Em `@arqel-dev/ui/widgets/`:
 
 - `StatCard.tsx`: número grande + description + icon + optional sparkline
 - `ChartCard.tsx`: wrapper que renderiza LineChart, BarChart, AreaChart, PieChart, DonutChart via Recharts polymorphic
 - `TableCard.tsx`: mini DataTable com columns + "See all" link
 - `WidgetWrapper.tsx`: common chrome (heading, description, loading state, error boundary)
 
-`@arqel/widgets` npm package (separate from PHP arqel/widgets):
+`@arqel-dev/widgets` npm package (separate from PHP arqel-dev/widgets):
 
 - Registry de custom widgets
 - `registerWidget(name, component)`
@@ -1704,7 +1704,7 @@ Em `@arqel/ui/widgets/`:
 
 **Descrição técnica**
 
-`@arqel/ui/dashboard/DashboardGrid.tsx`:
+`@arqel-dev/ui/dashboard/DashboardGrid.tsx`:
 
 ```tsx
 import { ResponsiveGrid } from './ResponsiveGrid'
@@ -1754,7 +1754,7 @@ Cobre RF-W-08. Schedule/calendar widget é comum em admin panels mas pesado.
 
 **Descrição técnica**
 
-- `@arqel/widgets/schedule` subpackage (opt-in via npm install)
+- `@arqel-dev/widgets/schedule` subpackage (opt-in via npm install)
 - Wrapper Base UI ou FullCalendar React binding
 - ScheduleWidget PHP class que serializa eventos (start, end, title, color)
 - Interactions: click event, click date, drag-drop events
@@ -1833,7 +1833,7 @@ SKILL.md com exemplos dos 4 widget types, dashboard composition, filters, pollin
 
 ## 4. Advanced fields (FIELDS-ADV)
 
-### [FIELDS-ADV-001] Setup do sub-pacote `arqel/fields-advanced`
+### [FIELDS-ADV-001] Setup do sub-pacote `arqel-dev/fields-advanced`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [FIELDS-001] (Fase 1)
 
@@ -1845,7 +1845,7 @@ Cobre RF-F-10. 8 field types avançados separados em pacote opt-in para evitar b
 
 Estrutura `packages/fields-advanced/`:
 
-- `composer.json` (deps: `arqel/fields`)
+- `composer.json` (deps: `arqel-dev/fields`)
 - `src/Types/RichTextField.php`
 - `src/Types/MarkdownField.php`
 - `src/Types/CodeField.php`
@@ -1857,7 +1857,7 @@ Estrutura `packages/fields-advanced/`:
 - Register macros em `FieldsAdvancedServiceProvider`
 - SKILL.md, tests/
 
-npm equivalent: `@arqel/fields-advanced` com os React components correspondentes.
+npm equivalent: `@arqel-dev/fields-advanced` com os React components correspondentes.
 
 **Critérios de aceite**
 
@@ -1924,7 +1924,7 @@ Validação:
 - Output sanitizado server-side via HTML Purifier ou similar (RNF-S-06)
 - Max content size check
 
-React side em `@arqel/fields-advanced/RichTextInput.tsx`:
+React side em `@arqel-dev/fields-advanced/RichTextInput.tsx`:
 
 - Tiptap v2+ editor
 - Toolbar dinâmica baseada em field config
@@ -2407,7 +2407,7 @@ Componente React correspondente ao `RichTextField` PHP. Editor WYSIWYG feature-r
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/rich-text/RichTextInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/rich-text/RichTextInput.tsx`:
 
 ```tsx
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -2416,7 +2416,7 @@ import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Toolbar } from './Toolbar'
-import type { FieldComponentProps } from '@arqel/types'
+import type { FieldComponentProps } from '@arqel-dev/types'
 
 interface RichTextProps extends FieldComponentProps<string> {
     field: FieldSchema & {
@@ -2488,7 +2488,7 @@ Componente React correspondente ao `MarkdownField` PHP. Editor side-by-side com 
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/markdown/MarkdownInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/markdown/MarkdownInput.tsx`:
 
 ```tsx
 import { useState, useMemo } from 'react'
@@ -2582,7 +2582,7 @@ Componente React correspondente ao `CodeField` PHP. Editor de código com syntax
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/code/CodeInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/code/CodeInput.tsx`:
 
 ```tsx
 import CodeMirror, { Extension } from '@uiw/react-codemirror'
@@ -2673,13 +2673,13 @@ Componente React correspondente ao `RepeaterField` PHP. Lista drag-drop de sub-f
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/repeater/RepeaterInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/repeater/RepeaterInput.tsx`:
 
 ```tsx
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { FormRenderer } from '@arqel/ui'
+import { FormRenderer } from '@arqel-dev/ui'
 import { RepeaterItem } from './RepeaterItem'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -2785,7 +2785,7 @@ Componente React correspondente ao `BuilderField` PHP. Similar a RepeaterInput m
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/builder/BuilderInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/builder/BuilderInput.tsx`:
 
 ```tsx
 import { useState } from 'react'
@@ -2881,7 +2881,7 @@ Componente React correspondente ao `KeyValueField` PHP. Table-like editor com 2 
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/key-value/KeyValueInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/key-value/KeyValueInput.tsx`:
 
 ```tsx
 import { useState } from 'react'
@@ -2978,7 +2978,7 @@ Componente React correspondente ao `TagsField` PHP. Combobox com chips para cada
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/tags/TagsInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/tags/TagsInput.tsx`:
 
 ```tsx
 import { useState, useRef, KeyboardEvent } from 'react'
@@ -3085,11 +3085,11 @@ Componente React para Wizard layout. Multi-step com state preservation via React
 
 **Descrição técnica**
 
-Criar `@arqel/fields-advanced/src/wizard/WizardInput.tsx`:
+Criar `@arqel-dev/fields-advanced/src/wizard/WizardInput.tsx`:
 
 ```tsx
 import { useState, Activity } from 'react'
-import { FormRenderer } from '@arqel/ui'
+import { FormRenderer } from '@arqel-dev/ui'
 import { WizardProgress } from './WizardProgress'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
@@ -3215,7 +3215,7 @@ export function WizardInput({ wizard, data, errors, onChange, onSubmit }: Wizard
 
 ---
 
-### [FIELDS-ADV-018] Registry + boot em `@arqel/fields-advanced`
+### [FIELDS-ADV-018] Registry + boot em `@arqel-dev/fields-advanced`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** react • **Depende de:** [FIELDS-ADV-017]
 
@@ -3224,8 +3224,8 @@ export function WizardInput({ wizard, data, errors, onChange, onSubmit }: Wizard
 Registro lazy:
 
 ```typescript
-// @arqel/fields-advanced/index.ts
-import { registerField } from '@arqel/fields'
+// @arqel-dev/fields-advanced/index.ts
+import { registerField } from '@arqel-dev/fields'
 
 registerField('RichTextInput', () => import('./RichTextInput').then(m => m.RichTextInput))
 registerField('MarkdownInput', () => import('./MarkdownInput').then(m => m.MarkdownInput))
@@ -3284,7 +3284,7 @@ SKILL.md + `docs/guide/advanced-fields.md` com:
 
 ## 5. MCP server (MCP)
 
-### [MCP-001] Esqueleto do pacote `arqel/mcp`
+### [MCP-001] Esqueleto do pacote `arqel-dev/mcp`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [CORE-008] (Fase 1)
 
@@ -3296,7 +3296,7 @@ Cobre RF-DX-07 e ADR-013. MCP (Model Context Protocol) é standard 2025+ para ex
 
 Estrutura `packages/mcp/`:
 
-- `composer.json` (deps: `arqel/core`, um MCP PHP SDK — verificar disponibilidade)
+- `composer.json` (deps: `arqel-dev/core`, um MCP PHP SDK — verificar disponibilidade)
 - `src/McpServer.php` (main)
 - `src/Tools/` (individual MCP tools)
 - `src/Resources/` (MCP "resources" — different from Arqel Resources)
@@ -3833,7 +3833,7 @@ Cobre RF-T-08. Tables com 10k+ linhas matam o browser sem virtualização. TanSt
 
 **Descrição técnica**
 
-Adicionar dependência `@tanstack/react-virtual` ao `@arqel/ui`.
+Adicionar dependência `@tanstack/react-virtual` ao `@arqel-dev/ui`.
 
 Em `DataTable.tsx` implementar modo virtual:
 
@@ -4388,7 +4388,7 @@ Update `packages/table/SKILL.md` com nova features. Novas páginas em docs site:
 
 ## 7. Export e import (EXPORT)
 
-### [EXPORT-001] Esqueleto do pacote `arqel/export`
+### [EXPORT-001] Esqueleto do pacote `arqel-dev/export`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [ACTIONS-002] (Fase 1)
 
@@ -4400,7 +4400,7 @@ Cobre RF-T-14. Export para CSV, XLSX, PDF. Standard em admin panels.
 
 Estrutura `packages/export/`:
 
-- `composer.json` (deps: `arqel/core`, `arqel/actions`, suggest: spatie/simple-excel, dompdf/dompdf)
+- `composer.json` (deps: `arqel-dev/core`, `arqel-dev/actions`, suggest: spatie/simple-excel, dompdf/dompdf)
 - `src/ExportFormat.php` (interface/enum: CSV, XLSX, PDF)
 - `src/Exporters/CsvExporter.php`
 - `src/Exporters/XlsxExporter.php`
@@ -4898,7 +4898,7 @@ Order by score desc. Limit 10 results.
 
 **Descrição técnica**
 
-`@arqel/ui/palette/CommandPalette.tsx`:
+`@arqel-dev/ui/palette/CommandPalette.tsx`:
 
 - Cmd+K (Ctrl+K) trigger
 - Modal dialog com search input
@@ -4997,7 +4997,7 @@ final class ClearCacheCommand extends Command
 
 ## 9. Audit log (AUDIT)
 
-### [AUDIT-001] Pacote `arqel/audit` wraps spatie/laravel-activitylog
+### [AUDIT-001] Pacote `arqel-dev/audit` wraps spatie/laravel-activitylog
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** M • **Camada:** php • **Depende de:** [CORE-008] (Fase 1)
 

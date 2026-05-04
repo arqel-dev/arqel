@@ -12,8 +12,8 @@ use Throwable;
 /**
  * Mini-table widget rendered inside a dashboard.
  *
- * Intentionally avoids importing `arqel/table` so the dep graph
- * stays minimal (`arqel/widgets` → `arqel/core` only). Columns are
+ * Intentionally avoids importing `arqel-dev/table` so the dep graph
+ * stays minimal (`arqel-dev/widgets` → `arqel-dev/core` only). Columns are
  * duck-typed: anything exposing `toArray()` gets serialised, others
  * are dropped silently.
  *

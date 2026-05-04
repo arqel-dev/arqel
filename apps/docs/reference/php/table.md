@@ -1,4 +1,4 @@
-# `arqel/table` — API Reference
+# `arqel-dev/table` — API Reference
 
 Namespace `Arqel\Table\`. Builder fluente, 9 column types, 6 filter types, query builder.
 
@@ -67,6 +67,6 @@ Sort whitelisted contra columns sortable. `per_page` validado contra `perPageOpt
 
 ## Related
 
-- SKILL: [`packages/table/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/table/SKILL.md)
+- SKILL: [`packages/table/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/table/SKILL.md)
 - Conceitos: [`/guide/tables-forms`](/guide/tables-forms)
-- Próximo: [`arqel/form`](/reference/php/form)
+- Próximo: [`arqel-dev/form`](/reference/php/form)

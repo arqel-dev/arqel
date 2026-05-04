@@ -7,7 +7,7 @@
  * can plug in any dropdown impl (Base UI Menu, ShadCN-generated, etc.).
  */
 
-import { useTheme } from '@arqel/react/providers';
+import { useTheme } from '@arqel-dev/react/providers';
 import type { ReactNode } from 'react';
 import { Button } from '../action/Button.js';
 import { cn } from '../utils/cn.js';

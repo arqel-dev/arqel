@@ -3,10 +3,10 @@
  *
  * The schema/props plumbing is exercised by composing a synthetic
  * `FieldSchema` shape per test rather than relying on the (yet to be
- * shipped) `KeyValueFieldSchema` discriminant from `@arqel/types`.
+ * shipped) `KeyValueFieldSchema` discriminant from `@arqel-dev/types`.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -38,7 +38,7 @@ function buildField(overrides: KvProps = {}): FieldSchema {
   };
 
   // Cast through `unknown` because `keyValue` is not yet a declared
-  // discriminant in `@arqel/types` — the component itself is type-safe
+  // discriminant in `@arqel-dev/types` — the component itself is type-safe
   // via its defensive `readProps()` narrowing.
   return {
     type: 'keyValue',

@@ -23,7 +23,7 @@ use ReflectionMethod;
  * Field/Action serialisation is intentionally lightweight here:
  * each Field is serialised by calling `toArray()` if available,
  * otherwise we emit `{name, type}` as a fallback. The richer
- * serialiser lives in `arqel/fields`'s `FieldSchemaSerializer`
+ * serialiser lives in `arqel-dev/fields`'s `FieldSchemaSerializer`
  * (CORE-010), which this builder defers to once it lands.
  */
 final class InertiaDataBuilder
@@ -141,10 +141,10 @@ final class InertiaDataBuilder
     /**
      * Build the rich Inertia payload when the Resource declares a
      * Table. Delegates pagination to `TableQueryBuilder` (provided
-     * by `arqel/table`) and serialises columns/filters/actions.
+     * by `arqel-dev/table`) and serialises columns/filters/actions.
      *
-     * Both `arqel/table` and `arqel/actions` are duck-typed — this
-     * file lives in `arqel/core` and cannot import them as hard
+     * Both `arqel-dev/table` and `arqel-dev/actions` are duck-typed — this
+     * file lives in `arqel-dev/core` and cannot import them as hard
      * deps.
      *
      * @return array<string, mixed>
@@ -272,7 +272,7 @@ final class InertiaDataBuilder
      * Section/Tabs/etc.) goes through `Form::toArray()` and the
      * field list is sourced from `Form::getFields()` (flatten).
      *
-     * Duck-typed against `arqel/form` so `arqel/core` does not need
+     * Duck-typed against `arqel-dev/form` so `arqel-dev/core` does not need
      * a hard dep.
      *
      * @return array{0: array<int, mixed>, 1: ?array<string, mixed>}
@@ -350,7 +350,7 @@ final class InertiaDataBuilder
     /**
      * Detect whether `$candidate` looks like an `Arqel\Table\Table`
      * (or a structurally-compatible builder). Duck-typed because
-     * `arqel/core` does not depend on `arqel/table`.
+     * `arqel-dev/core` does not depend on `arqel-dev/table`.
      */
     private function isTableObject(object $candidate): bool
     {
@@ -495,8 +495,8 @@ final class InertiaDataBuilder
 
     /**
      * Returns the names of row actions that are visible AND executable
-     * for `$record` by `$user`. Duck-typed against `arqel/actions` so
-     * `arqel/core` keeps no hard dep on it.
+     * for `$record` by `$user`. Duck-typed against `arqel-dev/actions` so
+     * `arqel-dev/core` keeps no hard dep on it.
      *
      * @param array<int, mixed> $actions
      *

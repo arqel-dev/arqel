@@ -31,7 +31,7 @@ use LogicException;
  *     ],
  *     ```
  *
- * The adapter does **not** import Spatie's classes — `arqel/tenant`
+ * The adapter does **not** import Spatie's classes — `arqel-dev/tenant`
  * has no hard dep on the package. We call the static `::current()`
  * via the model class-string passed at construction time, falling
  * back to the canonical Spatie model when the consumer leaves it
@@ -71,7 +71,7 @@ final class SpatieAdapter implements TenantResolver
     /**
      * Returns the tenant model class to query. Honours the
      * developer's `modelClass` first (matches the convention used
-     * by every other resolver in `arqel/tenant`), falling back to
+     * by every other resolver in `arqel-dev/tenant`), falling back to
      * Spatie's canonical model when the caller passed an empty
      * string.
      *

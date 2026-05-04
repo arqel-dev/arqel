@@ -5,9 +5,9 @@
  * Crop / aspect-ratio editor lands in Phase 2 with `react-image-crop`.
  */
 
-import type { ImageFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
-import { cn } from '@arqel/ui/utils';
+import type { ImageFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
+import { cn } from '@arqel-dev/ui/utils';
 import { useEffect, useState } from 'react';
 
 export function ImageInput({

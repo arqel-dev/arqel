@@ -3,14 +3,14 @@
  *
  * Resolution order:
  *   1. Component registered via `registerField(field.component)` (rich
- *      inputs from `@arqel/fields`)
+ *      inputs from `@arqel-dev/fields`)
  *   2. Native fallback dispatched by `field.type` (text/number/boolean/...)
  *
  * Errors come from `errors[name]` (Inertia or client). The component
  * also honours `disabled` / `readonly` / `required` from the schema.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { type ChangeEvent, type ReactNode, useId } from 'react';
 import { cn } from '../utils/cn.js';
 import { getFieldComponent } from './FieldRegistry.js';

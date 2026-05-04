@@ -8,8 +8,8 @@
  * supply a custom `trigger` slot.
  */
 
-import type { ActionSchema } from '@arqel/types/actions';
-import type { FieldSchema } from '@arqel/types/fields';
+import type { ActionSchema } from '@arqel-dev/types/actions';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { Menu } from '@base-ui-components/react/menu';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn.js';

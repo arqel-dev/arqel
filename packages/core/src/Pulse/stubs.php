@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * Pulse/Livewire stub bridge (LCLOUD-003).
  *
- * `arqel/core` does NOT hard-depend on `laravel/pulse` nor on
+ * `arqel-dev/core` does NOT hard-depend on `laravel/pulse` nor on
  * `livewire/livewire`. The Pulse cards under
  * `Arqel\Core\Pulse\Cards\*` extend `Laravel\Pulse\Livewire\Card`
  * (which itself extends `Livewire\Component`). When neither package

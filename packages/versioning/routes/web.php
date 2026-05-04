@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Routes do pacote `arqel/versioning`
+| Routes do pacote `arqel-dev/versioning`
 |--------------------------------------------------------------------------
 |
 | Endpoints HTTP expostos pelo pacote. Carregados automaticamente pelo

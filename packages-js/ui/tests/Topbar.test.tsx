@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@arqel/react/providers';
+import { ThemeProvider } from '@arqel-dev/react/providers';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';

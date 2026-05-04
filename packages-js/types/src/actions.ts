@@ -1,5 +1,5 @@
 /**
- * Action schema mirroring `arqel/actions` PHP serialisation.
+ * Action schema mirroring `arqel-dev/actions` PHP serialisation.
  *
  * The shape is the output of `Action::toArray()` after PHP's
  * `array_filter(... !== null)` — so optional fields are simply
@@ -39,7 +39,7 @@ export interface ConfirmationConfig {
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 /**
- * Field schema entry used by Action form modals (see `arqel/actions`
+ * Field schema entry used by Action form modals (see `arqel-dev/actions`
  * `HasForm`). Action form fields are intentionally a flat list —
  * layout components live in regular `Form` schemas.
  */

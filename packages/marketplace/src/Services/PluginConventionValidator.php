@@ -180,7 +180,7 @@ final readonly class PluginConventionValidator
     /**
      * Valida um array decodificado a partir de `package.json` quando o plugin
      * tem peer npm. Aceita seja um campo `arqel.plugin-type` no root, seja
-     * a presença de `@arqel/types` em `peerDependencies`.
+     * a presença de `@arqel-dev/types` em `peerDependencies`.
      *
      * @param array<string, mixed> $packageData
      */
@@ -192,7 +192,7 @@ final readonly class PluginConventionValidator
         $pluginType = is_array($arqel) ? ($arqel['plugin-type'] ?? null) : null;
 
         $peers = $packageData['peerDependencies'] ?? [];
-        $hasArqelPeer = is_array($peers) && array_key_exists('@arqel/types', $peers);
+        $hasArqelPeer = is_array($peers) && array_key_exists('@arqel-dev/types', $peers);
 
         if (is_string($pluginType) && in_array($pluginType, self::ALLOWED_PLUGIN_TYPES, true)) {
             $checks[] = [
@@ -204,14 +204,14 @@ final readonly class PluginConventionValidator
             $checks[] = [
                 'name' => 'npm_plugin_type',
                 'status' => 'ok',
-                'message' => 'package.json peerDependencies include "@arqel/types".',
+                'message' => 'package.json peerDependencies include "@arqel-dev/types".',
             ];
         } else {
             $allowed = implode(', ', self::ALLOWED_PLUGIN_TYPES);
             $checks[] = [
                 'name' => 'npm_plugin_type',
                 'status' => 'fail',
-                'message' => "package.json must define arqel.plugin-type (one of: {$allowed}) or peerDependency \"@arqel/types\".",
+                'message' => "package.json must define arqel.plugin-type (one of: {$allowed}) or peerDependency \"@arqel-dev/types\".",
             ];
         }
 

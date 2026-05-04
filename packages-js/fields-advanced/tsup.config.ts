@@ -23,8 +23,8 @@ export default defineConfig({
   external: [
     'react',
     'react-dom',
-    '@arqel/ui',
-    '@arqel/types',
+    '@arqel-dev/ui',
+    '@arqel-dev/types',
     '@inertiajs/react',
     '@tiptap/react',
     '@tiptap/starter-kit',

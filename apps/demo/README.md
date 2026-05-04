@@ -91,13 +91,13 @@ O seeder cria:
 php artisan serve   # http://127.0.0.1:8000
 
 # Em terminal #2
-pnpm --filter @arqel/demo-app dev
+pnpm --filter @arqel-dev/demo-app dev
 ```
 
 Acesse:
 
 - `http://127.0.0.1:8000/admin` — dashboard.
-- `http://127.0.0.1:8000/admin/login` — login (provedor `arqel/auth`).
+- `http://127.0.0.1:8000/admin/login` — login (provedor `arqel-dev/auth`).
 - `http://127.0.0.1:8000/admin/posts` — listagem com Table + Filters.
 - `http://127.0.0.1:8000/admin/posts/create` — formulário com fields demonstrativos.
 - `http://127.0.0.1:8000/admin/tags` — listagem com aiSelect classifier.
@@ -114,7 +114,7 @@ O `PostResource` demonstra cinco tipos de field representativos:
 |---|---|---|
 | `title` | `text` | Validação obrigatória + slug source |
 | `slug` | `slug` | Auto-slug a partir de `title` |
-| `summary` | `aiText` | Geração via `arqel/ai` (prompt configurado) |
+| `summary` | `aiText` | Geração via `arqel-dev/ai` (prompt configurado) |
 | `body` | `richText` | Editor TipTap-style |
 | `state` | `stateTransition` | Workflow visual com botões de transição |
 | `published_at` | `dateTime` | Date + time picker com timezone awareness |
@@ -146,12 +146,12 @@ valida transições inválidas (HTTP 422 quando o destino não está em
 ### Versioning
 
 `Post` usa o trait `Versionable`. Cada save() incrementa `versionCount` (no
-demo) — em produção o pacote `arqel/versioning` persiste snapshots completos
+demo) — em produção o pacote `arqel-dev/versioning` persiste snapshots completos
 em `arqel_versions` e expõe UI de "Histórico" + restore.
 
 ### Audit log
 
-Plugins `arqel/audit` registram todas as ações user-driven (create, update,
+Plugins `arqel-dev/audit` registram todas as ações user-driven (create, update,
 delete, transition). UI acessível em `/admin/audit-log` quando o pacote
 estiver registrado no painel.
 
@@ -201,20 +201,20 @@ O `composer.json` declara path repositories para:
 
 | Pacote | Função no demo |
 |---|---|
-| `arqel/core` | `Panel`, `Resource`, registry, command palette |
-| `arqel/fields` | `Field::text()`, `slug()`, `dateTime()`, `belongsTo()`, `richText()` |
-| `arqel/auth` | Login, registration, email verification, password reset |
-| `arqel/table` | Listagem de Posts/Tags com filters + sort |
-| `arqel/form` | Form runtime (validação client+server, dirty state, autosave) |
-| `arqel/actions` | Bulk actions (publish, archive) e row actions |
-| `arqel/nav` | Sidebar, breadcrumbs, command palette |
-| `arqel/ai` | `aiText`, `aiSelect`, providers (OpenAI/Anthropic) |
-| `arqel/workflow` | `HasWorkflow` trait + `stateTransition` field |
-| `arqel/versioning` | `Versionable` trait + version history UI |
-| `arqel/audit` | Audit log automático para todas as ações |
+| `arqel-dev/core` | `Panel`, `Resource`, registry, command palette |
+| `arqel-dev/fields` | `Field::text()`, `slug()`, `dateTime()`, `belongsTo()`, `richText()` |
+| `arqel-dev/auth` | Login, registration, email verification, password reset |
+| `arqel-dev/table` | Listagem de Posts/Tags com filters + sort |
+| `arqel-dev/form` | Form runtime (validação client+server, dirty state, autosave) |
+| `arqel-dev/actions` | Bulk actions (publish, archive) e row actions |
+| `arqel-dev/nav` | Sidebar, breadcrumbs, command palette |
+| `arqel-dev/ai` | `aiText`, `aiSelect`, providers (OpenAI/Anthropic) |
+| `arqel-dev/workflow` | `HasWorkflow` trait + `stateTransition` field |
+| `arqel-dev/versioning` | `Versionable` trait + version history UI |
+| `arqel-dev/audit` | Audit log automático para todas as ações |
 
-`package.json` complementa com pacotes JS `@arqel/react`, `@arqel/ui`,
-`@arqel/auth`, `@arqel/workflow`, `@arqel/versioning`, `@arqel/ai`.
+`package.json` complementa com pacotes JS `@arqel-dev/react`, `@arqel-dev/ui`,
+`@arqel-dev/auth`, `@arqel-dev/workflow`, `@arqel-dev/versioning`, `@arqel-dev/ai`.
 
 ---
 
@@ -237,7 +237,7 @@ Suítes:
 ### JavaScript (Vitest)
 
 ```bash
-pnpm --filter @arqel/demo-app test
+pnpm --filter @arqel-dev/demo-app test
 ```
 
 Suítes:
@@ -250,7 +250,7 @@ Suítes:
 
 ```bash
 vendor/bin/pint --test
-pnpm --filter @arqel/demo-app typecheck
+pnpm --filter @arqel-dev/demo-app typecheck
 ```
 
 ---
@@ -258,7 +258,7 @@ pnpm --filter @arqel/demo-app typecheck
 ## Screenshots
 
 > **Placeholder** — capturas serão adicionadas em `docs/screenshots/demo/`
-> conforme as UIs `arqel/auth` e `arqel/table` finalizem suas APIs.
+> conforme as UIs `arqel-dev/auth` e `arqel-dev/table` finalizem suas APIs.
 
 - `demo-dashboard.png`
 - `demo-posts-list.png`
@@ -272,7 +272,7 @@ pnpm --filter @arqel/demo-app typecheck
 ## FAQ
 
 **Posso fazer fork e usar de boilerplate?**
-Sim — licença MIT. Rode `composer create-project arqel/demo-app meu-blog`
+Sim — licença MIT. Rode `composer create-project arqel-dev/demo-app meu-blog`
 quando o pacote for publicado, ou clone o monorepo e copie `apps/demo/` para
 um novo repositório.
 
@@ -283,7 +283,7 @@ Para que o setup seja zero-config. Para Postgres/MySQL, edite `.env` e rode
 **O AI funciona sem chave?**
 Sim — os endpoints retornam stubs determinísticos. Para usar provider real,
 configure `OPENAI_API_KEY` ou `ANTHROPIC_API_KEY` em `.env` e ajuste
-`config/arqel-ai.php` (gerado pelo `arqel/ai` package).
+`config/arqel-ai.php` (gerado pelo `arqel-dev/ai` package).
 
 **Como adiciono mais Resources?**
 Crie classe em `app/Arqel/Resources/` e adicione ao array em

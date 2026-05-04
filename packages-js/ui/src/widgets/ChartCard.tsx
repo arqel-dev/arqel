@@ -5,7 +5,7 @@ import { WidgetWrapper } from './WidgetWrapper';
 /**
  * Lazy-loaded chart sub-components. Each `import()` becomes a separate chunk
  * in the build output so the ~60KB Recharts payload (and its sibling chart
- * primitives) stay out of the main `@arqel/ui` bundle. Dashboards that only
+ * primitives) stay out of the main `@arqel-dev/ui` bundle. Dashboards that only
  * use StatCard never pay for Recharts.
  */
 const LineChart = lazy(() => import('./charts/LineChart').then((m) => ({ default: m.LineChart })));

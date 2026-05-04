@@ -158,16 +158,16 @@ it('valida package.json npm via arqel.plugin-type', function (): void {
     expect($this->validator->validateNpmPackageJson($package)->passed)->toBeTrue();
 });
 
-it('valida package.json npm via peerDependency @arqel/types', function (): void {
+it('valida package.json npm via peerDependency @arqel-dev/types', function (): void {
     $package = [
         'name' => '@acme/awesome',
-        'peerDependencies' => ['@arqel/types' => '^1.0'],
+        'peerDependencies' => ['@arqel-dev/types' => '^1.0'],
     ];
 
     expect($this->validator->validateNpmPackageJson($package)->passed)->toBeTrue();
 });
 
-it('falha package.json npm sem arqel.plugin-type nem peer @arqel/types', function (): void {
+it('falha package.json npm sem arqel.plugin-type nem peer @arqel-dev/types', function (): void {
     $package = ['name' => '@acme/foo', 'peerDependencies' => ['react' => '^19.2']];
 
     expect($this->validator->validateNpmPackageJson($package)->passed)->toBeFalse();

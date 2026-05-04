@@ -70,7 +70,7 @@ Cada panel é independente — Resources, sidebar, theme e middleware separados.
 
 ```tsx
 import { usePage } from '@inertiajs/react';
-import type { SharedProps } from '@arqel/types';
+import type { SharedProps } from '@arqel-dev/types';
 
 const { panel } = usePage<SharedProps>().props;
 console.log(panel.id);    // 'admin'

@@ -2,7 +2,7 @@
  * `<FormGrid>` — responsive CSS-grid container.
  */
 
-import type { GridProps } from '@arqel/types/forms';
+import type { GridProps } from '@arqel-dev/types/forms';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn.js';
 

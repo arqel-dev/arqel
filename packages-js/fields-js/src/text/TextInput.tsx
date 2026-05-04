@@ -6,8 +6,8 @@
  * `<SlugInput>`; this component is the simple text path.
  */
 
-import type { TextFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { TextFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { inputClasses } from '../shared/styles.js';
 
 export function TextInput({

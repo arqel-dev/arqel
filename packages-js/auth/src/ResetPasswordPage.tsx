@@ -24,7 +24,7 @@ type ResetPasswordFormData = {
 /**
  * Página de reset-password bundled de Arqel.
  *
- * Renderizada via Inertia em `arqel/auth/ResetPassword`. Recebe token
+ * Renderizada via Inertia em `arqel-dev/auth/ResetPassword`. Recebe token
  * via prop (extraído da rota) e email via query string.
  */
 export function ResetPasswordPage({

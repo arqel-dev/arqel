@@ -17,8 +17,8 @@ use Inertia\Response;
 /**
  * Registration bundled de Arqel.
  *
- * Renderiza o componente Inertia `arqel/auth/Register` (servido pelo
- * pacote npm `@arqel/auth`) e processa o submit via `RegisterRequest`.
+ * Renderiza o componente Inertia `arqel-dev/auth/Register` (servido pelo
+ * pacote npm `@arqel-dev/auth`) e processa o submit via `RegisterRequest`.
  */
 final class RegisterController
 {
@@ -55,7 +55,7 @@ final class RegisterController
      */
     public function showForm(): Response
     {
-        return Inertia::render('arqel/auth/Register', [
+        return Inertia::render('arqel-dev/auth/Register', [
             'canLogin' => true,
             'loginUrl' => $this->currentPanel()?->getLoginUrl() ?? '/admin/login',
         ]);

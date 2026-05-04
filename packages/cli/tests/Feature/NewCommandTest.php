@@ -48,7 +48,7 @@ it('generates a bash script for a react + no-tenancy app', function (): void {
     $contents = (string) file_get_contents($path);
     expect($contents)
         ->toContain('laravel new my-app --react')
-        ->toContain('composer require arqel/arqel')
+        ->toContain('composer require arqel-dev/arqel')
         ->not->toContain('stancl/tenancy');
     expect($tester->getDisplay())->toContain('Generated arqel-setup-my-app.sh');
 });
@@ -128,7 +128,7 @@ it('produces a .ps1 file when platform=windows is forced', function (): void {
     $contents = (string) file_get_contents($path);
     expect($contents)
         ->toContain('Set-Location winapp')
-        ->toContain('composer require arqel/tenant');
+        ->toContain('composer require arqel-dev/tenant');
     expect($tester->getDisplay())->toContain('powershell -File arqel-setup-winapp.ps1');
 });
 

@@ -1,10 +1,10 @@
-# SKILL.md — arqel/fields
+# SKILL.md — arqel-dev/fields
 
-> Contexto canónico para AI agents (Claude Code, Cursor via MCP, etc.) a trabalhar no pacote `arqel/fields`. Estrutura conforme `PLANNING/04-repo-structure.md` §11.
+> Contexto canónico para AI agents (Claude Code, Cursor via MCP, etc.) a trabalhar no pacote `arqel-dev/fields`. Estrutura conforme `PLANNING/04-repo-structure.md` §11.
 
 ## Purpose
 
-`arqel/fields` define a abstracção declarativa de campos. Um `Field` descreve **um e apenas um** atributo do model — como aparece num formulário, numa tabela, numa página de detalhe — e leva consigo:
+`arqel-dev/fields` define a abstracção declarativa de campos. Um `Field` descreve **um e apenas um** atributo do model — como aparece num formulário, numa tabela, numa página de detalhe — e leva consigo:
 
 - **Tipo + componente React** (`type` → `component` mapping)
 - **Label, placeholder, helper text** (i18n-ready via `getLabel()` server-side)
@@ -156,7 +156,7 @@ ValidationBridge::register('shouty', function (?string $arg, \Arqel\Fields\Trans
 - `declare(strict_types=1)` obrigatório
 - Subclasses concretas são `final` por convenção; bases (Text, Number, Date, File, Boolean, Select) são extensíveis intencionalmente
 - Closures em props (`disabled`, `dehydrated`, `minDate`, `maxDate`) são avaliadas em `getTypeSpecificProps()` — non-string returns (em `minDate`/`maxDate`) são descartados graciosamente
-- **Sem dependência inversa para `arqel/core`**: core não depende de fields. Fields depende de core (precisa de `HasResource` para BelongsTo/HasMany)
+- **Sem dependência inversa para `arqel-dev/core`**: core não depende de fields. Fields depende de core (precisa de `HasResource` para BelongsTo/HasMany)
 - Snapshot tests obrigatórios para cada tipo novo
 
 ## Anti-patterns

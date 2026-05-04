@@ -123,7 +123,7 @@ final class InstallCommand extends Command
     protected function installFrontend(Filesystem $files): void
     {
         if (! $files->exists(base_path('package.json'))) {
-            warning('package.json not found — skipping frontend setup. Run `composer require arqel/core` inside a Laravel app to enable it.');
+            warning('package.json not found — skipping frontend setup. Run `composer require arqel-dev/core` inside a Laravel app to enable it.');
 
             return;
         }
@@ -175,7 +175,7 @@ final class InstallCommand extends Command
     protected function frontendPackages(): array
     {
         return [
-            ['@arqel/react', '@arqel/ui', '@arqel/hooks', '@arqel/fields', '@arqel/types'],
+            ['@arqel-dev/react', '@arqel-dev/ui', '@arqel-dev/hooks', '@arqel-dev/fields', '@arqel-dev/types'],
             ['@inertiajs/react', 'react', 'react-dom', '@types/react', '@types/react-dom'],
         ];
     }
@@ -228,7 +228,7 @@ final class InstallCommand extends Command
     {
         $target = resource_path('js/app.tsx');
         $contents = $files->exists($target) ? (string) $files->get($target) : '';
-        $marker = "import '@arqel/ui/styles.css'";
+        $marker = "import '@arqel-dev/ui/styles.css'";
 
         if (str_contains($contents, $marker) && ! $this->option('force')) {
             note('resources/js/app.tsx already configured for Arqel — skipping.');
@@ -258,10 +258,10 @@ final class InstallCommand extends Command
 
         $existing = $files->exists($target) ? (string) $files->get($target) : '';
         $tailwindImport = "@import 'tailwindcss';";
-        $arqelImport = "@import '@arqel/ui/styles.css';";
+        $arqelImport = "@import '@arqel-dev/ui/styles.css';";
 
         $hasTailwind = str_contains($existing, "@import 'tailwindcss'") || str_contains($existing, '@import "tailwindcss"');
-        $hasArqel = str_contains($existing, "@import '@arqel/ui/styles.css'") || str_contains($existing, '@import "@arqel/ui/styles.css"');
+        $hasArqel = str_contains($existing, "@import '@arqel-dev/ui/styles.css'") || str_contains($existing, '@import "@arqel-dev/ui/styles.css"');
 
         if ($hasTailwind && $hasArqel && ! $this->option('force')) {
             note('resources/css/app.css already configured for Arqel — skipping.');

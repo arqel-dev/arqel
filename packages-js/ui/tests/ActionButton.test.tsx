@@ -1,4 +1,4 @@
-import type { ActionSchema } from '@arqel/types/actions';
+import type { ActionSchema } from '@arqel-dev/types/actions';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';

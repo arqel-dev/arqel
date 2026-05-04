@@ -1,10 +1,10 @@
-# SKILL.md — arqel/nav
+# SKILL.md — arqel-dev/nav
 
 > Contexto canónico para AI agents. Estrutura conforme `PLANNING/04-repo-structure.md` §11.
 
 ## Purpose
 
-`arqel/nav` declara o menu lateral do panel admin: **items** individuais (link, ícone, badge), **groups** colapsáveis e **dividers**, com auto-registo a partir das Resources do Panel. Também produz **breadcrumbs** a partir do nome de rota Inertia + parâmetros.
+`arqel-dev/nav` declara o menu lateral do panel admin: **items** individuais (link, ícone, badge), **groups** colapsáveis e **dividers**, com auto-registo a partir das Resources do Panel. Também produz **breadcrumbs** a partir do nome de rota Inertia + parâmetros.
 
 ## Status
 
@@ -19,7 +19,7 @@
 
 **Por chegar:**
 
-- Integração com `arqel/core` `ArqelServiceProvider` para chamar `autoRegisterFromResources(ResourceRegistry::all())` por defeito (NAV-005)
+- Integração com `arqel-dev/core` `ArqelServiceProvider` para chamar `autoRegisterFromResources(ResourceRegistry::all())` por defeito (NAV-005)
 - Customização de breadcrumbs via override em Resource (NAV-005)
 
 ## Key Contracts

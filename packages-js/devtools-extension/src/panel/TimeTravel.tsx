@@ -2,7 +2,7 @@
  * Time-travel debugging panel (DEVTOOLS-006).
  *
  * Renders the navigation snapshots ring buffer captured by the in-page
- * `@arqel/react` hook. Each row shows the URL, a relative timestamp
+ * `@arqel-dev/react` hook. Each row shows the URL, a relative timestamp
  * and (when present) the visit duration. Clicking a row expands its
  * `pageProps` via `<JsonNode>`. The "Replay" action emits a
  * `chrome.runtime.sendMessage({ type: 'arqel.replay' })` event so a

@@ -28,7 +28,7 @@ final class CloudDeployLinkCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('github-repo', InputArgument::REQUIRED, 'GitHub repository in owner/name format (e.g., arqel/laravel-cloud-template).')
+            ->addArgument('github-repo', InputArgument::REQUIRED, 'GitHub repository in owner/name format (e.g., arqel-dev/laravel-cloud-template).')
             ->addOption('region', null, InputOption::VALUE_REQUIRED, 'Laravel Cloud region (auto|us-east|us-west|eu-central|eu-west|ap-southeast|sa-east).', 'auto')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Application name pre-filled in the dashboard.');
     }

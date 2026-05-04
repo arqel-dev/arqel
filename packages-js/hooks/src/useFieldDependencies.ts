@@ -6,7 +6,7 @@
  * after a 300 ms debounce.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { router } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 

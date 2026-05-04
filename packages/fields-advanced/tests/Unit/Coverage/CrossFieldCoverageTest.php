@@ -113,5 +113,5 @@ it('honours the configured imageUploadDisk verbatim in the route query string', 
     $field = (new RichTextField('body'))->imageUploadDisk('private-attachments');
 
     expect($field->getTypeSpecificProps()['imageUploadRoute'])
-        ->toBe('/arqel/fields/upload?disk=private-attachments');
+        ->toBe('/arqel-dev/fields/upload?disk=private-attachments');
 });

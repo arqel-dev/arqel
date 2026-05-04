@@ -1,8 +1,8 @@
 /**
- * @arqel/ui — Structural React components for Arqel admin panels.
+ * @arqel-dev/ui — Structural React components for Arqel admin panels.
  *
  * Top-level barrel re-exports the most-used primitives. Subpath imports
- * (`@arqel/ui/action`, `@arqel/ui/auth`) are recommended for tree-shaking.
+ * (`@arqel-dev/ui/action`, `@arqel-dev/ui/auth`) are recommended for tree-shaking.
  */
 
 export type { ActionButtonProps } from './action/ActionButton.js';

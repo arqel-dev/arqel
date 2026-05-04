@@ -7,8 +7,8 @@
  * beyond what the native control provides.
  */
 
-import type { DateFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { DateFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { inputClasses } from '../shared/styles.js';
 
 export function DateInput({

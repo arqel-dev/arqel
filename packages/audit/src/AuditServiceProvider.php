@@ -8,7 +8,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/audit`.
+ * Auto-discovered provider for `arqel-dev/audit`.
  *
  * AUDIT-001 ships the package skeleton only:
  *

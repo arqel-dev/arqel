@@ -1,4 +1,4 @@
-import { clearFieldRegistry, getFieldComponent, getRegisteredFields } from '@arqel/ui/form';
+import { clearFieldRegistry, getFieldComponent, getRegisteredFields } from '@arqel-dev/ui/form';
 import { describe, expect, it, vi } from 'vitest';
 
 const ALL_ADVANCED_FIELDS = [
@@ -23,7 +23,7 @@ const LAZY_MODULE_PATHS: Record<string, () => Promise<unknown>> = {
   WizardInput: () => import('../src/wizard/WizardInput.js'),
 };
 
-describe('@arqel/fields-advanced — register side-effect', () => {
+describe('@arqel-dev/fields-advanced — register side-effect', () => {
   it('registers all 8 advanced field component slots without throwing', async () => {
     clearFieldRegistry();
     await expect(import('../src/register.js')).resolves.toBeDefined();
@@ -36,7 +36,7 @@ describe('@arqel/fields-advanced — register side-effect', () => {
 
   it('resolves a non-null component for every registered field name', async () => {
     vi.resetModules();
-    const formModule: typeof import('@arqel/ui/form') = await import('@arqel/ui/form');
+    const formModule: typeof import('@arqel-dev/ui/form') = await import('@arqel-dev/ui/form');
     formModule.clearFieldRegistry();
     await import('../src/register.js');
 

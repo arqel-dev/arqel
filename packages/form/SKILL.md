@@ -1,10 +1,10 @@
-# SKILL.md — arqel/form
+# SKILL.md — arqel-dev/form
 
 > Contexto canónico para AI agents. Estrutura conforme `PLANNING/04-repo-structure.md` §11.
 
 ## Purpose
 
-`arqel/form` constrói formulários declarativos sobre `arqel/fields`. Um `Form` é um schema heterogéneo de **layout components** (Section, Fieldset, Grid, Columns, Group, Tabs/Tab) e **fields** (qualquer subclasse de `Arqel\Fields\Field`). O builder serializa para o payload Inertia consumido pelo lado React; em FORM-007/008 será gerado também um FormRequest com as regras de validação espelhadas.
+`arqel-dev/form` constrói formulários declarativos sobre `arqel-dev/fields`. Um `Form` é um schema heterogéneo de **layout components** (Section, Fieldset, Grid, Columns, Group, Tabs/Tab) e **fields** (qualquer subclasse de `Arqel\Fields\Field`). O builder serializa para o payload Inertia consumido pelo lado React; em FORM-007/008 será gerado também um FormRequest com as regras de validação espelhadas.
 
 ## Status
 
@@ -16,10 +16,10 @@
 - `Arqel\Form\FieldRulesExtractor` — agrega `extract`/`extractMessages`/`extractAttributes` a partir de uma lista de Fields
 - `Arqel\Form\FormRequestGenerator` — gera `Store{Model}Request`/`Update{Model}Request` com stub que delega rules ao `FieldRulesExtractor`
 - `FormServiceProvider` auto-discovery
-- **Integração com `ResourceController` via `Resource::form()` hook (FORM-006)** — `Resource` ganha `form(): mixed` (default `null`); `Arqel\Core\Support\InertiaDataBuilder::resolveFormFields` é duck-typed contra `arqel/form` e detecta presença de `getFields()` + `toArray()`. Quando declarado, os payloads `buildCreateData`/`buildEditData`/`buildShowData` ganham chave `form` (= `Form::toArray()`) e o `fields` payload é sourced de `Form::getFields()` (flatten); sem `form()`, fallback para `Resource::fields()` flat (zero breaking-change). Retornos não-objeto também caem no fallback graciosamente
+- **Integração com `ResourceController` via `Resource::form()` hook (FORM-006)** — `Resource` ganha `form(): mixed` (default `null`); `Arqel\Core\Support\InertiaDataBuilder::resolveFormFields` é duck-typed contra `arqel-dev/form` e detecta presença de `getFields()` + `toArray()`. Quando declarado, os payloads `buildCreateData`/`buildEditData`/`buildShowData` ganham chave `form` (= `Form::toArray()`) e o `fields` payload é sourced de `Form::getFields()` (flatten); sem `form()`, fallback para `Resource::fields()` flat (zero breaking-change). Retornos não-objeto também caem no fallback graciosamente
 - Inertia useForm flow consumido transparentemente: `ResourceController::validated()` lança `ValidationException` → Laravel converte em `back()->withErrors()->withInput()` (FORM-008)
 - Precognition stub em routes (`Route::middleware('precognitive')->post`/`put`/`patch`) — Fase 2 expande para field-level real-time
-- 37 testes Pest no pacote form + 5 testes de integração (`FormPayloadIntegrationTest` em `arqel/core`) cobrindo: no-form fallback, form declarado emite payload + getFields, propagação em Edit/Show com record, fallback gracioso para retorno não-objeto
+- 37 testes Pest no pacote form + 5 testes de integração (`FormPayloadIntegrationTest` em `arqel-dev/core`) cobrindo: no-form fallback, form declarado emite payload + getFields, propagação em Edit/Show com record, fallback gracioso para retorno não-objeto
 
 ## Key Contracts
 
@@ -149,7 +149,7 @@ Group::make()
 ## Anti-patterns
 
 - ❌ **Lógica de query/persistência em closures de schema** — schema é descritivo, não executável fora do controller. Closures aceitas (visibleIf/canSee/badge) são puras (sem side effects).
-- ❌ **Field types definidos em `arqel/form`** — pertence a `arqel/fields`. Aqui só compomos.
+- ❌ **Field types definidos em `arqel-dev/form`** — pertence a `arqel-dev/fields`. Aqui só compomos.
 - ❌ **Dependências circulares em `visibleIf`** — A depende de B que depende de A. O resolver não detecta loops; resultado é UI inconsistente.
 - ❌ **Layout component sem `$type`/`$component`** — `Component::toArray()` espera ambos (PHP error em runtime se não declarado pelo subclasse).
 - ❌ **Misturar `Tab` fora de `Tabs`** — `Form::getFields()` ainda flattens correctamente, mas o `defaultTab` lookup só faz sentido dentro de um `Tabs`.

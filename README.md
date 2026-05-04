@@ -34,7 +34,7 @@ Ver `PLANNING/01-spec-tecnica.md` para spec completa.
 
 ## Começar
 
-> ⚠️ **Autenticação não vem incluída.** Arqel **não publica** páginas de `/login`/`/register` por design — você usa um starter kit Laravel (Breeze, Jetstream ou Fortify) ou implementa o seu próprio. Recomendado: **Breeze + React + Inertia**, que é o que `arqel new` instala por default. Ver [`apps/docs/guide/authentication.md`](apps/docs/guide/authentication.md). _Nota: estamos planeando shipar um fluxo Inertia-React opt-in dentro do `arqel/auth` — tickets AUTH-006/007/008 (TBD)._
+> ⚠️ **Autenticação não vem incluída.** Arqel **não publica** páginas de `/login`/`/register` por design — você usa um starter kit Laravel (Breeze, Jetstream ou Fortify) ou implementa o seu próprio. Recomendado: **Breeze + React + Inertia**, que é o que `arqel new` instala por default. Ver [`apps/docs/guide/authentication.md`](apps/docs/guide/authentication.md). _Nota: estamos planeando shipar um fluxo Inertia-React opt-in dentro do `arqel-dev/auth` — tickets AUTH-006/007/008 (TBD)._
 
 ### Pré-requisitos
 
@@ -47,7 +47,7 @@ Ver `PLANNING/01-spec-tecnica.md` para spec completa.
 ### Setup
 
 ```bash
-git clone https://github.com/arqel/arqel.git
+git clone https://github.com/arqel-dev/arqel.git
 cd arqel
 
 # Se usas nvm, fixa a versão do projecto

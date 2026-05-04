@@ -1,5 +1,5 @@
-import type { BooleanFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { BooleanFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { checkboxClasses } from '../shared/styles.js';
 
 export function Checkbox({

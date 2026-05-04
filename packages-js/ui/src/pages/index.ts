@@ -1,13 +1,13 @@
 /**
  * Built-in Inertia page registry for `arqel::*`.
  *
- * `createArqelApp({ pages })` from `@arqel/react/inertia` accepts
+ * `createArqelApp({ pages })` from `@arqel-dev/react/inertia` accepts
  * one or more `PageRegistry` records — merge `arqelPages` first so
  * user-defined pages can override per-resource:
  *
  * ```ts
- * import { arqelPages } from '@arqel/ui/pages';
- * import { createArqelApp } from '@arqel/react/inertia';
+ * import { arqelPages } from '@arqel-dev/ui/pages';
+ * import { createArqelApp } from '@arqel-dev/react/inertia';
  *
  * const userPages = import.meta.glob('./Pages/**\/*.tsx');
  *

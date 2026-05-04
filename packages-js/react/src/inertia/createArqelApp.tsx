@@ -41,7 +41,7 @@ export interface ArqelAppOptions {
  *
  * @example
  * ```ts
- * import { createArqelApp } from '@arqel/react/inertia';
+ * import { createArqelApp } from '@arqel-dev/react/inertia';
  *
  * const userPages = import.meta.glob('./Pages/**\/*.tsx');
  *

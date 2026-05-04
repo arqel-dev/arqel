@@ -1,10 +1,10 @@
-# SKILL.md — @arqel/auth
+# SKILL.md — @arqel-dev/auth
 
 > Contexto canónico para AI agents.
 
 ## Purpose
 
-`@arqel/auth` publica os componentes React de autenticação que o pacote PHP `arqel/auth` renderiza via Inertia (componente `arqel/auth/Login`). Junto com `arqel/auth` (PHP), fecha a lacuna de DX vs Filament/Nova: `composer require arqel/arqel` + `Panel::configure()->login()` resulta em `/admin/login` funcional out-of-the-box.
+`@arqel-dev/auth` publica os componentes React de autenticação que o pacote PHP `arqel-dev/auth` renderiza via Inertia (componente `arqel-dev/auth/Login`). Junto com `arqel-dev/auth` (PHP), fecha a lacuna de DX vs Filament/Nova: `composer require arqel-dev/arqel` + `Panel::configure()->login()` resulta em `/admin/login` funcional out-of-the-box.
 
 ## Key Contracts
 
@@ -13,7 +13,7 @@
 Página Inertia com email + senha + lembrar-me + submit.
 
 ```tsx
-import { LoginPage } from '@arqel/auth';
+import { LoginPage } from '@arqel-dev/auth';
 
 export default function Login(props: { canRegister: boolean; canResetPassword: boolean; loginUrl: string }) {
   return <LoginPage {...props} />;

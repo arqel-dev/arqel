@@ -1,5 +1,5 @@
 /**
- * Form schema mirroring `arqel/form` PHP serialisation.
+ * Form schema mirroring `arqel-dev/form` PHP serialisation.
  *
  * The `Form::toArray()` payload is a heterogeneous list of entries
  * tagged by `kind`: a `field` carries `{name, type}` (the React

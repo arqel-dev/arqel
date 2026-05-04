@@ -49,7 +49,7 @@ it('renders the Inertia login page on GET /admin/login', function (): void {
     $response->assertOk();
     expect($response->headers->get('X-Inertia'))->toBe('true');
     $payload = json_decode($response->getContent() ?: '', true);
-    expect($payload['component'] ?? null)->toBe('arqel/auth/Login');
+    expect($payload['component'] ?? null)->toBe('arqel-dev/auth/Login');
 });
 
 it('authenticates with valid credentials and redirects', function (): void {

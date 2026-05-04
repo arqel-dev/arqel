@@ -6,7 +6,7 @@ namespace Arqel\Ai\Tests\Fixtures;
 
 /**
  * Mock leve do `Arqel\Mcp\McpServer` usado para validar o registo
- * cross-package das tools AI-MCP sem depender do pacote `arqel/mcp`.
+ * cross-package das tools AI-MCP sem depender do pacote `arqel-dev/mcp`.
  *
  * Replica apenas a assinatura pública de `registerTool()` consumida
  * pelo `AiServiceProvider::packageBooted()`.

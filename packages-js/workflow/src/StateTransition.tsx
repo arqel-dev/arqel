@@ -1,7 +1,7 @@
 /**
  * `<StateTransition>` — apresentational component for the PHP
  * `Arqel\Workflow\Fields\StateTransitionField` (component string
- * `arqel/workflow/StateTransition`).
+ * `arqel-dev/workflow/StateTransition`).
  *
  * Render contract (from WF-003):
  *   - large pill displaying `currentState.label` (background colour

@@ -15,7 +15,7 @@ it('lists resources with correct shape from closure-supplied packages', function
     expect($entries)->toHaveCount(2)
         ->and($entries[0])->toBe([
             'uri' => 'arqel-skill://core',
-            'name' => 'SKILL.md for arqel/core',
+            'name' => 'SKILL.md for arqel-dev/core',
             'description' => 'AI agent context for the core package',
             'mimeType' => 'text/markdown',
         ])
@@ -47,7 +47,7 @@ it('reads contents wrapped in the MCP resource shape', function (): void {
         'contents' => [[
             'uri' => 'arqel-skill://core',
             'mimeType' => 'text/markdown',
-            'text' => '# SKILL.md for arqel/core',
+            'text' => '# SKILL.md for arqel-dev/core',
         ]],
     ]);
 });
@@ -88,7 +88,7 @@ it('propagates a reader failure as a RuntimeException carrying the package name'
     );
 
     $resource->read('arqel-skill://mcp');
-})->throws(RuntimeException::class, 'SKILL.md not found for arqel/mcp');
+})->throws(RuntimeException::class, 'SKILL.md not found for arqel-dev/mcp');
 
 it('does not call the reader when listing with an empty resolver', function (): void {
     $calls = 0;

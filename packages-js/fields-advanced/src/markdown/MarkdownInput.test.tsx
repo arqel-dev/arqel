@@ -3,11 +3,11 @@
  *
  * Composes synthetic `FieldSchema` shapes per test rather than relying
  * on a (yet to be shipped) `MarkdownFieldSchema` discriminant from
- * `@arqel/types`. The component itself is type-safe via its defensive
+ * `@arqel-dev/types`. The component itself is type-safe via its defensive
  * `readProps()` narrowing.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';

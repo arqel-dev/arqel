@@ -64,7 +64,7 @@ function MyComponent() {
 ### 3.1 Index page (listagem)
 
 ```typescript
-import type { RecordType, PaginatedRecords, FieldSchema, ActionSchema, FilterSchema } from '@arqel/types'
+import type { RecordType, PaginatedRecords, FieldSchema, ActionSchema, FilterSchema } from '@arqel-dev/types'
 
 export interface ResourceIndexProps<T extends RecordType = RecordType> {
     resource: ResourceMeta
@@ -402,7 +402,7 @@ export type ColumnType =
 ### 8.1 AppShell
 
 ```tsx
-import { AppShell } from '@arqel/ui'
+import { AppShell } from '@arqel-dev/ui'
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
     return (
@@ -420,8 +420,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 ### 8.2 ResourceIndex
 
 ```tsx
-import { ResourceIndex } from '@arqel/ui'
-import type { ResourceIndexProps } from '@arqel/types'
+import { ResourceIndex } from '@arqel-dev/ui'
+import type { ResourceIndexProps } from '@arqel-dev/types'
 
 export default function UsersIndex(props: ResourceIndexProps<User>) {
     return <ResourceIndex {...props} />
@@ -444,7 +444,7 @@ Declarative — todo o rendering é handled internamente pelo component a partir
 ### 8.3 DataTable (lower-level)
 
 ```tsx
-import { DataTable } from '@arqel/ui'
+import { DataTable } from '@arqel-dev/ui'
 
 <DataTable
     data={records.data}
@@ -465,8 +465,8 @@ import { DataTable } from '@arqel/ui'
 ### 8.4 FormRenderer
 
 ```tsx
-import { FormRenderer, useArqelForm } from '@arqel/ui'
-import type { ResourceCreateProps } from '@arqel/types'
+import { FormRenderer, useArqelForm } from '@arqel-dev/ui'
+import type { ResourceCreateProps } from '@arqel-dev/types'
 
 export default function UsersCreate({ resource, fields, form, defaults }: ResourceCreateProps<User>) {
     const inertiaForm = useArqelForm(defaults, fields)
@@ -499,7 +499,7 @@ export default function UsersCreate({ resource, fields, form, defaults }: Resour
 Renderização polimórfica baseada em `field.type`:
 
 ```tsx
-import { FieldRenderer } from '@arqel/ui'
+import { FieldRenderer } from '@arqel-dev/ui'
 
 <FieldRenderer
     field={field}
@@ -513,7 +513,7 @@ import { FieldRenderer } from '@arqel/ui'
 Internamente resolve via FieldRegistry:
 
 ```typescript
-import { getFieldComponent } from '@arqel/fields'
+import { getFieldComponent } from '@arqel-dev/fields'
 
 const Component = getFieldComponent(field.component)  // 'EmailInput' → EmailInput
 ```
@@ -521,7 +521,7 @@ const Component = getFieldComponent(field.component)  // 'EmailInput' → EmailI
 ### 8.6 CanAccess
 
 ```tsx
-import { CanAccess } from '@arqel/ui'
+import { CanAccess } from '@arqel-dev/ui'
 
 <CanAccess ability="users.create">
     <Button onClick={handleCreate}>Create User</Button>
@@ -538,7 +538,7 @@ import { CanAccess } from '@arqel/ui'
 ### 8.7 ActionButton + ActionMenu
 
 ```tsx
-import { ActionButton, ActionMenu } from '@arqel/ui'
+import { ActionButton, ActionMenu } from '@arqel-dev/ui'
 
 // Single action
 <ActionButton action={actionSchema} record={record} />
@@ -550,7 +550,7 @@ import { ActionButton, ActionMenu } from '@arqel/ui'
 ### 8.8 ConfirmDialog
 
 ```tsx
-import { ConfirmDialog } from '@arqel/ui'
+import { ConfirmDialog } from '@arqel-dev/ui'
 import { useState } from 'react'
 
 const [open, setOpen] = useState(false)
@@ -574,7 +574,7 @@ const [open, setOpen] = useState(false)
 Typed access aos props da página Resource.
 
 ```typescript
-import { useResource } from '@arqel/hooks'
+import { useResource } from '@arqel-dev/hooks'
 
 function MyComponent() {
     const { resource, records, filters, actions } = useResource<User>()
@@ -587,7 +587,7 @@ function MyComponent() {
 Wrap do `useForm` Inertia com awareness de fields.
 
 ```typescript
-import { useArqelForm } from '@arqel/hooks'
+import { useArqelForm } from '@arqel-dev/hooks'
 
 const form = useArqelForm(defaults, fields)
 
@@ -610,7 +610,7 @@ form.validateField('email')                 // Single field
 ### 9.3 useCanAccess
 
 ```typescript
-import { useCanAccess } from '@arqel/hooks'
+import { useCanAccess } from '@arqel-dev/hooks'
 
 const canDelete = useCanAccess('users.delete', user)
 ```
@@ -618,7 +618,7 @@ const canDelete = useCanAccess('users.delete', user)
 ### 9.4 useFlash
 
 ```typescript
-import { useFlash } from '@arqel/hooks'
+import { useFlash } from '@arqel-dev/hooks'
 
 function Layout() {
     const { success, error, info, warning } = useFlash()
@@ -635,7 +635,7 @@ function Layout() {
 Estado de tabela (sort, filter, selection) com URL sync.
 
 ```typescript
-import { useTable } from '@arqel/hooks'
+import { useTable } from '@arqel-dev/hooks'
 
 const table = useTable({
     defaultSort: { column: 'created_at', direction: 'desc' },
@@ -658,7 +658,7 @@ table.clearSelection()
 Executa Actions via Inertia.
 
 ```typescript
-import { useAction } from '@arqel/hooks'
+import { useAction } from '@arqel-dev/hooks'
 
 const { invoke, processing, progress } = useAction(actionSchema)
 
@@ -670,7 +670,7 @@ await invoke(record, { additionalData })
 Handles `dependsOn` Field reactivity.
 
 ```typescript
-import { useFieldDependencies } from '@arqel/hooks'
+import { useFieldDependencies } from '@arqel-dev/hooks'
 
 useFieldDependencies(form, fields, {
     onDependencyChange: (fieldName, newOptions) => {
@@ -684,8 +684,8 @@ useFieldDependencies(form, fields, {
 ```typescript
 // resources/js/app.tsx
 import { createInertiaApp } from '@inertiajs/react'
-import { createArqelApp } from '@arqel/react'
-import { registerField } from '@arqel/fields'
+import { createArqelApp } from '@arqel-dev/react'
+import { registerField } from '@arqel-dev/fields'
 import { MyCustomField } from './fields/MyCustomField'
 
 registerField('MyCustomField', MyCustomField)
@@ -698,7 +698,7 @@ createArqelApp({
 ### 10.1 Custom field component contract
 
 ```tsx
-import type { FieldComponentProps } from '@arqel/fields'
+import type { FieldComponentProps } from '@arqel-dev/fields'
 
 export function MyCustomField(props: FieldComponentProps<MyCustomFieldProps>) {
     const { field, value, onChange, error, disabled, readonly, record } = props
@@ -729,7 +729,7 @@ export interface MyCustomFieldProps {
 `<Sidebar />` reads from shared props `panel.navigation`:
 
 ```tsx
-import { Sidebar } from '@arqel/ui'
+import { Sidebar } from '@arqel-dev/ui'
 
 <Sidebar />                                 // Uses panel.navigation
 ```
@@ -737,7 +737,7 @@ import { Sidebar } from '@arqel/ui'
 ### 11.2 Custom nav items
 
 ```tsx
-import { Sidebar, NavGroup, NavItem } from '@arqel/ui'
+import { Sidebar, NavGroup, NavItem } from '@arqel-dev/ui'
 
 <Sidebar>
     <NavGroup label="Custom" icon="star">
@@ -754,7 +754,7 @@ import { Sidebar, NavGroup, NavItem } from '@arqel/ui'
 ```css
 /* resources/css/app.css */
 @import 'tailwindcss';
-@import '@arqel/ui/styles.css';
+@import '@arqel-dev/ui/styles.css';
 
 :root {
     --color-primary: oklch(63% 0.19 269);
@@ -773,7 +773,7 @@ import { Sidebar, NavGroup, NavItem } from '@arqel/ui'
 ### 12.2 ThemeProvider
 
 ```tsx
-import { ThemeProvider } from '@arqel/react'
+import { ThemeProvider } from '@arqel-dev/react'
 
 <ThemeProvider defaultTheme="system" storageKey="arqel-theme">
     <App />
@@ -864,7 +864,7 @@ import { router } from '@inertiajs/react'
 ```tsx
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import { FieldRenderer } from '@arqel/ui'
+import { FieldRenderer } from '@arqel-dev/ui'
 
 describe('FieldRenderer', () => {
     it('renders text field with label', () => {
@@ -892,7 +892,7 @@ describe('FieldRenderer', () => {
 ### 14.2 Inertia mock provider
 
 ```tsx
-import { InertiaTestProvider } from '@arqel/testing/react'
+import { InertiaTestProvider } from '@arqel-dev/testing/react'
 
 render(
     <InertiaTestProvider sharedProps={{ auth: { user: mockUser } }}>
@@ -966,8 +966,8 @@ build: {
     rollupOptions: {
         output: {
             manualChunks: {
-                'arqel-core': ['@arqel/react', '@arqel/hooks', '@inertiajs/react'],
-                'arqel-ui': ['@arqel/ui', '@arqel/fields'],
+                'arqel-core': ['@arqel-dev/react', '@arqel-dev/hooks', '@inertiajs/react'],
+                'arqel-ui': ['@arqel-dev/ui', '@arqel-dev/fields'],
                 'react-vendor': ['react', 'react-dom'],
                 'tanstack': ['@tanstack/react-table'],
             }
@@ -996,7 +996,7 @@ export default {
 
 ## 17. A11y requirements (RNF-A-*)
 
-Todos os componentes `@arqel/ui`:
+Todos os componentes `@arqel-dev/ui`:
 
 - Keyboard navigation completa (Tab, Shift+Tab, Arrow keys em menus/tabs)
 - Focus visible (outline via CSS var `--ring`)

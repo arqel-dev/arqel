@@ -52,7 +52,7 @@ A `cloud.yml` deste template provisiona:
 
 ### Build falha em "composer install"
 
-Verifique se `arqel/*` está disponível no Packagist (durante beta, pode ser necessário adicionar `repositories` apontando para `vcs` no `composer.json`).
+Verifique se `arqel-dev/*` está disponível no Packagist (durante beta, pode ser necessário adicionar `repositories` apontando para `vcs` no `composer.json`).
 
 ### Reverb não conecta
 
@@ -79,4 +79,4 @@ hooks:
 
 - Documentação Arqel: <https://arqel.dev/docs>
 - Documentação Laravel Cloud: <https://cloud.laravel.com/docs>
-- Issues / suporte: <https://github.com/arqel/arqel/issues>
+- Issues / suporte: <https://github.com/arqel-dev/arqel/issues>

@@ -12,7 +12,7 @@ import type { ThemeContextValue } from './types';
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
-    throw new Error('[arqel/theme] useTheme() deve ser usado dentro de <ThemeProvider>.');
+    throw new Error('[arqel-dev/theme] useTheme() deve ser usado dentro de <ThemeProvider>.');
   }
   return ctx;
 }

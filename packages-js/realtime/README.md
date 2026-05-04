@@ -1,4 +1,4 @@
-# @arqel/realtime
+# @arqel-dev/realtime
 
 Helper de bootstrap do Laravel Echo para apps Arqel — configura WebSockets
 contra um servidor Laravel Reverb.
@@ -6,7 +6,7 @@ contra um servidor Laravel Reverb.
 ## Instalação
 
 ```bash
-pnpm add @arqel/realtime
+pnpm add @arqel-dev/realtime
 ```
 
 `laravel-echo` e `pusher-js` já vêm como dependências diretas.
@@ -15,8 +15,8 @@ pnpm add @arqel/realtime
 
 ```ts
 // resources/js/app.tsx
-import { createArqelApp } from '@arqel/react';
-import { setupEcho } from '@arqel/realtime';
+import { createArqelApp } from '@arqel-dev/react';
+import { setupEcho } from '@arqel-dev/realtime';
 
 setupEcho({
   key: import.meta.env.VITE_REVERB_APP_KEY,
@@ -29,7 +29,7 @@ setupEcho({
 createArqelApp();
 ```
 
-Após o `setupEcho`, hooks de `@arqel/hooks` (`useResourceUpdates`,
+Após o `setupEcho`, hooks de `@arqel-dev/hooks` (`useResourceUpdates`,
 `useResourcePresence`, etc.) usam o `window.Echo` automaticamente.
 
 ## Características

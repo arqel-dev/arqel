@@ -1,6 +1,6 @@
 /**
- * Public re-exports for `@arqel/react`. Most apps should import
- * from a subpath (`@arqel/react/inertia`, `@arqel/react/providers`,
+ * Public re-exports for `@arqel-dev/react`. Most apps should import
+ * from a subpath (`@arqel-dev/react/inertia`, `@arqel-dev/react/providers`,
  * …) so unused modules tree-shake.
  */
 

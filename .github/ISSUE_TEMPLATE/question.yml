@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        > **Atenção:** perguntas gerais devem ir para [GitHub Discussions](https://github.com/arqel/arqel/discussions).
+        > **Atenção:** perguntas gerais devem ir para [GitHub Discussions](https://github.com/arqel-dev/arqel/discussions).
         > Esta issue é apenas para casos onde acreditas que a documentação **está errada ou em falta**.
 
   - type: checkboxes
@@ -25,7 +25,7 @@ body:
     id: package
     attributes:
       label: Package/área da dúvida
-      placeholder: "arqel/fields ou docs/guides/resources"
+      placeholder: "arqel-dev/fields ou docs/guides/resources"
 
   - type: textarea
     id: question

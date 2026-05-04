@@ -32,7 +32,7 @@ public function register(): void
 
 ## Configurando Stripe Connect
 
-O `StripeConnectGateway` real é opt-in — apps que querem cobrar plugins reais ativam o gateway via dependência adicional + config. O SDK `stripe/stripe-php` adiciona ~200KB ao vendor, então o pacote `arqel/marketplace` declara em `suggest` (não `require`). Apps que usam apenas plugins gratuitos não pagam o custo.
+O `StripeConnectGateway` real é opt-in — apps que querem cobrar plugins reais ativam o gateway via dependência adicional + config. O SDK `stripe/stripe-php` adiciona ~200KB ao vendor, então o pacote `arqel-dev/marketplace` declara em `suggest` (não `require`). Apps que usam apenas plugins gratuitos não pagam o custo.
 
 ### Pré-requisitos
 
@@ -171,7 +171,7 @@ Recomendações para definir `price_cents`:
 
 | Faixa | Tipo de plugin | Exemplo |
 |---|---|---|
-| Free (`0`) | Helpers genéricos, fields básicos, OSS pure | `arqel/fields-markdown` |
+| Free (`0`) | Helpers genéricos, fields básicos, OSS pure | `arqel-dev/fields-markdown` |
 | `$5-$15` | Field-pack com integração de SDK terceiro | Stripe Card, Mapbox Address |
 | `$20-$50` | Widget-pack ou integração crítica (Slack, Sentry) | Sentry dashboards widget |
 | `$100+` | White-label themes ou plugins enterprise (custom auth, multi-tenant SSO) | Themes corporativos |
@@ -229,7 +229,7 @@ POST /api/marketplace/plugins/{slug}/purchase/confirm
 }
 ```
 
-O cliente do marketplace (CLI `arqel:install`) salva a key em `~/.arqel/credentials.json` (TODO da entrega `arqel/cli`). Re-buscar a key passa por `GET /publisher/purchases/{id}` (autenticado).
+O cliente do marketplace (CLI `arqel:install`) salva a key em `~/.arqel/credentials.json` (TODO da entrega `arqel-dev/cli`). Re-buscar a key passa por `GET /publisher/purchases/{id}` (autenticado).
 
 ## Fluxo completo de purchase
 

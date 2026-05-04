@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * Stand-in for a user-land `Resource` subclass. We replicate just enough
  * of `Arqel\Core\Resources\Resource`'s lifecycle (a public `runUpdate`
  * that calls the protected `afterUpdate`) to exercise the trait without
- * pulling `arqel/core` into the test runner.
+ * pulling `arqel-dev/core` into the test runner.
  */
 final class FakeBroadcastingResource
 {

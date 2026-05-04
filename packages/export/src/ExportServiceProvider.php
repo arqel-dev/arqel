@@ -10,7 +10,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/export`.
+ * Auto-discovered provider for `arqel-dev/export`.
  *
  * Bindings:
  *   - `ExportLogger` → `NullExportLogger` (singletonIf — apps may override)

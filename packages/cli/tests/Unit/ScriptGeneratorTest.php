@@ -16,11 +16,11 @@ it('renders a bash script with the expected baseline commands', function (): voi
         ->toContain('set -euo pipefail')
         ->toContain('laravel new my-app --react')
         ->toContain('cd my-app')
-        ->toContain('composer require arqel/arqel')
+        ->toContain('composer require arqel-dev/arqel')
         ->toContain('php artisan arqel:install')
         ->toContain('pnpm install')
         ->not->toContain('stancl/tenancy')
-        ->not->toContain('arqel/mcp');
+        ->not->toContain('arqel-dev/mcp');
 });
 
 it('adds stancl/tenancy when tenancy is stancl', function (): void {
@@ -51,7 +51,7 @@ it('legacy "jetstream" alias resolves to react and adds spatie multitenancy', fu
         ->toContain('laravel new crm --react')
         ->toContain('composer require spatie/laravel-multitenancy')
         ->toContain('php artisan arqel:resource Customer')
-        ->toContain('composer require arqel/mcp')
+        ->toContain('composer require arqel-dev/mcp')
         ->toContain('php artisan arqel:mcp:install')
         ->not->toContain('--jet')
         ->not->toContain('Dark mode preset');
@@ -79,10 +79,10 @@ it('emits path-repo wiring + dev-main requires when monorepoPath is set', functi
         ->toContain('"type":"path"')
         ->toContain($monorepo.'/packages/*')
         ->toContain('composer config minimum-stability dev')
-        ->toContain('arqel/core:dev-main')
-        ->toContain('arqel/fields:dev-main')
-        ->toContain('arqel/tenant:dev-main') // simple tenancy -> arqel/tenant gets the suffix
-        ->not->toContain('composer require arqel/arqel');
+        ->toContain('arqel-dev/core:dev-main')
+        ->toContain('arqel-dev/fields:dev-main')
+        ->toContain('arqel-dev/tenant:dev-main') // simple tenancy -> arqel-dev/tenant gets the suffix
+        ->not->toContain('composer require arqel-dev/arqel');
 });
 
 it('legacy "breeze" alias resolves to react', function (): void {
@@ -106,8 +106,8 @@ it('renders a PowerShell script with the expected commands', function (): void {
     expect($script)
         ->toContain('$ErrorActionPreference = "Stop"')
         ->toContain('Set-Location win-app')
-        ->toContain('Write-Host "==> Installing arqel/arqel"')
-        ->toContain('composer require arqel/tenant')
+        ->toContain('Write-Host "==> Installing arqel-dev/arqel"')
+        ->toContain('composer require arqel-dev/tenant')
         ->toContain('laravel new win-app --react');
 });
 

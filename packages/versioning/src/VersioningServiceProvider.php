@@ -9,7 +9,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider para `arqel/versioning`.
+ * Auto-discovered provider para `arqel-dev/versioning`.
  *
  * VERS-001 entrega o esqueleto:
  *

@@ -1,12 +1,12 @@
 /**
  * Side-effect entry para integração futura com FieldRegistry / WidgetRegistry.
  *
- *   import '@arqel/versioning/register';
+ *   import '@arqel-dev/versioning/register';
  *
  * No momento `VersionTimeline` e `VersionDiff` são usados diretamente
  * pelo consumidor (drawer/modal lado-app), sem registro num registry
  * compartilhado. Este arquivo existe como placeholder para que o
- * subpath `@arqel/versioning/register` continue resolvível e para que
+ * subpath `@arqel-dev/versioning/register` continue resolvível e para que
  * adições futuras (ex.: registrar o timeline como widget de Resource)
  * tenham um lugar canônico.
  *

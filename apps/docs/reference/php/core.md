@@ -1,4 +1,4 @@
-# `arqel/core` — API Reference
+# `arqel-dev/core` — API Reference
 
 Namespace `Arqel\Core\`. Pacote raiz: Resources, Panel, Inertia bridge, controller HTTP.
 
@@ -109,7 +109,7 @@ Assembler dos payloads index/create/edit/show. Métodos: `buildIndexData`, `buil
 
 ### `Arqel\Core\Support\FieldSchemaSerializer` (final)
 
-Serializador central de Fields para o payload Inertia (shape canónico em [`06-api-react.md` §4](https://github.com/arqel/arqel/blob/main/PLANNING/06-api-react.md)). Duck-typed contra `Arqel\Fields\Field` — sem hard dep. Filtra fields por `canBeSeenBy(user, record)`.
+Serializador central de Fields para o payload Inertia (shape canónico em [`06-api-react.md` §4](https://github.com/arqel-dev/arqel/blob/main/PLANNING/06-api-react.md)). Duck-typed contra `Arqel\Fields\Field` — sem hard dep. Filtra fields por `canBeSeenBy(user, record)`.
 
 ## Comandos Artisan
 
@@ -120,6 +120,6 @@ Serializador central de Fields para o payload Inertia (shape canónico em [`06-a
 
 ## Related
 
-- SKILL: [`packages/core/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/core/SKILL.md)
-- Source: [`packages/core/src/`](https://github.com/arqel/arqel/blob/main/packages/core/src/)
-- Próximo: [`arqel/fields`](/reference/php/fields)
+- SKILL: [`packages/core/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/core/SKILL.md)
+- Source: [`packages/core/src/`](https://github.com/arqel-dev/arqel/blob/main/packages/core/src/)
+- Próximo: [`arqel-dev/fields`](/reference/php/fields)

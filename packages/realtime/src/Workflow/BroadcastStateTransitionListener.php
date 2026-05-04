@@ -8,14 +8,14 @@ use Arqel\Realtime\Events\ResourceUpdated;
 
 /**
  * Listener default que liga `Arqel\Workflow\Events\StateTransitioned` ao
- * pipeline de broadcasting do `arqel/realtime`.
+ * pipeline de broadcasting do `arqel-dev/realtime`.
  *
- * **Cross-package defensive design**: o listener fica em `arqel/realtime`
- * (não em `arqel/workflow`) porque a direção da dependência é `realtime →
+ * **Cross-package defensive design**: o listener fica em `arqel-dev/realtime`
+ * (não em `arqel-dev/workflow`) porque a direção da dependência é `realtime →
  * workflow` — `realtime` sabe da existência opcional de `workflow`, mas
  * `workflow` ignora `realtime`. O type-hint do `$event` é `mixed` e a
  * checagem é feita via `instanceof` por FQCN string para que o pacote
- * boote mesmo sem `arqel/workflow` instalado em runtime.
+ * boote mesmo sem `arqel-dev/workflow` instalado em runtime.
  *
  * Quando ativo, dispara `Arqel\Realtime\Events\ResourceUpdated` — que
  * já implementa `ShouldBroadcast` — usando o `record` carregado pelo

@@ -1,10 +1,10 @@
-# SKILL.md — arqel/marketplace
+# SKILL.md — arqel-dev/marketplace
 
 > Contexto canônico para AI agents.
 
 ## Purpose
 
-`arqel/marketplace` é o backend do plugin marketplace do Arqel — schema relacional, models Eloquent e API REST para descoberta + publicação de plugins community (`field`, `widget`, `integration`, `theme`). Cobre RF-IN-09.
+`arqel-dev/marketplace` é o backend do plugin marketplace do Arqel — schema relacional, models Eloquent e API REST para descoberta + publicação de plugins community (`field`, `widget`, `integration`, `theme`). Cobre RF-IN-09.
 
 A decisão arquitetural é entregar como **pacote embeddable** em vez de app Laravel monolítico:
 
@@ -16,7 +16,7 @@ A decisão arquitetural é entregar como **pacote embeddable** em vez de app Lar
 
 **Entregue (MKTPLC-001):**
 
-- Esqueleto `arqel/marketplace` com PSR-4 `Arqel\Marketplace\` → `src/`, autoload-dev `Arqel\Marketplace\Tests\` → `tests/`.
+- Esqueleto `arqel-dev/marketplace` com PSR-4 `Arqel\Marketplace\` → `src/`, autoload-dev `Arqel\Marketplace\Tests\` → `tests/`.
 - **Migration única** `2026_05_01_000000_create_arqel_marketplace_tables.php` cria 4 tabelas:
   - `arqel_plugins` — slug unique, name, description, type enum, author_id nullable, composer/npm packages, github_url, license, screenshots JSON, latest_version, status enum (draft/pending/published/archived), timestamps. Índice em `(type, status)`.
   - `arqel_plugin_versions` — plugin_id FK cascade, version, changelog, released_at, timestamps. Unique `(plugin_id, version)`.
@@ -87,7 +87,7 @@ Http::withToken($adminToken)
 
 Plugin metadata convention + validator + comando Artisan `arqel:plugin:list`. Ver `docs/CONVENTION.md` para o schema completo.
 
-- **`PluginConventionValidator`** (`Services/PluginConventionValidator.php`, `final readonly`) — valida arrays decodificados de `composer.json` e `package.json` contra o schema. Em `composer.json` checa `type=arqel-plugin` (fail), `extra.arqel.plugin-type` no enum (`field-pack`, `widget-pack`, `theme`, `integration`, `language-pack`, `tool`) (fail), `extra.arqel.compat.arqel` como constraint semver válida (fail), `extra.arqel.category` non-empty (fail), `extra.arqel.installation-instructions` (warn se ausente), `keywords` contém `arqel`+`plugin` (warn). Em `package.json` aceita `arqel.plugin-type` no root OU `peerDependencies."@arqel/types"`. Não faz I/O — recebe arrays prontos.
+- **`PluginConventionValidator`** (`Services/PluginConventionValidator.php`, `final readonly`) — valida arrays decodificados de `composer.json` e `package.json` contra o schema. Em `composer.json` checa `type=arqel-plugin` (fail), `extra.arqel.plugin-type` no enum (`field-pack`, `widget-pack`, `theme`, `integration`, `language-pack`, `tool`) (fail), `extra.arqel.compat.arqel` como constraint semver válida (fail), `extra.arqel.category` non-empty (fail), `extra.arqel.installation-instructions` (warn se ausente), `keywords` contém `arqel`+`plugin` (warn). Em `package.json` aceita `arqel.plugin-type` no root OU `peerDependencies."@arqel-dev/types"`. Não faz I/O — recebe arrays prontos.
 - **`ConventionValidationResult`** (`Services/ConventionValidationResult.php`, `final readonly`) — value-object com `checks`, `passed`, `warnings`, `errors`. Factories `success(checks)` e `failed(checks)`. Method `toArray()` para serialização.
 - **`PluginListCommand`** (`Console/PluginListCommand.php`, `final extends Command`) — signature `arqel:plugin:list {--validate}`. Descobre plugins via `Composer\InstalledVersions::getInstalledPackagesByType('arqel-plugin')`, lê o `composer.json` de cada install path, imprime tabela `Name | Version | Plugin Type | Category | Status`. Com `--validate` roda o validator e imprime checks detalhados.
 - **Service provider** — `MarketplaceServiceProvider::packageBooted()` registra o comando via `$this->commands(...)` quando `runningInConsole()`.
@@ -383,7 +383,7 @@ Revenue share padrão é `80%` para o publisher / `20%` para Arqel (configuráve
 ## Conventions
 
 - Models são `final` — Laravel 12 permite porque `lazyHydrate` não é mais usado em hydrate paths críticos.
-- Controllers single-action `__invoke` para alinhamento com padrão `arqel/audit`/`arqel/versioning`.
+- Controllers single-action `__invoke` para alinhamento com padrão `arqel-dev/audit`/`arqel-dev/versioning`.
 - Status enum hard-coded na migration (`draft`/`pending`/`published`/`archived`) — futuras transições adicionais exigem migration nova.
 - `published` é o ÚNICO status público; outros são opacos (404 explícito) para evitar leak de plugins em moderação.
 - Idempotência de review usa `firstOrCreate(user_id+plugin_id)` — não há unique index em DB porque `user_id` é nullable (futuras reviews anônimas).
@@ -426,7 +426,7 @@ Docs PT-BR para usuários e publishers em `apps/docs/marketplace/`:
 
 ## Related
 
-- `arqel/core` — `Resource` API que MKTPLC-005 vai consumir para Arqel-powered admin do marketplace.
-- `arqel/auth` — futuras integrações para OAuth de publishers.
+- `arqel-dev/core` — `Resource` API que MKTPLC-005 vai consumir para Arqel-powered admin do marketplace.
+- `arqel-dev/auth` — futuras integrações para OAuth de publishers.
 - RF-IN-09 — requirement origem em `PLANNING/01-spec-tecnica.md`.
 - ADR-008 — testes obrigatórios.

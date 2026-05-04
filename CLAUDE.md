@@ -10,11 +10,11 @@
 **Tagline:** Admin panels for Laravel, forged in PHP, rendered in React.
 
 **Distribuição:**
-- Composer: `arqel/*` em Packagist
-- npm: `@arqel/*`
+- Composer: `arqel-dev/*` em Packagist
+- npm: `@arqel-dev/*`
 - Licença: MIT + DCO
 - Domínio: `arqel.dev`
-- GitHub org: `arqel`
+- GitHub org: `arqel-dev`
 
 ## Modo operacional atual
 

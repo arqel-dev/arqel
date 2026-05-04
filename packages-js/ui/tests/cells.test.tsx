@@ -7,7 +7,7 @@ import type {
   NumberColumnSchema,
   RelationshipColumnSchema,
   TextColumnSchema,
-} from '@arqel/types/tables';
+} from '@arqel-dev/types/tables';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { TableCell } from '../src/table/cells.js';

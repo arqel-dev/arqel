@@ -8,14 +8,14 @@ integrados num único projeto: blog admin com **Posts**, **Tags** e
 ## Por que existe
 
 1. **Showcase público** — rodável em ~2 minutos, base de screenshots e tutoriais.
-2. **Smoke test cross-package** — exercita `arqel/core` + `fields` + `workflow`
+2. **Smoke test cross-package** — exercita `arqel-dev/core` + `fields` + `workflow`
    + `versioning` + `ai` + `audit` no CI a cada PR.
 3. **Boilerplate** — fork-friendly para quem quer começar com Arqel hoje.
 
 ## Setup rápido
 
 ```bash
-git clone https://github.com/arqel/arqel.git
+git clone https://github.com/arqel-dev/arqel.git
 cd arqel
 composer -d apps/demo install
 pnpm install
@@ -37,6 +37,6 @@ Acesse `http://127.0.0.1:8000/admin`.
 
 ## Repositório
 
-- Código: [`apps/demo/`](https://github.com/arqel/arqel/tree/main/apps/demo)
-- README: [`apps/demo/README.md`](https://github.com/arqel/arqel/tree/main/apps/demo/README.md)
-- SKILL: [`apps/demo/SKILL.md`](https://github.com/arqel/arqel/tree/main/apps/demo/SKILL.md)
+- Código: [`apps/demo/`](https://github.com/arqel-dev/arqel/tree/main/apps/demo)
+- README: [`apps/demo/README.md`](https://github.com/arqel-dev/arqel/tree/main/apps/demo/README.md)
+- SKILL: [`apps/demo/SKILL.md`](https://github.com/arqel-dev/arqel/tree/main/apps/demo/SKILL.md)

@@ -12,7 +12,7 @@
  * matching the canonical Filament/Linear UX.
  */
 
-import type { ColumnSchema, SortDirection, TableSort } from '@arqel/types/tables';
+import type { ColumnSchema, SortDirection, TableSort } from '@arqel-dev/types/tables';
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo, useRef } from 'react';

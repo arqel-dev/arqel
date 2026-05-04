@@ -2,16 +2,16 @@
  * `<BelongsToInput>` — async-search picker for belongsTo relationships.
  *
  * Hits the search route emitted server-side (`field.props.searchRoute`,
- * registered by `arqel/fields` `FieldSearchController`) with a 300ms
+ * registered by `arqel-dev/fields` `FieldSearchController`) with a 300ms
  * debounce. Returned options are { value: id, label: title } pairs.
  *
  * Phase 1 ships a list-rendered picker (combobox with native `<input>`
  * + `<ul>`); Base UI Combobox lands in a follow-up.
  */
 
-import type { BelongsToFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
-import { cn } from '@arqel/ui/utils';
+import type { BelongsToFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
+import { cn } from '@arqel-dev/ui/utils';
 import { useEffect, useRef, useState } from 'react';
 import { inputClasses } from '../shared/styles.js';
 

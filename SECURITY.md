@@ -23,14 +23,14 @@ Recomendamos sempre actualizar para a `latest` minor.
 
 Canais preferidos, por ordem:
 
-1. **[GitHub Security Advisories](https://github.com/arqel/arqel/security/advisories/new)** (recomendado) — permite colaboração privada e emissão coordenada de CVE.
+1. **[GitHub Security Advisories](https://github.com/arqel-dev/arqel/security/advisories/new)** (recomendado) — permite colaboração privada e emissão coordenada de CVE.
 2. **Email:** `security@arqel.dev` (equipa-core da governance).
 
 ### O que incluir no report
 
 - Descrição da vulnerabilidade e **potencial impacto** (RCE, XSS, SQLi, privilege escalation, denial-of-service, etc.)
 - **Passos reproduzíveis** — idealmente um proof-of-concept mínimo
-- **Versão afectada** (`composer info arqel/core`, `pnpm ls @arqel/ui`) e ambiente (PHP, Laravel, SO, browser)
+- **Versão afectada** (`composer info arqel-dev/core`, `pnpm ls @arqel-dev/ui`) e ambiente (PHP, Laravel, SO, browser)
 - **Mitigação** conhecida, se houver
 - Identificação (nome ou handle público) para crédito — podes indicar **reporter anónimo** se preferires
 
@@ -69,9 +69,9 @@ Swag enviado se possível (stickers, t-shirt) a reporters de críticas — detal
 
 ### Dentro do âmbito
 
-- Packages `arqel/*` publicados no Packagist (todas as versões actuais)
-- Packages `@arqel/*` publicados no npm
-- Código neste repositório (`github.com/arqel/arqel`)
+- Packages `arqel-dev/*` publicados no Packagist (todas as versões actuais)
+- Packages `@arqel-dev/*` publicados no npm
+- Código neste repositório (`github.com/arqel-dev/arqel`)
 - Registry ShadCN (`https://arqel.dev/r/*`)
 - Website e docs (`https://arqel.dev`, `https://docs.arqel.dev`)
 
@@ -97,7 +97,7 @@ Swag enviado se possível (stickers, t-shirt) a reporters de críticas — detal
 
 Advisories publicados vivem em:
 
-- [GitHub Security Advisories do Arqel](https://github.com/arqel/arqel/security/advisories)
+- [GitHub Security Advisories do Arqel](https://github.com/arqel-dev/arqel/security/advisories)
 - `CHANGELOG.md` (referência curta com link para advisory)
 
 ## Chaves criptográficas

@@ -63,7 +63,7 @@ it('renders the Inertia notice page when unverified', function (): void {
 
     $response->assertOk();
     $payload = json_decode($response->getContent() ?: '', true);
-    expect($payload['component'] ?? null)->toBe('arqel/auth/VerifyEmailNotice');
+    expect($payload['component'] ?? null)->toBe('arqel-dev/auth/VerifyEmailNotice');
 });
 
 it('marks email as verified and dispatches Verified event with valid signed URL', function (): void {

@@ -14,7 +14,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Throwable;
 
 /**
- * Auto-discovered provider for `arqel/ai`.
+ * Auto-discovered provider for `arqel-dev/ai`.
  *
  * Bootstraps the `AiManager` singleton, the `CostTracker` and `AiCache`
  * services, and publishes both the config file and the `ai_usage`
@@ -75,10 +75,10 @@ final class AiServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Cross-package hook: when `arqel/mcp` está presente e o `McpServer`
+     * Cross-package hook: when `arqel-dev/mcp` está presente e o `McpServer`
      * está bound no container, regista as 3 tools AI-MCP (AI-013).
      *
-     * Defensive: nunca adicionamos `arqel/mcp` como hard-dep — o registo
+     * Defensive: nunca adicionamos `arqel-dev/mcp` como hard-dep — o registo
      * é silenciosamente ignorado se o pacote não estiver instalado ou se
      * algo na introspecção falhar. Idempotente: chamar múltiplas vezes
      * sobrescreve com o mesmo nome.
@@ -115,7 +115,7 @@ final class AiServiceProvider extends PackageServiceProvider
             }
         } catch (Throwable $e) {
             if (function_exists('logger')) {
-                logger()->warning('arqel/ai: failed to register MCP tools: '.$e->getMessage());
+                logger()->warning('arqel-dev/ai: failed to register MCP tools: '.$e->getMessage());
             }
         }
     }

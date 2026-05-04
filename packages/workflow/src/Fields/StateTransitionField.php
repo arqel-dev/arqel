@@ -26,7 +26,7 @@ use Throwable;
  *   da `WorkflowDefinition` exposta pelo trait `HasWorkflow`.
  * - `history`: placeholder vazio até WF-007 implementar audit log.
  *
- * O componente React `arqel/workflow/StateTransition` (slice C29) consome
+ * O componente React `arqel-dev/workflow/StateTransition` (slice C29) consome
  * estes props. Este field é PHP-only por enquanto — a UI ainda não
  * existe.
  *
@@ -43,7 +43,7 @@ final class StateTransitionField extends Field
 {
     protected string $type = 'state-transition';
 
-    protected string $component = 'arqel/workflow/StateTransition';
+    protected string $component = 'arqel-dev/workflow/StateTransition';
 
     protected bool $showDescription = false;
 

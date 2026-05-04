@@ -1,4 +1,4 @@
-# `arqel/auth` — API Reference
+# `arqel-dev/auth` — API Reference
 
 Namespace `Arqel\Auth\`. AbilityRegistry + PolicyDiscovery + middleware + traits.
 
@@ -67,7 +67,7 @@ Lookup order: `AbilityRegistry` snapshot (quando bound) primeiro, fallback para 
 
 ## Related
 
-- SKILL: [`packages/auth/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/auth/SKILL.md)
+- SKILL: [`packages/auth/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/auth/SKILL.md)
 - Conceitos: [`/guide/auth`](/guide/auth)
 - ADR-017: Authorization is UX-only on the client
-- Próximo: [`arqel/nav`](/reference/php/nav)
+- Próximo: [`arqel-dev/nav`](/reference/php/nav)

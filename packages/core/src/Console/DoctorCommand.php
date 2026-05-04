@@ -172,16 +172,16 @@ final class DoctorCommand extends Command
         try {
             $version = null;
             if (class_exists(InstalledVersions::class)
-                && InstalledVersions::isInstalled('arqel/core')) {
-                $version = InstalledVersions::getVersion('arqel/core');
+                && InstalledVersions::isInstalled('arqel-dev/core')) {
+                $version = InstalledVersions::getVersion('arqel-dev/core');
             }
 
             return [
                 'name' => 'arqel.core.version',
                 'status' => $version !== null ? self::STATUS_OK : self::STATUS_WARN,
                 'message' => $version !== null
-                    ? "arqel/core installed at {$version}."
-                    : 'arqel/core version could not be determined (path repo / dev install?).',
+                    ? "arqel-dev/core installed at {$version}."
+                    : 'arqel-dev/core version could not be determined (path repo / dev install?).',
                 'details' => ['version' => $version],
             ];
         } catch (Throwable $e) {
@@ -420,7 +420,7 @@ final class DoctorCommand extends Command
 
     /**
      * Detecta se Laravel Pulse está instalado (LCLOUD-003). Pulse é
-     * opcional — `arqel/core` expõe cards quando presente, mas roda
+     * opcional — `arqel-dev/core` expõe cards quando presente, mas roda
      * standalone caso contrário.
      *
      * @return array{name: string, status: string, message: string, details?: mixed}
@@ -446,7 +446,7 @@ final class DoctorCommand extends Command
     /**
      * Detecta se a app instalou um Laravel starter kit (Breeze, Jetstream
      * ou Fortify). Arqel não publica login/register hoje — delega ao
-     * starter kit. Apps que rodaram só `composer require arqel/arqel`
+     * starter kit. Apps que rodaram só `composer require arqel-dev/arqel`
      * sem CLI ficam sem essas páginas.
      *
      * @return array{name: string, status: string, message: string, details?: mixed}
@@ -560,7 +560,7 @@ final class DoctorCommand extends Command
 
     /**
      * Reporta quantos providers de AI estão configurados quando
-     * `arqel/ai` está instalado. Neutral quando o pacote não está
+     * `arqel-dev/ai` está instalado. Neutral quando o pacote não está
      * presente — AI é opt-in.
      *
      * @return array{name: string, status: string, message: string, details?: mixed}
@@ -569,13 +569,13 @@ final class DoctorCommand extends Command
     {
         try {
             $installed = class_exists(InstalledVersions::class)
-                && InstalledVersions::isInstalled('arqel/ai');
+                && InstalledVersions::isInstalled('arqel-dev/ai');
 
             if (! $installed) {
                 return [
                     'name' => 'ai.providers.configured',
                     'status' => self::STATUS_NEUTRAL,
-                    'message' => 'arqel/ai not installed (optional).',
+                    'message' => 'arqel-dev/ai not installed (optional).',
                     'details' => ['installed' => false],
                 ];
             }
@@ -600,7 +600,7 @@ final class DoctorCommand extends Command
                 'status' => count($configured) > 0 ? self::STATUS_OK : self::STATUS_WARN,
                 'message' => count($configured) > 0
                     ? 'AI providers configured: '.implode(', ', $configured).'.'
-                    : 'arqel/ai installed but no provider configured — set ANTHROPIC_API_KEY / OPENAI_API_KEY / OLLAMA_HOST.',
+                    : 'arqel-dev/ai installed but no provider configured — set ANTHROPIC_API_KEY / OPENAI_API_KEY / OLLAMA_HOST.',
                 'details' => ['providers' => $configured],
             ];
         } catch (Throwable $e) {
@@ -610,7 +610,7 @@ final class DoctorCommand extends Command
 
     /**
      * Verifica se as tabelas do marketplace foram migradas quando
-     * `arqel/marketplace` está instalado. Neutral quando o pacote não
+     * `arqel-dev/marketplace` está instalado. Neutral quando o pacote não
      * está presente — marketplace é opt-in.
      *
      * @return array{name: string, status: string, message: string, details?: mixed}
@@ -619,13 +619,13 @@ final class DoctorCommand extends Command
     {
         try {
             $installed = class_exists(InstalledVersions::class)
-                && InstalledVersions::isInstalled('arqel/marketplace');
+                && InstalledVersions::isInstalled('arqel-dev/marketplace');
 
             if (! $installed) {
                 return [
                     'name' => 'marketplace.migrations',
                     'status' => self::STATUS_NEUTRAL,
-                    'message' => 'arqel/marketplace not installed (optional).',
+                    'message' => 'arqel-dev/marketplace not installed (optional).',
                     'details' => ['installed' => false],
                 ];
             }
@@ -648,7 +648,7 @@ final class DoctorCommand extends Command
                 'status' => $hasTable ? self::STATUS_OK : self::STATUS_WARN,
                 'message' => $hasTable
                     ? 'Marketplace table arqel_plugins exists.'
-                    : 'arqel/marketplace installed but arqel_plugins table missing — run `php artisan migrate`.',
+                    : 'arqel-dev/marketplace installed but arqel_plugins table missing — run `php artisan migrate`.',
                 'details' => ['has_table' => $hasTable],
             ];
         } catch (Throwable $e) {

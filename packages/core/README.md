@@ -1,4 +1,4 @@
-# arqel/core
+# arqel-dev/core
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![PHP](https://img.shields.io/badge/php-%5E8.3-8892BF.svg)](https://php.net)
@@ -9,7 +9,7 @@
 
 ## Posição no ecossistema
 
-Este pacote é a **fundação** de todos os pacotes `arqel/*`. É onde vivem:
+Este pacote é a **fundação** de todos os pacotes `arqel-dev/*`. É onde vivem:
 
 - O `ArqelServiceProvider` que faz auto-discovery na app Laravel consumidora
 - Contracts (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`, `Renderable`)
@@ -20,15 +20,15 @@ Este pacote é a **fundação** de todos os pacotes `arqel/*`. É onde vivem:
 - Facade `Arqel`
 - Suporte para serialização de schemas de Fields para Inertia props
 
-Os pacotes específicos (`arqel/fields`, `arqel/table`, `arqel/form`, ...) dependem de `arqel/core` e estendem os contracts/classes base daqui.
+Os pacotes específicos (`arqel-dev/fields`, `arqel-dev/table`, `arqel-dev/form`, ...) dependem de `arqel-dev/core` e estendem os contracts/classes base daqui.
 
 ## Instalação
 
 ```bash
-composer require arqel/core
+composer require arqel-dev/core
 ```
 
-> Normalmente instala-se via o meta-pacote `arqel/arqel`, que puxa `arqel/core` e companheiros obrigatórios.
+> Normalmente instala-se via o meta-pacote `arqel-dev/arqel`, que puxa `arqel-dev/core` e companheiros obrigatórios.
 
 ## Convenções
 

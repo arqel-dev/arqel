@@ -22,7 +22,7 @@ type RegisterFormData = {
 /**
  * Página de registro bundled de Arqel.
  *
- * Renderizada via Inertia em `arqel/auth/Register`. Usa `useForm()` do
+ * Renderizada via Inertia em `arqel-dev/auth/Register`. Usa `useForm()` do
  * Inertia para gerenciar estado, submit e errors.
  */
 export function RegisterPage({

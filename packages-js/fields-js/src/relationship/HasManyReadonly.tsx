@@ -6,8 +6,8 @@
  * collections require their own change-set tracking.
  */
 
-import type { HasManyFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { HasManyFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 
 interface RelatedRecord {
   id: string | number;

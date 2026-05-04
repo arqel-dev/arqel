@@ -33,7 +33,7 @@ use Traversable;
  * (b) a queue-threshold heuristic that dispatches `ProcessExportJob`
  * for large selections, and (c) a flash notification + signed download
  * URL. All three pieces require cross-package work into
- * `arqel/actions` form integration plus the `Export` model + jobs
+ * `arqel-dev/actions` form integration plus the `Export` model + jobs
  * (EXPORT-006/007/008). They are deliberately deferred — this action
  * is currently a synchronous, in-process exporter wrapper.
  */

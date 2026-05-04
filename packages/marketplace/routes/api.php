@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Routes do pacote `arqel/marketplace`
+| Routes do pacote `arqel-dev/marketplace`
 |--------------------------------------------------------------------------
 |
 | Endpoints REST públicos para o marketplace de plugins. O prefixo é

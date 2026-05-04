@@ -1,4 +1,4 @@
-import type { ActionSchema } from '@arqel/types/actions';
+import type { ActionSchema } from '@arqel-dev/types/actions';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ActionMenu } from '../src/action/ActionMenu.js';

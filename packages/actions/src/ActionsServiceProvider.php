@@ -11,10 +11,10 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Service provider for `arqel/actions`.
+ * Service provider for `arqel-dev/actions`.
  *
  * Mounts the `ActionController` routes under the active panel's
- * prefix + middleware (mirrors what `arqel/core` does for the
+ * prefix + middleware (mirrors what `arqel-dev/core` does for the
  * resource CRUD routes).
  */
 final class ActionsServiceProvider extends PackageServiceProvider

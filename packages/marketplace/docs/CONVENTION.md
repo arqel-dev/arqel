@@ -46,7 +46,7 @@ Todo plugin Arqel **deve** seguir o seguinte schema mínimo:
 |---|---|
 | `field-pack` | Pacote de Field types adicionais (ex: Stripe, GeoJSON, RichEditor custom) |
 | `widget-pack` | Pacote de dashboard Widgets (charts, KPIs, feeds) |
-| `theme` | Tema visual (paleta, tokens, layout) — consumido pelo `arqel/themes` |
+| `theme` | Tema visual (paleta, tokens, layout) — consumido pelo `arqel-dev/themes` |
 | `integration` | Integração com serviço externo (Slack, Sentry, Stripe, Pusher) |
 | `language-pack` | Pacote de tradução (locale `xx_YY` com strings UI) |
 | `tool` | CLI tool, dev utility, ou helper sem UI |
@@ -73,14 +73,14 @@ formas:
 }
 ```
 
-### Forma B: peerDependency `@arqel/types`
+### Forma B: peerDependency `@arqel-dev/types`
 
 ```json
 {
     "name": "@acme/arqel-stripe-fields",
     "version": "1.0.0",
     "peerDependencies": {
-        "@arqel/types": "^1.0"
+        "@arqel-dev/types": "^1.0"
     }
 }
 ```
@@ -93,7 +93,7 @@ peers (porque o ecossistema Arqel infere o tipo a partir dos exports).
 ```
 acme/arqel-stripe-fields/
 ├── composer.json            # type=arqel-plugin + extra.arqel
-├── package.json             # opcional, peer @arqel/types
+├── package.json             # opcional, peer @arqel-dev/types
 ├── src/
 │   ├── Fields/
 │   │   ├── StripeCustomerField.php

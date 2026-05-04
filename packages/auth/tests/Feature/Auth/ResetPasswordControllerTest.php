@@ -65,7 +65,7 @@ it('renders the Inertia reset-password page with token + email', function (): vo
 
     $response->assertOk();
     $payload = json_decode($response->getContent() ?: '', true);
-    expect($payload['component'] ?? null)->toBe('arqel/auth/ResetPassword');
+    expect($payload['component'] ?? null)->toBe('arqel-dev/auth/ResetPassword');
     expect($payload['props']['token'] ?? null)->toBe('some-token');
     expect($payload['props']['email'] ?? null)->toBe('foo@bar.com');
 });

@@ -1,5 +1,5 @@
 /**
- * `@arqel/versioning` — React surface for the Arqel Versioning PHP package.
+ * `@arqel-dev/versioning` — React surface for the Arqel Versioning PHP package.
  *
  * Exporta `<VersionTimeline>` (lista cronológica de versões) e
  * `<VersionDiff>` (comparador side-by-side). Componentes puramente
@@ -7,7 +7,7 @@
  *
  * O endpoint canônico que alimenta o timeline é
  * `GET /admin/{resource}/{id}/versions`, retornado via Inertia props
- * pelo PHP package (`arqel/versioning`).
+ * pelo PHP package (`arqel-dev/versioning`).
  */
 
 export {

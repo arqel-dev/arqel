@@ -284,7 +284,7 @@ Total time dry-run → live: <20 min.
 
 ### 4.3 Lockstep versioning
 
-Todos pacotes Arqel compartilham version (Composer + npm). `arqel/core 1.2.3` match `@arqel/react 1.2.3`.
+Todos pacotes Arqel compartilham version (Composer + npm). `arqel-dev/core 1.2.3` match `@arqel-dev/react 1.2.3`.
 
 **Prós:**
 - Reduz confusão (qual version é compat?)
@@ -292,7 +292,7 @@ Todos pacotes Arqel compartilham version (Composer + npm). `arqel/core 1.2.3` ma
 - Users instalam com confidence
 
 **Contras:**
-- Patch pequeno em `arqel/widgets` força bump em tudo
+- Patch pequeno em `arqel-dev/widgets` força bump em tudo
 - Aceitável para projeto integrado como Arqel
 
 **Exception:** plugins de terceiros no marketplace (Fase 4) versionam independently — convention opcional, não obrigada.
@@ -309,8 +309,8 @@ Antes de major:
 RCs published em npm com tag `next`:
 
 ```bash
-npm install @arqel/react@next  # Gets RC
-npm install @arqel/react       # Gets stable
+npm install @arqel-dev/react@next  # Gets RC
+npm install @arqel-dev/react       # Gets stable
 ```
 
 ### 4.5 Hotfix process
@@ -574,7 +574,7 @@ Exemplos:
 feat(fields): add AiTranslate field for multi-language content
 
 Implements RF-F-13 from spec. Supports Claude, OpenAI, and Ollama
-providers via @arqel/ai package.
+providers via @arqel-dev/ai package.
 
 Closes #142
 ```
@@ -770,7 +770,7 @@ Exemplo:
 
 ```typescript
 import { useState } from 'react'
-import type { FieldComponentProps } from '@arqel/types'
+import type { FieldComponentProps } from '@arqel-dev/types'
 
 export function TextInput({ field, value, onChange, error }: FieldComponentProps<string>) {
     const [focused, setFocused] = useState(false)

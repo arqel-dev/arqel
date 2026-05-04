@@ -1,10 +1,10 @@
-# SKILL.md — arqel/actions
+# SKILL.md — arqel-dev/actions
 
 > Contexto canónico para AI agents. Estrutura conforme `PLANNING/04-repo-structure.md` §11.
 
 ## Purpose
 
-`arqel/actions` fornece as primitivas invocáveis do framework: row actions (botão por linha numa Table), bulk actions (sobre selecção), toolbar/header actions (botões globais ou de detail page), com confirmação opcional (modal), formulário inline (Action que abre um Form modal com Fields), authorization gates, notificações de sucesso/falha.
+`arqel-dev/actions` fornece as primitivas invocáveis do framework: row actions (botão por linha numa Table), bulk actions (sobre selecção), toolbar/header actions (botões globais ou de detail page), com confirmação opcional (modal), formulário inline (Action que abre um Form modal com Fields), authorization gates, notificações de sucesso/falha.
 
 ## Status
 
@@ -171,7 +171,7 @@ RowAction::make('view_on_site')
 
 - `declare(strict_types=1)` obrigatório
 - `Action::__construct` é `final`; subclasses só declaram `$type`. Para extensibilidade usa **traits/concerns** ou mais um Type final
-- Form fields dentro de actions usam `arqel/fields` directamente (sem layout components — modais são intencionalmente simples)
+- Form fields dentro de actions usam `arqel-dev/fields` directamente (sem layout components — modais são intencionalmente simples)
 - Authorization é gate **adicional** ao Resource Policy — não substitui. `authorize()` é para regras especificas ao action; o Resource Policy continua a ser invocado via Laravel Gate
 - Notificações usam `successNotification`/`failureNotification` para texto literal — i18n é responsabilidade do consumer (passa string já traduzida)
 

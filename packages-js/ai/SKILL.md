@@ -1,4 +1,4 @@
-# SKILL.md — arqel/ai (JS)
+# SKILL.md — arqel-dev/ai (JS)
 
 ## Purpose
 
@@ -64,7 +64,7 @@ Comportamento ao clicar no botão:
 ### Uso direto
 
 ```tsx
-import { AiTextInput } from '@arqel/ai';
+import { AiTextInput } from '@arqel-dev/ai';
 
 <AiTextInput
   name="description"
@@ -83,11 +83,11 @@ import { AiTextInput } from '@arqel/ai';
 />;
 ```
 
-### Via FieldRegistry do `@arqel/ui`
+### Via FieldRegistry do `@arqel-dev/ui`
 
 ```ts
 // boot.ts
-import '@arqel/ai/register';
+import '@arqel-dev/ai/register';
 ```
 
 A partir daí qualquer schema com `component: 'AiTextInput'` (que é
@@ -158,7 +158,7 @@ via `onChange`.
 ### Uso direto
 
 ```tsx
-import { AiTranslateInput } from '@arqel/ai';
+import { AiTranslateInput } from '@arqel-dev/ai';
 
 <AiTranslateInput
   name="title"
@@ -230,7 +230,7 @@ Rota canônica: `POST /admin/{resource}/fields/{field}/classify`
 ### Uso direto
 
 ```tsx
-import { AiSelectInput } from '@arqel/ai';
+import { AiSelectInput } from '@arqel-dev/ai';
 
 <AiSelectInput
   name="priority"
@@ -302,7 +302,7 @@ Rota canônica: `POST /admin/{resource}/fields/{field}/extract`
 ### Uso direto
 
 ```tsx
-import { AiExtractInput } from '@arqel/ai';
+import { AiExtractInput } from '@arqel-dev/ai';
 
 <AiExtractInput
   name="contact"
@@ -383,7 +383,7 @@ Record<string,string> }` (200) ou `{ message }` (422).
 ### Uso direto
 
 ```tsx
-import { AiImageInput } from '@arqel/ai';
+import { AiImageInput } from '@arqel-dev/ai';
 
 <AiImageInput
   name="cover"

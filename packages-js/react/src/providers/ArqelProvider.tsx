@@ -1,4 +1,4 @@
-import type { PanelPayload } from '@arqel/types/inertia';
+import type { PanelPayload } from '@arqel-dev/types/inertia';
 import type { ReactNode } from 'react';
 
 import { PanelContext } from '../context/PanelContext.js';

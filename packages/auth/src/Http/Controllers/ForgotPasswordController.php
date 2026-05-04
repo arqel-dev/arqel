@@ -17,7 +17,7 @@ use Inertia\Response;
 /**
  * Forgot-password bundled de Arqel.
  *
- * Renderiza o componente Inertia `arqel/auth/ForgotPassword` e dispara o
+ * Renderiza o componente Inertia `arqel-dev/auth/ForgotPassword` e dispara o
  * envio do reset link via `Password::sendResetLink`. A resposta é genérica
  * (não revela se o e-mail existe) — flash `status` constante.
  */
@@ -46,7 +46,7 @@ final class ForgotPasswordController
      */
     public function showForm(): Response
     {
-        return Inertia::render('arqel/auth/ForgotPassword', [
+        return Inertia::render('arqel-dev/auth/ForgotPassword', [
             'loginUrl' => $this->currentPanel()?->getLoginUrl() ?? '/admin/login',
             'forgotPasswordUrl' => $this->currentPanel()?->getForgotPasswordUrl() ?? '/admin/forgot-password',
         ]);

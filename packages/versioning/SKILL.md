@@ -1,6 +1,6 @@
-# SKILL.md — arqel/versioning
+# SKILL.md — arqel-dev/versioning
 
-> Contexto canônico para AI agents trabalhando no pacote `arqel/versioning`.
+> Contexto canônico para AI agents trabalhando no pacote `arqel-dev/versioning`.
 
 ## Purpose
 
@@ -10,7 +10,7 @@ mudança em `arqel_versions`, com diff por campo, restore não-destrutivo,
 endpoints HTTP de history/restore e retention via Artisan command + Job
 queueable.
 
-A integração com `arqel/core` é **opcional** — o trait funciona standalone
+A integração com `arqel-dev/core` é **opcional** — o trait funciona standalone
 e os controllers degradam para `404` quando o `ResourceRegistry` não está
 bound. Sem hard-dep em `spatie/laravel-eventsourcing`.
 
@@ -113,7 +113,7 @@ serialização do `PruneOldVersionsJob`.
 ### Por chegar
 
 - **VERS-008** — Docs comparativo: versioning vs activity log
-  (`arqel/audit`).
+  (`arqel-dev/audit`).
 - Time-based prune **strategy** dentro do trait (atualmente só o
   Artisan command suporta `--days`).
 - Version **comparison API** (diff entre duas versions arbitrárias,
@@ -226,7 +226,7 @@ omitido — payloads podem conter PII e segredos do model.
 Ver `../../apps/docs/examples/versioning/`:
 
 - [`README.md`](../../apps/docs/examples/versioning/README.md) — comparativo
-  versioning vs `arqel/audit`, decision tree e anti-patterns.
+  versioning vs `arqel-dev/audit`, decision tree e anti-patterns.
 - [`cms-articles.md`](../../apps/docs/examples/versioning/cms-articles.md) —
   CMS com restore de artigos, schedule de prune e UI React.
 - [`ecommerce-orders.md`](../../apps/docs/examples/versioning/ecommerce-orders.md) —
@@ -319,5 +319,5 @@ final class AuditUser
   - [ADR-001](../../PLANNING/03-adrs.md) — Inertia-only
   - [ADR-008](../../PLANNING/03-adrs.md) — Pest 3 + tests-first
 - Pacotes vizinhos:
-  - `arqel/audit` — audit log complementar (eventos vs snapshots).
-  - `arqel/workflow` — layout de scaffold idêntico (state machines).
+  - `arqel-dev/audit` — audit log complementar (eventos vs snapshots).
+  - `arqel-dev/workflow` — layout de scaffold idêntico (state machines).

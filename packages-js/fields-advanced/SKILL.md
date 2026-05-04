@@ -1,20 +1,20 @@
-# SKILL.md — @arqel/fields-advanced (JS)
+# SKILL.md — @arqel-dev/fields-advanced (JS)
 
 > Contexto canónico para AI agents.
 
 ## Purpose
 
-`@arqel/fields-advanced` é o pacote React que entrega os 8 inputs avançados do Arqel: `RichTextInput`, `MarkdownInput`, `CodeInput`, `RepeaterInput`, `BuilderInput`, `KeyValueInput`, `TagsInput`, `WizardInput`. Existe ao lado do PHP `arqel/fields-advanced` — o PHP define `Field::component()` (os mesmos 8 nomes em PascalCase) e o JS faz o render. A separação versus `@arqel/fields` (core) existe porque os componentes ricos arrastam dependências pesadas (Tiptap, CodeMirror, Shiki, dnd-kit) que só devem entrar no bundle quando o panel realmente os usa.
+`@arqel-dev/fields-advanced` é o pacote React que entrega os 8 inputs avançados do Arqel: `RichTextInput`, `MarkdownInput`, `CodeInput`, `RepeaterInput`, `BuilderInput`, `KeyValueInput`, `TagsInput`, `WizardInput`. Existe ao lado do PHP `arqel-dev/fields-advanced` — o PHP define `Field::component()` (os mesmos 8 nomes em PascalCase) e o JS faz o render. A separação versus `@arqel-dev/fields` (core) existe porque os componentes ricos arrastam dependências pesadas (Tiptap, CodeMirror, Shiki, dnd-kit) que só devem entrar no bundle quando o panel realmente os usa.
 
 ## Status
 
 **Setup (FIELDS-ADV-018, scoped):**
 
-- Esqueleto do pacote `@arqel/fields-advanced` com 10 entry points subpath (`./`, `./register`, `./rich-text`, `./markdown`, `./code`, `./repeater`, `./builder`, `./key-value`, `./tags`, `./wizard`)
-- `src/register.ts` registra os 8 slots no `FieldRegistry` de `@arqel/ui` envolvendo cada `import()` dinâmico em `React.lazy`, garantindo code-splitting on-demand sem alterar `@arqel/ui`
+- Esqueleto do pacote `@arqel-dev/fields-advanced` com 10 entry points subpath (`./`, `./register`, `./rich-text`, `./markdown`, `./code`, `./repeater`, `./builder`, `./key-value`, `./tags`, `./wizard`)
+- `src/register.ts` registra os 8 slots no `FieldRegistry` de `@arqel-dev/ui` envolvendo cada `import()` dinâmico em `React.lazy`, garantindo code-splitting on-demand sem alterar `@arqel-dev/ui`
 - 8 stubs `<Name>Input.tsx` renderizam um placeholder `<div class="rounded border border-dashed ...">{name} not yet implemented (TICKET)</div>` + `<input type="hidden" id={inputId} value={JSON.stringify(value ?? null)} />` para preservar o round-trip do valor no submit do form enquanto o componente real não chegou
 - `src/shared/PlaceholderInput.tsx` centraliza a UI do stub; cada componente é um wrapper trivial
-- `src/shared/types.ts` re-exporta `FieldRendererProps` de `@arqel/ui/form` para imports ergonômicos
+- `src/shared/types.ts` re-exporta `FieldRendererProps` de `@arqel-dev/ui/form` para imports ergonômicos
 - 1 teste Vitest valida que `import('../src/register.js')` não lança e que os 8 nomes ficam disponíveis em `getFieldComponent()`
 
 ### Coverage
@@ -34,20 +34,20 @@
 
 ```tsx
 // resources/js/app.tsx
-import '@arqel/ui/styles.css';
-import '@arqel/fields/register';            // built-ins
-import '@arqel/fields-advanced/register';   // 8 slots advanced (lazy)
+import '@arqel-dev/ui/styles.css';
+import '@arqel-dev/fields/register';            // built-ins
+import '@arqel-dev/fields-advanced/register';   // 8 slots advanced (lazy)
 
-import { createArqelApp } from '@arqel/react/inertia';
+import { createArqelApp } from '@arqel-dev/react/inertia';
 
 createArqelApp({ appName: 'Acme', pages: import.meta.glob('./Pages/**/*.tsx') });
 ```
 
-A partir desse import, `<FieldRenderer>` resolve `field.component === 'RichTextInput'` (etc.) para o `LazyExoticComponent` registrado. O Suspense boundary do app shell de `@arqel/ui` cobre a primeira render enquanto o chunk carrega.
+A partir desse import, `<FieldRenderer>` resolve `field.component === 'RichTextInput'` (etc.) para o `LazyExoticComponent` registrado. O Suspense boundary do app shell de `@arqel-dev/ui` cobre a primeira render enquanto o chunk carrega.
 
 ```tsx
 // Override custom: registre depois do side-effect import
-import { registerField } from '@arqel/ui/form';
+import { registerField } from '@arqel-dev/ui/form';
 import { MyTiptapInput } from './fields/MyTiptapInput';
 
 registerField('RichTextInput', MyTiptapInput);

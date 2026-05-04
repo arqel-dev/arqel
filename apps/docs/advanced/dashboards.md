@@ -1,10 +1,10 @@
 # Dashboards e widgets
 
-> Pacote: [`arqel/widgets`](../../packages/widgets/) · Tickets: WIDGETS-001..015
+> Pacote: [`arqel-dev/widgets`](../../packages/widgets/) · Tickets: WIDGETS-001..015
 
 ## Purpose
 
-`arqel/widgets` entrega o sistema de **widgets de dashboard** para Arqel: cards de KPI (Stat), charts (Chart), mini-tabelas (Table) e widgets custom (escape-hatch). Cada widget é uma classe PHP declarativa que expõe um React component name + payload `data` per-render.
+`arqel-dev/widgets` entrega o sistema de **widgets de dashboard** para Arqel: cards de KPI (Stat), charts (Chart), mini-tabelas (Table) e widgets custom (escape-hatch). Cada widget é uma classe PHP declarativa que expõe um React component name + payload `data` per-render.
 
 Suporta:
 
@@ -73,7 +73,7 @@ Serializa config Recharts. **Sem hard dep** em libs JS — o PHP só emite a con
 
 ### `TableWidget`
 
-Mini-tabela. Sem hard dep em `arqel/table` (duck-typing) — bom para "últimos 5 pedidos" ou "top customers".
+Mini-tabela. Sem hard dep em `arqel-dev/table` (duck-typing) — bom para "últimos 5 pedidos" ou "top customers".
 
 ### `CustomWidget`
 
@@ -142,7 +142,7 @@ Sim — instancie `Dashboard` no seu próprio controller e passe ao Inertia rend
 Não — clamp em 1..12. Strings aceitam `'full'`, `'1/2'`, etc.
 
 **Onde vivem os components React?**
-`@arqel/ui/widgets` — entrega WIDGETS-010..012 (atualmente em desenvolvimento; PHP side e Inertia payload já estáveis).
+`@arqel-dev/ui/widgets` — entrega WIDGETS-010..012 (atualmente em desenvolvimento; PHP side e Inertia payload já estáveis).
 
 ## Anti-patterns
 

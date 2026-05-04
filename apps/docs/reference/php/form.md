@@ -1,4 +1,4 @@
-# `arqel/form` — API Reference
+# `arqel-dev/form` — API Reference
 
 Namespace `Arqel\Form\`. Builder fluente + 7 layout components + FormRequest generator.
 
@@ -56,6 +56,6 @@ Skip silente quando ficheiro existe e `force=false`. As classes geradas delegam 
 
 ## Related
 
-- SKILL: [`packages/form/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/form/SKILL.md)
+- SKILL: [`packages/form/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/form/SKILL.md)
 - Conceitos: [`/guide/tables-forms`](/guide/tables-forms)
-- Próximo: [`arqel/actions`](/reference/php/actions)
+- Próximo: [`arqel-dev/actions`](/reference/php/actions)

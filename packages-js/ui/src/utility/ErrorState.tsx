@@ -2,7 +2,7 @@
  * `<ErrorState>` — generic error block (404 / 403 / 500).
  *
  * Phase 1 ships a plain layout; richer illustrations / Heroicons land
- * with `@arqel/fields` icon registry.
+ * with `@arqel-dev/fields` icon registry.
  */
 
 import type { ReactNode } from 'react';

@@ -1,10 +1,10 @@
-# SKILL.md — arqel/cli-ink
+# SKILL.md — arqel-dev/cli-ink
 
 ## Purpose
 
-`@arqel/cli-ink` é um **CLI Node/TypeScript** baseado em [Ink](https://github.com/vadimdemedes/ink) + React 19 que entrega UIs ricas no terminal para apps Arqel: dashboard ao vivo com widgets, navegador read-only de Resources e tail de logs com highlight por nível.
+`@arqel-dev/cli-ink` é um **CLI Node/TypeScript** baseado em [Ink](https://github.com/vadimdemedes/ink) + React 19 que entrega UIs ricas no terminal para apps Arqel: dashboard ao vivo com widgets, navegador read-only de Resources e tail de logs com highlight por nível.
 
-Complementa o pacote PHP standalone `arqel/cli` (`packages/cli`, comandos `arqel new/install/cloud:export`). Aqui o foco é **observabilidade interativa**, não scaffolding.
+Complementa o pacote PHP standalone `arqel-dev/cli` (`packages/cli`, comandos `arqel new/install/cloud:export`). Aqui o foco é **observabilidade interativa**, não scaffolding.
 
 ## Status
 
@@ -52,7 +52,7 @@ Seu app gera os manifestos via comando agendado (cron) ou manual (`php artisan a
 ### React API exportada
 
 ```ts
-import { Dashboard, ResourceBrowser, LogTailer, MainMenu, useDataSource, useNavigableList } from '@arqel/cli-ink';
+import { Dashboard, ResourceBrowser, LogTailer, MainMenu, useDataSource, useNavigableList } from '@arqel-dev/cli-ink';
 ```
 
 Os componentes são **apresentacionais puros** — recebem `dataDir`/`filePath` e fazem I/O via fs. Para customizar a fonte, passe `ioOverrides={{ readFile, fileExists }}`.
@@ -71,7 +71,7 @@ Os componentes são **apresentacionais puros** — recebem `dataDir`/`filePath` 
 
 ```tsx
 import { render } from 'ink';
-import { Dashboard } from '@arqel/cli-ink';
+import { Dashboard } from '@arqel-dev/cli-ink';
 
 render(<Dashboard dataDir="/var/arqel/manifests" pollMs={2000} />);
 ```

@@ -18,7 +18,7 @@ use Throwable;
  * extraídos pelo `AiExtractField::extract()`.
  *
  * `ResourceRegistry` é resolvido via FQCN string para evitar
- * hard-dep sobre `arqel/core` durante o tipagem (consistente com
+ * hard-dep sobre `arqel-dev/core` durante o tipagem (consistente com
  * `AiTranslateController`/`AiClassifyController`).
  *
  * Authorization: Gate `use-ai` opt-in — quando ausente, allow por

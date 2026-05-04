@@ -43,7 +43,7 @@ Sem ação — Composer infere versão do tag git via Packagist.
 ### npm (`packages-js/*/package.json`)
 
 Bump `"version"` para a versão alvo (ex: `"0.8.0-rc.1"`) em todos os
-pacotes `@arqel/*`. Cross-deps em `workspace:*` permanecem como estão —
+pacotes `@arqel-dev/*`. Cross-deps em `workspace:*` permanecem como estão —
 pnpm/npm publish resolverão para a versão correta no momento do publish.
 
 ---
@@ -90,9 +90,9 @@ Acompanhar via `gh run watch` no workflow disparado pela tag.
 ## 6. Packagist + npm publish
 
 - **Packagist**: webhook dispara automático ao push da tag. Verificar
-  manualmente em `https://packagist.org/packages/arqel/<pkg>` que a
+  manualmente em `https://packagist.org/packages/arqel-dev/<pkg>` que a
   versão aparece (1–2 min de propagação).
-- **npm**: o workflow roda `pnpm --filter @arqel/<pkg> publish --tag
+- **npm**: o workflow roda `pnpm --filter @arqel-dev/<pkg> publish --tag
   rc --access public --no-git-checks`. Para releases estáveis, omitir
   `--tag rc` (será publicado em `latest`).
 
@@ -107,8 +107,8 @@ cd ~/PhpstormProjects/arqel-test
 
 Validar:
 
-- `composer require arqel/core:X.Y.Z` sem conflitos.
-- `pnpm add @arqel/ui@X.Y.Z @arqel/react@X.Y.Z ...` instala.
+- `composer require arqel-dev/core:X.Y.Z` sem conflitos.
+- `pnpm add @arqel-dev/ui@X.Y.Z @arqel-dev/react@X.Y.Z ...` instala.
 - `pnpm dev` + `php artisan serve` — admin panel carrega.
 - CRUD básico (create/read/update/delete) numa Resource de exemplo
   funciona.
@@ -133,13 +133,13 @@ Se o smoke test falha **ou** bug crítico reportado nas primeiras 24h:
 ### npm (janela de 72h)
 
 ```bash
-npm unpublish @arqel/<pkg>@X.Y.Z
+npm unpublish @arqel-dev/<pkg>@X.Y.Z
 ```
 
 Após 72h, npm bloqueia unpublish. Use `npm deprecate` em vez disso:
 
 ```bash
-npm deprecate @arqel/<pkg>@X.Y.Z "Critical bug — use X.Y.Z+1"
+npm deprecate @arqel-dev/<pkg>@X.Y.Z "Critical bug — use X.Y.Z+1"
 ```
 
 ### GitHub Release

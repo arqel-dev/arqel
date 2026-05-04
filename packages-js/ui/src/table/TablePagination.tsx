@@ -5,7 +5,7 @@
  * (typically via Inertia `router.get` with `preserveState: true`).
  */
 
-import type { PaginationMeta } from '@arqel/types/resources';
+import type { PaginationMeta } from '@arqel-dev/types/resources';
 import { Button } from '../action/Button.js';
 import { cn } from '../utils/cn.js';
 

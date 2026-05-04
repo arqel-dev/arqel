@@ -23,11 +23,11 @@ na infraestrutura gerenciada da Taylor Otwell, com ênfase em **DX zero-config**
 Arqel foi desenhado para qualquer host que rode **PHP 8.3+ com Laravel 12+**,
 mas o Laravel Cloud é nosso **target de referência** por três motivos:
 
-1. **Zero-config Reverb.** O broadcasting do Arqel (`@arqel/realtime`) usa Reverb
+1. **Zero-config Reverb.** O broadcasting do Arqel (`@arqel-dev/realtime`) usa Reverb
    como camada padrão (ADR-014). O Laravel Cloud expõe Reverb como serviço
    gerenciado com Redis pub/sub embutido — basta apontar `REVERB_HOST`.
 2. **Queue workers nativos.** O Arqel depende de queue para Bulk Actions, Exports
-   CSV/XLSX e jobs de IA (`@arqel/ai`). O Laravel Cloud trata workers como
+   CSV/XLSX e jobs de IA (`@arqel-dev/ai`). O Laravel Cloud trata workers como
    primeira-classe (não como hack de container).
 3. **Postgres + Redis em um único provisioning.** O `cloud:export` já gera o
    `cloud.yaml` com os serviços corretos.
@@ -57,7 +57,7 @@ o painel está no ar com HTTPS automático.
 
 - **Conta Laravel Cloud** ativa (qualquer plano — inclui free tier para testes).
 - **Repositório GitHub** (público ou privado).
-- **CLI Arqel** instalada globalmente: `composer global require arqel/cli`.
+- **CLI Arqel** instalada globalmente: `composer global require arqel-dev/cli`.
 - **PHP 8.3+** localmente para rodar `arqel cloud:export`.
 
 ## Estrutura desta seção
@@ -72,7 +72,7 @@ linear se for seu primeiro deploy:
 
 ## Suporte
 
-- **Issues do Arqel:** [github.com/arqel/arqel/issues](https://github.com/arqel/arqel/issues)
+- **Issues do Arqel:** [github.com/arqel-dev/arqel/issues](https://github.com/arqel-dev/arqel/issues)
   com label `infra/laravel-cloud`.
 - **Suporte Laravel Cloud:** dashboard oficial (questões de billing/infra fogem ao Arqel).
 - **Discord da comunidade:** canal `#deploys` (link no [README principal](../)).
@@ -99,7 +99,7 @@ A partir de 30+ deploys reais de Arqel no Laravel Cloud durante a Fase 4:
   vertical, Redis não tanto.
 - **Configure Sentry desde o primeiro deploy** — o Cloud não tem
   retentor de erros estruturados além de logs. Veja a integração em
-  `arqel/observability` (LCLOUD-006, próxima entrega).
+  `arqel-dev/observability` (LCLOUD-006, próxima entrega).
 - **Versione o `cloud.yaml`** — ele é a fonte da verdade do seu
   provisioning, não o dashboard.
 

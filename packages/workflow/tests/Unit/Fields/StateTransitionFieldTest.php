@@ -12,7 +12,7 @@ it('exposes type, component, and is created via make()', function (): void {
 
     expect($field)->toBeInstanceOf(StateTransitionField::class)
         ->and($field->getType())->toBe('state-transition')
-        ->and($field->getComponent())->toBe('arqel/workflow/StateTransition')
+        ->and($field->getComponent())->toBe('arqel-dev/workflow/StateTransition')
         ->and($field->getName())->toBe('state');
 });
 

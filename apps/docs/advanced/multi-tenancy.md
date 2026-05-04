@@ -1,10 +1,10 @@
 # Multi-tenancy
 
-> Pacote: [`arqel/tenant`](../../packages/tenant/) · Tickets: TENANT-001..015
+> Pacote: [`arqel-dev/tenant`](../../packages/tenant/) · Tickets: TENANT-001..015
 
 ## Purpose
 
-`arqel/tenant` fornece primitivas de multi-tenancy para o stack Arqel cobrindo dois grandes modos:
+`arqel-dev/tenant` fornece primitivas de multi-tenancy para o stack Arqel cobrindo dois grandes modos:
 
 - **Single-DB scoped** (default) — todos tenants partilham o mesmo schema; isolamento via global scope `tenant_id` no Eloquent. 80% dos casos. Zero overhead operacional.
 - **Multi-DB** (opt-in) — cada tenant tem o seu próprio database. Integra com `stancl/tenancy` ou `spatie/laravel-multitenancy` via adapters; não reinventa migrations/seeders isolados.

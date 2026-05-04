@@ -1,11 +1,11 @@
 # Arqel Marketplace — Frontend público
 
 App Laravel + Inertia + React (dogfood do framework Arqel) que renderiza o site público
-do marketplace de plugins. Consome os models e migrations expostos por `arqel/marketplace`.
+do marketplace de plugins. Consome os models e migrations expostos por `arqel-dev/marketplace`.
 
 ## Decisões arquiteturais
 
-- **Dogfood Arqel**: usamos `arqel/core` para futura área `/admin/marketplace`. As páginas
+- **Dogfood Arqel**: usamos `arqel-dev/core` para futura área `/admin/marketplace`. As páginas
   públicas (`/`, `/browse`, `/plugins/{slug}`) são Inertia "raw" — não vivem dentro de um Panel.
 - **Inertia 3** é a única ponte PHP↔React (ADR-001). Sem TanStack Query / SWR.
 - **Tailwind v4** via `@import 'tailwindcss';`.
@@ -17,7 +17,7 @@ do marketplace de plugins. Consome os models e migrations expostos por `arqel/ma
 ```bash
 composer install --ignore-platform-req=ext-zip
 corepack pnpm install
-pnpm --filter @arqel/marketplace-app build
+pnpm --filter @arqel-dev/marketplace-app build
 ```
 
 Após build, rode o servidor Laravel apontando para `apps/marketplace` (em produção:
@@ -93,7 +93,7 @@ e coluna `arqel_plugins.publisher_id` (FK lógica nullable).
 
 ## Checkout flow (MKTPLC-004-checkout)
 
-Fluxo completo de compra de plugins premium dentro do site público — usa `arqel/marketplace`
+Fluxo completo de compra de plugins premium dentro do site público — usa `arqel-dev/marketplace`
 `PaymentGateway` (Mock/Stripe via DI) e `LicenseKeyGenerator`.
 
 Rotas (todas em `web,auth`):

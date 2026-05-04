@@ -15,10 +15,10 @@ use Illuminate\Http\Request;
  * `Resource::fields()`. Resources that don't declare a form fall
  * back to the existing flat field list — no `form` key emitted.
  *
- * `arqel/core` is duck-typed against `arqel/form`, so we drive the
+ * `arqel-dev/core` is duck-typed against `arqel-dev/form`, so we drive the
  * test with a fake Form class implementing the contract
  * (`getFields`/`getSchema`/`toArray`) instead of pulling
- * `arqel/form` as a dev dep.
+ * `arqel-dev/form` as a dev dep.
  */
 final class FakeField
 {

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |     com optimistic concurrency via coluna `version`.
 |
 | Sync delta-by-delta (real-time) deve correr por WebSocket/Reverb
-| em pacote follow-up (`@arqel/realtime` cliente). Aqui só temos
+| em pacote follow-up (`@arqel-dev/realtime` cliente). Aqui só temos
 | snapshot persistence.
 |
 */

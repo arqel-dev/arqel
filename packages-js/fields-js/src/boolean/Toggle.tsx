@@ -5,9 +5,9 @@
  * correctly; styling is the canonical iOS-style track/thumb.
  */
 
-import type { ToggleFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
-import { cn } from '@arqel/ui/utils';
+import type { ToggleFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
+import { cn } from '@arqel-dev/ui/utils';
 
 export function Toggle({
   field,

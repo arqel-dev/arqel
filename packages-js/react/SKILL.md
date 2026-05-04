@@ -1,10 +1,10 @@
-# SKILL.md — @arqel/react
+# SKILL.md — @arqel-dev/react
 
 > Contexto canónico para AI agents.
 
 ## Purpose
 
-`@arqel/react` é a fundação do lado React: bindings Inertia, providers (panel/tenant/theme), contexts (panel/resource/tenant) e utilities compartilhadas (`route`, `translate`, `serializeFields`). É o pacote que `@arqel/hooks`, `@arqel/ui`, `@arqel/fields` (JS side) consomem.
+`@arqel-dev/react` é a fundação do lado React: bindings Inertia, providers (panel/tenant/theme), contexts (panel/resource/tenant) e utilities compartilhadas (`route`, `translate`, `serializeFields`). É o pacote que `@arqel-dev/hooks`, `@arqel-dev/ui`, `@arqel-dev/fields` (JS side) consomem.
 
 ## Status
 
@@ -23,24 +23,24 @@
 
 **Entregue (DEVTOOLS-002):**
 
-- Subpath `@arqel/react/devtools` exporta `installDevToolsHook(version)`,
+- Subpath `@arqel-dev/react/devtools` exporta `installDevToolsHook(version)`,
   `createDevToolsHook`, `ArqelDevToolsHook`, `ArqelDevToolsState`.
 - `createArqelApp` chama `installDevToolsHook` automaticamente no bootstrap.
 - 5 testes Vitest adicionais cobrindo install/no-op/idempotência/subscribe.
 
 **Por chegar:**
 
-- Hooks reusáveis em `@arqel/hooks` (HOOKS-001+)
-- UI components em `@arqel/ui` (UI-001+)
+- Hooks reusáveis em `@arqel-dev/hooks` (HOOKS-001+)
+- UI components em `@arqel-dev/ui` (UI-001+)
 
 ## DevTools hook (DEVTOOLS-002 + DEVTOOLS-003 + DEVTOOLS-006 + DEVTOOLS-007)
 
-Em modo desenvolvimento, `@arqel/react` expõe um hook em
+Em modo desenvolvimento, `@arqel-dev/react` expõe um hook em
 `window.__ARQEL_DEVTOOLS_HOOK__` para a extensão de browser
-(`@arqel/devtools-extension`) inspecionar o estado do panel/resource.
+(`@arqel-dev/devtools-extension`) inspecionar o estado do panel/resource.
 
 ```ts
-import { installDevToolsHook, installInertiaBridge } from '@arqel/react/devtools';
+import { installDevToolsHook, installInertiaBridge } from '@arqel-dev/react/devtools';
 
 const hook = installDevToolsHook('0.10.0-rc.1');
 // → cria { version, getState(), subscribe(cb), setPageProps(...), recordNavigation(...) }
@@ -106,7 +106,7 @@ ausentes). `createArqelApp` chama automaticamente se o hook está
 instalado e `'PerformanceObserver' in window`.
 
 ```ts
-import { installPerformanceObserver } from '@arqel/react/devtools';
+import { installPerformanceObserver } from '@arqel-dev/react/devtools';
 
 installPerformanceObserver(hook);
 hook.getPerformanceMetrics();
@@ -122,7 +122,7 @@ hook.getPerformanceMetrics();
 
 ```ts
 // resources/js/app.tsx
-import { createArqelApp } from '@arqel/react/inertia';
+import { createArqelApp } from '@arqel-dev/react/inertia';
 
 const userPages = import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx');
 
@@ -137,7 +137,7 @@ createArqelApp({
 ### Theme
 
 ```tsx
-import { useTheme } from '@arqel/react/providers';
+import { useTheme } from '@arqel-dev/react/providers';
 
 function ThemeToggle() {
   const { theme, resolved, setTheme, toggle } = useTheme();
@@ -155,7 +155,7 @@ function ThemeToggle() {
 ### Contexts
 
 ```tsx
-import { usePanel, useResourceContext } from '@arqel/react/context';
+import { usePanel, useResourceContext } from '@arqel-dev/react/context';
 
 function PanelHeader() {
   const panel = usePanel();
@@ -166,13 +166,13 @@ function PanelHeader() {
 ### Utilities
 
 ```ts
-import { route } from '@arqel/react/utils';
+import { route } from '@arqel-dev/react/utils';
 
 const url = route('arqel.resources.edit', { resource: 'users', id: 1 });
 ```
 
 ```ts
-import { translate, useTranslator } from '@arqel/react/utils';
+import { translate, useTranslator } from '@arqel-dev/react/utils';
 
 const t = useTranslator(translations); // translations from SharedProps
 t('arqel.actions.create'); // → "Create"
@@ -180,7 +180,7 @@ t('hello', { name: 'World' }); // → "Hello World"
 ```
 
 ```ts
-import { buildInitialFormState } from '@arqel/react/utils';
+import { buildInitialFormState } from '@arqel-dev/react/utils';
 
 const initial = buildInitialFormState(fields, record);
 // boolean → false, multiSelect/hasMany → [], number/currency → null, others → ''

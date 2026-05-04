@@ -10,7 +10,7 @@ return [
     |
     | The route path that exposes the global filterable activity log
     | (handled by GlobalActivityLogController). Future
-    | ActivityLogResource integration in `arqel/core` reads this value
+    | ActivityLogResource integration in `arqel-dev/core` reads this value
     | to build links from the panel navigation.
     */
     'global_log_url' => '/admin/audit/activity',

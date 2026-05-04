@@ -3,14 +3,14 @@
  *
  * Renders a `<FormRenderer>` over the schema/fields the server
  * emits (with `record: null`). Submission goes through Inertia's
- * `useForm` via `useArqelForm` from `@arqel/hooks` — this page is
+ * `useForm` via `useArqelForm` from `@arqel-dev/hooks` — this page is
  * just the layout shell.
  */
 
-import { useArqelForm } from '@arqel/hooks';
-import type { FieldSchema } from '@arqel/types/fields';
-import type { FormSchema } from '@arqel/types/forms';
-import type { ResourceCreateProps } from '@arqel/types/resources';
+import { useArqelForm } from '@arqel-dev/hooks';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import type { FormSchema } from '@arqel-dev/types/forms';
+import type { ResourceCreateProps } from '@arqel-dev/types/resources';
 import { router, usePage } from '@inertiajs/react';
 import type { FormEvent, JSX } from 'react';
 import { FormActions } from '../form/FormActions.js';

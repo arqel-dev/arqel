@@ -1,13 +1,13 @@
-# @arqel/cli-ink
+# @arqel-dev/cli-ink
 
 > Rich terminal UI para apps Arqel — dashboard live, resource browser e log tailer construídos com [Ink](https://github.com/vadimdemedes/ink) + React 19.
 
 ## Instalação
 
 ```bash
-npm install -g @arqel/cli-ink
+npm install -g @arqel-dev/cli-ink
 # ou
-pnpm add -g @arqel/cli-ink
+pnpm add -g @arqel-dev/cli-ink
 ```
 
 Requer **Node.js ≥ 20.9** (LTS). Suporta macOS, Linux e Windows (cmd / PowerShell / Windows Terminal).

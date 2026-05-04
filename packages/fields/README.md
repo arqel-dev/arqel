@@ -1,4 +1,4 @@
-# arqel/fields
+# arqel-dev/fields
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![PHP](https://img.shields.io/badge/php-%5E8.3-777bb4.svg)](https://www.php.net)
@@ -9,7 +9,7 @@ Pacote de **Fields** declarativos para o ecossistema [Arqel](https://arqel.dev) 
 
 ## Visão
 
-`arqel/fields` define a abstracção `Field` que descreve um único campo de formulário/coluna de tabela: tipo, label, validação Laravel, schema Zod inferido para o cliente, autorização per-field, visibilidade contextual, dependências reactivas, e tudo o que precisa para tornar a definição PHP renderizável em React sem duplicar lógica.
+`arqel-dev/fields` define a abstracção `Field` que descreve um único campo de formulário/coluna de tabela: tipo, label, validação Laravel, schema Zod inferido para o cliente, autorização per-field, visibilidade contextual, dependências reactivas, e tudo o que precisa para tornar a definição PHP renderizável em React sem duplicar lógica.
 
 ## Status
 

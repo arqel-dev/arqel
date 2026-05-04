@@ -16,15 +16,15 @@ Stripe é universal — qualquer admin que toca em pagamentos eventualmente prec
 
 ## Antes de começar: arqel/* vs marketplace plugins
 
-O monorepo `arqel/arqel` mantém pacotes "core" (`arqel/core`, `arqel/fields`, `arqel/table`, etc) que são **maintained pelos devs do framework**. Eles vivem em `packages/*` e são distribuídos via splitsh.
+O monorepo `arqel-dev/arqel` mantém pacotes "core" (`arqel-dev/core`, `arqel-dev/fields`, `arqel-dev/table`, etc) que são **maintained pelos devs do framework**. Eles vivem em `packages/*` e são distribuídos via splitsh.
 
-Plugins community (incluindo o exemplo deste tutorial) vivem em **repositórios separados**, mantidos por terceiros. Eles dependem de `arqel/*` mas não têm acesso privilegiado — usam exatamente as mesmas APIs públicas que qualquer dev usa.
+Plugins community (incluindo o exemplo deste tutorial) vivem em **repositórios separados**, mantidos por terceiros. Eles dependem de `arqel-dev/*` mas não têm acesso privilegiado — usam exatamente as mesmas APIs públicas que qualquer dev usa.
 
 A linha:
 
-| Aspecto | Pacote core (`arqel/*`) | Plugin community |
+| Aspecto | Pacote core (`arqel-dev/*`) | Plugin community |
 |---|---|---|
-| Repositório | Monorepo `arqel/arqel` | Repo standalone do autor |
+| Repositório | Monorepo `arqel-dev/arqel` | Repo standalone do autor |
 | Manutenção | Time Arqel | Autor (community) |
 | Distribuição | Composer + npm via splitsh | Composer + npm direto pelo autor |
 | Submissão ao marketplace | Não aplicável (já listado oficialmente) | Obrigatória |
@@ -53,8 +53,8 @@ Edite `composer.json` para o estado canônico:
   "keywords": ["arqel", "plugin", "field", "stripe", "payments"],
   "require": {
     "php": "^8.3",
-    "arqel/core": "^1.0",
-    "arqel/fields": "^1.0"
+    "arqel-dev/core": "^1.0",
+    "arqel-dev/fields": "^1.0"
   },
   "require-dev": {
     "pestphp/pest": "^3.0",
@@ -128,7 +128,7 @@ final class StripeCardServiceProvider extends ServiceProvider
 }
 ```
 
-A `FieldRegistry::register(name, class)` é a API canônica de `arqel/fields` para field types externos. O `name` (`'stripe-card'`) é o que o Field expõe via `Field::type()` e o que o React side usa para resolver o componente.
+A `FieldRegistry::register(name, class)` é a API canônica de `arqel-dev/fields` para field types externos. O `name` (`'stripe-card'`) é o que o Field expõe via `Field::type()` e o que o React side usa para resolver o componente.
 
 E `config/stripe-card.php`:
 
@@ -244,7 +244,7 @@ O lado React vive em pacote separado. Crie `package.json`:
   },
   "keywords": ["arqel", "plugin", "field", "stripe"],
   "peerDependencies": {
-    "@arqel/types": "^1.0",
+    "@arqel-dev/types": "^1.0",
     "@stripe/stripe-js": "^4.0",
     "react": "^19.2"
   },
@@ -261,7 +261,7 @@ O lado React vive em pacote separado. Crie `package.json`:
 Agora `src/StripeCardInput.tsx`:
 
 ```tsx
-import type { FieldProps } from '@arqel/types';
+import type { FieldProps } from '@arqel-dev/types';
 import { CardElement, Elements } from '@stripe/react-stripe-js';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -309,7 +309,7 @@ export function StripeCardInput(props: StripeCardInputProps) {
 Crie `src/index.ts` com export agregador:
 
 ```ts
-import { registerField } from '@arqel/react';
+import { registerField } from '@arqel-dev/react';
 
 import { StripeCardInput } from './StripeCardInput';
 
@@ -473,7 +473,7 @@ POST /api/marketplace/plugins/acme-stripe-card/versions
 ## Anti-patterns comuns
 
 - ❌ **Não embarque assets JS no pacote PHP**. Use companion npm package.
-- ❌ **Não require `arqel/arqel` inteiro** — declare apenas `arqel/core` + os pacotes que você de fato usa.
+- ❌ **Não require `arqel-dev/arqel` inteiro** — declare apenas `arqel-dev/core` + os pacotes que você de fato usa.
 - ❌ **Não use `setMeta()` raw** ao invés de criar setters tipados — perde DX e quebra autocomplete.
 - ❌ **Não chame `Stripe::setApiKey()` global** dentro do field — vaza estado entre requests.
 - ❌ **Não force `arqel: ^1` quando seu plugin precisa de feature `^1.5`** — coloque `^1.5` para falhar no `composer require`, não em runtime.

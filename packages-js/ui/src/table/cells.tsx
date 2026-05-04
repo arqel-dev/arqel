@@ -18,7 +18,7 @@ import type {
   NumberColumnSchema,
   RelationshipColumnSchema,
   TextColumnSchema,
-} from '@arqel/types/tables';
+} from '@arqel-dev/types/tables';
 import { cn } from '../utils/cn.js';
 
 export interface CellProps {

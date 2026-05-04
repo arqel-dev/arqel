@@ -51,10 +51,10 @@ export default defineConfig({
       {
         text: 'v0.0',
         items: [
-          { text: 'Changelog', link: 'https://github.com/arqel/arqel/blob/main/CHANGELOG.md' },
+          { text: 'Changelog', link: 'https://github.com/arqel-dev/arqel/blob/main/CHANGELOG.md' },
           {
             text: 'Roadmap',
-            link: 'https://github.com/arqel/arqel/blob/main/PLANNING/07-roadmap-fases.md',
+            link: 'https://github.com/arqel-dev/arqel/blob/main/PLANNING/07-roadmap-fases.md',
           },
         ],
       },
@@ -132,24 +132,24 @@ export default defineConfig({
           text: 'PHP',
           items: [
             { text: 'Overview', link: '/reference/php-overview' },
-            { text: 'arqel/core', link: '/reference/php/core' },
-            { text: 'arqel/fields', link: '/reference/php/fields' },
-            { text: 'arqel/table', link: '/reference/php/table' },
-            { text: 'arqel/form', link: '/reference/php/form' },
-            { text: 'arqel/actions', link: '/reference/php/actions' },
-            { text: 'arqel/auth', link: '/reference/php/auth' },
-            { text: 'arqel/nav', link: '/reference/php/nav' },
+            { text: 'arqel-dev/core', link: '/reference/php/core' },
+            { text: 'arqel-dev/fields', link: '/reference/php/fields' },
+            { text: 'arqel-dev/table', link: '/reference/php/table' },
+            { text: 'arqel-dev/form', link: '/reference/php/form' },
+            { text: 'arqel-dev/actions', link: '/reference/php/actions' },
+            { text: 'arqel-dev/auth', link: '/reference/php/auth' },
+            { text: 'arqel-dev/nav', link: '/reference/php/nav' },
           ],
         },
         {
           text: 'TypeScript',
           items: [
             { text: 'Overview', link: '/reference/typescript-overview' },
-            { text: '@arqel/types', link: '/reference/typescript/types' },
-            { text: '@arqel/react', link: '/reference/typescript/react' },
-            { text: '@arqel/hooks', link: '/reference/typescript/hooks' },
-            { text: '@arqel/ui', link: '/reference/typescript/ui' },
-            { text: '@arqel/fields', link: '/reference/typescript/fields' },
+            { text: '@arqel-dev/types', link: '/reference/typescript/types' },
+            { text: '@arqel-dev/react', link: '/reference/typescript/react' },
+            { text: '@arqel-dev/hooks', link: '/reference/typescript/hooks' },
+            { text: '@arqel-dev/ui', link: '/reference/typescript/ui' },
+            { text: '@arqel-dev/fields', link: '/reference/typescript/fields' },
           ],
         },
       ],
@@ -230,10 +230,10 @@ export default defineConfig({
       ],
     },
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/arqel/arqel' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/arqel-dev/arqel' }],
 
     editLink: {
-      pattern: 'https://github.com/arqel/arqel/edit/main/apps/docs/:path',
+      pattern: 'https://github.com/arqel-dev/arqel/edit/main/apps/docs/:path',
       text: 'Sugerir edição nesta página',
     },
 

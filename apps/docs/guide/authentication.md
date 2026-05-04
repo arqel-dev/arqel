@@ -1,6 +1,6 @@
 # Autenticação no Arqel
 
-> **TL;DR:** Arqel **não publica** páginas de login/registro hoje. Você precisa instalar um starter kit Laravel (Breeze, Jetstream ou Fortify), ou rolar o seu próprio. Um fluxo Inertia-React **opt-in** dentro de `arqel/auth` está planejado nos tickets **AUTH-006/007/008** — quando shipados, será equivalente ao que Filament/Nova oferecem nativamente.
+> **TL;DR:** Arqel **não publica** páginas de login/registro hoje. Você precisa instalar um starter kit Laravel (Breeze, Jetstream ou Fortify), ou rolar o seu próprio. Um fluxo Inertia-React **opt-in** dentro de `arqel-dev/auth` está planejado nos tickets **AUTH-006/007/008** — quando shipados, será equivalente ao que Filament/Nova oferecem nativamente.
 
 ## Por que Arqel não shipa autenticação hoje
 
@@ -13,11 +13,11 @@ Daí veio a lógica: o `arqel new` CLI instala Breeze + React + Inertia automati
 
 Na prática, isso falha em três cenários:
 
-- **`composer require arqel/arqel` direto, sem CLI** — o usuário não sabe que precisa de starter kit. Resultado: app instalada sem `/login`/`/register`.
+- **`composer require arqel-dev/arqel` direto, sem CLI** — o usuário não sabe que precisa de starter kit. Resultado: app instalada sem `/login`/`/register`.
 - **Comparação com competidores** — Filament e Nova shipam login pronto out-of-the-box; Arqel parece "mais incompleto" mesmo sendo a mesma quantidade de código no fim.
 - **Acoplamento escondido a Breeze + React + Inertia** — apesar do nome "starter kit-agnóstico", na realidade só essa combinação casa visualmente com o painel Arqel.
 
-Os tickets AUTH-006/007/008 (em revisão) propõem shipar páginas Inertia-React de auth dentro de `arqel/auth`, configuráveis via `Panel::configure()->login()->registration()->passwordReset()` no estilo Filament.
+Os tickets AUTH-006/007/008 (em revisão) propõem shipar páginas Inertia-React de auth dentro de `arqel-dev/auth`, configuráveis via `Panel::configure()->login()->registration()->passwordReset()` no estilo Filament.
 
 ## Como ter login/registro hoje
 
@@ -26,7 +26,7 @@ Os tickets AUTH-006/007/008 (em revisão) propõem shipar páginas Inertia-React
 Se está começando uma app nova:
 
 ```bash
-composer global require arqel/cli
+composer global require arqel-dev/cli
 arqel new my-admin --starter=breeze --tenancy=none --first-resource=Post
 bash arqel-setup-my-admin.sh
 ```
@@ -34,7 +34,7 @@ bash arqel-setup-my-admin.sh
 O script gerado executa:
 
 - `laravel new my-admin`
-- `composer require arqel/arqel`
+- `composer require arqel-dev/arqel`
 - `composer require laravel/breeze --dev`
 - `php artisan breeze:install react` (instala views Inertia/React de login, registro, forgot-password, profile)
 - `php artisan migrate`
@@ -90,9 +90,9 @@ Você implementa as views React/Inertia manualmente. Útil para apps SaaS onboar
 | Bundle size | Pequeno | Maior | Backend-only | TBD |
 | Visual encaixa no painel Arqel | ✅ Inertia/React | ✅ (variant inertia) | depende | ✅ |
 
-## Integração com `arqel/auth` (authorization)
+## Integração com `arqel-dev/auth` (authorization)
 
-Independente do starter kit, o pacote `arqel/auth` continua cuidando de **authorization** (Policies + Gate + abilities serializadas para Inertia). Após instalar o starter:
+Independente do starter kit, o pacote `arqel-dev/auth` continua cuidando de **authorization** (Policies + Gate + abilities serializadas para Inertia). Após instalar o starter:
 
 ```php
 // app/Providers/AppServiceProvider.php
@@ -143,7 +143,7 @@ $panel = Panel::configure()
 
 Isso registra automaticamente:
 
-- `GET /admin/register` — página Inertia `arqel/auth/Register` (componente `<RegisterPage />` do pacote `@arqel/auth`).
+- `GET /admin/register` — página Inertia `arqel-dev/auth/Register` (componente `<RegisterPage />` do pacote `@arqel-dev/auth`).
 - `POST /admin/register` — cria o `User` via `config('auth.providers.users.model')`, dispara `Illuminate\Auth\Events\Registered` e faz auto-login.
 
 Validação default: `name` (2–100 chars), `email` (único na tabela), `password` (mínimo 8 chars, com `password_confirmation`). Rate-limit: 3 registros por IP por hora.
@@ -172,7 +172,7 @@ $panel = Panel::configure()
 
 Isso registra:
 
-- `GET /admin/email/verify` — notice page Inertia `arqel/auth/VerifyEmailNotice`.
+- `GET /admin/email/verify` — notice page Inertia `arqel-dev/auth/VerifyEmailNotice`.
 - `GET /admin/email/verify/{id}/{hash}` — handler signed (com middleware `signed` + `throttle:6,1`), dispara `Verified` event ao confirmar.
 - `POST /admin/email/verify/resend` — reenvia o link via `sendEmailVerificationNotification()`.
 
@@ -198,7 +198,7 @@ $panel->middleware(['web', 'auth', 'verified']);
 
 ## Forgot password (AUTH-008)
 
-A partir de AUTH-008, o pacote `arqel/auth` shipa o fluxo completo de recuperação de senha — sem Breeze, Fortify ou Jetstream necessários.
+A partir de AUTH-008, o pacote `arqel-dev/auth` shipa o fluxo completo de recuperação de senha — sem Breeze, Fortify ou Jetstream necessários.
 
 ### Como ativar
 
@@ -218,18 +218,18 @@ Isso registra automaticamente quatro rotas (idempotentes — não duplicam se o 
 
 | Método | URL | Nome | Componente Inertia |
 |---|---|---|---|
-| GET | `/admin/forgot-password` | `password.request` | `arqel/auth/ForgotPassword` |
+| GET | `/admin/forgot-password` | `password.request` | `arqel-dev/auth/ForgotPassword` |
 | POST | `/admin/forgot-password` | `password.email` | — |
-| GET | `/admin/reset-password/{token}` | `password.reset` | `arqel/auth/ResetPassword` |
+| GET | `/admin/reset-password/{token}` | `password.reset` | `arqel-dev/auth/ResetPassword` |
 | POST | `/admin/reset-password` | `password.update` | — |
 
 ### Fluxo completo
 
 1. Usuário clica em **"Esqueci minha senha"** na `<LoginPage />` (link aparece automaticamente quando `passwordReset()` está ativo no painel).
-2. Inertia abre `arqel/auth/ForgotPassword`. Usuário digita o e-mail e submete.
+2. Inertia abre `arqel-dev/auth/ForgotPassword`. Usuário digita o e-mail e submete.
 3. Backend chama `Password::sendResetLink(['email' => ...])` e retorna **flash genérico** — independente do e-mail existir ou não. Isso evita user enumeration.
 4. Se o e-mail existe, Laravel envia a notificação `ResetPassword` com link para `/admin/reset-password/{token}?email=...`.
-5. Usuário abre o link, Inertia renderiza `arqel/auth/ResetPassword` com `token` (rota) e `email` (query) pré-preenchidos.
+5. Usuário abre o link, Inertia renderiza `arqel-dev/auth/ResetPassword` com `token` (rota) e `email` (query) pré-preenchidos.
 6. Submete nova senha + confirmação. Backend valida via `ResetPasswordRequest` (min:8 + confirmed), chama `Password::reset` e redireciona para `Panel::getLoginUrl()` com flash de sucesso.
 
 ### Segurança e limites
@@ -241,13 +241,13 @@ Isso registra automaticamente quatro rotas (idempotentes — não duplicam se o 
 
 ### Custom views
 
-As páginas React vêm em `@arqel/auth`:
+As páginas React vêm em `@arqel-dev/auth`:
 
 ```tsx
-import { ForgotPasswordPage, ResetPasswordPage } from '@arqel/auth';
+import { ForgotPasswordPage, ResetPasswordPage } from '@arqel-dev/auth';
 ```
 
-Você pode trocar pelo seu próprio componente registrando o nome do componente Inertia (`arqel/auth/ForgotPassword`/`arqel/auth/ResetPassword`) com a sua versão no resolver Inertia do app host.
+Você pode trocar pelo seu próprio componente registrando o nome do componente Inertia (`arqel-dev/auth/ForgotPassword`/`arqel-dev/auth/ResetPassword`) com a sua versão no resolver Inertia do app host.
 
 ## Próximos passos planejados
 
@@ -255,7 +255,7 @@ Você pode trocar pelo seu próprio componente registrando o nome do componente 
 - **AUTH-007** — Registration opt-in + email verification opt-in (entregue).
 - **AUTH-008** — Forgot-password + reset token flow (entregue).
 
-Quando esse ticket shipar, `composer require arqel/arqel` + `php artisan arqel:install` será suficiente — sem starter kit obrigatório.
+Quando esse ticket shipar, `composer require arqel-dev/arqel` + `php artisan arqel:install` será suficiente — sem starter kit obrigatório.
 
 ## Referências
 

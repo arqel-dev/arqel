@@ -22,9 +22,9 @@ use Throwable;
  * via `Log::warning()` para auditoria, ao invés de propagar
  * exceptions para o pipeline de auth do broadcaster.
  *
- * O acoplamento com `arqel/core` é opcional: usamos
+ * O acoplamento com `arqel-dev/core` é opcional: usamos
  * `app()->bound(ResourceRegistry::class)` antes de resolver. Apps
- * que usem `arqel/realtime` standalone (sem o core) recebem `false`
+ * que usem `arqel-dev/realtime` standalone (sem o core) recebem `false`
  * sem erros, preservando o contrato deny-by-default.
  */
 final readonly class ResourceChannelAuthorizer

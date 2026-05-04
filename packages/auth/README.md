@@ -1,4 +1,4 @@
-# arqel/auth
+# arqel-dev/auth
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![PHP](https://img.shields.io/badge/php-%5E8.3-777bb4.svg)](https://www.php.net)

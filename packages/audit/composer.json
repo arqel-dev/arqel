@@ -1,6 +1,6 @@
 {
-    "name": "arqel/audit",
-    "version": "0.8.0-rc.1",
+    "name": "arqel-dev/audit",
+    "version": "0.8.0",
     "description": "Activity log wrapper for Arqel — convenience trait + controller scaffold around spatie/laravel-activitylog.",
     "type": "library",
     "license": "MIT",
@@ -13,8 +13,8 @@
     ],
     "homepage": "https://arqel.dev",
     "support": {
-        "issues": "https://github.com/arqel/arqel/issues",
-        "source": "https://github.com/arqel/arqel",
+        "issues": "https://github.com/arqel-dev/arqel/issues",
+        "source": "https://github.com/arqel-dev/arqel",
         "docs": "https://arqel.dev/docs"
     },
     "require": {

@@ -1,5 +1,5 @@
-import type { FieldSchema } from '@arqel/types/fields';
-import type { FormSchema } from '@arqel/types/forms';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import type { FormSchema } from '@arqel-dev/types/forms';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';

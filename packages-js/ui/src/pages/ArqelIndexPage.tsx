@@ -8,7 +8,7 @@
  * lookup falls through to user pages first inside `createArqelApp`).
  */
 
-import type { RecordType, ResourceIndexProps } from '@arqel/types/resources';
+import type { RecordType, ResourceIndexProps } from '@arqel-dev/types/resources';
 import { usePage } from '@inertiajs/react';
 import type { JSX } from 'react';
 import { ResourceIndex } from '../resource/ResourceIndex.js';

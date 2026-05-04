@@ -1,12 +1,12 @@
 {
-  "name": "@arqel/ai",
-  "version": "0.8.0-rc.1",
+  "name": "@arqel-dev/ai",
+  "version": "0.8.0",
   "description": "React components for Arqel AI — AiTextInput field renderer paired with Arqel\\Ai\\Fields\\AiTextField.",
   "license": "MIT",
   "homepage": "https://arqel.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arqel/arqel.git",
+    "url": "https://github.com/arqel-dev/arqel.git",
     "directory": "packages-js/ai"
   },
   "keywords": [

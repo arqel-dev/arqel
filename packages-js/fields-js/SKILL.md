@@ -1,16 +1,16 @@
-# SKILL.md — @arqel/fields (JS)
+# SKILL.md — @arqel-dev/fields (JS)
 
 > Contexto canónico para AI agents.
 
 ## Purpose
 
-`@arqel/fields` é o pacote de inputs ricos do lado React. Cada componente registra-se no `FieldRegistry` de `@arqel/ui` (via `import '@arqel/fields/register'`) e substitui os fallbacks nativos do `<FieldRenderer>`. O nome usado em `registerField('TextInput', ...)` corresponde ao retornado por `Field::component()` no PHP — a Resource servidor não precisa saber nada do React.
+`@arqel-dev/fields` é o pacote de inputs ricos do lado React. Cada componente registra-se no `FieldRegistry` de `@arqel-dev/ui` (via `import '@arqel-dev/fields/register'`) e substitui os fallbacks nativos do `<FieldRenderer>`. O nome usado em `registerField('TextInput', ...)` corresponde ao retornado por `Field::component()` no PHP — a Resource servidor não precisa saber nada do React.
 
 ## Status
 
 **Entregue (FIELDS-JS-001..006):**
 
-- Pacote `@arqel/fields` com 12 entry points subpath (`./`, `./register`, `./text`, `./number`, `./boolean`, `./select`, `./relationship`, `./date`, `./file`, `./slug`, `./color`, `./hidden`)
+- Pacote `@arqel-dev/fields` com 12 entry points subpath (`./`, `./register`, `./text`, `./number`, `./boolean`, `./select`, `./relationship`, `./date`, `./file`, `./slug`, `./color`, `./hidden`)
 - **21 components no total** — um por field type canônico:
   - **text/**: `TextInput`, `TextareaInput`, `EmailInput`, `UrlInput`, `PasswordInput` (toggle reveal com `aria-pressed`)
   - **number/**: `NumberInput` (stepper buttons), `CurrencyInput` (Intl-format on blur, raw on focus)
@@ -23,9 +23,9 @@
   - **color/**: `ColorInput` (native picker + presets + hex text input)
   - **hidden/**: `HiddenInput` (`type="hidden"` value carrier)
 - Side-effect `register.ts` registra todos os 21 no FieldRegistry
-- `getRegisteredFields()` (re-exportado de `@arqel/ui/form`) retorna nomes registrados ordenados
+- `getRegisteredFields()` (re-exportado de `@arqel-dev/ui/form`) retorna nomes registrados ordenados
 - 23 testes Vitest passando — registry roundtrip, behaviour + a11y de cada componente
-- Estilo via CSS vars de `@arqel/ui` (sem hardcode); `aria-invalid` quando há erros
+- Estilo via CSS vars de `@arqel-dev/ui` (sem hardcode); `aria-invalid` quando há erros
 
 **Por chegar (Phase 2):**
 
@@ -38,7 +38,7 @@
 
 ```tsx
 // resources/js/fields/MoneyInput.tsx
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 
 export function MoneyInput({ field, value, onChange, errors, inputId }: FieldRendererProps) {
   const hasError = errors !== undefined && errors.length > 0;
@@ -58,9 +58,9 @@ export function MoneyInput({ field, value, onChange, errors, inputId }: FieldRen
 
 ```tsx
 // resources/js/app.tsx
-import '@arqel/ui/styles.css';
-import '@arqel/fields/register';
-import { registerField } from '@arqel/ui/form';
+import '@arqel-dev/ui/styles.css';
+import '@arqel-dev/fields/register';
+import { registerField } from '@arqel-dev/ui/form';
 import { MoneyInput } from './fields/MoneyInput';
 
 registerField('MoneyInput', MoneyInput); // depois do register.ts default
@@ -79,9 +79,9 @@ final class MoneyField extends Field
 
 ```tsx
 // resources/js/app.tsx
-import '@arqel/ui/styles.css';
-import '@arqel/fields/register'; // side effect: registra inputs ricos
-import { createArqelApp } from '@arqel/react/inertia';
+import '@arqel-dev/ui/styles.css';
+import '@arqel-dev/fields/register'; // side effect: registra inputs ricos
+import { createArqelApp } from '@arqel-dev/react/inertia';
 
 createArqelApp({
   appName: 'Acme Admin',
@@ -89,11 +89,11 @@ createArqelApp({
 });
 ```
 
-A partir desse import, `<FieldRenderer>` resolve `field.component === 'TextInput'` para o componente rico. Sem o import, cai no fallback nativo de `@arqel/ui/form` (`nativeFields.tsx`).
+A partir desse import, `<FieldRenderer>` resolve `field.component === 'TextInput'` para o componente rico. Sem o import, cai no fallback nativo de `@arqel-dev/ui/form` (`nativeFields.tsx`).
 
 ```tsx
 // Override custom: registre depois do side-effect import
-import { registerField } from '@arqel/ui/form';
+import { registerField } from '@arqel-dev/ui/form';
 import { MyFancyText } from './MyFancyText';
 
 registerField('TextInput', MyFancyText);
@@ -102,8 +102,8 @@ registerField('TextInput', MyFancyText);
 ## Conventions
 
 - **Nome do componente** segue o `Field::component()` retornado pelo PHP
-- **Props canônicas** vêm de `FieldRendererProps` (re-exportado de `@arqel/ui/form`): `field`, `value`, `onChange`, `errors`, `disabled`, `inputId`, `describedBy`
-- **Estilos** sempre via `@arqel/ui/utils#cn` + CSS vars (`--color-arqel-*`) — nunca hardcode
+- **Props canônicas** vêm de `FieldRendererProps` (re-exportado de `@arqel-dev/ui/form`): `field`, `value`, `onChange`, `errors`, `disabled`, `inputId`, `describedBy`
+- **Estilos** sempre via `@arqel-dev/ui/utils#cn` + CSS vars (`--color-arqel-*`) — nunca hardcode
 - **A11y**: `aria-invalid` quando `errors.length > 0`, `aria-describedby` propagado, labels associados via `inputId` (gerenciado pelo `<FieldRenderer>`)
 - **Side-effect entry**: `register.ts` é o único arquivo com `sideEffects: true` no `package.json`
 
@@ -112,7 +112,7 @@ registerField('TextInput', MyFancyText);
 - ❌ **Importar `register.ts` mais de uma vez** — registra 2x o mesmo componente; se você precisa override, chame `registerField` direto
 - ❌ **Criar wrapper `<label>` interno** — `<FieldRenderer>` já faz isso; o componente recebe `inputId` para `<input id={inputId}>`
 - ❌ **Hardcode de cor** — usa CSS vars
-- ❌ **Importar de `@arqel/fields/text/TextInput.js`** — usa subpaths declarados (`@arqel/fields/text`)
+- ❌ **Importar de `@arqel-dev/fields/text/TextInput.js`** — usa subpaths declarados (`@arqel-dev/fields/text`)
 - ❌ **Render label dentro do componente** — `<FieldRenderer>` é o dono do label
 
 ## Related

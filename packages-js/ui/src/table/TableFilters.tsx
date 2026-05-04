@@ -14,7 +14,7 @@ import type {
   SelectFilterSchema,
   TernaryFilterSchema,
   TextFilterSchema,
-} from '@arqel/types/tables';
+} from '@arqel-dev/types/tables';
 import { Button } from '../action/Button.js';
 import { cn } from '../utils/cn.js';
 

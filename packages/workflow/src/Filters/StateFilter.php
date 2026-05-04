@@ -13,11 +13,11 @@ use InvalidArgumentException;
 /**
  * Filtro standalone que extrai automaticamente as options a partir do
  * {@see WorkflowDefinition} de um Eloquent model que usa o trait
- * {@see HasWorkflow}. É **agnóstico** do `arqel/table`: expõe um
+ * {@see HasWorkflow}. É **agnóstico** do `arqel-dev/table`: expõe um
  * `toArray()` shape genérico que o user-land pluga em
- * `Table::filters([...])` quando o pacote `arqel/table` está disponível.
+ * `Table::filters([...])` quando o pacote `arqel-dev/table` está disponível.
  *
- * Mantém `arqel/workflow` standalone — sem dep em `arqel/table`.
+ * Mantém `arqel-dev/workflow` standalone — sem dep em `arqel-dev/table`.
  *
  * @phpstan-type StateOption array{value: string, label: string, color: string, icon: string}
  */
@@ -59,7 +59,7 @@ final readonly class StateFilter
     }
 
     /**
-     * Serialização para Inertia / consumo do `arqel/table`.
+     * Serialização para Inertia / consumo do `arqel-dev/table`.
      *
      * @return array{
      *     field: string,

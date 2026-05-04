@@ -6,11 +6,11 @@ Referência curada por pacote (TypeScript 5.6+ strict). Cada página documenta t
 
 | Pacote | Conteúdo | Página |
 |---|---|---|
-| `@arqel/types` | Discriminated unions de FieldType/ColumnType/FilterType, FormSchema, ResourceMeta, SharedProps | [Types →](/reference/typescript/types) |
-| `@arqel/react` | `createArqelApp`, `<ArqelProvider>`, `<ThemeProvider>`, contexts, utilities | [React →](/reference/typescript/react) |
-| `@arqel/hooks` | 10 hooks (`useResource`, `useArqelForm`, `useTable`, `useFlash`, `useCanAccess`, etc.) | [Hooks →](/reference/typescript/hooks) |
-| `@arqel/ui` | Shell, Table, Form, Action, Flash, Utility components + FieldRegistry + tokens CSS | [UI →](/reference/typescript/ui) |
-| `@arqel/fields` | 21 rich inputs registrados via FieldRegistry + helper `slugify` | [Fields →](/reference/typescript/fields) |
+| `@arqel-dev/types` | Discriminated unions de FieldType/ColumnType/FilterType, FormSchema, ResourceMeta, SharedProps | [Types →](/reference/typescript/types) |
+| `@arqel-dev/react` | `createArqelApp`, `<ArqelProvider>`, `<ThemeProvider>`, contexts, utilities | [React →](/reference/typescript/react) |
+| `@arqel-dev/hooks` | 10 hooks (`useResource`, `useArqelForm`, `useTable`, `useFlash`, `useCanAccess`, etc.) | [Hooks →](/reference/typescript/hooks) |
+| `@arqel-dev/ui` | Shell, Table, Form, Action, Flash, Utility components + FieldRegistry + tokens CSS | [UI →](/reference/typescript/ui) |
+| `@arqel-dev/fields` | 21 rich inputs registrados via FieldRegistry + helper `slugify` | [Fields →](/reference/typescript/fields) |
 
 ## Convenções gerais
 
@@ -18,7 +18,7 @@ Referência curada por pacote (TypeScript 5.6+ strict). Cada página documenta t
 - **Subpath exports** declarados em `package.json` → tree-shake friendly. Nunca importar de `dist/` directamente
 - **`peerDependencies`** para React 19+ e `@inertiajs/react` 2+ — apps controlam a versão
 - **Build via `tsup`** — ESM only, `.d.ts` gerado, sourcemaps incluídos
-- **Side-effects: `false`** em todos os pacotes excepto `@arqel/fields` (que declara `sideEffects: ['./dist/register.js']` para o registo automático)
+- **Side-effects: `false`** em todos os pacotes excepto `@arqel-dev/fields` (que declara `sideEffects: ['./dist/register.js']` para o registo automático)
 - **Testes via Vitest + jsdom + `@testing-library/react`** — type-level via `expect-type`
 
 ## Geração automática (TODO)
@@ -36,4 +36,4 @@ Os critérios de DOCS-006 ("Types/interfaces/hooks/components documentados via T
 ## Related
 
 - PHP: [API Reference PHP](/reference/php-overview)
-- Source: [`packages-js/`](https://github.com/arqel/arqel/tree/main/packages-js)
+- Source: [`packages-js/`](https://github.com/arqel-dev/arqel/tree/main/packages-js)

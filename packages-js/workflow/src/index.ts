@@ -1,11 +1,11 @@
 /**
- * `@arqel/workflow` — React surface for the Arqel Workflow PHP package.
+ * `@arqel-dev/workflow` — React surface for the Arqel Workflow PHP package.
  *
  * Exports the `<StateTransition>` apresentational component plus its
- * type contracts. Apps that wire fields through `@arqel/ui`'s
- * `FieldRegistry` should also import `@arqel/workflow/register` once
+ * type contracts. Apps that wire fields through `@arqel-dev/ui`'s
+ * `FieldRegistry` should also import `@arqel-dev/workflow/register` once
  * at boot to install the lazy entry under the component name
- * `arqel/workflow/StateTransition`.
+ * `arqel-dev/workflow/StateTransition`.
  */
 
 export {

@@ -51,7 +51,7 @@ it('renders the Inertia register page on GET /admin/register', function (): void
 
     $response->assertOk();
     $payload = json_decode($response->getContent() ?: '', true);
-    expect($payload['component'] ?? null)->toBe('arqel/auth/Register');
+    expect($payload['component'] ?? null)->toBe('arqel-dev/auth/Register');
 });
 
 it('creates user, dispatches Registered event, auto-logs in and redirects', function (): void {

@@ -14,12 +14,12 @@ salto cognitivo Livewire/Alpine). A tabela abaixo resume os trade-offs.
 |-----------------------------------|------------------------|-----------------------------|
 | Render layer                      | Livewire + Alpine      | Inertia 3 + React 19.2+     |
 | Linguagem do client               | Blade + Alpine.js      | TypeScript strict           |
-| Customização de UI                | Blade components       | React components (`@arqel/ui`) |
+| Customização de UI                | Blade components       | React components (`@arqel-dev/ui`) |
 | Hot-reload em dev                 | Livewire reload        | Vite HMR                    |
 | Bundle size de admin              | Médio (Alpine + Tailwind) | Maior (React + Inertia)  |
 | Curva de aprendizado React        | Não exige              | Exige TS+React              |
 | Plugins comunitários              | Ricos (4 anos)         | Em construção (v0.8)        |
-| Multi-tenancy                     | Built-in               | `arqel/tenant` (5 resolvers + 2 adapters) |
+| Multi-tenancy                     | Built-in               | `arqel-dev/tenant` (5 resolvers + 2 adapters) |
 | Code splitting                    | Limitado               | Vite + tsup nativo          |
 | Static analysis                   | Boa                    | PHPStan max + TS strict     |
 
@@ -41,8 +41,8 @@ dividendos quando o panel cresce em complexidade de UI custom.
 | Filters                 | ✓                            | ✓ (`SelectFilter`/`DateRangeFilter`/etc) | 6 tipos + Visual Query Builder |
 | Lifecycle hooks         | ✓ (`mutateFormDataBefore...`)| ✓ (`beforeSave`/`afterSave`/etc)     | Nomes diferentes           |
 | Policies                | ✓ (Laravel Gates)            | ✓ (Laravel Gates)                    | Idêntico                   |
-| Multi-tenancy           | ✓                            | ✓ (`arqel/tenant`)                   | Adapters Stancl + Spatie   |
-| Widgets / Dashboards    | ✓                            | ✓ (`arqel/widgets`)                  | Stat/Chart/Table/Custom    |
+| Multi-tenancy           | ✓                            | ✓ (`arqel-dev/tenant`)                   | Adapters Stancl + Spatie   |
+| Widgets / Dashboards    | ✓                            | ✓ (`arqel-dev/widgets`)                  | Stat/Chart/Table/Custom    |
 | Notifications           | ✓                            | ⚠ (Phase 2)                          | Use Laravel Notifications  |
 | Custom pages            | ✓ (Livewire components)      | ✓ (Inertia + React) — **paradigma diferente** | Reescrita necessária |
 | Plugins                 | Ricos                        | Em desenvolvimento                   | Avaliar caso a caso        |
@@ -116,7 +116,7 @@ public function fields(): array
     return [
         F::text('title')->required()->maxLength(255),
         F::select('status')->options(['draft' => 'Draft', 'published' => 'Published']),
-        F::richText('body'), // requer arqel/fields-advanced
+        F::richText('body'), // requer arqel-dev/fields-advanced
     ];
 }
 ```
@@ -277,7 +277,7 @@ protected function afterCreate(Model $record): void { /* ... */ }
 $panel->tenant(Team::class)->tenantRoutePrefix('team');
 ```
 
-**Arqel** (com `arqel/tenant`):
+**Arqel** (com `arqel-dev/tenant`):
 
 ```php
 // config/arqel.php
@@ -314,7 +314,7 @@ class StatsOverview extends BaseWidget
 }
 ```
 
-**Arqel** (`arqel/widgets`):
+**Arqel** (`arqel-dev/widgets`):
 
 ```php
 use Arqel\Widgets\StatWidget;
@@ -409,21 +409,21 @@ return back()->with('flash', ['message' => 'Saved', 'type' => 'success']);
 ```
 
 > Sistema unificado de notificações está planejado para Phase 2
-> (`arqel/notifications`). Hoje use Laravel Notifications + Inertia
+> (`arqel-dev/notifications`). Hoje use Laravel Notifications + Inertia
 > shared props.
 
 ## Checklist passo-a-passo
 
 1. [ ] Auditar Models, Migrations, Policies — **não mudam**.
-2. [ ] Instalar Arqel: `composer require arqel/core arqel/table arqel/actions arqel/fields`.
+2. [ ] Instalar Arqel: `composer require arqel-dev/core arqel-dev/table arqel-dev/actions arqel-dev/fields`.
 3. [ ] Configurar painel paralelo em `/admin-v2` (coexistência com Filament).
 4. [ ] Migrar Resources mais simples primeiro (CRUD raso, sem relações).
 5. [ ] Portar `form()` → `fields()` + ajustar nomes de hooks (`mutateFormDataBeforeCreate` → `beforeCreate`).
 6. [ ] Portar `table()` columns/filters — paridade próxima de 1:1.
 7. [ ] Migrar Actions (header → toolbar, BulkActionGroup → array direto).
-8. [ ] Migrar Widgets/Dashboards para `arqel/widgets`.
+8. [ ] Migrar Widgets/Dashboards para `arqel-dev/widgets`.
 9. [ ] Reescrever páginas custom Livewire em React + Inertia (último — maior esforço).
-10. [ ] Configurar `arqel/tenant` se houver multi-tenancy; remover Filament panel; trocar prefixo `/admin-v2` para `/admin`.
+10. [ ] Configurar `arqel-dev/tenant` se houver multi-tenancy; remover Filament panel; trocar prefixo `/admin-v2` para `/admin`.
 
 ## Pitfalls comuns
 

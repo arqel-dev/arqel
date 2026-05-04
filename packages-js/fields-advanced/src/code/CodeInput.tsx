@@ -27,7 +27,7 @@
  * without a `CodeField` don't pay the ~80KB cost.
  */
 
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import {
   type ChangeEvent,
   type CSSProperties,

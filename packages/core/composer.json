@@ -1,6 +1,6 @@
 {
-    "name": "arqel/core",
-    "version": "0.8.0-rc.1",
+    "name": "arqel-dev/core",
+    "version": "0.8.0",
     "description": "Core contracts, service provider, and primitives for Arqel.",
     "type": "library",
     "license": "MIT",
@@ -12,8 +12,8 @@
     ],
     "homepage": "https://arqel.dev",
     "support": {
-        "issues": "https://github.com/arqel/arqel/issues",
-        "source": "https://github.com/arqel/arqel",
+        "issues": "https://github.com/arqel-dev/arqel/issues",
+        "source": "https://github.com/arqel-dev/arqel",
         "docs": "https://arqel.dev/docs"
     },
     "require": {

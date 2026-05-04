@@ -6,8 +6,8 @@
  * `true` until the Zod bridge ships in HOOKS-002 follow-up.
  */
 
-import { buildInitialFormState } from '@arqel/react/utils';
-import type { FieldSchema } from '@arqel/types/fields';
+import { buildInitialFormState } from '@arqel-dev/react/utils';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FormDataConvertible } from '@inertiajs/core';
 import type { InertiaFormProps } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';

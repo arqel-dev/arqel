@@ -1,10 +1,10 @@
 /**
- * Public re-exports for `@arqel/types`.
+ * Public re-exports for `@arqel-dev/types`.
  *
  * Most apps should import from a subpath
- * (`@arqel/types/fields`, `@arqel/types/resources`, …) so unused
+ * (`@arqel-dev/types/fields`, `@arqel-dev/types/resources`, …) so unused
  * shapes are tree-shaken. This barrel exists for convenience —
- * `import type { FieldSchema, ColumnSchema } from '@arqel/types'`.
+ * `import type { FieldSchema, ColumnSchema } from '@arqel-dev/types'`.
  */
 
 export type * from './actions.js';

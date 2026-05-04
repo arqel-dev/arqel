@@ -2,7 +2,7 @@
 
 Bem-vindo! O Arqel é um framework open-source MIT mantido pela comunidade. Este guia explica em detalhe como começar a contribuir, do primeiro `git clone` ao primeiro PR aprovado.
 
-> Resumo executivo no [`CONTRIBUTING.md`](https://github.com/arqel/arqel/blob/main/CONTRIBUTING.md) raiz. Este documento expande com mais contexto, exemplos e gotchas.
+> Resumo executivo no [`CONTRIBUTING.md`](https://github.com/arqel-dev/arqel/blob/main/CONTRIBUTING.md) raiz. Este documento expande com mais contexto, exemplos e gotchas.
 
 ## Por que contribuir
 
@@ -19,13 +19,13 @@ Não importa o tamanho da contribuição: typo fix, novo Field, vertical inteiro
 
 Leia, na ordem:
 
-1. [`README.md`](https://github.com/arqel/arqel/blob/main/README.md) — visão geral do projeto.
-2. [`CLAUDE.md`](https://github.com/arqel/arqel/blob/main/CLAUDE.md) — convenções operacionais (linguagem, stack, commits).
-3. [`PLANNING/00-index.md`](https://github.com/arqel/arqel/blob/main/PLANNING/00-index.md) — estrutura do plano.
-4. [`PLANNING/03-adrs.md`](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md) — 18 ADRs canônicos. **Não contradizer sem RFC.**
-5. [`CODE_OF_CONDUCT.md`](https://github.com/arqel/arqel/blob/main/CODE_OF_CONDUCT.md).
+1. [`README.md`](https://github.com/arqel-dev/arqel/blob/main/README.md) — visão geral do projeto.
+2. [`CLAUDE.md`](https://github.com/arqel-dev/arqel/blob/main/CLAUDE.md) — convenções operacionais (linguagem, stack, commits).
+3. [`PLANNING/00-index.md`](https://github.com/arqel-dev/arqel/blob/main/PLANNING/00-index.md) — estrutura do plano.
+4. [`PLANNING/03-adrs.md`](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md) — 18 ADRs canônicos. **Não contradizer sem RFC.**
+5. [`CODE_OF_CONDUCT.md`](https://github.com/arqel-dev/arqel/blob/main/CODE_OF_CONDUCT.md).
 
-Se a sua contribuição for uma feature nova grande, **abra primeiro uma discussão** em [GitHub Discussions](https://github.com/arqel/arqel/discussions) ou uma issue com label `rfc`. Isto evita retrabalho.
+Se a sua contribuição for uma feature nova grande, **abra primeiro uma discussão** em [GitHub Discussions](https://github.com/arqel-dev/arqel/discussions) ou uma issue com label `rfc`. Isto evita retrabalho.
 
 ## Pré-requisitos
 
@@ -44,10 +44,10 @@ Extensões PHP necessárias: `mbstring`, `intl`, `pdo_mysql`, `pdo_pgsql`, `redi
 ### 1. Fork + clone
 
 ```bash
-# No GitHub: arqel/arqel → Fork
+# No GitHub: arqel-dev/arqel → Fork
 git clone https://github.com/<seu-user>/arqel.git
 cd arqel
-git remote add upstream https://github.com/arqel/arqel.git
+git remote add upstream https://github.com/arqel-dev/arqel.git
 ```
 
 ### 2. Selecionar versão de Node
@@ -184,7 +184,7 @@ Mantenedores fazem squash merge para manter histórico limpo. A mensagem final s
 - `strict: true` + `noUncheckedIndexedAccess: true` (já em `tsconfig.base.json`).
 - Componentes funcionais sempre. Sem class components.
 - Hooks: prefixo `use`, regras do React em modo estrito.
-- Tipos exportados em `@arqel/types`. Nunca duplicar entre pacotes.
+- Tipos exportados em `@arqel-dev/types`. Nunca duplicar entre pacotes.
 - ESLint via Biome (`biome.json`).
 
 ### Inertia-only (ADR-001)
@@ -263,8 +263,8 @@ Contribuidores são listados automaticamente via [all-contributors](https://allc
 
 ## Suporte e dúvidas
 
-- Bug ou comportamento inesperado: [issue com template `bug_report`](https://github.com/arqel/arqel/issues/new?template=bug_report.yml).
-- Pergunta de uso: [Discussions](https://github.com/arqel/arqel/discussions) ou template `question`.
-- Vulnerabilidade de segurança: **NÃO** abra issue pública — siga [`SECURITY.md`](https://github.com/arqel/arqel/blob/main/SECURITY.md).
+- Bug ou comportamento inesperado: [issue com template `bug_report`](https://github.com/arqel-dev/arqel/issues/new?template=bug_report.yml).
+- Pergunta de uso: [Discussions](https://github.com/arqel-dev/arqel/discussions) ou template `question`.
+- Vulnerabilidade de segurança: **NÃO** abra issue pública — siga [`SECURITY.md`](https://github.com/arqel-dev/arqel/blob/main/SECURITY.md).
 
 Obrigado por contribuir com o Arqel!

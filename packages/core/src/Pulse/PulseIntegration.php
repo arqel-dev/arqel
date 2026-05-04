@@ -21,7 +21,7 @@ use Throwable;
  *
  * Expõe cards e recorders Arqel-específicos no dashboard `/pulse` quando
  * `laravel/pulse` está instalado na app. Quando o pacote não está
- * presente, todos os métodos viram no-op silencioso — `arqel/core`
+ * presente, todos os métodos viram no-op silencioso — `arqel-dev/core`
  * continua a funcionar sem hard-dep.
  *
  * Defensive em duas camadas:

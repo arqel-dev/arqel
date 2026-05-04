@@ -126,7 +126,7 @@ it('detects pnpm via lockfile and runs add commands', function (): void {
     expect($invocations->count())->toBe(2)
         ->and($invocations[0][0])->toBe('pnpm')
         ->and($invocations[0][1])->toBe('add')
-        ->and($invocations[0])->toContain('@arqel/ui')
+        ->and($invocations[0])->toContain('@arqel-dev/ui')
         ->and($invocations[1])->toContain('-D')
         ->and($invocations[1])->toContain('@inertiajs/react');
 });
@@ -165,8 +165,8 @@ it('writes resources/js/app.tsx with the createArqelApp boilerplate', function (
     $contents = (string) $this->files->get(resource_path('js/app.tsx'));
 
     expect($contents)
-        ->toContain("import '@arqel/ui/styles.css'")
-        ->toContain("import '@arqel/fields/register'")
+        ->toContain("import '@arqel-dev/ui/styles.css'")
+        ->toContain("import '@arqel-dev/fields/register'")
         ->toContain('createArqelApp')
         ->not->toContain('{{');
 });
@@ -183,7 +183,7 @@ it('appends arqel imports to existing resources/css/app.css without duplicating'
     $contents = (string) $this->files->get(resource_path('css/app.css'));
 
     expect(substr_count($contents, "@import 'tailwindcss'"))->toBe(1)
-        ->and($contents)->toContain("@import '@arqel/ui/styles.css'");
+        ->and($contents)->toContain("@import '@arqel-dev/ui/styles.css'");
 });
 
 it('surfaces a warning instead of failing when the package install exits non-zero', function (): void {

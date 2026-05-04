@@ -1,10 +1,10 @@
-# SKILL.md — arqel/table
+# SKILL.md — arqel-dev/table
 
-> Contexto canónico para AI agents a trabalhar no pacote `arqel/table`.
+> Contexto canónico para AI agents a trabalhar no pacote `arqel-dev/table`.
 
 ## Purpose
 
-`arqel/table` constrói tabelas declarativas para Resources Arqel — sorting, filtering, search, pagination, ações row/bulk/toolbar, edição inline, agrupamento, visual query builder, reorder e mobile mode. Recebe Columns + Filters declarados em PHP, aplica-os a uma query Eloquent via `TableQueryBuilder`, e expõe o schema serializado para o `<DataTable>` em `@arqel/ui`.
+`arqel-dev/table` constrói tabelas declarativas para Resources Arqel — sorting, filtering, search, pagination, ações row/bulk/toolbar, edição inline, agrupamento, visual query builder, reorder e mobile mode. Recebe Columns + Filters declarados em PHP, aplica-os a uma query Eloquent via `TableQueryBuilder`, e expõe o schema serializado para o `<DataTable>` em `@arqel-dev/ui`.
 
 `Resource::table()` é detectado por duck-typing em `Arqel\Core\Support\InertiaDataBuilder::isTableObject` (presença de `getColumns/getFilters/getActions/getBulkActions/getToolbarActions`). Quando presente, `buildTableIndexData` carrega via Reflection o `TableQueryBuilder` para paginar.
 
@@ -12,12 +12,12 @@
 
 **Base (TABLE-001..008):**
 
-- `Arqel\Table\Table` (final) builder: `make/columns/filters/actions/bulkActions/toolbarActions/defaultSort/perPage/perPageOptions/searchable/selectable/striped/compact/emptyState/toArray`. Action arrays são `array<int, mixed>` (duck-typed contra `arqel/actions` para evitar circular dep — ambos dependem só de `arqel/core`).
+- `Arqel\Table\Table` (final) builder: `make/columns/filters/actions/bulkActions/toolbarActions/defaultSort/perPage/perPageOptions/searchable/selectable/striped/compact/emptyState/toArray`. Action arrays são `array<int, mixed>` (duck-typed contra `arqel-dev/actions` para evitar circular dep — ambos dependem só de `arqel-dev/core`).
 - **9 Column types** em `src/Columns/`: `TextColumn` (limit/wrap), `BadgeColumn` (colors map), `BooleanColumn`, `DateColumn` (displayFormat/timezone), `NumberColumn` (decimals/prefix/suffix), `IconColumn`, `ImageColumn` (disk/circular/size), `RelationshipColumn` (`make(name, relation, attribute)`), `ComputedColumn` (`make(name, Closure)`). Setters comuns: `label/sortable/searchable/hidden/hiddenOnMobile/align/width/tooltip`.
 - **6 Filter types** em `src/Filters/`: `SelectFilter`, `MultiSelectFilter`, `DateRangeFilter`, `TextFilter`, `TernaryFilter`, `ScopeFilter`. Setters comuns: `label/apply(Closure)/default/placeholder`.
 - `TableQueryBuilder` (final): search global cross-column, filter application, sort whitelisted, eager-load inferido de `RelationshipColumn`, paginate sanitizado contra `perPageOptions`. Factory `for(Table, Builder, Request)::paginate()`.
-- **Per-row authz** (TABLE-007): `arqel/core` `InertiaDataBuilder::resolveVisibleActionNames` injeta `record.arqel.actions: ['view', 'edit']`; React filtra a lista global pelo nome. Avalia `Action::isVisibleFor` + `Action::canBeExecutedBy` duck-typed.
-- **Bulk actions endpoint** (TABLE-008): `POST {panel}/{resource}/bulk-actions/{action}` em `arqel/actions`, fetcha via `whereIn(getKeyName, ids)`, delega para `BulkAction::execute(Collection)` que chunka via `chunkSize(int)` (default 100, clamp ≥ 1). `deselectRecordsAfterCompletion(bool)` controla UX pós-execução.
+- **Per-row authz** (TABLE-007): `arqel-dev/core` `InertiaDataBuilder::resolveVisibleActionNames` injeta `record.arqel.actions: ['view', 'edit']`; React filtra a lista global pelo nome. Avalia `Action::isVisibleFor` + `Action::canBeExecutedBy` duck-typed.
+- **Bulk actions endpoint** (TABLE-008): `POST {panel}/{resource}/bulk-actions/{action}` em `arqel-dev/actions`, fetcha via `whereIn(getKeyName, ids)`, delega para `BulkAction::execute(Collection)` que chunka via `chunkSize(int)` (default 100, clamp ≥ 1). `deselectRecordsAfterCompletion(bool)` controla UX pós-execução.
 
 **Inline editing (TABLE-V2-002):**
 
@@ -60,7 +60,7 @@
 
 **Por chegar (cross-package + JS):**
 
-- `POST {panel}/{resource}/{id}/inline-update` controller (TABLE-V2-002 — depende de `arqel/core` `ResourceRegistry::findBySlug` + Policy authorization).
+- `POST {panel}/{resource}/{id}/inline-update` controller (TABLE-V2-002 — depende de `arqel-dev/core` `ResourceRegistry::findBySlug` + Policy authorization).
 - React inline-cell components, query-builder tree UI (drag-drop groups + value pickers polimórficos), column-visibility dropdown + persistência cross-package (`POST /admin/user-settings/tables/{resource}`), grouping sticky headers + summary rows render, reorder DnD-kit + auto-scroll + rollback (regra: bloquear reorder quando sort != reorder column), mobile stacked-cards render via `useBreakpoint`.
 - Concurrency optimistic via version column (Phase 3).
 - Adiados Phase 2: TABLE-009..013 (advanced filters: relationship-based, range numeric, computed) e persistência per-user de preferências (column visibility + sort default).
@@ -68,8 +68,8 @@
 ## Conventions
 
 - `declare(strict_types=1)` obrigatório; classes `final` (Columns, Filters, Constraints, Summaries, Table, TableQueryBuilder).
-- Action arrays são `array<int, mixed>` — `arqel/table` não declara dep em `arqel/actions` (circular path-repo).
-- Eager loading inferido de `RelationshipColumn`, não de `BelongsToField` (essa coordenação fica em `EagerLoadingResolver` de `arqel/fields` no contexto de form).
+- Action arrays são `array<int, mixed>` — `arqel-dev/table` não declara dep em `arqel-dev/actions` (circular path-repo).
+- Eager loading inferido de `RelationshipColumn`, não de `BelongsToField` (essa coordenação fica em `EagerLoadingResolver` de `arqel-dev/fields` no contexto de form).
 - Sort whitelisted: `?sort=anything` só funciona se a column declarou `->sortable()`.
 - Visual Query Builder: field/operator whitelist é fonte da verdade — input desconhecido é descartado, não rejeitado com erro.
 - Mobile mode / pagination type: valores inválidos degradam para default, nunca lançam.

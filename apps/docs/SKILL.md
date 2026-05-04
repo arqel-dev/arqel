@@ -68,14 +68,14 @@ apps/docs/
 
 - **PT-BR em todas as páginas markdown** — alinhado com regra "Documentação: português brasileiro" do `CLAUDE.md`
 - **Stubs marcam-se com bloco `> **Status:** stub — DOCS-NNN`** — torna visível qual ticket completa cada página
-- **Links externos** para SKILL.md no GitHub usam path absoluto (`https://github.com/arqel/arqel/blob/main/...`) — quando o site for autodocumentado em DOCS-005/006, esses links serão substituídos por links internos
+- **Links externos** para SKILL.md no GitHub usam path absoluto (`https://github.com/arqel-dev/arqel/blob/main/...`) — quando o site for autodocumentado em DOCS-005/006, esses links serão substituídos por links internos
 - **Assets em `public/`** — paths começam em `/` (ex: `/logo.svg`, `/hero.svg`)
 - **Sidebar declarativo no config** — não auto-gera de filesystem; cada nova página precisa de entry explícito em `.vitepress/config.ts`
 
 ## Anti-patterns
 
 - ❌ **Adicionar página sem entry no sidebar** — VitePress só lista no nav o que estiver em `themeConfig.sidebar`
-- ❌ **Importar `@arqel/*`** — docs site não usa o pacote, só linka para SKILL.md no GitHub
+- ❌ **Importar `@arqel-dev/*`** — docs site não usa o pacote, só linka para SKILL.md no GitHub
 - ❌ **Usar componentes Vue custom em landing antes de DOCS-002** — landing usa o layout `home` default; custom Vue chega em DOCS-008 se necessário
 - ❌ **Hardcode de cor em markdown** — temas via CSS vars (`--vp-c-brand-*`) em `theme/style.css`
 - ❌ **PR cheio sem search funcional** — verificar `pnpm dev` e abrir o modal de busca antes de mergear

@@ -1,4 +1,4 @@
-# SKILL.md — arqel/versioning (JS)
+# SKILL.md — arqel-dev/versioning (JS)
 
 ## Purpose
 
@@ -15,7 +15,7 @@ histórico de Resources:
   (`added` / `removed` / `changed` / `unchanged`).
 
 A fonte de dados canônica é o endpoint PHP
-`GET /admin/{resource}/{id}/versions` do pacote `arqel/versioning`,
+`GET /admin/{resource}/{id}/versions` do pacote `arqel-dev/versioning`,
 mas os componentes **não** sabem disso — recebem props prontas.
 
 ## Status
@@ -53,7 +53,7 @@ mas os componentes **não** sabem disso — recebem props prontas.
 ## Examples
 
 ```tsx
-import { VersionTimeline, VersionDiff, type Version } from '@arqel/versioning';
+import { VersionTimeline, VersionDiff, type Version } from '@arqel-dev/versioning';
 
 function HistoryDrawer({ versions }: { versions: Version[] }) {
   const [active, setActive] = useState<Version | null>(null);

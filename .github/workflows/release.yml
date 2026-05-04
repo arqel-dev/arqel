@@ -1,7 +1,14 @@
 name: Release
 
-# Placeholder — será completado em GOV-002 (release pipeline:
-# splitsh/lite para Packagist + pnpm publish --recursive para npm).
+# Disparado por tag semver (ex: v0.8.0). Faz split de cada pacote PHP em
+# packages/* para o sub-repo arqel-dev/<pkg> via splitsh/lite (Packagist
+# puxa via webhook), e publica os pacotes npm em packages-js/* via
+# pnpm publish -r --access public.
+#
+# Pré-requisitos (ver docs/publishing-setup.md):
+# - Org github.com/arqel-dev existe
+# - Secrets: ARQEL_BOT_TOKEN (PAT com repo+admin:org), NPM_TOKEN (publish, automation)
+# - Conta Packagist arqel-dev com webhook do GitHub configurado por sub-repo
 
 on:
   push:
@@ -14,7 +21,11 @@ on:
         required: false
         default: "true"
         type: choice
-        options: [ "true", "false" ]
+        options: ["true", "false"]
+      tag:
+        description: "Tag manual a publicar (ex: v0.8.0). Default = HEAD"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -23,15 +34,207 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  GH_ORG: arqel-dev
+
 jobs:
-  placeholder:
-    name: Release (placeholder)
+  resolve:
+    name: Resolve tag and release params
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.params.outputs.tag }}
+      version: ${{ steps.params.outputs.version }}
+      dry_run: ${{ steps.params.outputs.dry_run }}
+    steps:
+      - id: params
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          INPUT_DRY_RUN: ${{ github.event.inputs.dry_run }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "push" ]; then
+            tag="$REF_NAME"
+            dry="false"
+          else
+            tag="${INPUT_TAG:-$REF_NAME}"
+            dry="${INPUT_DRY_RUN:-true}"
+          fi
+          version="${tag#v}"
+          {
+            echo "tag=$tag"
+            echo "version=$version"
+            echo "dry_run=$dry"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved: tag=$tag version=$version dry_run=$dry"
+
+  split-php:
+    name: Split PHP — ${{ matrix.package }}
+    needs: resolve
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - actions
+          - ai
+          - audit
+          - auth
+          - cli
+          - core
+          - export
+          - fields
+          - fields-advanced
+          - form
+          - marketplace
+          - mcp
+          - nav
+          - realtime
+          - table
+          - tenant
+          - versioning
+          - widgets
+          - workflow
+    steps:
+      - name: Checkout monorepo (full history)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ARQEL_BOT_TOKEN }}
+
+      - name: Install splitsh/lite
+        run: |
+          curl -sSL "https://github.com/splitsh/lite/releases/download/v2.0.0/lite_linux_amd64.tar.gz" \
+            | tar -xzC /tmp
+          sudo mv /tmp/splitsh-lite /usr/local/bin/splitsh-lite
+
+      - name: Ensure sub-repo exists (auto-create if missing)
+        env:
+          GH_TOKEN: ${{ secrets.ARQEL_BOT_TOKEN }}
+          PKG: ${{ matrix.package }}
+        run: |
+          if ! gh repo view "$GH_ORG/$PKG" >/dev/null 2>&1; then
+            echo "Creating $GH_ORG/$PKG"
+            gh repo create "$GH_ORG/$PKG" \
+              --public \
+              --description "Subtree split of arqel-dev/$PKG (read-only — open issues/PRs in arqel-dev/arqel)" \
+              --homepage "https://arqel.dev"
+          else
+            echo "Repo $GH_ORG/$PKG already exists"
+          fi
+
+      - name: Compute split SHA
+        id: split
+        env:
+          PKG: ${{ matrix.package }}
+        run: |
+          sha="$(splitsh-lite --prefix="packages/$PKG" --quiet)"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Split SHA for packages/$PKG → $sha"
+
+      - name: Push split to sub-repo
+        if: needs.resolve.outputs.dry_run != 'true'
+        env:
+          PKG: ${{ matrix.package }}
+          SHA: ${{ steps.split.outputs.sha }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+          GH_TOKEN: ${{ secrets.ARQEL_BOT_TOKEN }}
+        run: |
+          remote="https://x-access-token:$GH_TOKEN@github.com/$GH_ORG/$PKG.git"
+          git push "$remote" "$SHA:refs/heads/main" --force
+          git push "$remote" "$SHA:refs/tags/$TAG" --force
+
+      - name: Dry-run summary
+        if: needs.resolve.outputs.dry_run == 'true'
+        env:
+          PKG: ${{ matrix.package }}
+          SHA: ${{ steps.split.outputs.sha }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+        run: |
+          echo "DRY RUN: would push $SHA -> $GH_ORG/$PKG main + tag $TAG"
+
+  publish-npm:
+    name: Publish npm packages
+    needs: resolve
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Acknowledge trigger
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.9.0
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify package versions match release tag
         env:
-          REF: ${{ github.ref }}
+          VERSION: ${{ needs.resolve.outputs.version }}
         run: |
-          echo "Release workflow triggered for ref: $REF"
-          echo "This workflow is a placeholder — real publishing is wired up in GOV-002."
+          mismatched=0
+          for f in packages-js/*/package.json; do
+            pkg_version=$(node -p "require('./$f').version")
+            pkg_private=$(node -p "require('./$f').private || false")
+            if [ "$pkg_private" = "true" ]; then
+              echo "skip $f (private)"
+              continue
+            fi
+            if [ "$pkg_version" != "$VERSION" ]; then
+              echo "::error file=$f::version $pkg_version != tag $VERSION"
+              mismatched=$((mismatched+1))
+            fi
+          done
+          if [ "$mismatched" -gt 0 ]; then
+            echo "$mismatched npm packages have a version mismatch with tag v$VERSION"
+            exit 1
+          fi
+
+      - name: Build all publishable packages
+        run: pnpm -r --filter "./packages-js/*" --if-present run build
+
+      - name: Publish (dry run)
+        if: needs.resolve.outputs.dry_run == 'true'
+        run: pnpm publish -r --access public --no-git-checks --dry-run
+
+      - name: Publish to npm
+        if: needs.resolve.outputs.dry_run != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish -r --access public --no-git-checks
+
+  github-release:
+    name: Create GitHub release
+    needs: [resolve, split-php, publish-npm]
+    if: needs.resolve.outputs.dry_run != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Extract changelog section
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" { capture=1; next }
+            capture && /^## \[/ { exit }
+            capture { print }
+          ' CHANGELOG.md > release-notes.md
+          echo "Notes:"
+          cat release-notes.md
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.resolve.outputs.tag }}
+        run: |
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes-file release-notes.md \
+            --verify-tag

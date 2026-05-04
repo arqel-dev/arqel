@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Route;
  * — exactly what Inertia's `useForm` consumes on the client.
  *
  * The full validation path (rules extracted from Fields) is
- * covered in `arqel/form` (FieldRulesExtractor tests). Here we
+ * covered in `arqel-dev/form` (FieldRulesExtractor tests). Here we
  * verify the controller's success branch when rules are empty
- * (no `arqel/form` extractor → permissive fallback): route + CSRF
+ * (no `arqel-dev/form` extractor → permissive fallback): route + CSRF
  * params are stripped before reaching `runCreate`.
  */
 beforeEach(function (): void {

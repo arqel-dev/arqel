@@ -19,7 +19,7 @@ use Throwable;
  * $this->app->singleton(ExportLogger::class, MyAppExportLogger::class);
  * ```
  *
- * Keeping persistence + notifications out of `arqel/export` itself
+ * Keeping persistence + notifications out of `arqel-dev/export` itself
  * lets the package stay agnostic of the User model, the Notification
  * pipeline and the Export model schema.
  */

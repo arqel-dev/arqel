@@ -1,6 +1,6 @@
 # Política de Privacidade — Arqel DevTools Extension
 
-> **Status:** vigente • **Versão:** 1.0 • **Data efetiva:** 2026-05-01 • **Aplicável a:** `@arqel/devtools-extension` (Chrome, Firefox, Edge)
+> **Status:** vigente • **Versão:** 1.0 • **Data efetiva:** 2026-05-01 • **Aplicável a:** `@arqel-dev/devtools-extension` (Chrome, Firefox, Edge)
 
 A extensão **Arqel DevTools** foi desenhada com privacidade-first como princípio de design. Esta política descreve, de forma transparente, exatamente o que a extensão faz com dados do usuário — a resposta curta é: **nada sai da máquina do usuário, em nenhuma circunstância, sem ação explícita.**
 
@@ -22,14 +22,14 @@ A extensão **Arqel DevTools** foi desenhada com privacidade-first como princíp
 
 ## 2. O que a extensão faz
 
-A `@arqel/devtools-extension` é uma ferramenta de debug para desenvolvedores Arqel. Ela adiciona um painel ao DevTools do navegador que mostra:
+A `@arqel-dev/devtools-extension` é uma ferramenta de debug para desenvolvedores Arqel. Ela adiciona um painel ao DevTools do navegador que mostra:
 
 - **Resources detectados** na página atual (lista de classes Resource registradas no painel Arqel ativo).
 - **Inertia props** atuais e histórico de navegação Inertia (somente da aba ativa, somente em modo dev).
 - **Eventos do React DevTools bridge** para componentes Arqel (Field, Form, Table).
 - **Performance markers** dos hooks Arqel (`useArqelForm`, `useArqelTable`).
 
-Tudo isso vem **da própria página inspecionada**, via hook injetado **apenas quando** `window.__ARQEL_DEV__ === true` — uma flag que só é setada quando a aplicação está em modo `development` e o desenvolvedor explicitamente importa `@arqel/react/dev`.
+Tudo isso vem **da própria página inspecionada**, via hook injetado **apenas quando** `window.__ARQEL_DEV__ === true` — uma flag que só é setada quando a aplicação está em modo `development` e o desenvolvedor explicitamente importa `@arqel-dev/react/dev`.
 
 ---
 
@@ -61,7 +61,7 @@ A extensão **não solicita**: `tabs`, `history`, `cookies`, `webRequest`, `<all
 
 A injeção do bridge só acontece quando **todas** estas condições são verdadeiras:
 
-1. A aplicação importou `@arqel/react/dev` (subpath separado, removido do bundle de produção via tree-shaking).
+1. A aplicação importou `@arqel-dev/react/dev` (subpath separado, removido do bundle de produção via tree-shaking).
 2. `process.env.NODE_ENV === 'development'`.
 3. `window.__ARQEL_DEV__ === true` (setado explicitamente pelo dev).
 
@@ -97,7 +97,7 @@ Esses dados **nunca saem do dispositivo**.
 
 ## 8. Segurança
 
-- A extensão é open-source (MIT) — código auditável em `https://github.com/arqel/arqel/tree/main/packages-js/devtools-extension`.
+- A extensão é open-source (MIT) — código auditável em `https://github.com/arqel-dev/arqel/tree/main/packages-js/devtools-extension`.
 - Builds são reproduzíveis via `pnpm build`.
 - Source maps são publicados junto ao Web Store package, satisfazendo o requisito da Mozilla AMO de código revisável quando há minificação.
 - Sem dependências de runtime — apenas React (já presente no DevTools host).
@@ -135,7 +135,7 @@ A versão anterior fica preservada via git history.
 
 ## 12. Contato
 
-- **Issues**: `https://github.com/arqel/arqel/issues`
+- **Issues**: `https://github.com/arqel-dev/arqel/issues`
 - **Email**: `security@arqel.dev` (somente para questões de privacidade/segurança).
 - **Disclosure responsável**: ver `SECURITY.md` na raiz do monorepo.
 

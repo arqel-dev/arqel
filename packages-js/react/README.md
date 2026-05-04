@@ -1,4 +1,4 @@
-# @arqel/react
+# @arqel-dev/react
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![React](https://img.shields.io/badge/react-%5E19-61dafb.svg)](https://react.dev)
@@ -13,7 +13,7 @@ React + Inertia bindings, providers, and utilities for [Arqel](https://arqel.dev
 ## Install
 
 ```bash
-pnpm add @arqel/react @arqel/types
+pnpm add @arqel-dev/react @arqel-dev/types
 pnpm add @inertiajs/react react react-dom
 ```
 
@@ -21,7 +21,7 @@ pnpm add @inertiajs/react react react-dom
 
 ```ts
 // resources/js/app.tsx
-import { createArqelApp } from '@arqel/react/inertia';
+import { createArqelApp } from '@arqel-dev/react/inertia';
 
 const userPages = import.meta.glob('./Pages/**/*.tsx');
 
@@ -33,8 +33,8 @@ createArqelApp({
 
 ```tsx
 // Inside any component
-import { usePanel, useTheme } from '@arqel/react';
-import { useTranslator, route } from '@arqel/react/utils';
+import { usePanel, useTheme } from '@arqel-dev/react';
+import { useTranslator, route } from '@arqel-dev/react/utils';
 
 const panel = usePanel();
 const { theme, toggle } = useTheme();
@@ -42,7 +42,7 @@ const { theme, toggle } = useTheme();
 
 ## Convenções
 
-- Subpath imports preferidos: `@arqel/react/inertia`, `@arqel/react/providers`, `@arqel/react/context`, `@arqel/react/utils`
+- Subpath imports preferidos: `@arqel-dev/react/inertia`, `@arqel-dev/react/providers`, `@arqel-dev/react/context`, `@arqel-dev/react/utils`
 - `peerDependencies` para React 19 + Inertia 2 (não bundla)
 - SSR-safe: hydrateRoot quando há markup, createRoot caso contrário
 

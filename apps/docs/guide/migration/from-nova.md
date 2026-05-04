@@ -19,9 +19,9 @@ Tools proprietários. A tabela a seguir resume.
 | Customização de UI                | Vue components + Tools | React + ShadCN/Base UI      |
 | Tipagem do client                 | JS (TS opcional)       | TypeScript strict obrigatório |
 | Lenses                            | Built-in               | Mapear para scoped views    |
-| Cards                             | Built-in (Vue)         | Widgets (`arqel/widgets`)   |
+| Cards                             | Built-in (Vue)         | Widgets (`arqel-dev/widgets`)   |
 | Metrics (Value/Trend/Partition)   | Built-in               | StatWidget + ChartWidget    |
-| Multi-tenancy                     | DIY                    | `arqel/tenant`              |
+| Multi-tenancy                     | DIY                    | `arqel-dev/tenant`              |
 | Field types builtin               | ~30                    | ~25 (core + advanced)       |
 | Plugins comunitários              | Maduros                | Em construção (v0.8)        |
 | Migração para Laravel Cloud       | Ambos suportam         | Idêntico                    |
@@ -47,11 +47,11 @@ da empresa.
 | Tools                  | `Nova\Tool` (Vue)                        | Custom Inertia page (React)               | Reescrita                   |
 | Custom Field           | Vue SFC                                  | React component + `Field` PHP class       | Reescrita                   |
 | File uploads           | `File`/`Image` field                     | `FileField`/`ImageField`                  | Direto                      |
-| Multi-tenancy          | DIY (com `Stancl` ou similar)            | `arqel/tenant` adapters                   | Pacote nativo               |
+| Multi-tenancy          | DIY (com `Stancl` ou similar)            | `arqel-dev/tenant` adapters                   | Pacote nativo               |
 | Action queueing        | `ShouldQueue` (Laravel)                  | `ShouldQueue` (Laravel)                   | Idêntico                    |
 | Search                 | Scout ou `searchable`                    | Column `searchable()` + Scout opcional    |                             |
 | Inline create          | Modal embutido                           | Pendente Phase 3                          | Use route create por enquanto |
-| Repeatable fields      | Plugins comunitários                     | `RepeaterField`/`BuilderField`            | `arqel/fields-advanced`     |
+| Repeatable fields      | Plugins comunitários                     | `RepeaterField`/`BuilderField`            | `arqel-dev/fields-advanced`     |
 
 ## Side-by-side: 12 padrões
 
@@ -336,7 +336,7 @@ public function update(User $user, Post $post): bool
 ### 10. Multi-tenancy
 
 Nova não tem multi-tenancy nativo — você integra `stancl/tenancy` ou
-similar manualmente. Arqel inclui `arqel/tenant` com adapters prontos:
+similar manualmente. Arqel inclui `arqel-dev/tenant` com adapters prontos:
 
 ```php
 // config/arqel.php
@@ -407,15 +407,15 @@ Route::get('/admin/analytics', AnalyticsController::class)->name('admin.analytic
 ## Checklist passo-a-passo
 
 1. [ ] Auditar Models, Migrations, Policies — **não mudam**.
-2. [ ] Instalar Arqel: `composer require arqel/core arqel/table arqel/actions arqel/fields`.
+2. [ ] Instalar Arqel: `composer require arqel-dev/core arqel-dev/table arqel-dev/actions arqel-dev/fields`.
 3. [ ] Configurar painel paralelo em `/admin-v2` (coexistência com Nova).
 4. [ ] Migrar Resources simples primeiro; renomear classes para sufixo `Resource`.
 5. [ ] Separar `fields()` Nova em `fields()` (forms) + `table()` (index) Arqel.
 6. [ ] Portar Filters: classes custom Nova → declarativo `Arqel\Table\Filters\*`.
 7. [ ] Mapear Lenses → Resources scoped ou rotas custom.
-8. [ ] Migrar Cards/Metrics → `arqel/widgets` (`StatWidget`/`ChartWidget`).
+8. [ ] Migrar Cards/Metrics → `arqel-dev/widgets` (`StatWidget`/`ChartWidget`).
 9. [ ] Reescrever Tools Vue como Inertia pages React.
-10. [ ] Configurar `arqel/tenant` se aplicável; descartar Nova; promover `/admin-v2` para `/admin`.
+10. [ ] Configurar `arqel-dev/tenant` se aplicável; descartar Nova; promover `/admin-v2` para `/admin`.
 
 ## Pitfalls comuns
 

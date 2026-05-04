@@ -44,27 +44,27 @@ A partir de v1.0:
 
 ### 3.1 Objetivo
 
-Entregar uma framework Laravel funcional que permita instalar via `composer require arqel/arqel` e construir admin panels básicos declarados em PHP, renderizados em React+ShadCN via Inertia. Foco em CRUD completo com 20 field types, tabela funcional, formulários, actions básicas, e authorization via Laravel Policies.
+Entregar uma framework Laravel funcional que permita instalar via `composer require arqel-dev/arqel` e construir admin panels básicos declarados em PHP, renderizados em React+ShadCN via Inertia. Foco em CRUD completo com 20 field types, tabela funcional, formulários, actions básicas, e authorization via Laravel Policies.
 
 ### 3.2 Deliverables
 
 **Packages Composer:**
-- `arqel/arqel` (meta-package)
-- `arqel/core` (ServiceProvider, Resource, Panel, CLI)
-- `arqel/fields` (20 field types)
-- `arqel/table` (DataTable, columns, filters, row actions)
-- `arqel/form` (FormRenderer, layout components)
-- `arqel/actions` (RowAction, BulkAction, ToolbarAction)
-- `arqel/auth` (Policy discovery)
-- `arqel/nav` (Navigation builder)
-- `arqel/testing` (Pest helpers)
+- `arqel-dev/arqel` (meta-package)
+- `arqel-dev/core` (ServiceProvider, Resource, Panel, CLI)
+- `arqel-dev/fields` (20 field types)
+- `arqel-dev/table` (DataTable, columns, filters, row actions)
+- `arqel-dev/form` (FormRenderer, layout components)
+- `arqel-dev/actions` (RowAction, BulkAction, ToolbarAction)
+- `arqel-dev/auth` (Policy discovery)
+- `arqel-dev/nav` (Navigation builder)
+- `arqel-dev/testing` (Pest helpers)
 
 **Packages npm:**
-- `@arqel/types`
-- `@arqel/react`
-- `@arqel/hooks`
-- `@arqel/ui`
-- `@arqel/fields`
+- `@arqel-dev/types`
+- `@arqel-dev/react`
+- `@arqel-dev/hooks`
+- `@arqel-dev/ui`
+- `@arqel-dev/fields`
 
 **Artisan commands:**
 - `arqel:install`
@@ -107,7 +107,7 @@ Entregar uma framework Laravel funcional que permita instalar via `composer requ
 
 ### 3.4 Critérios de saída
 
-- [ ] `composer create-project laravel/laravel demo && cd demo && composer require arqel/arqel && php artisan arqel:install && php artisan arqel:resource User && npm install && npm run build` funciona sem erros
+- [ ] `composer create-project laravel/laravel demo && cd demo && composer require arqel-dev/arqel && php artisan arqel:install && php artisan arqel:resource User && npm install && npm run build` funciona sem erros
 - [ ] CRUD completo em <90s desde zero
 - [ ] Cobertura PHP ≥ 85%, React ≥ 80%
 - [ ] LCP < 1.5s em playground app
@@ -144,8 +144,8 @@ Entregar uma framework Laravel funcional que permita instalar via `composer requ
 | ACTIONS | ~10 | 8% |
 | AUTH | ~5 | 4% |
 | NAV | ~5 | 4% |
-| @arqel/ui | ~15 | 13% |
-| @arqel/fields | ~10 | 8% |
+| @arqel-dev/ui | ~15 | 13% |
+| @arqel-dev/fields | ~10 | 8% |
 | DOCS | ~5 | 4% |
 | INFRA | ~3 | 3% |
 | **Total** | **~120** | **100%** |
@@ -163,22 +163,22 @@ Transformar MVP em framework completo e production-ready. Adicionar features que
 ### 4.2 Deliverables
 
 **Novos packages Composer:**
-- `arqel/tenant` — multi-tenancy
-- `arqel/audit` — activity log (wraps spatie/laravel-activitylog)
-- `arqel/mcp` — MCP server oficial
+- `arqel-dev/tenant` — multi-tenancy
+- `arqel-dev/audit` — activity log (wraps spatie/laravel-activitylog)
+- `arqel-dev/mcp` — MCP server oficial
 
 **Extensões a packages existentes:**
-- `arqel/fields`: RichText (Tiptap), Markdown, Code (Shiki), Repeater, Builder, KeyValue, Tags
-- `arqel/table`: virtual scrolling, inline editing (TextInputColumn, SelectColumn, ToggleColumn), QueryBuilder filter, reorderable, grouping, export
-- `arqel/form`: Wizard multi-step, Tabs dentro de form, Split layout
-- `arqel/actions`: stacked modals (`<Activity>`), background queued actions, progress tracking
-- `arqel/core`: Dashboards + Widgets (Stat, Chart, Table, Custom), command palette
+- `arqel-dev/fields`: RichText (Tiptap), Markdown, Code (Shiki), Repeater, Builder, KeyValue, Tags
+- `arqel-dev/table`: virtual scrolling, inline editing (TextInputColumn, SelectColumn, ToggleColumn), QueryBuilder filter, reorderable, grouping, export
+- `arqel-dev/form`: Wizard multi-step, Tabs dentro de form, Split layout
+- `arqel-dev/actions`: stacked modals (`<Activity>`), background queued actions, progress tracking
+- `arqel-dev/core`: Dashboards + Widgets (Stat, Chart, Table, Custom), command palette
 
 **Novos npm packages:**
-- `@arqel/widgets` — widget components React
-- `@arqel/tiptap` — RichText opt-in
-- `@arqel/shiki` — Code field opt-in
-- `@arqel/charts` — Recharts-based widgets
+- `@arqel-dev/widgets` — widget components React
+- `@arqel-dev/tiptap` — RichText opt-in
+- `@arqel-dev/shiki` — Code field opt-in
+- `@arqel-dev/charts` — Recharts-based widgets
 
 **Features:**
 - Multi-tenancy (subdomain, path, header, session resolvers)
@@ -244,12 +244,12 @@ Features diferenciadoras que posicionam Arqel como line leader em inovação vs 
 ### 5.2 Deliverables
 
 **Novos packages Composer:**
-- `arqel/versioning` — record versioning com UI restore
-- `arqel/workflow` — state machines (wraps spatie/laravel-model-states)
-- `arqel/realtime` — Reverb + Echo integration
-- `arqel/ai` — AI-assisted fields (Claude, OpenAI, Ollama adapters)
-- `arqel/search` — semantic search via pgvector
-- `arqel/openapi` — auto-gen OpenAPI spec para Resources
+- `arqel-dev/versioning` — record versioning com UI restore
+- `arqel-dev/workflow` — state machines (wraps spatie/laravel-model-states)
+- `arqel-dev/realtime` — Reverb + Echo integration
+- `arqel-dev/ai` — AI-assisted fields (Claude, OpenAI, Ollama adapters)
+- `arqel-dev/search` — semantic search via pgvector
+- `arqel-dev/openapi` — auto-gen OpenAPI spec para Resources
 
 **Features:**
 - AI-assisted fields (translation, summarization, classification, generation)
@@ -258,7 +258,7 @@ Features diferenciadoras que posicionam Arqel como line leader em inovação vs 
 - Real-time widget updates via Reverb
 - Record versioning com UI de restore (time-travel)
 - Workflow engine (state machines com visual editor)
-- AG Grid adapter opt-in (`arqel/preset-grid-ag`)
+- AG Grid adapter opt-in (`arqel-dev/preset-grid-ag`)
 - Expose Resources como REST API (auto-OpenAPI)
 - Visual dashboard builder (drag-drop widgets)
 - Theme inspector DevTools
@@ -312,10 +312,10 @@ Consolidar Arqel como plataforma com ecossistema vibrante: plugin marketplace, c
 ### 6.2 Deliverables
 
 **Novos packages/tools:**
-- `arqel/devtools` — browser extension com time-travel debugging
-- `arqel/cli-tui` — CLI interactivo avançado (Laravel Prompts + Ink)
-- `arqel/pdf` — headless PDF generator para reports
-- `arqel/i18n-tools` — translation management UI
+- `arqel-dev/devtools` — browser extension com time-travel debugging
+- `arqel-dev/cli-tui` — CLI interactivo avançado (Laravel Prompts + Ink)
+- `arqel-dev/pdf` — headless PDF generator para reports
+- `arqel-dev/i18n-tools` — translation management UI
 
 **Ecosystem:**
 - Plugin marketplace (arqel.dev/marketplace)

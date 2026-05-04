@@ -1,4 +1,4 @@
-# @arqel/ui
+# @arqel-dev/ui
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![React](https://img.shields.io/badge/react-%5E19-61dafb.svg)](https://react.dev)
@@ -13,33 +13,33 @@ Structural React components for [Arqel](https://arqel.dev) admin panels.
 ## Install
 
 ```bash
-pnpm add @arqel/ui @arqel/react @arqel/hooks @arqel/types
+pnpm add @arqel-dev/ui @arqel-dev/react @arqel-dev/hooks @arqel-dev/types
 pnpm add @inertiajs/react react react-dom @base-ui-components/react @tanstack/react-table lucide-react
 ```
 
 ## Usage
 
 ```tsx
-import '@arqel/ui/styles.css';
+import '@arqel-dev/ui/styles.css';
 import {
   AppShell, Sidebar, Topbar, MainContent,
   ResourceIndex, FormRenderer, ActionButton, FlashContainer,
-} from '@arqel/ui';
+} from '@arqel-dev/ui';
 ```
 
 ## What's inside
 
 | Subpath           | Components                                                                    |
 |-------------------|--------------------------------------------------------------------------------|
-| `@arqel/ui/shell`    | `AppShell`, `Sidebar`, `Topbar`, `MainContent`, `Footer`                       |
-| `@arqel/ui/table`    | `DataTable`, `TableCell`, `TableFilters`, `TablePagination`, `TableToolbar`    |
-| `@arqel/ui/resource` | `ResourceIndex`                                                                |
-| `@arqel/ui/form`     | `FormRenderer`, `FieldRenderer`, `FormSection`, `FormFieldset`, `FormGrid`, `FormTabs`, `FormActions`, `registerField` |
-| `@arqel/ui/action`   | `Button`, `ActionButton`, `ActionMenu`, `ConfirmDialog`, `ActionFormModal`     |
-| `@arqel/ui/auth`     | `CanAccess`                                                                    |
-| `@arqel/ui/flash`    | `FlashContainer`, `FlashToast`                                                 |
-| `@arqel/ui/utility`  | `Breadcrumbs`, `PageHeader`, `EmptyState`, `ErrorState`, `LoadingSkeleton`     |
-| `@arqel/ui/utils`    | `cn`                                                                           |
+| `@arqel-dev/ui/shell`    | `AppShell`, `Sidebar`, `Topbar`, `MainContent`, `Footer`                       |
+| `@arqel-dev/ui/table`    | `DataTable`, `TableCell`, `TableFilters`, `TablePagination`, `TableToolbar`    |
+| `@arqel-dev/ui/resource` | `ResourceIndex`                                                                |
+| `@arqel-dev/ui/form`     | `FormRenderer`, `FieldRenderer`, `FormSection`, `FormFieldset`, `FormGrid`, `FormTabs`, `FormActions`, `registerField` |
+| `@arqel-dev/ui/action`   | `Button`, `ActionButton`, `ActionMenu`, `ConfirmDialog`, `ActionFormModal`     |
+| `@arqel-dev/ui/auth`     | `CanAccess`                                                                    |
+| `@arqel-dev/ui/flash`    | `FlashContainer`, `FlashToast`                                                 |
+| `@arqel-dev/ui/utility`  | `Breadcrumbs`, `PageHeader`, `EmptyState`, `ErrorState`, `LoadingSkeleton`     |
+| `@arqel-dev/ui/utils`    | `cn`                                                                           |
 
 ## Design tokens
 

@@ -18,7 +18,7 @@ use Illuminate\Support\Collection;
  * this schema with the result of `TableQueryBuilder` (TABLE-005).
  *
  * Action types (`actions`, `bulkActions`, `toolbarActions`) are
- * intentionally typed as `array<int, mixed>` until `arqel/actions`
+ * intentionally typed as `array<int, mixed>` until `arqel-dev/actions`
  * ships. Apps can pass any structure today; the controller hands
  * the unmodified payload to the React side.
  *

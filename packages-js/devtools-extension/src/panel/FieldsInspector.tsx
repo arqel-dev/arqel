@@ -2,7 +2,7 @@
  * Fields schema inspector panel (DEVTOOLS-005).
  *
  * Renders the normalized field schema captured from the inspected
- * page's `pageProps`. Heuristics live in `@arqel/react`'s
+ * page's `pageProps`. Heuristics live in `@arqel-dev/react`'s
  * `extractFieldsSchema()` — this component only consumes the result.
  *
  * Layout:

@@ -2,7 +2,7 @@
 
 > Sistema de temas do Arqel — dark-mode, tokens semânticos e customização visual completa do seu painel.
 
-O Arqel oferece um sistema de theming completo via o pacote **`@arqel/theme`**. Ele combina três peças:
+O Arqel oferece um sistema de theming completo via o pacote **`@arqel-dev/theme`**. Ele combina três peças:
 
 1. **Tokens semânticos via CSS variables** — descrevem intenção (`bg`, `fg`, `primary`), não cores cruas.
 2. **`<ThemeProvider>` React** — aplica `dark` no `<html>` baseado em preferência do utilizador + `prefers-color-scheme`.
@@ -15,7 +15,7 @@ Tudo funciona out-of-the-box num projeto Arqel novo. Personalizar é uma questã
 ### 1. Instalar
 
 ```bash
-pnpm add @arqel/theme
+pnpm add @arqel-dev/theme
 ```
 
 ### 2. Importar tokens + envolver app
@@ -24,8 +24,8 @@ No seu entry point Inertia:
 
 ```tsx
 // resources/js/app.tsx
-import { ThemeProvider } from '@arqel/theme';
-import '@arqel/theme/tokens.css';
+import { ThemeProvider } from '@arqel-dev/theme';
+import '@arqel-dev/theme/tokens.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 
@@ -59,7 +59,7 @@ A versão minificada acima é equivalente a chamar `preventFlashScript()` no ser
 ### 4. Adicionar o toggle
 
 ```tsx
-import { ThemeToggle } from '@arqel/theme';
+import { ThemeToggle } from '@arqel-dev/theme';
 
 export function Header() {
   return (
@@ -121,7 +121,7 @@ Sobrescreva variáveis no seu CSS após importar `tokens.css`:
 ```css
 /* resources/css/app.css */
 @import 'tailwindcss';
-@import '@arqel/theme/tokens.css';
+@import '@arqel-dev/theme/tokens.css';
 
 :root {
   --arqel-color-primary: #ff6b35;        /* laranja */
@@ -180,7 +180,7 @@ Tailwind v4 trabalha nativamente com CSS variables. Para usar tokens Arqel via c
 
 ```css
 @import 'tailwindcss';
-@import '@arqel/theme/tokens.css';
+@import '@arqel-dev/theme/tokens.css';
 
 @theme {
   --color-bg: var(--arqel-color-bg);
@@ -199,7 +199,7 @@ Agora `bg-primary`, `text-fg`, `border-border` funcionam e respondem automaticam
 Para componentes que precisam reagir programaticamente ao tema:
 
 ```tsx
-import { useTheme } from '@arqel/theme';
+import { useTheme } from '@arqel-dev/theme';
 
 function ChartWidget() {
   const { theme, resolvedTheme, setTheme } = useTheme();
@@ -236,7 +236,7 @@ Como `defaultTheme` só é usado quando localStorage está vazio, ainda assim é
 
 ```tsx
 import { useEffect } from 'react';
-import { useTheme } from '@arqel/theme';
+import { useTheme } from '@arqel-dev/theme';
 
 function ForceLight() {
   const { setTheme } = useTheme();
@@ -279,6 +279,6 @@ Lembre de passar o mesmo `storageKey` no snippet anti-FOUC do Blade — caso con
 
 ## Ver também
 
-- `SKILL.md` do `@arqel/theme` — referência rápida de contratos
+- `SKILL.md` do `@arqel-dev/theme` — referência rápida de contratos
 - `apps/docs/guide/getting-started.md` — setup inicial do Arqel
 - ADR-001 — Inertia-only (theming não usa fetch)

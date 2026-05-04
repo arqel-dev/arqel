@@ -1,10 +1,10 @@
-# SKILL.md — arqel/widgets
+# SKILL.md — arqel-dev/widgets
 
-> Contexto canónico para AI agents a trabalhar no pacote `arqel/widgets`.
+> Contexto canónico para AI agents a trabalhar no pacote `arqel-dev/widgets`.
 
 ## Purpose
 
-`arqel/widgets` entrega o sistema de **widgets de dashboard** para Arqel: cards de KPI (Stat), charts (Chart), mini-tabelas (Table) e widgets custom (escape-hatch). Cada widget é uma classe PHP declarativa que expõe um React component name + payload `data` per-render.
+`arqel-dev/widgets` entrega o sistema de **widgets de dashboard** para Arqel: cards de KPI (Stat), charts (Chart), mini-tabelas (Table) e widgets custom (escape-hatch). Cada widget é uma classe PHP declarativa que expõe um React component name + payload `data` per-render.
 
 Suporta polling (refresh automático), deferred loading (lazy fetch para widgets pesados), visibility per-user (`canSee`) e filtros declarativos partilhados entre widgets do mesmo Dashboard. Dashboards são compostos por uma lista de widgets + grid columns responsivo + filtros.
 
@@ -12,7 +12,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **Base (WIDGETS-001..006):**
 
-- Esqueleto `arqel/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel/core` via path repo.
+- Esqueleto `arqel-dev/widgets` com PSR-4 `Arqel\Widgets\` → `src/`, dep em `arqel-dev/core` via path repo.
 - `Arqel\Widgets\Widget` (abstract) — fluent API: `heading`, `description`, `sort`, `columnSpan(int|string)`, `poll(int)`, `deferred(bool)`, `canSee(Closure)`, `filters(array)`. Construtor `(string $name)`. Subclasses declaram `protected string $type` (snake_case) + `protected string $component` (PascalCase) e implementam `data(): array`. `toArray(?Authenticatable)` emite payload Inertia (`data: null` quando deferred). `id()` default = `<type>:<name>`. `canBeSeenBy(?Authenticatable)`, `filterValue(string, mixed=null)`, `getFilters(): array`.
 - `Arqel\Widgets\Dashboard` — `(string $id, string $label, ?string $path = null)` props readonly; factory `Dashboard::make(...)`. `widgets(array)` aceita Widget instances **e** `class-string<Widget>` (resolvidos via container em `resolve()`); silently filtra entradas inválidas. `addWidget()`, `columns(int|array)` (clamp 1..12 ou mapa responsivo), `heading`, `description`, `canSee`. `findWidget(string $widgetId): ?Widget` (sem auth — caller distingue 404 vs 403).
 - `Arqel\Widgets\DashboardRegistry` (final, singleton) — `register(Dashboard)` keyed por id (duplicata lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`.
@@ -23,7 +23,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 - `StatWidget` (final) — KPI card; setters value/description/icon/color/trend.
 - `ChartWidget` (final) — config Recharts serializada (sem hard dep em libs JS).
-- `TableWidget` (final) — mini-tabela; sem hard dep em `arqel/table` (duck-typing).
+- `TableWidget` (final) — mini-tabela; sem hard dep em `arqel-dev/table` (duck-typing).
 - `CustomWidget` (final) — escape-hatch para componentes React arbitrários.
 
 **HTTP layer (WIDGETS-007..008):**
@@ -49,7 +49,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **Por chegar (WIDGETS-010..012, 014..015):**
 
-- React side em `@arqel/ui/widgets` — components Stat/Chart/Table/Custom, `DateRangeFilter`/`SelectFilter` JS, polling/deferred client (WIDGETS-010..012).
+- React side em `@arqel-dev/ui/widgets` — components Stat/Chart/Table/Custom, `DateRangeFilter`/`SelectFilter` JS, polling/deferred client (WIDGETS-010..012).
 - Filters URL sync + refetch on filter change (WIDGETS-011..012).
 - E2E + dashboard demo + 90% coverage target (WIDGETS-014..015).
 

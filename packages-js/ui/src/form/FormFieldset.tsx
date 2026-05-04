@@ -2,7 +2,7 @@
  * `<FormFieldset>` — semantic `<fieldset>` with grid body.
  */
 
-import type { FieldsetProps } from '@arqel/types/forms';
+import type { FieldsetProps } from '@arqel-dev/types/forms';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn.js';
 

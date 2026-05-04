@@ -6,7 +6,7 @@
  * real Inertia progress events.
  */
 
-import type { ActionSchema } from '@arqel/types/actions';
+import type { ActionSchema } from '@arqel-dev/types/actions';
 import type { FormDataConvertible } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
@@ -22,7 +22,7 @@ export function useAction(action: ActionSchema): UseActionResult {
 
   const invoke = useCallback(
     (record: { id: string | number } | null, payload: Record<string, unknown> = {}) => {
-      const url = action.url ?? `/arqel/actions/${action.name}`;
+      const url = action.url ?? `/arqel-dev/actions/${action.name}`;
       const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
       const data = record ? { record_id: record.id, ...payload } : payload;
 

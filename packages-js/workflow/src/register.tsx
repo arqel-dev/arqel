@@ -1,10 +1,10 @@
 /**
  * Side-effect import that registers the workflow React components into
- * `@arqel/ui`'s FieldRegistry, lazily.
+ * `@arqel-dev/ui`'s FieldRegistry, lazily.
  *
- *   import '@arqel/workflow/register';
+ *   import '@arqel-dev/workflow/register';
  *
- * The component name (`arqel/workflow/StateTransition`) matches the
+ * The component name (`arqel-dev/workflow/StateTransition`) matches the
  * value emitted by `Arqel\Workflow\Fields\StateTransitionField::component()`
  * server-side. Apps may re-register their own component under the same
  * key to override the default.
@@ -15,8 +15,8 @@
  * the apresentational component.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
-import { registerField } from '@arqel/ui/form';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import { registerField } from '@arqel-dev/ui/form';
 import { type ComponentType, lazy } from 'react';
 import type { StateTransitionFieldProps, StateTransitionProps } from './StateTransition.js';
 
@@ -41,6 +41,6 @@ const LazyStateTransition = lazy(async () => {
 });
 
 registerField(
-  'arqel/workflow/StateTransition',
+  'arqel-dev/workflow/StateTransition',
   LazyStateTransition as unknown as Parameters<typeof registerField>[1],
 );

@@ -1,12 +1,12 @@
-# `@arqel/react` — API Reference
+# `@arqel-dev/react` — API Reference
 
 React + Inertia bindings, providers, contexts, utilities. 5 entry points subpath.
 
 ```ts
-import { createArqelApp } from '@arqel/react/inertia';
-import { ArqelProvider, ThemeProvider, useTheme } from '@arqel/react/providers';
-import { usePanel, useResourceContext, useTenant } from '@arqel/react/context';
-import { route, translate, useTranslator, buildInitialFormState } from '@arqel/react/utils';
+import { createArqelApp } from '@arqel-dev/react/inertia';
+import { ArqelProvider, ThemeProvider, useTheme } from '@arqel-dev/react/providers';
+import { usePanel, useResourceContext, useTenant } from '@arqel-dev/react/context';
+import { route, translate, useTranslator, buildInitialFormState } from '@arqel-dev/react/utils';
 ```
 
 `peerDependencies`: React 19+, `@inertiajs/react` 2+.
@@ -106,5 +106,5 @@ Helpers para iterar/filtrar a lista de fields do payload Inertia.
 
 ## Related
 
-- SKILL: [`packages-js/react/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages-js/react/SKILL.md)
-- Próximo: [`@arqel/hooks`](/reference/typescript/hooks)
+- SKILL: [`packages-js/react/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages-js/react/SKILL.md)
+- Próximo: [`@arqel-dev/hooks`](/reference/typescript/hooks)

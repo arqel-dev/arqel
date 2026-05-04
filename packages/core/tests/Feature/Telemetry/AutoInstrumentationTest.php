@@ -51,9 +51,9 @@ it('subscribes safely when optional event classes are missing', function (): voi
     $collector = new MetricsCollector;
     $instrumentation = new AutoInstrumentation($collector);
 
-    // No `arqel/workflow` or `arqel/ai` installed → subscribe must
+    // No `arqel-dev/workflow` or `arqel-dev/ai` installed → subscribe must
     // not throw and must register zero listeners.
-    $instrumentation->subscribe($this->app->make(\Illuminate\Contracts\Events\Dispatcher::class));
+    $instrumentation->subscribe($this->app->make(Illuminate\Contracts\Events\Dispatcher::class));
 
     expect(true)->toBeTrue();
 });

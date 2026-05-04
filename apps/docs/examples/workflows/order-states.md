@@ -6,7 +6,7 @@
 
 Pedidos em e-commerce são, talvez, o caso de uso mais clássico para máquinas de estados em backoffice: os estágios são bem definidos (pagamento, separação, expedição, entrega), múltiplos atores diferentes podem mover o pedido em pontos distintos do fluxo (cliente, caixa, expedição, sistema externo via webhook), e algumas transições são **bifurcações** que precisam estar disponíveis em vários pontos (`Cancelled`, `Refunded`).
 
-Este exemplo cobre um workflow linear com dois ramos paralelos: o caminho feliz `Pending → Paid → Shipped → Delivered`, mais a transição "any-to" `→ Cancelled` (disponível antes da expedição), e o ramo `Paid → Refunded` (gerência apenas, com motivo obrigatório). É uma boa demonstração de como o `arqel/workflow` combina três camadas de autorização (Gate, `authorizeFor`, deny-by-default), captura side-effects assíncronos via listener de evento e usa `metadata` no histórico para guardar o `webhook_event_id` de Stripe/Mercado Pago para idempotência.
+Este exemplo cobre um workflow linear com dois ramos paralelos: o caminho feliz `Pending → Paid → Shipped → Delivered`, mais a transição "any-to" `→ Cancelled` (disponível antes da expedição), e o ramo `Paid → Refunded` (gerência apenas, com motivo obrigatório). É uma boa demonstração de como o `arqel-dev/workflow` combina três camadas de autorização (Gate, `authorizeFor`, deny-by-default), captura side-effects assíncronos via listener de evento e usa `metadata` no histórico para guardar o `webhook_event_id` de Stripe/Mercado Pago para idempotência.
 
 A escolha de design importante aqui é: a transição `ShippedToDelivered` é disparada **apenas** por um webhook de transportadora — usuários humanos nunca veem este botão na UI. Conseguimos isso fazendo `authorizeFor()` retornar `false` para qualquer usuário autenticado, e o controller do webhook chama `->transitionTo()` com `Auth::loginUsingId(null)` (system actor), que ignora a autorização porque a transition class trata `null` user como permitido.
 
@@ -78,7 +78,7 @@ final class Order extends Model
 }
 ```
 
-A propriedade `order_state` é castada via spatie quando o app opta in (suggest no composer do `arqel/workflow`). Sem o cast, a coluna armazena a slug ou o FQCN como string — o trait resolve igual.
+A propriedade `order_state` é castada via spatie quando o app opta in (suggest no composer do `arqel-dev/workflow`). Sem o cast, a coluna armazena a slug ou o FQCN como string — o trait resolve igual.
 
 ## Resource (admin panel)
 
@@ -195,7 +195,7 @@ Gate::define('transition-paid-to-refunded', function ($user, Order $order): bool
 });
 ```
 
-O `TransitionAuthorizer` do `arqel/workflow` consulta primeiro `authorizeFor` (quando declarado), cai para a Gate `transition-{from-slug}-to-{to-slug}` em seguida, e finalmente nega por padrão. Note que `transition-paid-to-refunded` também valida `refund_reason` preenchido — combinar regras de autorização e validação de domínio na Gate é aceitável quando o motivo é simples.
+O `TransitionAuthorizer` do `arqel-dev/workflow` consulta primeiro `authorizeFor` (quando declarado), cai para a Gate `transition-{from-slug}-to-{to-slug}` em seguida, e finalmente nega por padrão. Note que `transition-paid-to-refunded` também valida `refund_reason` preenchido — combinar regras de autorização e validação de domínio na Gate é aceitável quando o motivo é simples.
 
 ## Filtro por estado na Table
 

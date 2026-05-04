@@ -37,16 +37,16 @@ it('emits spatie/laravel-multitenancy in forBash() when tenancy is spatie', func
         ->toContain('composer require spatie/laravel-multitenancy')
         ->toContain('laravel new multi --react')
         ->not->toContain('stancl/tenancy')
-        ->not->toContain('arqel/tenant');
+        ->not->toContain('arqel-dev/tenant');
 });
 
-it('appends composer require arqel/mcp in forBash() when mcpIntegration is true', function (): void {
+it('appends composer require arqel-dev/mcp in forBash() when mcpIntegration is true', function (): void {
     $script = (new SetupScriptGenerator(
         appName: 'mcp-app',
         mcpIntegration: true,
     ))->forBash();
 
-    $mcpRequirePosition = strpos($script, 'composer require arqel/mcp');
+    $mcpRequirePosition = strpos($script, 'composer require arqel-dev/mcp');
     $arqelInstallPosition = strpos($script, 'php artisan arqel:install');
 
     expect($mcpRequirePosition)->not->toBeFalse()

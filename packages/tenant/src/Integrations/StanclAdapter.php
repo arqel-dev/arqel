@@ -34,7 +34,7 @@ use LogicException;
  *     ```
  *
  * The constructor does **not** type-hint `Stancl\Tenancy\Tenancy`
- * directly — `arqel/tenant` cannot have a hard dep on Stancl. The
+ * directly — `arqel-dev/tenant` cannot have a hard dep on Stancl. The
  * adapter resolves it from the container at call time and throws
  * a clear `LogicException` when Stancl is not installed.
  */

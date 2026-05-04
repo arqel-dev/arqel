@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 /**
  * Endpoint demo para `Field::aiText('summary')`.
  *
- * Em produção delega ao `arqel/ai` provider; aqui retorna stub determinístico
+ * Em produção delega ao `arqel-dev/ai` provider; aqui retorna stub determinístico
  * para que o demo funcione offline e seja testável sem chave de API.
  */
 final class PostAiSummaryController

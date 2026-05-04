@@ -1,7 +1,7 @@
 /**
  * `<CommandPalette>` — global Cmd+K admin command palette.
  *
- * Wraps the `/admin/commands` endpoint shipped by `arqel/core` (CMDPAL-002)
+ * Wraps the `/admin/commands` endpoint shipped by `arqel-dev/core` (CMDPAL-002)
  * with a native `<dialog>`-based modal. No external dialog/combobox library
  * is used: the surface area is small enough that the platform primitives
  * (HTML dialog + ARIA combobox/listbox roles) cover every requirement.

@@ -1,4 +1,4 @@
-# arqel/fields-advanced
+# arqel-dev/fields-advanced
 
 Advanced field types for Arqel — RichText (Tiptap), Markdown, Code, Repeater, Builder, KeyValue, Tags, Wizard.
 
@@ -8,10 +8,10 @@ Phase 2 scaffold (FIELDS-ADV-001). The first concrete type, `RichTextField`, shi
 
 ## Install
 
-In a Laravel app already running `arqel/core` and `arqel/fields`:
+In a Laravel app already running `arqel-dev/core` and `arqel-dev/fields`:
 
 ```bash
-composer require arqel/fields-advanced
+composer require arqel-dev/fields-advanced
 ```
 
 The service provider is auto-discovered.

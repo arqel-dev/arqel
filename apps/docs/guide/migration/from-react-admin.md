@@ -50,12 +50,12 @@ final class PostResource extends Resource
 }
 ```
 
-Os components React de `@arqel/ui` (`<DataTable>`, `<FormRenderer>`) recebem o **schema serializado** via Inertia props e renderizam dinamicamente. Você não escreve `<TextField source="title" />` — o servidor declara isso.
+Os components React de `@arqel-dev/ui` (`<DataTable>`, `<FormRenderer>`) recebem o **schema serializado** via Inertia props e renderizam dinamicamente. Você não escreve `<TextField source="title" />` — o servidor declara isso.
 
 ## Por que essa inversão?
 
 - **Single source of truth:** validation rules, visibility, auth — tudo em PHP, próximo ao model
-- **Type-safe end-to-end:** types compartilhados em `@arqel/types` espelham o schema PHP
+- **Type-safe end-to-end:** types compartilhados em `@arqel-dev/types` espelham o schema PHP
 - **Sem API REST/GraphQL custom:** Inertia é o transport
 - **Custom React quando precisar:** override `Pages/Arqel/Index.tsx` ou registre um custom field component
 
@@ -92,7 +92,7 @@ Os components React de `@arqel/ui` (`<DataTable>`, `<FormRenderer>`) recebem o *
 
 ## Estado/data fetching
 
-react-admin usa React Query/SWR sob o capô. Arqel proíbe essas libs no Resource CRUD ([ADR-001](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md)) e usa **partial reload Inertia** (`router.reload({ only: ['posts'] })`) para atualizar pedaços específicos do payload — sem cache local mexido, sem stale state.
+react-admin usa React Query/SWR sob o capô. Arqel proíbe essas libs no Resource CRUD ([ADR-001](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md)) e usa **partial reload Inertia** (`router.reload({ only: ['posts'] })`) para atualizar pedaços específicos do payload — sem cache local mexido, sem stale state.
 
 Para fora do CRUD (ex: chart de analytics num dashboard widget), você pode usar `fetch`/Axios livremente.
 
@@ -101,4 +101,4 @@ Para fora do CRUD (ex: chart de analytics num dashboard widget), você pode usar
 - [Getting Started](/guide/getting-started)
 - [Tutorial: primeiro CRUD](/guide/tutorial-first-crud)
 - [Custom Fields](/advanced/custom-fields)
-- ADR-001: [Inertia-only](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md)
+- ADR-001: [Inertia-only](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md)

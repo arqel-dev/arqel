@@ -7,9 +7,9 @@
  * via `useArqelForm`'s `progress` field (Inertia native).
  */
 
-import type { FileFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
-import { cn } from '@arqel/ui/utils';
+import type { FileFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
+import { cn } from '@arqel-dev/ui/utils';
 import { useState } from 'react';
 
 export function FileInput({

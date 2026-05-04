@@ -6,8 +6,8 @@
  * FIELDS-JS-003 follow-up when `props.searchable === true`.
  */
 
-import type { SelectFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { SelectFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { normaliseOptions } from '../shared/options.js';
 import { inputClasses } from '../shared/styles.js';
 

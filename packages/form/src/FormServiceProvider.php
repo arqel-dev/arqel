@@ -8,7 +8,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Service provider for `arqel/form`.
+ * Service provider for `arqel-dev/form`.
  *
  * Today the provider is the boot anchor; the `Form` builder,
  * layout components, and FormRequest generator land in

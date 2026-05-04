@@ -7,8 +7,8 @@
  * props (server-emitted from `CurrencyField`).
  */
 
-import type { CurrencyFieldSchema } from '@arqel/types/fields';
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { CurrencyFieldSchema } from '@arqel-dev/types/fields';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { useState } from 'react';
 import { inputClasses } from '../shared/styles.js';
 

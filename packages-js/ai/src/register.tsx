@@ -1,8 +1,8 @@
 /**
- * Side-effect import que registra os componentes do `@arqel/ai` no
- * FieldRegistry do `@arqel/ui`, lazily.
+ * Side-effect import que registra os componentes do `@arqel-dev/ai` no
+ * FieldRegistry do `@arqel-dev/ui`, lazily.
  *
- *   import '@arqel/ai/register';
+ *   import '@arqel-dev/ai/register';
  *
  * Os component names (`AiTextInput`, `AiTranslateInput`,
  * `AiSelectInput`) batem com o que o PHP retorna em `getComponent()`.
@@ -14,8 +14,8 @@
  * um é envolvido aqui.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
-import { registerField } from '@arqel/ui/form';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import { registerField } from '@arqel-dev/ui/form';
 import { type ComponentType, lazy, type ReactElement } from 'react';
 import type {
   AiExtractInputFieldProps,

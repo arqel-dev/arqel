@@ -23,8 +23,8 @@ use Throwable;
  *
  * Scope note: AUDIT-003's full spec wires an
  * `ActivityLogResource extends Resource` into the panel nav. That
- * cross-package integration depends on `arqel/core` Resource API +
- * `arqel/table` Column/Filter API and is deferred to a follow-up
+ * cross-package integration depends on `arqel-dev/core` Resource API +
+ * `arqel-dev/table` Column/Filter API and is deferred to a follow-up
  * ticket. The config flags exposed here (`config('audit')`) give that
  * future Resource a stable url + nav metadata to consume.
  */

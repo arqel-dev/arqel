@@ -139,7 +139,7 @@ A instalação é um wrapper sobre Composer + npm que respeita as duas linguagen
 
 ### CLI: `arqel install`
 
-(Comando entregue em MKTPLC-005, previsto na `Console` do pacote `arqel/marketplace`.)
+(Comando entregue em MKTPLC-005, previsto na `Console` do pacote `arqel-dev/marketplace`.)
 
 ```bash
 php artisan arqel:install acme/stripe-card

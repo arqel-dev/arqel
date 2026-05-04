@@ -1,5 +1,5 @@
 /**
- * `@arqel/ui/widgets` — React components for dashboard widget rendering.
+ * `@arqel-dev/ui/widgets` — React components for dashboard widget rendering.
  *
  * Phase 2 ships StatCard (KPI), ChartCard (Recharts polymorphic),
  * TableCard (mini DataTable), DashboardGrid + WidgetRenderer +

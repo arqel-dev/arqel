@@ -1,4 +1,4 @@
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 
 /**
  * Build the initial state for a form from a list of FieldSchemas

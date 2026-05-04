@@ -1,4 +1,4 @@
-# `arqel/nav` — API Reference
+# `arqel-dev/nav` — API Reference
 
 Namespace `Arqel\Nav\`. NavigationItem + NavigationGroup + Navigation builder + BreadcrumbsBuilder.
 
@@ -61,5 +61,5 @@ Constantes: `ACTION_INDEX = 'index'`, `ACTION_CREATE = 'create'`, `ACTION_EDIT =
 
 ## Related
 
-- SKILL: [`packages/nav/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/nav/SKILL.md)
-- Volta: [`arqel/core`](/reference/php/core)
+- SKILL: [`packages/nav/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/nav/SKILL.md)
+- Volta: [`arqel-dev/core`](/reference/php/core)

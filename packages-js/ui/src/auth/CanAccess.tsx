@@ -6,7 +6,7 @@
  * keep markup declarative.
  */
 
-import { useCanAccess } from '@arqel/hooks';
+import { useCanAccess } from '@arqel-dev/hooks';
 import type { ReactNode } from 'react';
 
 export interface CanAccessProps {

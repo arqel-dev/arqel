@@ -6,8 +6,8 @@
  * `filters`, etc. with a single hook.
  */
 
-import { useResourceContext } from '@arqel/react/context';
-import type { ResourceMeta } from '@arqel/types/resources';
+import { useResourceContext } from '@arqel-dev/react/context';
+import type { ResourceMeta } from '@arqel-dev/types/resources';
 import { usePage } from '@inertiajs/react';
 
 export interface UseResourceResult<TRecord = unknown> {

@@ -3,7 +3,7 @@
 > Guia para desenvolvedores que querem rodar a extensão localmente antes
 > da publicação na Chrome Web Store / Firefox Add-ons.
 
-A extensão `@arqel/devtools-extension` é privada (`private: true` no
+A extensão `@arqel-dev/devtools-extension` é privada (`private: true` no
 `package.json`) e ainda não está nas stores. Para usá-la em DEV é
 necessário fazer build local e carregar em modo "unpacked" / "temporary".
 
@@ -15,8 +15,8 @@ em `packages-js/devtools-extension/dist/<browser>`.
 ```bash
 # Na raiz do monorepo:
 pnpm install
-pnpm --filter @arqel/devtools-extension build:chrome
-pnpm --filter @arqel/devtools-extension build:firefox
+pnpm --filter @arqel-dev/devtools-extension build:chrome
+pnpm --filter @arqel-dev/devtools-extension build:firefox
 ```
 
 Os scripts disponíveis no pacote:
@@ -62,12 +62,12 @@ recarrega automaticamente para extensões unpacked.
 ### "Hook não detectado" / aba mostra `Inactive`
 
 - Confirme que a app está rodando com `NODE_ENV=development` ou
-  `vite dev` — o runtime `@arqel/react` só chama `installDevToolsHook`
+  `vite dev` — o runtime `@arqel-dev/react` só chama `installDevToolsHook`
   quando `import.meta.env.DEV === true`. Em builds de produção o código
   é eliminado por dead-code-elimination (intencional).
 - Verifique no console da página: `window.__ARQEL_DEVTOOLS_HOOK__`.
   Se for `undefined`, o hook não foi instalado — confira a versão do
-  `@arqel/react` (mínimo 0.10.0).
+  `@arqel-dev/react` (mínimo 0.10.0).
 
 ### CSP errors no console (`Refused to execute inline script…`)
 

@@ -1,8 +1,8 @@
-# SKILL.md — arqel/ai
+# SKILL.md — arqel-dev/ai
 
 ## Purpose
 
-`arqel/ai` é o pacote AI-assist do Arqel — fornece campos como `AiTextField`, `AiTranslateField`, `AiSelectField`, `AiExtractField` e `AiImageField` que delegam a um provider (Claude / OpenAI / Ollama) atrás de um único contrato.
+`arqel-dev/ai` é o pacote AI-assist do Arqel — fornece campos como `AiTextField`, `AiTranslateField`, `AiSelectField`, `AiExtractField` e `AiImageField` que delegam a um provider (Claude / OpenAI / Ollama) atrás de um único contrato.
 
 O pacote é provider-agnóstico por design: o consumidor escolhe `claude`, `openai` ou `ollama` em `config/arqel-ai.php` e os fields chamam `AiManager::driver()` sem saber a implementação concreta.
 
@@ -11,7 +11,7 @@ O pacote é provider-agnóstico por design: o consumidor escolhe `claude`, `open
 ### Entregue
 
 **AI-001 + AI-002 — Bootstrap + contratos**
-- `composer.json` com `arqel/core` em `require` e SDKs nativos (`anthropic/anthropic-php`, `openai-php/client`, `ollama-laravel`) em `suggest:` — apps opt-in apenas para o provider que vão usar.
+- `composer.json` com `arqel-dev/core` em `require` e SDKs nativos (`anthropic/anthropic-php`, `openai-php/client`, `ollama-laravel`) em `suggest:` — apps opt-in apenas para o provider que vão usar.
 - `Arqel\Ai\AiServiceProvider` auto-discovered + publica `config/arqel-ai.php` via `vendor:publish --tag=arqel-ai-config`.
 - `Arqel\Ai\Contracts\AiProvider` — métodos `complete`, `chat`, `embed`, `stream`, `name`, `supportsEmbeddings`, `supportsStreaming`.
 - `Arqel\Ai\AiCompletionResult` — final readonly value-object com `text`, `inputTokens`, `outputTokens`, `estimatedCost`, `model`, `raw` + helper `totalTokens()`.
@@ -53,8 +53,8 @@ Convenções compartilhadas dos fields:
 - **Sem binding no `AiServiceProvider`** — toda a API é estática.
 
 **AI-013 — MCP tools AI-generated**
-- Tools registradas em `arqel/mcp` que invocam `AiManager` internamente — primeiro alvo: `generate_resource_from_description` (input: `description, model_name`; output: `resource_code, suggested_path`). Caller é Claude Code/Desktop via MCP server expondo Resources/Forms como tools.
-- Cross-package — implementação concreta vive em `arqel/mcp`, mas o contrato de prompt e o uso de `AiManager::complete()` segue as mesmas convenções deste pacote (Gate `use-ai`, cost enforcement, cache opcional).
+- Tools registradas em `arqel-dev/mcp` que invocam `AiManager` internamente — primeiro alvo: `generate_resource_from_description` (input: `description, model_name`; output: `resource_code, suggested_path`). Caller é Claude Code/Desktop via MCP server expondo Resources/Forms como tools.
+- Cross-package — implementação concreta vive em `arqel-dev/mcp`, mas o contrato de prompt e o uso de `AiManager::complete()` segue as mesmas convenções deste pacote (Gate `use-ai`, cost enforcement, cache opcional).
 
 **AI-014 — Coverage gaps**
 - `tests/Unit/Coverage/AiCoverageGapsTest.php` cobre branches que não eram exercitados pelos testes feature/unit existentes: `AiManager::resolveProvider()` com default null; cache hit que **não** chama provider; determinismo de `AiCache::key()`; `CostTracker::record()` com `cost null`; filtro temporal de `getCostSince()`; `ClaudeProvider::estimateCost(0,0) === 0.0`; `OpenAiProvider::chat()` sem system; `OllamaProvider::chat()` sem `eval_count`; `AiTextField::generate()` propagando `AiException`; `AiSelectField` com prosa AI → fallback; `AiTranslateField::translateAll()` no-op quando todas as línguas presentes; `AiExtractField` filtrando keys extras; `PromptLibrary::extractJson([])` com schema vazio.
@@ -304,7 +304,7 @@ $prompt = PromptLibrary::resolve('company_bio', [
 
 ### MCP tool integration
 
-`arqel/mcp` registra tools que chamam `AiManager` internamente. O exemplo
+`arqel-dev/mcp` registra tools que chamam `AiManager` internamente. O exemplo
 canônico (AI-013) é "gerar Resource a partir de descrição":
 
 ```php
@@ -386,7 +386,7 @@ logger()->info('AI call', [
 
 ## Related
 
-- `arqel/core` — `Resource` lifecycle hooks que vão dispatch AI calls de afterCreate/afterUpdate (futuro).
-- `arqel/fields` — base `Field` que `AiTextField` etc. estendem.
-- `arqel/mcp` — AI-013 expõe Resource analysis como MCP tools para Claude Desktop / Claude Code.
+- `arqel-dev/core` — `Resource` lifecycle hooks que vão dispatch AI calls de afterCreate/afterUpdate (futuro).
+- `arqel-dev/fields` — base `Field` que `AiTextField` etc. estendem.
+- `arqel-dev/mcp` — AI-013 expõe Resource analysis como MCP tools para Claude Desktop / Claude Code.
 - `PLANNING/10-fase-3-avancadas.md` §2 (AI fields) — roadmap completo + tickets AI-001..AI-016.

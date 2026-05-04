@@ -32,7 +32,7 @@ import {
   WidgetWrapper,
 } from '../../src/widgets/index.js';
 
-describe('@arqel/ui/widgets — module surface', () => {
+describe('@arqel-dev/ui/widgets — module surface', () => {
   it('exports all 7 widget components as functions', () => {
     expect(typeof StatCard).toBe('function');
     expect(typeof ChartCard).toBe('function');

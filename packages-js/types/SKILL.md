@@ -1,10 +1,10 @@
-# SKILL.md — @arqel/types
+# SKILL.md — @arqel-dev/types
 
 > Contexto canónico para AI agents. Estrutura conforme `PLANNING/04-repo-structure.md` §11.
 
 ## Purpose
 
-`@arqel/types` é o pacote base de TypeScript types compartilhados por todos os outros pacotes JS do ecossistema Arqel. Materializa em TS o que o PHP serializa (Fields, Tables, Forms, Actions, Resource payloads, Inertia shared props) — um único source of truth para o React side consumir sem reshape.
+`@arqel-dev/types` é o pacote base de TypeScript types compartilhados por todos os outros pacotes JS do ecossistema Arqel. Materializa em TS o que o PHP serializa (Fields, Tables, Forms, Actions, Resource payloads, Inertia shared props) — um único source of truth para o React side consumir sem reshape.
 
 **Zero runtime** — apenas types + 4 type guards:
 - `isFieldType(field, type)` — narrow `FieldSchema` por tipo discriminator
@@ -15,7 +15,7 @@
 
 **Entregue (TYPES-001..002, 004 parcial):**
 
-- Pacote npm `@arqel/types` com 7 entry points (`./`, `./fields`, `./resources`, `./tables`, `./forms`, `./actions`, `./inertia`)
+- Pacote npm `@arqel-dev/types` com 7 entry points (`./`, `./fields`, `./resources`, `./tables`, `./forms`, `./actions`, `./inertia`)
 - `tsup` build com `dts: true`, ESM, sourcemaps, tree-shake friendly (`sideEffects: false`)
 - 21 Field types em discriminated union sobre `type`
 - 9 Column types + 6 Filter types em discriminated unions
@@ -35,7 +35,7 @@
 ### FieldSchema (discriminated union)
 
 ```ts
-import { type FieldSchema, isFieldType } from '@arqel/types/fields';
+import { type FieldSchema, isFieldType } from '@arqel-dev/types/fields';
 
 function render(field: FieldSchema) {
     if (isFieldType(field, 'belongsTo')) {
@@ -57,7 +57,7 @@ Cada campo carrega `validation`, `visibility`, `dependsOn` e `props` (type-speci
 ### FormSchema + SchemaEntry
 
 ```ts
-import { isLayoutEntry, isFieldEntry, type FormSchema } from '@arqel/types/forms';
+import { isLayoutEntry, isFieldEntry, type FormSchema } from '@arqel-dev/types/forms';
 
 function renderSchema(form: FormSchema, fields: FieldSchema[]) {
     return form.schema.map((entry) => {
@@ -75,7 +75,7 @@ function renderSchema(form: FormSchema, fields: FieldSchema[]) {
 ### Resource page props
 
 ```ts
-import type { ResourceIndexProps, RecordType } from '@arqel/types/resources';
+import type { ResourceIndexProps, RecordType } from '@arqel-dev/types/resources';
 
 interface User extends RecordType {
     id: number;
@@ -90,7 +90,7 @@ export default function UsersIndex({ resource, records, columns }: ResourceIndex
 ### Inertia SharedProps
 
 ```ts
-import type { SharedProps } from '@arqel/types/inertia';
+import type { SharedProps } from '@arqel-dev/types/inertia';
 import { usePage } from '@inertiajs/react';
 
 const { auth, flash } = usePage<SharedProps>().props;
@@ -100,7 +100,7 @@ const { auth, flash } = usePage<SharedProps>().props;
 
 ## Conventions
 
-- **Subpath imports** preferidos sobre o barrel para tree-shaking (`@arqel/types/fields` em vez de `@arqel/types`)
+- **Subpath imports** preferidos sobre o barrel para tree-shaking (`@arqel-dev/types/fields` em vez de `@arqel-dev/types`)
 - Discriminated unions usam `type` como discriminator — usa `isFieldType` etc. para narrow
 - `RecordType` é loose por defeito — apps com `spatie/laravel-typescript-transformer` (TYPES-003) substituem por interfaces strict
 - Mantém-se sync com `Arqel\Core\Support\FieldSchemaSerializer` PHP — divergência causa bugs de runtime no React
@@ -110,7 +110,7 @@ const { auth, flash } = usePage<SharedProps>().props;
 - ❌ **Casts (`as FieldSchema`)** — usa type guards. Se o PHP emitir um shape inválido, prefere falhar cedo
 - ❌ **Manual reshape** dos payloads no React — o serializer já produz o shape canônico
 - ❌ **`any` em vez de `unknown`** para `defaultValue` / `tenant` — mantém safety, força narrow
-- ❌ **Duplicar Field types** em `@arqel/fields` (UI side) — aquele pacote consome estes types
+- ❌ **Duplicar Field types** em `@arqel-dev/fields` (UI side) — aquele pacote consome estes types
 - ❌ **Importar `dist/`** diretamente — usa apenas exports `./*` declarados em `package.json`
 
 ## Related

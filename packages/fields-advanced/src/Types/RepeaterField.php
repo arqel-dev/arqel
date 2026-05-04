@@ -20,7 +20,7 @@ use InvalidArgumentException;
  * `HasMany` relation when the form opens and (b) persist nested
  * items via `$record->{relationship}()->create(...)` lives in
  * Resource lifecycle hooks (`afterCreate`/`afterUpdate`) under
- * `arqel/core` and is intentionally deferred.
+ * `arqel-dev/core` and is intentionally deferred.
  *
  * @see PLANNING/09-fase-2-essenciais.md §FIELDS-ADV-005 hydration/persistence
  */

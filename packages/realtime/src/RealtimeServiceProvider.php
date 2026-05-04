@@ -11,7 +11,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/realtime`.
+ * Auto-discovered provider for `arqel-dev/realtime`.
  *
  * RT-001 ships the package skeleton:
  *
@@ -56,7 +56,7 @@ final class RealtimeServiceProvider extends PackageServiceProvider
 
     /**
      * Defensive cross-package wiring: only registers the broadcast listener
-     * when `arqel/workflow` is installed (event class is autoloadable).
+     * when `arqel-dev/workflow` is installed (event class is autoloadable).
      * Uses FQCN string so PHP's autoloader is not forced to load the class
      * if it's absent. The Event dispatcher is per-application instance, so
      * Testbench's per-test app rebuild correctly re-runs this hook.

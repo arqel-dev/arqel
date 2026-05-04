@@ -1,5 +1,5 @@
 /**
- * Native HTML fallback inputs — used until `@arqel/fields` registers
+ * Native HTML fallback inputs — used until `@arqel-dev/fields` registers
  * richer impls. One renderer per FieldSchema discriminant.
  */
 
@@ -22,7 +22,7 @@ import type {
   TextFieldSchema,
   ToggleFieldSchema,
   UrlFieldSchema,
-} from '@arqel/types/fields';
+} from '@arqel-dev/types/fields';
 import { cn } from '../utils/cn.js';
 
 export interface NativeProps {
@@ -310,7 +310,7 @@ function BelongsToInput({
   describedBy,
 }: NativeProps & { field: BelongsToFieldSchema }) {
   // Phase 1 fallback: native text input. The full async-search picker
-  // ships in `@arqel/fields/BelongsToField` and registers via FieldRegistry.
+  // ships in `@arqel-dev/fields/BelongsToField` and registers via FieldRegistry.
   return (
     <input
       id={inputId}

@@ -8,7 +8,7 @@ use Arqel\Fields\Field;
 
 /**
  * Markdown editor + preview field powered by CodeMirror on the React side
- * (`@arqel/fields-advanced/MarkdownInput.tsx`, shipped in a future ticket).
+ * (`@arqel-dev/fields-advanced/MarkdownInput.tsx`, shipped in a future ticket).
  *
  * The PHP side is configuration-only: it advertises whether the live
  * preview is enabled, the layout mode (`side-by-side`, `tab` or

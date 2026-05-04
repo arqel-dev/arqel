@@ -26,7 +26,7 @@ final class PostResource
 
     /**
      * Definição declarativa de fields. Cada entry mapeia para um Field do
-     * pacote `arqel/fields`. Strings de tipo refletem a API do FieldFactory.
+     * pacote `arqel-dev/fields`. Strings de tipo refletem a API do FieldFactory.
      *
      * @return array<int, array<string, mixed>>
      */

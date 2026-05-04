@@ -1,12 +1,12 @@
 # Advanced fields
 
-> Pacote: [`arqel/fields-advanced`](../../packages/fields-advanced/) · Tickets: FIELDS-ADV-001..020
+> Pacote: [`arqel-dev/fields-advanced`](../../packages/fields-advanced/) · Tickets: FIELDS-ADV-001..020
 
 ## Purpose
 
-`arqel/fields-advanced` agrupa os field types "ricos" que não fazem parte do core `arqel/fields`: editores WYSIWYG, Markdown, Code, estruturas dinâmicas (Repeater, Builder, KeyValue, Tags) e fluxos multi-step (Wizard).
+`arqel-dev/fields-advanced` agrupa os field types "ricos" que não fazem parte do core `arqel-dev/fields`: editores WYSIWYG, Markdown, Code, estruturas dinâmicas (Repeater, Builder, KeyValue, Tags) e fluxos multi-step (Wizard).
 
-A separação core × advanced existe porque estes types arrastam dependências JS pesadas (Tiptap, CodeMirror, Shiki) e padrões de UI mais opinionados — manter o `arqel/fields` enxuto preserva tempo de boot e bundle size em panels que só usam inputs simples.
+A separação core × advanced existe porque estes types arrastam dependências JS pesadas (Tiptap, CodeMirror, Shiki) e padrões de UI mais opinionados — manter o `arqel-dev/fields` enxuto preserva tempo de boot e bundle size em panels que só usam inputs simples.
 
 Cada type registra-se no `Arqel\Fields\FieldFactory` no `packageBooted` do provider, mantendo a ergonomia única `FieldFactory::richText('content')`.
 

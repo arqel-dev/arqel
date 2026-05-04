@@ -17,7 +17,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/fields-advanced`.
+ * Auto-discovered provider for `arqel-dev/fields-advanced`.
  *
  * Registers advanced field types into the shared `FieldFactory` so apps
  * can call `FieldFactory::richText('content')` (and, in subsequent

@@ -1,14 +1,14 @@
-# `@arqel/types` — API Reference
+# `@arqel-dev/types` — API Reference
 
 Pacote TypeScript-only (zero runtime). 7 entry points subpath:
 
 ```ts
-import type { FieldSchema, FieldType } from '@arqel/types/fields';
-import type { ResourceMeta, ResourceIndexProps } from '@arqel/types/resources';
-import type { ColumnType, FilterType } from '@arqel/types/tables';
-import type { FormSchema, SchemaEntry } from '@arqel/types/forms';
-import type { ActionSchema, ActionFormField } from '@arqel/types/actions';
-import type { SharedProps, AuthPayload } from '@arqel/types/inertia';
+import type { FieldSchema, FieldType } from '@arqel-dev/types/fields';
+import type { ResourceMeta, ResourceIndexProps } from '@arqel-dev/types/resources';
+import type { ColumnType, FilterType } from '@arqel-dev/types/tables';
+import type { FormSchema, SchemaEntry } from '@arqel-dev/types/forms';
+import type { ActionSchema, ActionFormField } from '@arqel-dev/types/actions';
+import type { SharedProps, AuthPayload } from '@arqel-dev/types/inertia';
 ```
 
 ## Fields
@@ -140,5 +140,5 @@ type AuthPayload = {
 
 ## Related
 
-- SKILL: [`packages-js/types/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages-js/types/SKILL.md)
-- Próximo: [`@arqel/react`](/reference/typescript/react)
+- SKILL: [`packages-js/types/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages-js/types/SKILL.md)
+- Próximo: [`@arqel-dev/react`](/reference/typescript/react)

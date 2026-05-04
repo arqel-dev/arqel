@@ -14,13 +14,13 @@ use Throwable;
  * Tool MCP cross-package (AI-013).
  *
  * Recebe um slug de Resource registado no `ResourceRegistry` do
- * `arqel/core` e devolve uma análise da AI (resumo, problemas
+ * `arqel-dev/core` e devolve uma análise da AI (resumo, problemas
  * potenciais, sugestões). A introspecção é feita lendo a forma
  * pública do Resource (slug, model, número de fields) — não
  * inspeciona código nem invoca queries.
  *
  * Defensiva: o registry é resolvido pelo FQCN string para evitar um
- * `use` directo (o `arqel/core` está sempre presente como peer-dep,
+ * `use` directo (o `arqel-dev/core` está sempre presente como peer-dep,
  * mas o FQCN explicitamente documentado permite que mocks/fakes
  * substituam o binding em testes sem tocar autoload).
  */
@@ -46,7 +46,7 @@ final readonly class AnalyzeResourceTool
 
         $container = Container::getInstance();
         if (! $container->bound(self::RESOURCE_REGISTRY_CLASS)) {
-            throw new RuntimeException('ResourceRegistry is not bound; ensure arqel/core is installed and registered');
+            throw new RuntimeException('ResourceRegistry is not bound; ensure arqel-dev/core is installed and registered');
         }
 
         $registry = $container->make(self::RESOURCE_REGISTRY_CLASS);

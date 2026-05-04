@@ -1,10 +1,10 @@
-# SKILL.md — arqel/tenant
+# SKILL.md — arqel-dev/tenant
 
-> Contexto canónico para AI agents a trabalhar no pacote `arqel/tenant`.
+> Contexto canónico para AI agents a trabalhar no pacote `arqel-dev/tenant`.
 
 ## Purpose
 
-`arqel/tenant` fornece primitivas de multi-tenancy para o stack Arqel: um `TenantManager` singleton, contract `TenantResolver` com 5 implementações concretas, middleware de boot, trait Eloquent `BelongsToTenant` + global scope, regra `ScopedUnique`, adapters opt-in para `stancl/tenancy` e `spatie/laravel-multitenancy`, switching multi-tenant, scaffolders (registration / profile / billing), white-labeling theme value-object e feature gates.
+`arqel-dev/tenant` fornece primitivas de multi-tenancy para o stack Arqel: um `TenantManager` singleton, contract `TenantResolver` com 5 implementações concretas, middleware de boot, trait Eloquent `BelongsToTenant` + global scope, regra `ScopedUnique`, adapters opt-in para `stancl/tenancy` e `spatie/laravel-multitenancy`, switching multi-tenant, scaffolders (registration / profile / billing), white-labeling theme value-object e feature gates.
 
 A escolha é **não reinventar**: oferece uma abstração leve que cobre 80% dos casos (single-DB, tenant-per-row via global scope) e integra elegantemente com soluções multi-DB já maduras via adapters.
 

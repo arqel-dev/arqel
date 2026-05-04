@@ -1,4 +1,4 @@
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { route } from '../src/utils/route.js';

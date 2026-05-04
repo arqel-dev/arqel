@@ -1,11 +1,11 @@
-# `@arqel/hooks` — API Reference
+# `@arqel-dev/hooks` — API Reference
 
 10 hooks reusáveis. 11 entry points subpath tree-shakeable.
 
 ```ts
 import { useResource, useArqelForm, useCanAccess, useFlash, useTable,
          useAction, useFieldDependencies, useNavigation, useBreakpoint,
-         useArqelOptimistic } from '@arqel/hooks';
+         useArqelOptimistic } from '@arqel-dev/hooks';
 ```
 
 ## `useResource<T>()`
@@ -105,5 +105,5 @@ const [optimisticPosts, addOptimistic] = useArqelOptimistic(posts, (state, newPo
 
 ## Related
 
-- SKILL: [`packages-js/hooks/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages-js/hooks/SKILL.md)
-- Próximo: [`@arqel/ui`](/reference/typescript/ui)
+- SKILL: [`packages-js/hooks/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages-js/hooks/SKILL.md)
+- Próximo: [`@arqel-dev/ui`](/reference/typescript/ui)

@@ -1,8 +1,8 @@
 /**
  * Side-effect import that registers every built-in field component
- * into `@arqel/ui`'s FieldRegistry.
+ * into `@arqel-dev/ui`'s FieldRegistry.
  *
- *   import '@arqel/fields/register';
+ *   import '@arqel-dev/fields/register';
  *
  * The component name passed to `registerField()` matches the value
  * emitted by `Field::component()` server-side (e.g. `'TextInput'`).
@@ -10,7 +10,7 @@
  * override defaults.
  */
 
-import { registerField } from '@arqel/ui/form';
+import { registerField } from '@arqel-dev/ui/form';
 import { Checkbox, Toggle } from './boolean/index.js';
 import { ColorInput } from './color/index.js';
 import { DateInput, DateTimeInput } from './date/index.js';

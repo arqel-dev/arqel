@@ -2,7 +2,7 @@
 
 > Hub oficial para descobrir, publicar e consumir extensões da comunidade Arqel.
 
-O **Arqel Marketplace** (em `arqel.dev/marketplace`) é o catálogo central de plugins community-driven que estendem o framework. Ele foi construído como um pacote embeddable (`arqel/marketplace`) e _dogfooded_ pela própria instância pública — ou seja, o site oficial é um admin Arqel rodando o marketplace package internamente.
+O **Arqel Marketplace** (em `arqel.dev/marketplace`) é o catálogo central de plugins community-driven que estendem o framework. Ele foi construído como um pacote embeddable (`arqel-dev/marketplace`) e _dogfooded_ pela própria instância pública — ou seja, o site oficial é um admin Arqel rodando o marketplace package internamente.
 
 ## Visão geral
 
@@ -18,10 +18,10 @@ Tudo isso conversa com o ecossistema Composer/npm sem reinventar registries — 
 
 | Tipo | Pacote PHP | Pacote npm companion | Exemplos típicos |
 |---|---|---|---|
-| **field-pack** | `arqel/fields-*` | `@vendor/arqel-fields-*` | Stripe Card, Mapbox Address, Markdown Editor |
-| **widget-pack** | `arqel/widgets-*` | `@vendor/arqel-widgets-*` | Stat cards, charts, calendários |
-| **integration** | `arqel/integration-*` | `@vendor/arqel-integration-*` | Slack notify, Algolia search, Sentry |
-| **theme** | `arqel/theme-*` | `@vendor/arqel-theme-*` | Dark mode variants, white-label kits |
+| **field-pack** | `arqel-dev/fields-*` | `@vendor/arqel-fields-*` | Stripe Card, Mapbox Address, Markdown Editor |
+| **widget-pack** | `arqel-dev/widgets-*` | `@vendor/arqel-widgets-*` | Stat cards, charts, calendários |
+| **integration** | `arqel-dev/integration-*` | `@vendor/arqel-integration-*` | Slack notify, Algolia search, Sentry |
+| **theme** | `arqel-dev/theme-*` | `@vendor/arqel-theme-*` | Dark mode variants, white-label kits |
 
 A categoria adicional `language-pack` cobre traduções e a `tool` cobre extensões CLI/Artisan.
 

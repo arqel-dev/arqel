@@ -1,24 +1,24 @@
-# SKILL.md — arqel/fields-advanced
+# SKILL.md — arqel-dev/fields-advanced
 
 > Contexto canónico para AI agents.
 
 ## Purpose
 
-`arqel/fields-advanced` agrupa os field types "ricos" que não fazem parte do core `arqel/fields`: editores WYSIWYG (RichText/Tiptap), Markdown (CodeMirror + preview), Code (CodeMirror + Shiki), estruturas dinâmicas (Repeater, Builder, KeyValue, Tags) e fluxos multi-step (Wizard). Cada type registra-se no `Arqel\Fields\FieldFactory` no `packageBooted` do provider, mantendo a ergonomia única `FieldFactory::richText('content')`.
+`arqel-dev/fields-advanced` agrupa os field types "ricos" que não fazem parte do core `arqel-dev/fields`: editores WYSIWYG (RichText/Tiptap), Markdown (CodeMirror + preview), Code (CodeMirror + Shiki), estruturas dinâmicas (Repeater, Builder, KeyValue, Tags) e fluxos multi-step (Wizard). Cada type registra-se no `Arqel\Fields\FieldFactory` no `packageBooted` do provider, mantendo a ergonomia única `FieldFactory::richText('content')`.
 
-A separação core × advanced existe porque estes types arrastam dependências JS pesadas (Tiptap, CodeMirror, Shiki) e padrões de UI mais opinionados — manter o `arqel/fields` enxuto preserva o tempo de boot e o bundle size em panels que só usam inputs simples.
+A separação core × advanced existe porque estes types arrastam dependências JS pesadas (Tiptap, CodeMirror, Shiki) e padrões de UI mais opinionados — manter o `arqel-dev/fields` enxuto preserva o tempo de boot e o bundle size em panels que só usam inputs simples.
 
 ## Status
 
 **Setup (FIELDS-ADV-001):**
 
-- Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\FieldsAdvanced\` → `src/`, deps em `arqel/core` + `arqel/fields` via path repos)
+- Esqueleto do pacote (`composer.json`, PSR-4 `Arqel\FieldsAdvanced\` → `src/`, deps em `arqel-dev/core` + `arqel-dev/fields` via path repos)
 - `FieldsAdvancedServiceProvider` (final, auto-discovered) registra 8 macros no `FieldFactory`: `richText`, `markdown`, `code`, `repeater`, `builder`, `keyValue`, `tags`, `wizard`
 - Pest 3 + Orchestra Testbench setup com SQLite in-memory
 
 **Rich content (FIELDS-ADV-002, 003, 004):**
 
-- **`RichTextField`** — `type='richText'`, `component='RichTextInput'`. Setters: `toolbar(array)`, `imageUploadDisk(string)`, `imageUploadDirectory(string)`, `maxLength(int)` (clamp ≥1, default 65535), `fileAttachments(bool)`, `customMarks(array)`, `mentionable(array)` (filtra entries sem `id`+`name`). `imageUploadRoute` é construído como string literal `'/arqel/fields/upload?disk='.$disk` (sem `route()` para preservar testabilidade).
+- **`RichTextField`** — `type='richText'`, `component='RichTextInput'`. Setters: `toolbar(array)`, `imageUploadDisk(string)`, `imageUploadDirectory(string)`, `maxLength(int)` (clamp ≥1, default 65535), `fileAttachments(bool)`, `customMarks(array)`, `mentionable(array)` (filtra entries sem `id`+`name`). `imageUploadRoute` é construído como string literal `'/arqel-dev/fields/upload?disk='.$disk` (sem `route()` para preservar testabilidade).
 - **`MarkdownField`** — `type='markdown'`, `component='MarkdownInput'`. Setters: `preview(bool)`, `previewMode(string)` com paleta `'side-by-side'|'tab'|'popup'` (constantes `PREVIEW_MODE_*`; valores desconhecidos fallback silencioso para `side-by-side`), `toolbar(bool)`, `rows(int)` (clamp ≥3, default 10), `fullscreen(bool)`, `syncScroll(bool)`. Preview React encadeia `remark` + `rehype-sanitize`.
 - **`CodeField`** — `type='code'`, `component='CodeInput'`. Setters: `language(string)` (default `'plaintext'`), `theme(?string)` (null herda do panel), `lineNumbers(bool)`, `wordWrap(bool)`, `tabSize(int)` (clamp ≥1, default 2), `minHeight(?int)`. `readonly` herdado da `Field` base. React lazy-load grammars Shiki.
 
@@ -58,7 +58,7 @@ A separação core × advanced existe porque estes types arrastam dependências 
 ## Anti-patterns
 
 - ❌ **Persistir HTML do RichText sem purificar** — sempre rode `Purifier::clean($html)` (ou equivalente) num mutator/FormRequest antes de gravar.
-- ❌ **Hard-dep em libs JS (Tiptap, CodeMirror, Shiki) no `composer.json`** — dependências JS vivem em `@arqel/fields-advanced` (npm), nunca em `composer.json`.
+- ❌ **Hard-dep em libs JS (Tiptap, CodeMirror, Shiki) no `composer.json`** — dependências JS vivem em `@arqel-dev/fields-advanced` (npm), nunca em `composer.json`.
 - ❌ **Aninhar `Repeater`/`Builder` além de 2 níveis** — performance React degrada exponencialmente com FormRenderer recursivo; quebre em Resources separados ou use Wizard.
 - ❌ **`toolbar([...])` com identifiers que `RichTextInput.tsx` não conhece** — botões desconhecidos são ignorados pelo Tiptap; consulte a lista canónica.
 

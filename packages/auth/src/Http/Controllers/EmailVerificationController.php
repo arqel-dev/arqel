@@ -31,7 +31,7 @@ final class EmailVerificationController
             return redirect()->intended($this->afterLoginUrl());
         }
 
-        return Inertia::render('arqel/auth/VerifyEmailNotice', [
+        return Inertia::render('arqel-dev/auth/VerifyEmailNotice', [
             'email' => $user?->getAttribute('email'),
             'status' => session('status'),
         ]);

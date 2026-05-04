@@ -1,12 +1,12 @@
 {
-  "name": "@arqel/fields",
-  "version": "0.8.0-rc.1",
-  "description": "Rich React input components for Arqel — registered into @arqel/ui's FieldRegistry.",
+  "name": "@arqel-dev/fields",
+  "version": "0.8.0",
+  "description": "Rich React input components for Arqel — registered into @arqel-dev/ui's FieldRegistry.",
   "license": "MIT",
   "homepage": "https://arqel.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arqel/arqel.git",
+    "url": "https://github.com/arqel-dev/arqel.git",
     "directory": "packages-js/fields-js"
   },
   "keywords": [
@@ -86,15 +86,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@arqel/types": "workspace:*"
+    "@arqel-dev/types": "workspace:*"
   },
   "peerDependencies": {
-    "@arqel/ui": "workspace:*",
+    "@arqel-dev/ui": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@arqel/ui": "workspace:*",
+    "@arqel-dev/ui": "workspace:*",
     "@inertiajs/react": "^2.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",

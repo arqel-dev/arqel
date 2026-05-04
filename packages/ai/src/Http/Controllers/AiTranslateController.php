@@ -17,7 +17,7 @@ use Throwable;
  * com cada idioma alvo traduzido por `AiTranslateField::translate()`.
  *
  * O `ResourceRegistry` é resolvido via FQCN string para evitar
- * hard-dep sobre `arqel/core` durante o tipagem (o package já
+ * hard-dep sobre `arqel-dev/core` durante o tipagem (o package já
  * exige o pacote em `composer.json` mas o controller fica
  * tolerante a ambientes onde a classe não está bound).
  *

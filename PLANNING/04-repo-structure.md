@@ -4,7 +4,7 @@
 
 ## 1. Visão geral
 
-**Repositório único:** `github.com/arqel/arqel`
+**Repositório único:** `github.com/arqel-dev/arqel`
 
 Layout top-level:
 
@@ -15,27 +15,27 @@ arqel/
 │   ├── playground/       # Demo Laravel app com Arqel instalado
 │   └── docs/             # Docs site (Nextra ou VitePress)
 ├── packages/             # Packages Composer (PHP)
-│   ├── arqel/            # Meta-package arqel/arqel
-│   ├── core/             # arqel/core
-│   ├── fields/           # arqel/fields
-│   ├── table/            # arqel/table
-│   ├── form/             # arqel/form
-│   ├── actions/          # arqel/actions
-│   ├── auth/             # arqel/auth
-│   ├── nav/              # arqel/nav
-│   ├── tenant/           # arqel/tenant (Fase 2)
-│   ├── audit/            # arqel/audit (Fase 2)
-│   ├── versioning/       # arqel/versioning (Fase 3)
-│   ├── workflow/         # arqel/workflow (Fase 3)
-│   ├── realtime/         # arqel/realtime (Fase 3)
-│   ├── mcp/              # arqel/mcp (Fase 2)
-│   └── testing/          # arqel/testing
+│   ├── arqel/            # Meta-package arqel-dev/arqel
+│   ├── core/             # arqel-dev/core
+│   ├── fields/           # arqel-dev/fields
+│   ├── table/            # arqel-dev/table
+│   ├── form/             # arqel-dev/form
+│   ├── actions/          # arqel-dev/actions
+│   ├── auth/             # arqel-dev/auth
+│   ├── nav/              # arqel-dev/nav
+│   ├── tenant/           # arqel-dev/tenant (Fase 2)
+│   ├── audit/            # arqel-dev/audit (Fase 2)
+│   ├── versioning/       # arqel-dev/versioning (Fase 3)
+│   ├── workflow/         # arqel-dev/workflow (Fase 3)
+│   ├── realtime/         # arqel-dev/realtime (Fase 3)
+│   ├── mcp/              # arqel-dev/mcp (Fase 2)
+│   └── testing/          # arqel-dev/testing
 ├── packages-js/          # Packages npm (TypeScript/React)
-│   ├── types/            # @arqel/types
-│   ├── react/            # @arqel/react (Inertia bindings)
-│   ├── hooks/            # @arqel/hooks
-│   ├── ui/               # @arqel/ui (structural components)
-│   └── fields/           # @arqel/fields (React field components)
+│   ├── types/            # @arqel-dev/types
+│   ├── react/            # @arqel-dev/react (Inertia bindings)
+│   ├── hooks/            # @arqel-dev/hooks
+│   ├── ui/               # @arqel-dev/ui (structural components)
+│   └── fields/           # @arqel-dev/fields (React field components)
 ├── registry/             # ShadCN CLI v4 registry (arqel.dev/r/*)
 │   ├── ui/               # Atomic UI components para CLI distribution
 │   ├── layouts/          # Layouts preset
@@ -108,16 +108,16 @@ packages-js/<name>/
 
 ## 3. Packages Composer detalhados
 
-### 3.1 `arqel/arqel` (meta-package)
+### 3.1 `arqel-dev/arqel` (meta-package)
 
-O que o usuário instala: `composer require arqel/arqel`.
+O que o usuário instala: `composer require arqel-dev/arqel`.
 
 **Não tem código próprio** — apenas depende dos sub-packages necessários para instalação completa.
 
 ```json
 // packages/arqel/composer.json
 {
-    "name": "arqel/arqel",
+    "name": "arqel-dev/arqel",
     "description": "Admin panel framework for Laravel — declared in PHP, rendered in React.",
     "type": "library",
     "license": "MIT",
@@ -127,13 +127,13 @@ O que o usuário instala: `composer require arqel/arqel`.
         "php": "^8.3",
         "laravel/framework": "^12.0|^13.0",
         "inertiajs/inertia-laravel": "^3.0",
-        "arqel/core": "self.version",
-        "arqel/fields": "self.version",
-        "arqel/table": "self.version",
-        "arqel/form": "self.version",
-        "arqel/actions": "self.version",
-        "arqel/auth": "self.version",
-        "arqel/nav": "self.version"
+        "arqel-dev/core": "self.version",
+        "arqel-dev/fields": "self.version",
+        "arqel-dev/table": "self.version",
+        "arqel-dev/form": "self.version",
+        "arqel-dev/actions": "self.version",
+        "arqel-dev/auth": "self.version",
+        "arqel-dev/nav": "self.version"
     },
     "autoload": {
         "psr-4": { "Arqel\\": "src/" }
@@ -148,13 +148,13 @@ O que o usuário instala: `composer require arqel/arqel`.
 }
 ```
 
-### 3.2 `arqel/core`
+### 3.2 `arqel-dev/core`
 
 O coração do framework — contracts, base classes, service provider.
 
 ```json
 {
-    "name": "arqel/core",
+    "name": "arqel-dev/core",
     "description": "Core contracts, service provider, and primitives for Arqel.",
     "type": "library",
     "license": "MIT",
@@ -215,7 +215,7 @@ src/
     └── InertiaDataBuilder.php
 ```
 
-### 3.3 `arqel/fields`
+### 3.3 `arqel-dev/fields`
 
 Catálogo de field types.
 
@@ -253,7 +253,7 @@ packages/fields/src/
 └── ValidationBridge.php              # Laravel rules → Zod schema
 ```
 
-### 3.4 `arqel/table`
+### 3.4 `arqel-dev/table`
 
 ```
 packages/table/src/
@@ -282,7 +282,7 @@ packages/table/src/
 └── TableQueryBuilder.php             # Eloquent eager loading detection
 ```
 
-### 3.5 `arqel/form`
+### 3.5 `arqel-dev/form`
 
 ```
 packages/form/src/
@@ -302,7 +302,7 @@ packages/form/src/
 └── FormRequestGenerator.php          # Auto-gen FormRequest classes
 ```
 
-### 3.6 `arqel/actions`
+### 3.6 `arqel-dev/actions`
 
 ```
 packages/actions/src/
@@ -322,7 +322,7 @@ packages/actions/src/
 └── BulkActionJob.php                 # Laravel Job base
 ```
 
-### 3.7 `arqel/auth`
+### 3.7 `arqel-dev/auth`
 
 ```
 packages/auth/src/
@@ -333,7 +333,7 @@ packages/auth/src/
     └── AuthorizesRequests.php
 ```
 
-### 3.8 `arqel/nav`
+### 3.8 `arqel-dev/nav`
 
 ```
 packages/nav/src/
@@ -344,7 +344,7 @@ packages/nav/src/
 └── BreadcrumbsBuilder.php
 ```
 
-### 3.9 `arqel/tenant` (Fase 2)
+### 3.9 `arqel-dev/tenant` (Fase 2)
 
 ```
 packages/tenant/src/
@@ -361,7 +361,7 @@ packages/tenant/src/
     └── SpatieAdapter.php             # spatie/laravel-multitenancy
 ```
 
-### 3.10 `arqel/audit` (Fase 2)
+### 3.10 `arqel-dev/audit` (Fase 2)
 
 ```
 packages/audit/src/
@@ -373,7 +373,7 @@ packages/audit/src/
         └── ActivityLogController.php
 ```
 
-### 3.11 `arqel/versioning` (Fase 3)
+### 3.11 `arqel-dev/versioning` (Fase 3)
 
 ```
 packages/versioning/src/
@@ -383,7 +383,7 @@ packages/versioning/src/
 └── RestoreAction.php
 ```
 
-### 3.12 `arqel/workflow` (Fase 3)
+### 3.12 `arqel-dev/workflow` (Fase 3)
 
 Wraps `spatie/laravel-model-states`.
 
@@ -396,7 +396,7 @@ packages/workflow/src/
     └── StateTransitionField.php
 ```
 
-### 3.13 `arqel/realtime` (Fase 3)
+### 3.13 `arqel-dev/realtime` (Fase 3)
 
 ```
 packages/realtime/src/
@@ -413,7 +413,7 @@ packages/realtime/src/
     └── ReverbIntegration.php
 ```
 
-### 3.14 `arqel/mcp` (Fase 2)
+### 3.14 `arqel-dev/mcp` (Fase 2)
 
 ```
 packages/mcp/src/
@@ -434,7 +434,7 @@ packages/mcp/src/
     └── ServeMcpCommand.php           # php artisan arqel:mcp
 ```
 
-### 3.15 `arqel/testing`
+### 3.15 `arqel-dev/testing`
 
 ```
 packages/testing/src/
@@ -453,7 +453,7 @@ packages/testing/src/
 
 ## 4. Packages npm detalhados
 
-### 4.1 `@arqel/types`
+### 4.1 `@arqel-dev/types`
 
 Types TypeScript partilhados.
 
@@ -474,7 +474,7 @@ packages-js/types/src/
 
 ```json
 {
-    "name": "@arqel/types",
+    "name": "@arqel-dev/types",
     "version": "0.0.0",
     "type": "module",
     "exports": {
@@ -490,7 +490,7 @@ packages-js/types/src/
 }
 ```
 
-### 4.2 `@arqel/react`
+### 4.2 `@arqel-dev/react`
 
 Inertia bindings + utilities.
 
@@ -514,7 +514,7 @@ packages-js/react/src/
     └── serializeFields.ts
 ```
 
-### 4.3 `@arqel/hooks`
+### 4.3 `@arqel-dev/hooks`
 
 React hooks.
 
@@ -533,7 +533,7 @@ packages-js/hooks/src/
 └── useOptimistic.ts                  # React 19.2 helper
 ```
 
-### 4.4 `@arqel/ui`
+### 4.4 `@arqel-dev/ui`
 
 Structural components.
 
@@ -582,7 +582,7 @@ packages-js/ui/src/
     └── globals.css                   # Tailwind base imports
 ```
 
-### 4.5 `@arqel/fields`
+### 4.5 `@arqel-dev/fields`
 
 Field React components (uma por field type).
 
@@ -720,9 +720,9 @@ packages:
         }
     ],
     "require-dev": {
-        "arqel/core": "*",
-        "arqel/fields": "*",
-        "arqel/table": "*"
+        "arqel-dev/core": "*",
+        "arqel-dev/fields": "*",
+        "arqel-dev/table": "*"
     }
 }
 ```
@@ -763,7 +763,7 @@ Ex: `v0.3.0` → todos os Composer e npm packages ficam em `0.3.0`.
 
 Vantagens:
 - Simples de raciocinar
-- Composer constraints triviais (`arqel/core: self.version`)
+- Composer constraints triviais (`arqel-dev/core: self.version`)
 - Matches Laravel model
 
 Desvantagens:
@@ -772,7 +772,7 @@ Desvantagens:
 ## 10. Convenções de arquivos
 
 - **Namespaces PHP:** `Arqel\<Subpackage>\` (ex: `Arqel\Fields\Types\TextField`)
-- **TypeScript modules:** paths absolutos via `tsconfig.paths`: `@arqel/ui`, `@arqel/hooks`, etc.
+- **TypeScript modules:** paths absolutos via `tsconfig.paths`: `@arqel-dev/ui`, `@arqel-dev/hooks`, etc.
 - **Indentação:** 4 spaces PHP, 2 spaces TS/JS/YAML/JSON
 - **Line endings:** LF (enforced via `.gitattributes`)
 - **Encoding:** UTF-8

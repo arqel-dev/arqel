@@ -2,7 +2,7 @@
 
 > **Use case:** loja online com milhões de pedidos. Cada pedido passa
 > por estados (`pending → paid → shipped → delivered`) e é raramente
-> editado depois. **Conclusão recomendada: usar `arqel/audit`, NÃO
+> editado depois. **Conclusão recomendada: usar `arqel-dev/audit`, NÃO
 > versioning.**
 
 ## Contexto
@@ -34,7 +34,7 @@ Storage anual:                ~28 GB
 Storage acumulado em 5 anos: ~140 GB
 ```
 
-Comparado a `arqel/audit` com payload delta de ~200 bytes:
+Comparado a `arqel-dev/audit` com payload delta de ~200 bytes:
 
 ```
 Eventos por ano:        14.400.000
@@ -199,7 +199,7 @@ restore**.
 
 ## Heurística rápida
 
-> **Use `arqel/versioning` quando o produto entre `saves_por_record`
+> **Use `arqel-dev/versioning` quando o produto entre `saves_por_record`
 > e `cardinalidade_total` está abaixo de ~1M, e quando restore é uma
 > feature explícita do produto.**
 

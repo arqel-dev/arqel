@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Concerns;
 
 /**
- * Trait demonstrativa para integração com `arqel/versioning`.
+ * Trait demonstrativa para integração com `arqel-dev/versioning`.
  *
  * Mantém um contador local de versões ao salvar — versão real do pacote
  * persiste snapshots em tabela `arqel_versions` e suporta restore.

@@ -8,7 +8,7 @@ body:
       value: |
         Obrigado pela sugestão!
 
-        > **Features grandes** beneficiam de discussão prévia em [GitHub Discussions](https://github.com/arqel/arqel/discussions) antes de abrir esta issue.
+        > **Features grandes** beneficiam de discussão prévia em [GitHub Discussions](https://github.com/arqel-dev/arqel/discussions) antes de abrir esta issue.
 
   - type: checkboxes
     id: checks
@@ -27,24 +27,24 @@ body:
     attributes:
       label: Package (ou área) alvo
       options:
-        - arqel/core
-        - arqel/fields
-        - arqel/table
-        - arqel/form
-        - arqel/actions
-        - arqel/auth
-        - arqel/nav
-        - arqel/tenant (Fase 2)
-        - arqel/audit (Fase 2)
-        - arqel/mcp (Fase 2)
-        - arqel/versioning (Fase 3)
-        - arqel/workflow (Fase 3)
-        - arqel/realtime (Fase 3)
-        - "@arqel/ui"
-        - "@arqel/react"
-        - "@arqel/hooks"
-        - "@arqel/types"
-        - "@arqel/fields"
+        - arqel-dev/core
+        - arqel-dev/fields
+        - arqel-dev/table
+        - arqel-dev/form
+        - arqel-dev/actions
+        - arqel-dev/auth
+        - arqel-dev/nav
+        - arqel-dev/tenant (Fase 2)
+        - arqel-dev/audit (Fase 2)
+        - arqel-dev/mcp (Fase 2)
+        - arqel-dev/versioning (Fase 3)
+        - arqel-dev/workflow (Fase 3)
+        - arqel-dev/realtime (Fase 3)
+        - "@arqel-dev/ui"
+        - "@arqel-dev/react"
+        - "@arqel-dev/hooks"
+        - "@arqel-dev/types"
+        - "@arqel-dev/fields"
         - Registry ShadCN
         - Docs
         - CLI / DX

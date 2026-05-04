@@ -1,8 +1,8 @@
 {
-  "name": "@arqel/marketplace-app",
+  "name": "@arqel-dev/marketplace-app",
   "private": true,
   "type": "module",
-  "version": "0.8.0-rc.1",
+  "version": "0.8.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@arqel/theme": "workspace:*",
+    "@arqel-dev/theme": "workspace:*",
     "@inertiajs/react": "^2.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

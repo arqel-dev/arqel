@@ -12,7 +12,7 @@ use Throwable;
 /**
  * Pulse card: Arqel AI tokens consumed today + cost (LCLOUD-003).
  *
- * Reads the optional `arqel_ai_usage` table written by `arqel/ai`.
+ * Reads the optional `arqel_ai_usage` table written by `arqel-dev/ai`.
  * If the table does not exist (apps without the AI package), the
  * card renders 0/0.0 rather than throwing.
  */

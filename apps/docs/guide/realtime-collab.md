@@ -1,6 +1,6 @@
 # Edição colaborativa em tempo real (Yjs + Reverb)
 
-Esta página descreve como habilitar **edição colaborativa multi-usuário** em campos de Resources do Arqel — ao estilo Google Docs / Notion — usando o pacote `arqel/realtime` no servidor e `@arqel/realtime-collab` no cliente. A solução combina:
+Esta página descreve como habilitar **edição colaborativa multi-usuário** em campos de Resources do Arqel — ao estilo Google Docs / Notion — usando o pacote `arqel-dev/realtime` no servidor e `@arqel-dev/realtime-collab` no cliente. A solução combina:
 
 - **Yjs** (CRDT) para resolver merges concorrentes sem servidor de coordenação central.
 - **Laravel Reverb** como WebSocket broadcaster oficial.
@@ -17,7 +17,7 @@ Esta página descreve como habilitar **edição colaborativa multi-usuário** em
 ## Pré-requisitos
 
 - Laravel 12+ (testado em 12.x e 13.x).
-- `arqel/realtime` instalado e bootado (já vem em qualquer projeto que usou `arqel/core`).
+- `arqel-dev/realtime` instalado e bootado (já vem em qualquer projeto que usou `arqel-dev/core`).
 - Setup mínimo de auth e policies — o canal aplica Gate `view` no record.
 
 ## Instalação
@@ -30,7 +30,7 @@ php artisan reverb:install
 php artisan migrate
 ```
 
-A migration `2026_05_06_000000_create_yjs_documents` (já no `arqel/realtime`) cria a tabela `arqel_yjs_documents` com unique `(model_type, model_id, field)` e blob para state.
+A migration `2026_05_06_000000_create_yjs_documents` (já no `arqel-dev/realtime`) cria a tabela `arqel_yjs_documents` com unique `(model_type, model_id, field)` e blob para state.
 
 `.env`:
 
@@ -52,13 +52,13 @@ php artisan reverb:start
 ### Lado cliente
 
 ```bash
-pnpm add @arqel/realtime @arqel/realtime-collab yjs
+pnpm add @arqel-dev/realtime @arqel-dev/realtime-collab yjs
 ```
 
 Setup global de Echo (uma vez no bootstrap do Inertia):
 
 ```ts
-import { setupEcho } from '@arqel/realtime';
+import { setupEcho } from '@arqel-dev/realtime';
 
 setupEcho({
   broadcaster: 'reverb',
@@ -72,7 +72,7 @@ setupEcho({
 ## Usando `<CollabRichTextField>`
 
 ```tsx
-import { CollabRichTextField } from '@arqel/realtime-collab';
+import { CollabRichTextField } from '@arqel-dev/realtime-collab';
 
 export function PostEditor({ post }: { post: { id: number } }) {
   return (
@@ -99,7 +99,7 @@ O componente:
 ## Hook `useYjsCollab`
 
 ```ts
-import { useYjsCollab } from '@arqel/realtime-collab';
+import { useYjsCollab } from '@arqel-dev/realtime-collab';
 
 const { doc, text, status, applyRemote } = useYjsCollab({
   modelType: 'App\\Models\\Post',
@@ -113,7 +113,7 @@ const { doc, text, status, applyRemote } = useYjsCollab({
 
 ## Channel authorization
 
-O canal é registrado em `arqel/realtime` (`routes/channels.php`):
+O canal é registrado em `arqel-dev/realtime` (`routes/channels.php`):
 
 ```php
 Broadcast::channel(
@@ -153,7 +153,7 @@ O endpoint `POST` aceita `{state, version}`. Lógica:
 
 ## Tests + mocking
 
-Os testes do `arqel/realtime` rodam com `BROADCAST_CONNECTION=null` + `Event::fake()` — você não precisa de Reverb para testar policies/handlers. No frontend, o hook fica em status `offline` quando `window.Echo` é undefined, permitindo testes em jsdom sem mocking pesado.
+Os testes do `arqel-dev/realtime` rodam com `BROADCAST_CONNECTION=null` + `Event::fake()` — você não precisa de Reverb para testar policies/handlers. No frontend, o hook fica em status `offline` quando `window.Echo` é undefined, permitindo testes em jsdom sem mocking pesado.
 
 ## Limitações conhecidas
 

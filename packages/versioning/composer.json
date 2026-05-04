@@ -1,6 +1,6 @@
 {
-    "name": "arqel/versioning",
-    "version": "0.8.0-rc.1",
+    "name": "arqel-dev/versioning",
+    "version": "0.8.0",
     "description": "Time-travel record versioning for Arqel — Versionable trait + version snapshots with diff tracking and pruning.",
     "type": "library",
     "license": "MIT",
@@ -13,13 +13,13 @@
     ],
     "homepage": "https://arqel.dev",
     "support": {
-        "issues": "https://github.com/arqel/arqel/issues",
-        "source": "https://github.com/arqel/arqel",
+        "issues": "https://github.com/arqel-dev/arqel/issues",
+        "source": "https://github.com/arqel-dev/arqel",
         "docs": "https://arqel.dev/docs"
     },
     "require": {
         "php": "^8.3",
-        "arqel/core": "@dev",
+        "arqel-dev/core": "@dev",
         "illuminate/support": "^12.0|^13.0",
         "spatie/laravel-package-tools": "^1.16"
     },
@@ -31,7 +31,7 @@
         "pestphp/pest-plugin-laravel": "^3.0"
     },
     "suggest": {
-        "spatie/laravel-eventsourcing": "Optional — pair with arqel/versioning when migrating to a full event-sourced model (^7.0)."
+        "spatie/laravel-eventsourcing": "Optional — pair with arqel-dev/versioning when migrating to a full event-sourced model (^7.0)."
     },
     "autoload": {
         "psr-4": {

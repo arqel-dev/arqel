@@ -27,7 +27,7 @@ use InvalidArgumentException;
  * Eloquent `fromRelationship(...)` integration (Spatie/laravel-tags
  * or arbitrary HasMany/BelongsToMany sync) is deferred to a follow-up
  * ticket because it requires Field hydration hooks that don't exist
- * yet in `arqel/core`. Current scope is config-only.
+ * yet in `arqel-dev/core`. Current scope is config-only.
  *
  * @see PLANNING/09-fase-2-essenciais.md §FIELDS-ADV-008
  */

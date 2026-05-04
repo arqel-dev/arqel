@@ -1,10 +1,10 @@
-# SKILL.md — arqel/auth
+# SKILL.md — arqel-dev/auth
 
 > Contexto canónico para AI agents. Estrutura conforme `PLANNING/04-repo-structure.md` §11.
 
 ## Purpose
 
-`arqel/auth` é a fina camada de **authorization** (não authentication) que envolve Laravel Policies + Gate com conveniences específicas para Arqel:
+`arqel-dev/auth` é a fina camada de **authorization** (não authentication) que envolve Laravel Policies + Gate com conveniences específicas para Arqel:
 
 - **`PolicyDiscovery`** — verifica/auto-registra Policies para Resources, com warning quando ausentes e suporte a override via `$policy` estático
 - **`AbilityRegistry`** — catálogo de abilities globais (resolvidas via Gate) + computed (closures arbitrárias) que são serializadas em shared props (`auth.can.*`) para o lado React
@@ -12,7 +12,7 @@
 
 User escreve as Policies (Laravel-native). Arqel apenas verifica existência, auto-registra com `Gate::policy(...)` e resolve abilities globais por user.
 
-> **Authentication (login/registro/forgot-password) não está incluída neste pacote.** Decisão de design: Arqel hoje delega ao starter kit Laravel (Breeze/Jetstream/Fortify) — o `arqel new` CLI instala Breeze + React + Inertia por default. Para apps que rodaram só `composer require arqel/arqel`, é necessário instalar manualmente um starter kit. Ver `apps/docs/guide/authentication.md`. _Tickets AUTH-006/007/008 (TBD) preveem shipar páginas Inertia-React opt-in dentro deste pacote, equivalente ao que Filament/Nova oferecem out-of-the-box._
+> **Authentication (login/registro/forgot-password) não está incluída neste pacote.** Decisão de design: Arqel hoje delega ao starter kit Laravel (Breeze/Jetstream/Fortify) — o `arqel new` CLI instala Breeze + React + Inertia por default. Para apps que rodaram só `composer require arqel-dev/arqel`, é necessário instalar manualmente um starter kit. Ver `apps/docs/guide/authentication.md`. _Tickets AUTH-006/007/008 (TBD) preveem shipar páginas Inertia-React opt-in dentro deste pacote, equivalente ao que Filament/Nova oferecem out-of-the-box._
 
 ## Status
 
@@ -29,12 +29,12 @@ User escreve as Policies (Laravel-native). Arqel apenas verifica existência, au
 
 **Entregue (AUTH-008):**
 
-- `Arqel\Auth\Http\Controllers\ForgotPasswordController` — GET renderiza Inertia `arqel/auth/ForgotPassword`; POST valida e-mail, dispara `Password::sendResetLink`, retorna flash `status` genérico (não revela se e-mail existe). Rate-limit 3/email+IP/hora
-- `Arqel\Auth\Http\Controllers\ResetPasswordController` — GET renderiza `arqel/auth/ResetPassword` com `{token, email}`; POST valida via `ResetPasswordRequest` e processa `Password::reset`. Sucesso redireciona para `Panel::getLoginUrl()`
+- `Arqel\Auth\Http\Controllers\ForgotPasswordController` — GET renderiza Inertia `arqel-dev/auth/ForgotPassword`; POST valida e-mail, dispara `Password::sendResetLink`, retorna flash `status` genérico (não revela se e-mail existe). Rate-limit 3/email+IP/hora
+- `Arqel\Auth\Http\Controllers\ResetPasswordController` — GET renderiza `arqel-dev/auth/ResetPassword` com `{token, email}`; POST valida via `ResetPasswordRequest` e processa `Password::reset`. Sucesso redireciona para `Panel::getLoginUrl()`
 - `Arqel\Auth\Http\Requests\ResetPasswordRequest` — rules `token+email+password(min:8 confirmed)+password_confirmation`; rate-limit 3/email+IP/hora
 - `Routes::registerPasswordReset(?Panel)` — registra `password.request`, `password.email`, `password.reset`, `password.update` (idempotente; pula se host já tem `password.request`/`password.reset`)
 - `Panel::passwordReset()/passwordResetEnabled()/passwordResetExpirationMinutes()/forgotPasswordUrl()` — fluent API opt-in. `passwordResetExpirationMinutes` ajusta `auth.passwords.users.expire` em runtime
-- Pacote npm `@arqel/auth` ganha `<ForgotPasswordPage />` e `<ResetPasswordPage />`
+- Pacote npm `@arqel-dev/auth` ganha `<ForgotPasswordPage />` e `<ResetPasswordPage />`
 
 Exemplo:
 
@@ -47,21 +47,21 @@ $panel
 
 **Entregue (AUTH-006):**
 
-- `Arqel\Auth\Http\Controllers\LoginController` — GET renderiza Inertia `arqel/auth/Login`; POST autentica via `LoginRequest`, regenera sessão e redireciona para `Panel::getAfterLoginUrl()`
+- `Arqel\Auth\Http\Controllers\LoginController` — GET renderiza Inertia `arqel-dev/auth/Login`; POST autentica via `LoginRequest`, regenera sessão e redireciona para `Panel::getAfterLoginUrl()`
 - `Arqel\Auth\Http\Controllers\LogoutController` — invalida sessão, rotaciona CSRF, redireciona para `Panel::getLoginUrl()`
 - `Arqel\Auth\Http\Requests\LoginRequest` — rate-limit Laravel-native (5/min por email+IP), dispara `Lockout` event
 - `Arqel\Auth\Routes::register(?Panel)` — registo idempotente; pula quando o host já tem rota `login` (Breeze/Jetstream/Fortify)
 - `Panel::login()/loginUrl()/afterLoginRedirectTo()/registration()/withoutDefaultAuth()/loginEnabled()/registrationEnabled()` — fluent API opt-in
-- Pacote npm `@arqel/auth` com componente `<LoginPage />` Inertia-React
+- Pacote npm `@arqel-dev/auth` com componente `<LoginPage />` Inertia-React
 
 **Entregue (AUTH-007):**
 
-- `Arqel\Auth\Http\Controllers\RegisterController` — GET renderiza Inertia `arqel/auth/Register`; POST cria User via `config('auth.providers.users.model')`, dispara `Registered` event, faz auto-login e redireciona
+- `Arqel\Auth\Http\Controllers\RegisterController` — GET renderiza Inertia `arqel-dev/auth/Register`; POST cria User via `config('auth.providers.users.model')`, dispara `Registered` event, faz auto-login e redireciona
 - `Arqel\Auth\Http\Requests\RegisterRequest` — rules name/email/password com `confirmed`, rate-limit 3 registros/IP/hora
 - `Arqel\Auth\Http\Controllers\EmailVerificationController` — `notice` (Inertia notice page), `verify` (signed URL handler que dispara `Verified`), `resend` (reenvio com flash status)
 - `Arqel\Auth\Routes::registerRegistration()` e `registerEmailVerification()` — registos idempotentes, opt-in via `Panel::registration()` e `Panel::emailVerification()`
 - `Panel::emailVerification()/emailVerificationEnabled()/registrationFields()/getRegistrationFields()` — fluent API opt-in
-- Componentes npm `<RegisterPage />` e `<VerifyEmailNoticePage />` em `@arqel/auth`
+- Componentes npm `<RegisterPage />` e `<VerifyEmailNoticePage />` em `@arqel-dev/auth`
 - Reservou `email/` no `routes/arqel.php` `$reservedSlugs` para não colidir com `{resource}` polymórfico
 
 Exemplo de uso:
@@ -75,7 +75,7 @@ $panel = Panel::configure()
 
 **Por chegar:**
 
-- Integração com `arqel/core` `ArqelServiceProvider::packageBooted` para chamar `PolicyDiscovery::autoRegisterPoliciesFor(ResourceRegistry::all())` automaticamente (AUTH-005 wrap-up)
+- Integração com `arqel-dev/core` `ArqelServiceProvider::packageBooted` para chamar `PolicyDiscovery::autoRegisterPoliciesFor(ResourceRegistry::all())` automaticamente (AUTH-005 wrap-up)
 
 ## Key Contracts
 

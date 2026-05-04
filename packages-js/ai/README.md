@@ -1,4 +1,4 @@
-# @arqel/ai
+# @arqel-dev/ai
 
 Componentes React do Arqel AI.
 
@@ -9,16 +9,16 @@ exemplos.
 ## Instalação
 
 ```bash
-pnpm add @arqel/ai
+pnpm add @arqel-dev/ai
 ```
 
 ## Uso
 
 ```ts
-import '@arqel/ai/register'; // registra no FieldRegistry de @arqel/ui
+import '@arqel-dev/ai/register'; // registra no FieldRegistry de @arqel-dev/ui
 
 // ou import direto:
-import { AiTextInput } from '@arqel/ai';
+import { AiTextInput } from '@arqel-dev/ai';
 ```
 
 Licença: MIT.

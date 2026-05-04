@@ -1,17 +1,17 @@
-# SKILL.md — @arqel/ui
+# SKILL.md — @arqel-dev/ui
 
 > Contexto canónico para AI agents.
 
 ## Purpose
 
-`@arqel/ui` é a "casca" estrutural do admin panel: shell (AppShell + Sidebar + Topbar), página de listagem (ResourceIndex + DataTable), formulário polimórfico (FormRenderer + FieldRenderer), botões e modais de Action, flash toasts e utilitários (Breadcrumbs, PageHeader, EmptyState, ErrorState, LoadingSkeleton). Tudo é presentational — estado vive nos hooks/Inertia.
+`@arqel-dev/ui` é a "casca" estrutural do admin panel: shell (AppShell + Sidebar + Topbar), página de listagem (ResourceIndex + DataTable), formulário polimórfico (FormRenderer + FieldRenderer), botões e modais de Action, flash toasts e utilitários (Breadcrumbs, PageHeader, EmptyState, ErrorState, LoadingSkeleton). Tudo é presentational — estado vive nos hooks/Inertia.
 
 ## Status
 
 **Entregue (UI-001..006):**
 
 - 9 entry points subpath para tree-shaking (`shell`, `resource`, `table`, `form`, `action`, `auth`, `flash`, `utility`, `utils`)
-- `globals.css` com Tailwind v4 `@import` + design tokens em `oklch` + `.dark` override (exposto como `@arqel/ui/styles.css`)
+- `globals.css` com Tailwind v4 `@import` + design tokens em `oklch` + `.dark` override (exposto como `@arqel-dev/ui/styles.css`)
 - `cn()` utility (clsx + tailwind-merge)
 
 **Shell** (UI-002):
@@ -52,12 +52,12 @@
 ## Key Contracts
 
 ```tsx
-import '@arqel/ui/styles.css';
+import '@arqel-dev/ui/styles.css';
 import {
   AppShell, Sidebar, Topbar, MainContent, FlashContainer,
   ResourceIndex, FormRenderer, ActionButton, CanAccess,
   Breadcrumbs, PageHeader,
-} from '@arqel/ui';
+} from '@arqel-dev/ui';
 
 export default function UsersIndex(props: ResourceIndexProps<User>) {
   return (
@@ -82,18 +82,18 @@ export default function UsersIndex(props: ResourceIndexProps<User>) {
 ## Conventions
 
 - Subpath imports preferidos para tree-shaking
-- CSS exposto como `@arqel/ui/styles.css` — apps importam uma vez
+- CSS exposto como `@arqel-dev/ui/styles.css` — apps importam uma vez
 - Design tokens via CSS vars (`--color-arqel-*`, `--radius-arqel-*`)
-- `.dark` class flip aplicada por `<ThemeProvider>` de `@arqel/react`
+- `.dark` class flip aplicada por `<ThemeProvider>` de `@arqel-dev/react`
 - Componentes presentational — callbacks lifted (sem fetch interno)
-- `peerDependencies`: Base UI / TanStack Table / lucide-react / @arqel/{react,hooks}
+- `peerDependencies`: Base UI / TanStack Table / lucide-react / @arqel-dev/{react,hooks}
 - Props com `undefined` explícito quando opcionais (necessário por `exactOptionalPropertyTypes: true`)
 
 ## Anti-patterns
 
 - ❌ **Hardcode de cor** — usa CSS vars para honrar tema
 - ❌ **Bundle Tailwind** — apps trazem o próprio Tailwind; expomos só os tokens
-- ❌ **Importar de `dist/`** — usa exports declarados (`@arqel/ui` ou subpaths)
+- ❌ **Importar de `dist/`** — usa exports declarados (`@arqel-dev/ui` ou subpaths)
 - ❌ **Estado local em ResourceIndex/DataTable** — sempre lifted via callbacks
 - ❌ **Duplicar `useFlash({ onMessage })`** — um único `<FlashContainer>` no AppShell
 

@@ -234,15 +234,15 @@ Livewire é a stack oficial Filament. Alternativa legítima para frontend Larave
 
 Como distribuir componentes UI (Button, Input, Select, etc.):
 
-1. **npm package tradicional** — `import { Button } from '@arqel/ui'`, versionado.
-2. **ShadCN CLI pattern** — user executa `npx shadcn@latest add arqel/button`, componente é copiado para `resources/js/components/ui/button.tsx`, versionado pelo user.
+1. **npm package tradicional** — `import { Button } from '@arqel-dev/ui'`, versionado.
+2. **ShadCN CLI pattern** — user executa `npx shadcn@latest add arqel-dev/button`, componente é copiado para `resources/js/components/ui/button.tsx`, versionado pelo user.
 3. **Hybrid** — structural via npm, atómicos via ShadCN CLI.
 
 ### Decisão
 
 **Hybrid com ShadCN CLI v4 para primitives + npm para structural.**
 
-- **@arqel/ui (npm):** AppShell, Sidebar, Topbar, DataTable shell, FormRenderer — componentes estruturais que mudam raramente.
+- **@arqel-dev/ui (npm):** AppShell, Sidebar, Topbar, DataTable shell, FormRenderer — componentes estruturais que mudam raramente.
 - **arqel.dev/r/** (ShadCN CLI registry): Button, Input, Select, Dialog, etc. — componentes atómicos, user owns.
 
 ### Rationale
@@ -280,7 +280,7 @@ Base UI (2025+) é o sucessor moderno do Radix UI para primitives headless. Shad
 
 ### Decisão
 
-**Base UI é o primitive layer default.** Radix opt-in via `@arqel/ui-radix` package.
+**Base UI é o primitive layer default.** Radix opt-in via `@arqel-dev/ui-radix` package.
 
 ### Rationale
 
@@ -352,7 +352,7 @@ Ter um único Git repo para todos os packages (PHP + JS) vs múltiplos repos.
 
 ### Decisão
 
-**Monorepo único em `github.com/arqel/arqel`** contendo:
+**Monorepo único em `github.com/arqel-dev/arqel`** contendo:
 
 - `packages/` — PHP packages Composer
 - `packages-js/` — npm packages
@@ -497,7 +497,7 @@ Model Context Protocol (MCP) está crescerndo como standard 2025/2026 para LLM t
 
 ### Decisão
 
-**`arqel/mcp` é package Composer oficial shipped em Fase 2.**
+**`arqel-dev/mcp` é package Composer oficial shipped em Fase 2.**
 
 ### Rationale
 
@@ -578,10 +578,10 @@ Spatie publica packages Laravel de fato-standard: Permission, Media Library, Act
 
 **Spatie packages são integrações opcionais, não hard dependencies.**
 
-- `arqel/auth-spatie` — opt-in wrapper `spatie/laravel-permission`
-- `arqel/media-spatie` — opt-in wrapper `spatie/laravel-medialibrary`
-- `arqel/audit` — wraps `spatie/laravel-activitylog` (wrapper fino)
-- `arqel/workflow` — wraps `spatie/laravel-model-states`
+- `arqel-dev/auth-spatie` — opt-in wrapper `spatie/laravel-permission`
+- `arqel-dev/media-spatie` — opt-in wrapper `spatie/laravel-medialibrary`
+- `arqel-dev/audit` — wraps `spatie/laravel-activitylog` (wrapper fino)
+- `arqel-dev/workflow` — wraps `spatie/laravel-model-states`
 
 ### Rationale
 
@@ -713,7 +713,7 @@ Como registar Arqel numa Laravel app.
 
 ### Rationale
 
-- **Zero-config install:** `composer require arqel/arqel` + `php artisan arqel:install` → funciona.
+- **Zero-config install:** `composer require arqel-dev/arqel` + `php artisan arqel:install` → funciona.
 - **Padrão Laravel package development.**
 - **Opt-out possível** via `extra.laravel.dont-discover`.
 

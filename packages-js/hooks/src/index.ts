@@ -1,8 +1,8 @@
 /**
- * @arqel/hooks — Reusable React hooks for Arqel admin panels.
+ * @arqel-dev/hooks — Reusable React hooks for Arqel admin panels.
  *
- * Re-exports each hook so consumers can `import { useResource } from '@arqel/hooks'`
- * or use subpath imports (`import { useResource } from '@arqel/hooks/useResource'`)
+ * Re-exports each hook so consumers can `import { useResource } from '@arqel-dev/hooks'`
+ * or use subpath imports (`import { useResource } from '@arqel-dev/hooks/useResource'`)
  * for maximal tree-shaking.
  */
 

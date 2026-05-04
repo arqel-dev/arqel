@@ -11,7 +11,7 @@ use Throwable;
  * Records Arqel-specific metrics through {@see MetricsCollector}
  * via convenience methods + automatic event listeners.
  *
- * Cross-package events (`arqel/workflow`, `arqel/ai`) are wired
+ * Cross-package events (`arqel-dev/workflow`, `arqel-dev/ai`) are wired
  * defensively with `class_exists` so this works standalone when
  * those packages are not installed.
  */
@@ -77,7 +77,7 @@ final readonly class AutoInstrumentation
 
     /**
      * Subscribe defensively to optional cross-package events. Safe
-     * to call when `arqel/workflow` or `arqel/ai` are missing — the
+     * to call when `arqel-dev/workflow` or `arqel-dev/ai` are missing — the
      * `class_exists` guards short-circuit before the listener is
      * registered.
      */

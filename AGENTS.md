@@ -8,7 +8,7 @@
 **Descrição:** Framework open-source MIT para admin panels Laravel com Inertia+React
 **Status:** Em desenvolvimento ativo (Fase 1, Sprint 0)
 **Licença:** MIT + DCO
-**Repositório canônico:** https://github.com/arqel/arqel (placeholder)
+**Repositório canônico:** https://github.com/arqel-dev/arqel (placeholder)
 **Documentação:** https://arqel.dev (placeholder)
 
 ## Stack

@@ -11,7 +11,7 @@ use Throwable;
  * Pulse recorder: AI tokens consumed per provider (LCLOUD-003).
  *
  * Subscribes to `Arqel\Ai\Events\AiCompletionGenerated` (when the
- * `arqel/ai` package is installed) and aggregates the
+ * `arqel-dev/ai` package is installed) and aggregates the
  * `total_tokens` field per provider into Pulse.
  */
 final class ArqelAiUsageRecorder

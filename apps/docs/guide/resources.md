@@ -40,7 +40,7 @@ A partir daí Arqel deriva:
 - Sidebar entry com label "Posts"
 - Index page com columns auto-derivadas
 - Forms create/edit com os fields acima
-- Inertia pages renderizadas pelos componentes de `@arqel/ui`
+- Inertia pages renderizadas pelos componentes de `@arqel-dev/ui`
 
 ## Convenções de naming
 

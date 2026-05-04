@@ -1,6 +1,6 @@
 {
-    "name": "arqel/auth",
-    "version": "0.8.0-rc.1",
+    "name": "arqel-dev/auth",
+    "version": "0.8.0",
     "description": "Authorization layer for Arqel — wraps Laravel Policies + Gate with conveniences for Resources and panels.",
     "type": "library",
     "license": "MIT",
@@ -13,13 +13,13 @@
     ],
     "homepage": "https://arqel.dev",
     "support": {
-        "issues": "https://github.com/arqel/arqel/issues",
-        "source": "https://github.com/arqel/arqel",
+        "issues": "https://github.com/arqel-dev/arqel/issues",
+        "source": "https://github.com/arqel-dev/arqel",
         "docs": "https://arqel.dev/docs"
     },
     "require": {
         "php": "^8.3",
-        "arqel/core": "@dev",
+        "arqel-dev/core": "@dev",
         "laravel/framework": "^12.0|^13.0"
     },
     "require-dev": {

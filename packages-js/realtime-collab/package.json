@@ -1,12 +1,12 @@
 {
-  "name": "@arqel/realtime-collab",
-  "version": "0.10.0-rc.1",
+  "name": "@arqel-dev/realtime-collab",
+  "version": "0.8.0",
   "description": "Yjs collaborative editing client for Arqel — sync via Laravel Echo + Reverb.",
   "license": "MIT",
   "homepage": "https://arqel.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arqel/arqel.git",
+    "url": "https://github.com/arqel-dev/arqel.git",
     "directory": "packages-js/realtime-collab"
   },
   "keywords": [

@@ -21,7 +21,7 @@ use Inertia\Response;
 /**
  * Reset-password bundled de Arqel.
  *
- * Renderiza o componente Inertia `arqel/auth/ResetPassword` (com token na
+ * Renderiza o componente Inertia `arqel-dev/auth/ResetPassword` (com token na
  * rota e email vindo da query string) e processa o submit validando token
  * via `Password::reset`.
  */
@@ -64,7 +64,7 @@ final class ResetPasswordController
      */
     public function showForm(Request $request, string $token): Response
     {
-        return Inertia::render('arqel/auth/ResetPassword', [
+        return Inertia::render('arqel-dev/auth/ResetPassword', [
             'token' => $token,
             'email' => (string) $request->query('email', ''),
             'loginUrl' => $this->currentPanel()?->getLoginUrl() ?? '/admin/login',

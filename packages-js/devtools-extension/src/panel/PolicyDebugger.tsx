@@ -2,7 +2,7 @@
  * Policy debugger panel (DEVTOOLS-004).
  *
  * Renders the `__devtools.policyLog` shared prop emitted by
- * `arqel/core` in `local` environment. Each row is one `Gate::after`
+ * `arqel-dev/core` in `local` environment. Each row is one `Gate::after`
  * event captured server-side: ability, arguments, allow/deny result
  * and a 5-frame stack trace.
  *

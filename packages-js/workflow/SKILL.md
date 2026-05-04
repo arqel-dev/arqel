@@ -1,11 +1,11 @@
-# SKILL.md — arqel/workflow (JS)
+# SKILL.md — arqel-dev/workflow (JS)
 
 ## Purpose
 
 Pacote React que entrega os componentes UI do Arqel Workflow. Por
 enquanto exporta apenas `<StateTransition>`, espelhando o PHP
 `Arqel\Workflow\Fields\StateTransitionField` (component string
-`arqel/workflow/StateTransition`).
+`arqel-dev/workflow/StateTransition`).
 
 O componente é **puramente apresentacional** — não faz fetch, não
 conhece Inertia. Disparos de transição saem como `CustomEvent`
@@ -45,7 +45,7 @@ document.addEventListener('arqel:state-transition', (e) => {
 - TypeScript strict, sem `any` (apenas asserts pontuais devidamente
   comentados em `register.ts`).
 - Classes PHP equivalentes ficam em `packages/workflow/src/Fields/`.
-- Component name canônico: `arqel/workflow/StateTransition`. Não
+- Component name canônico: `arqel-dev/workflow/StateTransition`. Não
   renomear — o PHP usa essa string.
 - Lint: Biome (`pnpm lint`); testes: Vitest + Testing Library; build:
   tsup.
@@ -54,7 +54,7 @@ document.addEventListener('arqel:state-transition', (e) => {
 ## Examples
 
 ```tsx
-import { StateTransition } from '@arqel/workflow';
+import { StateTransition } from '@arqel-dev/workflow';
 
 <StateTransition
   name="state"
@@ -71,10 +71,10 @@ import { StateTransition } from '@arqel/workflow';
 />
 ```
 
-Para registrar via FieldRegistry do `@arqel/ui`:
+Para registrar via FieldRegistry do `@arqel-dev/ui`:
 
 ```ts
-import '@arqel/workflow/register';
+import '@arqel-dev/workflow/register';
 ```
 
 ## Anti-patterns
@@ -83,8 +83,8 @@ import '@arqel/workflow/register';
   apresentacional. Use `onTransition` ou consuma o `CustomEvent`.
 - Misturar lógica de autorização no componente — autoridade já vem
   resolvida pelo PHP (`authorized: boolean`).
-- Renomear o component name para algo sem prefixo `arqel/` — o PHP
-  field aponta exatamente para `arqel/workflow/StateTransition`.
+- Renomear o component name para algo sem prefixo `arqel-dev/` — o PHP
+  field aponta exatamente para `arqel-dev/workflow/StateTransition`.
 
 ## WorkflowVisualizer (WF-005)
 
@@ -95,7 +95,7 @@ className="language-mermaid">` por default, ou delega via prop
 `renderer` quando o consumidor já tem mermaid configurado.
 
 ```tsx
-import { WorkflowVisualizer } from '@arqel/workflow';
+import { WorkflowVisualizer } from '@arqel-dev/workflow';
 
 <WorkflowVisualizer
   definition={{
@@ -119,7 +119,7 @@ Renderer customizado (consumidor já tem mermaid runtime):
 
 ```tsx
 import mermaid from 'mermaid';
-import { WorkflowVisualizer } from '@arqel/workflow';
+import { WorkflowVisualizer } from '@arqel-dev/workflow';
 
 <WorkflowVisualizer
   definition={definition}

@@ -1,12 +1,12 @@
 {
-  "name": "@arqel/hooks",
-  "version": "0.8.0-rc.1",
+  "name": "@arqel-dev/hooks",
+  "version": "0.8.0",
   "description": "Reusable React hooks for Arqel admin panels.",
   "license": "MIT",
   "homepage": "https://arqel.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arqel/arqel.git",
+    "url": "https://github.com/arqel-dev/arqel.git",
     "directory": "packages-js/hooks"
   },
   "keywords": [
@@ -83,16 +83,16 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@arqel/types": "workspace:*"
+    "@arqel-dev/types": "workspace:*"
   },
   "peerDependencies": {
-    "@arqel/react": "workspace:*",
+    "@arqel-dev/react": "workspace:*",
     "@inertiajs/react": "^2.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@arqel/react": "workspace:*",
+    "@arqel-dev/react": "workspace:*",
     "@inertiajs/core": "^2.0.0",
     "@inertiajs/react": "^2.0.0",
     "@testing-library/jest-dom": "^6.6.3",

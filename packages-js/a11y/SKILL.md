@@ -1,10 +1,10 @@
-# SKILL.md — @arqel/a11y
+# SKILL.md — @arqel-dev/a11y
 
 ## Purpose
 
 Helpers de acessibilidade (WCAG 2.1 AA) para componentes React do ecossistema Arqel.
 Foca em primitivos compartilhados: focus trap, live region/announcer, skip link e
-visually-hidden. Reusados por `@arqel/ui`, `@arqel/auth`, `@arqel/ai`, e demais pacotes
+visually-hidden. Reusados por `@arqel-dev/ui`, `@arqel-dev/auth`, `@arqel-dev/ai`, e demais pacotes
 React do monorepo.
 
 ## Key Contracts
@@ -30,7 +30,7 @@ React do monorepo.
 ## Examples
 
 ```tsx
-import { useFocusTrap, useAnnounce, SkipLink } from '@arqel/a11y';
+import { useFocusTrap, useAnnounce, SkipLink } from '@arqel-dev/a11y';
 
 function MyDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ref = useFocusTrap<HTMLDivElement>(open, { onEscape: onClose });

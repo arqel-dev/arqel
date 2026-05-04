@@ -15,7 +15,7 @@ export interface VerifyEmailNoticePageProps {
 /**
  * Página de notice de verificação de e-mail bundled de Arqel.
  *
- * Renderizada via Inertia em `arqel/auth/VerifyEmailNotice`. Mostra o
+ * Renderizada via Inertia em `arqel-dev/auth/VerifyEmailNotice`. Mostra o
  * e-mail do user autenticado e oferece um botão de reenvio.
  */
 export function VerifyEmailNoticePage({

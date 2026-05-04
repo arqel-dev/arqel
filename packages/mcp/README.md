@@ -1,4 +1,4 @@
-# arqel/mcp
+# arqel-dev/mcp
 
 Model Context Protocol server for Arqel — exposes panel resources, fields, tables, and actions to MCP-compatible AI clients (Claude Desktop, Cursor, Zed, etc.).
 
@@ -8,10 +8,10 @@ Phase 2 scaffold (MCP-001). The JSON-RPC handler, `serve` Artisan command, tool/
 
 ## Install
 
-In a Laravel app already running `arqel/core`:
+In a Laravel app already running `arqel-dev/core`:
 
 ```bash
-composer require arqel/mcp
+composer require arqel-dev/mcp
 ```
 
 The service provider is auto-discovered.

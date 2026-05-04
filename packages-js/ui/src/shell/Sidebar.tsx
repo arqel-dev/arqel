@@ -9,7 +9,7 @@
  * but the component also accepts an `items` override for custom panels.
  */
 
-import { type NavigationItemPayload, useNavigation } from '@arqel/hooks';
+import { type NavigationItemPayload, useNavigation } from '@arqel-dev/hooks';
 import { Dialog } from '@base-ui-components/react/dialog';
 import { useMemo } from 'react';
 import { cn } from '../utils/cn.js';

@@ -24,7 +24,7 @@ use Throwable;
  * `POST /admin/{resource}/{id}/versions/{versionId}/restore`.
  *
  * Resolve `ResourceRegistry` defensivamente via FQCN-string para evitar
- * acoplamento hard com `arqel/core` em ambientes de teste minimalistas.
+ * acoplamento hard com `arqel-dev/core` em ambientes de teste minimalistas.
  *
  * Authorization é gated por `Gate::authorize('update', $record)` quando
  * a Gate está definida; caso contrário (sem ability registrada) o

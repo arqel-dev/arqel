@@ -50,7 +50,7 @@
 
 ## 2. AI fields (AI)
 
-### [AI-001] Esqueleto do pacote `arqel/ai`
+### [AI-001] Esqueleto do pacote `arqel-dev/ai`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [FIELDS-001] (Fase 1)
 
@@ -62,7 +62,7 @@ Cobre RF-IN-01 e RF-F-11. AI-assisted fields — translation, summarization, cla
 
 Estrutura `packages/ai/`:
 
-- `composer.json` (deps: `arqel/fields`, suggest: anthropic/anthropic-php, openai-php/client, ollama-laravel)
+- `composer.json` (deps: `arqel-dev/fields`, suggest: anthropic/anthropic-php, openai-php/client, ollama-laravel)
 - `src/AiManager.php` (singleton que gerencia providers)
 - `src/Contracts/AiProvider.php`
 - `src/Providers/` (ClaudeProvider, OpenAiProvider, OllamaProvider)
@@ -796,7 +796,7 @@ MCP tools que usam AI internamente — ex: "generate Resource from description".
 
 **Descrição técnica**
 
-Expand `arqel/mcp` com tools que chamam AI:
+Expand `arqel-dev/mcp` com tools que chamam AI:
 
 ```php
 final class GenerateResourceFromDescriptionTool
@@ -884,7 +884,7 @@ SKILL.md + docs site:
 
 ## 3. Real-time (RT)
 
-### [RT-001] Esqueleto do pacote `arqel/realtime`
+### [RT-001] Esqueleto do pacote `arqel-dev/realtime`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [CORE-008] (Fase 1)
 
@@ -896,7 +896,7 @@ Cobre RF-IN-03. Laravel Reverb é nosso WebSocket server (oficial Laravel). Yjs 
 
 Estrutura `packages/realtime/`:
 
-- `composer.json` (deps: `arqel/core`, `laravel/reverb`, suggest: sergeytsv/yjs-php para collab)
+- `composer.json` (deps: `arqel-dev/core`, `laravel/reverb`, suggest: sergeytsv/yjs-php para collab)
 - `src/Events/` (ResourceUpdated, ActionStarted, etc.)
 - `src/Channels/` (ResourceChannel, ActionProgressChannel)
 - `src/Presence/` (online users tracking)
@@ -1006,7 +1006,7 @@ Quando record update recebido, reload partial Inertia. Show subtle indicator "Up
 **Descrição técnica**
 
 ```typescript
-// @arqel/hooks
+// @arqel-dev/hooks
 import { useEffect } from 'react'
 import { router } from '@inertiajs/react'
 import Echo from 'laravel-echo'
@@ -1258,13 +1258,13 @@ React: ProgressToast subscreve channel, update progress bar.
 
 ---
 
-### [RT-008] Laravel Echo setup + @arqel/realtime npm package
+### [RT-008] Laravel Echo setup + @arqel-dev/realtime npm package
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** M • **Camada:** react • **Depende de:** [RT-001]
 
 **Descrição técnica**
 
-`@arqel/realtime` npm package:
+`@arqel-dev/realtime` npm package:
 
 - Re-exports Laravel Echo configured
 - Auto-setup em ArqelProvider
@@ -1273,8 +1273,8 @@ React: ProgressToast subscreve channel, update progress bar.
 Configurar em `resources/js/app.tsx`:
 
 ```typescript
-import { createArqelApp } from '@arqel/react'
-import { setupEcho } from '@arqel/realtime'
+import { createArqelApp } from '@arqel-dev/react'
+import { setupEcho } from '@arqel-dev/realtime'
 
 setupEcho({
     broadcaster: 'reverb',
@@ -1290,7 +1290,7 @@ createArqelApp()
 
 **Critérios de aceite**
 
-- [ ] `@arqel/realtime` npm package publicado
+- [ ] `@arqel-dev/realtime` npm package publicado
 - [ ] Echo setup helper
 - [ ] Auto-reconnect on disconnect
 - [ ] Hooks integram seamlessly
@@ -1413,7 +1413,7 @@ SKILL.md + docs site:
 
 ## 4. Workflow engine (WF)
 
-### [WF-001] Esqueleto do pacote `arqel/workflow`
+### [WF-001] Esqueleto do pacote `arqel-dev/workflow`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [CORE-008] (Fase 1)
 
@@ -1425,7 +1425,7 @@ Cobre RF-IN-06. State machines via spatie/laravel-model-states. Wrapper fino que
 
 Estrutura `packages/workflow/`:
 
-- `composer.json` (dep: `arqel/core`, `spatie/laravel-model-states` ^2.5)
+- `composer.json` (dep: `arqel-dev/core`, `spatie/laravel-model-states` ^2.5)
 - `src/Concerns/HasWorkflow.php`
 - `src/Components/StateTransitionField.php`
 - `src/WorkflowManager.php`
@@ -1771,7 +1771,7 @@ Docs site com 3 workflow examples completos:
 
 ## 5. Record versioning (VERS)
 
-### [VERS-001] Esqueleto do pacote `arqel/versioning`
+### [VERS-001] Esqueleto do pacote `arqel-dev/versioning`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [CORE-008] (Fase 1)
 
@@ -1783,7 +1783,7 @@ Cobre RF-IN-05. Time-travel para records: ver histórico, restaurar versão ante
 
 Estrutura `packages/versioning/`:
 
-- `composer.json` (dep: `arqel/core`)
+- `composer.json` (dep: `arqel-dev/core`)
 - `src/Concerns/Versionable.php` (trait)
 - `src/Models/Version.php`
 - `src/VersionManager.php`
@@ -2063,7 +2063,7 @@ Docs comparando:
 
 ## 6. Semantic search (SEARCH)
 
-### [SEARCH-001] Esqueleto do pacote `arqel/search`
+### [SEARCH-001] Esqueleto do pacote `arqel-dev/search`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [AI-006]
 
@@ -2075,7 +2075,7 @@ Cobre RF-T-16 e RF-IN-02. Semantic search via embeddings (vector similarity).
 
 Estrutura `packages/search/`:
 
-- `composer.json` (deps: `arqel/core`, `arqel/ai`, suggest: pgvector/pgvector-php)
+- `composer.json` (deps: `arqel-dev/core`, `arqel-dev/ai`, suggest: pgvector/pgvector-php)
 - `src/Concerns/Searchable.php` (trait)
 - `src/SemanticSearchManager.php`
 - `src/Drivers/` (PgvectorDriver, QdrantDriver — Fase 4)
@@ -2326,7 +2326,7 @@ Cobre RF-IN-08. Auto-gerar OpenAPI spec para Resources, expose como REST API opt
 
 Estrutura `packages/openapi/`:
 
-- `composer.json` (deps: `arqel/core`)
+- `composer.json` (deps: `arqel-dev/core`)
 - `src/SpecGenerator.php`
 - `src/Commands/GenerateOpenApiCommand.php`
 - `src/Http/Controllers/ApiResourceController.php` (generic REST controller)
@@ -2636,7 +2636,7 @@ Cobre RF-T-15. Power users com >1M rows precisam AG Grid (melhor que TanStack pa
 
 **Descrição técnica**
 
-`@arqel/preset-grid-ag` npm package opt-in:
+`@arqel-dev/preset-grid-ag` npm package opt-in:
 - Substitui DataTable default com AG Grid
 - Config via Resource:
 

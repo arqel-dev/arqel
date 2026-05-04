@@ -1,4 +1,4 @@
-# SKILL.md — @arqel/devtools-extension
+# SKILL.md — @arqel-dev/devtools-extension
 
 > Contexto canônico para AI agents trabalhando na extensão DevTools.
 
@@ -20,7 +20,7 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
   manifest V3 com `browser_specific_settings` para Firefox 121+.
   Service worker stub que loga `onInstalled`. DevTools page que registra
   o painel "Arqel". Painel React com estados `Inactive` / `Connected`.
-- **Detecção real (DEVTOOLS-002):** injeção do hook em `@arqel/react` via
+- **Detecção real (DEVTOOLS-002):** injeção do hook em `@arqel-dev/react` via
   `installDevToolsHook(version)`, gateada por `import.meta.env.DEV`.
   `installProbeBridge()` injeta um `<script>` page-world inline que
   dispara um `CustomEvent('arqel-devtools-probe')` lido pelo content
@@ -40,18 +40,18 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
   Time Travel, Performance Metrics, coverage gaps).
 - **Policy debugger (DEVTOOLS-004):** nova top-tab "Policies" no
   painel renderiza a shared prop `__devtools.policyLog` que o
-  `arqel/core` emite em `app()->environment('local')`. Tabela com
+  `arqel-dev/core` emite em `app()->environment('local')`. Tabela com
   ability / arguments (JSON colapsado) / badge allow|deny / botão de
   expand/collapse para o stack trace por linha. Filter por result
   (`all|allow|deny`) + search por ability. Counter agregado no
   header (`X allowed / Y denied`). Empty state quando log vazio.
   Production builds sem `__devtools` ⇒ tab fica em empty state — sem
-  leak. Captura via `@arqel/react` no inertia-bridge: extrai
+  leak. Captura via `@arqel-dev/react` no inertia-bridge: extrai
   `props['__devtools']` e expõe no hook como `getDevToolsPayload()`.
 
 - **Field schema inspector (DEVTOOLS-005):** nova top-tab "Fields" no
   painel renderiza schema normalizado a partir de `pageProps`. Hook
-  `@arqel/react` ganha `getFieldsSchema()` com heurística defensive
+  `@arqel-dev/react` ganha `getFieldsSchema()` com heurística defensive
   (`pageProps.fields` → `pageProps.resource.fields` →
   `pageProps.form.fields`), normaliza para `FieldSchema[]` (defaults
   `visible=true`, `required=false`). Painel: lista compacta com badge
@@ -63,7 +63,7 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
 
 - **Time-travel debugging (DEVTOOLS-006):** nova top-tab "Time Travel"
   consome o ring buffer de até 50 `NavigationSnapshot`s capturado pelo
-  hook em `@arqel/react`. Cada snapshot inclui `id` (único por
+  hook em `@arqel-dev/react`. Cada snapshot inclui `id` (único por
   navegação), `timestamp`, `url`, `pageProps` (full payload), `sharedProps`
   e `durationMs?`. Painel renderiza timeline com path + relative
   timestamp + duration badge (vermelho quando ≥100ms). Click expande
@@ -74,7 +74,7 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
 - **Performance metrics dashboard (DEVTOOLS-007):** nova top-tab
   "Performance" renderiza dashboard com 4 tiles (LCP, INP/FID, CLS,
   navigation time). Color coding good / needs-improvement / poor com
-  thresholds canônicos do Web Vitals. Hook `@arqel/react` instala
+  thresholds canônicos do Web Vitals. Hook `@arqel-dev/react` instala
   `PerformanceObserver` automaticamente em `createArqelApp` quando
   `'PerformanceObserver' in window`. SSR-safe: bail-out quando `window`
   ausente. Footer mostra `queryCount` + `memoryUsage` da shared prop
@@ -123,7 +123,7 @@ acontece via Chrome Web Store + Firefox Add-ons após a Fase 4 fechar.
 ### Load unpacked em chrome://extensions
 
 ```bash
-pnpm --filter @arqel/devtools-extension build:chrome
+pnpm --filter @arqel-dev/devtools-extension build:chrome
 # Chrome/Edge: chrome://extensions → Developer mode → Load unpacked
 #   → selecione packages-js/devtools-extension/dist/chrome
 ```
@@ -136,14 +136,14 @@ No console da página rodando uma app Arqel em DEV mode:
 
 ```js
 window.__ARQEL_DEVTOOLS_HOOK__
-// => { version: '0.10.0' } se @arqel/react chamou installDevToolsHook
+// => { version: '0.10.0' } se @arqel-dev/react chamou installDevToolsHook
 // => undefined em produção (DCE removeu o código)
 ```
 
 ### Inspecionar Inertia state (futuro DEVTOOLS-003+)
 
 Atualmente o painel mostra apenas `Connected (vX.Y.Z)`. A inspeção de
-props/page object chega em DEVTOOLS-003 quando `@arqel/react` começar
+props/page object chega em DEVTOOLS-003 quando `@arqel-dev/react` começar
 a postar `arqel.inertia.update` para o background.
 
 ## Related

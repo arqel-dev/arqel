@@ -1,4 +1,4 @@
-# @arqel/hooks
+# @arqel-dev/hooks
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![React](https://img.shields.io/badge/react-%5E19-61dafb.svg)](https://react.dev)
@@ -13,7 +13,7 @@ Reusable React hooks for [Arqel](https://arqel.dev) admin panels.
 ## Install
 
 ```bash
-pnpm add @arqel/hooks @arqel/react @arqel/types
+pnpm add @arqel-dev/hooks @arqel-dev/react @arqel-dev/types
 pnpm add @inertiajs/react react react-dom
 ```
 
@@ -35,7 +35,7 @@ pnpm add @inertiajs/react react react-dom
 ## Subpath imports
 
 ```ts
-import { useTable } from '@arqel/hooks/useTable';
+import { useTable } from '@arqel-dev/hooks/useTable';
 ```
 
 ## Links

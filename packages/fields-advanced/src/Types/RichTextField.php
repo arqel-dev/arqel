@@ -8,7 +8,7 @@ use Arqel\Fields\Field;
 
 /**
  * Rich-text editor field powered by Tiptap on the React side
- * (`@arqel/fields-advanced/RichTextInput.tsx`, shipped in a future ticket).
+ * (`@arqel-dev/fields-advanced/RichTextInput.tsx`, shipped in a future ticket).
  *
  * The PHP side is configuration-only: it advertises the toolbar layout,
  * the optional image-upload disk/directory, the maximum length, the
@@ -185,7 +185,7 @@ final class RichTextField extends Field
             'toolbar' => $this->toolbar,
             'imageUploadRoute' => $this->imageUploadDisk === null
                 ? null
-                : '/arqel/fields/upload?disk='.$this->imageUploadDisk,
+                : '/arqel-dev/fields/upload?disk='.$this->imageUploadDisk,
             'imageUploadDirectory' => $this->imageUploadDirectory,
             'maxLength' => $this->maxLength,
             'fileAttachments' => $this->fileAttachments,

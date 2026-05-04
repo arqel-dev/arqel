@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Gate;
  * Stub `ResourceRegistry`-shaped object — the authorizer resolves it via
  * the FQCN string `Arqel\\Core\\Resources\\ResourceRegistry`. We bind a
  * stub to that name in the container per-test, exercising both the bound
- * and unbound code paths without pulling `arqel/core` into the test deps.
+ * and unbound code paths without pulling `arqel-dev/core` into the test deps.
  */
 final class FakeResourceRegistry
 {

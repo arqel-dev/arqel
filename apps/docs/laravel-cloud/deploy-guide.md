@@ -13,7 +13,7 @@ Antes de começar, garanta que você tem:
 - [x] Conta no [Laravel Cloud](https://cloud.laravel.com) (qualquer plano).
 - [x] Conta no GitHub com permissão de criar repositórios.
 - [x] PHP 8.3+ e Composer instalados localmente.
-- [x] CLI Arqel: `composer global require arqel/cli`.
+- [x] CLI Arqel: `composer global require arqel-dev/cli`.
 - [x] Git configurado com `user.email` e `user.name`.
 
 ---
@@ -24,7 +24,7 @@ O comando `cloud:export` (entregue em LCLOUD-001) materializa um app Laravel
 **pronto para Laravel Cloud** num diretório vazio. Ele inclui:
 
 - `cloud.yaml` com serviços (web, worker, scheduler, Reverb).
-- `composer.json` com `arqel/core`, `arqel/auth`, `arqel/fields` e dependências.
+- `composer.json` com `arqel-dev/core`, `arqel-dev/auth`, `arqel-dev/fields` e dependências.
 - `package.json` com Inertia + React 19.2 + Tailwind v4.
 - `app/Providers/PanelServiceProvider.php` registrando o panel default.
 - `routes/arqel.php`, `config/arqel.php` e `database/migrations/0000_arqel_base.php`.
@@ -139,7 +139,7 @@ O Laravel Cloud injeta automaticamente:
 | `MAIL_FROM_ADDRESS` | `noreply@seu-dominio.com` | Header `From:` em emails transacionais. |
 | `REVERB_APP_ID` / `REVERB_APP_KEY` / `REVERB_APP_SECRET` | (gere com `php artisan reverb:install`) | Auth do broadcasting. |
 | `ARQEL_PANEL_PATH` | `/admin` | Prefixo das rotas do painel. |
-| `ARQEL_AI_OPENAI_KEY` | (opcional) | Se usar `@arqel/ai` com OpenAI. |
+| `ARQEL_AI_OPENAI_KEY` | (opcional) | Se usar `@arqel-dev/ai` com OpenAI. |
 
 > O `cloud:export` já produz um `.env.example` com todos os placeholders.
 > Copie-o no dashboard, preencha os valores e clique **Save**.

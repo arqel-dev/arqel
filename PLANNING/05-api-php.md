@@ -794,14 +794,14 @@ Field::macro('richMarkdown', fn ($name) => RichMarkdownField::make($name));
 Frontend component correspondente (ver `06-api-react.md`):
 
 ```tsx
-// resources/js/arqel/fields/RichMarkdownInput.tsx
+// resources/js/arqel-dev/fields/RichMarkdownInput.tsx
 export function RichMarkdownInput({ field, value, onChange }) {
   // ...
 }
 
 // Register em app.tsx
-import { registerField } from '@arqel/fields'
-import { RichMarkdownInput } from './arqel/fields/RichMarkdownInput'
+import { registerField } from '@arqel-dev/fields'
+import { RichMarkdownInput } from './arqel-dev/fields/RichMarkdownInput'
 
 registerField('RichMarkdownInput', RichMarkdownInput)
 ```

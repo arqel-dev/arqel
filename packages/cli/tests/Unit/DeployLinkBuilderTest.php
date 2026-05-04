@@ -7,7 +7,7 @@ use Arqel\Cli\Services\DeployLinkBuilder;
 it('builds a canonical deploy URL with default region auto', function (): void {
     $builder = new DeployLinkBuilder;
 
-    $url = $builder->build('arqel/laravel-cloud-template');
+    $url = $builder->build('arqel-dev/laravel-cloud-template');
 
     expect($url)->toStartWith(DeployLinkBuilder::BASE_URL.'?')
         ->and($url)->toContain('repo=https%3A%2F%2Fgithub.com%2Farqel%2Flaravel-cloud-template')
@@ -32,7 +32,7 @@ it('rejects empty owner or name', function (): void {
 it('honours custom valid region', function (): void {
     $builder = new DeployLinkBuilder;
 
-    $url = $builder->build('arqel/template', 'eu-central');
+    $url = $builder->build('arqel-dev/template', 'eu-central');
 
     expect($url)->toContain('region=eu-central');
 });
@@ -40,14 +40,14 @@ it('honours custom valid region', function (): void {
 it('rejects unknown region', function (): void {
     $builder = new DeployLinkBuilder;
 
-    expect(fn (): string => $builder->build('arqel/template', 'mars-1'))
+    expect(fn (): string => $builder->build('arqel-dev/template', 'mars-1'))
         ->toThrow(InvalidArgumentException::class, 'Invalid region');
 });
 
 it('appends name option when provided', function (): void {
     $builder = new DeployLinkBuilder;
 
-    $url = $builder->build('arqel/template', 'auto', 'acme-admin');
+    $url = $builder->build('arqel-dev/template', 'auto', 'acme-admin');
 
     expect($url)->toContain('name=acme-admin');
 });
@@ -55,11 +55,11 @@ it('appends name option when provided', function (): void {
 it('rejects invalid name option', function (): void {
     $builder = new DeployLinkBuilder;
 
-    expect(fn (): string => $builder->build('arqel/template', 'auto', '1bad'))
+    expect(fn (): string => $builder->build('arqel-dev/template', 'auto', '1bad'))
         ->toThrow(InvalidArgumentException::class)
-        ->and(fn (): string => $builder->build('arqel/template', 'auto', ''))
+        ->and(fn (): string => $builder->build('arqel-dev/template', 'auto', ''))
         ->toThrow(InvalidArgumentException::class)
-        ->and(fn (): string => $builder->build('arqel/template', 'auto', str_repeat('a', 41)))
+        ->and(fn (): string => $builder->build('arqel-dev/template', 'auto', str_repeat('a', 41)))
         ->toThrow(InvalidArgumentException::class);
 });
 

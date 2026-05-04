@@ -1,4 +1,4 @@
-# `arqel/fields` — API Reference
+# `arqel-dev/fields` — API Reference
 
 Namespace `Arqel\Fields\`. 21 field types canónicos + ValidationBridge + macro registry.
 
@@ -113,6 +113,6 @@ Field::register('rating', RatingField::class);
 
 ## Related
 
-- SKILL: [`packages/fields/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/fields/SKILL.md)
+- SKILL: [`packages/fields/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/fields/SKILL.md)
 - Catálogo: [`/guide/fields`](/guide/fields)
-- Próximo: [`arqel/table`](/reference/php/table)
+- Próximo: [`arqel-dev/table`](/reference/php/table)

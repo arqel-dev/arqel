@@ -14,7 +14,7 @@ Um app Arqel em produção paga por **cinco categorias**:
 3. **Cache/Queue/PubSub** (Redis managed) — por tier mensal.
 4. **Egress** (banda saída) — por GB.
 5. **Add-ons Arqel-specific:**
-   - Tokens de IA (`@arqel/ai` com OpenAI/Anthropic).
+   - Tokens de IA (`@arqel-dev/ai` com OpenAI/Anthropic).
    - Conexões Reverb (incluído no compute, mas afeta dimensionamento).
    - Storage S3-compatible para uploads de Field `FileField`.
 
@@ -93,7 +93,7 @@ Add-ons fora do Cloud:
 
 ## Otimizações de custo específicas do Arqel
 
-1. **Cache table queries.** O `@arqel/table` usa `cache()->remember()` por
+1. **Cache table queries.** O `@arqel-dev/table` usa `cache()->remember()` por
    padrão para queries de `getRecords()`. Aumente o TTL para 60s em tabelas
    de baixa volatilidade — derruba 70% das queries Postgres.
 2. **AI prompt caching.** Use Anthropic prompt caching (5 min TTL) para

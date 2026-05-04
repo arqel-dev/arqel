@@ -12,8 +12,8 @@ namespace Arqel\Cli\Support;
  * `stty <mode>` invocation rejects with "stty: invalid argument ...",
  * crashing any prompt mid-flow.
  *
- * Standalone copy of `Arqel\Core\Support\InteractiveTerminal` — `arqel/cli`
- * has no dependency on `arqel/core` (and shouldn't, the CLI ships before
+ * Standalone copy of `Arqel\Core\Support\InteractiveTerminal` — `arqel-dev/cli`
+ * has no dependency on `arqel-dev/core` (and shouldn't, the CLI ships before
  * any framework code runs), so the helper is duplicated. Both copies
  * implement the same probe and should stay in sync.
  */

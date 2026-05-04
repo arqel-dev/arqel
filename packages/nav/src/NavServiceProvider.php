@@ -8,7 +8,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Service provider for `arqel/nav`.
+ * Service provider for `arqel-dev/nav`.
  *
  * Registers `Navigation` and `BreadcrumbsBuilder` as singletons so
  * the Inertia middleware (CORE-007) can pull a per-request snapshot

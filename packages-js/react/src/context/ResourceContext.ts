@@ -1,9 +1,9 @@
-import type { ResourceMeta } from '@arqel/types/resources';
+import type { ResourceMeta } from '@arqel-dev/types/resources';
 import { createContext, useContext } from 'react';
 
 /**
  * Resource context — set by `<ResourceLayout>` (Phase 1: layout
- * components in @arqel/ui set this; the bare provider lives here
+ * components in @arqel-dev/ui set this; the bare provider lives here
  * so hooks can read it).
  */
 export const ResourceContext = createContext<ResourceMeta | null>(null);

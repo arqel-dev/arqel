@@ -8,11 +8,11 @@
  *   - neither                      → fires `onInvoke` immediately
  *
  * `onInvoke` receives optional form data so parents (typically using
- * `useAction()` from @arqel/hooks) can dispatch the underlying request.
+ * `useAction()` from @arqel-dev/hooks) can dispatch the underlying request.
  */
 
-import type { ActionColor, ActionSchema, ActionVariant } from '@arqel/types/actions';
-import type { FieldSchema } from '@arqel/types/fields';
+import type { ActionColor, ActionSchema, ActionVariant } from '@arqel-dev/types/actions';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { useState } from 'react';
 import { ActionFormModal } from './ActionFormModal.js';
 import { Button, type ButtonProps } from './Button.js';

@@ -12,8 +12,8 @@
  * (Inertia-driven) and dashboard widgets (memory-driven).
  */
 
-import type { RecordType, ResourceIndexProps as ServerProps } from '@arqel/types/resources';
-import type { SortDirection, TableSort } from '@arqel/types/tables';
+import type { RecordType, ResourceIndexProps as ServerProps } from '@arqel-dev/types/resources';
+import type { SortDirection, TableSort } from '@arqel-dev/types/tables';
 import type { ReactNode } from 'react';
 import { DataTable } from '../table/DataTable.js';
 import { TableFilters } from '../table/TableFilters.js';

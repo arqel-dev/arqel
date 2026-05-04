@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\Gate;
  * Endpoint single-action que devolve o histórico paginado de
  * `Version` para um record gerido por um `Resource` registrado.
  *
- * Resolução do `ResourceRegistry`: por design, o `arqel/versioning`
- * permanece utilizável sem o `arqel/core` em runtime. Resolvemos o
+ * Resolução do `ResourceRegistry`: por design, o `arqel-dev/versioning`
+ * permanece utilizável sem o `arqel-dev/core` em runtime. Resolvemos o
  * registry pelo FQCN-string e devolvemos `404` quando ele não está
  * bound — apps sem core (ex.: standalone CLI) ainda podem usar o
  * trait `Versionable`, mesmo que esta rota não seja útil.

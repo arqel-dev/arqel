@@ -5,7 +5,7 @@
  * Defensive: imprime findings, não falha o processo. Heurístico apenas (regex);
  * confirme manualmente cada item antes de corrigir.
  *
- * Uso: pnpm --filter @arqel/a11y audit:scan -- [glob-root]
+ * Uso: pnpm --filter @arqel-dev/a11y audit:scan -- [glob-root]
  */
 import { readdirSync, readFileSync, type Stats, statSync } from 'node:fs';
 import { join, relative } from 'node:path';

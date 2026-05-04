@@ -1,6 +1,6 @@
 # Fields
 
-Um **Field** descreve uma coluna do model: tipo, label, validação, visibilidade, dependências. Arqel entrega 21 field types canónicos e 1:1 entre PHP (`packages/fields`) e React (`@arqel/fields`).
+Um **Field** descreve uma coluna do model: tipo, label, validação, visibilidade, dependências. Arqel entrega 21 field types canónicos e 1:1 entre PHP (`packages/fields`) e React (`@arqel-dev/fields`).
 
 ## O mínimo
 
@@ -154,10 +154,10 @@ Veja [Custom Fields](/advanced/custom-fields) para criar um type novo (PHP class
 
 - ❌ **`Field::text('email')`** — use `Field::email('email')` para herdar a `email` rule automaticamente
 - ❌ **Validation server-only ignorada no client** — regras como `confirmed`, `password`, `current_password` são saltadas pelo `ValidationBridge` (server-only por design)
-- ❌ **Hardcode de cor em Field** — use CSS vars do `@arqel/ui`
+- ❌ **Hardcode de cor em Field** — use CSS vars do `@arqel-dev/ui`
 
 ## Próximos passos
 
 - [Tables & Forms](/guide/tables-forms) — onde os fields aparecem
 - [Custom Fields](/advanced/custom-fields) — criar inputs próprios
-- API reference: [`packages/fields/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/fields/SKILL.md)
+- API reference: [`packages/fields/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/fields/SKILL.md)

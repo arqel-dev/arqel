@@ -1,12 +1,12 @@
 {
-  "name": "@arqel/versioning",
-  "version": "0.8.0-rc.1",
+  "name": "@arqel-dev/versioning",
+  "version": "0.8.0",
   "description": "React components for Arqel Versioning — VersionTimeline + VersionDiff viewer.",
   "license": "MIT",
   "homepage": "https://arqel.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arqel/arqel.git",
+    "url": "https://github.com/arqel-dev/arqel.git",
     "directory": "packages-js/versioning"
   },
   "keywords": [

@@ -22,7 +22,7 @@ acontecem via aliases conforme cada pacote estabilize sua API pública.
 
 - **Resources** declarativos em `app/Arqel/Resources/`. Cada Resource expõe `$slug`,
   `$model` e `fields(): array<int, array<string, mixed>>`. Quando o `FieldFactory`
-  do pacote `arqel/fields` for finalizado, migrar de arrays para chamadas
+  do pacote `arqel-dev/fields` for finalizado, migrar de arrays para chamadas
   `Field::text(...)` sem alterar o consumo no provider.
 - **Panel registration** em `app/Providers/ArqelServiceProvider.php` (user-land).
   Sempre usa `Panel::configure('admin')->...` — nenhum acesso direto a singleton.

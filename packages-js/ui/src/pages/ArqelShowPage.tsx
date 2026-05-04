@@ -6,9 +6,9 @@
  * for create/edit/show without a parallel "DetailRenderer" stack.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
-import type { FormSchema } from '@arqel/types/forms';
-import type { RecordType, ResourceDetailProps } from '@arqel/types/resources';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import type { FormSchema } from '@arqel-dev/types/forms';
+import type { RecordType, ResourceDetailProps } from '@arqel-dev/types/resources';
 import { usePage } from '@inertiajs/react';
 import type { JSX } from 'react';
 import { FormRenderer } from '../form/FormRenderer.js';

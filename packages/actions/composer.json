@@ -1,6 +1,6 @@
 {
-    "name": "arqel/actions",
-    "version": "0.8.0-rc.1",
+    "name": "arqel-dev/actions",
+    "version": "0.8.0",
     "description": "Action invocation primitives for Arqel — row, bulk, toolbar, header actions with confirmation, forms, authorization.",
     "type": "library",
     "license": "MIT",
@@ -11,15 +11,15 @@
     ],
     "homepage": "https://arqel.dev",
     "support": {
-        "issues": "https://github.com/arqel/arqel/issues",
-        "source": "https://github.com/arqel/arqel",
+        "issues": "https://github.com/arqel-dev/arqel/issues",
+        "source": "https://github.com/arqel-dev/arqel",
         "docs": "https://arqel.dev/docs"
     },
     "require": {
         "php": "^8.3",
-        "arqel/core": "@dev",
-        "arqel/fields": "@dev",
-        "arqel/form": "@dev",
+        "arqel-dev/core": "@dev",
+        "arqel-dev/fields": "@dev",
+        "arqel-dev/form": "@dev",
         "laravel/framework": "^12.0|^13.0"
     },
     "require-dev": {

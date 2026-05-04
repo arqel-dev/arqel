@@ -11,13 +11,13 @@ use Illuminate\Http\Request;
  * `InertiaDataBuilder::buildIndexData` switches into the rich
  * "table" path when the Resource declares a `table()` returning
  * an object exposing `getColumns/getFilters/...`. The full
- * pagination flow is covered in the `arqel/table` package tests;
+ * pagination flow is covered in the `arqel-dev/table` package tests;
  * here we only verify the duck-typed dispatch.
  *
  * We use a hand-rolled stub that mimics the Table contract so we
- * don't pull `arqel/table` as a dev dep into `arqel/core` (which
- * would create a circular path-repo edge — arqel/table requires
- * arqel/core).
+ * don't pull `arqel-dev/table` as a dev dep into `arqel-dev/core` (which
+ * would create a circular path-repo edge — arqel-dev/table requires
+ * arqel-dev/core).
  */
 final class StubTable
 {
@@ -90,7 +90,7 @@ it('detects a Table-shaped object on the Resource and emits the rich payload sha
     try {
         $payload = $builder->buildIndexData(new TabledFixtureResource, new Request);
     } catch (Throwable) {
-        // Without arqel/table installed (and without a DB), the run/paginate
+        // Without arqel-dev/table installed (and without a DB), the run/paginate
         // path bails before producing the dictionary. We only care that the
         // table branch was attempted, so treat any exception as success
         // for the dispatch assertion.

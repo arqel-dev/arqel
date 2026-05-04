@@ -221,9 +221,9 @@ Para flows críticos (login, criar Resource, submeter Form). Usa `apps/playgroun
 
 ## Pergunta difícil?
 
-- Abre discussão em [GitHub Discussions](https://github.com/arqel/arqel/discussions)
+- Abre discussão em [GitHub Discussions](https://github.com/arqel-dev/arqel/discussions)
 - Marca um maintainer em issues complexas
-- **Sem respostas em 7 dias?** Bump com `@arqel/maintainers`
+- **Sem respostas em 7 dias?** Bump com `@arqel-dev/maintainers`
 
 ## Reconhecimento
 

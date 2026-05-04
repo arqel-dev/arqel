@@ -3,7 +3,7 @@
  * every Field component without forcing a wrapper component.
  */
 
-import { cn } from '@arqel/ui/utils';
+import { cn } from '@arqel-dev/ui/utils';
 
 export const inputClasses = cn(
   'h-9 w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)]',

@@ -25,7 +25,7 @@ type LoginFormData = {
 /**
  * Página de login bundled de Arqel.
  *
- * Renderizada via Inertia em `arqel/auth/Login`. Usa `useForm()` do
+ * Renderizada via Inertia em `arqel-dev/auth/Login`. Usa `useForm()` do
  * Inertia para gerenciar estado, submit e errors.
  */
 export function LoginPage({

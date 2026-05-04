@@ -1,6 +1,6 @@
 # Tables & Forms
 
-`Arqel\Table\Table` e `Arqel\Form\Form` são builders fluentes que produzem schemas serializados para o Inertia payload. O React renderiza-os via `<DataTable>` e `<FormRenderer>` em `@arqel/ui`.
+`Arqel\Table\Table` e `Arqel\Form\Form` são builders fluentes que produzem schemas serializados para o Inertia payload. O React renderiza-os via `<DataTable>` e `<FormRenderer>` em `@arqel-dev/ui`.
 
 ## Tables
 
@@ -169,4 +169,4 @@ Você pode editar livremente — Arqel não regera por defeito (`--force` para o
 
 - [Actions](/guide/actions) — botões row/bulk/toolbar
 - [Auth](/guide/auth) — Policies + field-level
-- API reference: [`packages/table/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/table/SKILL.md), [`packages/form/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/form/SKILL.md)
+- API reference: [`packages/table/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/table/SKILL.md), [`packages/form/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/form/SKILL.md)

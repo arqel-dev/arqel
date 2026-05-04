@@ -98,15 +98,15 @@ Extensão só ativa quando detecta Arqel rodando na página.
 Content script verifica presença de:
 
 ```javascript
-window.__ARQEL_DEVTOOLS_HOOK__ // Injetado pelo @arqel/react em dev mode
+window.__ARQEL_DEVTOOLS_HOOK__ // Injetado pelo @arqel-dev/react em dev mode
 ```
 
 Se presente, extensão fica "active" (ícone colorido). Senão, "inactive" (ícone cinza).
 
-Hook no `@arqel/react`:
+Hook no `@arqel-dev/react`:
 
 ```typescript
-// @arqel/react/devtools.ts
+// @arqel-dev/react/devtools.ts
 if (import.meta.env.DEV) {
     window.__ARQEL_DEVTOOLS_HOOK__ = {
         version: ARQEL_VERSION,
@@ -253,7 +253,7 @@ Time-travel: snapshot state em cada Inertia navigation, ability to jump back.
 
 **Descrição técnica**
 
-Hook em `@arqel/react`:
+Hook em `@arqel-dev/react`:
 
 ```typescript
 window.__ARQEL_DEVTOOLS_HOOK__.snapshot = () => {
@@ -339,10 +339,10 @@ Cobre RF-EC-01. `arqel:new` command que cria projeto novo Laravel + Arqel com sc
 
 **Descrição técnica**
 
-Standalone CLI tool (composer global): `arqel/cli`.
+Standalone CLI tool (composer global): `arqel-dev/cli`.
 
 ```bash
-composer global require arqel/cli
+composer global require arqel-dev/cli
 arqel new my-app
 ```
 
@@ -374,7 +374,7 @@ Executa:
 1. `laravel new {name}`
 2. `cd {name}`
 3. Starter kit setup
-4. `composer require arqel/arqel`
+4. `composer require arqel-dev/arqel`
 5. Packages adicionais based on answers
 6. `php artisan arqel:install` + flags
 7. `pnpm install`
@@ -460,10 +460,10 @@ Alternative CLI em Node/TypeScript com Ink:
 - Live log tailing
 - Interactive artisan commands
 
-Separate package `@arqel/cli-ink`:
+Separate package `@arqel-dev/cli-ink`:
 
 ```bash
-npm i -g @arqel/cli-ink
+npm i -g @arqel-dev/cli-ink
 arqel-ink
 ```
 
@@ -858,7 +858,7 @@ Cobre RF-EC-03. Laravel Cloud (Taylor Otwell's SaaS) é o deploy default recomen
 
 Template repository + button "Deploy to Laravel Cloud":
 
-- `github.com/arqel/laravel-cloud-template`
+- `github.com/arqel-dev/laravel-cloud-template`
 - Pre-configured: Arqel installed, sample Resources, DB seeded, Reverb configured
 - `cloud.yml` template com:
   - PHP 8.3
@@ -989,7 +989,7 @@ Case study: migration from Forge to Cloud com Arqel app.
 
 ## 6. Headless PDF generator (PDF)
 
-### [PDF-001] Esqueleto do pacote `arqel/pdf`
+### [PDF-001] Esqueleto do pacote `arqel-dev/pdf`
 
 **Tipo:** feat • **Prioridade:** P0 • **Estimativa:** S • **Camada:** php • **Depende de:** [EXPORT-001] (Fase 2)
 
@@ -1001,7 +1001,7 @@ Cobre RF-EC-04. Fase 2 tem export PDF via dompdf. Fase 4 add headless PDF genera
 
 Estrutura `packages/pdf/`:
 
-- `composer.json` (dep: `arqel/core`, suggest: spatie/browsershot)
+- `composer.json` (dep: `arqel-dev/core`, suggest: spatie/browsershot)
 - `src/PdfGenerator.php`
 - `src/BrowsershotEngine.php`
 - `src/TemplateRenderer.php`

@@ -1,10 +1,10 @@
-# SKILL.md — @arqel/hooks
+# SKILL.md — @arqel-dev/hooks
 
 > Contexto canónico para AI agents.
 
 ## Purpose
 
-`@arqel/hooks` consolida hooks reusáveis para Resource pages, formulários, tabelas, ações e UI. Consome `@arqel/react` (contexts/utils) e `@inertiajs/react` (page props, useForm, router) — não tem componentes, só lógica.
+`@arqel-dev/hooks` consolida hooks reusáveis para Resource pages, formulários, tabelas, ações e UI. Consome `@arqel-dev/react` (contexts/utils) e `@inertiajs/react` (page props, useForm, router) — não tem componentes, só lógica.
 
 ## Status
 
@@ -38,7 +38,7 @@
 ## Key Contracts
 
 ```ts
-import { useResource, useArqelForm, useCanAccess, useFlash } from '@arqel/hooks';
+import { useResource, useArqelForm, useCanAccess, useFlash } from '@arqel-dev/hooks';
 
 function UsersIndex() {
   const { records, resource } = useResource<User>();
@@ -49,7 +49,7 @@ function UsersIndex() {
 ```
 
 ```ts
-import { useArqelForm } from '@arqel/hooks';
+import { useArqelForm } from '@arqel-dev/hooks';
 
 const form = useArqelForm({
   fields: schema.fields,
@@ -61,7 +61,7 @@ form.post('/admin/users');
 ```
 
 ```ts
-import { useTable } from '@arqel/hooks';
+import { useTable } from '@arqel-dev/hooks';
 
 const table = useTable({ defaultSort: { column: 'created_at', direction: 'desc' } });
 
@@ -71,7 +71,7 @@ table.toggleSelection(record.id);
 
 ## Conventions
 
-- Subpath imports preferidos: `@arqel/hooks/useTable` evita arrastar deps de outros hooks
+- Subpath imports preferidos: `@arqel-dev/hooks/useTable` evita arrastar deps de outros hooks
 - Hooks acessam page props via `usePage()` — apps devem garantir que estão dentro do `<App>` Inertia
 - `useCanAccess` é UX-only: enforcement real é server-side (ADR-017)
 

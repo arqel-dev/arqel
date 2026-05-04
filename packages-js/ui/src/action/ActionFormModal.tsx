@@ -1,6 +1,6 @@
 /**
  * `<ActionFormModal>` — modal hosting a `<FormRenderer>` for an Action's
- * companion form (see `arqel/actions` `HasForm`).
+ * companion form (see `arqel-dev/actions` `HasForm`).
  *
  * Action form fields are a flat list — Action FormSchema is built
  * inline from the `ActionFormField[]` since layout components don't
@@ -8,9 +8,9 @@
  * (typically `useAction`) handles invocation + loading.
  */
 
-import type { ActionSchema, ModalSize } from '@arqel/types/actions';
-import type { FieldSchema } from '@arqel/types/fields';
-import type { FormSchema } from '@arqel/types/forms';
+import type { ActionSchema, ModalSize } from '@arqel-dev/types/actions';
+import type { FieldSchema } from '@arqel-dev/types/fields';
+import type { FormSchema } from '@arqel-dev/types/forms';
 import { Dialog } from '@base-ui-components/react/dialog';
 import { useMemo, useState } from 'react';
 import { FormActions } from '../form/FormActions.js';

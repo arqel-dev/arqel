@@ -1,4 +1,4 @@
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';

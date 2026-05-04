@@ -3,7 +3,7 @@
  *
  * Manifest V3 isolates content scripts from the page's JavaScript
  * context: `window` here is a *different* `window` than the one
- * `@arqel/react` writes to. We bridge the two worlds by injecting a
+ * `@arqel-dev/react` writes to. We bridge the two worlds by injecting a
  * tiny inline `<script>` into the page DOM that probes the real
  * `window.__ARQEL_DEVTOOLS_HOOK__` and relays the result back via a
  * `CustomEvent`. The content script listens for that event and

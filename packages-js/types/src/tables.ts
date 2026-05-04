@@ -1,5 +1,5 @@
 /**
- * Table column schema mirroring `arqel/table` PHP serialisation.
+ * Table column schema mirroring `arqel-dev/table` PHP serialisation.
  */
 
 export type ColumnType =

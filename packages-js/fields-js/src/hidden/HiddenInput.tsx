@@ -6,7 +6,7 @@
  * keeps the form layout tight. The component just renders the input.
  */
 
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 
 export function HiddenInput({ field, value, inputId }: FieldRendererProps) {
   return (

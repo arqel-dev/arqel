@@ -54,7 +54,7 @@ it('passes imageUploadDirectory through verbatim', function (): void {
     $props = $field->getTypeSpecificProps();
 
     expect($props['imageUploadDirectory'])->toBe('posts/images')
-        ->and($props['imageUploadRoute'])->toBe('/arqel/fields/upload?disk=s3');
+        ->and($props['imageUploadRoute'])->toBe('/arqel-dev/fields/upload?disk=s3');
 });
 
 it('returns null imageUploadRoute when no disk is configured', function (): void {
@@ -115,7 +115,7 @@ it('serialises the full type-specific props payload end-to-end', function (): vo
 
     expect($field->getTypeSpecificProps())->toBe([
         'toolbar' => ['bold', 'italic'],
-        'imageUploadRoute' => '/arqel/fields/upload?disk=public',
+        'imageUploadRoute' => '/arqel-dev/fields/upload?disk=public',
         'imageUploadDirectory' => 'uploads',
         'maxLength' => 1000,
         'fileAttachments' => true,

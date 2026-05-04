@@ -1,6 +1,6 @@
 # Web Store Submission — Arqel DevTools Extension
 
-> **Status:** preparação • **Versão alvo:** 0.8.0-rc.1 • **Pacote:** `@arqel/devtools-extension` • **Stores:** Chrome Web Store, Firefox AMO, Microsoft Edge Add-ons
+> **Status:** preparação • **Versão alvo:** 0.8.0-rc.1 • **Pacote:** `@arqel-dev/devtools-extension` • **Stores:** Chrome Web Store, Firefox AMO, Microsoft Edge Add-ons
 
 Este documento descreve, **passo a passo**, como preparar e submeter a extensão Arqel DevTools às três principais lojas. **Não execute as submissões ainda** — este guia documenta o processo para a release final v0.8.0 (não a `-rc.1`).
 
@@ -8,7 +8,7 @@ Este documento descreve, **passo a passo**, como preparar e submeter a extensão
 
 ## 1. Visão geral
 
-A `@arqel/devtools-extension` é uma extensão MV3 (Manifest V3) desenhada para Chrome, Firefox e Edge. Por ser ferramenta de dev, tem fluxo de submissão simples — sem permissions amplas, sem network calls, sem coleta de dados (ver `privacy-policy.md`).
+A `@arqel-dev/devtools-extension` é uma extensão MV3 (Manifest V3) desenhada para Chrome, Firefox e Edge. Por ser ferramenta de dev, tem fluxo de submissão simples — sem permissions amplas, sem network calls, sem coleta de dados (ver `privacy-policy.md`).
 
 | Loja | URL | Custo | Review | Auto-update |
 |---|---|---|---|---|
@@ -25,7 +25,7 @@ A `@arqel/devtools-extension` é uma extensão MV3 (Manifest V3) desenhada para 
 A partir da raiz do monorepo:
 
 ```bash
-pnpm --filter @arqel/devtools-extension build
+pnpm --filter @arqel-dev/devtools-extension build
 ```
 
 Isso produz, em `packages-js/devtools-extension/dist/`:
@@ -85,7 +85,7 @@ Verificar:
 |---|---|
 | **Nome** | `Arqel DevTools` |
 | **Short description** (132 chars max) | `Inspecione resources, fields e props Inertia das suas aplicações Arqel direto no DevTools do navegador.` |
-| **Detailed description** | Markdown ~500–1500 palavras: o que é, como instalar (`pnpm add -D @arqel/react/dev`), como ativar (`window.__ARQEL_DEV__ = true`), tour das abas, link para docs e GitHub. |
+| **Detailed description** | Markdown ~500–1500 palavras: o que é, como instalar (`pnpm add -D @arqel-dev/react/dev`), como ativar (`window.__ARQEL_DEV__ = true`), tour das abas, link para docs e GitHub. |
 | **Category** | `Developer Tools` |
 | **Language** | `Português (Brasil)` (primário) + `English` (secundário). |
 | **Icon** | 128×128 PNG (em `apps/docs/public/devtools-icon-128.png`). |
@@ -93,7 +93,7 @@ Verificar:
 | **Promotional tile (small)** | 440×280 PNG. |
 | **Privacy policy URL** | `https://arqel.dev/devtools-extension/privacy-policy` (resolve para `apps/docs/devtools-extension/privacy-policy.md`). |
 | **Homepage URL** | `https://arqel.dev/devtools-extension`. |
-| **Support URL** | `https://github.com/arqel/arqel/issues`. |
+| **Support URL** | `https://github.com/arqel-dev/arqel/issues`. |
 | **Search keywords** | `arqel, laravel, inertia, devtools, react, admin panel, debugging, php`. |
 
 ### 3.3. Permissions justification
@@ -215,7 +215,7 @@ Fluxo:
 ```bash
 # 1. Bump no package.json e manifest.json
 # 2. Build
-pnpm --filter @arqel/devtools-extension build
+pnpm --filter @arqel-dev/devtools-extension build
 
 # 3. Upload em cada dashboard
 #    Chrome: dashboard → Package → Upload new package
@@ -239,7 +239,7 @@ Reviews automatizados liberam em horas (Chrome/Edge) ou ~1 dia (Firefox).
 Quando `v0.8.0-rc.1` for promovida a `v0.8.0` final:
 
 1. [ ] Bump de versão coordenado: `package.json` + `manifest.json` (Chrome, Firefox, Edge) → `0.8.0`.
-2. [ ] Build artifacts: `pnpm --filter @arqel/devtools-extension build`.
+2. [ ] Build artifacts: `pnpm --filter @arqel-dev/devtools-extension build`.
 3. [ ] Smoke test local em Chrome, Firefox, Edge.
 4. [ ] Submissão Chrome Web Store (primeira a entrar em review por ser mais rápida).
 5. [ ] Submissão Edge Add-ons (mesmo bundle).

@@ -189,7 +189,7 @@ protected function casts(): array
 
 ### Audit access patterns
 
-Para fields que mostram dados PII, use `arqel/audit` (pacote core) e dispare event quando alguém abre o registro. O marketplace não exige audit, mas plugins de saúde/financeiro deveriam.
+Para fields que mostram dados PII, use `arqel-dev/audit` (pacote core) e dispare event quando alguém abre o registro. O marketplace não exige audit, mas plugins de saúde/financeiro deveriam.
 
 ## Vulnerability disclosure
 
@@ -231,7 +231,7 @@ Plugin não pode criar usuário admin, gerar API token, ou modificar `users.is_a
 
 ### Modificação de pacotes core
 
-Plugin não pode reescrever class de `arqel/core` via service container override sem documentar. Se precisa estender comportamento, use eventos ou contracts oficiais.
+Plugin não pode reescrever class de `arqel-dev/core` via service container override sem documentar. Se precisa estender comportamento, use eventos ou contracts oficiais.
 
 ## Checklist de hardening
 

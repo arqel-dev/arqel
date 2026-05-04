@@ -25,10 +25,10 @@
  * GFM (tables, task lists, strikethrough, footnotes, autolinks, etc.)
  * is NOT supported. Consumers who need a richer preview should
  * register a custom component for the `MarkdownInput` slot via the
- * `@arqel/ui` `FieldRegistry` and opt into a heavier renderer there.
+ * `@arqel-dev/ui` `FieldRegistry` and opt into a heavier renderer there.
  */
 
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import {
   type ChangeEvent,
   type CSSProperties,

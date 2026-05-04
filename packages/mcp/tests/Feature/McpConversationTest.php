@@ -207,7 +207,7 @@ it('completes a resources/list → resources/read cycle for SkillResource', func
 
     expect($responses[1]['result']['contents'][0]['uri'])->toBe('arqel-skill://mcp')
         ->and($responses[1]['result']['contents'][0]['text'])
-        ->toContain('# SKILL.md fixture for arqel/mcp');
+        ->toContain('# SKILL.md fixture for arqel-dev/mcp');
 
     fclose($input);
     fclose($output);

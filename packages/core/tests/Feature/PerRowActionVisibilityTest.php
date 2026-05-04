@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * would block.
  *
  * Duck-typed objects mimic `Arqel\Actions\Action` so we don't pull
- * `arqel/actions` as a dep of `arqel/core` (it goes the other way
+ * `arqel-dev/actions` as a dep of `arqel-dev/core` (it goes the other way
  * around in the dep graph).
  *
  * The host environment does not ship with `pdo_sqlite`, so we drive

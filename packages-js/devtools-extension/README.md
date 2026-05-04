@@ -1,4 +1,4 @@
-# @arqel/devtools-extension
+# @arqel-dev/devtools-extension
 
 Extensão de browser que adiciona uma aba **Arqel** ao DevTools de Chrome,
 Edge e Firefox para inspeção runtime de admin panels Arqel.
@@ -9,8 +9,8 @@ Edge e Firefox para inspeção runtime de admin panels Arqel.
 ## Build
 
 ```bash
-pnpm --filter @arqel/devtools-extension build:chrome
-pnpm --filter @arqel/devtools-extension build:firefox
+pnpm --filter @arqel-dev/devtools-extension build:chrome
+pnpm --filter @arqel-dev/devtools-extension build:firefox
 ```
 
 Os artefatos vão para `dist/chrome/` e `dist/firefox/`.

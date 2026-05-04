@@ -1,4 +1,4 @@
-# SKILL.md — arqel/theme
+# SKILL.md — arqel-dev/theme
 
 ## Purpose
 
@@ -70,8 +70,8 @@ Retorna string IIFE para inserir antes dos bundles React:
 
 ```tsx
 // resources/js/app.tsx
-import { ThemeProvider } from '@arqel/theme';
-import '@arqel/theme/tokens.css';
+import { ThemeProvider } from '@arqel-dev/theme';
+import '@arqel-dev/theme/tokens.css';
 
 createInertiaApp({
   setup({ el, App, props }) {
@@ -87,7 +87,7 @@ createInertiaApp({
 ### Toggle no header
 
 ```tsx
-import { ThemeToggle } from '@arqel/theme';
+import { ThemeToggle } from '@arqel-dev/theme';
 
 <header className="flex items-center justify-between">
   <h1>Dashboard</h1>
@@ -129,5 +129,5 @@ import { ThemeToggle } from '@arqel/theme';
 
 - ADR-001 — Inertia-only (theme não usa fetch)
 - ADR-016 — Sem libs de fetch para CRUD
-- `@arqel/ui` — consome tokens via Tailwind v4 `@theme`
+- `@arqel-dev/ui` — consome tokens via Tailwind v4 `@theme`
 - `apps/docs/guide/theming.md` — guia completo de theming

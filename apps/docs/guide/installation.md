@@ -5,7 +5,7 @@ Para o walkthrough completo (com configuração de `app.tsx` e geração de Reso
 ## Composer (PHP)
 
 ```bash
-composer require arqel/core
+composer require arqel-dev/core
 php artisan arqel:install
 ```
 
@@ -14,7 +14,7 @@ php artisan arqel:install
 Para puxar pacotes adicionais:
 
 ```bash
-composer require arqel/fields arqel/table arqel/form arqel/actions arqel/auth arqel/nav
+composer require arqel-dev/fields arqel-dev/table arqel-dev/form arqel-dev/actions arqel-dev/auth arqel-dev/nav
 ```
 
 > **Nota:** os pacotes PHP têm auto-discovery via Laravel Service Providers. Se você desabilitou auto-discovery (`composer.json` → `extra.laravel.dont-discover`), registre os providers manualmente em `bootstrap/providers.php`.
@@ -22,7 +22,7 @@ composer require arqel/fields arqel/table arqel/form arqel/actions arqel/auth ar
 ## pnpm (JavaScript)
 
 ```bash
-pnpm add @arqel/react @arqel/ui @arqel/hooks @arqel/fields @arqel/types
+pnpm add @arqel-dev/react @arqel-dev/ui @arqel-dev/hooks @arqel-dev/fields @arqel-dev/types
 pnpm add -D @inertiajs/react react react-dom @types/react @types/react-dom
 ```
 
@@ -39,7 +39,7 @@ Em `resources/css/app.css`:
 
 ```css
 @import 'tailwindcss';
-@import '@arqel/ui/styles.css';
+@import '@arqel-dev/ui/styles.css';
 ```
 
 Arqel usa **Tailwind v4 syntax** (`@import` em vez de `@tailwind base`). Se você está em v3, atualize via:

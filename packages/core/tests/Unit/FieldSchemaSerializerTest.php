@@ -6,7 +6,7 @@ use Arqel\Core\Support\FieldSchemaSerializer;
 
 /**
  * Hand-rolled fixtures with explicit accessors so we don't depend
- * on `arqel/fields` from the core test-suite. The serializer is
+ * on `arqel-dev/fields` from the core test-suite. The serializer is
  * duck-typed and only invokes a method when `method_exists`, so
  * minimal stubs are enough to cover the canonical shape.
  */

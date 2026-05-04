@@ -1,9 +1,9 @@
 /**
- * Tipos públicos do Echo expostos para consumidores do `@arqel/realtime`.
+ * Tipos públicos do Echo expostos para consumidores do `@arqel-dev/realtime`.
  *
  * Esses tipos são intencionalmente shape-based (não estruturais aos pacotes
  * `laravel-echo` / `pusher-js`) para evitar acoplar a API pública do Arqel
- * a versões internas. Hooks em `@arqel/hooks` podem importar esses tipos
+ * a versões internas. Hooks em `@arqel-dev/hooks` podem importar esses tipos
  * sem precisar redeclarar `Window`.
  */
 

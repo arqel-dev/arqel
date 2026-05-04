@@ -1,10 +1,10 @@
 /**
- * @arqel/fields-advanced — advanced React inputs (RichText, Markdown,
+ * @arqel-dev/fields-advanced — advanced React inputs (RichText, Markdown,
  * Code, Repeater, Builder, KeyValue, Tags, Wizard).
  *
  * Recommended entrypoint is the side-effect register import:
  *
- *   import '@arqel/fields-advanced/register';
+ *   import '@arqel-dev/fields-advanced/register';
  *
  * Each component is also exported individually so apps can register a
  * subset (or override a single one) manually.

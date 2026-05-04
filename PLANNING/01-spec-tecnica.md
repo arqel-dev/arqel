@@ -72,7 +72,7 @@ Construir **Arqel** — uma framework open-source MIT de admin panels para Larav
 | RF-R-05 | Routing auto-gerado via Inertia: `/admin/{resource}`, `/admin/{resource}/create`, `/admin/{resource}/{id}`, `/admin/{resource}/{id}/edit` | 1 |
 | RF-R-06 | Policy-based authorization — integração nativa com Laravel Policies + abilities customizáveis | 1 |
 | RF-R-07 | Resource scoping automático via Laravel global scopes (ex: por tenant) | 2 |
-| RF-R-08 | Record versioning opcional via `arqel/versioning` | 3 |
+| RF-R-08 | Record versioning opcional via `arqel-dev/versioning` | 3 |
 | RF-R-09 | Generation a partir de Eloquent models existentes: `php artisan arqel:resource User --from-model` | 1 |
 | RF-R-10 | Generation a partir de migrations: `php artisan arqel:resource --from-migration` | 3 |
 | RF-R-11 | Soft delete support nativo (detecta `SoftDeletes` trait) | 1 |
@@ -118,7 +118,7 @@ Text, Textarea, Number, Currency, Boolean, Toggle, Select, MultiSelect, Radio, E
 | RF-T-12 | Grouping com summaries (sum, avg, count) | 2 |
 | RF-T-13 | Reorderable (drag-drop) via campo sortOrder | 2 |
 | RF-T-14 | Export (CSV, XLSX via Spatie Simple Excel ou Maatwebsite Excel, PDF via DomPDF/Snappy) | 2 |
-| RF-T-15 | AG Grid adapter opt-in (`arqel/preset-grid-ag`) | 3 |
+| RF-T-15 | AG Grid adapter opt-in (`arqel-dev/preset-grid-ag`) | 3 |
 | RF-T-16 | Semantic search via embeddings (Pgvector) | 3 |
 | RF-T-17 | Infinite scroll via Inertia 3 `merge` prop | 2 |
 
@@ -244,7 +244,7 @@ Text, Textarea, Number, Currency, Boolean, Toggle, Select, MultiSelect, Radio, E
 | RF-DX-04 | Artisan `arqel:action <Name>` | 1 |
 | RF-DX-05 | Artisan `arqel:widget <Name>` | 2 |
 | RF-DX-06 | SKILL.md por package Composer | 1 |
-| RF-DX-07 | MCP server oficial (`arqel/mcp`) | 2 |
+| RF-DX-07 | MCP server oficial (`arqel-dev/mcp`) | 2 |
 | RF-DX-08 | AGENTS.md auto-gerado em `arqel:install` | 1 |
 | RF-DX-09 | DevTools browser extension | 3 |
 | RF-DX-10 | Mensagens de erro acionáveis com links para docs | 1 |
@@ -256,7 +256,7 @@ Text, Textarea, Number, Currency, Boolean, Toggle, Select, MultiSelect, Radio, E
 
 | ID | Requisito | Fase |
 |---|---|---|
-| RF-TS-01 | `arqel/testing` Composer package com test helpers | 1 |
+| RF-TS-01 | `arqel-dev/testing` Composer package com test helpers | 1 |
 | RF-TS-02 | Pest 3 + PHPUnit 11 compatibility | 1 |
 | RF-TS-03 | Orchestra Testbench integration | 1 |
 | RF-TS-04 | `actingAsAdmin()`, `visitResource()`, `submitForm()` helpers | 1 |
@@ -468,7 +468,7 @@ Arqel **não** é:
 
 ## 7. Dependências mínimas runtime (resume)
 
-### 7.1 composer.json core (arqel/arqel)
+### 7.1 composer.json core (arqel-dev/arqel)
 
 ```json
 {
@@ -478,11 +478,11 @@ Arqel **não** é:
         "inertiajs/inertia-laravel": "^3.0",
         "spatie/laravel-package-tools": "^1.16",
         "livewire/flux": "optional",
-        "arqel/core": "self.version",
-        "arqel/fields": "self.version",
-        "arqel/table": "self.version",
-        "arqel/form": "self.version",
-        "arqel/actions": "self.version"
+        "arqel-dev/core": "self.version",
+        "arqel-dev/fields": "self.version",
+        "arqel-dev/table": "self.version",
+        "arqel-dev/form": "self.version",
+        "arqel-dev/actions": "self.version"
     },
     "suggest": {
         "spatie/laravel-permission": "For RBAC authorization",
@@ -492,7 +492,7 @@ Arqel **não** é:
 }
 ```
 
-### 7.2 package.json core (@arqel/ui)
+### 7.2 package.json core (@arqel-dev/ui)
 
 ```json
 {

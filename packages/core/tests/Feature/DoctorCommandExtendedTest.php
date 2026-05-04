@@ -62,16 +62,16 @@ it('warns when queue driver is sync in production', function (): void {
     expect($checks['queue.driver']['message'])->toContain('sync');
 });
 
-it('reports ai.providers.configured as neutral when arqel/ai is absent', function (): void {
+it('reports ai.providers.configured as neutral when arqel-dev/ai is absent', function (): void {
     $checks = arqel_doctor_checks_by_name();
 
     expect($checks)->toHaveKey('ai.providers.configured');
-    // Testbench environment does not install arqel/ai by default.
+    // Testbench environment does not install arqel-dev/ai by default.
     expect($checks['ai.providers.configured']['status'])->toBe('neutral');
     expect($checks['ai.providers.configured']['message'])->toContain('not installed');
 });
 
-it('reports marketplace.migrations as neutral when arqel/marketplace is absent', function (): void {
+it('reports marketplace.migrations as neutral when arqel-dev/marketplace is absent', function (): void {
     $checks = arqel_doctor_checks_by_name();
 
     expect($checks)->toHaveKey('marketplace.migrations');

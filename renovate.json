@@ -95,17 +95,17 @@
     },
     {
       "description": "shadcn registry components — never group (breaking by policy)",
-      "matchPackageNames": ["arqel/registry"],
+      "matchPackageNames": ["arqel-dev/registry"],
       "groupName": null
     },
     {
       "description": "Internal workspace packages — ignore",
       "matchPackageNames": [
-        "@arqel/types",
-        "@arqel/react",
-        "@arqel/hooks",
-        "@arqel/ui",
-        "@arqel/fields"
+        "@arqel-dev/types",
+        "@arqel-dev/react",
+        "@arqel-dev/hooks",
+        "@arqel-dev/ui",
+        "@arqel-dev/fields"
       ],
       "matchPackagePatterns": ["^arqel/"],
       "enabled": false

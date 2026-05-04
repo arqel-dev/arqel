@@ -1,6 +1,6 @@
 {
-    "name": "arqel/marketplace",
-    "version": "0.8.0-rc.1",
+    "name": "arqel-dev/marketplace",
+    "version": "0.8.0",
     "description": "Plugin marketplace backend for Arqel — schema, models e REST API para descoberta/publicação de plugins community.",
     "type": "library",
     "license": "MIT",
@@ -12,13 +12,13 @@
     ],
     "homepage": "https://arqel.dev",
     "support": {
-        "issues": "https://github.com/arqel/arqel/issues",
-        "source": "https://github.com/arqel/arqel",
+        "issues": "https://github.com/arqel-dev/arqel/issues",
+        "source": "https://github.com/arqel-dev/arqel",
         "docs": "https://arqel.dev/docs"
     },
     "require": {
         "php": "^8.3",
-        "arqel/core": "@dev",
+        "arqel-dev/core": "@dev",
         "illuminate/support": "^12.0|^13.0",
         "spatie/laravel-package-tools": "^1.16"
     },

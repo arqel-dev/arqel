@@ -14,7 +14,7 @@
 - [ ] Acesso `npm` ao escopo `@arqel` (token 2FA-protected em `~/.npmrc`).
 - [ ] Webhook Packagist configurado em `https://packagist.org/api/update-package`.
 - [ ] GPG key registrada no GitHub (`git config user.signingkey` + `commit.gpgsign true`).
-- [ ] Permissão de push em todos os 13 sub-repos `arqel/*` no GitHub (criados via splitsh/lite).
+- [ ] Permissão de push em todos os 13 sub-repos `arqel-dev/*` no GitHub (criados via splitsh/lite).
 - [ ] Smoke app `arqel-test` clonada localmente em `~/PhpstormProjects/arqel-test`.
 
 ---
@@ -54,29 +54,29 @@ key deve ser adicionado** a esses arquivos (ADR-004, evita drift).
 
 Pacotes afetados (13):
 
-- `arqel/core`
-- `arqel/fields`
-- `arqel/fields-advanced`
-- `arqel/form`
-- `arqel/table`
-- `arqel/actions`
-- `arqel/auth`
-- `arqel/nav`
-- `arqel/audit`
-- `arqel/export`
-- `arqel/mcp`
-- `arqel/tenant`
-- `arqel/widgets`
+- `arqel-dev/core`
+- `arqel-dev/fields`
+- `arqel-dev/fields-advanced`
+- `arqel-dev/form`
+- `arqel-dev/table`
+- `arqel-dev/actions`
+- `arqel-dev/auth`
+- `arqel-dev/nav`
+- `arqel-dev/audit`
+- `arqel-dev/export`
+- `arqel-dev/mcp`
+- `arqel-dev/tenant`
+- `arqel-dev/widgets`
 
 ### 2.2 Pacotes npm (`packages-js/*/package.json`)
 
 Bump `"version"` para `"0.8.0-rc.1"` (já aplicado neste commit) em:
 
-- [x] `packages-js/types/package.json` — `@arqel/types`
-- [x] `packages-js/react/package.json` — `@arqel/react`
-- [x] `packages-js/hooks/package.json` — `@arqel/hooks`
-- [x] `packages-js/ui/package.json` — `@arqel/ui`
-- [x] `packages-js/fields-js/package.json` — `@arqel/fields`
+- [x] `packages-js/types/package.json` — `@arqel-dev/types`
+- [x] `packages-js/react/package.json` — `@arqel-dev/react`
+- [x] `packages-js/hooks/package.json` — `@arqel-dev/hooks`
+- [x] `packages-js/ui/package.json` — `@arqel-dev/ui`
+- [x] `packages-js/fields-js/package.json` — `@arqel-dev/fields`
 
 > Cross-deps em `workspace:*` permanecem como estão — pnpm/npm publish
 > resolverão para `0.8.0-rc.1` no momento do publish.
@@ -91,7 +91,7 @@ Bump `"version"` para `"0.8.0-rc.1"` (já aplicado neste commit) em:
 - [ ] Verificar que toda a evolução desde 0.0.0 está listada (consolidar
       Batches paralelos #1–#16 em subseções `Added`/`Changed`/`Fixed`).
 - [ ] Adicionar link de comparação no rodapé:
-      `[0.8.0-rc.1]: https://github.com/arqel/arqel/releases/tag/v0.8.0-rc.1`.
+      `[0.8.0-rc.1]: https://github.com/arqel-dev/arqel/releases/tag/v0.8.0-rc.1`.
 - [ ] Manter o placeholder `## [Unreleased]` vazio no topo para o próximo ciclo.
 
 Commit dedicado:
@@ -130,7 +130,7 @@ automaticamente quando a tag `v*` é empurrada.
 ## 6. Packagist
 
 - [ ] Webhook Packagist dispara automático ao push da tag.
-- [ ] Verificar manualmente em `https://packagist.org/packages/arqel/<pkg>`
+- [ ] Verificar manualmente em `https://packagist.org/packages/arqel-dev/<pkg>`
       que a versão `0.8.0-rc.1` aparece (pode levar 1–2 min).
 - [ ] Em caso de atraso, forçar update:
       `curl -XPOST -H'content-type:application/json' "https://packagist.org/api/update-package?username=arqel&apiToken=$PACKAGIST_TOKEN" -d'{"repository":{"url":"https://github.com/arqel/<pkg>"}}'`.
@@ -143,15 +143,15 @@ Disparado pelo workflow `.github/workflows/release.yml` ao detectar tag
 `v*`. Para cada pacote em `packages-js/*`, o workflow roda:
 
 ```bash
-pnpm --filter @arqel/<pkg> publish --tag rc --access public --no-git-checks
+pnpm --filter @arqel-dev/<pkg> publish --tag rc --access public --no-git-checks
 ```
 
-> `--tag rc` garante que `npm install @arqel/ui` (sem flag) **não**
-> instale o RC — só `@arqel/ui@rc` ou `@arqel/ui@0.8.0-rc.1` explícitos.
+> `--tag rc` garante que `npm install @arqel-dev/ui` (sem flag) **não**
+> instale o RC — só `@arqel-dev/ui@rc` ou `@arqel-dev/ui@0.8.0-rc.1` explícitos.
 
 - [ ] Workflow `release.yml` verde.
-- [ ] `npm view @arqel/ui versions --json` lista `0.8.0-rc.1`.
-- [ ] `npm view @arqel/ui dist-tags` mostra `rc: 0.8.0-rc.1` e `latest`
+- [ ] `npm view @arqel-dev/ui versions --json` lista `0.8.0-rc.1`.
+- [ ] `npm view @arqel-dev/ui dist-tags` mostra `rc: 0.8.0-rc.1` e `latest`
       apontando para versão estável anterior (ou ausente, se for o primeiro).
 
 Manual fallback (se workflow falhar):
@@ -169,8 +169,8 @@ cd ~/PhpstormProjects/arqel-test
 ./scripts/setup-test-app.sh --version=0.8.0-rc.1
 ```
 
-- [ ] `composer require arqel/core:0.8.0-rc.1 --dev-master=false` — sem conflitos.
-- [ ] `pnpm add @arqel/ui@rc @arqel/react@rc @arqel/hooks@rc @arqel/types@rc @arqel/fields@rc` — instala.
+- [ ] `composer require arqel-dev/core:0.8.0-rc.1 --dev-master=false` — sem conflitos.
+- [ ] `pnpm add @arqel-dev/ui@rc @arqel-dev/react@rc @arqel-dev/hooks@rc @arqel-dev/types@rc @arqel-dev/fields@rc` — instala.
 - [ ] `pnpm dev` + `php artisan serve` — admin panel carrega em `http://localhost:8000/admin`.
 - [ ] CRUD básico (create/read/update/delete) de uma `Resource` de exemplo funciona.
 - [ ] Login + Policy flow funciona.
@@ -206,14 +206,14 @@ Se smoke test (§8) falha **ou** bug crítico reportado nas primeiras 24h:
 
 ```bash
 for pkg in types react hooks ui fields; do
-  npm unpublish @arqel/$pkg@0.8.0-rc.1
+  npm unpublish @arqel-dev/$pkg@0.8.0-rc.1
 done
 ```
 
 > Após 72h, npm bloqueia unpublish. Use `npm deprecate` em vez disso:
 >
 > ```bash
-> npm deprecate @arqel/ui@0.8.0-rc.1 "Critical bug — use 0.8.0-rc.2"
+> npm deprecate @arqel-dev/ui@0.8.0-rc.1 "Critical bug — use 0.8.0-rc.2"
 > ```
 
 ### 11.2 Marcar tag como broken no GitHub

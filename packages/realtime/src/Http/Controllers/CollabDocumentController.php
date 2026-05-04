@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
  *   `incoming.version >= current.version`, devolve `409` caso contrário.
  *
  * Sync delta-by-delta de Yjs (via WebSocket / Reverb) fica para
- * follow-up (`@arqel/realtime` cliente). Aqui só persistimos snapshot
+ * follow-up (`@arqel-dev/realtime` cliente). Aqui só persistimos snapshot
  * consolidado.
  */
 final class CollabDocumentController

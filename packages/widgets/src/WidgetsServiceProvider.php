@@ -10,7 +10,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/widgets`.
+ * Auto-discovered provider for `arqel-dev/widgets`.
  *
  * Binds:
  *   - `WidgetRegistry` as a singleton (apps register custom widget

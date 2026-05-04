@@ -75,7 +75,9 @@ function isI18nSharedProps(value: unknown): value is I18nSharedProps {
 export function useI18nContext(): I18nContextValue {
   const ctx = useContext(I18nContext);
   if (ctx === null) {
-    throw new Error('[@arqel/i18n] useTranslation/useI18n must be used inside an <I18nProvider>.');
+    throw new Error(
+      '[@arqel-dev/i18n] useTranslation/useI18n must be used inside an <I18nProvider>.',
+    );
   }
   return ctx;
 }

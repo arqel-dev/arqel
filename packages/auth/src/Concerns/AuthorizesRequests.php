@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  *   - Resources expose `getModel(): class-string`
  *   - Actions expose `getName(): string` + `canBeExecutedBy(...)`
  *   - Fields expose `getName(): string` + a `canBeSeenBy/EditedBy`
- *     pair (when `arqel/fields` HasAuthorization is mixed in).
+ *     pair (when `arqel-dev/fields` HasAuthorization is mixed in).
  */
 trait AuthorizesRequests
 {
@@ -70,7 +70,7 @@ trait AuthorizesRequests
 
     /**
      * Authorise a per-field operation (`view`/`edit`). Honours the
-     * `HasAuthorization` trait from `arqel/fields` when present.
+     * `HasAuthorization` trait from `arqel-dev/fields` when present.
      * Aborts with 403 when the field's gate denies.
      */
     protected function authorizeField(object $field, string $operation, mixed $record = null): void

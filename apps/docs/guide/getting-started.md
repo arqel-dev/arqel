@@ -28,14 +28,14 @@ Aceite os defaults — sem starter kit (Arqel não depende de Breeze/Jetstream).
 ## 2. Instalar Arqel
 
 ```bash
-composer require arqel/core
+composer require arqel-dev/core
 php artisan arqel:install
 ```
 
 `arqel:install` faz **tudo**: scaffold PHP + instalação automática dos pacotes JS + configuração de `resources/js/app.tsx` e `resources/css/app.css`. Ele detecta seu package manager (`pnpm`/`yarn`/`npm`) via lockfile e roda o equivalente:
 
 ```bash
-{pm} add @arqel/react @arqel/ui @arqel/hooks @arqel/fields @arqel/types
+{pm} add @arqel-dev/react @arqel-dev/ui @arqel-dev/hooks @arqel-dev/fields @arqel-dev/types
 {pm} add -D @inertiajs/react react react-dom @types/react @types/react-dom
 ```
 
@@ -46,7 +46,7 @@ Arquivos criados/modificados:
 - `app/Providers/ArqelServiceProvider.php`
 - `resources/js/Pages/Arqel/`
 - `resources/js/app.tsx` (com `createArqelApp`)
-- `resources/css/app.css` (`@import 'tailwindcss'` + `@import '@arqel/ui/styles.css'`)
+- `resources/css/app.css` (`@import 'tailwindcss'` + `@import '@arqel-dev/ui/styles.css'`)
 - `resources/views/arqel/layout.blade.php`
 - `AGENTS.md` (contexto canónico para LLMs)
 
@@ -56,7 +56,7 @@ Arquivos criados/modificados:
 :::
 
 ::: tip Já tem um `app.tsx` configurado?
-O comando é idempotente: se `resources/js/app.tsx` já contém `import '@arqel/ui/styles.css'`, ele pula esse step. Mesma coisa pro `app.css`. Use `--force` para forçar rescrita.
+O comando é idempotente: se `resources/js/app.tsx` já contém `import '@arqel-dev/ui/styles.css'`, ele pula esse step. Mesma coisa pro `app.css`. Use `--force` para forçar rescrita.
 :::
 
 ## 3. Gerar primeiro Resource
@@ -135,7 +135,7 @@ E adicione um middleware `auth` no panel, em `config/arqel.php`:
 ## Troubleshooting
 
 ::: warning PHP < 8.3
-Arqel **requer PHP 8.3+**. `composer require arqel/core` em PHP 8.2 falha com mensagem de versão. Atualize via Herd, Homebrew, ou `phpbrew`.
+Arqel **requer PHP 8.3+**. `composer require arqel-dev/core` em PHP 8.2 falha com mensagem de versão. Atualize via Herd, Homebrew, ou `phpbrew`.
 :::
 
 ::: warning Node < 20.9
@@ -147,5 +147,5 @@ Erro 500 com "Permission denied" em `storage/logs/laravel.log` é Laravel-cláss
 :::
 
 ::: warning `Class "Arqel\Fields\FieldFactory" not found`
-O ServiceProvider de `arqel/fields` é auto-discovered, mas se você desabilitou auto-discovery em `composer.json` (`extra.laravel.dont-discover`), registe `Arqel\Fields\FieldServiceProvider::class` manualmente em `bootstrap/providers.php`.
+O ServiceProvider de `arqel-dev/fields` é auto-discovered, mas se você desabilitou auto-discovery em `composer.json` (`extra.laravel.dont-discover`), registe `Arqel\Fields\FieldServiceProvider::class` manualmente em `bootstrap/providers.php`.
 :::

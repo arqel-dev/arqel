@@ -12,7 +12,7 @@
  * messages.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import {
   type FieldEntry,
   type FormSchema,
@@ -21,7 +21,7 @@ import {
   type LayoutEntry,
   type SchemaEntry,
   type TabEntry,
-} from '@arqel/types/forms';
+} from '@arqel-dev/types/forms';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn.js';
 import { FieldRenderer } from './FieldRenderer.js';

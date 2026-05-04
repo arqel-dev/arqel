@@ -185,7 +185,7 @@ Cloud especificamente. O que muda entre hosts é apenas:
 
 Para migrar, comece pelo `arqel cloud:export` e adapte o serviço de
 deploy. PRs com templates para outros hosts (Fly, Render) são bem-vindos
-no [repositório](https://github.com/arqel/arqel).
+no [repositório](https://github.com/arqel-dev/arqel).
 
 ## Próximos passos
 

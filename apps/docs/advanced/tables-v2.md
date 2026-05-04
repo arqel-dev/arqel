@@ -1,12 +1,12 @@
 # Tables V2
 
-> Pacote: [`arqel/table`](../../packages/table/) · Tickets: TABLE-V2-002..010
+> Pacote: [`arqel-dev/table`](../../packages/table/) · Tickets: TABLE-V2-002..010
 
 ## Purpose
 
-Phase 2 estende o `arqel/table` da Phase 1 com capacidades avançadas: edição inline, query builder visual, controle granular de visibilidade de colunas, agrupamento com summaries, reordenação drag-drop, mobile mode e múltiplos tipos de paginação.
+Phase 2 estende o `arqel-dev/table` da Phase 1 com capacidades avançadas: edição inline, query builder visual, controle granular de visibilidade de colunas, agrupamento com summaries, reordenação drag-drop, mobile mode e múltiplos tipos de paginação.
 
-Toda a API mantém-se declarativa — `Resource::table()` continua devolvendo um `Arqel\Table\Table` builder, e `arqel/core` detecta-o por duck-typing em `InertiaDataBuilder::isTableObject`.
+Toda a API mantém-se declarativa — `Resource::table()` continua devolvendo um `Arqel\Table\Table` builder, e `arqel-dev/core` detecta-o por duck-typing em `InertiaDataBuilder::isTableObject`.
 
 ## Inline editing
 
@@ -32,7 +32,7 @@ ToggleColumn::make('is_active')
     ->readonly(fn ($record) => $record->locked_at !== null);
 ```
 
-Endpoint `POST {panel}/{resource}/{id}/inline-update` está **deferred** — depende de `arqel/core` `ResourceRegistry::findBySlug` + Policy authorization.
+Endpoint `POST {panel}/{resource}/{id}/inline-update` está **deferred** — depende de `arqel-dev/core` `ResourceRegistry::findBySlug` + Policy authorization.
 
 ## Visual Query Builder
 

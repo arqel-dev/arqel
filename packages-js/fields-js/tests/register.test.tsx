@@ -1,4 +1,4 @@
-import { clearFieldRegistry, getFieldComponent, getRegisteredFields } from '@arqel/ui/form';
+import { clearFieldRegistry, getFieldComponent, getRegisteredFields } from '@arqel-dev/ui/form';
 import { describe, expect, it } from 'vitest';
 
 const ALL_FIELDS = [

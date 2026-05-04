@@ -1,4 +1,4 @@
-# `arqel/actions` — API Reference
+# `arqel-dev/actions` — API Reference
 
 Namespace `Arqel\Actions\`. Action base + 4 variantes + concerns + factory.
 
@@ -96,6 +96,6 @@ Resolve action por nome em `actions()/headerActions()/toolbarActions()/bulkActio
 
 ## Related
 
-- SKILL: [`packages/actions/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/actions/SKILL.md)
+- SKILL: [`packages/actions/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/actions/SKILL.md)
 - Conceitos: [`/guide/actions`](/guide/actions)
-- Próximo: [`arqel/auth`](/reference/php/auth)
+- Próximo: [`arqel-dev/auth`](/reference/php/auth)

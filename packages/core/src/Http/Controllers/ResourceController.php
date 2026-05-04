@@ -172,7 +172,7 @@ final class ResourceController
 
     /**
      * Run validation against the rules extracted from the
-     * Resource's Field schema (FORM-007). When `arqel/form` is not
+     * Resource's Field schema (FORM-007). When `arqel-dev/form` is not
      * installed (extractor class missing) we fall back to a
      * permissive pass that just strips route + CSRF params.
      *

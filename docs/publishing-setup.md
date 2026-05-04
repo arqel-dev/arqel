@@ -4,12 +4,34 @@
 
 **Audiência:** maintainer principal (Diogo). Inclui passos com cobrança financeira — todos sinalizados com 💰.
 
-**Estado atual do repo (2026-04-29):**
+**Estado atual do repo (2026-05-04):**
 
-- Distribuição planeada: Composer (`arqel/*` no Packagist), npm (`@arqel/*`), site `arqel.dev`.
-- Workflows GitHub Actions já existem como **placeholders** (`release.yml`, `docs-deploy.yml`) — vão ser preenchidos quando os secrets correspondentes existirem.
+- Distribuição: Composer (`arqel-dev/*` no Packagist), npm (`@arqel-dev/*`), site `arqel.dev`.
+- Versão alvo da primeira publicação: **`0.8.0`** (tag `v0.8.0`).
+- Rename `arqel/*` → `arqel-dev/*` **completo** em todos os manifests (Composer + npm + URLs GitHub). Namespace PHP `Arqel\` mantido.
+- Workflow `release.yml` agora é **real** — split via splitsh/lite + `pnpm publish -r --access public` + GitHub release notes a partir do CHANGELOG.
+- Org `github.com/arqel-dev` criada. Repositório principal **ainda em `github.com/arqel/arqel`** — transferência manual pendente.
+- Contas Packagist + npm `arqel-dev` ainda não criadas/confirmadas. Secrets `ARQEL_BOT_TOKEN` e `NPM_TOKEN` ainda não configurados em GitHub Actions.
 - DCO bot ainda não instalado (GOV-003 ficou marcado pendente "App instalação pendente").
-- Nenhum package publicado ainda. Tudo abaixo é setup inicial de greenfield.
+- Nenhum package publicado ainda.
+
+### Checklist pré-tag `v0.8.0`
+
+Antes de fazer `git tag v0.8.0 && git push --tags`:
+
+1. **Transferir o repo** `github.com/arqel/arqel` → `github.com/arqel-dev/arqel` (Settings → Transfer ownership). Atualizar `git remote set-url origin git@github.com:arqel-dev/arqel.git` localmente.
+2. **Criar conta npm `arqel-dev`** + criar org `arqel-dev` (free para públicos). Gerar token "Automation" → guardar como secret `NPM_TOKEN` no repo.
+3. **Criar conta Packagist** com user `arqel-dev` (login via GitHub OAuth). Não submeter pacotes ainda — o webhook em cada sub-repo cuida disso quando o split-php job criar os repos.
+4. **Criar PAT (`ARQEL_BOT_TOKEN`)** com scopes `repo` + `admin:org` + `workflow` (recomendado: GitHub App ou fine-grained PAT com permissões mínimas em `arqel-dev/*`). Guardar como secret no repo.
+5. **Dry-run primeiro:** `gh workflow run release.yml -f tag=v0.8.0 -f dry_run=true` — confirma que o split SHA é computado para todos os 19 pacotes e que `pnpm publish --dry-run` lista os 16 pacotes npm sem erros.
+6. **Push da tag:** `git tag -s v0.8.0 -m "Release 0.8.0" && git push origin v0.8.0`. O workflow dispara automaticamente.
+7. **Pós-publish:** registar cada sub-repo no Packagist (Submit Package → URL `https://github.com/arqel-dev/<pkg>`). A partir daí, o webhook do GitHub atualiza Packagist em cada split push.
+
+### Resumo das mudanças neste ciclo
+
+- Manifests bumped: `0.8.0-rc.1` → `0.8.0` (36 ficheiros). `realtime-collab` saiu de `0.10.0-rc.1` para `0.8.0` para uniformizar.
+- `CHANGELOG.md` ganhou seção `[0.8.0]` documentando o rename + nota da primeira release pública.
+- `.github/workflows/release.yml` reescrito (splitsh-lite + pnpm publish + release notes).
 
 ---
 
@@ -43,10 +65,10 @@
 
 ### 1.2 Repo principal
 
-1. Cria `github.com/arqel/arqel` — público, MIT.
+1. Cria `github.com/arqel-dev/arqel` — público, MIT.
 2. Push do monorepo atual:
    ```bash
-   git remote add origin git@github.com:arqel/arqel.git
+   git remote add origin git@github.com:arqel-dev/arqel.git
    git push -u origin master
    git push -u origin main
    ```
@@ -56,20 +78,20 @@
 
 Cada package em `packages/*` e `packages-js/*` vai ter um repo read-only espelhado via splitsh. Cria-os já vazios:
 
-- `arqel/core`, `arqel/panel`, `arqel/fields`, `arqel/table`, `arqel/form`, `arqel/actions`, `arqel/auth`, `arqel/nav`, `arqel/tenant`, `arqel/widgets`, `arqel/fields-advanced`, `arqel/audit`, `arqel/export`, `arqel/mcp`, `arqel/testing`
-- `arqel/react`, `arqel/ui`, `arqel/hooks`, `arqel/types`
+- `arqel-dev/core`, `arqel-dev/panel`, `arqel-dev/fields`, `arqel-dev/table`, `arqel-dev/form`, `arqel-dev/actions`, `arqel-dev/auth`, `arqel-dev/nav`, `arqel-dev/tenant`, `arqel-dev/widgets`, `arqel-dev/fields-advanced`, `arqel-dev/audit`, `arqel-dev/export`, `arqel-dev/mcp`, `arqel-dev/testing`
+- `arqel-dev/react`, `arqel-dev/ui`, `arqel-dev/hooks`, `arqel-dev/types`
 
 **Atalho:** usa o GitHub CLI:
 ```bash
 for pkg in core panel fields table form actions auth nav tenant widgets fields-advanced audit export mcp testing; do
-  gh repo create arqel/$pkg --public --description "Read-only mirror of arqel/arqel — packages/$pkg" --license mit
+  gh repo create arqel/$pkg --public --description "Read-only mirror of arqel-dev/arqel — packages/$pkg" --license mit
 done
 for pkg in react ui hooks types; do
-  gh repo create arqel/$pkg --public --description "Read-only mirror of arqel/arqel — packages-js/$pkg" --license mit
+  gh repo create arqel/$pkg --public --description "Read-only mirror of arqel-dev/arqel — packages-js/$pkg" --license mit
 done
 ```
 
-**Importante:** todos esses repos têm um aviso no README a apontar para o monorepo (`This is a read-only split. Open issues / PRs at https://github.com/arqel/arqel`).
+**Importante:** todos esses repos têm um aviso no README a apontar para o monorepo (`This is a read-only split. Open issues / PRs at https://github.com/arqel-dev/arqel`).
 
 ### 1.4 Personal Access Token (PAT)
 
@@ -119,10 +141,10 @@ Para os workflows de splitsh + release precisarem fazer push nos sub-repos, cria
 
 ### 3.2 Vendor namespace
 
-Packagist não tem "orgs" como o npm — o vendor `arqel/` fica reservado a partir do momento em que registas o **primeiro** package com esse prefixo. Submete já um:
+Packagist não tem "orgs" como o npm — o vendor `arqel-dev/` fica reservado a partir do momento em que registas o **primeiro** package com esse prefixo. Submete já um:
 
-1. Submit Repository: `https://github.com/arqel/core` (depois do splitsh ter feito o primeiro push, §7).
-2. Após o primeiro package, todos os outros `arqel/*` ficam implicitamente teus (Packagist verifica via GitHub que tu controlas a org).
+1. Submit Repository: `https://github.com/arqel-dev/core` (depois do splitsh ter feito o primeiro push, §7).
+2. Após o primeiro package, todos os outros `arqel-dev/*` ficam implicitamente teus (Packagist verifica via GitHub que tu controlas a org).
 
 ### 3.3 Auto-update via GitHub webhook
 
@@ -149,7 +171,7 @@ Faz após o primeiro splitsh push (§7). Repete o submit para cada sub-repo. Dem
 
 1. [npmjs.com/org/create](https://www.npmjs.com/org/create) → escolhe **Free** (público).
 2. Nome: `arqel`. Confirma que está livre — se não estiver, é a mesma decisão que fizeste no §1.1 (escolher alternativa e atualizar tudo).
-3. Após criada, todos os packages publicados como `@arqel/<nome>` ficam na org.
+3. Após criada, todos os packages publicados como `@arqel-dev/<nome>` ficam na org.
 
 ### 4.3 Granular Access Token para CI
 
@@ -170,7 +192,7 @@ Antes de publicar a primeira vez, confere que cada nome em `packages-js/*` está
 
 ```bash
 for pkg in react ui hooks types; do
-  npm view @arqel/$pkg 2>&1 | head -1
+  npm view @arqel-dev/$pkg 2>&1 | head -1
 done
 ```
 
@@ -195,7 +217,7 @@ Cada um deve dizer "404 Not Found" (livre). Se algum estiver ocupado, é colisã
 ### 5.2 Estrutura
 
 ```
-apps/docs/                  # ou repo separado arqel/arqel.dev
+apps/docs/                  # ou repo separado arqel-dev/arqel.dev
 ├── astro.config.mjs
 ├── src/
 │   ├── content/docs/
@@ -214,9 +236,9 @@ Os `SKILL.md` PT-BR de cada package podem ser fonte direta — basta um script q
 **Cloudflare Pages** (recomendado):
 
 1. Login em [pages.cloudflare.com](https://pages.cloudflare.com).
-2. Connect GitHub → autoriza repo `arqel/arqel`.
+2. Connect GitHub → autoriza repo `arqel-dev/arqel`.
 3. Build settings:
-   - Build command: `pnpm --filter @arqel/docs build`
+   - Build command: `pnpm --filter @arqel-dev/docs build`
    - Build output: `apps/docs/dist`
    - Root directory: `/` (monorepo aware)
    - Node: 20
@@ -239,7 +261,7 @@ O placeholder atual só faz `echo`. Quando o site existir, substitui por:
 - uses: actions/setup-node@v4
   with: { node-version: 20, cache: pnpm }
 - run: pnpm install --frozen-lockfile
-- run: pnpm --filter @arqel/docs build
+- run: pnpm --filter @arqel-dev/docs build
 - uses: cloudflare/pages-action@v1
   with:
     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -254,7 +276,7 @@ Os 2 secrets vêm do passo 6.
 
 ## 6. Secrets em GitHub Actions
 
-Todos em `Settings → Secrets and variables → Actions → New repository secret` no repo `arqel/arqel`.
+Todos em `Settings → Secrets and variables → Actions → New repository secret` no repo `arqel-dev/arqel`.
 
 | Secret | Origem | Usado em |
 |---|---|---|
@@ -298,7 +320,7 @@ PACKAGES_JS=(react ui hooks types)
 
 split_and_push() {
   local prefix="$1"   # packages/core
-  local repo="$2"     # arqel/core
+  local repo="$2"     # arqel-dev/core
 
   local sha
   sha=$(splitsh-lite --prefix="$prefix")
@@ -307,10 +329,10 @@ split_and_push() {
 }
 
 for pkg in "${PACKAGES_PHP[@]}"; do
-  split_and_push "packages/$pkg" "arqel/$pkg"
+  split_and_push "packages/$pkg" "arqel-dev/$pkg"
 done
 for pkg in "${PACKAGES_JS[@]}"; do
-  split_and_push "packages-js/$pkg" "arqel/$pkg"
+  split_and_push "packages-js/$pkg" "arqel-dev/$pkg"
 done
 ```
 
@@ -346,7 +368,7 @@ Depois da corrida manual, **submete cada package no Packagist** (§3.4).
 
 ### 8.2 Branch protection em `main`
 
-`Settings → Branches → Add rule` no `arqel/arqel`:
+`Settings → Branches → Add rule` no `arqel-dev/arqel`:
 
 - Branch name pattern: `main` (e `master` se for a default).
 - ✅ Require pull request before merging
@@ -375,13 +397,13 @@ Garante que tu reviês mudanças sensíveis. Adiciona maintainers à medida que 
 
 Setup leve para receber feedback antes do release:
 
-- **GitHub Discussions** em `arqel/arqel` — `Settings → Features → Discussions ✅`. Categorias: Q&A, Ideas, Show and tell, Announcements.
+- **GitHub Discussions** em `arqel-dev/arqel` — `Settings → Features → Discussions ✅`. Categorias: Q&A, Ideas, Show and tell, Announcements.
 - **Discord ou Slack** (opcional, fase 2): Discord é mais comum para OSS. Server grátis. Cria 3 canais: `#general`, `#help`, `#contributors`.
 - **Twitter/X + Bluesky:** handle `@arqel_dev` em ambos. Vai sendo construído ao longo das releases.
 - **README badges:** após release v0.1.0, adiciona em `README.md`:
-  - `![Packagist](https://img.shields.io/packagist/v/arqel/core)`
-  - `![npm](https://img.shields.io/npm/v/@arqel/ui)`
-  - `![CI](https://github.com/arqel/arqel/actions/workflows/ci.yml/badge.svg)`
+  - `![Packagist](https://img.shields.io/packagist/v/arqel-dev/core)`
+  - `![npm](https://img.shields.io/npm/v/@arqel-dev/ui)`
+  - `![CI](https://github.com/arqel-dev/arqel-dev/actions/workflows/ci.yml/badge.svg)`
   - `![License](https://img.shields.io/badge/license-MIT-blue)`
 
 ---
@@ -407,7 +429,7 @@ Checklist sequencial. Não saltar steps.
    git tag -s v0.1.0 -m "Release v0.1.0"
    git push origin v0.1.0
    ```
-2. **GitHub Actions** despara `release.yml` automaticamente. Acompanha em `arqel/arqel/actions`.
+2. **GitHub Actions** despara `release.yml` automaticamente. Acompanha em `arqel-dev/arqel-dev/actions`.
 3. Workflow vai:
    - Correr `splitsh-lite` e push para os 18 sub-repos com a tag `v0.1.0`.
    - Notificar Packagist via webhook (sub-repos publicam-se sozinhos com a tag).
@@ -419,8 +441,8 @@ Checklist sequencial. Não saltar steps.
    ```bash
    composer create-project laravel/laravel test-arqel
    cd test-arqel
-   composer require arqel/core
-   pnpm add @arqel/ui @arqel/react
+   composer require arqel-dev/core
+   pnpm add @arqel-dev/ui @arqel-dev/react
    ```
    Confirma que tudo resolve sem path repos.
 

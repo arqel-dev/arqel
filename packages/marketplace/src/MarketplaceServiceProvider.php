@@ -16,7 +16,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Stripe\StripeClient;
 
 /**
- * Auto-discovered provider para `arqel/marketplace`.
+ * Auto-discovered provider para `arqel-dev/marketplace`.
  *
  * Bind do `PaymentGateway` é configurável via `config('arqel-marketplace.payment_gateway')`:
  *

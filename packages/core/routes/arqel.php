@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 // Reserved sub-paths that Arqel itself owns under the panel prefix
-// (e.g. /admin/login, /admin/logout from arqel/auth) must not be
+// (e.g. /admin/login, /admin/logout from arqel-dev/auth) must not be
 // captured by the polymorphic `{resource}` slug.
 //
 // Use lookahead with `(?:/|$)` so the exclusion fires even when the

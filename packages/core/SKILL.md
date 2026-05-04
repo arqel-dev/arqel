@@ -1,10 +1,10 @@
-# SKILL.md — arqel/core
+# SKILL.md — arqel-dev/core
 
-> Este ficheiro é contexto canónico para **AI agents** (Claude Code, Cursor via MCP, etc.) a trabalhar no pacote `arqel/core`. Estrutura conforme [`PLANNING/04-repo-structure.md`](../../PLANNING/04-repo-structure.md) §11.
+> Este ficheiro é contexto canónico para **AI agents** (Claude Code, Cursor via MCP, etc.) a trabalhar no pacote `arqel-dev/core`. Estrutura conforme [`PLANNING/04-repo-structure.md`](../../PLANNING/04-repo-structure.md) §11.
 
 ## Purpose
 
-`arqel/core` é o pacote base do ecossistema Arqel. Contém:
+`arqel-dev/core` é o pacote base do ecossistema Arqel. Contém:
 
 - **Service Provider** (`ArqelServiceProvider`) com auto-discovery via Laravel package discovery (ADR-018)
 - **Contracts** (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`) que outros pacotes implementam
@@ -22,11 +22,11 @@
 
 **Entregues após o scope inicial:**
 
-- `ResourceController` (CORE-006) — 7 endpoints polimórficos (`index/create/store/show/edit/update/destroy`) sob `arqel.resources.{action}`. Resolve Resource pelo slug via `ResourceRegistry::findBySlug`, autoriza via `Gate::denies(viewAny|create|view|update|delete)`, materializa payload via `InertiaDataBuilder`, invoca lifecycle via `Resource::runCreate/runUpdate/runDelete`. Validation via `FieldRulesExtractor` (carregado via Reflection — sem hard dep em `arqel/form`).
-- `HandleArqelInertiaRequests` middleware (CORE-007) — estende `Inertia\Middleware`. Shared props: `auth.user` (`only(['id','name','email'])`), `auth.can` (delegated to `AbilityRegistry::resolveForUser` quando `arqel/auth` está bound), `panel`, `tenant`, `flash` (success/error/info/warning closures), `translations` (`arqel::*`), `arqel.version`.
+- `ResourceController` (CORE-006) — 7 endpoints polimórficos (`index/create/store/show/edit/update/destroy`) sob `arqel.resources.{action}`. Resolve Resource pelo slug via `ResourceRegistry::findBySlug`, autoriza via `Gate::denies(viewAny|create|view|update|delete)`, materializa payload via `InertiaDataBuilder`, invoca lifecycle via `Resource::runCreate/runUpdate/runDelete`. Validation via `FieldRulesExtractor` (carregado via Reflection — sem hard dep em `arqel-dev/form`).
+- `HandleArqelInertiaRequests` middleware (CORE-007) — estende `Inertia\Middleware`. Shared props: `auth.user` (`only(['id','name','email'])`), `auth.can` (delegated to `AbilityRegistry::resolveForUser` quando `arqel-dev/auth` está bound), `panel`, `tenant`, `flash` (success/error/info/warning closures), `translations` (`arqel::*`), `arqel.version`.
 - `FieldSchemaSerializer` (CORE-010) — duck-typed contra `Arqel\Fields\Field`. Filtra fields por `canBeSeenBy(user, record)`, combina `isReadonly` com `canBeEditedBy` num único flag, emite `validation.{rules,messages,attribute}`, `visibility.{create,edit,detail,table,canSee}`, `dependsOn` e `props`. `stringifyRules` descarta Closures e converte rule objects para class-string.
 - `InertiaDataBuilder` (CORE-006 partial → CORE-010) — assembler dos payloads index/create/edit/show. `buildIndexData` paginate sanitizado; `buildCreateData/EditData/ShowData` retornam `{resource, record, recordTitle, recordSubtitle, fields}`. Detecta `Resource::table()` via duck-typing e roteia para `buildTableIndexData` (delega ao `Arqel\Table\TableQueryBuilder` via Reflection).
-- `arqel:install` extendido com auto-instalação frontend (CORE-016) — detecta package manager (`pnpm`/`yarn`/`npm`), instala `@arqel/{react,ui,hooks,fields,types}` + peer dev deps, scaffolda `resources/js/app.tsx` + `resources/css/app.css`. Flag `--no-frontend` para skip; `--force` re-escreve.
+- `arqel:install` extendido com auto-instalação frontend (CORE-016) — detecta package manager (`pnpm`/`yarn`/`npm`), instala `@arqel-dev/{react,ui,hooks,fields,types}` + peer dev deps, scaffolda `resources/js/app.tsx` + `resources/css/app.css`. Flag `--no-frontend` para skip; `--force` re-escreve.
 - **Command Palette backend (CMDPAL-001):**
   - `Arqel\Core\CommandPalette\Command` — value-object readonly com `id/label/url/description/category/icon`. `toArray()` devolve sempre as 6 chaves (com `null` explícito para os opcionais).
   - `Arqel\Core\CommandPalette\CommandProvider` — contract com `provide(?Authenticatable $user, string $query): array<Command>` para fontes lazy.
@@ -154,7 +154,7 @@ em vez de obter erros opacos no controller.
 
 - `Arqel\Core\Contracts\HasResource` — 7 métodos estáticos: `getModel`, `getSlug`, `getLabel`, `getPluralLabel`, `getNavigationIcon`, `getNavigationGroup`, `getNavigationSort`. A classe base `Resource` implementa todos com auto-derivation
 - `Arqel\Core\Contracts\HasFields` — `fields(): array`. Tipo solto até `Arqel\Fields\Field` existir
-- `Arqel\Core\Contracts\HasActions` — marker interface; assinaturas concretas chegam com `arqel/actions`
+- `Arqel\Core\Contracts\HasActions` — marker interface; assinaturas concretas chegam com `arqel-dev/actions`
 - `Arqel\Core\Contracts\HasPolicies` — `getPolicy(): ?string` opcional; integra com Laravel Policies (ADR-017)
 
 ## Policy debugger (DEVTOOLS-004)
@@ -191,7 +191,7 @@ registado e `__devtools` resolve para `null`. Para desativar
 manualmente em `local` (e.g. dev profiling), defina
 `APP_ENV=development` ou outro nome no `.env` antes do boot.
 
-A extensão DevTools (`@arqel/devtools-extension`) consome
+A extensão DevTools (`@arqel-dev/devtools-extension`) consome
 `__devtools.policyLog` na tab "Policies" para mostrar uma tabela
 filtrável allow/deny + busca por ability + expand/collapse de stack
 trace por linha.
@@ -241,7 +241,7 @@ Comando Artisan `arqel:doctor` (em `src/Console/DoctorCommand.php`) faz um healt
 1. `php.version` — `PHP >= 8.3` (fail caso contrário)
 2. `laravel.version` — `Laravel >= 12.0` (fail caso contrário)
 3. `php.extensions` — `json`, `pdo`, `mbstring`, `tokenizer`, `openssl`
-4. `arqel.core.version` — via `Composer\InstalledVersions::getVersion('arqel/core')` (warn se desconhecida — path repo / dev install)
+4. `arqel.core.version` — via `Composer\InstalledVersions::getVersion('arqel-dev/core')` (warn se desconhecida — path repo / dev install)
 5. `arqel.provider` — `ArqelServiceProvider` está em `app->getLoadedProviders()`
 6. `arqel.config` — namespace `config('arqel')` está populado
 7. `database.migrations` — inspecciona o `Migrator` directamente (não corre `migrate:status` aninhado, evita corromper o buffer da Artisan); warn se há migrations pendentes ou se a tabela `migrations` ainda não existe
@@ -344,7 +344,7 @@ Mostra plataforma detectada, status do auto-configure e os drivers efectivos. Ú
 
 ## Monitoring (LCLOUD-003)
 
-`arqel/core` regista cards e recorders no dashboard do **Laravel Pulse** quando o pacote `laravel/pulse` está instalado na app. **Sem hard-dep**: apps sem Pulse continuam a funcionar — toda a integração é guardada por `class_exists(\Laravel\Pulse\Pulse::class)`.
+`arqel-dev/core` regista cards e recorders no dashboard do **Laravel Pulse** quando o pacote `laravel/pulse` está instalado na app. **Sem hard-dep**: apps sem Pulse continuam a funcionar — toda a integração é guardada por `class_exists(\Laravel\Pulse\Pulse::class)`.
 
 **Como instalar Pulse:**
 
@@ -389,13 +389,13 @@ Mostra versão do Pulse, cards/recorders registados e amostras (tokens hoje, dis
 
 ## Telemetry (post-tag)
 
-`arqel/core` inclui telemetria mínima e opt-in para SLOs, debugging em produção e capacity planning. **Sem dependências externas** — usa apenas in-memory storage e o protocolo Prometheus text exposition.
+`arqel-dev/core` inclui telemetria mínima e opt-in para SLOs, debugging em produção e capacity planning. **Sem dependências externas** — usa apenas in-memory storage e o protocolo Prometheus text exposition.
 
 **Componentes:**
 
 - `Arqel\Core\Telemetry\MetricsCollector` (request-scoped) — armazena counters, gauges e histograms agregados por `name + labels`.
 - `Arqel\Core\Telemetry\PrometheusExporter` — serializa o snapshot para o formato Prometheus 0.0.4.
-- `Arqel\Core\Telemetry\AutoInstrumentation` — atalhos para métricas Arqel-specific + listeners defensivos para eventos opcionais (`arqel/workflow`, `arqel/ai`).
+- `Arqel\Core\Telemetry\AutoInstrumentation` — atalhos para métricas Arqel-specific + listeners defensivos para eventos opcionais (`arqel-dev/workflow`, `arqel-dev/ai`).
 - `Arqel\Core\Http\Controllers\MetricsController` — endpoint `GET /admin/_metrics` (gated por config + `auth` + Gate `viewMetrics`).
 
 **Habilitar:**
@@ -417,7 +417,7 @@ app(\Arqel\Core\Telemetry\MetricsCollector::class)
 
 ## Anti-patterns
 
-- ❌ **Depender directamente de pacotes descendentes** (`arqel/fields`, `arqel/table`, ...). Core é a base; inversão de dependência. Se precisas de algo de `fields`, expõe um contract em `core` que `fields` implementa.
+- ❌ **Depender directamente de pacotes descendentes** (`arqel-dev/fields`, `arqel-dev/table`, ...). Core é a base; inversão de dependência. Se precisas de algo de `fields`, expõe um contract em `core` que `fields` implementa.
 - ❌ **Stringly-typed APIs** (e.g., `$resource->addField('text', 'email')`). Usa classes: `TextField::make('email')`.
 - ❌ **Mutar Inertia props depois do response**. Todas as props são construídas no controller e enviadas.
 - ❌ **Registrar rotas globais** fora do controlo do Panel. Rotas são sempre scoped para o `Panel` actual.

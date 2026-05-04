@@ -1,10 +1,10 @@
-# SKILL.md — arqel/cli
+# SKILL.md — arqel-dev/cli
 
-> Contexto canônico para AI agents trabalhando no pacote `arqel/cli`.
+> Contexto canônico para AI agents trabalhando no pacote `arqel-dev/cli`.
 
 ## Purpose
 
-Pacote standalone, instalado via `composer global require arqel/cli`,
+Pacote standalone, instalado via `composer global require arqel-dev/cli`,
 expõe o binário `arqel` com subcomandos meta (não rodam dentro de uma
 app Arqel — orquestram a criação delas). O comando flagship é `arqel new`,
 um scaffolder interactivo entregue por CLI-TUI-001 da Fase 4.
@@ -71,7 +71,7 @@ e segue o mesmo idioma do Filament installer.
   - `cloud.env.example` + `.env.production.example` com vars
     Arqel essenciais.
   - `composer.json` template (`your-org/{{APP_NAME}}`, type
-    `project`, deps `arqel/core`, `arqel/panel`, Reverb,
+    `project`, deps `arqel-dev/core`, `arqel-dev/panel`, Reverb,
     Inertia).
   - `app/Providers/ArqelServiceProvider.php` stub.
   - `README.md` PT-BR com botão "Deploy to Laravel Cloud",
@@ -95,8 +95,8 @@ arqel cloud:export ./my-arqel-app --app-name=myadmin
 ```
 
 A decisão arquitetural é manter o template **dentro do monorepo
-arqel/cli** (em `templates/laravel-cloud/`) ao invés de
-`github.com/arqel/laravel-cloud-template` separado: isso evita
+arqel-dev/cli** (em `templates/laravel-cloud/`) ao invés de
+`github.com/arqel-dev/laravel-cloud-template` separado: isso evita
 um repo desincronizado e permite testar o template no mesmo CI.
 Quando o Arqel for promovido a 1.0, podemos espelhar o conteúdo
 para um template repo dedicado via splitsh; o command continua
@@ -131,14 +131,14 @@ sendo o caminho canônico para gerar a estrutura.
   com grupo "Laravel Cloud" no nav e sidebar `/laravel-cloud/`.
 
 ```bash
-arqel cloud:deploy-link arqel/laravel-cloud-template
+arqel cloud:deploy-link arqel-dev/laravel-cloud-template
 # => https://cloud.laravel.com/deploy?repo=https%3A%2F%2Fgithub.com%2Farqel%2Flaravel-cloud-template&region=auto
 arqel cloud:deploy-link owner/meu-painel --region=us-east --name=meu-painel
 ```
 
 ### Por chegar
 
-- **CLI-TUI-002** — Resource generator interactivo. Reside em `arqel/core`
+- **CLI-TUI-002** — Resource generator interactivo. Reside em `arqel-dev/core`
   como `php artisan arqel:resource:make` (Artisan command, não comando
   do binário global). **Não confundir com este pacote.**
 - **CLI-TUI-003** — Camada Ink-equivalente (rich UI com TUI completa,
@@ -169,8 +169,8 @@ arqel cloud:deploy-link owner/meu-painel --region=us-east --name=meu-painel
 - **Não** executar `laravel new` / `composer require` diretamente do
   comando. Isso quebra testabilidade, esconde a sequência do usuário,
   e introduz dependência de network nos testes.
-- **Não** depender de `arqel/core`. Este pacote é meta — roda fora de
-  qualquer app Arqel. Dep cíclica seria pior ainda quando `arqel/core`
+- **Não** depender de `arqel-dev/core`. Este pacote é meta — roda fora de
+  qualquer app Arqel. Dep cíclica seria pior ainda quando `arqel-dev/core`
   evoluir.
 - **Não** usar `dd()`, `var_dump()`, `Symfony\…\OutputInterface::write`
   com cores hard-coded. Confiar nos tags `<info>`/`<error>` do Symfony
@@ -184,7 +184,7 @@ arqel cloud:deploy-link owner/meu-painel --region=us-east --name=meu-painel
 ### Instalação global
 
 ```bash
-composer global require arqel/cli
+composer global require arqel-dev/cli
 # Garantir que ~/.composer/vendor/bin está no PATH:
 export PATH="$PATH:$HOME/.composer/vendor/bin"
 arqel --version
@@ -234,6 +234,6 @@ arqel new my-admin --no-prompts --platform=powershell
   da family de comandos.
 - `PLANNING/03-adrs.md` ADR-001 (Inertia-only) — explica porque o
   scaffolder não precisa colher escolhas de fetch lib.
-- `arqel/core` — comandos Artisan que **rodam dentro** da app
+- `arqel-dev/core` — comandos Artisan que **rodam dentro** da app
   (`arqel:install`, `arqel:doctor`, `arqel:resource`). Não confundir
   com este pacote.

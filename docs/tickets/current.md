@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Pós-tag QoL polish (Batches #27..#55): i18n (en + pt_BR) + LocaleSwitcher + dark-mode/theme tokens + a11y helpers + audit guide. 3 novos pacotes JS: @arqel/i18n, @arqel/theme, @arqel/a11y. Total ≈ 269 core (+16 i18n) + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 10 demo app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + 15 realtime-collab JS + 3 demo JS + 12 i18n JS + 27 theme JS + 18 a11y JS = ~1.371 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1` (todos critérios atingidos), comunicar release em GitHub Discussions/Discord.
+**Pós-tag QoL polish (Batches #27..#55): i18n (en + pt_BR) + LocaleSwitcher + dark-mode/theme tokens + a11y helpers + audit guide. 3 novos pacotes JS: @arqel-dev/i18n, @arqel-dev/theme, @arqel-dev/a11y. Total ≈ 269 core (+16 i18n) + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 10 demo app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + 15 realtime-collab JS + 3 demo JS + 12 i18n JS + 27 theme JS + 18 a11y JS = ~1.371 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1` (todos critérios atingidos), comunicar release em GitHub Discussions/Discord.
 
 **Fase:** 1 (MVP)
 
@@ -40,18 +40,18 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - **Bug 2 (blocker)** — `HandleArqelInertiaRequests` herdava `$rootView = 'app'` do Inertia mas só `arqel::app` está publicada → `View [app] not found`. Override `$rootView = 'arqel::app'` + leitura de `config('arqel.inertia.root_view')` no `__construct`
 - **Bug 4 (high)** — `buildPlainIndexData` não emitia `columns/filters/search/sort/actions` → React `<ResourceIndex>` quebrava em `filters.length`. Plain fallback agora deriva columns automaticamente de `fields()` (honra `visibility.table` via `isVisibleIn` duck-type) + emite arrays/objetos vazios para todos os keys table-shaped
 - **Bug 5 (medium)** — `app.blade.php` hardcoded `resources/css/app.css + resources/js/app.tsx`. Agora lê `config('arqel.inertia.vite_entries', [...])`; default config publicado mantém os 2 entries originais
-- **Bug 6 (high)** — `@arqel/ui/styles/globals.css` faz `@import 'tailwindcss'` mas tailwindcss não estava em peerDependencies. Adicionado `"tailwindcss": "^4.0.0"` em peerDependencies
+- **Bug 6 (high)** — `@arqel-dev/ui/styles/globals.css` faz `@import 'tailwindcss'` mas tailwindcss não estava em peerDependencies. Adicionado `"tailwindcss": "^4.0.0"` em peerDependencies
 - **Bug 8 (medium)** — `arqel:resource --with-policy` delegava para `make:policy` cujo stub Laravel default retorna `false` em todos os métodos → 403 em qualquer access pós-scaffolding. `MakeResourceCommand::rewritePolicyToArqelDefaults` reescreve o ficheiro gerado com policy "allow-all + TODOs apontando os pontos de tightening"
 - 4 testes Pest novos (`PanelToRegistrySyncTest`, 113/113 total) cobrindo o sync, election, override explicit, skip de invalid resource entries
 - **Bug 9 (low)** — `Panel::path()` prepend `/`. Marcado wontfix — `Route::prefix` aceita ambos formatos e mudar agora ondularia em testes existentes
 
 **`e443e1f` — feat(ui): built-in Inertia page registry for arqel::* (bug 3, bug 7)**
 
-- **Bug 3 (blocker)** — `ResourceController` emite `component: 'arqel::index'` mas `@arqel/ui` não exportava registry de pages → `resolveArqelPage: no page found for [arqel::index]`. Novo subpath `@arqel/ui/pages` exportando `arqelPages: Record<string, LazyPage>` mapeando os 4 names canônicos para componentes default. `ArqelIndexPage` wrappa `<ResourceIndex>` com `usePage().props`; `ArqelCreatePage`/`EditPage` usam `useArqelForm` + `<FormRenderer>` + `<FormActions>` com submit via `router.post/put`; `ArqelShowPage` re-usa `<FormRenderer>` com `schema.disabled = true` (read-only). `tsup.config.ts` ganha entry `pages`; `package.json` exports declaram `./pages`. `setup-test-app.sh` agora gera `app.tsx` com `pages: { ...arqelPages, ...userPages }` por defeito
+- **Bug 3 (blocker)** — `ResourceController` emite `component: 'arqel::index'` mas `@arqel-dev/ui` não exportava registry de pages → `resolveArqelPage: no page found for [arqel::index]`. Novo subpath `@arqel-dev/ui/pages` exportando `arqelPages: Record<string, LazyPage>` mapeando os 4 names canônicos para componentes default. `ArqelIndexPage` wrappa `<ResourceIndex>` com `usePage().props`; `ArqelCreatePage`/`EditPage` usam `useArqelForm` + `<FormRenderer>` + `<FormActions>` com submit via `router.post/put`; `ArqelShowPage` re-usa `<FormRenderer>` com `schema.disabled = true` (read-only). `tsup.config.ts` ganha entry `pages`; `package.json` exports declaram `./pages`. `setup-test-app.sh` agora gera `app.tsx` com `pages: { ...arqelPages, ...userPages }` por defeito
 - **Bug 7 (high)** — Vite ENOSPC em `pnpm dev` por watch dos `vendor/arqel/*/vendor/**` symlinkados (~65k+ files). `setup-test-app.sh` auto-inject `server.watch.ignored` no `vite.config.{ts,js,mjs}` com glob para `vendor/arqel/*/vendor/**` + `vendor/arqel/*/node_modules/**` quando o block ainda não existe (Python inline regex pass com fallback warning)
-- `resolvePage.ts` docblock atualizado: descreve o pattern correto de merge `{ ...arqelPages, ...userPages }` em vez do stale "registered later by @arqel/ui"
+- `resolvePage.ts` docblock atualizado: descreve o pattern correto de merge `{ ...arqelPages, ...userPages }` em vez do stale "registered later by @arqel-dev/ui"
 
-**Validações pós-fixes:** `pest packages/core` 113/113 ✅ · `pest packages/tenant` 95/95 ✅ · `pest packages/widgets` 29/29 ✅ · `pest packages/actions` 49/49 ✅ · `pnpm build @arqel/ui` 11 ESM entries + dts ✅ · `pnpm test @arqel/ui` 70/70 ✅ · phpstan + pint todos limpos.
+**Validações pós-fixes:** `pest packages/core` 113/113 ✅ · `pest packages/tenant` 95/95 ✅ · `pest packages/widgets` 29/29 ✅ · `pest packages/actions` 49/49 ✅ · `pnpm build @arqel-dev/ui` 11 ESM entries + dts ✅ · `pnpm test @arqel-dev/ui` 70/70 ✅ · phpstan + pint todos limpos.
 
 ### Bug fix — `arqel new` interativo em TTY não-POSIX (2026-05-01)
 
@@ -63,15 +63,15 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Cluster A — `worktree-agent-a2728c0fdb2bfcbe5`** (3 tickets, 3 commits, 39 testes novos):
 - **WIDGETS-003 ChartWidget** (final, fluent) — `chartType` (line/bar/area/pie/donut/radar com `CHART_*` constants, fallback line), `height` (clamp ≥ 50), `showLegend`/`showGrid`, `chartData(array|Closure)` (Closure non-array → `{labels:[], datasets:[]}`), `chartOptions(array|Closure)`. `data()` resolve Closures lazy
-- **WIDGETS-004 TableWidget** (final, fluent) — `query(Closure(): Builder<Model>)`, `limit` (clamp ≥ 1), `columns` (duck-typed), `seeAllUrl`. **Sem dep em `arqel/table`** — duck-typing preserva o dep graph mínimo. Throwables capturados → `loadError + records: []`
+- **WIDGETS-004 TableWidget** (final, fluent) — `query(Closure(): Builder<Model>)`, `limit` (clamp ≥ 1), `columns` (duck-typed), `seeAllUrl`. **Sem dep em `arqel-dev/table`** — duck-typing preserva o dep graph mínimo. Throwables capturados → `loadError + records: []`
 - **WIDGETS-005 CustomWidget** (final, escape hatch) — `make(name, component)`, `component(string)` valida não-vazio, `withData(array|Closure)` define payload (note: setter renomeado de `data()` para `withData()` para preservar LSP do `Widget::data(): array`)
 
 **Cluster B — `worktree-agent-a56324a69056748ac`** (1 ticket, 1 commit, 4 testes):
-- **MCP-001** — esqueleto `arqel/mcp` (PHP 8.3+, Laravel 12|13, dep `arqel/core`). `Arqel\Mcp\McpServer` (final stub) com `registerTool/Resource/Prompt` no-op + `getTools/Resources/Prompts` retornando `[]`. `Arqel\Mcp\McpServiceProvider` auto-discovered + singleton binding. SKILL.md PT-BR. Implementação real do JSON-RPC fica para MCP-002
+- **MCP-001** — esqueleto `arqel-dev/mcp` (PHP 8.3+, Laravel 12|13, dep `arqel-dev/core`). `Arqel\Mcp\McpServer` (final stub) com `registerTool/Resource/Prompt` no-op + `getTools/Resources/Prompts` retornando `[]`. `Arqel\Mcp\McpServiceProvider` auto-discovered + singleton binding. SKILL.md PT-BR. Implementação real do JSON-RPC fica para MCP-002
 
 **Cluster C — `worktree-agent-ad1a26bdfd116074f`** (2 tickets, 2 commits, 14 testes):
-- **FIELDS-ADV-001** — esqueleto `arqel/fields-advanced` (PHP 8.3+, Laravel 12|13, deps `arqel/core` + `arqel/fields`). `Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider` registra macro `richText` em `FieldFactory`
-- **FIELDS-ADV-002 RichTextField** — `final extends Arqel\Fields\Field`, `type='richText'`/`component='RichTextInput'`. Setters: `toolbar`/`imageUploadDisk`/`imageUploadDirectory`/`maxLength` (clamp ≥1)/`fileAttachments`/`customMarks`/`mentionable` (filtra entries sem id+name). `getTypeSpecificProps()` emite `imageUploadRoute` como string literal (`/arqel/fields/upload?disk=<disk>`) ou `null`. **Sem hard dep em HTML Purifier** — sanitização documentada como responsabilidade do consumer (FormRequest rules, Eloquent mutators)
+- **FIELDS-ADV-001** — esqueleto `arqel-dev/fields-advanced` (PHP 8.3+, Laravel 12|13, deps `arqel-dev/core` + `arqel-dev/fields`). `Arqel\FieldsAdvanced\FieldsAdvancedServiceProvider` registra macro `richText` em `FieldFactory`
+- **FIELDS-ADV-002 RichTextField** — `final extends Arqel\Fields\Field`, `type='richText'`/`component='RichTextInput'`. Setters: `toolbar`/`imageUploadDisk`/`imageUploadDirectory`/`maxLength` (clamp ≥1)/`fileAttachments`/`customMarks`/`mentionable` (filtra entries sem id+name). `getTypeSpecificProps()` emite `imageUploadRoute` como string literal (`/arqel-dev/fields/upload?disk=<disk>`) ou `null`. **Sem hard dep em HTML Purifier** — sanitização documentada como responsabilidade do consumer (FormRequest rules, Eloquent mutators)
 
 **Merge issues resolvidos pelo orquestrador:**
 
@@ -81,8 +81,8 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Commits no main:**
 
-- `7f06f98` feat(mcp): scaffold arqel/mcp package (MCP-001) [agente B]
-- `6140c8c` feat(fields): scaffold arqel/fields-advanced (FIELDS-ADV-001) [agente C]
+- `7f06f98` feat(mcp): scaffold arqel-dev/mcp package (MCP-001) [agente B]
+- `6140c8c` feat(fields): scaffold arqel-dev/fields-advanced (FIELDS-ADV-001) [agente C]
 - `41dfeb3` feat(fields): RichTextField with Tiptap config (FIELDS-ADV-002) [agente C]
 - `4d89c8a` feat(widgets): add ChartWidget Recharts wrapper (WIDGETS-003) [agente A]
 - `5f285d5` feat(widgets): add TableWidget mini-table dashboard widget (WIDGETS-004) [agente A]
@@ -118,11 +118,11 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 4. **Snapshot pre-existing** que se manifestou na suite global teria sido invisível sem o merge — vale rodar `pest` per-package no main antes de cada batch para baseline limpo
 5. **Tempo total**: ~15 min para 6 tickets + merge. Sequential teria sido ~45-60 min
 
-### WIDGETS-001 — Esqueleto do pacote `arqel/widgets` (2026-04-29)
+### WIDGETS-001 — Esqueleto do pacote `arqel-dev/widgets` (2026-04-29)
 
 **Entregue:**
 
-- Esqueleto do pacote `arqel/widgets` (PHP 8.3+, Laravel 12|13, dep em `arqel/core` via path repo): `composer.json` PSR-4 `Arqel\Widgets\` → `src/`, scripts test/coverage/analyse/lint/format. `WidgetsServiceProvider` auto-discovered + `phpunit.xml` config padrão Arqel
+- Esqueleto do pacote `arqel-dev/widgets` (PHP 8.3+, Laravel 12|13, dep em `arqel-dev/core` via path repo): `composer.json` PSR-4 `Arqel\Widgets\` → `src/`, scripts test/coverage/analyse/lint/format. `WidgetsServiceProvider` auto-discovered + `phpunit.xml` config padrão Arqel
 - **`Arqel\Widgets\Widget`** (abstract) — base com fluent API completo: construtor `(string $name)`, getters/setters para `heading`/`description`/`sort`/`columnSpan(int|string)` (clamp ≥1 quando int, passthrough quando string)/`poll(int)` (≤0 disable, >0 sets)/`deferred(bool)`/`canSee(Closure)`/`filters(array)`. Subclasses declaram `protected string $type` + `protected string $component` e implementam `data(): array`. `id()` default `<type>:<name>`. `canBeSeenBy(?Authenticatable)` default true, delegação ao Closure quando registrado. `toArray(?Authenticatable)` emite payload canônico para Inertia: deferred → `data: null`, inline → chama `data()`
 - **`Arqel\Widgets\Dashboard`** (final) — builder de schema dashboard. `make()`, `widgets(array)` (filtra non-Widget silently), `addWidget(Widget)`, `columns(int)` (clamp 1..12), `heading`, `description`, `canSee(Closure)`. `toArray(?Authenticatable)` filtra widgets por `canBeSeenBy` + sort por `getSort()` (null sorts last via PHP_INT_MAX) + serializa cada widget. `canBeSeenBy(?Authenticatable)` oracle no nível do dashboard
 - **`Arqel\Widgets\WidgetRegistry`** (final, singleton) — `register(type, class-string<Widget>)` valida `is_subclass_of(Widget)` (lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`. Bound em `WidgetsServiceProvider::packageRegistered`
@@ -135,7 +135,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 - **`Widget` é abstract com `protected string $type='' / $component=''`** — força subclasse a override; permite reflection/registry ler o type sem instanciar
 - **`columnSpan` aceita `int|string`** — int para grid simples (1..12), string para atalhos client-side (`'full'`, `'1/2'`, `'1/3'`); a decode fica no `<DashboardRenderer>` React (WIDGETS-007+)
-- **`Dashboard::widgets()` filtra non-Widget silently** — UX consistente com `Form::schema()` em `arqel/form`; consumidor não precisa lembrar de `array_filter`
+- **`Dashboard::widgets()` filtra non-Widget silently** — UX consistente com `Form::schema()` em `arqel-dev/form`; consumidor não precisa lembrar de `array_filter`
 - **`PHP_INT_MAX` para null sort** — null widgets vão pro fim da lista naturalmente sem precisar de comparator complexo
 - **`pollingInterval=null` quando `poll(0)` ou `poll(<0)`** — server emite `pollingInterval: null` no payload e o React skip o setInterval
 
@@ -173,7 +173,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - **`Container::getInstance()` em vez de `app()` helper** — mantém a rule serializable (importante porque rules são geralmente atribuídas a Field e podem ser serializadas para o payload Inertia), e desacopla do helper global
 - **Fallback global quando não há tenant** — match com expectativa: validação de slug em route pública (sem tenant scope) ainda deve ser unique global. Apps que querem comportamento estrito devem combinar com `EnsureUserCanAccessPanel` middleware que aborta sem tenant
 - **`?string $connection` em vez de string** — apps multi-DB podem direcionar a rule para uma connection específica; default null usa a connection padrão (resolver decide)
-- **Helper de Field `uniqueInTenant`** mencionado no ticket fica para um sub-ticket TENANT-006-followup (precisa mexer em `arqel/fields`); sintaxe atual é `Field::text('slug')->rule(new ScopedUnique('posts', 'slug'))` — verbosa mas funcional
+- **Helper de Field `uniqueInTenant`** mencionado no ticket fica para um sub-ticket TENANT-006-followup (precisa mexer em `arqel-dev/fields`); sintaxe atual é `Field::text('slug')->rule(new ScopedUnique('posts', 'slug'))` — verbosa mas funcional
 - **Test do "no DB resolver bound"** removido — Testbench sempre boota um `db` slot; o guard existe na impl (defere silently para outras rules) mas testá-lo unitário exigiria desbindar todo o `DatabaseServiceProvider`
 
 ### TENANT-005 — Trait `BelongsToTenant` + scope `TenantScope` (2026-04-29)
@@ -261,11 +261,11 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - **`identifierFor` lê a coluna configurada antes de `getKey()`** — útil quando o tenant é identificado por slug humano-readable (cache keys, logs); apenas cai no key quando a coluna não retorna scalar
 - **`AuthUserResolver` aceita 3 shapes** (`BelongsTo`, `Model`, property) — espelha o realismo: Jetstream usa `currentTeam()` method; código novo prefere acessor com tipo; alguns usam relação com `belongsTo` para lazy-load. Cobrir os 3 evita rebar para o user
 
-### TENANT-001 — Esqueleto do pacote `arqel/tenant` (2026-04-29) — **Início Fase 2**
+### TENANT-001 — Esqueleto do pacote `arqel-dev/tenant` (2026-04-29) — **Início Fase 2**
 
 **Entregue:**
 
-- Esqueleto do pacote `arqel/tenant` (PHP 8.3+, Laravel 12|13, dep em `arqel/core` via path repo): `composer.json` com PSR-4 `Arqel\Tenant\` → `src/`, autoload-dev `Arqel\Tenant\Tests\`, scripts `test`/`test:coverage`/`analyse`/`lint`/`format`, suggested deps comentadas (stancl, spatie)
+- Esqueleto do pacote `arqel-dev/tenant` (PHP 8.3+, Laravel 12|13, dep em `arqel-dev/core` via path repo): `composer.json` com PSR-4 `Arqel\Tenant\` → `src/`, autoload-dev `Arqel\Tenant\Tests\`, scripts `test`/`test:coverage`/`analyse`/`lint`/`format`, suggested deps comentadas (stancl, spatie)
 - `Arqel\Tenant\TenantServiceProvider` (final, extends `PackageServiceProvider`) registado via `extra.laravel.providers`. `packageRegistered()` faz `singleton(TenantManager::class)`
 - `Arqel\Tenant\TenantManager` (final) — stub com `current(): mixed` retornando `null` e `hasCurrent(): bool` retornando `false` até TENANT-003 entregar resolver/scope chain
 - `tests/TestCase.php` extendendo `Orchestra\Testbench\TestCase`: `getPackageProviders` registra `ArqelServiceProvider + TenantServiceProvider`, `defineEnvironment` configura SQLite in-memory para isolamento
@@ -274,7 +274,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - `phpunit.xml` com configuração padrão dos pacotes Arqel (testsuites Unit/Feature, env testing/sqlite/array)
 - `SKILL.md` PT-BR com Status (entregue + por chegar TENANT-002..015), Conventions (sem hard dep em stancl/spatie — adapters são opt-in), 3 Anti-patterns
 - `README.md` minimal + ponteiro pro SKILL
-- Pacote registrado em `composer.json` raiz (`"arqel/tenant": "@dev"`); `composer update` symlinkou via path repo `packages/*`
+- Pacote registrado em `composer.json` raiz (`"arqel-dev/tenant": "@dev"`); `composer update` symlinkou via path repo `packages/*`
 
 **Validações:** `pest packages/tenant` 4/4 ✅ · `phpstan analyse packages/tenant` ✅ · `pint --test packages/tenant` ✅
 
@@ -299,8 +299,8 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 - **Mock global em `setup.ts`** em vez de helper file separado — `vi.mock('@inertiajs/react')` precisa rodar antes de qualquer import; helper file separado conflitava com `organizeImports` do Biome (auto-reorder colocava o `useFlash` import antes do mock)
 - **Smoke test mantido** mesmo após a expansão — cobre `useBreakpoint` (que precisaria de mockar `matchMedia` para um teste isolado, e o smoke já confirma que o jsdom resolve para um valor válido)
-- **`useArqelForm`/`useAction`/`useFieldDependencies`/`useArqelOptimistic`/`useBreakpoint` sem testes unitários dedicados** — são thin wrappers de Inertia `useForm`/`router.visit`/Inertia `router.reload`/React 19 `useOptimistic`/`window.matchMedia`. Cobertura de smoke + integration tests em `@arqel/ui` (que consome os hooks reais) é suficiente para Fase 1
-- **Sem coverage % mensurado local** — `@vitest/coverage-v8` não está instalado no `@arqel/hooks` (existe em `@arqel/ui`); CI matrix mede no pipeline. Suite expandiu de 4 para 30 tests, qualitativamente acima do threshold
+- **`useArqelForm`/`useAction`/`useFieldDependencies`/`useArqelOptimistic`/`useBreakpoint` sem testes unitários dedicados** — são thin wrappers de Inertia `useForm`/`router.visit`/Inertia `router.reload`/React 19 `useOptimistic`/`window.matchMedia`. Cobertura de smoke + integration tests em `@arqel-dev/ui` (que consome os hooks reais) é suficiente para Fase 1
+- **Sem coverage % mensurado local** — `@vitest/coverage-v8` não está instalado no `@arqel-dev/hooks` (existe em `@arqel-dev/ui`); CI matrix mede no pipeline. Suite expandiu de 4 para 30 tests, qualitativamente acima do threshold
 
 ### ACTIONS-007/008 — User-aware action serialization + test coverage (2026-04-29)
 
@@ -311,14 +311,14 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
   - `Unit/ConfirmableTest.php` (8): default false, requiresConfirmation flag, modalHeading/Description/ConfirmationRequiresText auto-activam, modalColor com fallback destructive, `getConfirmationConfig()` shape em toArray
   - `Unit/HasAuthorizationTest.php` (4): canBeExecutedBy default true, delegação ao Closure, coerção bool, propagação de user+record
   - `Feature/ActionControllerTest.php` (7): 404 slug desconhecido, 404 action name, success notification (toolbar action callback invocado + session flash), deny via `authorize → false` resulta em 403, failure notification quando callback throw, 422 bulk sem `ids[]`, duck-typed collection (Resource sem `toolbarActions()` cai em 404)
-- `tests/Pest.php` do `arqel/actions` ganha `'Unit'` (antes só rodava `Feature/`)
+- `tests/Pest.php` do `arqel-dev/actions` ganha `'Unit'` (antes só rodava `Feature/`)
 - `packages/actions/SKILL.md` § Status atualizado — ACTIONS-001..008 entregue (era 001..005); 49 testes Pest passando; "Por chegar" reduzido a Queue helper + bulk per-record authorization + DB end-to-end (bloqueado por `pdo_sqlite`)
 
 **Validações:** `pest packages/actions` 49/49, 140 assertions ✅ · `pest packages/core` 109/109, 311 assertions ✅ · `phpstan analyse packages/{core,actions}` ✅ · `pint` ✅
 
 **Decisões autónomas:**
 
-- **`ReflectionMethod` em vez de `instanceof Action`** — `arqel/core` não pode importar `Arqel\Actions\Action` (dep direction é `actions → core`). Reflection inspeciona signature dinamicamente sem hard dep
+- **`ReflectionMethod` em vez de `instanceof Action`** — `arqel-dev/core` não pode importar `Arqel\Actions\Action` (dep direction é `actions → core`). Reflection inspeciona signature dinamicamente sem hard dep
 - **`@phpstan-ignore method.notFound`** localizado em cada chamada (não no método inteiro) — caller já valida `method_exists`, mas PHPStan não atravessa o boundary; ternário split em if/else porque uma única annotation não cobre 2 chamadas no mesmo statement
 - **Test `Feature/ActionControllerTest`** sem DB — focado em paths que não exigem `pdo_sqlite`: resolveOrFail, resolveAction, invokeToolbar (sem record), invokeBulk até a checagem de `ids[]`. Row/header e bulk fetch path ficam para CI matrix com DB real
 
@@ -327,7 +327,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 **Entregue:**
 
 - `Arqel\Core\Resources\Resource::form(): mixed` (default `null`) — hook opcional simétrico ao `table()` já existente
-- `Arqel\Core\Support\InertiaDataBuilder::resolveFormFields` (private) duck-typed contra `arqel/form`: detecta presença de `getFields()` + `toArray()`, emite `[fields, formPayload]`. Sem hard dep em `arqel/form`
+- `Arqel\Core\Support\InertiaDataBuilder::resolveFormFields` (private) duck-typed contra `arqel-dev/form`: detecta presença de `getFields()` + `toArray()`, emite `[fields, formPayload]`. Sem hard dep em `arqel-dev/form`
 - `buildCreateData`/`buildEditData`/`buildShowData` agora chamam `resolveFormFields` e:
   - Quando `Resource::form()` retorna um Form: emitem chave nova `form: Form::toArray()` no payload + `fields` source de `Form::getFields()` (flatten)
   - Quando retorna `null` ou objeto sem o contract: caem no fallback existente (`Resource::fields()` flat, sem chave `form`) — zero breaking-change para Resources que não declaram form
@@ -339,7 +339,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Decisões autónomas:**
 
-- **Hook `form(): mixed` em vez de `?Form`** — espelha `table(): mixed` para manter `arqel/core` independente de `arqel/form` (o dep direction já é `form → core`, adicionar `core → form` criaria ciclo path-repo)
+- **Hook `form(): mixed` em vez de `?Form`** — espelha `table(): mixed` para manter `arqel-dev/core` independente de `arqel-dev/form` (o dep direction já é `form → core`, adicionar `core → form` criaria ciclo path-repo)
 - **Sem chave `form` no payload quando ausente** — Resources que só declaram `fields()` continuam emitindo o payload exato pré-FORM-006. Isso evita ter que atualizar testes de InertiaDataBuilder existentes (e front-end componentes) que assumiam shape strict
 - **`Form::getFields()` em vez de `Resource::fields()` quando form declarado** — fonte da verdade muda explicitamente. User que quer mix (e.g., extra fields no form mas não no Resource::fields()) declara tudo no `form()`
 
@@ -347,11 +347,11 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Entregue:**
 
-- **TABLE-007 — Per-row authorization**: `Arqel\Core\Support\InertiaDataBuilder::resolveVisibleActionNames` implementado (duck-typed contra `arqel/actions` — sem hard dep). Para cada record do payload index, emite `arqel.actions: ['view', 'edit', ...]` (lista de nomes das row actions visíveis) avaliando `Action::isVisibleFor($record)` + `Action::canBeExecutedBy($user, $record)`. O `<DataTable>` em `@arqel/ui` filtra a lista global pelo nome contra `record.arqel.actions`
+- **TABLE-007 — Per-row authorization**: `Arqel\Core\Support\InertiaDataBuilder::resolveVisibleActionNames` implementado (duck-typed contra `arqel-dev/actions` — sem hard dep). Para cada record do payload index, emite `arqel.actions: ['view', 'edit', ...]` (lista de nomes das row actions visíveis) avaliando `Action::isVisibleFor($record)` + `Action::canBeExecutedBy($user, $record)`. O `<DataTable>` em `@arqel-dev/ui` filtra a lista global pelo nome contra `record.arqel.actions`
 - **`InertiaDataBuilder::serializeRecord`** estendido com 2 args opcionais (`array $rowActions = []`, `?Authenticatable $user = null`); `buildTableIndexData` propaga `$rowActions` + `$user` resolved uma vez antes do loop (evita N+1 em `Auth::user()`)
 - 5 testes Pest novos (`PerRowActionVisibilityTest`) cobrindo: keep all, drop por `isVisibleFor=false`, drop por `canBeExecutedBy=false`, per-record evaluation com Closure, skip silent de entries não-objeto ou sem `getName`. Reflection do método private — testa unidade sem precisar de `pdo_sqlite` driver
 - **TABLE-008 — Bulk pipeline**: já implementado pré-existente em `ActionController::invokeBulk` + `BulkAction::execute(Collection)` chunking via `chunkSize(int)` (default 100, clamp ≥ 1) + teste unit pré-existente (250 records → 3 chunks). Per-record authorization no bulk usa `Action::canBeExecutedBy($user, $records)` global (não itera per-record — Phase 2 considera fine-grained)
-- **SKILL.md `arqel/table` reescrito** (46 → 130 linhas): § Status atualizado para refletir TABLE-001..008 entregues, exemplo copy-paste completo de `Resource::table()` com 4 columns + 3 filters + 3 actions, seções dedicadas para "Per-row authorization" (com payload JSON exemplo) e "Bulk pipeline" (sequência de chamadas), 5 anti-patterns
+- **SKILL.md `arqel-dev/table` reescrito** (46 → 130 linhas): § Status atualizado para refletir TABLE-001..008 entregues, exemplo copy-paste completo de `Resource::table()` com 4 columns + 3 filters + 3 actions, seções dedicadas para "Per-row authorization" (com payload JSON exemplo) e "Bulk pipeline" (sequência de chamadas), 5 anti-patterns
 
 **Validações:** `pest packages/core` 104/104 passando (era 99) ✅ · `pest packages/table` 56/56 ✅ · `phpstan analyse packages/{core,table,actions}` ✅ · `pint --test` ✅
 
@@ -363,7 +363,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 - **Lista de nomes em vez de lista de Actions per-row** — payload size: 50 records × 5 actions × 200B JSON = 50KB extra. Lista de nomes (5 strings × 50 = ~1KB). Decisão: emit names only, React faz filter
 - **Reflection nos testes em vez de end-to-end** — sem `pdo_sqlite` no host, testar via Reflection o método privado mantém cobertura sem flaky integration. Test integration com DB chega via CI matrix
-- **Implementação no `arqel/core`** (`InertiaDataBuilder`) em vez de `arqel/table` — `arqel/table` não tem visibilidade do `Authenticatable user` ou do payload pipeline; o builder em core já centraliza serialização
+- **Implementação no `arqel-dev/core`** (`InertiaDataBuilder`) em vez de `arqel-dev/table` — `arqel-dev/table` não tem visibilidade do `Authenticatable user` ou do payload pipeline; o builder em core já centraliza serialização
 
 ### CORE-014/015 — Testes de infraestrutura + SKILL.md atualizado (2026-04-29)
 
@@ -393,7 +393,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
   1. **Detect package manager** via lockfile (`pnpm-lock.yaml`/`yarn.lock`/`package-lock.json`); fallback para `select()` Laravel Prompts
   2. **Install runtime + dev deps** via `Symfony\Component\Process\Process` com timeout 300s e TTY auto-detect; verbo correto por pm (`pnpm/yarn add` vs `npm install`); flag dev correto (`-D` vs `--dev`)
   3. **Scaffold `resources/js/app.tsx`** a partir de `packages/core/stubs/app.tsx.stub` com `{{app_name}}` substituído por `config('app.name')`
-  4. **Scaffold `resources/css/app.css`** garantindo `@import 'tailwindcss';` + `@import '@arqel/ui/styles.css';` (idempotente — só adiciona o que falta)
+  4. **Scaffold `resources/css/app.css`** garantindo `@import 'tailwindcss';` + `@import '@arqel-dev/ui/styles.css';` (idempotente — só adiciona o que falta)
 - Property estática `$processFactory` para test injection (mock Process sem TTY)
 - Flags: `--force` re-escreve `app.tsx`/`app.css` mesmo configurados; `--no-frontend` pula tudo silently; idempotente sem `--force`
 - Skip silente quando `package.json` não existe (caso monorepo dev sem app Laravel real)
@@ -535,7 +535,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Entregue:**
 
-- `apps/docs/guide/getting-started.md` real (substitui o stub de DOCS-001) com 7 steps testáveis: pré-requisitos (tabela com PHP 8.3+/Composer 2.7+/Node 20.9+/pnpm 10.x e comando de verificação), `laravel new acme --pest`, `composer require arqel/core` + `php artisan arqel:install`, `pnpm add @arqel/{react,ui,hooks,fields,types}`, configuração de `app.tsx` (`createArqelApp` + import side-effect `@arqel/fields/register` + `@arqel/ui/styles.css`), `php artisan arqel:resource User --with-policy` com edição de `UserResource::fields()` (text/email/password com `unique`), `php artisan serve` + `pnpm dev`, login via `tinker`
+- `apps/docs/guide/getting-started.md` real (substitui o stub de DOCS-001) com 7 steps testáveis: pré-requisitos (tabela com PHP 8.3+/Composer 2.7+/Node 20.9+/pnpm 10.x e comando de verificação), `laravel new acme --pest`, `composer require arqel-dev/core` + `php artisan arqel:install`, `pnpm add @arqel-dev/{react,ui,hooks,fields,types}`, configuração de `app.tsx` (`createArqelApp` + import side-effect `@arqel-dev/fields/register` + `@arqel-dev/ui/styles.css`), `php artisan arqel:resource User --with-policy` com edição de `UserResource::fields()` (text/email/password com `unique`), `php artisan serve` + `pnpm dev`, login via `tinker`
 - Seção "Próximos passos" com 4 links internos (what-is-arqel, panels, custom-fields, blog-admin)
 - Bloco "Troubleshooting" com 4 warnings VitePress containers cobrindo: PHP < 8.3, Node < 20.9, permissions em `storage/`, `dont-discover` quebrando auto-registo do `FieldServiceProvider`
 - Uso de containers VitePress (`::: tip`/`::: warning`/`::: details`) para call-outs
@@ -557,7 +557,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Entregue:**
 
-- `apps/docs/` adicionado ao workspace `apps/*` com `@arqel/docs` (private, vitepress 1.6.4 + vue 3.5)
+- `apps/docs/` adicionado ao workspace `apps/*` com `@arqel-dev/docs` (private, vitepress 1.6.4 + vue 3.5)
 - `.vitepress/config.ts` PT-BR completo: nav (Guia/Recursos/API/Avançado/Exemplos/Versão), sidebar declarativo cobrindo 18 páginas, edit-on-GitHub link, footer, search local com translations PT-BR, outline/docFooter/notFound labels, head meta (favicon SVG, OpenGraph, Twitter Card, theme-color)
 - `.vitepress/theme/` override de paleta brand para indigo→purple (`--vp-c-brand-1=#6366f1`/`--vp-c-brand-2=#4f46e5`/`--vp-c-brand-3=#4338ca` + gradient hero `#6366f1 → #ec4899`)
 - Landing page `index.md` (layout `home`) com hero + 6 features (Resources/React 19/21 fields/Auth/Hooks/Extensible)
@@ -566,7 +566,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - `srcExclude: ['**/SKILL.md', '**/README.md']` no config — evita VitePress tratar os SKILL.md como páginas (resolveu deadlinks `../../PLANNING/...`)
 - SKILL.md + README.md PT-BR em `apps/docs/`
 
-**Validações:** `pnpm build` → 19 páginas renderizadas em 2.7s ✅ · `biome check .` ✅ · `pnpm typecheck` ✅ · todos os 23 testes Vitest de `@arqel/fields` continuam passando ✅
+**Validações:** `pnpm build` → 19 páginas renderizadas em 2.7s ✅ · `biome check .` ✅ · `pnpm typecheck` ✅ · todos os 23 testes Vitest de `@arqel-dev/fields` continuam passando ✅
 
 **Decisões autónomas:**
 
@@ -576,25 +576,25 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - **Deploy preview** ainda não configurado — escolha entre Cloudflare Pages e GitHub Pages é DOCS-001 follow-up no CI (`.github/workflows/docs-deploy.yml` já existe parcialmente)
 - **Fix paralelo** de 4 lint warnings pré-existentes (`noUselessTernary` em `BelongsToInput`, `useOptionalChain` em `ResourceIndex`, 2× `useLiteralKeys` em `FormGrid`/`types/inertia.test.ts`); os 2 últimos receberam `// biome-ignore` porque conflitam com tsc `noPropertyAccessFromIndexSignature`
 
-### FIELDS-JS-001..006 — `@arqel/fields` completo (2026-04-29)
+### FIELDS-JS-001..006 — `@arqel-dev/fields` completo (2026-04-29)
 
 **Entregue (12 entry points subpath, 21 components 1:1 com PHP, 23 testes Vitest):**
 
-- **FIELDS-JS-001/002 (scaffold + 9 inputs básicos)**: pacote `@arqel/fields` com `sideEffects: ['./dist/register.js']`, peerDeps `@arqel/ui` + `react`. Inputs: TextInput, TextareaInput, EmailInput, UrlInput, PasswordInput (toggle reveal `aria-pressed`), NumberInput (stepper buttons), CurrencyInput (Intl-format on blur), Checkbox, Toggle (role=switch + iOS thumb)
+- **FIELDS-JS-001/002 (scaffold + 9 inputs básicos)**: pacote `@arqel-dev/fields` com `sideEffects: ['./dist/register.js']`, peerDeps `@arqel-dev/ui` + `react`. Inputs: TextInput, TextareaInput, EmailInput, UrlInput, PasswordInput (toggle reveal `aria-pressed`), NumberInput (stepper buttons), CurrencyInput (Intl-format on blur), Checkbox, Toggle (role=switch + iOS thumb)
 - **FIELDS-JS-003 (advanced)**: SelectInput, MultiSelectInput (chips removíveis), RadioGroup (role=radiogroup), BelongsToInput (async fetch + 300ms debounce + role=combobox/listbox), HasManyReadonly, DateInput, DateTimeInput, FileInput (drag-drop em `<section>`), ImageInput (URL.createObjectURL preview, sem crop)
-- **FIELDS-JS-004/005/006 (slug + color + hidden + helper)**: SlugInput + helper `slugify` (NFD + `[a-z0-9-]+`), ColorInput (native picker + presets + hex text), HiddenInput; `register.ts` registra os 21; `getRegisteredFields()` re-exportado de `@arqel/ui/form`
+- **FIELDS-JS-004/005/006 (slug + color + hidden + helper)**: SlugInput + helper `slugify` (NFD + `[a-z0-9-]+`), ColorInput (native picker + presets + hex text), HiddenInput; `register.ts` registra os 21; `getRegisteredFields()` re-exportado de `@arqel-dev/ui/form`
 - SKILL.md PT-BR completo com guia "Creating a custom field" (PHP `Field::component()` + React component + `registerField` triple)
 
 **Validações:** `tsc --noEmit` strict ✅ · `biome check` ✅ · `vitest run` 23 testes passando ✅ · `tsup` 12 ESM entries com dts ✅
 
 **Decisões autónomas:**
 
-- **Folder `packages-js/fields-js/`** — nome diverge de `@arqel/fields` (npm) para não colidir com `packages/fields/` (PHP/Composer)
+- **Folder `packages-js/fields-js/`** — nome diverge de `@arqel-dev/fields` (npm) para não colidir com `packages/fields/` (PHP/Composer)
 - **Componente único por field type** — 21 components mapeiam 1:1 aos 21 PHP `FIELDS-001..022`. Combobox searchable Base UI fica para Phase 2
 - **`<input type="color">` nativo + presets** — mesma decisão de não importar libs pesadas; `react-image-crop` + `react-day-picker` ficam para Phase 2
 - **Single side-effect entry** (`./dist/register.js`) — apps que querem subset chamam `registerField` manualmente; tree-shake stays preserved
 
-### UI-001..007 — `@arqel/ui` completo (2026-04-29)
+### UI-001..007 — `@arqel-dev/ui` completo (2026-04-29)
 
 **Entregue (8 entry points subpath, 70 testes Vitest passando):**
 
@@ -611,12 +611,12 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 **Decisões autónomas:**
 
 - **Self-rendered FlashToast** sem `sonner` — apps que querem podem registrar fallback custom; bundle stays lean
-- **FieldRegistry global** (`registerField/getFieldComponent`) — `@arqel/fields` JS plugará via essa API; native fallback cobre 17 tipos enquanto isso
+- **FieldRegistry global** (`registerField/getFieldComponent`) — `@arqel-dev/fields` JS plugará via essa API; native fallback cobre 17 tipos enquanto isso
 - **Lazy `usePage()`** em Breadcrumbs/Sidebar — quando `items` é passado explicitamente, hook não é invocado, permite uso fora de Inertia (testes, dashboards)
 - **Components presentational** — selection/sort/filters lifted via callbacks, sem fetch interno
 - **`exactOptionalPropertyTypes` compliance** — props opcionais declaradas como `T | undefined` quando recebem undefined explícito (necessário pelo strict mode)
 
-### HOOKS-001 — `@arqel/hooks` completo (2026-04-28)
+### HOOKS-001 — `@arqel-dev/hooks` completo (2026-04-28)
 
 **Entregue:** 10 hooks reusáveis com 11 entry points subpath tree-shakeable: `useResource<T>()`, `useArqelForm({ fields, record })`, `useCanAccess(ability, record?)`, `useFlash({ onMessage })`, `useTable()` (sort/filters/selection local), `useAction(action)`, `useFieldDependencies()` (debounce 300ms), `useNavigation()`, `useBreakpoint()` (Tailwind v4 SSR-safe), `useArqelOptimistic()` (React 19 wrapper). 4 testes Vitest. SKILL + README PT-BR.
 
@@ -906,18 +906,18 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - **`final public function __construct`** — subclasses **não** podem override. Forçando o pattern factory que vem em FIELDS-003
 - **Construtor não recebe `$type`/`$component`** — esses ficam declarados como properties default na subclasse (`protected string $type = 'text';`). Mais clean que passar pelo construtor
 
-### FIELDS-001 — Esqueleto do pacote `arqel/fields` (2026-04-27)
+### FIELDS-001 — Esqueleto do pacote `arqel-dev/fields` (2026-04-27)
 
 **Entregue:**
 
-- `packages/fields/composer.json` — `arqel/fields` PHP ^8.3, Laravel ^12|^13, depende de `arqel/core: @dev` (com `repositories` apontando para `../core` para resolução em modo path-repo). Dev: Orchestra Testbench, Pest, Larastan
+- `packages/fields/composer.json` — `arqel-dev/fields` PHP ^8.3, Laravel ^12|^13, depende de `arqel-dev/core: @dev` (com `repositories` apontando para `../core` para resolução em modo path-repo). Dev: Orchestra Testbench, Pest, Larastan
 - `packages/fields/src/FieldServiceProvider.php` — `final class` extends Spatie `PackageServiceProvider`, regista o package com nome `arqel-fields`. Concrete `Field` types serão registados aqui em FIELDS-002+
 - Auto-discovery via `extra.laravel.providers`
 - `packages/fields/src/{Types,Concerns}/` (placeholders com `.gitkeep`)
-- `packages/fields/tests/{TestCase.php,Pest.php}` — base extends Orchestra registando AMBOS providers (`ArqelServiceProvider` + `FieldServiceProvider`), porque `arqel/fields` depende de core e algumas integrações vão precisar do core booted
+- `packages/fields/tests/{TestCase.php,Pest.php}` — base extends Orchestra registando AMBOS providers (`ArqelServiceProvider` + `FieldServiceProvider`), porque `arqel-dev/fields` depende de core e algumas integrações vão precisar do core booted
 - `packages/fields/tests/Feature/FieldServiceProviderTest.php` — 2 smoke tests: provider booted, namespace autoload
 - `phpunit.xml`, `pest.xml`, `.gitattributes`, `README.md`, `SKILL.md`
-- Root `composer.json` adicionou `arqel/fields: @dev` em `require-dev` — symlink confirmado
+- Root `composer.json` adicionou `arqel-dev/fields: @dev` em `require-dev` — symlink confirmado
 
 **Validações:**
 
@@ -929,7 +929,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 **Decisões autónomas:**
 
 - Spatie `name('arqel-fields')` (não `arqel`): namespace do core já reservou `arqel`. Traduções/views futuras de fields ficam em `arqel-fields::*`
-- `repositories` local em `packages/fields/composer.json` aponta para `../core` (relative path): permite que `composer install` no package fields resolva `arqel/core` quando rodado standalone (CI por package, ou local debugging). Em modo monorepo, o root resolve via `packages/*` glob — ambos os paths funcionam
+- `repositories` local em `packages/fields/composer.json` aponta para `../core` (relative path): permite que `composer install` no package fields resolva `arqel-dev/core` quando rodado standalone (CI por package, ou local debugging). Em modo monorepo, o root resolve via `packages/*` glob — ambos os paths funcionam
 - Smoke tests minimalistas (não testar coisas que ainda não existem). FIELDS-013 (cobertura completa) virá depois dos types existirem
 - Sem `config/` real ainda — tipos concretos não precisam de config até FIELDS-022 (registry runtime)
 
@@ -982,7 +982,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Decisões autónomas:**
 
-- **`--from-model` adiado** — o ticket pede introspecção que gera `Field::text(...)`, `Field::toggle(...)` etc., mas a classe `Field` não existe (vive em `arqel/fields`, FIELDS-*). Implementar agora seria gerar código que não compila ou hardcoded com `// TODO Field não existe`. Quando FIELDS-001 chegar, adicionar a flag é trivial: ler `getFillable()` + `getCasts()` e mapear para factory methods reais
+- **`--from-model` adiado** — o ticket pede introspecção que gera `Field::text(...)`, `Field::toggle(...)` etc., mas a classe `Field` não existe (vive em `arqel-dev/fields`, FIELDS-*). Implementar agora seria gerar código que não compila ou hardcoded com `// TODO Field não existe`. Quando FIELDS-001 chegar, adicionar a flag é trivial: ler `getFillable()` + `getCasts()` e mapear para factory methods reais
 - **`--from-migration` adiado** pelo mesmo motivo
 - **`--dry-run` não implementado** — está nas notas como "considerar"; valor real só aparece depois de `--from-*` existirem
 - **`make:policy --model=<FQN>`** em vez de só `make:policy <Name>Policy`: gera o policy com os métodos do CRUD já preenchidos (Laravel reconhece a flag e popula o stub). Critério "Policy contém viewAny, view, create, update, delete" passa naturalmente
@@ -998,8 +998,8 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Entregue:**
 
-- `packages/core/src/Contracts/HasFields.php` — interface mínima com `fields(): array`. Type loose intencionalmente: classe `Field` ainda não existe (vive em `arqel/fields`)
-- `packages/core/src/Contracts/HasActions.php` — marker interface. Métodos concretos (`actions()`, `tableActions()`) ficam para quando `arqel/actions`/`arqel/table` existirem
+- `packages/core/src/Contracts/HasFields.php` — interface mínima com `fields(): array`. Type loose intencionalmente: classe `Field` ainda não existe (vive em `arqel-dev/fields`)
+- `packages/core/src/Contracts/HasActions.php` — marker interface. Métodos concretos (`actions()`, `tableActions()`) ficam para quando `arqel-dev/actions`/`arqel-dev/table` existirem
 - `packages/core/src/Contracts/HasPolicies.php` — `getPolicy(): ?string` opcional para Resources que declaram policy explicitamente
 - `packages/core/src/Resources/Resource.php` — `abstract class` que implementa os 3 contracts + `HasResource`. Static props (`$model`/`$label`/`$pluralLabel`/`$slug`/`$navigationIcon`/`$navigationGroup`/`$navigationSort`/`$recordTitleAttribute`). Auto-derivation:
   - `getSlug()`: `UserResource` → `users` (via `Str::beforeLast('Resource')->snake('-')->plural()`)
@@ -1107,10 +1107,10 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Decisões autónomas:**
 
-- `laravel/prompts` não foi adicionado a `require` do `arqel/core` — já vem como dep transitiva do `laravel/framework` (12+). Adicionar explicitamente seria redundante e arrisca conflito futuro
+- `laravel/prompts` não foi adicionado a `require` do `arqel-dev/core` — já vem como dep transitiva do `laravel/framework` (12+). Adicionar explicitamente seria redundante e arrisca conflito futuro
 - Substituí o `hasInstallCommand` do Spatie pelo nosso `InstallCommand` registado via `hasCommands` — o Spatie é demasiado limitado para o pipeline RF-DX-08 (Laravel Prompts, AGENTS.md, scaffold de múltiplos directórios). Mantemos o sinal `php artisan arqel:install` para o utilizador
 - Tag de publish `arqel-config` (confirmado por inspecção da Spatie `ProcessConfigs`: `"{$this->package->shortName()}-config"`)
-- `runMigrations()` e `scaffoldFirstResource()` mencionados no exemplo do ticket foram **omitidos**: não há migrations no `arqel/core` (decisão do próprio ticket, nota: "Não usar `loadMigrationsFrom` em CORE") e o comando `arqel:resource` só nasce em CORE-016+. Os "Next steps" do output mencionam ambos para o utilizador correr quando estiver pronto
+- `runMigrations()` e `scaffoldFirstResource()` mencionados no exemplo do ticket foram **omitidos**: não há migrations no `arqel-dev/core` (decisão do próprio ticket, nota: "Não usar `loadMigrationsFrom` em CORE") e o comando `arqel:resource` só nasce em CORE-016+. Os "Next steps" do output mencionam ambos para o utilizador correr quando estiver pronto
 - `App\Providers\ArqelServiceProvider` é gerado mas **não** é registado automaticamente em `bootstrap/providers.php` — Laravel 11+ usa array literal e edição programática é frágil. O output instrui o utilizador a fazer manualmente
 
 **Pendente humano:**
@@ -1121,7 +1121,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Entregue:**
 
-- `packages/core/src/ArqelServiceProvider.php` — `final` class estende `Spatie\LaravelPackageTools\PackageServiceProvider`. Configura `name('arqel')`, `hasConfigFile('arqel')`, `hasInstallCommand` com `publishConfigFile()` + `askToStarRepoOnGitHub('arqel/arqel')`. Em `packageBooted()` regista singletons (`ResourceRegistry`, `PanelRegistry`) e alias `arqel` → `PanelRegistry`. Constante tipada `public const string FACADE_ACCESSOR = 'arqel'`
+- `packages/core/src/ArqelServiceProvider.php` — `final` class estende `Spatie\LaravelPackageTools\PackageServiceProvider`. Configura `name('arqel')`, `hasConfigFile('arqel')`, `hasInstallCommand` com `publishConfigFile()` + `askToStarRepoOnGitHub('arqel-dev/arqel')`. Em `packageBooted()` regista singletons (`ResourceRegistry`, `PanelRegistry`) e alias `arqel` → `PanelRegistry`. Constante tipada `public const string FACADE_ACCESSOR = 'arqel'`
 - `packages/core/src/Registries/ResourceRegistry.php` — stub `final class` (preenchido em CORE-004)
 - `packages/core/src/Registries/PanelRegistry.php` — stub `final class` (preenchido em CORE-005)
 - `packages/core/src/Facades/Arqel.php` — `final` Facade que aponta para o accessor `arqel`
@@ -1149,11 +1149,11 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 - Instalar PCOV ou Xdebug localmente para validar coverage ≥90% em desenvolvimento (workflow `test-matrix.yml` já o faz no CI)
 
-### CORE-001 — Esqueleto do pacote `arqel/core` com composer.json e PSR-4 (2026-04-17)
+### CORE-001 — Esqueleto do pacote `arqel-dev/core` com composer.json e PSR-4 (2026-04-17)
 
 **Entregue:**
 
-- `packages/core/composer.json` — name `arqel/core`, PHP `^8.3`, Laravel `^12.0|^13.0`, Inertia 3, spatie/laravel-package-tools 1.16+. Dev deps: Orchestra Testbench 10, Pest 3, pest-plugin-laravel 3, Larastan 3. PSR-4 `Arqel\Core\` → `src/`; PSR-4 dev `Arqel\Core\Tests\` → `tests/`
+- `packages/core/composer.json` — name `arqel-dev/core`, PHP `^8.3`, Laravel `^12.0|^13.0`, Inertia 3, spatie/laravel-package-tools 1.16+. Dev deps: Orchestra Testbench 10, Pest 3, pest-plugin-laravel 3, Larastan 3. PSR-4 `Arqel\Core\` → `src/`; PSR-4 dev `Arqel\Core\Tests\` → `tests/`
 - Estrutura: `src/`, `tests/Feature/`, `tests/Unit/`, `config/` (todos com `.gitkeep` por agora)
 - `README.md` com badges (License/PHP/Laravel/Status), visão do pacote, convenções e links
 - `SKILL.md` canónico — Purpose, Key Contracts, Conventions, Common tasks, Anti-patterns, Related
@@ -1163,8 +1163,8 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Root monorepo alterado:**
 
-- `composer.json` root: `require-dev` agora tem `"arqel/core": "@dev"` (constraint obrigatória para path repos em root `minimum-stability: stable`)
-- `composer.lock` regenerado — `arqel/core (dev-main): Symlinking from packages/core` confirma path repository activo
+- `composer.json` root: `require-dev` agora tem `"arqel-dev/core": "@dev"` (constraint obrigatória para path repos em root `minimum-stability: stable`)
+- `composer.lock` regenerado — `arqel-dev/core (dev-main): Symlinking from packages/core` confirma path repository activo
 - `.gitignore` — adicionado `packages/*/composer.lock` e `packages-js/*/pnpm-lock.yaml` (lockfiles canónicos vivem só na raiz)
 - `phpstan.neon` — exclude patterns corrigidas para `packages/*/vendor/*` (sufixo `/*` obrigatório) e `reportUnmatchedIgnoredErrors: false`
 - `scripts/phpstan.sh` — detecção refinada para usar `find -name '*.php'` em vez de `ls dir/`, para saltar graciosamente quando só há `.gitkeep`
@@ -1172,14 +1172,14 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 **Validações:**
 
 - `composer validate` em `packages/core/` → OK
-- `composer install` root → instala arqel/core via path repo (symlink em `vendor/arqel/core`)
+- `composer install` root → instala arqel-dev/core via path repo (symlink em `vendor/arqel-dev/core`)
 - `composer dump-autoload` gera classmap sem erro
 - `composer run analyse` → skip gracioso (ainda não há `.php` em src)
 - Autoload: `require 'vendor/autoload.php'` no root carrega o namespace `Arqel\Core\`
 
 **Desvios:**
 
-- Ticket pedia `"arqel/core": "*"` no root — composer rejeita porque path repo resolve em `dev-main`. Usei `"@dev"` (standard Composer para path repos em monorepos). Solução aplicável ao padrão para todos os packages subsequentes
+- Ticket pedia `"arqel-dev/core": "*"` no root — composer rejeita porque path repo resolve em `dev-main`. Usei `"@dev"` (standard Composer para path repos em monorepos). Solução aplicável ao padrão para todos os packages subsequentes
 
 ### GOV-001 — SECURITY.md e processo de disclosure (2026-04-17)
 
@@ -1224,7 +1224,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 - Vulnerability alerts habilitados
 - Lockfile maintenance mensal
 - Sign-off automático nos commits do bot (respeita DCO)
-- Internal workspace packages (`@arqel/*`, `arqel/*` excluindo registry) ignorados
+- Internal workspace packages (`@arqel-dev/*`, `arqel-dev/*` excluindo registry) ignorados
 - `.github/dependabot.yml` reduzido a `github-actions` apenas (Renovate gere composer e npm; Dependabot Security Updates continuam activos automaticamente no repo)
 
 **Pendente humano:**
@@ -1335,7 +1335,7 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 **Notas:**
 
-- O repositório remoto está em `diogocoutinho/arqel` (acordado com o utilizador), não `arqel/arqel` — push à org oficial fica para quando a org for criada
+- O repositório remoto está em `diogocoutinho/arqel` (acordado com o utilizador), não `arqel-dev/arqel` — push à org oficial fica para quando a org for criada
 - Commit `637f870` (o inicial) antecede DCO hooks e não tem sign-off; é aceitável conforme nota do `KICKOFF.md` §Passo 3
 - Branch protection fica para após INFRA-004 (CI verde como pré-requisito)
 - Push do `main` e eliminação do `origin/master` remoto ficam para o utilizador executar manualmente
@@ -1370,4 +1370,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-29 (UI-007 completo — `@arqel/ui` totalmente scaffolded com 70 testes Vitest passando)
+**Última atualização:** 2026-04-29 (UI-007 completo — `@arqel-dev/ui` totalmente scaffolded com 70 testes Vitest passando)

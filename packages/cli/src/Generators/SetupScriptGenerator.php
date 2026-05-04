@@ -30,20 +30,20 @@ final readonly class SetupScriptGenerator
     public const array TENANCIES = ['none', 'simple', 'stancl', 'spatie'];
 
     /**
-     * Packages required when expanding `arqel/arqel` against a local monorepo.
+     * Packages required when expanding `arqel-dev/arqel` against a local monorepo.
      * Mirrors the meta-package contents — keep in sync when adding new packages.
      *
      * @var list<string>
      */
     public const array MONOREPO_PACKAGES = [
-        'arqel/core',
-        'arqel/fields',
-        'arqel/table',
-        'arqel/form',
-        'arqel/actions',
-        'arqel/auth',
-        'arqel/nav',
-        'arqel/widgets',
+        'arqel-dev/core',
+        'arqel-dev/fields',
+        'arqel-dev/table',
+        'arqel-dev/form',
+        'arqel-dev/actions',
+        'arqel-dev/auth',
+        'arqel-dev/nav',
+        'arqel-dev/widgets',
     ];
 
     public string $starter;
@@ -116,12 +116,12 @@ final readonly class SetupScriptGenerator
             $monorepoSpec = implode(' ', array_map(static fn (string $p): string => "{$p}:dev-main", self::MONOREPO_PACKAGES));
             $lines[] = "composer require {$monorepoSpec} -W";
         } else {
-            $lines[] = 'echo "==> Installing arqel/arqel"';
-            $lines[] = 'composer require arqel/arqel';
+            $lines[] = 'echo "==> Installing arqel-dev/arqel"';
+            $lines[] = 'composer require arqel-dev/arqel';
         }
 
         foreach ($this->extraComposerRequires() as $pkg) {
-            $suffix = $this->monorepoPath !== null && str_starts_with($pkg, 'arqel/') ? ':dev-main' : '';
+            $suffix = $this->monorepoPath !== null && str_starts_with($pkg, 'arqel-dev/') ? ':dev-main' : '';
             $lines[] = "composer require {$pkg}{$suffix}";
         }
 
@@ -143,8 +143,8 @@ final readonly class SetupScriptGenerator
 
         if ($this->mcpIntegration) {
             $lines[] = $this->monorepoPath !== null
-                ? 'composer require arqel/mcp:dev-main'
-                : 'composer require arqel/mcp';
+                ? 'composer require arqel-dev/mcp:dev-main'
+                : 'composer require arqel-dev/mcp';
             $lines[] = 'php artisan arqel:mcp:install';
         }
 
@@ -180,12 +180,12 @@ final readonly class SetupScriptGenerator
             $monorepoSpec = implode(' ', array_map(static fn (string $p): string => "{$p}:dev-main", self::MONOREPO_PACKAGES));
             $lines[] = "composer require {$monorepoSpec} -W";
         } else {
-            $lines[] = 'Write-Host "==> Installing arqel/arqel"';
-            $lines[] = 'composer require arqel/arqel';
+            $lines[] = 'Write-Host "==> Installing arqel-dev/arqel"';
+            $lines[] = 'composer require arqel-dev/arqel';
         }
 
         foreach ($this->extraComposerRequires() as $pkg) {
-            $suffix = $this->monorepoPath !== null && str_starts_with($pkg, 'arqel/') ? ':dev-main' : '';
+            $suffix = $this->monorepoPath !== null && str_starts_with($pkg, 'arqel-dev/') ? ':dev-main' : '';
             $lines[] = "composer require {$pkg}{$suffix}";
         }
 
@@ -207,8 +207,8 @@ final readonly class SetupScriptGenerator
 
         if ($this->mcpIntegration) {
             $lines[] = $this->monorepoPath !== null
-                ? 'composer require arqel/mcp:dev-main'
-                : 'composer require arqel/mcp';
+                ? 'composer require arqel-dev/mcp:dev-main'
+                : 'composer require arqel-dev/mcp';
             $lines[] = 'php artisan arqel:mcp:install';
         }
 
@@ -237,7 +237,7 @@ final readonly class SetupScriptGenerator
         return match ($this->tenancy) {
             'stancl' => ['stancl/tenancy'],
             'spatie' => ['spatie/laravel-multitenancy'],
-            'simple' => ['arqel/tenant'],
+            'simple' => ['arqel-dev/tenant'],
             default => [],
         };
     }

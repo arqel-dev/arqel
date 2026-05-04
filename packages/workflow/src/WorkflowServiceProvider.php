@@ -11,7 +11,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/workflow`.
+ * Auto-discovered provider for `arqel-dev/workflow`.
  *
  * WF-001 ships the package skeleton:
  *

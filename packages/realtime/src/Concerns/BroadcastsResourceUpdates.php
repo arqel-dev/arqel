@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * broadcast event.
  *
  * We intentionally provide the wiring as a trait instead of patching the
- * core `Resource` base class — `arqel/core` and `arqel/realtime` ship as
+ * core `Resource` base class — `arqel-dev/core` and `arqel-dev/realtime` ship as
  * independent packages and adding a hard hook to core would push every
  * consumer into the broadcasting stack whether they use it or not.
  *

@@ -14,7 +14,7 @@ use Throwable;
  * Authorizer for Yjs collab channels (`arqel.collab.{modelType}.{modelId}.{field}`).
  *
  * Defensive by default: any failure path (registry unbound, model not found,
- * Gate throws, FQCN inválido) retorna `false`. O acoplamento com `arqel/core`
+ * Gate throws, FQCN inválido) retorna `false`. O acoplamento com `arqel-dev/core`
  * é opcional — quando `Arqel\Core\Resources\ResourceRegistry` não está bound
  * o authorizer só consegue resolver o record se `$modelType` for FQCN direto
  * de uma classe Eloquent.

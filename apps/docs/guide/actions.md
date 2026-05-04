@@ -136,4 +136,4 @@ RowAction::make('publish')
 ## Próximos passos
 
 - [Auth](/guide/auth) — Policies + ability registry
-- API reference: [`packages/actions/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages/actions/SKILL.md)
+- API reference: [`packages/actions/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/actions/SKILL.md)

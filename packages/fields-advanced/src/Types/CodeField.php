@@ -8,7 +8,7 @@ use Arqel\Fields\Field;
 
 /**
  * Code editor field powered by CodeMirror 6 + Shiki on the React side
- * (`@arqel/fields-advanced/CodeInput.tsx`, shipped in a future
+ * (`@arqel-dev/fields-advanced/CodeInput.tsx`, shipped in a future
  * FIELDS-JS ticket).
  *
  * The PHP side is configuration-only: it advertises the language

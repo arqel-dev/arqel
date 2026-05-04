@@ -1,4 +1,4 @@
-# @arqel/types
+# @arqel-dev/types
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![TypeScript](https://img.shields.io/badge/typescript-%5E5.6-3178c6.svg)](https://www.typescriptlang.org)
@@ -13,19 +13,19 @@ Shared TypeScript types for the [Arqel](https://arqel.dev) ecosystem — fields,
 ## Install
 
 ```bash
-pnpm add -D @arqel/types
+pnpm add -D @arqel-dev/types
 ```
 
 ## Usage
 
 ```ts
 // Tree-shake-friendly subpath imports
-import type { FieldSchema, isFieldType } from '@arqel/types/fields';
-import type { ResourceIndexProps, RecordType } from '@arqel/types/resources';
-import type { SharedProps } from '@arqel/types/inertia';
+import type { FieldSchema, isFieldType } from '@arqel-dev/types/fields';
+import type { ResourceIndexProps, RecordType } from '@arqel-dev/types/resources';
+import type { SharedProps } from '@arqel-dev/types/inertia';
 
 // Or barrel
-import type { FieldSchema, ColumnSchema, FormSchema } from '@arqel/types';
+import type { FieldSchema, ColumnSchema, FormSchema } from '@arqel-dev/types';
 ```
 
 ## Convenções

@@ -11,11 +11,11 @@ use Throwable;
  * Pulse recorder: counts Arqel action executions (LCLOUD-003).
  *
  * Subscribes to `Arqel\Actions\Events\ActionExecuted` (when the
- * `arqel/actions` package is installed) and forwards each event to
+ * `arqel-dev/actions` package is installed) and forwards each event to
  * Pulse via `Pulse::record('arqel_action', $name)->count()`.
  *
- * The class is loaded unconditionally by `arqel/core`, but every
- * branch is defensive: no Pulse, no `arqel/actions`, or a malformed
+ * The class is loaded unconditionally by `arqel-dev/core`, but every
+ * branch is defensive: no Pulse, no `arqel-dev/actions`, or a malformed
  * event all degrade to a silent no-op.
  */
 final class ArqelActionRecorder

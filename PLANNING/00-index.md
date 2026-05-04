@@ -7,7 +7,7 @@
 **Arqel** é um package Laravel que permite:
 
 ```bash
-composer require arqel/arqel
+composer require arqel-dev/arqel
 php artisan arqel:install
 php artisan arqel:resource User
 ```
@@ -86,8 +86,8 @@ php artisan arqel:resource User
 
 ### Distribuição
 
-- **Packagist:** `arqel/arqel` (principal), `arqel/core`, `arqel/ui`, `arqel/fields`, `arqel/table`, `arqel/form`, `arqel/actions`, etc.
-- **npm:** `@arqel/ui`, `@arqel/fields`, `@arqel/table`, `@arqel/hooks`, `@arqel/types` (componentes React e types)
+- **Packagist:** `arqel-dev/arqel` (principal), `arqel-dev/core`, `arqel-dev/ui`, `arqel-dev/fields`, `arqel-dev/table`, `arqel-dev/form`, `arqel-dev/actions`, etc.
+- **npm:** `@arqel-dev/ui`, `@arqel-dev/fields`, `@arqel-dev/table`, `@arqel-dev/hooks`, `@arqel-dev/types` (componentes React e types)
 - **Domínio principal:** `arqel.dev`
 - **GitHub org:** `github.com/arqel`
 
@@ -123,26 +123,26 @@ Avisos, armadilhas, dicas.
 ### Convenção de IDs
 
 **PHP packages (Packagist):**
-- `CORE` — `arqel/core` (traits, contracts, service provider)
-- `PANEL` — `arqel/arqel` (meta-package, instalação)
-- `FIELDS` — `arqel/fields`
-- `TABLE` — `arqel/table`
-- `FORM` — `arqel/form`
-- `ACTIONS` — `arqel/actions`
-- `AUTH` — `arqel/auth` (authorization, policies)
-- `NAV` — `arqel/nav` (navegação, menu)
-- `TENANT` — `arqel/tenant` (multi-tenancy)
-- `AUDIT` — `arqel/audit`
-- `VERS` — `arqel/versioning`
-- `WF` — `arqel/workflow`
-- `RT` — `arqel/realtime`
+- `CORE` — `arqel-dev/core` (traits, contracts, service provider)
+- `PANEL` — `arqel-dev/arqel` (meta-package, instalação)
+- `FIELDS` — `arqel-dev/fields`
+- `TABLE` — `arqel-dev/table`
+- `FORM` — `arqel-dev/form`
+- `ACTIONS` — `arqel-dev/actions`
+- `AUTH` — `arqel-dev/auth` (authorization, policies)
+- `NAV` — `arqel-dev/nav` (navegação, menu)
+- `TENANT` — `arqel-dev/tenant` (multi-tenancy)
+- `AUDIT` — `arqel-dev/audit`
+- `VERS` — `arqel-dev/versioning`
+- `WF` — `arqel-dev/workflow`
+- `RT` — `arqel-dev/realtime`
 - `CLI` — comandos Artisan
-- `MCP` — `arqel/mcp` (MCP server)
+- `MCP` — `arqel-dev/mcp` (MCP server)
 
 **npm packages:**
-- `REACT` — `@arqel/react` (bindings Inertia + hooks)
-- `UI` — `@arqel/ui` (componentes visuais ShadCN-based)
-- `TYPES` — `@arqel/types` (TypeScript types espelhando PHP)
+- `REACT` — `@arqel-dev/react` (bindings Inertia + hooks)
+- `UI` — `@arqel-dev/ui` (componentes visuais ShadCN-based)
+- `TYPES` — `@arqel-dev/types` (TypeScript types espelhando PHP)
 
 **Transversais:**
 - `INFRA` — CI/CD, repo config

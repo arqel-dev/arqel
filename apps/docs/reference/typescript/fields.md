@@ -1,18 +1,18 @@
-# `@arqel/fields` — API Reference
+# `@arqel-dev/fields` — API Reference
 
-21 rich React inputs registrados via `FieldRegistry` de `@arqel/ui`. 12 entry points subpath.
+21 rich React inputs registrados via `FieldRegistry` de `@arqel-dev/ui`. 12 entry points subpath.
 
 ```ts
-import '@arqel/fields/register';                           // side-effect: registra os 21
-import { TextInput, SlugInput, slugify } from '@arqel/fields';
+import '@arqel-dev/fields/register';                           // side-effect: registra os 21
+import { TextInput, SlugInput, slugify } from '@arqel-dev/fields';
 // ou subset
-import { TextInput, EmailInput } from '@arqel/fields/text';
-import { CurrencyInput } from '@arqel/fields/number';
+import { TextInput, EmailInput } from '@arqel-dev/fields/text';
+import { CurrencyInput } from '@arqel-dev/fields/number';
 ```
 
 ## Catálogo
 
-Cada componente recebe `FieldRendererProps` (re-exportado de `@arqel/ui/form`):
+Cada componente recebe `FieldRendererProps` (re-exportado de `@arqel-dev/ui/form`):
 
 ```ts
 type FieldRendererProps = {
@@ -55,17 +55,17 @@ slugify('São Paulo')           // 'sao-paulo' (NFD diacritics stripping)
 
 ```tsx
 // resources/js/app.tsx
-import '@arqel/ui/styles.css';
-import '@arqel/fields/register';
-import { createArqelApp } from '@arqel/react/inertia';
+import '@arqel-dev/ui/styles.css';
+import '@arqel-dev/fields/register';
+import { createArqelApp } from '@arqel-dev/react/inertia';
 ```
 
-A partir desse import, `<FieldRenderer>` resolve `field.component === 'TextInput'` para o componente rico. Sem o import, cai no fallback nativo de `@arqel/ui/form`.
+A partir desse import, `<FieldRenderer>` resolve `field.component === 'TextInput'` para o componente rico. Sem o import, cai no fallback nativo de `@arqel-dev/ui/form`.
 
 ## Override custom
 
 ```tsx
-import { registerField } from '@arqel/ui/form';
+import { registerField } from '@arqel-dev/ui/form';
 import { MyFancyText } from './MyFancyText';
 
 registerField('TextInput', MyFancyText);                   // depois do register.ts
@@ -86,7 +86,7 @@ final class RatingField extends Field
 
 ```tsx
 // resources/js/fields/RatingInput.tsx
-import type { FieldRendererProps } from '@arqel/ui/form';
+import type { FieldRendererProps } from '@arqel-dev/ui/form';
 
 export function RatingInput({ field, value, onChange, errors, inputId }: FieldRendererProps) {
   // ...
@@ -95,8 +95,8 @@ export function RatingInput({ field, value, onChange, errors, inputId }: FieldRe
 
 ```tsx
 // resources/js/app.tsx
-import '@arqel/fields/register';
-import { registerField } from '@arqel/ui/form';
+import '@arqel-dev/fields/register';
+import { registerField } from '@arqel-dev/ui/form';
 import { RatingInput } from './fields/RatingInput';
 
 registerField('RatingInput', RatingInput);
@@ -104,6 +104,6 @@ registerField('RatingInput', RatingInput);
 
 ## Related
 
-- SKILL: [`packages-js/fields-js/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages-js/fields-js/SKILL.md)
+- SKILL: [`packages-js/fields-js/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages-js/fields-js/SKILL.md)
 - Conceitos: [`/guide/fields`](/guide/fields), [`/advanced/custom-fields`](/advanced/custom-fields)
-- Volta: [`@arqel/types`](/reference/typescript/types)
+- Volta: [`@arqel-dev/types`](/reference/typescript/types)

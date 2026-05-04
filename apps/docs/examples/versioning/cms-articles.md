@@ -13,7 +13,7 @@ depois o erro é detectado em produção. O artigo precisa voltar ao
 estado de 3h atrás **sem perder mudanças posteriores feitas em outros
 artigos**.
 
-Este é o caso clássico para `arqel/versioning`:
+Este é o caso clássico para `arqel-dev/versioning`:
 
 - Cardinalidade baixa-média (~5.000 artigos no total).
 - Saves por artigo: ~20-50 ao longo do ciclo de vida.
@@ -117,7 +117,7 @@ Para ~5.000 artigos com 50 versions cada, o prune roda em segundos.
 ```tsx
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { useArqelEndpoint } from '@arqel/core/hooks';
+import { useArqelEndpoint } from '@arqel-dev/core/hooks';
 
 type VersionItem = {
   id: number;
@@ -231,9 +231,9 @@ function RestoreConfirmDialog({
 }
 ```
 
-## Combinação com `arqel/audit`
+## Combinação com `arqel-dev/audit`
 
-`arqel/versioning` não registra _intenção_ — só conteúdo. Para
+`arqel-dev/versioning` não registra _intenção_ — só conteúdo. Para
 compliance editorial é útil registrar **quem clicou em Restore e
 porquê**, em separado:
 

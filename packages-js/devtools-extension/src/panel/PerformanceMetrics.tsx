@@ -4,7 +4,7 @@
  * Renders four Web Vitals tiles (LCP, INP/FID, CLS, navigation time)
  * with green / yellow / red status badges based on the canonical Web
  * Vitals thresholds. Server-side telemetry (query count + memory) is
- * sourced from the `__devtools` shared prop emitted by `arqel/core` in
+ * sourced from the `__devtools` shared prop emitted by `arqel-dev/core` in
  * `local` environment.
  */
 

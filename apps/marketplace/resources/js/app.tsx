@@ -1,5 +1,5 @@
-import { ThemeProvider } from '@arqel/theme';
-import '@arqel/theme/tokens.css';
+import { ThemeProvider } from '@arqel-dev/theme';
+import '@arqel-dev/theme/tokens.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 

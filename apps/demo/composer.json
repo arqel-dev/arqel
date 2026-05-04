@@ -1,14 +1,14 @@
 {
-  "name": "arqel/demo-app",
+  "name": "arqel-dev/demo-app",
   "description": "Demo end-to-end do framework Arqel — blog admin com AI, workflow, versioning e audit.",
   "type": "project",
   "license": "MIT",
-  "version": "0.8.0-rc.1",
+  "version": "0.8.0",
   "keywords": ["laravel", "arqel", "demo", "showcase", "inertia", "react"],
   "homepage": "https://demo.arqel.dev",
   "require": {
     "php": "^8.3",
-    "arqel/core": "@dev",
+    "arqel-dev/core": "@dev",
     "laravel/framework": "^12.0|^13.0",
     "inertiajs/inertia-laravel": "^1.0|^2.0|^3.0"
   },
@@ -54,9 +54,7 @@
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover --ansi"
     ],
-    "post-create-project-cmd": [
-      "@php artisan key:generate --ansi"
-    ],
+    "post-create-project-cmd": ["@php artisan key:generate --ansi"],
     "test": "vendor/bin/pest",
     "lint": "pint --test",
     "format": "pint"

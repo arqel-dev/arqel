@@ -14,7 +14,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: GitHub
-      link: https://github.com/arqel/arqel
+      link: https://github.com/arqel-dev/arqel
     - theme: alt
       text: Conceitos
       link: /guide/what-is-arqel

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Gate;
 
 /**
  * Cobertura de gaps identificados por RT-011 — exercita os caminhos
- * defensivos das classes do `arqel/realtime` que ainda não tinham
+ * defensivos das classes do `arqel-dev/realtime` que ainda não tinham
  * teste explícito (slug pluralization edge cases, payload com chave
  * string, dispatch sem dirty diff, registry sem `findBySlug`, pattern
  * de presence com placeholders custom, etc).

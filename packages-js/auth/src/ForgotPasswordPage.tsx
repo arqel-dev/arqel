@@ -22,7 +22,7 @@ interface PageProps {
 /**
  * Página de forgot-password bundled de Arqel.
  *
- * Renderizada via Inertia em `arqel/auth/ForgotPassword`. Mostra flash
+ * Renderizada via Inertia em `arqel-dev/auth/ForgotPassword`. Mostra flash
  * `status` quando o backend confirma o envio do reset link.
  */
 export function ForgotPasswordPage({

@@ -7,7 +7,7 @@
  * global map. Real enforcement happens server-side via Policies (ADR-017).
  */
 
-import type { SharedProps } from '@arqel/types/inertia';
+import type { SharedProps } from '@arqel-dev/types/inertia';
 import { usePage } from '@inertiajs/react';
 
 interface RecordWithAbilities {

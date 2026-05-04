@@ -15,7 +15,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/mcp`.
+ * Auto-discovered provider for `arqel-dev/mcp`.
  *
  * Binds `McpServer` as a singleton and auto-registers built-in tools
  * (e.g. `list_resources`, `describe_resource`) once the application has

@@ -24,7 +24,7 @@ use Throwable;
  *
  * The resource's contract is duck-typed (`getModel(): ?string` +
  * optional public static `$policy`) to avoid circular dependency
- * with `arqel/core` at type-check time.
+ * with `arqel-dev/core` at type-check time.
  */
 final class PolicyDiscovery
 {

@@ -1,6 +1,6 @@
 # Command palette (Cmd+K)
 
-> Pacote: [`arqel/core`](../../packages/core/) · Tickets: CMDPAL-001..003
+> Pacote: [`arqel-dev/core`](../../packages/core/) · Tickets: CMDPAL-001..003
 
 ## Purpose
 
@@ -12,10 +12,10 @@ A ranking é fuzzy — `FuzzyMatcher` aplica scoring estável: exact match > sub
 
 ## Setup
 
-O `CommandPaletteServiceProvider` está incluso em `arqel/core` e registra automaticamente os providers built-in. Apenas inclua o `<CommandPalette />` no React shell:
+O `CommandPaletteServiceProvider` está incluso em `arqel-dev/core` e registra automaticamente os providers built-in. Apenas inclua o `<CommandPalette />` no React shell:
 
 ```tsx
-import { CommandPalette } from '@arqel/ui/palette';
+import { CommandPalette } from '@arqel-dev/ui/palette';
 
 export default function AppLayout({ children }) {
   return (

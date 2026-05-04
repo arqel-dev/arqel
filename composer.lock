@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8640fdcbe91dd40844e472d146d0f292",
+    "content-hash": "30d034206f5d89aea90095ea536089ee",
     "packages": [],
     "packages-dev": [
         {
-            "name": "arqel/actions",
-            "version": "dev-main",
+            "name": "arqel-dev/actions",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/actions",
-                "reference": "d6bb470d82b698f14aaa9137c3906912dbc6d119"
+                "reference": "b839d77d4aa4766469aad59cbb83be6acc4e4cf5"
             },
             "require": {
-                "arqel/core": "@dev",
-                "arqel/fields": "@dev",
-                "arqel/form": "@dev",
+                "arqel-dev/core": "@dev",
+                "arqel-dev/fields": "@dev",
+                "arqel-dev/form": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -74,8 +74,8 @@
                 "laravel"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -84,16 +84,16 @@
             }
         },
         {
-            "name": "arqel/ai",
-            "version": "dev-main",
+            "name": "arqel-dev/ai",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/ai",
-                "reference": "75c47126c2a6b75a2c86edb4bf2455fac506eb2f"
+                "reference": "31a27d9db005b4612ae874577539f7a646263141"
             },
             "require": {
-                "arqel/core": "@dev",
-                "arqel/fields": "@dev",
+                "arqel-dev/core": "@dev",
+                "arqel-dev/fields": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -157,8 +157,8 @@
                 "openai"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -167,12 +167,12 @@
             }
         },
         {
-            "name": "arqel/audit",
-            "version": "dev-main",
+            "name": "arqel-dev/audit",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/audit",
-                "reference": "6538a408395966fd71694713bc5f0753b90fbc59"
+                "reference": "df2f9dadc3b8eb65de02fdcc3f882f0db3f048c6"
             },
             "require": {
                 "illuminate/support": "^12.0|^13.0",
@@ -235,8 +235,8 @@
                 "spatie"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -245,15 +245,15 @@
             }
         },
         {
-            "name": "arqel/auth",
-            "version": "dev-main",
+            "name": "arqel-dev/auth",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/auth",
-                "reference": "75726ca274bb322838011fb7507c868173c707ab"
+                "reference": "8d8633c90c77d87352638d7f4149909f7e7cdc0c"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -314,8 +314,8 @@
                 "policies"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -324,12 +324,12 @@
             }
         },
         {
-            "name": "arqel/cli",
-            "version": "dev-main",
+            "name": "arqel-dev/cli",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "7ec727fc3cc6cb7507c89c4e88b6284c6ae0d652"
+                "reference": "9ec4555ac584938280cf1b6d554bafa145b6a5e1"
             },
             "require": {
                 "laravel/prompts": "^0.3",
@@ -381,8 +381,8 @@
                 "scaffolder"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -391,12 +391,12 @@
             }
         },
         {
-            "name": "arqel/core",
-            "version": "dev-main",
+            "name": "arqel-dev/core",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
-                "reference": "2836f5e44203c6fd701daca6b0a8dd7348a5df32"
+                "reference": "f221c38627596112dd5e9221e603f9bd637816eb"
             },
             "require": {
                 "inertiajs/inertia-laravel": "^3.0",
@@ -421,7 +421,10 @@
             "autoload": {
                 "psr-4": {
                     "Arqel\\Core\\": "src/"
-                }
+                },
+                "files": [
+                    "src/Pulse/stubs.php"
+                ]
             },
             "autoload-dev": {
                 "psr-4": {
@@ -457,8 +460,8 @@
                 "laravel"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -467,16 +470,16 @@
             }
         },
         {
-            "name": "arqel/export",
-            "version": "dev-main",
+            "name": "arqel-dev/export",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/export",
-                "reference": "a700a5b9e10ba46024c434aa4f21580f19ad4a83"
+                "reference": "21b29c73b9bae836737587689b232c931503c60e"
             },
             "require": {
-                "arqel/actions": "@dev",
-                "arqel/core": "@dev",
+                "arqel-dev/actions": "@dev",
+                "arqel-dev/core": "@dev",
                 "dompdf/dompdf": "^3.0",
                 "illuminate/support": "^12.0|^13.0",
                 "php": "^8.3",
@@ -539,8 +542,8 @@
                 "xlsx"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -549,15 +552,15 @@
             }
         },
         {
-            "name": "arqel/fields",
-            "version": "dev-main",
+            "name": "arqel-dev/fields",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/fields",
-                "reference": "111659148c3bc772dd71df6e40ec449f9b9f5b9b"
+                "reference": "d3c8bb6c93b897903c2851e329e221b3859cb8cc"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -614,8 +617,8 @@
                 "laravel"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -624,16 +627,16 @@
             }
         },
         {
-            "name": "arqel/fields-advanced",
-            "version": "dev-main",
+            "name": "arqel-dev/fields-advanced",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/fields-advanced",
-                "reference": "2e6235711b96c47e4e6b583ec73cc27076483b23"
+                "reference": "84e982ef4acc6382d2a8efe078d768d5e48a2e5e"
             },
             "require": {
-                "arqel/core": "@dev",
-                "arqel/fields": "@dev",
+                "arqel-dev/core": "@dev",
+                "arqel-dev/fields": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -691,8 +694,8 @@
                 "tiptap"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -701,16 +704,16 @@
             }
         },
         {
-            "name": "arqel/form",
-            "version": "dev-main",
+            "name": "arqel-dev/form",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/form",
-                "reference": "4dd766a1484918f505aec8d041477b7a7410d0ce"
+                "reference": "a6d28783970f6a4aec9a4d77d9736d3a30f72185"
             },
             "require": {
-                "arqel/core": "@dev",
-                "arqel/fields": "@dev",
+                "arqel-dev/core": "@dev",
+                "arqel-dev/fields": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -766,8 +769,8 @@
                 "laravel"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -776,15 +779,15 @@
             }
         },
         {
-            "name": "arqel/marketplace",
-            "version": "dev-main",
+            "name": "arqel-dev/marketplace",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/marketplace",
-                "reference": "adbcc5a13448c9decf0e2dd6b813182473c71f71"
+                "reference": "90f0498facb2e5ddca05567bb19e913d4a2f5326"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "illuminate/support": "^12.0|^13.0",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.16"
@@ -792,9 +795,14 @@
             "require-dev": {
                 "larastan/larastan": "^3.9",
                 "laravel/pint": "^1.29",
+                "mockery/mockery": "^1.6",
                 "orchestra/testbench": "^9.0|^10.0",
                 "pestphp/pest": "^3.0",
-                "pestphp/pest-plugin-laravel": "^3.0"
+                "pestphp/pest-plugin-laravel": "^3.0",
+                "stripe/stripe-php": "^15.0|^16.0"
+            },
+            "suggest": {
+                "stripe/stripe-php": "Required to enable StripeConnectGateway for premium plugins (composer require stripe/stripe-php)."
             },
             "type": "library",
             "extra": {
@@ -843,8 +851,8 @@
                 "plugins"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -853,15 +861,15 @@
             }
         },
         {
-            "name": "arqel/mcp",
-            "version": "dev-main",
+            "name": "arqel-dev/mcp",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
-                "reference": "9ebdfb9f0a4bc1e78374d785928369416e779811"
+                "reference": "72d59dde8b77ffbff038db213d68d4ee1f7cc22a"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -919,8 +927,8 @@
                 "model-context-protocol"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -929,15 +937,15 @@
             }
         },
         {
-            "name": "arqel/nav",
-            "version": "dev-main",
+            "name": "arqel-dev/nav",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/nav",
-                "reference": "3c6d6777a3d334e931bfca39e1e25b18ee88f19d"
+                "reference": "2bd7bce2f9fb5086506111ed565fbd3bf005b6e6"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -995,8 +1003,8 @@
                 "sidebar"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -1005,15 +1013,15 @@
             }
         },
         {
-            "name": "arqel/realtime",
-            "version": "dev-main",
+            "name": "arqel-dev/realtime",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/realtime",
-                "reference": "df8ca238c628dd5a4191a226796da4e7fc482428"
+                "reference": "0a5446273ee426ad555b8cfb09447e3d03ed9a3f"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "illuminate/broadcasting": "^12.0|^13.0",
                 "illuminate/contracts": "^12.0|^13.0",
                 "illuminate/database": "^12.0|^13.0",
@@ -1023,6 +1031,8 @@
                 "spatie/laravel-package-tools": "^1.16"
             },
             "require-dev": {
+                "arqel-dev/fields": "@dev",
+                "arqel-dev/workflow": "@dev",
                 "larastan/larastan": "^3.9",
                 "laravel/pint": "^1.29",
                 "orchestra/testbench": "^9.0|^10.0",
@@ -1030,6 +1040,7 @@
                 "pestphp/pest-plugin-laravel": "^3.0"
             },
             "suggest": {
+                "arqel-dev/workflow": "@dev — install to broadcast workflow StateTransitioned events as ResourceUpdated automatically",
                 "laravel/reverb": "^1.0 — first-party Laravel WebSocket server to deliver these broadcast events"
             },
             "type": "library",
@@ -1081,8 +1092,8 @@
                 "websockets"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -1091,15 +1102,15 @@
             }
         },
         {
-            "name": "arqel/table",
-            "version": "dev-main",
+            "name": "arqel-dev/table",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/table",
-                "reference": "a64f9d63b5fdf1bf53fb8a7c8e8050a909be632e"
+                "reference": "d6cf52590333b417b8cf11e8034b6dfbb0a8b04f"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -1156,8 +1167,8 @@
                 "table"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -1166,15 +1177,15 @@
             }
         },
         {
-            "name": "arqel/tenant",
-            "version": "dev-main",
+            "name": "arqel-dev/tenant",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/tenant",
-                "reference": "e236747c7405d7a4723078c4105416092269ca89"
+                "reference": "436d850d3d3d24f2790a38c9a5d6701c7c2d0bcf"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -1235,8 +1246,8 @@
                 "tenant"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -1245,15 +1256,15 @@
             }
         },
         {
-            "name": "arqel/versioning",
-            "version": "dev-main",
+            "name": "arqel-dev/versioning",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/versioning",
-                "reference": "81c34ca8b1eeb6c08de4e0a573d5280c7039e611"
+                "reference": "302fb054b04290e266ae514f8aa8c7b679ce56c5"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "illuminate/support": "^12.0|^13.0",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.16"
@@ -1266,7 +1277,7 @@
                 "pestphp/pest-plugin-laravel": "^3.0"
             },
             "suggest": {
-                "spatie/laravel-eventsourcing": "Optional — pair with arqel/versioning when migrating to a full event-sourced model (^7.0)."
+                "spatie/laravel-eventsourcing": "Optional — pair with arqel-dev/versioning when migrating to a full event-sourced model (^7.0)."
             },
             "type": "library",
             "extra": {
@@ -1316,8 +1327,8 @@
                 "versioning"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -1326,15 +1337,15 @@
             }
         },
         {
-            "name": "arqel/widgets",
-            "version": "dev-main",
+            "name": "arqel-dev/widgets",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/widgets",
-                "reference": "acebd542265e82a92979d6c28ec7b97822f28bab"
+                "reference": "a0dee571ac8fa6dbd987ec7a5492a01243ebdb1b"
             },
             "require": {
-                "arqel/core": "@dev",
+                "arqel-dev/core": "@dev",
                 "laravel/framework": "^12.0|^13.0",
                 "php": "^8.3"
             },
@@ -1392,8 +1403,8 @@
                 "widgets"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -1402,16 +1413,16 @@
             }
         },
         {
-            "name": "arqel/workflow",
-            "version": "dev-main",
+            "name": "arqel-dev/workflow",
+            "version": "0.8.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/workflow",
-                "reference": "4c6ba004ebd2246b6fa6b35040fdaffbccb8976a"
+                "reference": "8caf3dfe8e356536b06760ec1c24552d81013294"
             },
             "require": {
-                "arqel/core": "@dev",
-                "arqel/fields": "@dev",
+                "arqel-dev/core": "@dev",
+                "arqel-dev/fields": "@dev",
                 "illuminate/support": "^12.0|^13.0",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.16"
@@ -1474,8 +1485,8 @@
                 "workflow"
             ],
             "support": {
-                "issues": "https://github.com/arqel/arqel/issues",
-                "source": "https://github.com/arqel/arqel",
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
                 "docs": "https://arqel.dev/docs"
             },
             "transport-options": {
@@ -3115,16 +3126,16 @@
         },
         {
             "name": "laravel/pint",
-            "version": "v1.29.0",
+            "version": "v1.29.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
-                "reference": "bdec963f53172c5e36330f3a400604c69bf02d39"
+                "reference": "0770e9b7fafd50d4586881d456d6eb41c9247a80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/bdec963f53172c5e36330f3a400604c69bf02d39",
-                "reference": "bdec963f53172c5e36330f3a400604c69bf02d39",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/0770e9b7fafd50d4586881d456d6eb41c9247a80",
+                "reference": "0770e9b7fafd50d4586881d456d6eb41c9247a80",
                 "shasum": ""
             },
             "require": {
@@ -3135,14 +3146,14 @@
                 "php": "^8.2.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.94.2",
-                "illuminate/view": "^12.54.1",
-                "larastan/larastan": "^3.9.3",
-                "laravel-zero/framework": "^12.0.5",
+                "friendsofphp/php-cs-fixer": "^3.95.1",
+                "illuminate/view": "^12.56.0",
+                "larastan/larastan": "^3.9.6",
+                "laravel-zero/framework": "^12.1.0",
                 "mockery/mockery": "^1.6.12",
                 "nunomaduro/termwind": "^2.4.0",
                 "pestphp/pest": "^3.8.6",
-                "shipfastlabs/agent-detector": "^1.1.0"
+                "shipfastlabs/agent-detector": "^1.1.3"
             },
             "bin": [
                 "builds/pint"
@@ -3179,7 +3190,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-            "time": "2026-03-12T15:51:39+00:00"
+            "time": "2026-04-20T15:26:14+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -4550,11 +4561,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.50",
+            "version": "2.1.54",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d452086fb4cf648c6b2d8cf3b639351f79e4f3e2",
-                "reference": "d452086fb4cf648c6b2d8cf3b639351f79e4f3e2",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/8be50c3992107dc837b17da4d140fbbdf9a5c5bd",
+                "reference": "8be50c3992107dc837b17da4d140fbbdf9a5c5bd",
                 "shasum": ""
             },
             "require": {
@@ -4599,7 +4610,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-17T13:10:32+00:00"
+            "time": "2026-04-29T13:31:09+00:00"
         },
         {
             "name": "psr/clock",
@@ -8325,25 +8336,25 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "arqel/actions": 20,
-        "arqel/ai": 20,
-        "arqel/audit": 20,
-        "arqel/auth": 20,
-        "arqel/cli": 20,
-        "arqel/core": 20,
-        "arqel/export": 20,
-        "arqel/fields": 20,
-        "arqel/fields-advanced": 20,
-        "arqel/form": 20,
-        "arqel/marketplace": 20,
-        "arqel/mcp": 20,
-        "arqel/nav": 20,
-        "arqel/realtime": 20,
-        "arqel/table": 20,
-        "arqel/tenant": 20,
-        "arqel/versioning": 20,
-        "arqel/widgets": 20,
-        "arqel/workflow": 20
+        "arqel-dev/actions": 20,
+        "arqel-dev/ai": 20,
+        "arqel-dev/audit": 20,
+        "arqel-dev/auth": 20,
+        "arqel-dev/cli": 20,
+        "arqel-dev/core": 20,
+        "arqel-dev/export": 20,
+        "arqel-dev/fields": 20,
+        "arqel-dev/fields-advanced": 20,
+        "arqel-dev/form": 20,
+        "arqel-dev/marketplace": 20,
+        "arqel-dev/mcp": 20,
+        "arqel-dev/nav": 20,
+        "arqel-dev/realtime": 20,
+        "arqel-dev/table": 20,
+        "arqel-dev/tenant": 20,
+        "arqel-dev/versioning": 20,
+        "arqel-dev/widgets": 20,
+        "arqel-dev/workflow": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

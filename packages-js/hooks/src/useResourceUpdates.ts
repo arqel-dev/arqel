@@ -8,7 +8,7 @@
  * hook becomes a no-op so that consumers can ship pages without crashing in
  * environments where realtime is disabled.
  *
- * Note: the `laravel-echo` package is *not* a dependency of `@arqel/hooks` —
+ * Note: the `laravel-echo` package is *not* a dependency of `@arqel-dev/hooks` —
  * we only declare an ambient minimal shape of `window.Echo`.
  */
 

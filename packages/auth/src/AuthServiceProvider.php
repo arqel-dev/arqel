@@ -9,7 +9,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Service provider for `arqel/auth`.
+ * Service provider for `arqel-dev/auth`.
  *
  * Boots the authorization layer: registers `AbilityRegistry` as a
  * singleton so panels can register global abilities and resolve

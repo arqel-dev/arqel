@@ -21,7 +21,7 @@ import type {
  * Minimal subset of the Inertia router surface that we need. Kept
  * structural so we don't take a hard `@inertiajs/core` dependency at
  * the type level (the bridge is optional and the runtime peer dep is
- * already declared by `@arqel/react`).
+ * already declared by `@arqel-dev/react`).
  */
 export interface InertiaRouterLike {
   on(event: 'navigate' | 'finish' | 'start', cb: (event: InertiaRouterEvent) => void): () => void;
@@ -134,7 +134,7 @@ function pickSharedProps(props: Record<string, unknown>): Record<string, unknown
 
 /**
  * Extract the convention-reserved `__devtools` shared prop emitted by
- * `arqel/core` in `local` environment (DEVTOOLS-004). Returns `null`
+ * `arqel-dev/core` in `local` environment (DEVTOOLS-004). Returns `null`
  * when the key is missing or shaped unexpectedly — production builds
  * never populate it.
  */

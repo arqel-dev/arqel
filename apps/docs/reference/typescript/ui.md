@@ -1,19 +1,19 @@
-# `@arqel/ui` — API Reference
+# `@arqel-dev/ui` — API Reference
 
 Componentes estruturais. 9 entry points subpath.
 
 ```ts
-import '@arqel/ui/styles.css';                                    // Tailwind v4 + tokens oklch
-import { cn } from '@arqel/ui/utils';
-import { Button, CanAccess } from '@arqel/ui';
-import { AppShell, Sidebar, Topbar, MainContent, Footer } from '@arqel/ui/shell';
-import { ResourceIndex } from '@arqel/ui/resource';
-import { DataTable, TableFilters, TablePagination, TableToolbar } from '@arqel/ui/table';
+import '@arqel-dev/ui/styles.css';                                    // Tailwind v4 + tokens oklch
+import { cn } from '@arqel-dev/ui/utils';
+import { Button, CanAccess } from '@arqel-dev/ui';
+import { AppShell, Sidebar, Topbar, MainContent, Footer } from '@arqel-dev/ui/shell';
+import { ResourceIndex } from '@arqel-dev/ui/resource';
+import { DataTable, TableFilters, TablePagination, TableToolbar } from '@arqel-dev/ui/table';
 import { FormRenderer, FieldRenderer, FormSection, FormGrid, FormTabs,
-         registerField, getFieldComponent, getRegisteredFields } from '@arqel/ui/form';
-import { ActionButton, ActionMenu, ConfirmDialog, ActionFormModal } from '@arqel/ui/action';
-import { FlashContainer, FlashToast } from '@arqel/ui/flash';
-import { Breadcrumbs, PageHeader, EmptyState, ErrorState, LoadingSkeleton } from '@arqel/ui/utility';
+         registerField, getFieldComponent, getRegisteredFields } from '@arqel-dev/ui/form';
+import { ActionButton, ActionMenu, ConfirmDialog, ActionFormModal } from '@arqel-dev/ui/action';
+import { FlashContainer, FlashToast } from '@arqel-dev/ui/flash';
+import { Breadcrumbs, PageHeader, EmptyState, ErrorState, LoadingSkeleton } from '@arqel-dev/ui/utility';
 ```
 
 ## Action
@@ -102,7 +102,7 @@ function clearFieldRegistry(): void                       // testes
 
 ## Tokens CSS
 
-`@arqel/ui/styles.css` declara em `oklch`:
+`@arqel-dev/ui/styles.css` declara em `oklch`:
 
 - `--color-arqel-{bg,fg,primary,secondary,destructive,success,warning,muted,border,ring}`
 - `--radius-arqel`, `--radius-arqel-sm`, `--radius-arqel-lg`
@@ -110,5 +110,5 @@ function clearFieldRegistry(): void                       // testes
 
 ## Related
 
-- SKILL: [`packages-js/ui/SKILL.md`](https://github.com/arqel/arqel/blob/main/packages-js/ui/SKILL.md)
-- Próximo: [`@arqel/fields`](/reference/typescript/fields)
+- SKILL: [`packages-js/ui/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages-js/ui/SKILL.md)
+- Próximo: [`@arqel-dev/fields`](/reference/typescript/fields)

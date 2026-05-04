@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  * object) into the rich JSON shape consumed by the React renderer
  * (`06-api-react.md` §4).
  *
- * The serialiser is intentionally duck-typed: `arqel/core` does
- * not depend on `arqel/fields`, so each accessor is guarded with
+ * The serialiser is intentionally duck-typed: `arqel-dev/core` does
+ * not depend on `arqel-dev/fields`, so each accessor is guarded with
  * `method_exists` and falls back when the source object does not
  * implement it. The serializer is the single source of truth for
  * the payload shape — controllers should defer to it rather than

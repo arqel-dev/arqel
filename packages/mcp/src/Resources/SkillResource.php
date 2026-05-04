@@ -45,7 +45,7 @@ final class SkillResource
     private ?Closure $contentReader;
 
     /**
-     * @param (Closure(): array<int, string>)|null $packagesResolver Returns list of package names (no `arqel/` prefix).
+     * @param (Closure(): array<int, string>)|null $packagesResolver Returns list of package names (no `arqel-dev/` prefix).
      * @param (Closure(string): string)|null $contentReader Returns SKILL.md contents for a given package, or throws.
      */
     public function __construct(?Closure $packagesResolver = null, ?Closure $contentReader = null)

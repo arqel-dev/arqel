@@ -12,7 +12,7 @@
  * inside the type-to-confirm input fires confirm when the value matches.
  */
 
-import type { ConfirmationConfig } from '@arqel/types/actions';
+import type { ConfirmationConfig } from '@arqel-dev/types/actions';
 import { Dialog } from '@base-ui-components/react/dialog';
 import { useEffect, useState } from 'react';
 import { cn } from '../utils/cn.js';

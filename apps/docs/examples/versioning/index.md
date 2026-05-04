@@ -1,6 +1,6 @@
 # Versioning vs Audit log — quando usar qual
 
-> **Documento comparativo do pacote `arqel/versioning` versus `arqel/audit`.**
+> **Documento comparativo do pacote `arqel-dev/versioning` versus `arqel-dev/audit`.**
 > Lê-se em conjunto com os 3 cenários reais nesta mesma pasta:
 > [CMS Articles](./cms-articles.md), [E-commerce Orders](./ecommerce-orders.md),
 > [Legal Contracts](./legal-contracts.md).
@@ -21,10 +21,10 @@ Este doc dá uma régua objetiva para decidir.
 
 ## TL;DR
 
-- **`arqel/versioning`** = snapshot completo do _conteúdo_ do registro
+- **`arqel-dev/versioning`** = snapshot completo do _conteúdo_ do registro
   num ponto do tempo. Permite restore. Caso de uso: "voltar artigo
   para a versão de ontem".
-- **`arqel/audit`** = event log apêndice-only de _quem fez o quê e quando_.
+- **`arqel-dev/audit`** = event log apêndice-only de _quem fez o quê e quando_.
   Não permite restore (sozinho). Caso de uso: "quem mudou o status
   desse pedido?".
 - **Ambos juntos** = compliance / legal-tech / financeiro: snapshot
@@ -32,7 +32,7 @@ Este doc dá uma régua objetiva para decidir.
 
 ## Tabela comparativa
 
-| Aspecto | `arqel/versioning` | `arqel/audit` |
+| Aspecto | `arqel-dev/versioning` | `arqel-dev/audit` |
 | --- | --- | --- |
 | **Forma de armazenamento** | Snapshot completo do `getAttributes()` por save | Event row com `event_name` + delta |
 | **Custo de storage** | Alto (linear no nº de saves × tamanho do model) | Baixo (linear no nº de eventos × tamanho do delta) |
@@ -57,12 +57,12 @@ flowchart TD
     Start([Preciso registrar histórico]) --> Q1{Preciso fazer<br/>restore para um<br/>ponto no tempo?}
     Q1 -->|Sim| Q2{Quantos saves<br/>por record por mês?}
     Q1 -->|Não| Q3{Preciso saber<br/>quem fez<br/>cada mudança?}
-    Q2 -->|< 100| V[arqel/versioning]
+    Q2 -->|< 100| V[arqel-dev/versioning]
     Q2 -->|>= 100 e payload pequeno| V
     Q2 -->|>= 100 e payload grande| Q4{Posso filtrar<br/>campos voláteis?}
     Q4 -->|Sim| V
-    Q4 -->|Não| AB[arqel/audit + diff manual]
-    Q3 -->|Sim| A[arqel/audit]
+    Q4 -->|Não| AB[arqel-dev/audit + diff manual]
+    Q3 -->|Sim| A[arqel-dev/audit]
     Q3 -->|Não| Q5{Estou em domínio<br/>regulado<br/>legal/financeiro?}
     Q5 -->|Sim| Both[Versioning + Audit<br/>combinados]
     Q5 -->|Não| Nothing[Nenhum dos dois]

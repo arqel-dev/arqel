@@ -2,7 +2,7 @@
 
 > **Use case:** plataforma legal-tech onde cada edição em contrato
 > precisa ser preservada **imutavelmente** por 7 anos para
-> compliance. Combina `arqel/versioning` (snapshot) com `arqel/audit`
+> compliance. Combina `arqel-dev/versioning` (snapshot) com `arqel-dev/audit`
 > (contexto humano).
 
 ## Contexto
@@ -111,7 +111,7 @@ remoção em massa precisa ser auditada por sua vez. Se a janela de 7
 anos vence, o operador legal precisa autorizar — idealmente o job
 gera um relatório antes de apagar.
 
-## Integração `arqel/audit` para contexto humano
+## Integração `arqel-dev/audit` para contexto humano
 
 ```php
 <?php
@@ -161,11 +161,11 @@ A divisão de responsabilidades fica:
 
 | Pergunta | Quem responde |
 | --- | --- |
-| "Qual era o texto da cláusula 4.2 em 2026-03-15?" | `arqel/versioning` |
-| "Quem aprovou a alteração da cláusula 4.2?" | `arqel/audit` |
-| "De que IP veio a aprovação?" | `arqel/audit` |
-| "Qual o motivo declarado da alteração?" | `arqel/audit` |
-| "Posso provar que o contrato não foi alterado depois de assinado?" | `arqel/versioning` (hash) + `arqel/audit` (evento `contract.signed`) |
+| "Qual era o texto da cláusula 4.2 em 2026-03-15?" | `arqel-dev/versioning` |
+| "Quem aprovou a alteração da cláusula 4.2?" | `arqel-dev/audit` |
+| "De que IP veio a aprovação?" | `arqel-dev/audit` |
+| "Qual o motivo declarado da alteração?" | `arqel-dev/audit` |
+| "Posso provar que o contrato não foi alterado depois de assinado?" | `arqel-dev/versioning` (hash) + `arqel-dev/audit` (evento `contract.signed`) |
 
 ## GDPR / LGPD — anonimização pós-encerramento
 

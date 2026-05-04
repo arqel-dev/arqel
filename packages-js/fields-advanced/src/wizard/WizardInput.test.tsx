@@ -3,10 +3,10 @@
  *
  * The schema/props plumbing is exercised by composing a synthetic
  * `FieldSchema` shape per test rather than relying on a (yet to be
- * shipped) `WizardFieldSchema` discriminant from `@arqel/types`.
+ * shipped) `WizardFieldSchema` discriminant from `@arqel-dev/types`.
  */
 
-import type { FieldSchema } from '@arqel/types/fields';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

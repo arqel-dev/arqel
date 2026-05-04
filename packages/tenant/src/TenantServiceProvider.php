@@ -17,7 +17,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
- * Auto-discovered provider for `arqel/tenant`.
+ * Auto-discovered provider for `arqel-dev/tenant`.
  *
  * Binds:
  *   - `TenantResolver` to whatever class-string the

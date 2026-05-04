@@ -27,7 +27,7 @@ Com `AGENTS.md`, o agente lê uma vez no início da sessão e mantém-se aderent
 
 ### 2. Stack
 
-Lista versões mínimas (PHP 8.3+, Node 20.9+, etc.) e libs principais. **Crítico:** menciona explicitamente que **Inertia é a única bridge PHP↔React permitida** ([ADR-001](https://github.com/arqel/arqel/blob/main/PLANNING/03-adrs.md)) — evita o agente sugerir TanStack Query.
+Lista versões mínimas (PHP 8.3+, Node 20.9+, etc.) e libs principais. **Crítico:** menciona explicitamente que **Inertia é a única bridge PHP↔React permitida** ([ADR-001](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md)) — evita o agente sugerir TanStack Query.
 
 ### 3. Comandos frequentes
 
@@ -62,16 +62,16 @@ resources/
   js/
     Pages/Arqel/   # Inertia pages (overrides Arqel defaults)
     Arqel/Fields/  # Custom fields React
-  css/app.css      # @import 'tailwindcss' + @arqel/ui
+  css/app.css      # @import 'tailwindcss' + @arqel-dev/ui
 ```
 
 ### 6. Architecture summary
 
 Resume RF/RNF principais e aponta para `docs/` interno e SKILLs dos pacotes Arqel:
 
-- `vendor/arqel/core/SKILL.md`
-- `vendor/arqel/fields/SKILL.md`
-- `vendor/arqel/table/SKILL.md`
+- `vendor/arqel-dev/core/SKILL.md`
+- `vendor/arqel-dev/fields/SKILL.md`
+- `vendor/arqel-dev/table/SKILL.md`
 - ...
 
 ### 7. Links
@@ -105,7 +105,7 @@ cat packages/core/stubs/agents.stub
 
 Ou ver o `AGENTS.md` do próprio monorepo Arqel como referência:
 
-- [`AGENTS.md` no GitHub](https://github.com/arqel/arqel/blob/main/AGENTS.md)
+- [`AGENTS.md` no GitHub](https://github.com/arqel-dev/arqel/blob/main/AGENTS.md)
 
 ## MCP — Model Context Protocol (stub)
 
@@ -113,7 +113,7 @@ Em paralelo ao `AGENTS.md`, Arqel expõe um **MCP server** (stub na Fase 1, full
 
 ```ts
 // Phase 2 preview
-import { ArqelMcpServer } from '@arqel/mcp';
+import { ArqelMcpServer } from '@arqel-dev/mcp';
 
 const server = new ArqelMcpServer({ panel: 'admin' });
 // Tools: list-resources, get-resource-fields, list-actions, ...
@@ -132,6 +132,6 @@ Hoje o agente lê `AGENTS.md` + SKILL.md estaticamente. Em Fase 2, o MCP server 
 ## Links relacionados
 
 - [agents.md](https://agents.md/) — standard comunitário
-- [`packages/core/stubs/agents.stub`](https://github.com/arqel/arqel/blob/main/packages/core/stubs/agents.stub)
-- [Roadmap Fase 2 — MCP](https://github.com/arqel/arqel/blob/main/PLANNING/09-fase-2-essenciais.md)
+- [`packages/core/stubs/agents.stub`](https://github.com/arqel-dev/arqel/blob/main/packages/core/stubs/agents.stub)
+- [Roadmap Fase 2 — MCP](https://github.com/arqel-dev/arqel/blob/main/PLANNING/09-fase-2-essenciais.md)
 - [Custom Fields](/advanced/custom-fields) — pattern que LLMs usam pra gerar custom field types

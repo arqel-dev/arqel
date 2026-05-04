@@ -171,7 +171,10 @@ export default defineConfig({
       '/examples/': [
         {
           text: 'Exemplos',
-          items: [{ text: 'Blog admin', link: '/examples/blog-admin' }],
+          items: [
+            { text: 'Blog admin', link: '/examples/blog-admin' },
+            { text: 'Demo app (showcase)', link: '/examples/demo-app' },
+          ],
         },
         {
           text: 'Workflows',

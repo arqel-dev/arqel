@@ -1,0 +1,9 @@
+/vendor
+/node_modules
+/public/build
+/.phpunit.cache
+.phpunit.result.cache
+.env
+.env.local
+composer.lock
+pnpm-lock.yaml

@@ -1,0 +1,64 @@
+{
+  "name": "@arqel/theme",
+  "version": "0.8.0-rc.1",
+  "description": "Tokens semânticos + dark-mode + ThemeProvider/ThemeToggle para painéis Arqel.",
+  "license": "MIT",
+  "homepage": "https://arqel.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arqel/arqel.git",
+    "directory": "packages-js/theme"
+  },
+  "keywords": [
+    "arqel",
+    "theme",
+    "dark-mode",
+    "tailwind",
+    "tokens",
+    "react"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./src/tokens.css"
+  },
+  "files": [
+    "dist",
+    "src/tokens.css",
+    "README.md",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

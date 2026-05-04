@@ -37,11 +37,15 @@
         <script type="application/ld+json">{!! str_replace('<', '<', json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) !!}</script>
     @endif
 
+    {{-- @arqel/theme: FOUC prevention. Aplica .dark em <html> antes do React montar.
+         Lê localStorage 'arqel-theme' + system preference. Falhas silenciosas. --}}
+    <script>(function(){try{var k="arqel-theme",t=null;try{t=localStorage.getItem(k)}catch(e){}if(t!=="light"&&t!=="dark"&&t!=="system")t="system";var r=t==="system"?(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):t;var el=document.documentElement;if(r==="dark")el.classList.add("dark");else el.classList.remove("dark");el.style.colorScheme=r;}catch(e){}})();</script>
+
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx'])
     @inertiaHead
 </head>
-<body class="bg-neutral-50 text-neutral-900 antialiased">
+<body class="bg-[var(--arqel-color-bg)] text-[var(--arqel-color-fg)] antialiased">
     @inertia
 </body>
 </html>

@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@arqel/theme": "workspace:*",
     "@inertiajs/react": "^2.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

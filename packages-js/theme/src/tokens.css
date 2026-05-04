@@ -1,0 +1,90 @@
+/**
+ * @arqel/theme — semantic design tokens
+ *
+ * Estes tokens são as variáveis canônicas usadas pelos componentes Arqel.
+ * Eles são "semânticos" (descrevem intenção: bg, fg, primary) e não cores
+ * concretas — o que permite trocar paleta inteira sem refatorar componentes.
+ *
+ * Override:
+ *   :root { --arqel-color-primary: #ff0080; }
+ *
+ * Tailwind v4 usage (via @theme):
+ *   @import 'tailwindcss';
+ *   @import '@arqel/theme/tokens.css';
+ *   @theme {
+ *     --color-primary: var(--arqel-color-primary);
+ *   }
+ */
+
+:root {
+  /* Surface */
+  --arqel-color-bg: #ffffff;
+  --arqel-color-bg-muted: #f5f5f5;
+  --arqel-color-bg-subtle: #fafafa;
+
+  /* Foreground */
+  --arqel-color-fg: #0a0a0a;
+  --arqel-color-fg-muted: #525252;
+  --arqel-color-fg-subtle: #737373;
+
+  /* Borders */
+  --arqel-color-border: #e5e5e5;
+  --arqel-color-border-strong: #d4d4d4;
+
+  /* Brand / accent */
+  --arqel-color-primary: #6366f1;
+  --arqel-color-primary-fg: #ffffff;
+  --arqel-color-primary-hover: #4f46e5;
+
+  /* Semantic */
+  --arqel-color-success: #10b981;
+  --arqel-color-success-fg: #ffffff;
+  --arqel-color-warning: #f59e0b;
+  --arqel-color-warning-fg: #0a0a0a;
+  --arqel-color-danger: #ef4444;
+  --arqel-color-danger-fg: #ffffff;
+  --arqel-color-info: #0ea5e9;
+  --arqel-color-info-fg: #ffffff;
+
+  /* Focus ring */
+  --arqel-color-ring: #6366f1;
+
+  /* Radii */
+  --arqel-radius-sm: 0.25rem;
+  --arqel-radius-md: 0.375rem;
+  --arqel-radius-lg: 0.5rem;
+}
+
+.dark {
+  /* Surface */
+  --arqel-color-bg: #0a0a0a;
+  --arqel-color-bg-muted: #171717;
+  --arqel-color-bg-subtle: #1f1f1f;
+
+  /* Foreground */
+  --arqel-color-fg: #fafafa;
+  --arqel-color-fg-muted: #a3a3a3;
+  --arqel-color-fg-subtle: #737373;
+
+  /* Borders */
+  --arqel-color-border: #262626;
+  --arqel-color-border-strong: #404040;
+
+  /* Brand / accent */
+  --arqel-color-primary: #818cf8;
+  --arqel-color-primary-fg: #0a0a0a;
+  --arqel-color-primary-hover: #6366f1;
+
+  /* Semantic */
+  --arqel-color-success: #34d399;
+  --arqel-color-success-fg: #022c22;
+  --arqel-color-warning: #fbbf24;
+  --arqel-color-warning-fg: #1c1917;
+  --arqel-color-danger: #f87171;
+  --arqel-color-danger-fg: #1f1f1f;
+  --arqel-color-info: #38bdf8;
+  --arqel-color-info-fg: #0c1f2c;
+
+  /* Focus ring */
+  --arqel-color-ring: #818cf8;
+}

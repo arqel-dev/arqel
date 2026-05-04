@@ -37,4 +37,19 @@ return [
         'enabled' => env('LARAVEL_CLOUD', false),
         'auto_configure' => env('ARQEL_CLOUD_AUTO_CONFIGURE', true),
     ],
+
+    // Telemetry / observability (opt-in).
+    //
+    // Quando `enabled = true`, o `AutoInstrumentation` é registrado
+    // como listener para eventos internos do Arqel (workflow, AI) e
+    // contadores ficam disponíveis via `MetricsCollector`.
+    //
+    // Quando `metrics_endpoint_enabled = true`, o endpoint
+    // `GET <metrics_endpoint_path>` exporta métricas no formato
+    // Prometheus (gated por `web` + `auth` + Gate `viewMetrics`).
+    'telemetry' => [
+        'enabled' => env('ARQEL_TELEMETRY_ENABLED', false),
+        'metrics_endpoint_enabled' => env('ARQEL_METRICS_ENDPOINT_ENABLED', false),
+        'metrics_endpoint_path' => env('ARQEL_METRICS_ENDPOINT_PATH', '/admin/_metrics'),
+    ],
 ];

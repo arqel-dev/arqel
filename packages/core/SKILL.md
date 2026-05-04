@@ -387,6 +387,34 @@ php artisan arqel:pulse:info --json   # output JSON (deploy hooks / CI)
 
 Mostra versão do Pulse, cards/recorders registados e amostras (tokens hoje, distinct actions). `arqel:doctor` inclui o check `monitoring.pulse_detected` (neutral quando ausente).
 
+## Telemetry (post-tag)
+
+`arqel/core` inclui telemetria mínima e opt-in para SLOs, debugging em produção e capacity planning. **Sem dependências externas** — usa apenas in-memory storage e o protocolo Prometheus text exposition.
+
+**Componentes:**
+
+- `Arqel\Core\Telemetry\MetricsCollector` (request-scoped) — armazena counters, gauges e histograms agregados por `name + labels`.
+- `Arqel\Core\Telemetry\PrometheusExporter` — serializa o snapshot para o formato Prometheus 0.0.4.
+- `Arqel\Core\Telemetry\AutoInstrumentation` — atalhos para métricas Arqel-specific + listeners defensivos para eventos opcionais (`arqel/workflow`, `arqel/ai`).
+- `Arqel\Core\Http\Controllers\MetricsController` — endpoint `GET /admin/_metrics` (gated por config + `auth` + Gate `viewMetrics`).
+
+**Habilitar:**
+
+```env
+ARQEL_TELEMETRY_ENABLED=true
+ARQEL_METRICS_ENDPOINT_ENABLED=true
+ARQEL_METRICS_ENDPOINT_PATH=/admin/_metrics
+```
+
+**Registrar métricas em user-land:**
+
+```php
+app(\Arqel\Core\Telemetry\MetricsCollector::class)
+    ->counter('arqel_custom_total', 1.0, ['tenant' => $tenantId]);
+```
+
+`arqel:doctor` inclui o check `telemetry.enabled`. Integrações com Prometheus/Grafana/Datadog/Sentry documentadas em `apps/docs/guide/telemetry.md`.
+
 ## Anti-patterns
 
 - ❌ **Depender directamente de pacotes descendentes** (`arqel/fields`, `arqel/table`, ...). Core é a base; inversão de dependência. Se precisas de algo de `fields`, expõe um contract em `core` que `fields` implementa.

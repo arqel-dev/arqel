@@ -69,6 +69,7 @@ final class DoctorCommand extends Command
             $this->checkQueueDriver(),
             $this->checkAiProvidersConfigured(),
             $this->checkMarketplaceMigrations(),
+            $this->checkTelemetry(),
         ];
 
         $summary = $this->summarise($checks);
@@ -652,6 +653,42 @@ final class DoctorCommand extends Command
             ];
         } catch (Throwable $e) {
             return $this->fromThrowable('marketplace.migrations', $e);
+        }
+    }
+
+    /**
+     * Reporta o estado da telemetria opcional. Neutral quando
+     * desabilitado (default), `ok` quando habilitado.
+     *
+     * @return array{name: string, status: string, message: string, details?: mixed}
+     */
+    private function checkTelemetry(): array
+    {
+        try {
+            $enabled = (bool) config('arqel.telemetry.enabled', false);
+            $endpointEnabled = (bool) config('arqel.telemetry.metrics_endpoint_enabled', false);
+
+            if (! $enabled && ! $endpointEnabled) {
+                return [
+                    'name' => 'telemetry.enabled',
+                    'status' => self::STATUS_NEUTRAL,
+                    'message' => 'Telemetry disabled (opt-in via ARQEL_TELEMETRY_ENABLED).',
+                    'details' => ['enabled' => false, 'endpoint' => false],
+                ];
+            }
+
+            return [
+                'name' => 'telemetry.enabled',
+                'status' => self::STATUS_OK,
+                'message' => sprintf(
+                    'Telemetry %s; metrics endpoint %s.',
+                    $enabled ? 'enabled' : 'disabled',
+                    $endpointEnabled ? 'enabled' : 'disabled',
+                ),
+                'details' => ['enabled' => $enabled, 'endpoint' => $endpointEnabled],
+            ];
+        } catch (Throwable $e) {
+            return $this->fromThrowable('telemetry.enabled', $e);
         }
     }
 

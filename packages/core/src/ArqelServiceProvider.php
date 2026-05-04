@@ -22,6 +22,10 @@ use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Pulse\PulseIntegration;
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Core\Support\InertiaDataBuilder;
+use Arqel\Core\Telemetry\AutoInstrumentation;
+use Arqel\Core\Telemetry\MetricsCollector;
+use Arqel\Core\Telemetry\PrometheusExporter;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +64,17 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $this->app->singleton(CloudDetector::class);
         $this->app->singleton(CloudConfigurator::class);
         $this->app->singleton(PulseIntegration::class);
+
+        // Telemetry — request-scoped collector + format-agnostic
+        // exporters. Use `scoped` when available so values do not
+        // leak across requests in long-lived workers (octane).
+        if (method_exists($this->app, 'scoped')) {
+            $this->app->scoped(MetricsCollector::class);
+        } else {
+            $this->app->singleton(MetricsCollector::class);
+        }
+        $this->app->singleton(PrometheusExporter::class);
+        $this->app->singleton(AutoInstrumentation::class);
     }
 
     public function packageBooted(): void
@@ -85,7 +100,51 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $this->app->booted(function (): void {
             $this->applyCloudAutoConfigure();
             $this->registerPulseIntegration();
+            $this->registerTelemetryIntegration();
         });
+    }
+
+    /**
+     * Wire telemetry: register the auto-instrumentation listeners
+     * (when `arqel.telemetry.enabled`) and the Prometheus endpoint
+     * route (when `arqel.telemetry.metrics_endpoint_enabled`).
+     *
+     * Both flags default to false — telemetry is opt-in. Wrapped
+     * in `try/catch` so a misconfigured event/route never blocks
+     * application boot.
+     */
+    protected function registerTelemetryIntegration(): void
+    {
+        try {
+            if ((bool) config('arqel.telemetry.enabled', false)) {
+                $instrumentation = $this->app->make(AutoInstrumentation::class);
+                assert($instrumentation instanceof AutoInstrumentation);
+                $events = $this->app->make(Dispatcher::class);
+                assert($events instanceof Dispatcher);
+                $instrumentation->subscribe($events);
+            }
+
+            // Route is always registered — the controller itself
+            // returns 404 when `metrics_endpoint_enabled = false`.
+            // This keeps the route table stable across config edits
+            // and makes feature tests deterministic.
+            $rawPath = config('arqel.telemetry.metrics_endpoint_path', '/admin/_metrics');
+            $path = is_string($rawPath) && $rawPath !== '' ? $rawPath : '/admin/_metrics';
+
+            if (! Route::has('arqel.telemetry.metrics')) {
+                // Only `auth` is applied at the framework level — `web`
+                // middleware (sessions/CSRF) is unnecessary for an
+                // operations endpoint and complicates Testbench setup.
+                Route::middleware(['auth'])
+                    ->get($path, \Arqel\Core\Http\Controllers\MetricsController::class)
+                    ->name('arqel.telemetry.metrics');
+            }
+        } catch (Throwable $e) {
+            Log::warning('Arqel telemetry integration failed to register', [
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

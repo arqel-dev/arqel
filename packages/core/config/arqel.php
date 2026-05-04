@@ -47,6 +47,20 @@ return [
     // Quando `metrics_endpoint_enabled = true`, o endpoint
     // `GET <metrics_endpoint_path>` exporta métricas no formato
     // Prometheus (gated por `web` + `auth` + Gate `viewMetrics`).
+    // Internationalization (i18n).
+    //
+    // O `TranslationLoader` agrega os ficheiros de lang
+    // publicados em `resources/lang/{locale}/` para serem
+    // injectados como Inertia shared prop (`i18n`). O middleware
+    // `SetLocaleMiddleware` lê session/cookie/Accept-Language
+    // e chama `App::setLocale()` antes do Inertia partilhar o
+    // payload.
+    'i18n' => [
+        'enabled' => env('ARQEL_I18N_ENABLED', true),
+        'default' => env('ARQEL_I18N_DEFAULT', 'en'),
+        'locales' => ['en', 'pt_BR'],
+    ],
+
     'telemetry' => [
         'enabled' => env('ARQEL_TELEMETRY_ENABLED', false),
         'metrics_endpoint_enabled' => env('ARQEL_METRICS_ENDPOINT_ENABLED', false),

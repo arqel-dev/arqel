@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Core\Http\Middleware;
 
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
+use Arqel\Core\I18n\TranslationLoader;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -83,6 +84,7 @@ final class HandleArqelInertiaRequests extends Middleware
                 'warning' => fn () => $request->session()->get('warning'),
             ],
             'translations' => fn () => $this->translations(),
+            'i18n' => fn () => $this->i18nPayload(),
             'arqel' => [
                 'version' => is_string($configVersion) ? $configVersion : '0.1.0',
             ],
@@ -196,6 +198,41 @@ final class HandleArqelInertiaRequests extends Middleware
     {
         // Tenant scaffold for Phase 2 — stays null in Phase 1.
         return null;
+    }
+
+    /**
+     * Build the `i18n` shared prop. Defensive — returns an empty
+     * payload if the {@see TranslationLoader} is not bound (e.g.
+     * tests that override the provider).
+     *
+     * @return array<string, mixed>
+     */
+    private function i18nPayload(): array
+    {
+        if (! app()->bound(TranslationLoader::class)) {
+            return [
+                'locale' => app()->getLocale(),
+                'available' => ['en', 'pt_BR'],
+                'translations' => [],
+            ];
+        }
+
+        $loader = app(TranslationLoader::class);
+        if (! $loader instanceof TranslationLoader) {
+            return [
+                'locale' => app()->getLocale(),
+                'available' => ['en', 'pt_BR'],
+                'translations' => [],
+            ];
+        }
+
+        $locale = app()->getLocale();
+
+        return [
+            'locale' => $locale,
+            'available' => $loader->availableLocales(),
+            'translations' => $loader->loadForLocale($locale),
+        ];
     }
 
     /**

@@ -18,6 +18,7 @@ use Arqel\Core\Console\PulseInfoCommand;
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\DevTools\PolicyLogCollector;
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
+use Arqel\Core\I18n\TranslationLoader;
 use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Pulse\PulseIntegration;
 use Arqel\Core\Resources\ResourceRegistry;
@@ -61,6 +62,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
         // before any application provider that may register commands
         // or providers eagerly during boot.
         $this->app->singleton(CommandRegistry::class);
+        $this->app->singleton(TranslationLoader::class);
         $this->app->singleton(CloudDetector::class);
         $this->app->singleton(CloudConfigurator::class);
         $this->app->singleton(PulseIntegration::class);
@@ -136,7 +138,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
                 // middleware (sessions/CSRF) is unnecessary for an
                 // operations endpoint and complicates Testbench setup.
                 Route::middleware(['auth'])
-                    ->get($path, \Arqel\Core\Http\Controllers\MetricsController::class)
+                    ->get($path, Http\Controllers\MetricsController::class)
                     ->name('arqel.telemetry.metrics');
             }
         } catch (Throwable $e) {

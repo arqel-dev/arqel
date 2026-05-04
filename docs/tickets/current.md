@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Pós-tag prep concluído (Batches #27..#54): apps/demo showcase blog admin (53 arquivos, 10 Pest + 3 vitest), telemetry MetricsCollector + Prometheus exporter (21 testes adicionais → 253 core), CODEOWNERS + labeler workflow + apps/docs/guide/contributing.md. Total ≈ 253 core (+21 telemetry) + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 10 demo app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + 15 realtime-collab JS + ~3 demo JS = ~1.295 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1`, comunicar release em GitHub Discussions/Discord, monitorar feedback inicial.
+**Pós-tag QoL polish (Batches #27..#55): i18n (en + pt_BR) + LocaleSwitcher + dark-mode/theme tokens + a11y helpers + audit guide. 3 novos pacotes JS: @arqel/i18n, @arqel/theme, @arqel/a11y. Total ≈ 269 core (+16 i18n) + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 10 demo app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + 15 realtime-collab JS + 3 demo JS + 12 i18n JS + 27 theme JS + 18 a11y JS = ~1.371 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1` (todos critérios atingidos), comunicar release em GitHub Discussions/Discord.
 
 **Fase:** 1 (MVP)
 

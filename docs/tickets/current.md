@@ -5,7 +5,7 @@
 
 ## 🎯 Ticket corrente
 
-**Tudo fechado para tag v0.8.0-rc.1 (Batches #27..#53): RT-005 Yjs full sync ✅ · audit final + arqel:audit + extended doctor ✅ · version alignment 0.8.0-rc.1 todos pacotes + apps ✅ · Web Store submission docs + privacy policy ✅ · scripts/release-prep.sh ✅. Total ≈ 232 core + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + ~30 marketplace app JS + 15 realtime-collab JS = ~1.290 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1` seguindo `apps/docs/guide/release-checklist.md`. Daí em diante, ciclos de manutenção + community feedback.
+**Pós-tag prep concluído (Batches #27..#54): apps/demo showcase blog admin (53 arquivos, 10 Pest + 3 vitest), telemetry MetricsCollector + Prometheus exporter (21 testes adicionais → 253 core), CODEOWNERS + labeler workflow + apps/docs/guide/contributing.md. Total ≈ 253 core (+21 telemetry) + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 10 demo app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + 15 realtime-collab JS + ~3 demo JS = ~1.295 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1`, comunicar release em GitHub Discussions/Discord, monitorar feedback inicial.
 
 **Fase:** 1 (MVP)
 

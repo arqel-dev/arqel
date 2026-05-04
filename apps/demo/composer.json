@@ -9,11 +9,7 @@
   "require": {
     "php": "^8.3",
     "arqel/core": "@dev",
-    "illuminate/database": "^12.0|^13.0",
-    "illuminate/http": "^12.0|^13.0",
-    "illuminate/routing": "^12.0|^13.0",
-    "illuminate/support": "^12.0|^13.0",
-    "illuminate/view": "^12.0|^13.0",
+    "laravel/framework": "^12.0|^13.0",
     "inertiajs/inertia-laravel": "^1.0|^2.0|^3.0"
   },
   "require-dev": {
@@ -54,9 +50,21 @@
     { "type": "path", "url": "../../packages/audit", "options": { "symlink": true } }
   ],
   "scripts": {
+    "post-autoload-dump": [
+      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+      "@php artisan package:discover --ansi"
+    ],
+    "post-create-project-cmd": [
+      "@php artisan key:generate --ansi"
+    ],
     "test": "vendor/bin/pest",
     "lint": "pint --test",
     "format": "pint"
+  },
+  "extra": {
+    "laravel": {
+      "dont-discover": []
+    }
   },
   "minimum-stability": "stable",
   "prefer-stable": true

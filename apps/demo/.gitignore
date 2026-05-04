@@ -1,9 +1,14 @@
 /vendor
 /node_modules
 /public/build
+/public/hot
 /.phpunit.cache
 .phpunit.result.cache
 .env
 .env.local
 composer.lock
 pnpm-lock.yaml
+/storage/*.key
+/storage/pail
+/database/database.sqlite
+/database/database.sqlite-journal

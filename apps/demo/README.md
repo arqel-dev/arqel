@@ -70,6 +70,8 @@ pnpm install
 
 ```bash
 cd apps/demo
+cp .env.example .env
+php artisan key:generate
 touch database/database.sqlite
 php artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
 ```

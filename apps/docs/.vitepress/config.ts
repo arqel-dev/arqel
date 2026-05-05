@@ -1,6 +1,14 @@
 import { type DefaultTheme, defineConfig } from 'vitepress';
+import typesPkg from '../../../packages-js/types/package.json' with { type: 'json' };
 
 const ogImage = '/og.png';
+
+// Read version at build time from @arqel-dev/types — single source of truth
+// shared by every package in the monorepo (pnpm bumps them together).
+// Display as "v<MAJOR>.<MINOR>" in the nav (e.g. "v0.8") so patch releases
+// don't churn the rendered HTML on every nav.
+const FULL_VERSION = typesPkg.version;
+const NAV_VERSION = `v${FULL_VERSION.split('.').slice(0, 2).join('.')}`;
 
 type SidebarText = {
   starting: string;
@@ -168,7 +176,7 @@ const T = {
     autoScaling: 'Auto-scaling',
     costEstimation: 'Cost estimation',
     comparison: 'Other hosts comparison',
-    versionMenu: 'v0.0',
+    versionMenu: NAV_VERSION,
     changelog: 'Changelog',
     roadmap: 'Roadmap',
   } as SidebarText,
@@ -252,7 +260,7 @@ const T = {
     autoScaling: 'Auto-scaling',
     costEstimation: 'Estimativa de custos',
     comparison: 'Comparação com outros hosts',
-    versionMenu: 'v0.0',
+    versionMenu: NAV_VERSION,
     changelog: 'Changelog',
     roadmap: 'Roadmap',
   } as SidebarText,
@@ -336,7 +344,7 @@ const T = {
     autoScaling: 'Auto-scaling',
     costEstimation: 'Estimación de costos',
     comparison: 'Comparación con otros hosts',
-    versionMenu: 'v0.0',
+    versionMenu: NAV_VERSION,
     changelog: 'Changelog',
     roadmap: 'Roadmap',
   } as SidebarText,

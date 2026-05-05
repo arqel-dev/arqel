@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/versioning",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "description": "Time-travel record versioning for Arqel — Versionable trait + version snapshots with diff tracking and pruning.",
     "type": "library",
     "license": "MIT",

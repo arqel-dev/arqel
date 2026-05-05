@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/types",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Shared TypeScript types for Arqel — fields, resources, tables, forms, actions, and Inertia shared props.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

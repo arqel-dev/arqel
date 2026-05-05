@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/table",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "description": "Table builder for Arqel — sort, filter, search, paginate against Eloquent.",
     "type": "library",
     "license": "MIT",

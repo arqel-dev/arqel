@@ -7,6 +7,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+_Placeholder para próximo ciclo (pós v0.8.1)._
+
+### Added
+### Changed
+### Fixed
+### Removed
+
+---
+
+## [0.8.1] - 2026-05-05
+
 ### Added
 
 - **Meta-package `arqel-dev/framework`**: instalação one-line do stack completo. `composer require arqel-dev/framework` puxa core, auth, fields, form, actions, nav, table + `inertiajs/inertia-laravel`.
@@ -35,6 +46,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Fixed
 
+- **`pnpm dev` quebrado em projetos novos**: `InstallCommand` corria `pnpm add @vitejs/plugin-react vite ...` sem versões pinadas, puxando `plugin-react@6` (requer Vite 8) ao lado de `vite@7` (Laravel 12 default), resultando em `ERR_PACKAGE_PATH_NOT_EXPORTED 'vite/internal'`. Pinou-se a `@vitejs/plugin-react@^4.7.0`, `vite@^7.0.0`, `tailwindcss@^4.0.0`, `laravel-vite-plugin@^2.0.0`, `typescript@^5.6.0`. Projetos `0.8.0` precisam: `pnpm remove @vitejs/plugin-react && pnpm add -D @vitejs/plugin-react@^4.7.0`.
 - **Split-screen invisível em dark mode**: `dark:brightness-[0.2] dark:grayscale` no hero `<img>` removido das 5 auth pages.
 - **`@arqel-dev/fields-advanced` DTS build**: corrigido `exactOptionalPropertyTypes` em `RepeaterInput`, `BuilderInput`, `WizardInput`.
 - **`@arqel-dev/react` ThemeProvider context split**: `tsup splitting: true` evita que `useTheme()` veja contextos diferentes entre entries.
@@ -277,6 +289,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 - _Sem entradas — primeira release tagueada._
 
-[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/arqel-dev/arqel/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/arqel-dev/arqel/compare/v0.8.0-rc.1...v0.8.0
 [0.8.0-rc.1]: https://github.com/arqel-dev/arqel/releases/tag/v0.8.0-rc.1

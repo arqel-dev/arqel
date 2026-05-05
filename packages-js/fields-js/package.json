@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/fields",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Rich React input components for Arqel — registered into @arqel-dev/ui's FieldRegistry.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

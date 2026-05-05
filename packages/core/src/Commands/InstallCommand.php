@@ -294,7 +294,10 @@ final class InstallCommand extends Command
     {
         return [
             ['@arqel-dev/react', '@arqel-dev/ui', '@arqel-dev/auth', '@arqel-dev/hooks', '@arqel-dev/fields', '@arqel-dev/types'],
-            ['@inertiajs/react', 'react', 'react-dom', '@types/react', '@types/react-dom', '@vitejs/plugin-react', '@tailwindcss/vite', 'tailwindcss', 'laravel-vite-plugin', 'vite', 'typescript'],
+            // Pinned versions: @vitejs/plugin-react v6 requires Vite 8; we
+            // target Vite 7 (Laravel 12 default), so use plugin-react v4
+            // which supports Vite 5/6/7. typescript v6 is an alpha — pin v5.
+            ['@inertiajs/react', 'react', 'react-dom', '@types/react', '@types/react-dom', '@vitejs/plugin-react@^4.7.0', '@tailwindcss/vite@^4.0.0', 'tailwindcss@^4.0.0', 'laravel-vite-plugin@^2.0.0', 'vite@^7.0.0', 'typescript@^5.6.0'],
         ];
     }
 

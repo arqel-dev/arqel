@@ -30,10 +30,13 @@ import type { FieldRendererProps } from '../shared/types.js';
 interface SubFieldSchema {
   name: string;
   type: string;
-  label?: string;
-  required?: boolean;
-  options?: ReadonlyArray<{ value: string | number; label: string }> | Record<string, string>;
-  placeholder?: string;
+  label?: string | undefined;
+  required?: boolean | undefined;
+  options?:
+    | ReadonlyArray<{ value: string | number; label: string }>
+    | Record<string, string>
+    | undefined;
+  placeholder?: string | undefined;
 }
 
 interface WizardStep {
@@ -60,66 +63,66 @@ const SUPPORTED_TYPES = new Set([
 ]);
 
 const inputClasses =
-  'h-9 w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
-  'bg-[var(--color-arqel-bg)] px-3 text-sm text-[var(--color-arqel-fg)] ' +
-  'placeholder:text-[var(--color-arqel-muted-fg)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'h-9 w-full rounded-sm border border-[var(--input)] ' +
+  'bg-background px-3 text-sm text-foreground ' +
+  'placeholder:text-muted-foreground ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50 ' +
-  'aria-invalid:border-[var(--color-arqel-destructive)]';
+  'aria-invalid:border-destructive';
 
 const textareaClasses =
-  'w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
-  'bg-[var(--color-arqel-bg)] px-3 py-2 text-sm text-[var(--color-arqel-fg)] ' +
-  'placeholder:text-[var(--color-arqel-muted-fg)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'w-full rounded-sm border border-[var(--input)] ' +
+  'bg-background px-3 py-2 text-sm text-foreground ' +
+  'placeholder:text-muted-foreground ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const buttonClasses =
-  'inline-flex h-9 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'px-3 text-sm text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-9 items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'px-3 text-sm text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const primaryButtonClasses =
-  'inline-flex h-9 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-primary)] bg-[var(--color-arqel-primary)] ' +
-  'px-3 text-sm text-[var(--color-arqel-primary-fg)] ' +
+  'inline-flex h-9 items-center justify-center rounded-sm ' +
+  'border border-primary bg-primary ' +
+  'px-3 text-sm text-primary-foreground ' +
   'hover:opacity-90 ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 function readSubField(raw: unknown): SubFieldSchema | null {
   if (typeof raw !== 'object' || raw === null) return null;
   const r = raw as Record<string, unknown>;
-  if (typeof r.name !== 'string' || typeof r.type !== 'string') return null;
+  if (typeof r['name'] !== 'string' || typeof r['type'] !== 'string') return null;
   return {
-    name: r.name,
-    type: r.type,
-    label: typeof r.label === 'string' ? r.label : undefined,
-    required: typeof r.required === 'boolean' ? r.required : false,
+    name: r['name'],
+    type: r['type'],
+    label: typeof r['label'] === 'string' ? r['label'] : undefined,
+    required: typeof r['required'] === 'boolean' ? r['required'] : false,
     options:
-      Array.isArray(r.options) || (typeof r.options === 'object' && r.options !== null)
-        ? (r.options as SubFieldSchema['options'])
+      Array.isArray(r['options']) || (typeof r['options'] === 'object' && r['options'] !== null)
+        ? (r['options'] as SubFieldSchema['options'])
         : undefined,
-    placeholder: typeof r.placeholder === 'string' ? r.placeholder : undefined,
+    placeholder: typeof r['placeholder'] === 'string' ? r['placeholder'] : undefined,
   };
 }
 
 function readStep(raw: unknown): WizardStep | null {
   if (typeof raw !== 'object' || raw === null) return null;
   const r = raw as Record<string, unknown>;
-  if (typeof r.name !== 'string') return null;
-  const schema = Array.isArray(r.schema)
-    ? (r.schema
+  if (typeof r['name'] !== 'string') return null;
+  const schema = Array.isArray(r['schema'])
+    ? (r['schema']
         .map(readSubField)
         .filter((s): s is SubFieldSchema => s !== null) as SubFieldSchema[])
     : [];
   return {
-    name: r.name,
-    label: typeof r.label === 'string' && r.label !== '' ? r.label : r.name,
-    icon: typeof r.icon === 'string' ? r.icon : null,
+    name: r['name'],
+    label: typeof r['label'] === 'string' && r['label'] !== '' ? r['label'] : r['name'],
+    icon: typeof r['icon'] === 'string' ? r['icon'] : null,
     schema,
   };
 }
@@ -166,7 +169,7 @@ interface SubFieldInputProps {
   field: SubFieldSchema;
   value: unknown;
   onChange: (next: unknown) => void;
-  disabled?: boolean;
+  disabled?: boolean | undefined;
   inputId: string;
 }
 
@@ -247,7 +250,7 @@ function SubFieldInput({ field, value, onChange, disabled, inputId }: SubFieldIn
   }
 
   const note = SUPPORTED_TYPES.has(type) ? null : (
-    <p className="mt-1 text-xs text-[var(--color-arqel-muted-fg)]">type {type} not yet supported</p>
+    <p className="mt-1 text-xs text-muted-foreground">type {type} not yet supported</p>
   );
 
   return (
@@ -403,7 +406,7 @@ export function WizardInput({
     return (
       <div
         id={baseId}
-        className="rounded-[var(--radius-arqel-sm)] border border-dashed border-[var(--color-arqel-input)] p-4 text-sm text-[var(--color-arqel-muted-fg)]"
+        className="rounded-sm border border-dashed border-[var(--input)] p-4 text-sm text-muted-foreground"
         aria-describedby={describedBy}
       >
         No wizard steps configured.
@@ -420,7 +423,7 @@ export function WizardInput({
       className="space-y-4"
     >
       {field.label ? (
-        <h2 id={titleId} className="text-sm font-medium text-[var(--color-arqel-fg)]">
+        <h2 id={titleId} className="text-sm font-medium text-foreground">
           {field.label}
         </h2>
       ) : null}
@@ -437,12 +440,12 @@ export function WizardInput({
           const reachable = props.skippable || isVisited;
 
           const baseStepClasses =
-            'inline-flex items-center gap-2 rounded-[var(--radius-arqel-sm)] border px-3 py-1.5 text-sm';
+            'inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm';
           const stateClasses = isActive
-            ? 'border-[var(--color-arqel-primary)] font-semibold ring-2 ring-[var(--color-arqel-ring)]'
+            ? 'border-primary font-semibold ring-2 ring-ring'
             : isCompleted
-              ? 'border-[var(--color-arqel-input)] text-[var(--color-arqel-fg)]'
-              : 'border-[var(--color-arqel-input)] text-[var(--color-arqel-muted-fg)]';
+              ? 'border-[var(--input)] text-foreground'
+              : 'border-[var(--input)] text-muted-foreground';
           const ariaCurrent: 'step' | undefined = isActive ? 'step' : undefined;
           const accessibleLabel = `Step ${idx + 1}: ${step.label}`;
 
@@ -454,7 +457,7 @@ export function WizardInput({
                   onClick={() => handleHeaderClick(idx)}
                   aria-current={ariaCurrent}
                   aria-label={accessibleLabel}
-                  className={`${baseStepClasses} ${stateClasses} hover:bg-[var(--color-arqel-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]`}
+                  className={`${baseStepClasses} ${stateClasses} hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
                   disabled={disabled}
                 >
                   <span aria-hidden="true">
@@ -488,25 +491,19 @@ export function WizardInput({
 
       {/* Step body */}
       {currentStep ? (
-        <div className="grid grid-cols-1 gap-3 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] p-4">
+        <div className="grid grid-cols-1 gap-3 rounded-sm border border-[var(--input)] bg-background p-4">
           {currentStep.schema.length === 0 ? (
-            <p className="text-sm text-[var(--color-arqel-muted-fg)]">This step has no fields.</p>
+            <p className="text-sm text-muted-foreground">This step has no fields.</p>
           ) : (
             currentStep.schema.map((sub) => {
               const subId = `${baseId}-step-${safeIndex}-${sub.name}`;
               const subLabel = sub.label ?? sub.name;
               return (
                 <div key={sub.name} className="grid gap-1">
-                  <label
-                    htmlFor={subId}
-                    className="text-xs font-medium text-[var(--color-arqel-muted-fg)]"
-                  >
+                  <label htmlFor={subId} className="text-xs font-medium text-muted-foreground">
                     {subLabel}
                     {sub.required ? (
-                      <span
-                        aria-hidden="true"
-                        className="ml-0.5 text-[var(--color-arqel-destructive)]"
-                      >
+                      <span aria-hidden="true" className="ml-0.5 text-destructive">
                         *
                       </span>
                     ) : null}
@@ -529,7 +526,7 @@ export function WizardInput({
       {stepErrors.length > 0 ? (
         <div
           role="alert"
-          className="rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-destructive)] bg-[var(--color-arqel-destructive)]/10 p-3 text-sm text-[var(--color-arqel-destructive)]"
+          className="rounded-sm border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
         >
           <ul className="list-disc pl-4">
             {stepErrors.map((err) => (

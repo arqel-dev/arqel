@@ -7,6 +7,7 @@ namespace Arqel\Auth\Http\Controllers;
 use Arqel\Auth\Http\Requests\LoginRequest;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,6 +42,7 @@ final class LoginController
             'canRegister' => $panel?->registrationEnabled() ?? false,
             'canResetPassword' => $panel?->passwordResetEnabled() ?? false,
             'loginUrl' => $panel?->getLoginUrl() ?? '/admin/login',
+            'registerUrl' => Route::has('register') ? route('register') : '/admin/register',
             'forgotPasswordUrl' => $panel?->getForgotPasswordUrl() ?? '/admin/forgot-password',
         ]);
     }

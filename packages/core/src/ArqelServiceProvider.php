@@ -11,6 +11,7 @@ use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
 use Arqel\Core\CommandPalette\Providers\ThemeCommandProvider;
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
+use Arqel\Core\Commands\MakeUserCommand;
 use Arqel\Core\Console\AuditCommand;
 use Arqel\Core\Console\CloudInfoCommand;
 use Arqel\Core\Console\DoctorCommand;
@@ -49,6 +50,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 InstallCommand::class,
                 MakeResourceCommand::class,
+                MakeUserCommand::class,
                 DoctorCommand::class,
                 AuditCommand::class,
                 CloudInfoCommand::class,

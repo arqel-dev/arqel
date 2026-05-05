@@ -15,6 +15,7 @@
  * package dependency-free. The renderer prop is the extension point.
  */
 
+import { Card, CardContent } from '@arqel-dev/ui';
 import type { ReactElement, ReactNode } from 'react';
 
 export interface WorkflowVisualizerStateShape {
@@ -177,18 +178,27 @@ export function WorkflowVisualizer({
 
   if (renderer) {
     return (
-      <div className={wrapperClass} data-testid="workflow-visualizer" data-field={definition.field}>
-        {renderer(source)}
-      </div>
+      <Card
+        className={wrapperClass}
+        data-testid="workflow-visualizer"
+        data-field={definition.field}
+      >
+        <CardContent className="p-4">{renderer(source)}</CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className={wrapperClass} data-testid="workflow-visualizer" data-field={definition.field}>
-      <pre className="language-mermaid" data-testid="workflow-visualizer-source">
-        {source}
-      </pre>
-    </div>
+    <Card className={wrapperClass} data-testid="workflow-visualizer" data-field={definition.field}>
+      <CardContent className="p-4">
+        <pre
+          className="language-mermaid overflow-x-auto rounded-md bg-muted p-3 text-sm text-foreground"
+          data-testid="workflow-visualizer-source"
+        >
+          {source}
+        </pre>
+      </CardContent>
+    </Card>
   );
 }
 

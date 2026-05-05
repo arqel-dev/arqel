@@ -17,6 +17,7 @@
       "**/*.jsonc",
       "!**/node_modules",
       "!**/dist",
+      "!**/src/shadcn",
       "!**/build",
       "!**/coverage",
       "!**/.turbo",

@@ -126,9 +126,9 @@ export function DataTable<TRecord extends DataTableRecord>({
   return (
     <div className={cn('w-full overflow-x-auto', className)}>
       <table className="w-full border-collapse text-sm">
-        <thead className="sticky top-0 bg-[var(--color-arqel-bg)]">
+        <thead className="sticky top-0 bg-background">
           {table.getHeaderGroups().map((group) => (
-            <tr key={group.id} className="border-b border-[var(--color-arqel-border)]">
+            <tr key={group.id} className="border-b border-border">
               {enableSelection && (
                 <th scope="col" className="w-10 px-3 py-2 text-left">
                   <input
@@ -151,7 +151,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                     key={header.id}
                     scope="col"
                     className={cn(
-                      'px-3 py-2 text-left font-medium text-[var(--color-arqel-muted-fg)]',
+                      'px-3 py-2 text-left font-medium text-muted-foreground',
                       col?.align === 'center' && 'text-center',
                       col?.align === 'end' && 'text-right',
                     )}
@@ -166,7 +166,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                     {sortable ? (
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1 hover:text-[var(--color-arqel-fg)]"
+                        className="inline-flex items-center gap-1 hover:text-foreground"
                         onClick={() =>
                           onSortChange(header.column.id, direction === 'asc' ? 'desc' : 'asc')
                         }
@@ -193,7 +193,7 @@ export function DataTable<TRecord extends DataTableRecord>({
             <tr>
               <td
                 colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
-                className="px-3 py-4 text-center text-[var(--color-arqel-muted-fg)]"
+                className="px-3 py-4 text-center text-muted-foreground"
               >
                 Loading…
               </td>
@@ -203,7 +203,7 @@ export function DataTable<TRecord extends DataTableRecord>({
             <tr>
               <td
                 colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
-                className="px-3 py-8 text-center text-[var(--color-arqel-muted-fg)]"
+                className="px-3 py-8 text-center text-muted-foreground"
               >
                 {emptyState ?? 'No records found.'}
               </td>
@@ -217,10 +217,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                 <tr
                   key={row.id}
                   data-selected={checked || undefined}
-                  className={cn(
-                    'border-b border-[var(--color-arqel-border)]',
-                    checked && 'bg-[var(--color-arqel-muted)]',
-                  )}
+                  className={cn('border-b border-border', checked && 'bg-muted')}
                 >
                   {enableSelection && (
                     <td className="w-10 px-3 py-2">

@@ -1,3 +1,4 @@
+import { Alert, AlertDescription } from '@arqel-dev/ui';
 import type { ReactNode } from 'react';
 import { type ConnectionStatus, useConnectionStatus } from './useConnectionStatus';
 import { useFallbackPolling } from './useFallbackPolling';
@@ -31,6 +32,16 @@ const DEFAULT_MESSAGES: Record<ConnectionStatus, string> = {
   unavailable: '',
 };
 
+type AlertVariant = 'default' | 'destructive' | 'success' | 'warning';
+
+const STATUS_VARIANT: Record<ConnectionStatus, AlertVariant> = {
+  connected: 'success',
+  connecting: 'warning',
+  disconnected: 'warning',
+  failed: 'destructive',
+  unavailable: 'default',
+};
+
 /**
  * Banner inline que mostra o estado da conexão WebSocket e (opcionalmente)
  * dispara fallback polling Inertia quando o canal cai.
@@ -38,7 +49,7 @@ const DEFAULT_MESSAGES: Record<ConnectionStatus, string> = {
  * Render rules:
  * - `connected`   → null
  * - `unavailable` → null (Echo não configurado; ignora silenciosamente)
- * - outros        → banner com `role="status"` e `aria-live="polite"`
+ * - outros        → `<Alert>` com variant mapeada por status
  *
  * O fallback polling só é ativado quando `pollOnDisconnect === true` e
  * `status === 'disconnected'`. Em `connecting` / `failed` não polleamos
@@ -69,13 +80,15 @@ export function ConnectionStatusBanner(props: ConnectionStatusBannerProps): Reac
   }
 
   return (
-    <div
+    <Alert
+      variant={STATUS_VARIANT[status]}
       role="status"
       aria-live="polite"
       data-status={status}
-      className={className ?? 'arqel-connection-banner'}
+      data-arqel-connection-banner=""
+      className={className}
     >
-      {DEFAULT_MESSAGES[status]}
-    </div>
+      <AlertDescription>{DEFAULT_MESSAGES[status]}</AlertDescription>
+    </Alert>
   );
 }

@@ -1,0 +1,42 @@
+{
+    "name": "arqel-dev/arqel",
+    "version": "0.8.0",
+    "description": "Arqel — admin panels for Laravel, forged in PHP, rendered in React. Meta-package that requires the full Arqel stack (core, auth, fields, form, actions, nav, table) plus inertia-laravel.",
+    "type": "metapackage",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "admin",
+        "panel",
+        "filament",
+        "inertia",
+        "react",
+        "shadcn",
+        "arqel"
+    ],
+    "homepage": "https://arqel.dev",
+    "support": {
+        "issues": "https://github.com/arqel-dev/arqel/issues",
+        "source": "https://github.com/arqel-dev/arqel",
+        "docs": "https://arqel.dev/docs"
+    },
+    "authors": [
+        {
+            "name": "Arqel Contributors",
+            "homepage": "https://github.com/arqel-dev/arqel"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "arqel-dev/core": "self.version",
+        "arqel-dev/auth": "self.version",
+        "arqel-dev/fields": "self.version",
+        "arqel-dev/form": "self.version",
+        "arqel-dev/actions": "self.version",
+        "arqel-dev/nav": "self.version",
+        "arqel-dev/table": "self.version",
+        "inertiajs/inertia-laravel": "^1.0|^2.0|^3.0"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

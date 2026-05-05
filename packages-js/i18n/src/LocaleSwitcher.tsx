@@ -1,5 +1,13 @@
+import {
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@arqel-dev/ui';
 import { router } from '@inertiajs/react';
-import { type ChangeEvent, useId } from 'react';
+import { type ReactElement, useId } from 'react';
 import { useI18nContext } from './I18nProvider';
 
 type LocaleSwitcherProps = {
@@ -21,8 +29,8 @@ const DEFAULT_LABELS: Readonly<Record<string, string>> = {
 };
 
 /**
- * `<LocaleSwitcher />` — `<select>` semanticamente correto que dispara
- * POST a `endpoint` com `{locale}`, aproveitando Inertia router para
+ * `<LocaleSwitcher />` — Radix Select styled (shadcn) que dispara POST
+ * para `endpoint` com `{locale}`, aproveitando Inertia router para
  * preservar state e re-renderizar com o novo locale resolvido.
  */
 export function LocaleSwitcher({
@@ -30,14 +38,13 @@ export function LocaleSwitcher({
   label,
   labels,
   className,
-}: LocaleSwitcherProps): JSX.Element {
+}: LocaleSwitcherProps): ReactElement {
   const { locale, available, t } = useI18nContext();
   const selectId = useId();
   const fieldLabel = label ?? t('locale.switcher.label');
   const map = { ...DEFAULT_LABELS, ...(labels ?? {}) };
 
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const next = event.target.value;
+  const handleValueChange = (next: string): void => {
     if (next === locale) {
       return;
     }
@@ -45,25 +52,22 @@ export function LocaleSwitcher({
   };
 
   return (
-    <div className={className} data-arqel-locale-switcher>
-      <label
-        htmlFor={selectId}
-        style={{
-          display: 'block',
-          fontSize: '0.75rem',
-          color: 'var(--arqel-color-fg-muted, #525252)',
-          marginBottom: '0.25rem',
-        }}
-      >
+    <div className={className} data-arqel-locale-switcher="">
+      <Label htmlFor={selectId} className="text-xs text-muted-foreground mb-1 block">
         {fieldLabel}
-      </label>
-      <select id={selectId} value={locale} onChange={handleChange} aria-label={fieldLabel}>
-        {available.map((code) => (
-          <option key={code} value={code}>
-            {map[code] ?? code}
-          </option>
-        ))}
-      </select>
+      </Label>
+      <Select value={locale} onValueChange={handleValueChange}>
+        <SelectTrigger id={selectId} aria-label={fieldLabel}>
+          <SelectValue placeholder={fieldLabel} />
+        </SelectTrigger>
+        <SelectContent>
+          {available.map((code) => (
+            <SelectItem key={code} value={code}>
+              {map[code] ?? code}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

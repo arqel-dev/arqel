@@ -1,8 +1,79 @@
-import '@arqel/ui/styles.css';
-import '@arqel/fields/register';
-import { createArqelApp } from '@arqel/react/inertia';
+import {
+  ForgotPasswordPage,
+  LoginPage,
+  RegisterPage,
+  ResetPasswordPage,
+  VerifyEmailNoticePage,
+} from '@arqel-dev/auth';
+import { createArqelApp } from '@arqel-dev/react/inertia';
+import { arqelPages } from '@arqel-dev/ui/pages';
+import { AppShell, Sidebar, Topbar } from '@arqel-dev/ui/shell';
+import '@arqel-dev/fields/register';
+import type { ComponentType, ReactNode } from 'react';
 
-createArqelApp({
+type LazyPage = () => Promise<{ default: ComponentType<unknown> }>;
+
+type LayoutFn = (page: ReactNode) => ReactNode;
+
+type LayoutComponent = ComponentType<unknown> & { layout?: LayoutFn };
+
+/**
+ * Layout persistente para páginas de Resources do painel admin.
+ * Páginas de auth (Login, Register, etc.) renderizam standalone sem
+ * AppShell.
+ */
+const adminLayout: LayoutFn = (page) => (
+  <AppShell
+    variant="sidebar-left"
+    sidebar={<Sidebar brand={<span className="font-semibold">{'{{app_name}}'}</span>} />}
+    topbar={<Topbar brand={<span className="font-medium">{'{{app_name}}'}</span>} />}
+  >
+    {page}
+  </AppShell>
+);
+
+/**
+ * Embrulha o loader de uma página Inertia para que o componente
+ * resolvido carregue um `layout` estático persistente — Inertia trata
+ * `Component.layout` como layout persistente, só re-renderiza o
+ * conteúdo interno entre navegações.
+ */
+function withAdminLayout(loader: LazyPage): LazyPage {
+  return async () => {
+    const mod = await loader();
+    const Component = mod.default as LayoutComponent;
+    if (!Component.layout) {
+      Component.layout = adminLayout;
+    }
+    return { default: Component };
+  };
+}
+
+const wrappedArqelPages: Record<string, LazyPage> = Object.fromEntries(
+  Object.entries(arqelPages).map(([key, loader]) => [key, withAdminLayout(loader as LazyPage)]),
+);
+
+const authPages: Record<string, LazyPage> = {
+  'arqel-dev/auth/Login': async () => ({ default: LoginPage as ComponentType<unknown> }),
+  'arqel-dev/auth/Register': async () => ({ default: RegisterPage as ComponentType<unknown> }),
+  'arqel-dev/auth/ForgotPassword': async () => ({
+    default: ForgotPasswordPage as ComponentType<unknown>,
+  }),
+  'arqel-dev/auth/ResetPassword': async () => ({
+    default: ResetPasswordPage as ComponentType<unknown>,
+  }),
+  'arqel-dev/auth/VerifyEmailNotice': async () => ({
+    default: VerifyEmailNoticePage as ComponentType<unknown>,
+  }),
+};
+
+const userPages = import.meta.glob<{ default: ComponentType<unknown> }>('./Pages/**/*.tsx');
+
+void createArqelApp({
   appName: import.meta.env.VITE_APP_NAME ?? '{{app_name}}',
-  pages: import.meta.glob('./Pages/**/*.tsx'),
+  pages: {
+    ...wrappedArqelPages,
+    ...authPages,
+    ...(userPages as unknown as Record<string, LazyPage>),
+  },
 });

@@ -31,6 +31,6 @@ describe('VerifyEmailNoticePage', () => {
   it('renders the status message when verification-link-sent', () => {
     render(<VerifyEmailNoticePage status="verification-link-sent" />);
 
-    expect(screen.getByRole('status')).toHaveTextContent(/novo link de verificação/i);
+    expect(screen.getByText(/novo link de verificação/i)).toBeInTheDocument();
   });
 });

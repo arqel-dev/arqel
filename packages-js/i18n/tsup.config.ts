@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', '@inertiajs/react'],
+  external: ['react', 'react-dom', '@arqel-dev/ui', '@inertiajs/react'],
 });

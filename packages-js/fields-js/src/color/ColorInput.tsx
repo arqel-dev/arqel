@@ -31,7 +31,7 @@ export function ColorInput({
         id={inputId}
         type="color"
         className={cn(
-          'h-9 w-12 cursor-pointer rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)]',
+          'h-9 w-12 cursor-pointer rounded-sm border border-[var(--input)]',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
         value={current}
@@ -42,7 +42,7 @@ export function ColorInput({
       />
       <input
         type="text"
-        className="h-9 w-28 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] px-2 font-mono text-xs"
+        className="h-9 w-28 rounded-sm border border-[var(--input)] bg-background px-2 font-mono text-xs"
         value={current}
         disabled={isDisabled}
         onChange={(e) => onChange(e.target.value)}
@@ -56,7 +56,7 @@ export function ColorInput({
               aria-label={`Preset ${preset}`}
               disabled={isDisabled}
               onClick={() => onChange(preset)}
-              className="h-6 w-6 rounded-full border border-[var(--color-arqel-border)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-6 w-6 rounded-full border border-border disabled:cursor-not-allowed disabled:opacity-50"
               style={{ backgroundColor: preset }}
             />
           ))}

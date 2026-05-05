@@ -34,7 +34,7 @@ export function TableToolbar({
       </div>
       {selectedCount > 0 && (
         <section
-          className="flex flex-wrap items-center gap-2 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-border)] bg-[var(--color-arqel-muted)] px-3 py-2"
+          className="flex flex-wrap items-center gap-2 rounded-sm border border-border bg-muted px-3 py-2"
           aria-label="Bulk actions"
         >
           <span className="text-sm font-medium">{selectedCount} selected</span>
@@ -43,7 +43,7 @@ export function TableToolbar({
             {onClearSelection && (
               <button
                 type="button"
-                className="text-sm text-[var(--color-arqel-muted-fg)] hover:underline"
+                className="text-sm text-muted-foreground hover:underline"
                 onClick={onClearSelection}
               >
                 Clear

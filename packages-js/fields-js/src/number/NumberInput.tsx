@@ -66,7 +66,7 @@ export function NumberInput({
           aria-label="Increment"
           disabled={isDisabled}
           onClick={() => setValue((current ?? 0) + step)}
-          className="flex h-1/2 w-8 items-center justify-center text-xs text-[var(--color-arqel-muted-fg)] hover:text-[var(--color-arqel-fg)] disabled:opacity-50"
+          className="flex h-1/2 w-8 items-center justify-center text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           ▲
         </button>
@@ -75,7 +75,7 @@ export function NumberInput({
           aria-label="Decrement"
           disabled={isDisabled}
           onClick={() => setValue((current ?? 0) - step)}
-          className="flex h-1/2 w-8 items-center justify-center text-xs text-[var(--color-arqel-muted-fg)] hover:text-[var(--color-arqel-fg)] disabled:opacity-50"
+          className="flex h-1/2 w-8 items-center justify-center text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           ▼
         </button>

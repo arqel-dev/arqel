@@ -37,9 +37,9 @@ export interface NativeProps {
 }
 
 const inputClasses = cn(
-  'h-9 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)]',
-  'bg-[var(--color-arqel-bg)] px-3 text-sm',
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]',
+  'h-9 rounded-sm border border-[var(--input)]',
+  'bg-background px-3 text-sm',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   'disabled:cursor-not-allowed disabled:opacity-50',
 );
 
@@ -191,7 +191,7 @@ function Checkbox({
     <input
       id={inputId}
       type="checkbox"
-      className="h-4 w-4 rounded border-[var(--color-arqel-input)]"
+      className="h-4 w-4 rounded border-[var(--input)]"
       checked={value === true}
       disabled={disabled || field.disabled || field.readonly}
       aria-describedby={describedBy}

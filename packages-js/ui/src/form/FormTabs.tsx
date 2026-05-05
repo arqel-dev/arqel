@@ -64,7 +64,7 @@ export function FormTabs({ config, tabs, className }: FormTabsProps): ReactEleme
       <div
         role="tablist"
         aria-orientation={config.orientation}
-        className="flex gap-1 border-b border-[var(--color-arqel-border)]"
+        className="flex gap-1 border-b border-border"
       >
         {tabs.map((tab, i) => {
           const selected = tab.id === active;
@@ -85,15 +85,13 @@ export function FormTabs({ config, tabs, className }: FormTabsProps): ReactEleme
               className={cn(
                 '-mb-px border-b-2 px-3 py-2 text-sm transition-colors',
                 selected
-                  ? 'border-[var(--color-arqel-primary)] font-medium text-[var(--color-arqel-fg)]'
-                  : 'border-transparent text-[var(--color-arqel-muted-fg)] hover:text-[var(--color-arqel-fg)]',
+                  ? 'border-primary font-medium text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground',
               )}
             >
               {tab.label}
               {tab.badge !== undefined && tab.badge !== null && (
-                <span className="ml-1 rounded-full bg-[var(--color-arqel-muted)] px-1.5 text-xs">
-                  {tab.badge}
-                </span>
+                <span className="ml-1 rounded-full bg-muted px-1.5 text-xs">{tab.badge}</span>
               )}
             </button>
           );

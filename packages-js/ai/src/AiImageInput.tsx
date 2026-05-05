@@ -36,6 +36,7 @@
  * em handlers de evento.
  */
 
+import { Alert, AlertDescription, Badge, Button, Card, CardContent } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
 
 export interface AiImageInputFieldProps {
@@ -117,6 +118,28 @@ function formatBytes(bytes: number): string {
     return `${(bytes / 1024).toFixed(1)} KB`;
   }
   return `${String(bytes)} B`;
+}
+
+function Spinner(): ReactElement {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="animate-spin"
+    >
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
+      <path
+        d="M22 12a10 10 0 0 1-10 10"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export function AiImageInput(props: AiImageInputProps): ReactElement {
@@ -271,13 +294,16 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
 
   return (
     <div
-      className="arqel-ai-image-input"
+      className="flex flex-col gap-2"
       data-arqel-field="aiImage"
       data-field-name={name}
       data-has-value={value !== null && value !== '' ? 'true' : 'false'}
     >
-      <label htmlFor={inputId} className="arqel-ai-image-input__dropzone">
-        <span className="arqel-ai-image-input__dropzone-text">
+      <label
+        htmlFor={inputId}
+        className="flex items-center justify-center w-full min-h-[6rem] rounded-sm border-2 border-dashed border-border bg-muted/40 px-4 py-6 text-sm text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
+      >
+        <span>
           {file !== null ? file.name : `Click or drop image (${accept !== '' ? accept : 'any'})`}
         </span>
         <input
@@ -285,107 +311,106 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
           type="file"
           accept={accept}
           onChange={handleFileChange}
-          className="arqel-ai-image-input__file"
+          className="sr-only"
           aria-label="Image file"
         />
       </label>
 
       {previewUrl !== null ? (
-        <div className="arqel-ai-image-input__preview-image">
-          <img src={previewUrl} alt="Selected preview" data-testid="image-preview" />
-        </div>
+        <Card>
+          <CardContent className="p-2 flex items-center justify-center">
+            <img
+              src={previewUrl}
+              alt="Selected preview"
+              data-testid="image-preview"
+              className="max-h-64 max-w-full rounded-sm"
+            />
+          </CardContent>
+        </Card>
       ) : null}
 
-      <div className="arqel-ai-image-input__toolbar">
-        <button
-          type="button"
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => {
             void handleAnalyze();
           }}
           disabled={!canAnalyze}
           aria-label={buttonLabel}
-          className="arqel-ai-image-input__button"
         >
           {isLoading ? (
-            <span role="status" aria-label="Analyzing" className="arqel-ai-image-input__spinner">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeOpacity="0.25"
-                  strokeWidth="4"
-                />
-                <path
-                  d="M22 12a10 10 0 0 1-10 10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-              </svg>
+            <span role="status" aria-label="Analyzing">
+              <Spinner />
             </span>
           ) : null}
           <span>{buttonLabel}</span>
-        </button>
+        </Button>
 
         {hasResults && results !== null ? (
-          <button
-            type="button"
+          <Button
+            variant="default"
+            size="sm"
             onClick={() => {
               applyAll(results);
             }}
-            className="arqel-ai-image-input__apply-all"
           >
             Apply all
-          </button>
+          </Button>
         ) : null}
       </div>
 
       {hasResults && results !== null ? (
-        <dl className="arqel-ai-image-input__results">
-          {(analyses.length > 0 ? analyses : Object.keys(results)).map((key) => {
-            const val = results[key];
-            if (val === undefined) {
-              return null;
-            }
-            const target = populateMapping[key];
-            const hasTarget = target !== undefined && target !== '';
-            return (
-              <div key={key} className="arqel-ai-image-input__result-entry">
-                <dt className="arqel-ai-image-input__result-key">{key}</dt>
-                <dd className="arqel-ai-image-input__result-value">
-                  <span data-testid={`analysis-value-${key}`}>{val}</span>
-                  {hasTarget ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        applyOne(key, val);
-                      }}
-                      className="arqel-ai-image-input__apply-one"
-                      aria-label={`Apply ${key}`}
-                    >
-                      Apply
-                    </button>
-                  ) : null}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
+        <Card>
+          <CardContent className="p-4">
+            <dl className="flex flex-col gap-2">
+              {(analyses.length > 0 ? analyses : Object.keys(results)).map((key) => {
+                const val = results[key];
+                if (val === undefined) {
+                  return null;
+                }
+                const target = populateMapping[key];
+                const hasTarget = target !== undefined && target !== '';
+                return (
+                  <div
+                    key={key}
+                    className="flex items-center justify-between gap-2 border-b border-border pb-2 last:border-b-0 last:pb-0"
+                  >
+                    <dt>
+                      <Badge variant="outline">{key}</Badge>
+                    </dt>
+                    <dd className="flex items-center gap-2 flex-1 justify-end">
+                      <span
+                        className="text-sm text-foreground truncate"
+                        data-testid={`analysis-value-${key}`}
+                      >
+                        {val}
+                      </span>
+                      {hasTarget ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            applyOne(key, val);
+                          }}
+                          aria-label={`Apply ${key}`}
+                        >
+                          Apply
+                        </Button>
+                      ) : null}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </CardContent>
+        </Card>
       ) : null}
 
       {error !== null ? (
-        <div role="alert" className="arqel-ai-image-input__error">
-          {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       ) : null}
     </div>
   );

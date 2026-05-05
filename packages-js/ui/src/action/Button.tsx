@@ -1,56 +1,16 @@
 /**
- * `<Button>` — primitive button used by ActionButton, FormActions, etc.
+ * Re-export shadcn (new-york) Button so existing consumers continue to
+ * import `Button` and `buttonVariants` from `@arqel-dev/ui/action`
+ * while the actual implementation lives in `src/shadcn/ui/button.tsx`.
  *
- * Variants and sizes mirror the canonical Arqel ActionVariant + ActionColor
- * matrix so server-emitted ActionSchema can drive presentation directly.
+ * Variants exposed (shadcn): `default | destructive | outline |
+ * secondary | ghost | link`. Sizes: `default | xs | sm | lg | icon |
+ * icon-xs | icon-sm | icon-lg`.
  */
 
-import { cva, type VariantProps } from 'class-variance-authority';
-import { forwardRef } from 'react';
-import { cn } from '../utils/cn.js';
+import type { ComponentProps } from 'react';
+import type { Button } from '../shadcn/ui/button.js';
 
-const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-arqel-sm)] text-sm font-medium ' +
-    'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
-    'disabled:pointer-events-none disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        default:
-          'bg-[var(--color-arqel-primary)] text-[var(--color-arqel-primary-fg)] hover:opacity-90',
-        outline:
-          'border border-[var(--color-arqel-border)] bg-transparent text-[var(--color-arqel-fg)] hover:bg-[var(--color-arqel-muted)]',
-        ghost: 'bg-transparent text-[var(--color-arqel-fg)] hover:bg-[var(--color-arqel-muted)]',
-        destructive:
-          'bg-[var(--color-arqel-destructive)] text-[var(--color-arqel-destructive-fg)] hover:opacity-90',
-      },
-      size: {
-        sm: 'h-8 px-3',
-        md: 'h-9 px-4',
-        lg: 'h-10 px-6',
-        icon: 'h-9 w-9',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'md',
-    },
-  },
-);
+export { Button, buttonVariants } from '../shadcn/ui/button.js';
 
-export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
-  VariantProps<typeof buttonVariants>;
-
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, type = 'button', ...props }, ref) => (
-    <button
-      ref={ref}
-      type={type}
-      className={cn(buttonVariants({ variant, size }), className)}
-      {...props}
-    />
-  ),
-);
-Button.displayName = 'Button';
-
-export { buttonVariants };
+export type ButtonProps = ComponentProps<typeof Button>;

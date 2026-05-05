@@ -15,11 +15,18 @@ return [
     ],
 
     'inertia' => [
-        'root_view' => 'arqel::app',
+        // Default Blade root view used by Inertia. `arqel:install`
+        // publishes a user-owned root at `resources/views/arqel/layout.blade.php`
+        // (referenced by the `arqel.layout` view name) so the framework
+        // doesn't depend on Ziggy's `@routes` directive. Override here
+        // when the app already has a different Inertia root, e.g.
+        // pointing at the package-shipped `arqel::app` (which expects
+        // Ziggy installed) or at a custom view.
+        'root_view' => 'arqel.layout',
 
-        // Vite entry points injected by the `arqel::app` Blade root
-        // view. Override when the app uses non-default paths (e.g.
-        // a separate admin bundle or a Turbopack setup).
+        // Vite entry points injected by the Blade root view. Override
+        // when the app uses non-default paths (e.g. a separate admin
+        // bundle or a Turbopack setup).
         'vite_entries' => [
             'resources/css/app.css',
             'resources/js/app.tsx',

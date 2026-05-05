@@ -14,7 +14,7 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   treeshake: true,
-  splitting: false,
+  splitting: true,
   minify: false,
   external: ['react', 'react-dom', '@inertiajs/react'],
 });

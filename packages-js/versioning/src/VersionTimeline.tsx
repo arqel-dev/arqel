@@ -7,6 +7,7 @@
  * "View" e "Restore". Não faz fetch nem decisões de autorização.
  */
 
+import { Badge, Button, Card, CardContent, CardHeader, LoadingSkeleton } from '@arqel-dev/ui';
 import type { JSX } from 'react';
 
 export interface VersionUser {
@@ -86,14 +87,14 @@ function SkeletonItem({ index }: SkeletonItemProps): JSX.Element {
   return (
     <li
       key={`skeleton-${index}`}
-      className="arqel-version-timeline__item arqel-version-timeline__item--skeleton"
+      className="relative flex gap-4 pl-6"
       aria-hidden="true"
       data-testid="version-timeline-skeleton"
     >
-      <div className="arqel-version-timeline__avatar arqel-skeleton" />
-      <div className="arqel-version-timeline__body">
-        <div className="arqel-skeleton arqel-skeleton--line" />
-        <div className="arqel-skeleton arqel-skeleton--line arqel-skeleton--short" />
+      <LoadingSkeleton variant="circle" />
+      <div className="flex-1 flex flex-col gap-2">
+        <LoadingSkeleton variant="line" />
+        <LoadingSkeleton variant="line" width="60%" />
       </div>
     </li>
   );
@@ -109,7 +110,7 @@ export function VersionTimeline({
   if (loading === true) {
     return (
       <ol
-        className="arqel-version-timeline arqel-version-timeline--loading"
+        className="flex flex-col gap-4 border-l border-border pl-4"
         role="feed"
         aria-busy="true"
         aria-label="Loading versions"
@@ -123,18 +124,24 @@ export function VersionTimeline({
 
   if (versions.length === 0) {
     return (
-      <div
-        className="arqel-version-timeline arqel-version-timeline--empty"
+      <Card
+        className="text-center text-muted-foreground"
         role="status"
         data-testid="version-timeline-empty"
       >
-        <p>No versions yet.</p>
-      </div>
+        <CardContent className="py-8">
+          <p>No versions yet.</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <ol className="arqel-version-timeline" role="feed" aria-label="Version history">
+    <ol
+      className="flex flex-col gap-4 border-l border-border pl-4"
+      role="feed"
+      aria-label="Version history"
+    >
       {versions.map((version) => {
         const userName = version.user?.name ?? 'system';
         const initials = getInitials(version.user?.name);
@@ -144,53 +151,61 @@ export function VersionTimeline({
         return (
           <li
             key={version.id}
-            className="arqel-version-timeline__item"
+            className="relative"
             aria-label={`Version ${version.id} by ${userName}, ${relative}: ${version.changes_summary}`}
           >
-            <div
-              className="arqel-version-timeline__avatar"
-              aria-hidden="true"
-              data-testid={`version-timeline-avatar-${version.id}`}
-            >
-              {initials}
-            </div>
-            <div className="arqel-version-timeline__body">
-              <p className="arqel-version-timeline__summary">
-                {version.is_initial === true ? <strong>Initial: </strong> : null}
-                {version.changes_summary}
-              </p>
-              <p className="arqel-version-timeline__meta">
-                <span className="arqel-version-timeline__user">{userName}</span>
-                <span aria-hidden="true"> · </span>
-                <time dateTime={version.created_at} className="arqel-version-timeline__time">
-                  {relative}
-                </time>
-              </p>
-              <div className="arqel-version-timeline__actions">
-                {onViewDiff !== undefined ? (
-                  <button
-                    type="button"
-                    className="arqel-version-timeline__btn arqel-version-timeline__btn--view"
-                    onClick={() => {
-                      onViewDiff(version);
-                    }}
-                  >
-                    View
-                  </button>
+            <Card>
+              <CardHeader className="flex flex-row items-center gap-3">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium text-foreground"
+                  aria-hidden="true"
+                  data-testid={`version-timeline-avatar-${version.id}`}
+                >
+                  {initials}
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-foreground">{userName}</span>
+                    <Badge variant="outline">#{version.id}</Badge>
+                    {version.is_initial === true ? (
+                      <Badge variant="secondary">Initial</Badge>
+                    ) : null}
+                  </div>
+                  <time dateTime={version.created_at} className="text-xs text-muted-foreground">
+                    {relative}
+                  </time>
+                </div>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                <p className="text-sm text-foreground">{version.changes_summary}</p>
+                {onViewDiff !== undefined || (onRestore !== undefined && restoreVisible) ? (
+                  <div className="flex gap-2">
+                    {onViewDiff !== undefined ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          onViewDiff(version);
+                        }}
+                      >
+                        Compare
+                      </Button>
+                    ) : null}
+                    {onRestore !== undefined && restoreVisible ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          onRestore(version);
+                        }}
+                      >
+                        Restore
+                      </Button>
+                    ) : null}
+                  </div>
                 ) : null}
-                {onRestore !== undefined && restoreVisible ? (
-                  <button
-                    type="button"
-                    className="arqel-version-timeline__btn arqel-version-timeline__btn--restore"
-                    onClick={() => {
-                      onRestore(version);
-                    }}
-                  >
-                    Restore
-                  </button>
-                ) : null}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </li>
         );
       })}

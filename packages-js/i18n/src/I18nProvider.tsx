@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import { createContext, type ReactNode, useContext, useMemo } from 'react';
+import { createContext, type ReactElement, type ReactNode, useContext, useMemo } from 'react';
 import { buildTranslator } from './translate';
 import type { I18nContextValue, I18nSharedProps } from './types';
 
@@ -28,7 +28,7 @@ export function I18nProvider({
   children,
   i18n,
   fallbackLocale = 'en',
-}: I18nProviderProps): JSX.Element {
+}: I18nProviderProps): ReactElement {
   const sharedI18n = useSharedI18n();
   const resolved: I18nSharedProps = i18n ??
     sharedI18n ?? {
@@ -55,7 +55,7 @@ function useSharedI18n(): I18nSharedProps | undefined {
   // Hooks. When Inertia is not bootstrapped, our test mock returns
   // `{ props: {} }` so the lookup just yields `undefined` here.
   const page = usePage();
-  const i18n = (page?.props as Record<string, unknown> | undefined)?.i18n;
+  const i18n = (page?.props as Record<string, unknown> | undefined)?.['i18n'];
   return isI18nSharedProps(i18n) ? i18n : undefined;
 }
 
@@ -65,10 +65,10 @@ function isI18nSharedProps(value: unknown): value is I18nSharedProps {
   }
   const v = value as Record<string, unknown>;
   return (
-    typeof v.locale === 'string' &&
-    Array.isArray(v.available) &&
-    typeof v.translations === 'object' &&
-    v.translations !== null
+    typeof v['locale'] === 'string' &&
+    Array.isArray(v['available']) &&
+    typeof v['translations'] === 'object' &&
+    v['translations'] !== null
   );
 }
 

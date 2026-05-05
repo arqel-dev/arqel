@@ -93,42 +93,42 @@ const SUPPORTED_TYPES = new Set([
 ]);
 
 const inputClasses =
-  'h-9 w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
-  'bg-[var(--color-arqel-bg)] px-3 text-sm text-[var(--color-arqel-fg)] ' +
-  'placeholder:text-[var(--color-arqel-muted-fg)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'h-9 w-full rounded-sm border border-[var(--input)] ' +
+  'bg-background px-3 text-sm text-foreground ' +
+  'placeholder:text-muted-foreground ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50 ' +
-  'aria-invalid:border-[var(--color-arqel-destructive)]';
+  'aria-invalid:border-destructive';
 
 const textareaClasses =
-  'w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
-  'bg-[var(--color-arqel-bg)] px-3 py-2 text-sm text-[var(--color-arqel-fg)] ' +
-  'placeholder:text-[var(--color-arqel-muted-fg)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'w-full rounded-sm border border-[var(--input)] ' +
+  'bg-background px-3 py-2 text-sm text-foreground ' +
+  'placeholder:text-muted-foreground ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const buttonClasses =
-  'inline-flex h-8 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'px-3 text-sm text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-8 items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'px-3 text-sm text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const iconButtonClasses =
-  'inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'text-sm text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-8 w-8 items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'text-sm text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const dragHandleClasses =
-  'inline-flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'text-sm text-[var(--color-arqel-muted-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'text-sm text-muted-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'active:cursor-grabbing';
 
 function generateId(): string {
@@ -229,7 +229,7 @@ interface SubFieldInputProps {
   field: SubFieldSchema;
   value: unknown;
   onChange: (next: unknown) => void;
-  disabled?: boolean;
+  disabled?: boolean | undefined;
   inputId: string;
 }
 
@@ -311,7 +311,7 @@ function SubFieldInput({ field, value, onChange, disabled, inputId }: SubFieldIn
 
   // text / string / unknown fallback
   const note = SUPPORTED_TYPES.has(type) ? null : (
-    <p className="mt-1 text-xs text-[var(--color-arqel-muted-fg)]">type {type} not yet supported</p>
+    <p className="mt-1 text-xs text-muted-foreground">type {type} not yet supported</p>
   );
 
   return (
@@ -461,7 +461,7 @@ export function RepeaterInput({
       aria-invalid={hasError || undefined}
     >
       {field.label ? (
-        <legend id={legendId} className="text-sm font-medium text-[var(--color-arqel-fg)]">
+        <legend id={legendId} className="text-sm font-medium text-foreground">
           {field.label}
         </legend>
       ) : null}
@@ -484,7 +484,7 @@ export function RepeaterInput({
                   {({ listeners, attributes }) => (
                     <article
                       aria-labelledby={itemTitleId}
-                      className="rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] p-3"
+                      className="rounded-sm border border-[var(--input)] bg-background p-3"
                     >
                       <header className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
@@ -500,10 +500,7 @@ export function RepeaterInput({
                               ≡
                             </button>
                           ) : null}
-                          <h3
-                            id={itemTitleId}
-                            className="text-sm font-medium text-[var(--color-arqel-fg)]"
-                          >
+                          <h3 id={itemTitleId} className="text-sm font-medium text-foreground">
                             {labelText}
                           </h3>
                         </div>
@@ -577,7 +574,7 @@ export function RepeaterInput({
                               <div key={sub.name} className="grid gap-1">
                                 <label
                                   htmlFor={subId}
-                                  className="text-xs font-medium text-[var(--color-arqel-muted-fg)]"
+                                  className="text-xs font-medium text-muted-foreground"
                                 >
                                   {subLabel}
                                 </label>

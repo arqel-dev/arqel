@@ -68,3 +68,4 @@ apps/*/public/storage
 *.tmp
 *.bak
 *~
+/apps/demo/vendor/

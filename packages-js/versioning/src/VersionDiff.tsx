@@ -14,6 +14,7 @@
  * linha-a-linha; senão render block-level com badge "Modified".
  */
 
+import { Badge, Card, CardContent } from '@arqel-dev/ui';
 import { type JSX, useMemo } from 'react';
 
 export type DiffStatus = 'added' | 'removed' | 'changed' | 'unchanged';
@@ -107,11 +108,18 @@ interface ValueCellProps {
   lineDiffWith?: string;
 }
 
+const STATUS_ROW_BG: Record<DiffStatus, string> = {
+  added: 'bg-[var(--chart-2)]/10',
+  removed: 'bg-destructive/10',
+  changed: 'bg-[var(--chart-4)]/10',
+  unchanged: '',
+};
+
 function renderValueCell({ value, side, status, lineDiffWith }: ValueCellProps): JSX.Element {
   if (value === undefined && (status === 'added' || status === 'removed')) {
     return (
       <span
-        className="arqel-version-diff__value arqel-version-diff__value--missing"
+        className="text-muted-foreground italic"
         role="note"
         aria-label={side === 'before' ? 'no previous value' : 'no new value'}
       >
@@ -123,7 +131,7 @@ function renderValueCell({ value, side, status, lineDiffWith }: ValueCellProps):
   if (!isPrimitive(value)) {
     return (
       <pre
-        className="arqel-version-diff__value arqel-version-diff__value--json"
+        className="text-xs whitespace-pre-wrap break-words rounded-sm bg-muted p-2 text-foreground"
         data-testid={`version-diff-json-${side}`}
       >
         {JSON.stringify(value, null, 2)}
@@ -141,7 +149,7 @@ function renderValueCell({ value, side, status, lineDiffWith }: ValueCellProps):
       if (lines.length === otherLines.length) {
         return (
           <div
-            className="arqel-version-diff__value arqel-version-diff__value--lines"
+            className="flex flex-col text-xs font-mono"
             data-testid={`version-diff-lines-${side}`}
           >
             {lines.map((line, idx) => {
@@ -149,16 +157,16 @@ function renderValueCell({ value, side, status, lineDiffWith }: ValueCellProps):
               const lineChanged = line !== otherLine;
               const cls = lineChanged
                 ? side === 'before'
-                  ? 'arqel-version-diff__line arqel-version-diff__line--removed'
-                  : 'arqel-version-diff__line arqel-version-diff__line--added'
-                : 'arqel-version-diff__line';
+                  ? 'block px-2 py-0.5 bg-destructive/15 text-foreground'
+                  : 'block px-2 py-0.5 bg-[var(--chart-2)]/15 text-foreground'
+                : 'block px-2 py-0.5 text-foreground';
               return (
                 <span
                   // biome-ignore lint/suspicious/noArrayIndexKey: lines are a stable text snapshot, no reordering possible
                   key={`${side}-${idx}-${line.length}`}
                   className={cls}
                 >
-                  {line === '' ? ' ' : line}
+                  {line === '' ? ' ' : line}
                 </span>
               );
             })}
@@ -167,17 +175,16 @@ function renderValueCell({ value, side, status, lineDiffWith }: ValueCellProps):
       }
     }
     return (
-      <div
-        className="arqel-version-diff__value arqel-version-diff__value--block"
-        data-testid={`version-diff-block-${side}`}
-      >
-        <span className="arqel-version-diff__badge">Modified</span>
-        <pre className="arqel-version-diff__pre">{text}</pre>
+      <div className="flex flex-col gap-2" data-testid={`version-diff-block-${side}`}>
+        <Badge variant="default">Modified</Badge>
+        <pre className="text-xs whitespace-pre-wrap break-words rounded-sm bg-muted p-2 text-foreground">
+          {text}
+        </pre>
       </div>
     );
   }
 
-  return <span className="arqel-version-diff__value">{text}</span>;
+  return <span className="text-sm text-foreground">{text}</span>;
 }
 
 export function VersionDiff({
@@ -194,64 +201,60 @@ export function VersionDiff({
 
   if (visible.length === 0) {
     return (
-      <section
-        className="arqel-version-diff arqel-version-diff--empty"
-        aria-label="Field comparison"
-        data-testid="version-diff-empty"
-      >
-        <p>No changes to display.</p>
-      </section>
+      <Card aria-label="Field comparison" data-testid="version-diff-empty">
+        <CardContent className="py-8 text-center text-muted-foreground">
+          <p>No changes to display.</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <section
-      className="arqel-version-diff"
-      aria-label="Field comparison"
-      data-testid="version-diff"
-    >
-      <dl className="arqel-version-diff__list">
-        {visible.map((entry) => {
-          const label = fieldLabels?.[entry.key] ?? entry.key;
-          const rowCls = `arqel-version-diff__row arqel-version-diff__row--${entry.status}`;
+    <Card aria-label="Field comparison" data-testid="version-diff">
+      <CardContent className="p-0">
+        <dl className="flex flex-col divide-y divide-[var(--border)]">
+          {visible.map((entry) => {
+            const label = fieldLabels?.[entry.key] ?? entry.key;
+            const rowCls = `grid grid-cols-[200px_1fr_1fr] gap-4 p-4 ${STATUS_ROW_BG[entry.status]}`;
 
-          let lineDiffOld: string | undefined;
-          let lineDiffNew: string | undefined;
-          if (
-            entry.status === 'changed' &&
-            typeof entry.oldValue === 'string' &&
-            typeof entry.newValue === 'string' &&
-            entry.oldValue.length > LONG_TEXT_THRESHOLD &&
-            entry.newValue.length > LONG_TEXT_THRESHOLD
-          ) {
-            lineDiffOld = entry.newValue;
-            lineDiffNew = entry.oldValue;
-          }
+            let lineDiffOld: string | undefined;
+            let lineDiffNew: string | undefined;
+            if (
+              entry.status === 'changed' &&
+              typeof entry.oldValue === 'string' &&
+              typeof entry.newValue === 'string' &&
+              entry.oldValue.length > LONG_TEXT_THRESHOLD &&
+              entry.newValue.length > LONG_TEXT_THRESHOLD
+            ) {
+              lineDiffOld = entry.newValue;
+              lineDiffNew = entry.oldValue;
+            }
 
-          return (
-            <div key={entry.key} className={rowCls} data-status={entry.status}>
-              <dt className="arqel-version-diff__key">{label}</dt>
-              <dd className="arqel-version-diff__cell arqel-version-diff__cell--before">
-                {renderValueCell({
-                  value: entry.oldValue,
-                  side: 'before',
-                  status: entry.status,
-                  ...(lineDiffOld !== undefined ? { lineDiffWith: lineDiffOld } : {}),
-                })}
-              </dd>
-              <dd className="arqel-version-diff__cell arqel-version-diff__cell--after">
-                {renderValueCell({
-                  value: entry.newValue,
-                  side: 'after',
-                  status: entry.status,
-                  ...(lineDiffNew !== undefined ? { lineDiffWith: lineDiffNew } : {}),
-                })}
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
-    </section>
+            return (
+              <div key={entry.key} className={rowCls} data-status={entry.status}>
+                <dt className="text-sm font-medium text-foreground">{label}</dt>
+                <dd className="min-w-0">
+                  {renderValueCell({
+                    value: entry.oldValue,
+                    side: 'before',
+                    status: entry.status,
+                    ...(lineDiffOld !== undefined ? { lineDiffWith: lineDiffOld } : {}),
+                  })}
+                </dd>
+                <dd className="min-w-0">
+                  {renderValueCell({
+                    value: entry.newValue,
+                    side: 'after',
+                    status: entry.status,
+                    ...(lineDiffNew !== undefined ? { lineDiffWith: lineDiffNew } : {}),
+                  })}
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -4,9 +4,9 @@
  * `arqel-dev/workflow/StateTransition`).
  *
  * Render contract (from WF-003):
- *   - large pill displaying `currentState.label` (background colour
+ *   - large pill (Badge) displaying `currentState.label` (background colour
  *     pulled from `currentState.color` when it looks like a CSS string,
- *     fallback `bg-gray-200`),
+ *     fallback to a state-derived Badge variant),
  *   - list of buttons, one per transition; authorized → enabled,
  *     non-authorized → shown only when `showDescription = true` and
  *     rendered disabled,
@@ -23,7 +23,11 @@
  * coupling lives in higher layers.
  */
 
+import { Badge, Button, type badgeVariants } from '@arqel-dev/ui';
+import type { VariantProps } from 'class-variance-authority';
 import { type ReactElement, useCallback } from 'react';
+
+type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>;
 
 export interface StateTransitionCurrentState {
   name: string;
@@ -92,6 +96,25 @@ function isCssColor(value: string): boolean {
   return false;
 }
 
+/**
+ * Maps a workflow state name to a Badge variant. Common naming
+ * conventions across PHP workflow definitions are recognised; anything
+ * unknown falls back to `outline`.
+ */
+function badgeVariantForState(stateName: string): BadgeVariant {
+  const normalized = stateName.toLowerCase();
+  if (normalized.includes('draft') || normalized.includes('pending')) {
+    return 'secondary';
+  }
+  if (normalized.includes('published') || normalized.includes('approved')) {
+    return 'default';
+  }
+  if (normalized.includes('rejected') || normalized.includes('archived')) {
+    return 'destructive';
+  }
+  return 'outline';
+}
+
 export function StateTransition({
   name,
   props,
@@ -128,57 +151,61 @@ export function StateTransition({
     typeof pillColor === 'string' && isCssColor(pillColor)
       ? { backgroundColor: pillColor }
       : undefined;
-  const pillClass =
-    pillStyle === undefined
-      ? 'inline-flex items-center rounded-full bg-gray-200 px-4 py-1.5 text-base font-semibold text-gray-900'
-      : 'inline-flex items-center rounded-full px-4 py-1.5 text-base font-semibold text-gray-900';
 
   return (
     <div className="arqel-state-transition" data-name={name}>
       <div className="arqel-state-transition__current">
         {currentState === null ? (
-          <span className="text-sm text-gray-500" data-testid="state-transition-empty-state">
+          <span
+            className="text-sm text-muted-foreground"
+            data-testid="state-transition-empty-state"
+          >
             No state assigned.
           </span>
         ) : (
-          <span
-            className={pillClass}
+          <Badge
+            variant={badgeVariantForState(currentState.name)}
+            className="px-4 py-1.5 text-base font-semibold"
             style={pillStyle}
             data-testid="state-transition-pill"
             data-state={currentState.name}
           >
             {currentState.label}
-          </span>
+          </Badge>
         )}
       </div>
 
       <div className="arqel-state-transition__transitions mt-3 flex flex-wrap gap-2">
         {visibleTransitions.length === 0 ? (
-          <span className="text-sm text-gray-500" data-testid="state-transition-empty-transitions">
+          <span
+            className="text-sm text-muted-foreground"
+            data-testid="state-transition-empty-transitions"
+          >
             No transitions available.
           </span>
         ) : (
           visibleTransitions.map((t) => (
-            <button
+            <Button
               key={`${t.from}->${t.to}`}
               type="button"
+              variant="outline"
+              size="sm"
               data-testid="state-transition-button"
               data-transition-from={t.from}
               data-transition-to={t.to}
               data-authorized={t.authorized ? 'true' : 'false'}
               disabled={!t.authorized}
               onClick={() => handleClick(t.from, t.to)}
-              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t.label}
-            </button>
+            </Button>
           ))
         )}
       </div>
 
       {showHistory && history.length > 0 ? (
         <ol
-          className="arqel-state-transition__history mt-4 space-y-1 text-sm text-gray-600"
+          className="arqel-state-transition__history mt-4 space-y-1 text-sm text-muted-foreground"
           data-testid="state-transition-history"
         >
           {history.map((entry) => (
@@ -188,12 +215,12 @@ export function StateTransition({
               data-history-from={entry.from}
               data-history-to={entry.to}
             >
-              <span className="font-medium">{entry.from}</span>
+              <span className="font-medium text-foreground">{entry.from}</span>
               {' → '}
-              <span className="font-medium">{entry.to}</span>
-              <span className="text-gray-400"> ({entry.at}</span>
-              {entry.by ? <span className="text-gray-400">{` by ${entry.by}`}</span> : null}
-              <span className="text-gray-400">)</span>
+              <span className="font-medium text-foreground">{entry.to}</span>
+              <span className="text-muted-foreground"> ({entry.at}</span>
+              {entry.by ? <span className="text-muted-foreground">{` by ${entry.by}`}</span> : null}
+              <span className="text-muted-foreground">)</span>
             </li>
           ))}
         </ol>

@@ -81,9 +81,9 @@ function FilterControl({
 
 function controlClasses() {
   return cn(
-    'h-9 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)]',
-    'bg-[var(--color-arqel-bg)] px-2 text-sm',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]',
+    'h-9 rounded-sm border border-[var(--input)]',
+    'bg-background px-2 text-sm',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   );
 }
 
@@ -108,7 +108,7 @@ function SelectControl({
 }) {
   const options = normaliseOptions(filter.options);
   return (
-    <label className="flex flex-col gap-1 text-xs text-[var(--color-arqel-muted-fg)]">
+    <label className="flex flex-col gap-1 text-xs text-muted-foreground">
       {filter.label ?? filter.name}
       <select
         aria-label={filter.label ?? filter.name}
@@ -144,7 +144,7 @@ function DateRangeControl({
   const toValue = typeof range.to === 'string' ? range.to : '';
 
   return (
-    <fieldset className="flex flex-col gap-1 text-xs text-[var(--color-arqel-muted-fg)]">
+    <fieldset className="flex flex-col gap-1 text-xs text-muted-foreground">
       <legend>{filter.label ?? filter.name}</legend>
       <div className="flex items-center gap-1">
         <input

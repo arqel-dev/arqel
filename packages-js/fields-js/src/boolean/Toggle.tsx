@@ -36,8 +36,8 @@ export function Toggle({
         onClick={() => onChange(!checked)}
         className={cn(
           'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-          checked ? 'bg-[var(--color-arqel-primary)]' : 'bg-[var(--color-arqel-muted)]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]',
+          checked ? 'bg-primary' : 'bg-muted',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
       >
@@ -50,7 +50,7 @@ export function Toggle({
         />
       </button>
       {(f.props.onLabel || f.props.offLabel) && (
-        <span className="text-sm text-[var(--color-arqel-muted-fg)]">
+        <span className="text-sm text-muted-foreground">
           {checked ? f.props.onLabel : f.props.offLabel}
         </span>
       )}

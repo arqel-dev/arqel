@@ -69,7 +69,7 @@ export function DashboardGrid({
         <div className="space-y-1">
           {heading && <h1 className="text-xl font-semibold">{heading}</h1>}
           {dashboard.description && (
-            <p className="text-sm text-[var(--color-arqel-muted-fg)]">{dashboard.description}</p>
+            <p className="text-sm text-muted-foreground">{dashboard.description}</p>
           )}
         </div>
         {filterPayload.length > 0 && (

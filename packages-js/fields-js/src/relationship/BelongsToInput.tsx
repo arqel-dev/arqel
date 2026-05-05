@@ -94,7 +94,7 @@ export function BelongsToInput({
           id={`${inputId}-listbox`}
           role="listbox"
           className={cn(
-            'absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)] shadow-md',
+            'absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-sm border border-border bg-background shadow-md',
           )}
         >
           {results.map((r) => (
@@ -103,7 +103,7 @@ export function BelongsToInput({
               role="option"
               aria-selected={String(r.value) === String(value)}
               tabIndex={-1}
-              className="cursor-pointer px-3 py-1.5 text-sm hover:bg-[var(--color-arqel-muted)]"
+              className="cursor-pointer px-3 py-1.5 text-sm hover:bg-muted"
               onMouseDown={(e) => {
                 e.preventDefault();
                 onChange(r.value);

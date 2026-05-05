@@ -164,7 +164,7 @@ export function TagsInput({
       aria-controls={listId}
       className="relative"
     >
-      <div className="flex flex-wrap items-center gap-2 rounded border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] p-2">
+      <div className="flex flex-wrap items-center gap-2 rounded border border-[var(--input)] bg-background p-2">
         {tags.map((tag, index) => (
           <span
             // biome-ignore lint/suspicious/noArrayIndexKey: tags can repeat when unique=false; index disambiguates duplicates.
@@ -216,7 +216,7 @@ export function TagsInput({
           id={listId}
           // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: ARIA listbox is the canonical role for <ul> in a combobox pattern.
           role="listbox"
-          className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-auto rounded border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] py-1 text-sm shadow"
+          className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-auto rounded border border-[var(--input)] bg-background py-1 text-sm shadow"
         >
           {filteredSuggestions.map((suggestion, index) => {
             const selected = index === highlighted;
@@ -231,8 +231,8 @@ export function TagsInput({
                 aria-selected={selected}
                 className={
                   selected
-                    ? 'cursor-pointer bg-[var(--color-arqel-accent)] px-3 py-1'
-                    : 'cursor-pointer px-3 py-1 hover:bg-[var(--color-arqel-accent)]'
+                    ? 'cursor-pointer bg-[var(--accent)] px-3 py-1'
+                    : 'cursor-pointer px-3 py-1 hover:bg-[var(--accent)]'
                 }
                 onMouseDown={(event) => {
                   // Prevent input blur from racing the click.

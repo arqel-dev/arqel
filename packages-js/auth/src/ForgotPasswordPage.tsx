@@ -1,3 +1,14 @@
+import {
+  Button,
+  Card,
+  CardContent,
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+} from '@arqel-dev/ui';
 import { useForm, usePage } from '@inertiajs/react';
 import type { FormEvent, ReactElement } from 'react';
 
@@ -8,6 +19,12 @@ export interface ForgotPasswordPageProps {
   loginUrl?: string;
   /** Texto do header (default "Recuperar senha"). */
   title?: string;
+  /** Subtítulo opcional. */
+  description?: string;
+  /** URL/path da imagem do hero panel à direita (visível em md+). */
+  heroImageSrc?: string;
+  /** Alt text da imagem hero. */
+  heroImageAlt?: string;
 }
 
 type ForgotPasswordFormData = {
@@ -22,13 +39,17 @@ interface PageProps {
 /**
  * Página de forgot-password bundled de Arqel.
  *
- * Renderizada via Inertia em `arqel-dev/auth/ForgotPassword`. Mostra flash
- * `status` quando o backend confirma o envio do reset link.
+ * Layout split-screen consistente com `LoginPage` (Card com form à
+ * esquerda e hero image à direita visível em md+). Usa `useForm()` do
+ * Inertia para estado, submit e errors; lê o flash status via `usePage()`.
  */
 export function ForgotPasswordPage({
   forgotPasswordUrl = '/admin/forgot-password',
   loginUrl = '/admin/login',
   title = 'Recuperar senha',
+  description = 'Enviaremos um link de redefinição para o seu e-mail',
+  heroImageSrc = '/login-hero.svg',
+  heroImageAlt = 'Forgot password illustration',
 }: ForgotPasswordPageProps): ReactElement {
   const { data, setData, post, processing, errors } = useForm<ForgotPasswordFormData>({
     email: '',
@@ -43,44 +64,62 @@ export function ForgotPasswordPage({
   };
 
   return (
-    <div className="arqel-forgot-password-page">
-      <h1 className="arqel-forgot-password-title">{title}</h1>
+    <div className="flex min-h-svh w-full items-center justify-center bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-3xl flex-col gap-6">
+        <Card className="overflow-hidden p-0">
+          <CardContent className="grid p-0 md:grid-cols-2">
+            <form onSubmit={handleSubmit} className="p-6 md:p-8" noValidate>
+              <FieldGroup>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <h1 className="text-2xl font-bold">{title}</h1>
+                  <p className="text-balance text-muted-foreground">{description}</p>
+                </div>
 
-      {status ? (
-        <p className="arqel-forgot-password-status" role="status">
-          {status}
-        </p>
-      ) : null}
+                {status ? (
+                  <FieldDescription className="text-center text-green-600 dark:text-green-400">
+                    {status}
+                  </FieldDescription>
+                ) : null}
 
-      <form onSubmit={handleSubmit} className="arqel-forgot-password-form" noValidate>
-        <div className="arqel-forgot-password-field">
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            value={data.email}
-            autoComplete="username"
-            required
-            onChange={(event) => setData('email', event.target.value)}
-          />
-          {errors.email ? (
-            <p className="arqel-forgot-password-error" role="alert">
-              {errors.email}
-            </p>
-          ) : null}
-        </div>
+                <Field>
+                  <FieldLabel htmlFor="email">E-mail</FieldLabel>
+                  <Input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={data.email}
+                    autoComplete="username"
+                    required
+                    aria-invalid={Boolean(errors.email)}
+                    onChange={(event) => setData('email', event.target.value)}
+                  />
+                  {errors.email ? <FieldError>{errors.email}</FieldError> : null}
+                </Field>
 
-        <button type="submit" disabled={processing} className="arqel-forgot-password-submit">
-          {processing ? 'Enviando…' : 'Enviar link de reset'}
-        </button>
+                <Field>
+                  <Button type="submit" disabled={processing}>
+                    {processing ? 'Enviando…' : 'Enviar link de reset'}
+                  </Button>
+                </Field>
 
-        <div className="arqel-forgot-password-links">
-          <a href={loginUrl} className="arqel-forgot-password-link">
-            Voltar ao login
-          </a>
-        </div>
-      </form>
+                <FieldDescription className="text-center">
+                  <a href={loginUrl} className="underline underline-offset-4">
+                    Voltar ao login
+                  </a>
+                </FieldDescription>
+              </FieldGroup>
+            </form>
+
+            <div className="bg-primary/10 relative hidden md:block">
+              <img
+                src={heroImageSrc}
+                alt={heroImageAlt}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

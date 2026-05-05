@@ -41,9 +41,8 @@ export interface TableCardProps {
 export function TableCard({ widget, className }: TableCardProps) {
   return (
     <WidgetWrapper
-      name={widget.name}
-      heading={widget.heading ?? null}
-      description={widget.description ?? null}
+      heading={widget.heading ?? undefined}
+      description={widget.description ?? undefined}
       className={className}
     >
       {widget.loadError ? (
@@ -53,14 +52,14 @@ export function TableCard({ widget, className }: TableCardProps) {
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className={cn('w-full border-collapse text-sm', 'text-[var(--color-arqel-fg)]')}>
+            <table className={cn('w-full border-collapse text-sm', 'text-foreground')}>
               <thead>
-                <tr className="border-b border-[var(--color-arqel-border)] text-left">
+                <tr className="border-b border-border text-left">
                   {widget.columns.map((column) => (
                     <th
                       key={column.name}
                       scope="col"
-                      className="px-2 py-1.5 font-medium text-[var(--color-arqel-muted-fg)]"
+                      className="px-2 py-1.5 font-medium text-muted-foreground"
                     >
                       {column.label ?? column.name}
                     </th>
@@ -72,7 +71,7 @@ export function TableCard({ widget, className }: TableCardProps) {
                   <tr
                     // biome-ignore lint/suspicious/noArrayIndexKey: records may lack a stable id
                     key={rowIndex}
-                    className="border-b border-[var(--color-arqel-border)] last:border-0"
+                    className="border-b border-border last:border-0"
                   >
                     {widget.columns.map((column) => (
                       <td key={column.name} className="px-2 py-1.5">
@@ -86,7 +85,7 @@ export function TableCard({ widget, className }: TableCardProps) {
           </div>
           {widget.seeAllUrl && (
             <div className="mt-3 text-right">
-              <a href={widget.seeAllUrl} className="text-sm text-[var(--color-arqel-primary)]">
+              <a href={widget.seeAllUrl} className="text-sm text-primary">
                 See all →
               </a>
             </div>

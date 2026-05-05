@@ -48,22 +48,18 @@ export function FileInput({
         if (!isDisabled) handleFiles(e.dataTransfer.files);
       }}
       className={cn(
-        'flex flex-col items-center justify-center gap-2 rounded-[var(--radius-arqel-sm)] border-2 border-dashed px-4 py-6 text-sm',
-        dragOver
-          ? 'border-[var(--color-arqel-primary)] bg-[var(--color-arqel-muted)]'
-          : 'border-[var(--color-arqel-border)]',
-        hasError && 'border-[var(--color-arqel-destructive)]',
+        'flex flex-col items-center justify-center gap-2 rounded-sm border-2 border-dashed px-4 py-6 text-sm',
+        dragOver ? 'border-primary bg-muted' : 'border-border',
+        hasError && 'border-destructive',
         isDisabled && 'opacity-50',
       )}
     >
       {filename ? (
         <span className="font-medium">{filename}</span>
       ) : (
-        <span className="text-[var(--color-arqel-muted-fg)]">
-          Drag a file here or click to browse
-        </span>
+        <span className="text-muted-foreground">Drag a file here or click to browse</span>
       )}
-      <label className="cursor-pointer text-xs text-[var(--color-arqel-primary)] hover:underline">
+      <label className="cursor-pointer text-xs text-primary hover:underline">
         {filename ? 'Choose another file' : 'Browse'}
         <input
           id={inputId}

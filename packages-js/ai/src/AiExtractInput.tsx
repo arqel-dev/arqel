@@ -27,6 +27,7 @@
  * SSR-safe: nada no render path toca `window`/`document`.
  */
 
+import { Alert, AlertDescription, Badge, Button, Card, CardContent, Label } from '@arqel-dev/ui';
 import { type ReactElement, useCallback, useId, useState } from 'react';
 
 export interface AiExtractInputFieldProps {
@@ -103,6 +104,28 @@ function formatPreviewValue(value: unknown): string {
   } catch {
     return String(value);
   }
+}
+
+function Spinner(): ReactElement {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="animate-spin"
+    >
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
+      <path
+        d="M22 12a10 10 0 0 1-10 10"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export function AiExtractInput(props: AiExtractInputProps): ReactElement {
@@ -211,96 +234,90 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
   const hasExtraction = extracted !== null && Object.keys(extracted).length > 0;
 
   return (
-    <div className="arqel-ai-extract-input" data-arqel-field="aiExtract" data-field-name={name}>
-      <div className="arqel-ai-extract-input__source">
-        <span className="arqel-ai-extract-input__source-label">Source: {sourceField}</span>
+    <div className="flex flex-col gap-2" data-arqel-field="aiExtract" data-field-name={name}>
+      <div>
+        <Label className="text-muted-foreground">Source: {sourceField}</Label>
       </div>
 
-      <div className="arqel-ai-extract-input__toolbar">
-        <button
-          type="button"
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => {
             void handleExtract();
           }}
           disabled={isLoading}
           aria-label={buttonLabel}
-          className="arqel-ai-extract-input__button"
         >
           {isLoading ? (
-            <span role="status" aria-label="Extracting" className="arqel-ai-extract-input__spinner">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeOpacity="0.25"
-                  strokeWidth="4"
-                />
-                <path
-                  d="M22 12a10 10 0 0 1-10 10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-              </svg>
+            <span role="status" aria-label="Extracting">
+              <Spinner />
             </span>
           ) : null}
           <span>{buttonLabel}</span>
-        </button>
+        </Button>
 
         {hasExtraction && extracted !== null ? (
-          <button
-            type="button"
+          <Button
+            variant="default"
+            size="sm"
             onClick={() => {
               applyAll(extracted);
             }}
-            className="arqel-ai-extract-input__apply-all"
           >
             Apply all
-          </button>
+          </Button>
         ) : null}
       </div>
 
       {hasExtraction && extracted !== null ? (
-        <dl id={previewId} className="arqel-ai-extract-input__preview">
-          {(targetFields.length > 0 ? targetFields : Object.keys(extracted)).map((target) => {
-            const val = extracted[target];
-            return (
-              <div key={target} className="arqel-ai-extract-input__preview-entry">
-                <dt className="arqel-ai-extract-input__preview-key">{target}</dt>
-                <dd className="arqel-ai-extract-input__preview-value">
-                  <span data-testid={`extract-value-${target}`}>{formatPreviewValue(val)}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      applyOne(target, val);
-                    }}
-                    className="arqel-ai-extract-input__apply-one"
-                    aria-label={`Apply ${target}`}
+        <Card>
+          <CardContent className="p-4">
+            <dl id={previewId} className="flex flex-col gap-2">
+              {(targetFields.length > 0 ? targetFields : Object.keys(extracted)).map((target) => {
+                const val = extracted[target];
+                return (
+                  <div
+                    key={target}
+                    className="flex items-center justify-between gap-2 border-b border-border pb-2 last:border-b-0 last:pb-0"
                   >
-                    Apply
-                  </button>
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
+                    <dt>
+                      <Badge variant="outline">{target}</Badge>
+                    </dt>
+                    <dd className="flex items-center gap-2 flex-1 justify-end">
+                      <span
+                        className="text-sm text-foreground truncate"
+                        data-testid={`extract-value-${target}`}
+                      >
+                        {formatPreviewValue(val)}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          applyOne(target, val);
+                        }}
+                        aria-label={`Apply ${target}`}
+                      >
+                        Apply
+                      </Button>
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </CardContent>
+        </Card>
       ) : (
-        <p className="arqel-ai-extract-input__empty">No extraction yet — click button to start.</p>
+        <p className="text-sm text-muted-foreground italic">
+          No extraction yet — click button to start.
+        </p>
       )}
 
       {error !== null ? (
-        <div role="alert" className="arqel-ai-extract-input__error">
-          {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       ) : null}
     </div>
   );

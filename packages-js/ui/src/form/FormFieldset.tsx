@@ -14,12 +14,7 @@ export interface FormFieldsetProps {
 
 export function FormFieldset({ config, children, className }: FormFieldsetProps) {
   return (
-    <fieldset
-      className={cn(
-        'rounded-[var(--radius-arqel)] border border-[var(--color-arqel-border)] p-4',
-        className,
-      )}
-    >
+    <fieldset className={cn('rounded-md border border-border p-4', className)}>
       <legend className="px-1 text-sm font-medium">{config.legend}</legend>
       <div
         className="grid gap-4"

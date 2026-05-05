@@ -22,5 +22,9 @@ it('ships the expected directives in the blade source', function (): void {
 });
 
 it('exposes the configured root view to Inertia via config', function (): void {
-    expect(config('arqel.inertia.root_view'))->toBe('arqel::app');
+    // Default points at the user-owned `arqel.layout` view scaffolded by
+    // `arqel:install`, so the framework doesn't depend on Ziggy's @routes.
+    // Apps can override to `arqel::app` (package-shipped) when Ziggy is
+    // installed, or to any custom view name.
+    expect(config('arqel.inertia.root_view'))->toBe('arqel.layout');
 });

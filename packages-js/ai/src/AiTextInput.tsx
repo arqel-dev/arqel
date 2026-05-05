@@ -28,6 +28,7 @@
  * the network call only fires from the click handler (post-mount).
  */
 
+import { Alert, AlertDescription, Button, Textarea } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
 
 export interface AiTextInputFieldProps {
@@ -68,6 +69,28 @@ function buildGenerateUrl(
     return `/admin/${resource}/fields/${field}/generate`;
   }
   return null;
+}
+
+function Spinner(): ReactElement {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="animate-spin"
+    >
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
+      <path
+        d="M22 12a10 10 0 0 1-10 10"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export function AiTextInput(props: AiTextInputProps): ReactElement {
@@ -162,69 +185,45 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
   const charCount = currentValue.length;
 
   return (
-    <div className="arqel-ai-text-input" data-arqel-field="aiText" data-field-name={name}>
-      <textarea
+    <div className="flex flex-col gap-2" data-arqel-field="aiText" data-field-name={name}>
+      <Textarea
         id={textareaId}
         name={name}
         value={currentValue}
         onChange={handleTextareaChange}
         {...(maxLength !== null ? { maxLength } : {})}
-        className="arqel-ai-text-input__textarea"
         rows={6}
       />
 
       {maxLength !== null ? (
-        <div className="arqel-ai-text-input__counter" aria-live="polite">
+        <div className="text-xs text-muted-foreground self-end" aria-live="polite">
           {charCount} / {maxLength}
         </div>
       ) : null}
 
-      <div className="arqel-ai-text-input__actions">
-        <button
-          type="button"
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => {
             void handleGenerate();
           }}
           disabled={isLoading}
           aria-label={triggerLabel}
-          className="arqel-ai-text-input__button"
         >
           {isLoading ? (
-            <span role="status" aria-label="Generating" className="arqel-ai-text-input__spinner">
-              {/* inline SVG keeps the package dep-free */}
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeOpacity="0.25"
-                  strokeWidth="4"
-                />
-                <path
-                  d="M22 12a10 10 0 0 1-10 10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-              </svg>
+            <span role="status" aria-label="Generating">
+              <Spinner />
             </span>
           ) : null}
           <span>{triggerLabel}</span>
-        </button>
+        </Button>
       </div>
 
       {error !== null ? (
-        <div role="alert" className="arqel-ai-text-input__error">
-          {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       ) : null}
     </div>
   );

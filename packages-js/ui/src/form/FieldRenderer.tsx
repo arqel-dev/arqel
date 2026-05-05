@@ -51,7 +51,7 @@ export function FieldRenderer(props: FieldRendererProps): ReactNode {
         <label htmlFor={id} className="text-sm font-medium">
           {field.label}
           {field.required && (
-            <span aria-hidden="true" className="ml-0.5 text-[var(--color-arqel-destructive)]">
+            <span aria-hidden="true" className="ml-0.5 text-destructive">
               *
             </span>
           )}
@@ -59,12 +59,12 @@ export function FieldRenderer(props: FieldRendererProps): ReactNode {
       )}
       <Input {...props} inputId={id} describedBy={describedBy || undefined} />
       {field.helperText && !hasError && (
-        <p id={helperId} className="text-xs text-[var(--color-arqel-muted-fg)]">
+        <p id={helperId} className="text-xs text-muted-foreground">
           {field.helperText}
         </p>
       )}
       {hasError && (
-        <p id={errorId} role="alert" className="text-xs text-[var(--color-arqel-destructive)]">
+        <p id={errorId} role="alert" className="text-xs text-destructive">
           {errors[0]}
         </p>
       )}

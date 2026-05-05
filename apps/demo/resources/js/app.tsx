@@ -1,24 +1,79 @@
-import { ThemeProvider } from '@arqel-dev/theme';
-import '@arqel-dev/theme/tokens.css';
-import { createInertiaApp } from '@inertiajs/react';
-import { createRoot } from 'react-dom/client';
+import {
+  ForgotPasswordPage,
+  LoginPage,
+  RegisterPage,
+  ResetPasswordPage,
+  VerifyEmailNoticePage,
+} from '@arqel-dev/auth';
+import { createArqelApp } from '@arqel-dev/react/inertia';
+import { arqelPages } from '@arqel-dev/ui/pages';
+import { AppShell, Sidebar, Topbar } from '@arqel-dev/ui/shell';
+import '@arqel-dev/fields/register';
+import type { ComponentType, ReactNode } from 'react';
 
-createInertiaApp({
-  resolve: (name) => {
-    const pages = import.meta.glob<{ default: React.ComponentType }>('./Pages/**/*.tsx', {
-      eager: true,
-    });
-    const page = pages[`./Pages/${name}.tsx`];
-    if (!page) {
-      throw new Error(`Inertia page not found: ${name}`);
+type LazyPage = () => Promise<{ default: ComponentType<unknown> }>;
+
+type LayoutFn = (page: ReactNode) => ReactNode;
+
+type LayoutComponent = ComponentType<unknown> & { layout?: LayoutFn };
+
+/**
+ * Layout persistente para páginas de Resources do painel admin.
+ * Páginas de auth (Login, Register, etc.) renderizam standalone sem
+ * AppShell.
+ */
+const adminLayout: LayoutFn = (page) => (
+  <AppShell
+    variant="sidebar-left"
+    sidebar={<Sidebar brand={<span className="font-semibold">{'Laravel'}</span>} />}
+    topbar={<Topbar brand={<span className="font-medium">{'Laravel'}</span>} />}
+  >
+    {page}
+  </AppShell>
+);
+
+/**
+ * Embrulha o loader de uma página Inertia para que o componente
+ * resolvido carregue um `layout` estático persistente — Inertia trata
+ * `Component.layout` como layout persistente, só re-renderiza o
+ * conteúdo interno entre navegações.
+ */
+function withAdminLayout(loader: LazyPage): LazyPage {
+  return async () => {
+    const mod = await loader();
+    const Component = mod.default as LayoutComponent;
+    if (!Component.layout) {
+      Component.layout = adminLayout;
     }
-    return page;
-  },
-  setup({ el, App, props }) {
-    createRoot(el).render(
-      <ThemeProvider>
-        <App {...props} />
-      </ThemeProvider>,
-    );
+    return { default: Component };
+  };
+}
+
+const wrappedArqelPages: Record<string, LazyPage> = Object.fromEntries(
+  Object.entries(arqelPages).map(([key, loader]) => [key, withAdminLayout(loader as LazyPage)]),
+);
+
+const authPages: Record<string, LazyPage> = {
+  'arqel-dev/auth/Login': async () => ({ default: LoginPage as ComponentType<unknown> }),
+  'arqel-dev/auth/Register': async () => ({ default: RegisterPage as ComponentType<unknown> }),
+  'arqel-dev/auth/ForgotPassword': async () => ({
+    default: ForgotPasswordPage as ComponentType<unknown>,
+  }),
+  'arqel-dev/auth/ResetPassword': async () => ({
+    default: ResetPasswordPage as ComponentType<unknown>,
+  }),
+  'arqel-dev/auth/VerifyEmailNotice': async () => ({
+    default: VerifyEmailNoticePage as ComponentType<unknown>,
+  }),
+};
+
+const userPages = import.meta.glob<{ default: ComponentType<unknown> }>('./Pages/**/*.tsx');
+
+void createArqelApp({
+  appName: import.meta.env.VITE_APP_NAME ?? 'Laravel',
+  pages: {
+    ...wrappedArqelPages,
+    ...authPages,
+    ...(userPages as unknown as Record<string, LazyPage>),
   },
 });

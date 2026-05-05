@@ -32,20 +32,20 @@ export function TablePagination({
   return (
     <nav
       className={cn(
-        'flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-arqel-border)] px-3 py-2 text-sm',
+        'flex flex-wrap items-center justify-between gap-2 border-t border-border px-3 py-2 text-sm',
         className,
       )}
       aria-label="Pagination"
     >
-      <span className="text-[var(--color-arqel-muted-fg)]">
+      <span className="text-muted-foreground">
         {meta.total === 0 ? 'No results' : `${from}–${to} of ${meta.total}`}
       </span>
       <div className="flex items-center gap-2">
         {onPerPageChange && (
-          <label className="flex items-center gap-1 text-xs text-[var(--color-arqel-muted-fg)]">
+          <label className="flex items-center gap-1 text-xs text-muted-foreground">
             Per page
             <select
-              className="h-8 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] px-2"
+              className="h-8 rounded-sm border border-[var(--input)] bg-background px-2"
               value={meta.perPage}
               onChange={(e) => onPerPageChange(Number(e.target.value))}
             >
@@ -66,7 +66,7 @@ export function TablePagination({
         >
           Prev
         </Button>
-        <span className="text-xs text-[var(--color-arqel-muted-fg)]">
+        <span className="text-xs text-muted-foreground">
           {meta.currentPage} / {meta.lastPage}
         </span>
         <Button

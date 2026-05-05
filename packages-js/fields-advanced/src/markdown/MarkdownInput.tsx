@@ -260,37 +260,37 @@ function prefixLine(source: string, start: number, end: number, prefix: string):
 /* -------------------------------------------------------------------------- */
 
 const textareaClasses =
-  'w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
-  'bg-[var(--color-arqel-bg)] px-3 py-2 font-mono text-sm text-[var(--color-arqel-fg)] ' +
-  'placeholder:text-[var(--color-arqel-muted-fg)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'w-full rounded-sm border border-[var(--input)] ' +
+  'bg-background px-3 py-2 font-mono text-sm text-foreground ' +
+  'placeholder:text-muted-foreground ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50 ' +
-  'aria-invalid:border-[var(--color-arqel-destructive)]';
+  'aria-invalid:border-destructive';
 
 const buttonClasses =
-  'inline-flex h-8 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'px-2 text-xs text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-8 items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'px-2 text-xs text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const tabClasses =
-  'inline-flex h-8 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'px-3 text-xs text-[var(--color-arqel-fg)] ' +
-  'aria-selected:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]';
+  'inline-flex h-8 items-center justify-center rounded-sm ' +
+  'px-3 text-xs text-foreground ' +
+  'aria-selected:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
 const previewPaneClasses =
-  'prose prose-sm max-w-none overflow-auto rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] p-3 ' +
-  'text-sm text-[var(--color-arqel-fg)]';
+  'prose prose-sm max-w-none overflow-auto rounded-sm ' +
+  'border border-[var(--input)] bg-background p-3 ' +
+  'text-sm text-foreground';
 
 const fullscreenStyle: CSSProperties = {
   position: 'fixed',
   inset: 0,
   zIndex: 50,
-  background: 'var(--color-arqel-bg)',
+  background: 'var(--background)',
   padding: '1rem',
   overflow: 'auto',
 };
@@ -410,11 +410,7 @@ export function MarkdownInput({
   return (
     <div className={containerClass} style={containerStyle}>
       {field.label ? (
-        <label
-          id={labelId}
-          htmlFor={id}
-          className="block text-sm font-medium text-[var(--color-arqel-fg)]"
-        >
+        <label id={labelId} htmlFor={id} className="block text-sm font-medium text-foreground">
           {field.label}
         </label>
       ) : null}
@@ -562,7 +558,7 @@ export function MarkdownInput({
         <dialog
           ref={dialogRef}
           aria-label="Markdown preview"
-          className="rounded-[var(--radius-arqel-sm)] p-4"
+          className="rounded-sm p-4"
           onClose={() => setIsPopupOpen(false)}
         >
           <section

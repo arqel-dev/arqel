@@ -29,6 +29,7 @@
  * SSR-safe: nothing in the render path touches `window`/`document`.
  */
 
+import { Alert, AlertDescription, Badge, Button, Select } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
 
 export interface AiSelectInputFieldProps {
@@ -74,6 +75,28 @@ function buildClassifyUrl(
     return `/admin/${resource}/fields/${field}/classify`;
   }
   return null;
+}
+
+function Spinner(): ReactElement {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="animate-spin"
+    >
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
+      <path
+        d="M22 12a10 10 0 0 1-10 10"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export function AiSelectInput(props: AiSelectInputProps): ReactElement {
@@ -180,92 +203,72 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
   const buttonTitle = !hasContextFields ? NO_CONTEXT_TOOLTIP : undefined;
 
   return (
-    <div className="arqel-ai-select-input" data-arqel-field="aiSelect" data-field-name={name}>
-      <select
-        id={selectId}
-        name={name}
-        value={currentValue ?? ''}
-        onChange={handleSelectChange}
-        className="arqel-ai-select-input__select"
-      >
-        <option value="">Select...</option>
-        {Object.entries(options).map(([key, label]) => (
-          <option key={key} value={key}>
-            {label}
-          </option>
-        ))}
-      </select>
+    <div className="flex flex-col gap-2" data-arqel-field="aiSelect" data-field-name={name}>
+      <div className="flex items-center gap-2">
+        <Select
+          id={selectId}
+          name={name}
+          value={currentValue ?? ''}
+          onChange={handleSelectChange}
+          className="flex-1"
+        >
+          <option value="">Select...</option>
+          {Object.entries(options).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </Select>
 
-      <div className="arqel-ai-select-input__actions">
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => {
             void handleClassify();
           }}
           disabled={buttonDisabled}
           aria-label={DEFAULT_BUTTON_LABEL}
-          className="arqel-ai-select-input__button"
           {...(buttonTitle !== undefined ? { title: buttonTitle } : {})}
         >
           {isLoading ? (
-            <span role="status" aria-label="Classifying" className="arqel-ai-select-input__spinner">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeOpacity="0.25"
-                  strokeWidth="4"
-                />
-                <path
-                  d="M22 12a10 10 0 0 1-10 10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-              </svg>
+            <span role="status" aria-label="Classifying">
+              <Spinner />
             </span>
           ) : null}
           <span>{DEFAULT_BUTTON_LABEL}</span>
-        </button>
+        </Button>
       </div>
 
       {suggestion !== null ? (
-        <div role="status" className="arqel-ai-select-input__suggestion">
-          <span>{suggestion === 'ai' ? 'Suggested by AI' : 'Used fallback'}</span>
-          <button
-            type="button"
+        <div role="status" className="flex items-center gap-2">
+          <Badge variant={suggestion === 'ai' ? 'success' : 'warning'}>
+            {suggestion === 'ai' ? 'Suggested by AI' : 'Used fallback'}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => {
               setSuggestion(null);
             }}
-            className="arqel-ai-select-input__suggestion-accept"
           >
             Accept
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => {
               setSuggestion(null);
             }}
-            className="arqel-ai-select-input__suggestion-pick"
           >
             Pick another
-          </button>
+          </Button>
         </div>
       ) : null}
 
       {error !== null ? (
-        <div role="alert" className="arqel-ai-select-input__error">
-          {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       ) : null}
     </div>
   );

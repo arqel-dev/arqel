@@ -77,12 +77,12 @@ export function ResourceIndex<TRecord extends RecordType = RecordType>({
     if (searchSlot) return searchSlot;
     if (!onSearchChange) return null;
     return (
-      <label className="flex flex-col gap-1 text-xs text-[var(--color-arqel-muted-fg)]">
+      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
         Search
         <input
           type="search"
           placeholder={`Search ${resource.pluralLabel.toLowerCase()}…`}
-          className="h-9 w-64 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]"
+          className="h-9 w-64 rounded-sm border border-[var(--input)] bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           value={search ?? ''}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -99,13 +99,10 @@ export function ResourceIndex<TRecord extends RecordType = RecordType>({
 
   return (
     <section
-      className={cn(
-        'flex flex-col rounded-[var(--radius-arqel)] border border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)]',
-        className,
-      )}
+      className={cn('flex flex-col rounded-md border border-border bg-background', className)}
       aria-label={resource.pluralLabel}
     >
-      <header className="flex flex-wrap items-center gap-3 border-b border-[var(--color-arqel-border)] px-4 py-3">
+      <header className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3">
         <h1 className="text-lg font-semibold">{resource.pluralLabel}</h1>
         <div className="ml-auto flex flex-wrap items-center gap-2">{toolbarActions}</div>
       </header>

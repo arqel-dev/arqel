@@ -41,7 +41,7 @@ export function MultiSelectInput({
             return (
               <span
                 key={String(v)}
-                className="inline-flex items-center gap-1 rounded-[var(--radius-arqel-sm)] bg-[var(--color-arqel-muted)] px-2 py-0.5 text-xs"
+                className="inline-flex items-center gap-1 rounded-sm bg-muted px-2 py-0.5 text-xs"
               >
                 {opt?.label ?? String(v)}
                 {!isDisabled && (
@@ -49,7 +49,7 @@ export function MultiSelectInput({
                     type="button"
                     aria-label={`Remove ${opt?.label ?? String(v)}`}
                     onClick={() => remove(v)}
-                    className="text-[var(--color-arqel-muted-fg)] hover:text-[var(--color-arqel-fg)]"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     ✕
                   </button>

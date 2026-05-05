@@ -49,7 +49,7 @@ export function PasswordInput({
         onClick={() => setRevealed((v) => !v)}
         className={cn(
           'absolute inset-y-0 right-0 flex w-9 items-center justify-center text-sm',
-          'text-[var(--color-arqel-muted-fg)] hover:text-[var(--color-arqel-fg)]',
+          'text-muted-foreground hover:text-foreground',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
       >

@@ -21,11 +21,7 @@ export function HasManyReadonly({ field, value, inputId, describedBy }: FieldRen
 
   if (items.length === 0) {
     return (
-      <p
-        id={inputId}
-        aria-describedby={describedBy}
-        className="text-sm text-[var(--color-arqel-muted-fg)]"
-      >
+      <p id={inputId} aria-describedby={describedBy} className="text-sm text-muted-foreground">
         No {f.props.relatedResource} linked.
       </p>
     );
@@ -35,7 +31,7 @@ export function HasManyReadonly({ field, value, inputId, describedBy }: FieldRen
     <ul
       id={inputId}
       aria-describedby={describedBy}
-      className="divide-y divide-[var(--color-arqel-border)] rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-border)]"
+      className="divide-y divide-[var(--border)] rounded-sm border border-border"
     >
       {items.map((item) => (
         <li
@@ -43,7 +39,7 @@ export function HasManyReadonly({ field, value, inputId, describedBy }: FieldRen
           className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
         >
           <span>{item.label ?? `#${item.id}`}</span>
-          <span className="font-mono text-xs text-[var(--color-arqel-muted-fg)]">{item.id}</span>
+          <span className="font-mono text-xs text-muted-foreground">{item.id}</span>
         </li>
       ))}
     </ul>

@@ -52,16 +52,13 @@ function BreadcrumbsList({
 
   return (
     <nav aria-label="Breadcrumb" className={cn('text-sm', className)}>
-      <ol className="flex flex-wrap items-center gap-2 text-[var(--color-arqel-muted-fg)]">
+      <ol className="flex flex-wrap items-center gap-2 text-muted-foreground">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
             <li key={`${item.label}-${item.url ?? 'leaf'}`} className="flex items-center gap-2">
               {isLast || !item.url ? (
-                <span
-                  aria-current={isLast ? 'page' : undefined}
-                  className="text-[var(--color-arqel-fg)]"
-                >
+                <span aria-current={isLast ? 'page' : undefined} className="text-foreground">
                   {item.label}
                 </span>
               ) : (

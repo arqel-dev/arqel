@@ -391,34 +391,34 @@ function lineEndIncl(source: string, pos: number): number {
 /* -------------------------------------------------------------------------- */
 
 const textareaBaseClasses =
-  'block w-full resize-y rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
+  'block w-full resize-y rounded-sm border border-[var(--input)] ' +
   'py-2 pr-3 font-mono text-sm leading-5 ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50 ' +
-  'aria-invalid:border-[var(--color-arqel-destructive)]';
+  'aria-invalid:border-destructive';
 
 // When the Shiki overlay is rendering colors, the textarea needs to be
 // transparent so the colored tokens behind it show through. The caret
 // keeps its native foreground color.
-const textareaOverlayClasses = 'bg-transparent text-transparent caret-[var(--color-arqel-fg)]';
+const textareaOverlayClasses = 'bg-transparent text-transparent caret-[var(--foreground)]';
 
 const buttonClasses =
-  'inline-flex h-7 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'px-2 text-xs text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]';
+  'inline-flex h-7 items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'px-2 text-xs text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
 const badgeClasses =
-  'inline-flex h-6 items-center rounded-[var(--radius-arqel-sm)] ' +
-  'bg-[var(--color-arqel-muted)] px-2 text-[10px] font-medium uppercase tracking-wide ' +
-  'text-[var(--color-arqel-muted-fg)]';
+  'inline-flex h-6 items-center rounded-sm ' +
+  'bg-muted px-2 text-[10px] font-medium uppercase tracking-wide ' +
+  'text-muted-foreground';
 
 const fullscreenStyle: CSSProperties = {
   position: 'fixed',
   inset: 0,
   zIndex: 50,
-  background: 'var(--color-arqel-bg)',
+  background: 'var(--background)',
   padding: '1rem',
   overflow: 'auto',
 };
@@ -523,9 +523,9 @@ export function CodeInput({
     paddingRight: '0.75rem', // matches pr-3
     overflow: 'hidden',
     pointerEvents: 'none',
-    color: 'var(--color-arqel-fg)',
-    background: 'var(--color-arqel-bg)',
-    borderRadius: 'var(--radius-arqel-sm)',
+    color: 'var(--foreground)',
+    background: 'var(--background)',
+    borderRadius: 'var(--radius-sm)',
   };
   if (props.minHeight !== null) {
     overlayStyle.minHeight = `${props.minHeight}px`;
@@ -550,11 +550,7 @@ export function CodeInput({
   return (
     <div className={containerClass} style={containerStyle}>
       {field.label ? (
-        <label
-          id={labelId}
-          htmlFor={id}
-          className="block text-sm font-medium text-[var(--color-arqel-fg)]"
-        >
+        <label id={labelId} htmlFor={id} className="block text-sm font-medium text-foreground">
           {field.label}
         </label>
       ) : null}
@@ -565,7 +561,7 @@ export function CodeInput({
             ref={gutterRef}
             aria-hidden="true"
             data-testid="code-gutter"
-            className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 select-none overflow-hidden border-r border-[var(--color-arqel-input)] bg-[var(--color-arqel-muted)] py-2 text-right text-[var(--color-arqel-muted-fg)]"
+            className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 select-none overflow-hidden border-r border-[var(--input)] bg-muted py-2 text-right text-muted-foreground"
             style={{ width: `${GUTTER_WIDTH_PX}px`, lineHeight: `${LINE_HEIGHT_PX}px` }}
           >
             {lineNumbers.map((n) => (

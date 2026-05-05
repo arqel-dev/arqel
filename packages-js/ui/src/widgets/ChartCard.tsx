@@ -32,7 +32,7 @@ export function ChartCard({ widget }: ChartWidgetProps) {
   const Chart = REGISTRY[widget.chartType] ?? LineChart;
 
   return (
-    <WidgetWrapper name={widget.name} heading={widget.heading} description={widget.description}>
+    <WidgetWrapper heading={widget.heading} description={widget.description}>
       <Suspense
         fallback={
           <div

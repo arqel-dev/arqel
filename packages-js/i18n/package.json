@@ -40,11 +40,13 @@
     "test:watch": "vitest"
   },
   "peerDependencies": {
+    "@arqel-dev/ui": "workspace:*",
     "@inertiajs/react": "^2.0.0 || ^3.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@arqel-dev/ui": "workspace:*",
     "@inertiajs/core": "^2.0.0",
     "@inertiajs/react": "^2.0.0",
     "@testing-library/jest-dom": "^6.6.3",

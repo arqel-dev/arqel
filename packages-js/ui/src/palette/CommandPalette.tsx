@@ -127,8 +127,8 @@ const dialogStyle: CSSProperties = {
   padding: 0,
   width: 'min(640px, 92vw)',
   maxHeight: '70vh',
-  background: 'var(--color-arqel-bg, #fff)',
-  color: 'var(--color-arqel-fg, #111)',
+  background: 'var(--background, #fff)',
+  color: 'var(--foreground, #111)',
 };
 
 export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteProps) {
@@ -285,7 +285,7 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
           placeholder="Type a command…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full border-b border-[var(--color-arqel-border,#e5e7eb)] bg-transparent px-4 py-3 text-base outline-none"
+          className="w-full border-b border-[var(--border,#e5e7eb)] bg-transparent px-4 py-3 text-base outline-none"
         />
         <div role="status" aria-live="polite" className="sr-only">
           {flat.length} commands
@@ -330,7 +330,7 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
                         onClick={() => execute(cmd)}
                         className={
                           'flex cursor-pointer items-center gap-3 px-4 py-2 text-sm ' +
-                          (isActive ? 'bg-[var(--color-arqel-accent,#f1f5f9)]' : '')
+                          (isActive ? 'bg-[var(--accent,#f1f5f9)]' : '')
                         }
                       >
                         <span className="flex-1">{cmd.label}</span>
@@ -347,7 +347,7 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
         </ul>
         <footer
           id={hintId}
-          className="flex items-center gap-3 border-t border-[var(--color-arqel-border,#e5e7eb)] px-4 py-2 text-xs opacity-70"
+          className="flex items-center gap-3 border-t border-[var(--border,#e5e7eb)] px-4 py-2 text-xs opacity-70"
         >
           <span>↑↓ navigate</span>
           <span>↵ select</span>

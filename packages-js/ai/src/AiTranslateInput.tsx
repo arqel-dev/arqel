@@ -34,6 +34,7 @@
  * só dispara dentro do click handler (post-mount).
  */
 
+import { Alert, AlertDescription, Badge, Button, Textarea } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useMemo, useState } from 'react';
 
 export interface AiTranslateInputFieldProps {
@@ -89,6 +90,28 @@ function isStringRecord(input: unknown): input is Record<string, string> {
 function isMissing(translations: AiTranslateValue, lang: string): boolean {
   const v = translations[lang];
   return v === undefined || v === null || v === '';
+}
+
+function Spinner(): ReactElement {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="animate-spin"
+    >
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
+      <path
+        d="M22 12a10 10 0 0 1-10 10"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
@@ -238,19 +261,19 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
   const activeIsLoading = loadingLangs.has(activeLang);
 
   return (
-    <div className="arqel-ai-translate-input" data-arqel-field="aiTranslate" data-field-name={name}>
-      <div className="arqel-ai-translate-input__toolbar">
-        <button
-          type="button"
+    <div className="flex flex-col gap-2" data-arqel-field="aiTranslate" data-field-name={name}>
+      <div className="flex items-center justify-end">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={handleTranslateAllMissing}
           disabled={missingCount === 0 || loadingLangs.size > 0}
-          className="arqel-ai-translate-input__translate-all"
         >
           Translate all missing
-        </button>
+        </Button>
       </div>
 
-      <div role="tablist" id={tablistId} className="arqel-ai-translate-input__tabs">
+      <div role="tablist" id={tablistId} className="flex items-center gap-1 border-b border-border">
         {languages.map((lang) => {
           const selected = lang === activeLang;
           const missing = isMissing(currentValue, lang);
@@ -263,87 +286,62 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
               aria-controls={`${tablistId}-panel-${lang}`}
               data-missing={missing ? 'true' : 'false'}
               onClick={() => setActiveLang(lang)}
-              className="arqel-ai-translate-input__tab"
+              className={
+                'inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium border-b-2 -mb-px transition-colors ' +
+                (selected
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground')
+              }
             >
               <span>{lang}</span>
               {missing ? (
-                <span
+                <Badge
+                  variant="secondary"
                   role="img"
                   aria-label="Missing translation"
-                  className="arqel-ai-translate-input__missing-dot"
                   data-testid={`missing-dot-${lang}`}
+                  className="px-1 py-0"
                 >
                   •
-                </span>
+                </Badge>
               ) : null}
             </button>
           );
         })}
       </div>
 
-      <div
-        role="tabpanel"
-        id={`${tablistId}-panel-${activeLang}`}
-        className="arqel-ai-translate-input__panel"
-      >
-        <textarea
+      <div role="tabpanel" id={`${tablistId}-panel-${activeLang}`} className="flex flex-col gap-2">
+        <Textarea
           name={`${name}[${activeLang}]`}
           value={activeText}
           onChange={handleTextareaChange}
           rows={6}
           aria-label={`Translation in ${activeLang}`}
-          className="arqel-ai-translate-input__textarea"
         />
 
         {activeLang !== defaultLanguage ? (
-          <div className="arqel-ai-translate-input__panel-actions">
-            <button
-              type="button"
+          <div className="flex items-center">
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => handleTranslateOne(activeLang)}
               disabled={activeIsLoading}
-              className="arqel-ai-translate-input__translate-one"
             >
               {activeIsLoading ? (
-                <span
-                  role="status"
-                  aria-label="Translating"
-                  className="arqel-ai-translate-input__spinner"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeOpacity="0.25"
-                      strokeWidth="4"
-                    />
-                    <path
-                      d="M22 12a10 10 0 0 1-10 10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                <span role="status" aria-label="Translating">
+                  <Spinner />
                 </span>
               ) : null}
               <span>Translate from {defaultLanguage}</span>
-            </button>
+            </Button>
           </div>
         ) : null}
       </div>
 
       {error !== null ? (
-        <div role="alert" className="arqel-ai-translate-input__error">
-          {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       ) : null}
     </div>
   );

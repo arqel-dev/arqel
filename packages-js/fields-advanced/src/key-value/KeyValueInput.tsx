@@ -46,27 +46,27 @@ interface InternalItem {
 }
 
 const inputClasses =
-  'h-9 w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
-  'bg-[var(--color-arqel-bg)] px-3 text-sm text-[var(--color-arqel-fg)] ' +
-  'placeholder:text-[var(--color-arqel-muted-fg)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'h-9 w-full rounded-sm border border-[var(--input)] ' +
+  'bg-background px-3 text-sm text-foreground ' +
+  'placeholder:text-muted-foreground ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50 ' +
-  'aria-invalid:border-[var(--color-arqel-destructive)]';
+  'aria-invalid:border-destructive';
 
 const buttonClasses =
-  'inline-flex h-8 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'px-3 text-sm text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-8 items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'px-3 text-sm text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const removeButtonClasses =
-  'inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'text-sm text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-9 w-9 items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'text-sm text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 function generateId(): string {
@@ -230,18 +230,14 @@ export function KeyValueInput({
       aria-invalid={hasError || undefined}
     >
       {field.label ? (
-        <legend id={legendId} className="text-sm font-medium text-[var(--color-arqel-fg)]">
+        <legend id={legendId} className="text-sm font-medium text-foreground">
           {field.label}
         </legend>
       ) : null}
 
       <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-        <div className="text-xs font-medium text-[var(--color-arqel-muted-fg)]">
-          {props.keyLabel}
-        </div>
-        <div className="text-xs font-medium text-[var(--color-arqel-muted-fg)]">
-          {props.valueLabel}
-        </div>
+        <div className="text-xs font-medium text-muted-foreground">{props.keyLabel}</div>
+        <div className="text-xs font-medium text-muted-foreground">{props.valueLabel}</div>
         <div aria-hidden="true" />
 
         {items.map((item, index) => {

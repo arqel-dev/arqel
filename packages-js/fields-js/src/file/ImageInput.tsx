@@ -45,15 +45,13 @@ export function ImageInput({
         <img
           src={previewUrl}
           alt="Preview"
-          className={cn(
-            'max-h-40 w-auto rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-border)]',
-          )}
+          className={cn('max-h-40 w-auto rounded-sm border border-border')}
         />
       )}
       <label
         className={cn(
-          'inline-flex w-fit cursor-pointer items-center gap-2 rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-border)] px-3 py-1.5 text-sm',
-          'hover:bg-[var(--color-arqel-muted)]',
+          'inline-flex w-fit cursor-pointer items-center gap-2 rounded-sm border border-border px-3 py-1.5 text-sm',
+          'hover:bg-muted',
           isDisabled && 'cursor-not-allowed opacity-50',
         )}
       >

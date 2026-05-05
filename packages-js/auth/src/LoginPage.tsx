@@ -1,3 +1,14 @@
+import {
+  Button,
+  Card,
+  CardContent,
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+} from '@arqel-dev/ui';
 import { useForm } from '@inertiajs/react';
 import type { FormEvent, ReactElement } from 'react';
 
@@ -12,8 +23,14 @@ export interface LoginPageProps {
   registerUrl?: string;
   /** URL para reset de senha (default `/forgot-password`). */
   forgotPasswordUrl?: string;
-  /** Texto do header (default "Entrar"). */
+  /** Texto do header (default "Welcome back"). */
   title?: string;
+  /** Subtítulo opcional. */
+  description?: string;
+  /** URL/path da imagem do hero panel à direita (visível em md+). */
+  heroImageSrc?: string;
+  /** Alt text da imagem hero. */
+  heroImageAlt?: string;
 }
 
 type LoginFormData = {
@@ -25,8 +42,9 @@ type LoginFormData = {
 /**
  * Página de login bundled de Arqel.
  *
- * Renderizada via Inertia em `arqel-dev/auth/Login`. Usa `useForm()` do
- * Inertia para gerenciar estado, submit e errors.
+ * Layout shadcn `login-04` (split-screen Card: form à esquerda, hero
+ * image à direita visível em md+). Lógica `useForm()` do Inertia para
+ * estado, submit e errors. Renderizada via Inertia em `arqel-dev/auth/Login`.
  */
 export function LoginPage({
   canRegister = false,
@@ -34,7 +52,10 @@ export function LoginPage({
   loginUrl = '/admin/login',
   registerUrl = '/register',
   forgotPasswordUrl = '/forgot-password',
-  title = 'Entrar',
+  title = 'Welcome back',
+  description = 'Login to your account',
+  heroImageSrc = '/login-hero.svg',
+  heroImageAlt = 'Login illustration',
 }: LoginPageProps): ReactElement {
   const { data, setData, post, processing, errors, reset } = useForm<LoginFormData>({
     email: '',
@@ -50,73 +71,84 @@ export function LoginPage({
   };
 
   return (
-    <div className="arqel-login-page">
-      <h1 className="arqel-login-title">{title}</h1>
+    <div className="flex min-h-svh w-full items-center justify-center bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-3xl flex-col gap-6">
+        <Card className="overflow-hidden p-0">
+          <CardContent className="grid p-0 md:grid-cols-2">
+            <form onSubmit={handleSubmit} className="p-6 md:p-8" noValidate>
+              <FieldGroup>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <h1 className="text-2xl font-bold">{title}</h1>
+                  <p className="text-balance text-muted-foreground">{description}</p>
+                </div>
 
-      <form onSubmit={handleSubmit} className="arqel-login-form" noValidate>
-        <div className="arqel-login-field">
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            value={data.email}
-            autoComplete="username"
-            required
-            onChange={(event) => setData('email', event.target.value)}
-          />
-          {errors.email ? (
-            <p className="arqel-login-error" role="alert">
-              {errors.email}
-            </p>
-          ) : null}
-        </div>
+                <Field>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <Input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={data.email}
+                    autoComplete="username"
+                    required
+                    aria-invalid={Boolean(errors.email)}
+                    onChange={(event) => setData('email', event.target.value)}
+                  />
+                  {errors.email ? <FieldError>{errors.email}</FieldError> : null}
+                </Field>
 
-        <div className="arqel-login-field">
-          <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            value={data.password}
-            autoComplete="current-password"
-            required
-            onChange={(event) => setData('password', event.target.value)}
-          />
-          {errors.password ? (
-            <p className="arqel-login-error" role="alert">
-              {errors.password}
-            </p>
-          ) : null}
-        </div>
+                <Field>
+                  <div className="flex items-center">
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    {canResetPassword ? (
+                      <a
+                        href={forgotPasswordUrl}
+                        className="ml-auto text-sm underline-offset-2 hover:underline"
+                      >
+                        Forgot your password?
+                      </a>
+                    ) : null}
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={data.password}
+                    autoComplete="current-password"
+                    required
+                    aria-invalid={Boolean(errors.password)}
+                    onChange={(event) => setData('password', event.target.value)}
+                  />
+                  {errors.password ? <FieldError>{errors.password}</FieldError> : null}
+                </Field>
 
-        <label className="arqel-login-remember">
-          <input
-            type="checkbox"
-            name="remember"
-            checked={data.remember}
-            onChange={(event) => setData('remember', event.target.checked)}
-          />
-          Lembrar-me
-        </label>
+                <Field>
+                  <Button type="submit" disabled={processing}>
+                    {processing ? 'Signing in…' : 'Login'}
+                  </Button>
+                </Field>
 
-        <button type="submit" disabled={processing} className="arqel-login-submit">
-          {processing ? 'Entrando…' : 'Entrar'}
-        </button>
+                {canRegister ? (
+                  <FieldDescription className="text-center">
+                    Don't have an account?{' '}
+                    <a href={registerUrl} className="underline underline-offset-4">
+                      Sign up
+                    </a>
+                  </FieldDescription>
+                ) : null}
+              </FieldGroup>
+            </form>
 
-        <div className="arqel-login-links">
-          {canResetPassword ? (
-            <a href={forgotPasswordUrl} className="arqel-login-link">
-              Esqueci minha senha
-            </a>
-          ) : null}
-          {canRegister ? (
-            <a href={registerUrl} className="arqel-login-link">
-              Criar conta
-            </a>
-          ) : null}
-        </div>
-      </form>
+            <div className="bg-primary/10 relative hidden md:block">
+              <img
+                src={heroImageSrc}
+                alt={heroImageAlt}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -124,27 +124,27 @@ export function safeUrl(raw: string): string {
 /* -------------------------------------------------------------------------- */
 
 const editorClasses =
-  'min-h-[8rem] w-full rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-input)] ' +
-  'bg-[var(--color-arqel-bg)] px-3 py-2 text-sm text-[var(--color-arqel-fg)] ' +
-  'focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--color-arqel-ring)] ' +
-  'aria-invalid:border-[var(--color-arqel-destructive)] arqel-rich-editor';
+  'min-h-[8rem] w-full rounded-sm border border-[var(--input)] ' +
+  'bg-background px-3 py-2 text-sm text-foreground ' +
+  'focus-within:outline-none focus-within:ring-2 focus-within:ring-ring ' +
+  'aria-invalid:border-destructive arqel-rich-editor';
 
 const buttonClasses =
-  'inline-flex h-8 min-w-[2rem] items-center justify-center rounded-[var(--radius-arqel-sm)] ' +
-  'border border-[var(--color-arqel-input)] bg-[var(--color-arqel-bg)] ' +
-  'px-2 text-xs text-[var(--color-arqel-fg)] ' +
-  'hover:bg-[var(--color-arqel-muted)] ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)] ' +
+  'inline-flex h-8 min-w-[2rem] items-center justify-center rounded-sm ' +
+  'border border-[var(--input)] bg-background ' +
+  'px-2 text-xs text-foreground ' +
+  'hover:bg-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const warningStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--color-arqel-destructive, #b91c1c)',
+  color: 'var(--destructive, #b91c1c)',
 };
 
 const counterStyle: CSSProperties = {
   fontSize: '0.75rem',
-  color: 'var(--color-arqel-muted-fg, #94a3b8)',
+  color: 'var(--muted-foreground, #94a3b8)',
 };
 
 /* -------------------------------------------------------------------------- */
@@ -343,7 +343,7 @@ export function RichTextInput({
   return (
     <div className="space-y-2">
       {field.label ? (
-        <span id={labelId} className="block text-sm font-medium text-[var(--color-arqel-fg)]">
+        <span id={labelId} className="block text-sm font-medium text-foreground">
           {field.label}
         </span>
       ) : null}

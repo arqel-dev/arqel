@@ -51,7 +51,7 @@ export function ActionButton({
   onInvoke,
   processing = false,
   errors,
-  size = 'md',
+  size = 'default',
   className,
 }: ActionButtonProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);

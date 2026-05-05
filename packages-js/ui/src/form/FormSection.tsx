@@ -24,7 +24,7 @@ export function FormSection({ config, children, className }: FormSectionProps) {
       <div className="flex-1">
         <h3 className="text-sm font-semibold">{config.heading}</h3>
         {config.description && (
-          <p className="text-xs text-[var(--color-arqel-muted-fg)]">{config.description}</p>
+          <p className="text-xs text-muted-foreground">{config.description}</p>
         )}
       </div>
       {collapsible && (
@@ -32,7 +32,7 @@ export function FormSection({ config, children, className }: FormSectionProps) {
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="text-sm text-[var(--color-arqel-muted-fg)] hover:underline"
+          className="text-sm text-muted-foreground hover:underline"
         >
           {open ? 'Hide' : 'Show'}
         </button>
@@ -53,7 +53,7 @@ export function FormSection({ config, children, className }: FormSectionProps) {
     <section
       data-arqel-section=""
       className={cn(
-        'rounded-[var(--radius-arqel)] border border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)]',
+        'rounded-md border border-border bg-background',
         config.compact ? 'p-3' : 'p-4',
         className,
       )}

@@ -1,294 +1,59 @@
-# Arqel Demo App — Blog Admin Showcase
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-> **Demo end-to-end** do framework Arqel: um blog admin minimal que integra
-> Resources, Fields (incluindo AI fields), Workflow, Versioning e Audit num
-> único projeto Laravel + Inertia + React.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-Este é o **app canônico** para:
+## About Laravel
 
-- Visitantes que querem rodar Arqel local em **2 minutos**.
-- Screenshots da documentação e do site marketing.
-- Smoke test cross-package no CI.
-- Base para tutoriais "do zero ao painel" (`docs/guides/getting-started`).
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
----
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-## Sumário
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-- [Stack](#stack)
-- [Setup local](#setup-local)
-- [Tour das features](#tour-das-features)
-- [Estrutura de diretórios](#estrutura-de-diretórios)
-- [Pacotes integrados](#pacotes-integrados)
-- [Como rodar testes](#como-rodar-testes)
-- [Screenshots](#screenshots)
-- [FAQ](#faq)
+## Learning Laravel
 
----
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-## Stack
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-| Camada | Versão |
-|---|---|
-| PHP | 8.3+ |
-| Laravel | 12.x ou 13.x |
-| Inertia | 3.x |
-| React | 19.2+ |
-| TypeScript | 5.6+ (strict + `noUncheckedIndexedAccess`) |
-| Tailwind | v4 |
-| Pest | 3.x |
-| Vitest | 2.x |
+## Laravel Sponsors
 
-Distribuído sob licença **MIT**, ponto de entrada do showcase de release `0.8.0-rc.1`.
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
----
+### Premium Partners
 
-## Setup local
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-### 1. Pré-requisitos
+## Contributing
 
-```bash
-php --version    # 8.3+
-node --version   # 20.9+ LTS
-composer --version
-corepack enable  # habilita pnpm
-```
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-### 2. Instalar dependências
+## Code of Conduct
 
-A partir da raiz do monorepo:
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-```bash
-# PHP — usa path repositories para os pacotes locais
-composer -d apps/demo install
+## Security Vulnerabilities
 
-# JS — pnpm workspace já cobre o app/demo
-pnpm install
-```
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-### 3. Banco de dados (SQLite default)
+## License
 
-```bash
-cd apps/demo
-cp .env.example .env
-php artisan key:generate
-touch database/database.sqlite
-php artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
-```
-
-O seeder cria:
-
-- **3 usuários** (Ada, Alan, Grace) com email `<slug>@arqel.dev`.
-- **5 categorias** (Engineering, Product, Design, DevOps, Community).
-- **20 tags** (laravel, react, inertia, php, …) classificadas em frontend/
-  backend/devops/design/product.
-- **50 posts** distribuídos entre `draft`, `review`, `published` e `archived`.
-
-### 4. Rodar dev server
-
-```bash
-# Em terminal #1
-php artisan serve   # http://127.0.0.1:8000
-
-# Em terminal #2
-pnpm --filter @arqel-dev/demo-app dev
-```
-
-Acesse:
-
-- `http://127.0.0.1:8000/admin` — dashboard.
-- `http://127.0.0.1:8000/admin/login` — login (provedor `arqel-dev/auth`).
-- `http://127.0.0.1:8000/admin/posts` — listagem com Table + Filters.
-- `http://127.0.0.1:8000/admin/posts/create` — formulário com fields demonstrativos.
-- `http://127.0.0.1:8000/admin/tags` — listagem com aiSelect classifier.
-
----
-
-## Tour das features
-
-### Field types em ação
-
-O `PostResource` demonstra cinco tipos de field representativos:
-
-| Field | Tipo | Demonstra |
-|---|---|---|
-| `title` | `text` | Validação obrigatória + slug source |
-| `slug` | `slug` | Auto-slug a partir de `title` |
-| `summary` | `aiText` | Geração via `arqel-dev/ai` (prompt configurado) |
-| `body` | `richText` | Editor TipTap-style |
-| `state` | `stateTransition` | Workflow visual com botões de transição |
-| `published_at` | `dateTime` | Date + time picker com timezone awareness |
-| `author_id` | `belongsTo` | Searchable select para `UserResource` |
-
-### Workflow
-
-State machine declarado em `app/States/PostStates.php`:
-
-```
-pending → draft → review → published → archived
-            ↑       ↓
-            └───────┘   (review pode voltar para draft)
-```
-
-A transição é exposta via endpoint `POST /admin/posts/{id}/transition` que
-valida transições inválidas (HTTP 422 quando o destino não está em
-`PostStates::allowedFrom()`).
-
-### AI generation
-
-- **`Field::aiText('summary')`** — botão "Generate" no form chama
-  `POST /admin/posts/ai/summary` que delega ao provider configurado.
-  No demo, retorna stub determinístico (`arqel-ai-stub`) para funcionar offline.
-- **`Field::aiSelect('category')->classifyFromFields(['name', 'description'])`** —
-  classifica tags automaticamente baseado no conteúdo. Chama
-  `POST /admin/tags/ai/classify`.
-
-### Versioning
-
-`Post` usa o trait `Versionable`. Cada save() incrementa `versionCount` (no
-demo) — em produção o pacote `arqel-dev/versioning` persiste snapshots completos
-em `arqel_versions` e expõe UI de "Histórico" + restore.
-
-### Audit log
-
-Plugins `arqel-dev/audit` registram todas as ações user-driven (create, update,
-delete, transition). UI acessível em `/admin/audit-log` quando o pacote
-estiver registrado no painel.
-
----
-
-## Estrutura de diretórios
-
-```
-apps/demo/
-├── app/
-│   ├── Arqel/
-│   │   ├── Panel.php              # Stub leve do builder
-│   │   └── Resources/             # PostResource, TagResource, CategoryResource, UserResource
-│   ├── Http/Controllers/          # Dashboard + Posts + Tags + AI endpoints
-│   ├── Models/                    # Post, Tag, Category, User + Concerns/
-│   ├── Policies/                  # PostPolicy
-│   ├── Providers/                 # ArqelServiceProvider (user-land)
-│   └── States/                    # PostStates (workflow)
-├── database/
-│   ├── migrations/
-│   └── seeders/                   # DemoSeeder
-├── resources/
-│   ├── css/app.css
-│   ├── js/
-│   │   ├── Pages/Admin/           # Dashboard, Posts/Index, Posts/Create, Tags/Index
-│   │   ├── __tests__/             # Vitest specs
-│   │   ├── app.tsx
-│   │   └── types.ts
-│   └── views/app.blade.php
-├── routes/web.php
-├── tests/
-│   ├── Feature/                   # Pest specs (PHP)
-│   ├── Fixtures/                  # views + helpers
-│   └── TestCase.php
-├── composer.json
-├── package.json
-├── phpunit.xml
-├── tsconfig.json
-└── vite.config.ts
-```
-
----
-
-## Pacotes integrados
-
-O `composer.json` declara path repositories para:
-
-| Pacote | Função no demo |
-|---|---|
-| `arqel-dev/core` | `Panel`, `Resource`, registry, command palette |
-| `arqel-dev/fields` | `Field::text()`, `slug()`, `dateTime()`, `belongsTo()`, `richText()` |
-| `arqel-dev/auth` | Login, registration, email verification, password reset |
-| `arqel-dev/table` | Listagem de Posts/Tags com filters + sort |
-| `arqel-dev/form` | Form runtime (validação client+server, dirty state, autosave) |
-| `arqel-dev/actions` | Bulk actions (publish, archive) e row actions |
-| `arqel-dev/nav` | Sidebar, breadcrumbs, command palette |
-| `arqel-dev/ai` | `aiText`, `aiSelect`, providers (OpenAI/Anthropic) |
-| `arqel-dev/workflow` | `HasWorkflow` trait + `stateTransition` field |
-| `arqel-dev/versioning` | `Versionable` trait + version history UI |
-| `arqel-dev/audit` | Audit log automático para todas as ações |
-
-`package.json` complementa com pacotes JS `@arqel-dev/react`, `@arqel-dev/ui`,
-`@arqel-dev/auth`, `@arqel-dev/workflow`, `@arqel-dev/versioning`, `@arqel-dev/ai`.
-
----
-
-## Como rodar testes
-
-### PHP (Pest 3)
-
-```bash
-cd apps/demo
-vendor/bin/pest
-```
-
-Suítes:
-
-- `DemoBootstrapTest` — registro do painel + migrations + seeder.
-- `PostResourceTest` — list, create form, AI summary, workflow transition.
-- `TagResourceTest` — list + AI classify.
-- `AdminDashboardTest` — render do dashboard com stats reais.
-
-### JavaScript (Vitest)
-
-```bash
-pnpm --filter @arqel-dev/demo-app test
-```
-
-Suítes:
-
-- `Dashboard.test.tsx`
-- `PostsIndex.test.tsx`
-- `TagsIndex.test.tsx`
-
-### Lint + typecheck
-
-```bash
-vendor/bin/pint --test
-pnpm --filter @arqel-dev/demo-app typecheck
-```
-
----
-
-## Screenshots
-
-> **Placeholder** — capturas serão adicionadas em `docs/screenshots/demo/`
-> conforme as UIs `arqel-dev/auth` e `arqel-dev/table` finalizem suas APIs.
-
-- `demo-dashboard.png`
-- `demo-posts-list.png`
-- `demo-post-create.png`
-- `demo-workflow-transition.png`
-- `demo-version-history.png`
-- `demo-audit-log.png`
-
----
-
-## FAQ
-
-**Posso fazer fork e usar de boilerplate?**
-Sim — licença MIT. Rode `composer create-project arqel-dev/demo-app meu-blog`
-quando o pacote for publicado, ou clone o monorepo e copie `apps/demo/` para
-um novo repositório.
-
-**Por que SQLite default?**
-Para que o setup seja zero-config. Para Postgres/MySQL, edite `.env` e rode
-`php artisan migrate:fresh --seed`.
-
-**O AI funciona sem chave?**
-Sim — os endpoints retornam stubs determinísticos. Para usar provider real,
-configure `OPENAI_API_KEY` ou `ANTHROPIC_API_KEY` em `.env` e ajuste
-`config/arqel-ai.php` (gerado pelo `arqel-dev/ai` package).
-
-**Como adiciono mais Resources?**
-Crie classe em `app/Arqel/Resources/` e adicione ao array em
-`ArqelServiceProvider::register()`.
-
----
-
-**Tickets de origem:** ver `PLANNING/08-fase-1-mvp.md` e `apps/demo/SKILL.md`.
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

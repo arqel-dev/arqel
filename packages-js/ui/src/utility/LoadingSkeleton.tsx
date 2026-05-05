@@ -43,8 +43,8 @@ export function LoadingSkeleton({
           key={i}
           style={{ width, height }}
           className={cn(
-            'animate-pulse bg-[var(--color-arqel-muted)]',
-            variant !== 'circle' && 'rounded-[var(--radius-arqel-sm)]',
+            'animate-pulse bg-muted',
+            variant !== 'circle' && 'rounded-sm',
             VARIANT_CLASSES[variant],
             className,
           )}

@@ -11,5 +11,5 @@ export default defineConfig({
   treeshake: true,
   splitting: false,
   minify: false,
-  external: ['react', '@inertiajs/react', 'laravel-echo', 'pusher-js'],
+  external: ['react', '@arqel-dev/ui', '@inertiajs/react', 'laravel-echo', 'pusher-js'],
 });

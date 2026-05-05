@@ -5,7 +5,7 @@
 
 ## Visão geral
 
-**Arqel** é um framework open-source MIT para construção de admin panels em Laravel, posicionado como competidor do Filament e Nova. Stack: Laravel 12+/13 + Inertia 3 + React 19.2+ + ShadCN CLI v4 (Base UI) + Tailwind v4 + TypeScript strict + Pest 3.
+**Arqel** é um framework open-source MIT para construção de admin panels em Laravel, posicionado como competidor do Filament e Nova. Stack: Laravel 12+/13 + Inertia 3 + React 19.2+ + ShadCN CLI v4 (Radix UI) + Tailwind v4 + TypeScript strict + Pest 3.
 
 **Tagline:** Admin panels for Laravel, forged in PHP, rendered in React.
 
@@ -69,7 +69,7 @@ Paralelo a tudo acima: GOV-001 (SECURITY.md) e GOV-003 (CONTRIBUTING.md + DCO bo
 - **TypeScript**: 5.6+ com `strict: true`, `noUncheckedIndexedAccess: true`
 - **PHPStan**: level max
 - **Pest**: 3.x
-- **ShadCN CLI**: v4 com Base UI como default registry
+- **ShadCN CLI**: v4 com Radix UI como default registry
 - **Tailwind**: v4 (syntax `@import 'tailwindcss';`)
 
 ### Inertia-only

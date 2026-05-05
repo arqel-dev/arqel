@@ -81,8 +81,8 @@ function BadgeCell({ column, value }: { column: BadgeColumnSchema; value: unknow
     <span
       className={cn(
         'inline-flex items-center px-2 py-0.5 text-xs',
-        column.props.pill ? 'rounded-full' : 'rounded-[var(--radius-arqel-sm)]',
-        'bg-[var(--color-arqel-muted)] text-[var(--color-arqel-fg)]',
+        column.props.pill ? 'rounded-full' : 'rounded-sm',
+        'bg-muted text-foreground',
       )}
     >
       {label}
@@ -100,7 +100,7 @@ function BooleanCell({ column, value }: { column: BooleanColumnSchema; value: un
 }
 
 function DateCell({ column, value }: { column: DateColumnSchema; value: unknown }) {
-  if (!value) return <span className="text-[var(--color-arqel-muted-fg)]">—</span>;
+  if (!value) return <span className="text-muted-foreground">—</span>;
   const raw = String(value);
   const date = new Date(raw);
   if (Number.isNaN(date.getTime())) return <span>{raw}</span>;
@@ -177,9 +177,7 @@ function RelationshipCell({ column, value }: { column: RelationshipColumnSchema;
 
 function ComputedCell({ column, value }: { column: ComputedColumnSchema; value: unknown }) {
   if (value === null || value === undefined) {
-    return (
-      <span className="text-[var(--color-arqel-muted-fg)]">{column.props.placeholder ?? '—'}</span>
-    );
+    return <span className="text-muted-foreground">{column.props.placeholder ?? '—'}</span>;
   }
   return <span>{asString(value)}</span>;
 }

@@ -1,6 +1,6 @@
 /**
  * `<ActionMenu>` — renders a list of actions inline (≤ `inlineThreshold`)
- * or collapses them into a Base UI dropdown menu when the list grows.
+ * or collapses them into a shadcn (Radix) dropdown menu when the list grows.
  *
  * Each menu item delegates to `<ActionButton>` so confirmation /
  * form-modal behaviour is consistent across surfaces. The dropdown
@@ -10,8 +10,13 @@
 
 import type { ActionSchema } from '@arqel-dev/types/actions';
 import type { FieldSchema } from '@arqel-dev/types/fields';
-import { Menu } from '@base-ui-components/react/menu';
 import type { ReactNode } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../shadcn/ui/dropdown-menu.js';
 import { cn } from '../utils/cn.js';
 import { ActionButton } from './ActionButton.js';
 import { Button } from './Button.js';
@@ -55,51 +60,33 @@ export function ActionMenu({
   }
 
   return (
-    <Menu.Root>
-      <Menu.Trigger
-        render={
-          trigger ? (
-            (trigger as React.ReactElement)
-          ) : (
-            <Button variant="ghost" size="icon" aria-label="Actions">
-              ⋯
-            </Button>
-          )
-        }
-      />
-      <Menu.Portal>
-        <Menu.Positioner sideOffset={6}>
-          <Menu.Popup
-            className={cn(
-              'z-50 min-w-[12rem] rounded-[var(--radius-arqel-sm)] border border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)] p-1 shadow-md outline-none',
-              className,
-            )}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        {trigger ?? (
+          <Button variant="ghost" size="icon" aria-label="Actions">
+            ⋯
+          </Button>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={6} className={cn('min-w-[12rem]', className)}>
+        {actions.map((action) => (
+          <DropdownMenuItem
+            key={action.name}
+            disabled={action.disabled === true}
+            variant={action.color === 'destructive' ? 'destructive' : 'default'}
+            onSelect={() => {
+              // Delegate to ActionButton-style handling by routing
+              // through onInvoke. Confirmation/form modals are still
+              // available via direct ActionButton usage; the menu
+              // is intended for plain links / direct invocations.
+              if (action.disabled) return;
+              onInvoke(action);
+            }}
           >
-            {actions.map((action) => (
-              <Menu.Item
-                key={action.name}
-                disabled={action.disabled === true}
-                className={cn(
-                  'flex cursor-pointer select-none items-center rounded-[var(--radius-arqel-sm)] px-3 py-1.5 text-sm outline-none',
-                  'data-[highlighted]:bg-[var(--color-arqel-muted)]',
-                  action.color === 'destructive' && 'text-[var(--color-arqel-destructive)]',
-                  'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                )}
-                onClick={() => {
-                  // Delegate to ActionButton-style handling by routing
-                  // through onInvoke. Confirmation/form modals are still
-                  // available via direct ActionButton usage; the menu
-                  // is intended for plain links / direct invocations.
-                  if (action.disabled) return;
-                  onInvoke(action);
-                }}
-              >
-                {action.label}
-              </Menu.Item>
-            ))}
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
+            {action.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

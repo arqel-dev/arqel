@@ -191,7 +191,49 @@ final class HandleArqelInertiaRequests extends Middleware
             'id' => $panel->id,
             'path' => $panel->getPath(),
             'brand' => $panel->getBrand(),
+            'navigation' => $this->buildNavigation($panel),
         ];
+    }
+
+    /**
+     * Build the `panel.navigation` payload — one entry per Resource
+     * registered with the current Panel. The Sidebar reads it via
+     * `useNavigation()` (`@arqel-dev/hooks`) and renders grouped menu
+     * items with icons + active highlighting.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildNavigation(\Arqel\Core\Panel\Panel $panel): array
+    {
+        $items = [];
+        $request = request();
+        $currentPath = $request instanceof Request ? '/'.ltrim($request->path(), '/') : null;
+        $panelPath = '/'.trim($panel->getPath(), '/');
+
+        foreach ($panel->getResources() as $resourceClass) {
+            if (! class_exists($resourceClass) || ! is_subclass_of($resourceClass, \Arqel\Core\Resources\Resource::class)) {
+                continue;
+            }
+
+            $slug = $resourceClass::getSlug();
+            $label = $resourceClass::getPluralLabel();
+            $url = rtrim($panelPath, '/').'/'.$slug;
+
+            $items[] = [
+                'label' => $label,
+                'url' => $url,
+                'icon' => $resourceClass::getNavigationIcon(),
+                'group' => $resourceClass::getNavigationGroup(),
+                'sort' => $resourceClass::getNavigationSort() ?? 0,
+                'active' => $currentPath !== null && (
+                    $currentPath === $url || str_starts_with($currentPath, $url.'/')
+                ),
+            ];
+        }
+
+        usort($items, static fn (array $a, array $b): int => $a['sort'] <=> $b['sort']);
+
+        return $items;
     }
 
     private function currentTenant(Request $request): mixed

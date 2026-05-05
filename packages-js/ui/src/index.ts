@@ -35,6 +35,44 @@ export type { FormRendererProps } from './form/FormRenderer.js';
 export { FormRenderer } from './form/FormRenderer.js';
 export type { CommandPaletteProps, PaletteCommand } from './palette/CommandPalette.js';
 export { CommandPalette } from './palette/CommandPalette.js';
+export {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Badge,
+  badgeVariants,
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Checkbox,
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+  FieldTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  Separator,
+  Skeleton,
+  Textarea,
+} from './primitives/index.js';
 export type { ResourceIndexUIProps } from './resource/ResourceIndex.js';
 export { ResourceIndex } from './resource/ResourceIndex.js';
 export type { AppShellProps, AppShellVariant } from './shell/AppShell.js';

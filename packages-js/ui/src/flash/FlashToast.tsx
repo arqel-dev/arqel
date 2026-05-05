@@ -20,13 +20,10 @@ export interface FlashToastProps {
 }
 
 const KIND_CLASSES: Record<FlashKind, string> = {
-  success:
-    'border-[var(--color-arqel-success)]/60 bg-[var(--color-arqel-success)]/15 text-[var(--color-arqel-fg)]',
-  error:
-    'border-[var(--color-arqel-destructive)]/60 bg-[var(--color-arqel-destructive)]/15 text-[var(--color-arqel-fg)]',
-  warning:
-    'border-[var(--color-arqel-warning)]/60 bg-[var(--color-arqel-warning)]/15 text-[var(--color-arqel-fg)]',
-  info: 'border-[var(--color-arqel-border)] bg-[var(--color-arqel-muted)] text-[var(--color-arqel-fg)]',
+  success: 'border-[var(--chart-2)]/60 bg-[var(--chart-2)]/15 text-foreground',
+  error: 'border-destructive/60 bg-destructive/15 text-foreground',
+  warning: 'border-[var(--chart-4)]/60 bg-[var(--chart-4)]/15 text-foreground',
+  info: 'border-border bg-muted text-foreground',
 };
 
 const KIND_GLYPH: Record<FlashKind, string> = {
@@ -54,7 +51,7 @@ export function FlashToast({
       role={kind === 'error' ? 'alert' : 'status'}
       aria-live={kind === 'error' ? 'assertive' : 'polite'}
       className={cn(
-        'pointer-events-auto flex items-start gap-3 rounded-[var(--radius-arqel)] border px-4 py-3 shadow-md',
+        'pointer-events-auto flex items-start gap-3 rounded-md border px-4 py-3 shadow-md',
         'min-w-[18rem] max-w-md text-sm',
         KIND_CLASSES[kind],
         className,
@@ -68,7 +65,7 @@ export function FlashToast({
         type="button"
         aria-label="Dismiss"
         onClick={onDismiss}
-        className="text-[var(--color-arqel-muted-fg)] hover:text-[var(--color-arqel-fg)]"
+        className="text-muted-foreground hover:text-foreground"
       >
         ✕
       </button>

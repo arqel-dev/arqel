@@ -165,13 +165,12 @@ it('writes resources/js/app.tsx with the createArqelApp boilerplate', function (
     $contents = (string) $this->files->get(resource_path('js/app.tsx'));
 
     expect($contents)
-        ->toContain("import '@arqel-dev/ui/styles.css'")
         ->toContain("import '@arqel-dev/fields/register'")
         ->toContain('createArqelApp')
         ->not->toContain('{{');
 });
 
-it('appends arqel imports to existing resources/css/app.css without duplicating', function (): void {
+it('writes resources/css/app.css with arqel imports + @source directives', function (): void {
     $this->files->put(base_path('package.json'), '{}');
     $this->files->put(base_path('pnpm-lock.yaml'), '');
     $this->files->ensureDirectoryExists(resource_path('css'));
@@ -182,8 +181,11 @@ it('appends arqel imports to existing resources/css/app.css without duplicating'
 
     $contents = (string) $this->files->get(resource_path('css/app.css'));
 
-    expect(substr_count($contents, "@import 'tailwindcss'"))->toBe(1)
-        ->and($contents)->toContain("@import '@arqel-dev/ui/styles.css'");
+    // @arqel-dev/ui/styles.css already imports Tailwind internally — we
+    // intentionally do not emit a second `@import 'tailwindcss'` here.
+    expect(substr_count($contents, "@import 'tailwindcss'"))->toBe(0)
+        ->and($contents)->toContain("@import '@arqel-dev/ui/styles.css'")
+        ->and($contents)->toContain('@source "../../node_modules/@arqel-dev/ui/dist/');
 });
 
 it('surfaces a warning instead of failing when the package install exits non-zero', function (): void {

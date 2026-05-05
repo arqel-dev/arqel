@@ -10,6 +10,7 @@
 import { useTheme } from '@arqel-dev/react/providers';
 import type { ReactNode } from 'react';
 import { Button } from '../action/Button.js';
+import { SidebarTrigger } from '../shadcn/ui/sidebar.js';
 import { cn } from '../utils/cn.js';
 
 export interface TopbarProps {
@@ -35,21 +36,11 @@ export function Topbar({
     <header
       data-arqel-topbar=""
       className={cn(
-        'flex h-14 shrink-0 items-center gap-2 border-b border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)] px-4',
+        'flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-4',
         className,
       )}
     >
-      {onMobileMenuClick && (
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Open navigation"
-          className="md:hidden"
-          onClick={onMobileMenuClick}
-        >
-          <span aria-hidden="true">≡</span>
-        </Button>
-      )}
+      <SidebarTrigger className="-ml-1" />
       {brand && <div className="flex items-center">{brand}</div>}
       <div className="hidden flex-1 md:block">{search}</div>
       <div className="ml-auto flex items-center gap-2 md:ml-0">

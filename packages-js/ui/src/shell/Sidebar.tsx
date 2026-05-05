@@ -1,157 +1,85 @@
 /**
  * `<Sidebar>` — primary navigation rail.
  *
- * Desktop: fixed-width (240px default, override via `--sidebar-width`).
- * Mobile (`md:` breakpoint): rendered inside a Base UI `Dialog` overlay
- * driven by the `open` / `onOpenChange` props. The default `useBreakpoint`
- * gate auto-collapses the in-flow rail at `<md` so callers can avoid
- * threading props through. Items come from `useNavigation()` shared props,
- * but the component also accepts an `items` override for custom panels.
+ * Wraps the shadcn `Sidebar` block. Items come from `useNavigation()`
+ * shared props (Inertia panel.navigation) by default, but the component
+ * also accepts an `items` override for custom panels. The shadcn block
+ * already handles desktop rail, mobile sheet, collapsed/icon mode, and
+ * keyboard/cookie state via `<SidebarProvider>` (rendered by `<AppShell>`).
  */
 
 import { type NavigationItemPayload, useNavigation } from '@arqel-dev/hooks';
-import { Dialog } from '@base-ui-components/react/dialog';
-import { useMemo } from 'react';
-import { cn } from '../utils/cn.js';
+import { type ReactNode, useMemo } from 'react';
+import {
+  Sidebar as ShadcnSidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '../shadcn/ui/sidebar.js';
 
 export interface SidebarProps {
   items?: NavigationItemPayload[];
-  brand?: React.ReactNode;
-  footer?: React.ReactNode;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  brand?: ReactNode;
+  footer?: ReactNode;
   className?: string;
 }
 
-interface RenderProps {
-  items: NavigationItemPayload[];
-  brand?: React.ReactNode;
-  footer?: React.ReactNode;
-}
-
-function SidebarBody({ items, brand, footer }: RenderProps) {
+export function Sidebar({ items: itemsProp, brand, footer, className }: SidebarProps) {
+  const { items: sharedItems } = useNavigation();
+  const items = itemsProp ?? sharedItems;
   const grouped = useMemo(() => groupItems(items), [items]);
 
   return (
-    <div className="flex h-full flex-col">
-      {brand && (
-        <div className="flex h-14 shrink-0 items-center border-b border-[var(--color-arqel-border)] px-4">
-          {brand}
-        </div>
-      )}
-      <nav className="flex-1 overflow-y-auto p-2" aria-label="Primary">
+    <ShadcnSidebar collapsible="icon" className={className}>
+      {brand ? (
+        <SidebarHeader>
+          <div className="flex items-center gap-2 px-2 py-1.5 text-sm font-semibold">{brand}</div>
+        </SidebarHeader>
+      ) : null}
+      <SidebarContent>
         {grouped.map(([group, list]) => (
-          <div key={group ?? '__ungrouped__'} className="mb-4">
-            {group && (
-              <div className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-arqel-muted-fg)]">
-                {group}
-              </div>
-            )}
-            <ul className="space-y-0.5">
-              {list.map((item) => (
-                <SidebarItem key={`${group ?? ''}::${item.url}::${item.label}`} item={item} />
-              ))}
-            </ul>
-          </div>
+          <SidebarGroup key={group ?? '__ungrouped__'}>
+            {group ? <SidebarGroupLabel>{group}</SidebarGroupLabel> : null}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {list.map((item) => (
+                  <SidebarMenuItem key={item.url ?? item.label}>
+                    <SidebarMenuButton asChild={Boolean(item.url)} isActive={Boolean(item.active)}>
+                      {item.url ? (
+                        <a href={item.url}>
+                          <span>{item.label}</span>
+                        </a>
+                      ) : (
+                        <span>{item.label}</span>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         ))}
-      </nav>
-      {footer && (
-        <div className="shrink-0 border-t border-[var(--color-arqel-border)] p-2">{footer}</div>
-      )}
-    </div>
-  );
-}
-
-function SidebarItem({ item }: { item: NavigationItemPayload }) {
-  return (
-    <li>
-      <a
-        href={item.url}
-        aria-current={item.active ? 'page' : undefined}
-        className={cn(
-          'flex items-center gap-2 rounded-[var(--radius-arqel-sm)] px-3 py-2 text-sm transition-colors',
-          'hover:bg-[var(--color-arqel-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arqel-ring)]',
-          item.active && 'bg-[var(--color-arqel-muted)] font-medium',
-        )}
-      >
-        <span className="flex-1 truncate">{item.label}</span>
-        {item.badge !== undefined && item.badge !== null && (
-          <span className="rounded-full bg-[var(--color-arqel-primary)] px-2 py-0.5 text-xs text-[var(--color-arqel-primary-fg)]">
-            {item.badge}
-          </span>
-        )}
-      </a>
-    </li>
+      </SidebarContent>
+      {footer ? <SidebarFooter>{footer}</SidebarFooter> : null}
+    </ShadcnSidebar>
   );
 }
 
 function groupItems(
   items: NavigationItemPayload[],
-): Array<[string | null, NavigationItemPayload[]]> {
-  const map = new Map<string | null, NavigationItemPayload[]>();
+): Array<[string | undefined, NavigationItemPayload[]]> {
+  const groups = new Map<string | undefined, NavigationItemPayload[]>();
   for (const item of items) {
-    const key = item.group ?? null;
-    const list = map.get(key);
-    if (list) list.push(item);
-    else map.set(key, [item]);
+    const key = item.group ?? undefined;
+    const list = groups.get(key) ?? [];
+    list.push(item);
+    groups.set(key, list);
   }
-  return Array.from(map.entries());
-}
-
-export function Sidebar(props: SidebarProps) {
-  if (props.items === undefined) {
-    return <SidebarFromShared {...props} />;
-  }
-  return <SidebarImpl {...props} items={props.items} />;
-}
-
-function SidebarFromShared(props: SidebarProps) {
-  const fromHook = useNavigation();
-  return <SidebarImpl {...props} items={fromHook.items} />;
-}
-
-function SidebarImpl({
-  items,
-  brand,
-  footer,
-  open,
-  onOpenChange,
-  className,
-}: SidebarProps & { items: NavigationItemPayload[] }) {
-  const resolvedItems = items;
-
-  const desktop = (
-    <aside
-      data-arqel-sidebar=""
-      style={{ width: 'var(--sidebar-width, 240px)' }}
-      className={cn(
-        'hidden shrink-0 border-r border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)] md:block',
-        className,
-      )}
-    >
-      <SidebarBody items={resolvedItems} brand={brand} footer={footer} />
-    </aside>
-  );
-
-  if (open === undefined) return desktop;
-
-  return (
-    <>
-      {desktop}
-      <Dialog.Root open={open} onOpenChange={(next) => onOpenChange?.(next)} modal>
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40 md:hidden" />
-          <Dialog.Popup
-            aria-label="Navigation"
-            className={cn(
-              'fixed inset-y-0 left-0 z-50 w-72 border-r border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)] shadow-xl outline-none md:hidden',
-              className,
-            )}
-          >
-            <SidebarBody items={resolvedItems} brand={brand} footer={footer} />
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
-    </>
-  );
+  return Array.from(groups.entries());
 }

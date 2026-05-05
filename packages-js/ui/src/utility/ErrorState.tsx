@@ -22,13 +22,9 @@ export function ErrorState({ status, title, description, action, className }: Er
       role="alert"
       className={cn('flex flex-col items-center gap-3 px-4 py-16 text-center', className)}
     >
-      {status && (
-        <span className="text-sm font-mono text-[var(--color-arqel-muted-fg)]">{status}</span>
-      )}
+      {status && <span className="text-sm font-mono text-muted-foreground">{status}</span>}
       <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-      {description && (
-        <p className="max-w-md text-sm text-[var(--color-arqel-muted-fg)]">{description}</p>
-      )}
+      {description && <p className="max-w-md text-sm text-muted-foreground">{description}</p>}
       {action && <div className="mt-2">{action}</div>}
     </div>
   );

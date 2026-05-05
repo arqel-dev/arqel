@@ -20,12 +20,12 @@ export function EmptyState({ title, description, icon, action, className }: Empt
   return (
     <div
       className={cn(
-        'flex flex-col items-center gap-3 px-4 py-12 text-center text-[var(--color-arqel-muted-fg)]',
+        'flex flex-col items-center gap-3 px-4 py-12 text-center text-muted-foreground',
         className,
       )}
     >
       {icon && <div className="text-3xl">{icon}</div>}
-      <h2 className="text-base font-semibold text-[var(--color-arqel-fg)]">{title}</h2>
+      <h2 className="text-base font-semibold text-foreground">{title}</h2>
       {description && <p className="max-w-md text-sm">{description}</p>}
       {action && <div className="mt-2">{action}</div>}
     </div>

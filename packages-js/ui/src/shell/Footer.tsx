@@ -15,7 +15,7 @@ export function Footer({ children, className }: FooterProps) {
     <footer
       data-arqel-footer=""
       className={cn(
-        'shrink-0 border-t border-[var(--color-arqel-border)] bg-[var(--color-arqel-bg)] px-4 py-3 text-sm text-[var(--color-arqel-muted-fg)]',
+        'shrink-0 border-t border-border bg-background px-4 py-3 text-sm text-muted-foreground',
         className,
       )}
     >

@@ -1,1 +1,6 @@
-@import 'tailwindcss';
+@import '@arqel-dev/ui/styles.css';
+
+@source "../../node_modules/@arqel-dev/ui/dist/**/*.{js,mjs}";
+@source "../../node_modules/@arqel-dev/auth/dist/**/*.{js,mjs}";
+@source "../../node_modules/@arqel-dev/fields/dist/**/*.{js,mjs}";
+@source "../../node_modules/@arqel-dev/react/dist/**/*.{js,mjs}";

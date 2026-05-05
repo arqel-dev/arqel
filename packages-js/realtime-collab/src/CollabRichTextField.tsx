@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { type ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 import { encodeUpdate } from './encoders';
 import { useYjsCollab } from './useYjsCollab';
@@ -35,7 +35,7 @@ const DEFAULT_DEBOUNCE_MS = 2000;
  * estabelece o contrato de sync; consumidores avançados podem
  * substituir o textarea por bindings y-prosemirror.
  */
-export function CollabRichTextField(props: CollabRichTextFieldProps): JSX.Element {
+export function CollabRichTextField(props: CollabRichTextFieldProps): ReactElement {
   const {
     modelType,
     modelId,

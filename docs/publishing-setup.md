@@ -32,6 +32,20 @@ Antes de fazer `git tag v0.8.0 && git push --tags`:
 - Manifests bumped: `0.8.0-rc.1` → `0.8.0` (36 ficheiros). `realtime-collab` saiu de `0.10.0-rc.1` para `0.8.0` para uniformizar.
 - `CHANGELOG.md` ganhou seção `[0.8.0]` documentando o rename + nota da primeira release pública.
 - `.github/workflows/release.yml` reescrito (splitsh-lite + pnpm publish + release notes).
+- Meta-package `arqel-dev/framework` criado em repo separado (`github.com/arqel-dev/framework`) — `composer require arqel-dev/framework` puxa core + auth + fields + form + actions + nav + table + inertia.
+
+### Auto-update Packagist (lessons learned)
+
+Submeter via API com `?username=X&apiToken=Y` cria webhook **"Legacy Auto-Update"**, que funciona mas mostra warning "Needs Attention". Para auto-update **non-legacy**:
+
+1. **Conecta GitHub à conta Packagist** em `packagist.org/profile/`.
+2. **Autoriza Packagist OAuth na org `arqel-dev`** em `github.com/settings/applications` → Packagist → Organization access → **Grant** para `arqel-dev`.
+3. **Remove os webhooks legacy** dos sub-repos com `./scripts/remove-packagist-webhooks.sh` — Packagist passa a usar OAuth para crawl.
+4. **Reconecta GitHub** em `packagist.org/profile/` (desligar/ligar) para forçar Packagist a re-detectar a org.
+
+Resultado: cada `git push v0.X.Y` é detectado automaticamente em poucos minutos via OAuth, sem webhooks no repo, sem warnings.
+
+Se precisares forçar um crawl imediato (ex: deploy crítico), usa `./scripts/trigger-packagist-update.sh` — o crawl manual via API token continua a funcionar e não reativa o "Legacy" warning desde que não haja webhook ativo.
 
 ---
 

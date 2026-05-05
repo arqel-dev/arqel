@@ -1,30 +1,81 @@
 name: Docs — Deploy
 
-# Placeholder — será preenchido em ticket DOCS posterior.
-# Por agora: apenas garante que o ficheiro existe para branch protection
-# e dispara no merge para main sem fazer nada de destrutivo.
+# Builds the VitePress site in apps/docs and rsyncs it to Hostinger
+# Business hosting (~/domains/arqel.dev/public_html) over SSH (port 65002).
+#
+# Required secrets in arqel-dev/arqel:
+#   HOSTINGER_SSH_HOST  e.g. 123.45.67.89 or arqel.dev
+#   HOSTINGER_SSH_USER  e.g. u123456789
+#   HOSTINGER_SSH_KEY   private key (ed25519), full contents including header/footer
+#   HOSTINGER_SSH_PORT  optional, defaults to 65002
+#   HOSTINGER_DEPLOY_PATH  optional, defaults to /home/<user>/domains/arqel.dev/public_html
 
 on:
   push:
-    branches: [master, main]
+    branches: [main]
     paths:
       - "apps/docs/**"
-      - "docs-content/**"
-      - "PLANNING/**"
+      - ".github/workflows/docs-deploy.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: docs-deploy
+  group: docs-deploy-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  placeholder:
-    name: Docs deploy (placeholder)
+  deploy:
+    name: Build + rsync to Hostinger
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Acknowledge trigger
-        run: echo "Docs deploy workflow is a placeholder — real deployment wired up in a future DOCS ticket."
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.9.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build VitePress
+        run: pnpm --filter @arqel-dev/docs build
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy via rsync
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          DEPLOY_PATH: ${{ secrets.HOSTINGER_DEPLOY_PATH || format('/home/{0}/domains/arqel.dev/public_html', secrets.HOSTINGER_SSH_USER) }}
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=no" \
+            apps/docs/.vitepress/dist/ \
+            "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+
+      - name: Verify deploy
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          DEPLOY_PATH: ${{ secrets.HOSTINGER_DEPLOY_PATH || format('/home/{0}/domains/arqel.dev/public_html', secrets.HOSTINGER_SSH_USER) }}
+        run: |
+          ssh -i "$HOME/.ssh/deploy_key" -p "$SSH_PORT" -o StrictHostKeyChecking=no \
+            "$SSH_USER@$SSH_HOST" \
+            "ls -la \"$DEPLOY_PATH/index.html\" && du -sh \"$DEPLOY_PATH\""

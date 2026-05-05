@@ -1,5 +1,5 @@
-# Actions (referência)
+# Actions (referencia)
 
-> **Status:** stub — DOCS-005.
+> **Estado:** stub — DOCS-005.
 
-Documentação detalhada de `Arqel\Actions\Action` (variantes, `Confirmable`, `HasForm`, `Actions` factory) chega em DOCS-005. Por enquanto consulte `packages/actions/SKILL.md`.
+La documentación detallada de `Arqel\Actions\Action` (variantes, `Confirmable`, `HasForm`, `Actions` factory) llega en DOCS-005. Por ahora consulta `packages/actions/SKILL.md`.

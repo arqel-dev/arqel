@@ -1,5 +1,5 @@
 # Resource
 
-> **Status:** stub — DOCS-005.
+> **Estado:** stub — DOCS-005.
 
-Detailed documentation for `Arqel\Core\Resources\Resource` (static props, lifecycle hooks, `runCreate/runUpdate/runDelete`, `recordTitle/recordSubtitle`, `indexQuery`) is coming in DOCS-005. For now, see `packages/core/SKILL.md`.
+La documentación detallada de `Arqel\Core\Resources\Resource` (static props, lifecycle hooks, `runCreate/runUpdate/runDelete`, `recordTitle/recordSubtitle`, `indexQuery`) llega en DOCS-005. Por ahora consulta `packages/core/SKILL.md`.

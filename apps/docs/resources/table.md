@@ -1,5 +1,5 @@
-# Table (referência)
+# Table (reference)
 
 > **Status:** stub — DOCS-005.
 
-Documentação detalhada de `Arqel\Table\Table` (Columns, Filters, ações de toolbar/row/bulk, `TableQueryBuilder`) chega em DOCS-005. Por enquanto consulte `packages/table/SKILL.md`.
+Detailed documentation for `Arqel\Table\Table` (Columns, Filters, toolbar/row/bulk actions, `TableQueryBuilder`) is coming in DOCS-005. For now, see `packages/table/SKILL.md`.

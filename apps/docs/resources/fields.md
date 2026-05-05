@@ -1,5 +1,5 @@
-# Fields (referência)
+# Fields (reference)
 
 > **Status:** stub — DOCS-005.
 
-Tabela completa dos 21 field types com props, defaults e default rules chega em DOCS-005. Por enquanto consulte `packages/fields/SKILL.md`.
+A complete table of the 21 field types with props, defaults and default rules is coming in DOCS-005. For now, see `packages/fields/SKILL.md`.

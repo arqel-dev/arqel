@@ -1,5 +1,5 @@
-# Form (referência)
+# Form (reference)
 
 > **Status:** stub — DOCS-005.
 
-Documentação detalhada de `Arqel\Form\Form` (Layout components, FormRequest generator, FieldRulesExtractor) chega em DOCS-005. Por enquanto consulte `packages/form/SKILL.md`.
+Detailed documentation for `Arqel\Form\Form` (Layout components, FormRequest generator, FieldRulesExtractor) is coming in DOCS-005. For now, see `packages/form/SKILL.md`.

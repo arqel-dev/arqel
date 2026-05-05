@@ -201,6 +201,10 @@ jobs:
           fi
 
       - name: Build all publishable packages
+        env:
+          # @arqel-dev/ui has 14 entry points + DTS — default heap (~2GB)
+          # OOMs the tsup DTS worker on standard runners.
+          NODE_OPTIONS: --max-old-space-size=6144
         run: pnpm -r --filter "./packages-js/*" --if-present run build
 
       - name: Publish (dry run)

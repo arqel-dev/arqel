@@ -350,7 +350,7 @@ arqel-dev/arqel (meta-package)
 2. **ShadCN CLI v4 via `arqel.dev/r/*`** — componentes atómicos (Button, Input, Select, etc.) são copiados para `resources/js/components/ui/*` do user.
 
 **Porquê:**
-- Base UI / ShadCN CLI é o padrão moderno React 2026.
+- Radix UI / shadcn CLI é o padrão moderno React 2026.
 - User owns the code dos primitives — customização sem hacks.
 - Structural components via npm para updates semânticos.
 

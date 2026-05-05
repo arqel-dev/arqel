@@ -11,19 +11,33 @@
 - **Registries**:
   - `ResourceRegistry` (em `src/Resources/`): `register`/`registerMany`/`discover` (PSR-4 + Symfony Finder)/`findByModel`/`findBySlug`/`has`/`clear`/`all`. Idempotente; valida o contract via `is_subclass_of`
   - `PanelRegistry` (em `src/Panel/`): create-or-get via `panel($id)`, `setCurrent`/`getCurrent`, `all`, `has`, `clear`. Lança `PanelNotFoundException` em ID desconhecido
-- **`Panel` fluent builder** (`src/Panel/Panel.php`): `path`/`brand`/`theme`/`primaryColor`/`darkMode`/`middleware`/`resources`/`widgets`/`navigationGroups`/`authGuard`/`tenant` com getters tipados
+- **`Panel` fluent builder** (`src/Panel/Panel.php`): `path`/`brand`/`theme`/`primaryColor`/`darkMode`/`middleware`/`resources`/`widgets`/`navigationGroups`/`authGuard`/`tenant`/`afterLoginRedirectTo` com getters tipados. `afterLoginRedirectTo(string)` (default `/admin`) define para onde o `LoginController` redirecciona após `Auth::attempt`; getter complementar é `getAfterLoginUrl()`.
 - **Classe base `Resource`** abstracta (`src/Resources/Resource.php`): static metadata (`$model`, `$slug`, `$label`, `$pluralLabel`, navigation), auto-derivation de slug/label/plural, 8 lifecycle hooks no-op, `recordTitle`/`recordSubtitle`/`indexQuery` defaults
 - **Facade `Arqel`** (`src/Facades/Arqel.php`) com accessor `arqel` aliasado ao `PanelRegistry`
 - **Comandos Artisan**:
-  - `arqel:install {--force}` — bootstrap pipeline com Laravel Prompts (publica config, faz scaffold de `app/Arqel`, `resources/js/Pages/Arqel`, gera provider/layout/`AGENTS.md`)
+  - `arqel:install {--force}` — bootstrap pipeline end-to-end (zero-touch). Numa app Laravel limpa este comando deixa o admin panel pronto. Cada passo é idempotente:
+    1. Publica `config/arqel.php`.
+    2. Gera `app/Providers/ArqelServiceProvider.php` a partir de `provider.stub`.
+    3. **Auto-regista o provider em `bootstrap/providers.php`** (insere a linha se ausente; no-op caso já presente).
+    4. Publica `app/Http/Middleware/HandleInertiaRequests.php` (de `handle_inertia_requests.stub`) com `rootView = 'arqel.layout'`.
+    5. Publica `vite.config.ts` (de `vite.config.ts.stub`) — substitui o `vite.config.js` default do Laravel para alinhar com o entry TSX.
+    6. Scaffold de `app/Arqel/Resources/UserResource.php` a partir de `user_resource.stub`.
+    7. Scaffold de `resources/views/arqel/layout.blade.php` a partir de `layout.stub` (sem `@routes` Ziggy — Arqel não depende de Ziggy).
+    8. Scaffold de `resources/js/app.tsx` a partir de `app.tsx.stub`.
+    9. Publica `public/login-hero.svg` (de `login-hero.svg.stub`).
+    10. Gera `AGENTS.md` na raiz da app (de `agents.stub`) com guidelines para AI agents.
+    11. Detecta package manager (`pnpm`/`yarn`/`npm`) e instala JS deps — incluindo `@arqel-dev/auth` para as páginas Login/Register/Forgot/Reset/VerifyEmail.
+    Flag `--force` re-escreve ficheiros existentes.
   - `arqel:resource {model?} {--label=} {--group=} {--icon=} {--with-policy} {--with-form-requests} {--tests=none|pest} {--force}` — gera Resource em `app/Arqel/Resources` a partir de `stubs/resource.stub` (modo direto) ou via wizard interactivo Laravel Prompts (CLI-TUI-002) quando o argumento `model` é omitido num TTY. Geração delega ao `Arqel\Core\Generators\ResourceGenerator` (final readonly, retorna source PHP — não toca em disco)
-- **Blade root view** `arqel::app` (`resources/views/app.blade.php`) com `@inertia`, CSRF, FOUC guard de tema; publicada para `resources/views/vendor/arqel/`
+  - `arqel:make-user {--name=} {--email=} {--password=}` — comando Filament-style para criar admins rapidamente. Sem flags entra em modo interactivo (Laravel Prompts: name/email/password/confirm). Resolve a classe User dinamicamente via `config('auth.providers.users.model')` em vez de hard-coding `App\Models\User` — funciona com guards customizados e users multi-tenant. Hash automático via `Hash::make`. Falha cedo se `email` já existe.
+- **Stubs disponíveis** em `packages/core/stubs/`: `provider.stub`, `user_resource.stub`, `layout.stub`, `app.tsx.stub`, `vite.config.ts.stub`, `handle_inertia_requests.stub`, `login-hero.svg.stub`, `agents.stub`, `resource.stub`. _Removido_ `panel.stub` — o panel agora vive directamente dentro do `ArqelServiceProvider` gerado, sem ficheiro separado.
+- **Blade root view** `arqel::app` (`resources/views/app.blade.php`) com `@inertia`, CSRF, FOUC guard de tema; publicada para `resources/views/vendor/arqel/`. **Default config `arqel.inertia.root_view`** passou a ser `arqel.layout` (consistência com o stub `layout.stub`).
 - **Traduções** (`resources/lang/{en,pt_BR}/`): `messages`, `actions`, `table`, `form`, `validation`. Acesso via `__('arqel::messages.actions.create')`
 
 **Entregues após o scope inicial:**
 
 - `ResourceController` (CORE-006) — 7 endpoints polimórficos (`index/create/store/show/edit/update/destroy`) sob `arqel.resources.{action}`. Resolve Resource pelo slug via `ResourceRegistry::findBySlug`, autoriza via `Gate::denies(viewAny|create|view|update|delete)`, materializa payload via `InertiaDataBuilder`, invoca lifecycle via `Resource::runCreate/runUpdate/runDelete`. Validation via `FieldRulesExtractor` (carregado via Reflection — sem hard dep em `arqel-dev/form`).
-- `HandleArqelInertiaRequests` middleware (CORE-007) — estende `Inertia\Middleware`. Shared props: `auth.user` (`only(['id','name','email'])`), `auth.can` (delegated to `AbilityRegistry::resolveForUser` quando `arqel-dev/auth` está bound), `panel`, `tenant`, `flash` (success/error/info/warning closures), `translations` (`arqel::*`), `arqel.version`.
+- `HandleArqelInertiaRequests` middleware (CORE-007) — estende `Inertia\Middleware`. Shared props: `auth.user` (`only(['id','name','email'])`), `auth.can` (delegated to `AbilityRegistry::resolveForUser` quando `arqel-dev/auth` está bound), `panel`, `tenant`, `flash` (success/error/info/warning closures), `translations` (`arqel::*`), `arqel.version`. **`panel.navigation`** é populado por `buildNavigation()` que itera os Resources do panel actual e devolve `{ label, url, icon, group, sort, active }` por entry — derivando label de `getPluralLabel()`, url de `/{panel.path}/{slug}`, icon de `getNavigationIcon()`, group de `getNavigationGroup()`, sort de `getNavigationSort()`, active comparando o path actual da request com a url do entry. Resources que rebentem em qualquer dos getters são silently skippados.
 - `FieldSchemaSerializer` (CORE-010) — duck-typed contra `Arqel\Fields\Field`. Filtra fields por `canBeSeenBy(user, record)`, combina `isReadonly` com `canBeEditedBy` num único flag, emite `validation.{rules,messages,attribute}`, `visibility.{create,edit,detail,table,canSee}`, `dependsOn` e `props`. `stringifyRules` descarta Closures e converte rule objects para class-string.
 - `InertiaDataBuilder` (CORE-006 partial → CORE-010) — assembler dos payloads index/create/edit/show. `buildIndexData` paginate sanitizado; `buildCreateData/EditData/ShowData` retornam `{resource, record, recordTitle, recordSubtitle, fields}`. Detecta `Resource::table()` via duck-typing e roteia para `buildTableIndexData` (delega ao `Arqel\Table\TableQueryBuilder` via Reflection).
 - `arqel:install` extendido com auto-instalação frontend (CORE-016) — detecta package manager (`pnpm`/`yarn`/`npm`), instala `@arqel-dev/{react,ui,hooks,fields,types}` + peer dev deps, scaffolda `resources/js/app.tsx` + `resources/css/app.css`. Flag `--no-frontend` para skip; `--force` re-escreve.

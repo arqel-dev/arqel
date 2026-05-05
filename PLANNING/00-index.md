@@ -76,7 +76,7 @@ php artisan arqel:resource User
 - **TypeScript 5.5+** (strict mode)
 - **Inertia.js 3 React adapter** (`@inertiajs/react`)
 - **Tailwind CSS v4**
-- **ShadCN CLI v4** (Base UI default)
+- **shadcn CLI v4 (new-york)** (Radix UI default)
 - **TanStack Table v8** (v9 quando estável)
 - **TanStack Form** para forms avançados
 - **Zod 4** para validação cliente (espelha Laravel rules)
@@ -162,7 +162,7 @@ Iguais ao planeamento anterior (ver seção "Tone and formatting" de qualquer do
 3. **Inertia props** como default para state/data (sem TanStack Query default)
 4. **Eloquent** como ORM suportado (sem DB-agnosticism)
 5. **ShadCN CLI v4** para distribuição de componentes React (user owns the code)
-6. **Base UI default**, Radix opt-in
+6. **Radix UI default** (via shadcn CLI v4 new-york)
 7. **Pest 3** como test runner (PHPUnit compatível mas sintaxe moderna)
 8. **Monorepo Composer + npm** num único repo
 9. **MIT License + DCO**

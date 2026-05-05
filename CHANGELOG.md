@@ -7,12 +7,54 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-_Placeholder para próximo ciclo (pós v0.8.0). Adicionar entradas conforme novos batches forem mesclados._
-
 ### Added
+
+- **Meta-package `arqel-dev/arqel`**: instalação one-line do stack completo. `composer require arqel-dev/arqel` puxa core, auth, fields, form, actions, nav, table + `inertiajs/inertia-laravel`.
+- **shadcn (new-york) + Radix UI**: registry oficial integrado em `packages-js/ui/src/shadcn/` via `shadcn@4.6` CLI. 16 primitivas (Button, Input, Label, Card, Alert, Badge, Select, Textarea, Checkbox, Separator, Dialog, DropdownMenu, Sheet, Sidebar, Tooltip, Skeleton, Field) + blocks `login-04` / `signup-04`.
+- **Comando `arqel:make-user`**: cria primeiro admin via prompt (estilo `filament:make-user`) — flags `--name --email --password` para uso non-interactive.
+- **Hero illustration**: `public/login-hero.svg` publicado pelo install (gradient abstracto que funciona em light + dark).
+- **`HandleArqelInertiaRequests::buildNavigation()`**: popula `panel.navigation` shared prop a partir do `ResourceRegistry` — Sidebar shadcn renderiza items reais com icon/group/active.
+- **Auto-registo de `App\Providers\ArqelServiceProvider`** em `bootstrap/providers.php` (idempotente).
+- **Auto-publish de `App\Http\Middleware\HandleInertiaRequests`** com `rootView = 'arqel.layout'` + auto-registo no pipeline `web` via `ArqelServiceProvider::boot()` (apps não precisam de editar `bootstrap/app.php`).
+- **`vite.config.ts` publicado** pelo install (substitui o `vite.config.js` default do Laravel) — React + Tailwind v4 + watch.ignored para `vendor/` e `node_modules/`.
+- **`UserResource` exemplo** scaffolded automaticamente pelo install em `app/Arqel/Resources/UserResource.php`.
+- **Playwright e2e** smoke set no demo (`apps/demo/tests-e2e/auth.spec.ts`).
+- **Documentação i18n**: VitePress site reorganizado com locales `en` (default), `pt-BR`, `es`.
+
 ### Changed
+
+- **`Sidebar` / `AppShell` / `Topbar`** rebuilt sobre o block shadcn `sidebar-07` (`<SidebarProvider>` + `<SidebarTrigger>` + `<SidebarInset>`).
+- **Auth pages** (`@arqel-dev/auth`): `LoginPage` + `RegisterPage` adoptam o layout `login-04` (Card split-screen com hero image à direita em md+). `ForgotPasswordPage`, `ResetPasswordPage`, `VerifyEmailNoticePage` alinhadas com o mesmo padrão.
+- **`LoginController`** passa `registerUrl` como prop Inertia (respeita `panel->path()` em vez de fallback hardcoded `/register`).
+- **`globals.css`** reescrito com vars shadcn (`--background`, `--primary`, `--sidebar-*`, …) + Tailwind v4 `@theme inline` bridge.
+- **`ConfirmDialog`, `ActionMenu`, `ActionFormModal`** migrados de `@base-ui-components/react` para `radix-ui` — API pública preservada.
+- **`Button`** reduzido a re-export do `src/shadcn/ui/button.tsx`. Variantes shadcn: `default | destructive | outline | secondary | ghost | link` × `default | xs | sm | lg | icon | …`.
+- **Token CSS migration**: 61 ficheiros substituem `var(--color-arqel-*)` pelos tokens shadcn ou utilities directas.
+- **`displaySuccess()`** do install simplificado: 4 next-steps em vez de 7.
+- **`arqel.inertia.root_view`** default agora `arqel.layout`.
+
 ### Fixed
+
+- **Split-screen invisível em dark mode**: `dark:brightness-[0.2] dark:grayscale` no hero `<img>` removido das 5 auth pages.
+- **`@arqel-dev/fields-advanced` DTS build**: corrigido `exactOptionalPropertyTypes` em `RepeaterInput`, `BuilderInput`, `WizardInput`.
+- **`@arqel-dev/react` ThemeProvider context split**: `tsup splitting: true` evita que `useTheme()` veja contextos diferentes entre entries.
+- **CSS duplicado** no install: `app.tsx` deixou de re-importar `@arqel-dev/ui/styles.css` (Vite emitia 2 stylesheets, escondendo o split-screen).
+- **`/admin/users` 404 ao login**: `Panel::afterLoginRedirectTo('/admin/users')` aplicado pelo provider stub.
+- **Sidebar vazia**: ver Added (`buildNavigation`).
+
 ### Removed
+
+- **`@base-ui-components/react`** removido das peerDependencies do `@arqel-dev/ui`.
+- **`packages-js/ui/src/primitives/{Input,Label,Card,Alert,Badge,Select,Textarea}.tsx`**: implementações ad-hoc substituídas pelos componentes shadcn oficiais.
+- **`packages/core/stubs/panel.stub`**: gerava uma class `AdminPanel` vazia. Substituído por `user_resource.stub`.
+- **CSS vars `--color-arqel-*`**: substituídas pelos nomes shadcn (`--background`, `--primary`, …).
+
+### Breaking Changes
+
+- `<Button size="md">` deixa de ser válido — usar `size="default"`.
+- `<Badge variant="success">` / `<Badge variant="warning">` deixam de existir — mapear para `default`/`secondary`.
+- CSS vars `--color-arqel-*` removidas. Apps com CSS custom têm que migrar para os tokens shadcn.
+- `@base-ui-components/react` deixa de ser peerDep — apps que importavam directamente devem migrar para `radix-ui`.
 
 ---
 

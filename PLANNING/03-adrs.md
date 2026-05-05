@@ -12,7 +12,7 @@
 | ADR-004 | React 19.2+ obrigatório | 2026-04 | Aceite |
 | ADR-005 | Rejeitar Livewire | 2026-04 | Aceite |
 | ADR-006 | ShadCN CLI v4 para distribuição componentes | 2026-04 | Aceite |
-| ADR-007 | Base UI como default, Radix opt-in | 2026-04 | Aceite |
+| ADR-007 | Base UI como default, Radix opt-in | 2026-04 | Aceite (Update 2026-05: migrated to Radix via shadcn CLI v4 — see CHANGELOG) |
 | ADR-008 | Pest 3 como test runner | 2026-04 | Aceite |
 | ADR-009 | Monorepo Composer + npm | 2026-04 | Aceite |
 | ADR-010 | MIT License + DCO | 2026-04 | Aceite |
@@ -249,7 +249,7 @@ Como distribuir componentes UI (Button, Input, Select, etc.):
 
 - **User owns the code:** customização sem forks, sem CSS overrides hacky.
 - **ShadCN é o padrão 2026:** toda a comunidade React moderna conhece.
-- **Base UI compatibility:** ShadCN CLI v4 é Base UI-first (tema que escolhemos em ADR-007).
+- **Radix compatibility:** shadcn CLI v4 (new-york) usa Radix UI (tema que escolhemos em ADR-007, atualizado 2026-05).
 - **Structural via npm** porque updates de AppShell não devem quebrar apps (semver strict).
 
 ### Consequências
@@ -272,7 +272,7 @@ Como distribuir componentes UI (Button, Input, Select, etc.):
 
 ## ADR-007: Base UI como default, Radix opt-in
 
-**Estado:** Aceite • **Data:** 2026-04
+**Estado:** Aceite • **Data:** 2026-04 • **Update 2026-05:** migrated to Radix via shadcn CLI v4 (new-york) — ver CHANGELOG. Decisão original abaixo preservada para histórico.
 
 ### Contexto
 

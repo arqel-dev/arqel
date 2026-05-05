@@ -12,6 +12,18 @@
 
 User escreve as Policies (Laravel-native). Arqel apenas verifica existência, auto-registra com `Gate::policy(...)` e resolve abilities globais por user.
 
+### Inertia pages renderizadas
+
+| Controller | Component (Inertia) | Pacote npm |
+|---|---|---|
+| `LoginController` | `arqel-dev/auth/Login` | `@arqel-dev/auth` |
+| `RegisterController` | `arqel-dev/auth/Register` | `@arqel-dev/auth` |
+| `ForgotPasswordController` | `arqel-dev/auth/ForgotPassword` | `@arqel-dev/auth` |
+| `ResetPasswordController` | `arqel-dev/auth/ResetPassword` | `@arqel-dev/auth` |
+| `EmailVerificationController` | `arqel-dev/auth/VerifyEmailNotice` | `@arqel-dev/auth` |
+
+Os componentes vivem em `@arqel-dev/auth` (npm) e são instalados automaticamente pelo `arqel:install`.
+
 > **Authentication (login/registro/forgot-password) não está incluída neste pacote.** Decisão de design: Arqel hoje delega ao starter kit Laravel (Breeze/Jetstream/Fortify) — o `arqel new` CLI instala Breeze + React + Inertia por default. Para apps que rodaram só `composer require arqel-dev/arqel`, é necessário instalar manualmente um starter kit. Ver `apps/docs/guide/authentication.md`. _Tickets AUTH-006/007/008 (TBD) preveem shipar páginas Inertia-React opt-in dentro deste pacote, equivalente ao que Filament/Nova oferecem out-of-the-box._
 
 ## Status
@@ -47,10 +59,11 @@ $panel
 
 **Entregue (AUTH-006):**
 
-- `Arqel\Auth\Http\Controllers\LoginController` — GET renderiza Inertia `arqel-dev/auth/Login`; POST autentica via `LoginRequest`, regenera sessão e redireciona para `Panel::getAfterLoginUrl()`
+- `Arqel\Auth\Http\Controllers\LoginController` — GET renderiza Inertia `arqel-dev/auth/Login` passando `loginUrl`, `registerUrl` e `forgotPasswordUrl` como props (todos respeitam `Panel::path()` actual; `registerUrl` e `forgotPasswordUrl` são `null` quando o feature respectivo não está activado, permitindo ao componente React esconder os links). POST autentica via `LoginRequest`, regenera sessão e redireciona para `Panel::getAfterLoginUrl()`
 - `Arqel\Auth\Http\Controllers\LogoutController` — invalida sessão, rotaciona CSRF, redireciona para `Panel::getLoginUrl()`
 - `Arqel\Auth\Http\Requests\LoginRequest` — rate-limit Laravel-native (5/min por email+IP), dispara `Lockout` event
-- `Arqel\Auth\Routes::register(?Panel)` — registo idempotente; pula quando o host já tem rota `login` (Breeze/Jetstream/Fortify)
+- `Arqel\Auth\Routes::register(?Panel)` — registo idempotente. Quando o `?Panel` é omitido, **auto-detecta** o panel via `PanelRegistry::getCurrent()` desde que o panel tenha `->login()` activo. Pula quando o host já tem rota nomeada `login` (Breeze/Jetstream/Fortify) para coexistir com starter kits.
+- `Arqel\Auth\Routes::registerLogout(?Panel)` — deriva a URL de logout via `deriveLogoutUrl($loginUrl)` (substitui o último segmento do path por `/logout` mantendo o prefixo do panel). Idempotente.
 - `Panel::login()/loginUrl()/afterLoginRedirectTo()/registration()/withoutDefaultAuth()/loginEnabled()/registrationEnabled()` — fluent API opt-in
 - Pacote npm `@arqel-dev/auth` com componente `<LoginPage />` Inertia-React
 

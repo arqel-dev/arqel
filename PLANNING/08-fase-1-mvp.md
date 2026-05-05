@@ -5487,7 +5487,7 @@ Estrutura `packages-js/ui/`:
 
 - `package.json` com peer deps @arqel-dev/react, @arqel-dev/hooks, @arqel-dev/types, React 19.2+
 - Deps runtime:
-  - `@base-ui-components/react` (Base UI, ADR-007)
+  - `radix-ui` (Radix UI, ADR-007 — ver update 2026-05)
   - `lucide-react` (icons)
   - `class-variance-authority`, `clsx`, `tailwind-merge`
   - `@tanstack/react-table` (para DataTable)
@@ -5526,7 +5526,7 @@ Layout top-level do admin panel. Cobre RF-N-07.
 - Collapsible groups
 - Icons + labels
 - Badges dinâmicos (via closure server-side)
-- Mobile: overlay drawer (slide-in via Base UI Dialog)
+- Mobile: overlay drawer (slide-in via Radix UI Dialog)
 - Desktop: fixed width (240px default, configurable via CSS var `--sidebar-width`)
 - Active state (current page highlighted)
 - Keyboard navigation: Tab, Enter, Arrow keys
@@ -5557,7 +5557,7 @@ Layout top-level do admin panel. Cobre RF-N-07.
 
 **Notas de implementação**
 
-- Base UI tem `Dialog` para mobile drawer.
+- Radix UI tem `Dialog` para mobile drawer.
 - Usar `useBreakpoint()` (HOOKS-005) para detectar mobile.
 
 ---
@@ -5633,7 +5633,7 @@ Renderização de forms. Polimorfismo baseado em field.type/component.
 
 `src/form/FormGrid.tsx`: CSS grid responsivo com breakpoints.
 
-`src/form/FormTabs.tsx`: tabs usando Base UI Tabs primitive. Default tab + navigation. Em Fase 1 não preserva state ao submit.
+`src/form/FormTabs.tsx`: tabs usando Radix UI Tabs primitive. Default tab + navigation. Em Fase 1 não preserva state ao submit.
 
 **Critérios de aceite**
 
@@ -5680,7 +5680,7 @@ Componentes de ação. Invocam actions via Inertia.
 
 **Notas de implementação**
 
-- Base UI Dialog/AlertDialog como base.
+- Radix UI Dialog/AlertDialog como base.
 - Form modal reutiliza FormRenderer.
 
 ---
@@ -5810,7 +5810,7 @@ Base em ShadCN primitives (Input, Checkbox, Switch) via copy-paste do registry.
 
 **Descrição técnica**
 
-- `select/SelectInput.tsx`: native `<select>` ou Base UI Combobox (searchable). Props determinam qual.
+- `select/SelectInput.tsx`: native `<select>` ou Radix UI Combobox (searchable). Props determinam qual.
 - `select/MultiSelectInput.tsx`: chips + combobox, multi-select
 - `select/RadioGroup.tsx`: radio group inline ou vertical
 - `relationship/BelongsToInput.tsx`: async combobox via endpoint search (debounced 300ms)
@@ -5823,7 +5823,7 @@ Base em ShadCN primitives (Input, Checkbox, Switch) via copy-paste do registry.
 **Critérios de aceite**
 
 - [ ] 9 components implementados
-- [ ] Select searchable com combobox (Base UI)
+- [ ] Select searchable com combobox (Radix UI)
 - [ ] BelongsTo faz debounced search
 - [ ] Date picker tem min/max validation
 - [ ] File upload shows progress

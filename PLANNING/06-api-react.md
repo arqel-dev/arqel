@@ -8,7 +8,7 @@
 - **TypeScript 5.5+** strict mode
 - **Inertia.js 3 React adapter** (`@inertiajs/react`)
 - **Tailwind CSS v4** + CSS variables
-- **ShadCN CLI v4** primitives (Base UI default)
+- **shadcn CLI v4 (new-york)** primitives (Radix UI default)
 - **TanStack Table v8** para DataTable
 - **Zod 4** para schema validation (espelha Laravel rules)
 - **Lucide React** para icons (Heroicons compat via map)
@@ -1000,7 +1000,7 @@ Todos os componentes `@arqel-dev/ui`:
 
 - Keyboard navigation completa (Tab, Shift+Tab, Arrow keys em menus/tabs)
 - Focus visible (outline via CSS var `--ring`)
-- ARIA attributes corretos (via Base UI primitives)
+- ARIA attributes corretos (via Radix UI primitives)
 - `prefers-reduced-motion` respeitado em transitions
 - Color contrast WCAG AA (4.5:1 text)
 - Screen reader testing (NVDA, VoiceOver, JAWS) em Fase 2

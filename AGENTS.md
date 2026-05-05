@@ -14,9 +14,30 @@
 ## Stack
 
 - **Backend:** PHP 8.3+, Laravel 12+, Pest 3
-- **Frontend:** React 19.2+, TypeScript 5.6+, Inertia 3, Tailwind v4, Base UI, ShadCN CLI v4
+- **Frontend:** React 19.2+, TypeScript 5.6+, Inertia 3, Tailwind v4, Radix UI, shadcn CLI v4 (new-york)
 - **Build:** Vite 6, tsup, pnpm workspaces, Composer path repositories
 - **CI:** GitHub Actions com matrix PHP × Laravel × DB
+
+## Conceitos centrais
+
+- **Panels** — agrupamento de Resources sob uma rota base (`/admin`).
+- **Resources** — definição declarativa CRUD para um Eloquent model.
+- **Fields** — atributos de Resource (texto, select, relação, etc.) com rendering React.
+- **AppShell** — layout top-level (sidebar + topbar + content) construído sobre primitives shadcn/Radix.
+- **Sidebar shadcn** — usa o componente `Sidebar` da registry shadcn (new-york), com Radix Dialog para o overlay drawer mobile.
+
+## Instalação em apps Laravel
+
+Fluxo one-line (gerado pelo `arqel:install`):
+
+```bash
+composer require arqel-dev/arqel
+php artisan arqel:install
+```
+
+O comando publica config, registra o panel default, gera o `AppShell` em `resources/js/`, instala primitives shadcn (new-york) e cria um `AGENTS.md` na raiz da app a partir de `packages/core/stubs/agents.stub`.
+
+> Nota: o `AGENTS.md` no top-level deste monorepo é fonte para LLMs trabalhando *no próprio Arqel*; ele não é gerado pelo `arqel:install` — esse comando gera um AGENTS.md na app consumidora a partir do stub.
 
 ## Comandos frequentes
 

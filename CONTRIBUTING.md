@@ -54,6 +54,19 @@ composer run analyse # phpstan (skip gracioso se ainda não há packages)
 
 Tudo verde? Estás pronto.
 
+### Builds incrementais por package
+
+Em monorepo grande, evita rebuilds completos. Usa `pnpm --filter`:
+
+```bash
+pnpm --filter @arqel-dev/ui build              # Só o pacote ui
+pnpm --filter @arqel-dev/ui... build           # ui + tudo que depende dele
+pnpm --filter ./packages-js/ui test            # Por path
+pnpm --filter @arqel-dev/ui dev                # Watch mode num único pacote
+```
+
+Para o lado PHP, navega ao package: `cd packages/core && vendor/bin/pest`.
+
 ## Fluxo de trabalho
 
 ### 1. Pega num ticket

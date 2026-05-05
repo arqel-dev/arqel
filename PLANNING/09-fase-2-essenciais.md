@@ -1755,7 +1755,7 @@ Cobre RF-W-08. Schedule/calendar widget é comum em admin panels mas pesado.
 **Descrição técnica**
 
 - `@arqel-dev/widgets/schedule` subpackage (opt-in via npm install)
-- Wrapper Base UI ou FullCalendar React binding
+- Wrapper Radix UI ou FullCalendar React binding
 - ScheduleWidget PHP class que serializa eventos (start, end, title, color)
 - Interactions: click event, click date, drag-drop events
 
@@ -2983,7 +2983,7 @@ Criar `@arqel-dev/fields-advanced/src/tags/TagsInput.tsx`:
 ```tsx
 import { useState, useRef, KeyboardEvent } from 'react'
 import { X } from 'lucide-react'
-import { Combobox } from '@base-ui-components/react/combobox'
+import { Combobox } from 'radix-ui'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 
@@ -4930,7 +4930,7 @@ Integrar em AppShell:
 
 **Notas de implementação**
 
-- Base UI Dialog + Combobox primitives.
+- Radix UI Dialog + Combobox primitives.
 - Recent commands: top 5 most used in last 30 days.
 
 ---

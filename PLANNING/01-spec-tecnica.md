@@ -416,7 +416,7 @@ Text, Textarea, Number, Currency, Boolean, Toggle, Select, MultiSelect, Radio, E
 - Laravel continua a ser o framework PHP dominante.
 - Inertia.js continua a ter backing do Laravel team (Taylor Otwell support).
 - ShadCN CLI v4 mantém-se em linha com releases de Março 2026.
-- Base UI continua com engenharia full-time.
+- Radix UI continua com manutenção ativa.
 - Comunidade Laravel está aberta a React (evidência: Nova usa Vue+Inertia, Breeze oferece React starter).
 
 ### 4.3 Riscos identificados
@@ -502,7 +502,7 @@ Arqel **não** é:
         "react-dom": "^19.2.3"
     },
     "dependencies": {
-        "@base-ui-components/react": "^2.0",
+        "radix-ui": "^1.0",
         "lucide-react": "^0.400",
         "class-variance-authority": "^0.7",
         "clsx": "^2.1",

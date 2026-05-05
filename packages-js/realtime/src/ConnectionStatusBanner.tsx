@@ -32,14 +32,24 @@ const DEFAULT_MESSAGES: Record<ConnectionStatus, string> = {
   unavailable: '',
 };
 
-type AlertVariant = 'default' | 'destructive' | 'success' | 'warning';
+type AlertVariant = 'default' | 'destructive';
 
 const STATUS_VARIANT: Record<ConnectionStatus, AlertVariant> = {
-  connected: 'success',
-  connecting: 'warning',
-  disconnected: 'warning',
+  connected: 'default',
+  connecting: 'default',
+  disconnected: 'default',
   failed: 'destructive',
   unavailable: 'default',
+};
+
+// Tailwind classes layered on top of the Alert variant to convey
+// success/warning intent without extending shadcn's variant set.
+const STATUS_TONE: Record<ConnectionStatus, string> = {
+  connected: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+  connecting: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+  disconnected: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+  failed: '',
+  unavailable: '',
 };
 
 /**
@@ -86,7 +96,7 @@ export function ConnectionStatusBanner(props: ConnectionStatusBannerProps): Reac
       aria-live="polite"
       data-status={status}
       data-arqel-connection-banner=""
-      className={className}
+      className={[STATUS_TONE[status], className].filter(Boolean).join(' ')}
     >
       <AlertDescription>{DEFAULT_MESSAGES[status]}</AlertDescription>
     </Alert>

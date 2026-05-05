@@ -29,8 +29,18 @@
  * SSR-safe: nothing in the render path touches `window`/`document`.
  */
 
-import { Alert, AlertDescription, Badge, Button, Select } from '@arqel-dev/ui';
-import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
+import {
+  Alert,
+  AlertDescription,
+  Badge,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@arqel-dev/ui';
+import { type ReactElement, useCallback, useId, useState } from 'react';
 
 export interface AiSelectInputFieldProps {
   options: Record<string, string>;
@@ -139,9 +149,8 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
   );
 
   const handleSelectChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      const next = event.target.value === '' ? null : event.target.value;
-      applyValue(next);
+    (next: string) => {
+      applyValue(next === '' ? null : next);
       setSuggestion(null);
     },
     [applyValue],
@@ -205,19 +214,17 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
   return (
     <div className="flex flex-col gap-2" data-arqel-field="aiSelect" data-field-name={name}>
       <div className="flex items-center gap-2">
-        <Select
-          id={selectId}
-          name={name}
-          value={currentValue ?? ''}
-          onChange={handleSelectChange}
-          className="flex-1"
-        >
-          <option value="">Select...</option>
-          {Object.entries(options).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
+        <Select value={currentValue ?? ''} onValueChange={handleSelectChange} name={name}>
+          <SelectTrigger id={selectId} className="flex-1">
+            <SelectValue placeholder="Select..." />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(options).map(([key, label]) => (
+              <SelectItem key={key} value={key}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
         <Button
@@ -241,7 +248,14 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
 
       {suggestion !== null ? (
         <div role="status" className="flex items-center gap-2">
-          <Badge variant={suggestion === 'ai' ? 'success' : 'warning'}>
+          <Badge
+            variant="secondary"
+            className={
+              suggestion === 'ai'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                : 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+            }
+          >
             {suggestion === 'ai' ? 'Suggested by AI' : 'Used fallback'}
           </Badge>
           <Button

@@ -105,10 +105,12 @@ jobs:
       - name: Install splitsh/lite
         run: |
           # v2.0.0 ships no binaries — last release with prebuilt binaries is v1.0.1.
+          # --no-same-owner / --no-same-permissions avoid tar trying to chmod /tmp.
+          mkdir -p /tmp/splitsh
           curl -fsSL "https://github.com/splitsh/lite/releases/download/v1.0.1/lite_linux_amd64.tar.gz" \
-            | tar -xzC /tmp
-          sudo mv /tmp/splitsh-lite /usr/local/bin/splitsh-lite
-          splitsh-lite --version
+            | tar -xz --no-same-owner --no-same-permissions -C /tmp/splitsh
+          sudo install -m 755 /tmp/splitsh/splitsh-lite /usr/local/bin/splitsh-lite
+          splitsh-lite --version || true
 
       - name: Ensure sub-repo exists (auto-create if missing)
         env:

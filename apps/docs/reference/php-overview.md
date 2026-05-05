@@ -5,17 +5,17 @@ A curated per-package reference (PHP 8.3+). Each page documents the public class
 ## One-line install
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 php artisan arqel:install
 ```
 
-`arqel-dev/arqel` is the **meta-package** that aggregates every core package via `composer.json` and exposes the root `ArqelServiceProvider` with the `arqel:install` command. Consumer apps don't need to declare individual dependencies.
+`arqel-dev/framework` is the **meta-package** that aggregates every core package via `composer.json` and exposes the root `ArqelServiceProvider` with the `arqel:install` command. Consumer apps don't need to declare individual dependencies.
 
 ## Packages
 
 | Package | Contents | Page |
 |---|---|---|
-| `arqel-dev/arqel` | Meta-package + `InstallCommand` + `MakeUserCommand` | [Core →](/reference/php/core) |
+| `arqel-dev/framework` | Meta-package + `InstallCommand` + `MakeUserCommand` | [Core →](/reference/php/core) |
 | `arqel-dev/core` | Resource, ResourceRegistry, Panel, PanelRegistry, controller, middleware | [Core →](/reference/php/core) |
 | `arqel-dev/fields` | Field abstract, FieldFactory, 21 field types, ValidationBridge | [Fields →](/reference/php/fields) |
 | `arqel-dev/table` | Table builder, 9 column types, 6 filter types, TableQueryBuilder | [Table →](/reference/php/table) |

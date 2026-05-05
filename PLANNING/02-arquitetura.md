@@ -160,7 +160,7 @@ A arquitectura **não é SPA com API separada**. É **monolito Laravel com front
 ### 4.1 Packages Composer
 
 ```
-arqel-dev/arqel (meta-package)
+arqel-dev/framework (meta-package)
     │
     ├── arqel-dev/core
     │     ├── ArqelServiceProvider

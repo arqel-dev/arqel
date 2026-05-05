@@ -13,7 +13,7 @@ Daí veio a lógica: o `arqel new` CLI instala Breeze + React + Inertia automati
 
 Na prática, isso falha em três cenários:
 
-- **`composer require arqel-dev/arqel` direto, sem CLI** — o usuário não sabe que precisa de starter kit. Resultado: app instalada sem `/login`/`/register`.
+- **`composer require arqel-dev/framework` direto, sem CLI** — o usuário não sabe que precisa de starter kit. Resultado: app instalada sem `/login`/`/register`.
 - **Comparação com competidores** — Filament e Nova shipam login pronto out-of-the-box; Arqel parece "mais incompleto" mesmo sendo a mesma quantidade de código no fim.
 - **Acoplamento escondido a Breeze + React + Inertia** — apesar do nome "starter kit-agnóstico", na realidade só essa combinação casa visualmente com o painel Arqel.
 
@@ -34,7 +34,7 @@ bash arqel-setup-my-admin.sh
 O script gerado executa:
 
 - `laravel new my-admin`
-- `composer require arqel-dev/arqel`
+- `composer require arqel-dev/framework`
 - `composer require laravel/breeze --dev`
 - `php artisan breeze:install react` (instala views Inertia/React de login, registro, forgot-password, profile)
 - `php artisan migrate`
@@ -261,7 +261,7 @@ O `LoginController` (e equivalentes para registro/forgot/reset) passa props já 
 - **AUTH-007** — Registration opt-in + email verification opt-in (entregue).
 - **AUTH-008** — Forgot-password + reset token flow (entregue).
 
-Quando esse ticket shipar, `composer require arqel-dev/arqel` + `php artisan arqel:install` será suficiente — sem starter kit obrigatório.
+Quando esse ticket shipar, `composer require arqel-dev/framework` + `php artisan arqel:install` será suficiente — sem starter kit obrigatório.
 
 ## Referências
 

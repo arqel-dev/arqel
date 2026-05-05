@@ -9,7 +9,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Added
 
-- **Meta-package `arqel-dev/arqel`**: instalação one-line do stack completo. `composer require arqel-dev/arqel` puxa core, auth, fields, form, actions, nav, table + `inertiajs/inertia-laravel`.
+- **Meta-package `arqel-dev/framework`**: instalação one-line do stack completo. `composer require arqel-dev/framework` puxa core, auth, fields, form, actions, nav, table + `inertiajs/inertia-laravel`.
 - **shadcn (new-york) + Radix UI**: registry oficial integrado em `packages-js/ui/src/shadcn/` via `shadcn@4.6` CLI. 16 primitivas (Button, Input, Label, Card, Alert, Badge, Select, Textarea, Checkbox, Separator, Dialog, DropdownMenu, Sheet, Sidebar, Tooltip, Skeleton, Field) + blocks `login-04` / `signup-04`.
 - **Comando `arqel:make-user`**: cria primeiro admin via prompt (estilo `filament:make-user`) — flags `--name --email --password` para uso non-interactive.
 - **Hero illustration**: `public/login-hero.svg` publicado pelo install (gradient abstracto que funciona em light + dark).

@@ -48,7 +48,7 @@ it('generates a bash script for a react + no-tenancy app', function (): void {
     $contents = (string) file_get_contents($path);
     expect($contents)
         ->toContain('laravel new my-app --react')
-        ->toContain('composer require arqel-dev/arqel')
+        ->toContain('composer require arqel-dev/framework')
         ->not->toContain('stancl/tenancy');
     expect($tester->getDisplay())->toContain('Generated arqel-setup-my-app.sh');
 });

@@ -14,7 +14,7 @@ Meta-package that requires the full Arqel stack:
 ## Install
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 php artisan arqel:install
 ```
 

@@ -53,16 +53,16 @@ Policies, Gates, FormRequest, Eloquent — usados directamente. Arqel no tiene m
 ### Instalación en una línea
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 ```
 
-El meta-paquete `arqel-dev/arqel` arrastra todo el stack PHP. Si quieres saber qué hay debajo:
+El meta-paquete `arqel-dev/framework` arrastra todo el stack PHP. Si quieres saber qué hay debajo:
 
 ### PHP
 
 | Paquete | Responsabilidad |
 |---|---|
-| `arqel-dev/arqel` | Meta-paquete — agrupa todo lo de abajo |
+| `arqel-dev/framework` | Meta-paquete — agrupa todo lo de abajo |
 | `arqel-dev/core` | Panels, Resources, rutas polimórficas, bridge de Inertia, command palette, telemetría |
 | `arqel-dev/auth` | Login/Register/Forgot/Reset/Verify incluido (páginas Inertia React) + AbilityRegistry |
 | `arqel-dev/fields` | 21 tipos de Field + ValidationBridge |

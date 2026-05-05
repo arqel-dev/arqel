@@ -374,7 +374,7 @@ Executa:
 1. `laravel new {name}`
 2. `cd {name}`
 3. Starter kit setup
-4. `composer require arqel-dev/arqel`
+4. `composer require arqel-dev/framework`
 5. Packages adicionais based on answers
 6. `php artisan arqel:install` + flags
 7. `pnpm install`

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`@arqel-dev/auth` publica os componentes React de autenticação que o pacote PHP `arqel-dev/auth` renderiza via Inertia. Junto com o backend, fecha a lacuna de DX vs Filament/Nova: `composer require arqel-dev/arqel` + `Panel::configure()->login()` resulta em `/admin/login` funcional out-of-the-box, com layout idiomático shadcn.
+`@arqel-dev/auth` publica os componentes React de autenticação que o pacote PHP `arqel-dev/auth` renderiza via Inertia. Junto com o backend, fecha a lacuna de DX vs Filament/Nova: `composer require arqel-dev/framework` + `Panel::configure()->login()` resulta em `/admin/login` funcional out-of-the-box, com layout idiomático shadcn.
 
 ## Key Contracts
 

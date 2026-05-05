@@ -16,7 +16,7 @@ it('renders a bash script with the expected baseline commands', function (): voi
         ->toContain('set -euo pipefail')
         ->toContain('laravel new my-app --react')
         ->toContain('cd my-app')
-        ->toContain('composer require arqel-dev/arqel')
+        ->toContain('composer require arqel-dev/framework')
         ->toContain('php artisan arqel:install')
         ->toContain('pnpm install')
         ->not->toContain('stancl/tenancy')
@@ -82,7 +82,7 @@ it('emits path-repo wiring + dev-main requires when monorepoPath is set', functi
         ->toContain('arqel-dev/core:dev-main')
         ->toContain('arqel-dev/fields:dev-main')
         ->toContain('arqel-dev/tenant:dev-main') // simple tenancy -> arqel-dev/tenant gets the suffix
-        ->not->toContain('composer require arqel-dev/arqel');
+        ->not->toContain('composer require arqel-dev/framework');
 });
 
 it('legacy "breeze" alias resolves to react', function (): void {

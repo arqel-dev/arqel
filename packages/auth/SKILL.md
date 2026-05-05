@@ -24,7 +24,7 @@ User escreve as Policies (Laravel-native). Arqel apenas verifica existência, au
 
 Os componentes vivem em `@arqel-dev/auth` (npm) e são instalados automaticamente pelo `arqel:install`.
 
-> **Authentication (login/registro/forgot-password) não está incluída neste pacote.** Decisão de design: Arqel hoje delega ao starter kit Laravel (Breeze/Jetstream/Fortify) — o `arqel new` CLI instala Breeze + React + Inertia por default. Para apps que rodaram só `composer require arqel-dev/arqel`, é necessário instalar manualmente um starter kit. Ver `apps/docs/guide/authentication.md`. _Tickets AUTH-006/007/008 (TBD) preveem shipar páginas Inertia-React opt-in dentro deste pacote, equivalente ao que Filament/Nova oferecem out-of-the-box._
+> **Authentication (login/registro/forgot-password) não está incluída neste pacote.** Decisão de design: Arqel hoje delega ao starter kit Laravel (Breeze/Jetstream/Fortify) — o `arqel new` CLI instala Breeze + React + Inertia por default. Para apps que rodaram só `composer require arqel-dev/framework`, é necessário instalar manualmente um starter kit. Ver `apps/docs/guide/authentication.md`. _Tickets AUTH-006/007/008 (TBD) preveem shipar páginas Inertia-React opt-in dentro deste pacote, equivalente ao que Filament/Nova oferecem out-of-the-box._
 
 ## Status
 

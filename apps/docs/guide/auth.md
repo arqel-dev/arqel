@@ -2,7 +2,7 @@
 
 Arqel reuses **Laravel Policies, Gates, and abilities** without a parallel ACL. There is no proprietary `Role` model or permissions table. What does exist is an `AbilityRegistry` to coordinate global abilities between PHP and React.
 
-> The `arqel-dev/auth` package (which provides the `EnsureUserCanAccessPanel` middleware, the `AbilityRegistry`, etc.) is already included in the `arqel-dev/arqel` meta-package — just `composer require arqel-dev/arqel` + `php artisan arqel:install`. No need to install it separately.
+> The `arqel-dev/auth` package (which provides the `EnsureUserCanAccessPanel` middleware, the `AbilityRegistry`, etc.) is already included in the `arqel-dev/framework` meta-package — just `composer require arqel-dev/framework` + `php artisan arqel:install`. No need to install it separately.
 
 ## Panel gate
 

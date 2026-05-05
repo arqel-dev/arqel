@@ -25,11 +25,11 @@ cd my-admin-app
 ## 2. Install Arqel
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 php artisan arqel:install
 ```
 
-`composer require arqel-dev/arqel` pulls the full stack via the meta-package: core, auth, fields, form, actions, nav, table + `inertiajs/inertia-laravel`.
+`composer require arqel-dev/framework` pulls the full stack via the meta-package: core, auth, fields, form, actions, nav, table + `inertiajs/inertia-laravel`.
 
 `arqel:install` does **everything else**: PHP scaffold + middleware + Vite config + JS package installation + ready-to-use auth pages. When prompted for the JS package manager, pick `pnpm` (or `npm`/`yarn`).
 
@@ -207,7 +207,7 @@ More details in [Theming](/guide/theming).
 ## Troubleshooting
 
 ::: warning PHP < 8.3
-Arqel requires PHP 8.3+. `composer require arqel-dev/arqel` fails on PHP 8.2. Upgrade via Herd, Homebrew (`brew install php@8.3`), or `phpbrew`.
+Arqel requires PHP 8.3+. `composer require arqel-dev/framework` fails on PHP 8.2. Upgrade via Herd, Homebrew (`brew install php@8.3`), or `phpbrew`.
 :::
 
 ::: warning `Vite manifest not found`

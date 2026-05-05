@@ -7,7 +7,7 @@
 `arqel-dev/arqel` é o **único requirement** que uma app Laravel precisa para entrar no ecossistema Arqel. Em vez do utilizador final ter de fazer `composer require` de 7 pacotes individuais + `inertiajs/inertia-laravel`, basta:
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 ```
 
 …e o Composer puxa transitivamente o stack completo.
@@ -42,7 +42,7 @@ A versão é mantida em sincronia com os sub-pacotes via `self.version` no `requ
 
 ```bash
 # 1. Adicionar Arqel
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 
 # 2. Bootstrap (idempotente — pode ser corrido várias vezes com --force)
 php artisan arqel:install

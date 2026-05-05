@@ -407,7 +407,7 @@ Route::get('/admin/analytics', AnalyticsController::class)->name('admin.analytic
 ## Checklist passo-a-passo
 
 1. [ ] Auditar Models, Migrations, Policies — **não mudam**.
-2. [ ] Instalar Arqel: `composer require arqel-dev/arqel` seguido de `php artisan arqel:install` (instala core + table + actions + fields, publica configs e o tema shadcn (new-york) sobre Radix UI).
+2. [ ] Instalar Arqel: `composer require arqel-dev/framework` seguido de `php artisan arqel:install` (instala core + table + actions + fields, publica configs e o tema shadcn (new-york) sobre Radix UI).
 3. [ ] Configurar painel paralelo em `/admin-v2` (coexistência com Nova).
 4. [ ] Migrar Resources simples primeiro; renomear classes para sufixo `Resource`.
 5. [ ] Separar `fields()` Nova em `fields()` (forms) + `table()` (index) Arqel.

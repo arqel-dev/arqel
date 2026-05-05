@@ -44,12 +44,12 @@ A partir de v1.0:
 
 ### 3.1 Objetivo
 
-Entregar uma framework Laravel funcional que permita instalar via `composer require arqel-dev/arqel` e construir admin panels básicos declarados em PHP, renderizados em React+ShadCN via Inertia. Foco em CRUD completo com 20 field types, tabela funcional, formulários, actions básicas, e authorization via Laravel Policies.
+Entregar uma framework Laravel funcional que permita instalar via `composer require arqel-dev/framework` e construir admin panels básicos declarados em PHP, renderizados em React+ShadCN via Inertia. Foco em CRUD completo com 20 field types, tabela funcional, formulários, actions básicas, e authorization via Laravel Policies.
 
 ### 3.2 Deliverables
 
 **Packages Composer:**
-- `arqel-dev/arqel` (meta-package)
+- `arqel-dev/framework` (meta-package)
 - `arqel-dev/core` (ServiceProvider, Resource, Panel, CLI)
 - `arqel-dev/fields` (20 field types)
 - `arqel-dev/table` (DataTable, columns, filters, row actions)
@@ -107,7 +107,7 @@ Entregar uma framework Laravel funcional que permita instalar via `composer requ
 
 ### 3.4 Critérios de saída
 
-- [ ] `composer create-project laravel/laravel demo && cd demo && composer require arqel-dev/arqel && php artisan arqel:install && php artisan arqel:resource User && npm install && npm run build` funciona sem erros
+- [ ] `composer create-project laravel/laravel demo && cd demo && composer require arqel-dev/framework && php artisan arqel:install && php artisan arqel:resource User && npm install && npm run build` funciona sem erros
 - [ ] CRUD completo em <90s desde zero
 - [ ] Cobertura PHP ≥ 85%, React ≥ 80%
 - [ ] LCP < 1.5s em playground app

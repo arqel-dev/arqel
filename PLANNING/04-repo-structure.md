@@ -15,7 +15,7 @@ arqel/
 │   ├── playground/       # Demo Laravel app com Arqel instalado
 │   └── docs/             # Docs site (Nextra ou VitePress)
 ├── packages/             # Packages Composer (PHP)
-│   ├── arqel/            # Meta-package arqel-dev/arqel
+│   ├── arqel/            # Meta-package arqel-dev/framework
 │   ├── core/             # arqel-dev/core
 │   ├── fields/           # arqel-dev/fields
 │   ├── table/            # arqel-dev/table
@@ -110,38 +110,33 @@ packages-js/<name>/
 
 ### 3.1 `arqel-dev/arqel` (meta-package)
 
-O que o usuário instala: `composer require arqel-dev/arqel`.
+O que o usuário instala: `composer require arqel-dev/framework`.
 
 **Não tem código próprio** — apenas depende dos sub-packages necessários para instalação completa.
 
+> O meta-package vive em **repo separado** `arqel-dev/framework` (não num
+> sub-folder do monorepo) porque `type: metapackage` não tem código — só
+> declara `require`.
+
 ```json
-// packages/arqel/composer.json
+// arqel-dev/framework — composer.json
 {
-    "name": "arqel-dev/arqel",
-    "description": "Admin panel framework for Laravel — declared in PHP, rendered in React.",
-    "type": "library",
+    "name": "arqel-dev/framework",
+    "description": "Arqel framework — meta-package that pulls the full stack.",
+    "type": "metapackage",
     "license": "MIT",
-    "keywords": ["laravel", "admin", "panel", "react", "inertia", "shadcn"],
+    "keywords": ["arqel", "laravel", "admin-panel", "inertia", "react", "shadcn"],
     "homepage": "https://arqel.dev",
     "require": {
         "php": "^8.3",
-        "laravel/framework": "^12.0|^13.0",
-        "inertiajs/inertia-laravel": "^3.0",
-        "arqel-dev/core": "self.version",
-        "arqel-dev/fields": "self.version",
-        "arqel-dev/table": "self.version",
-        "arqel-dev/form": "self.version",
-        "arqel-dev/actions": "self.version",
-        "arqel-dev/auth": "self.version",
-        "arqel-dev/nav": "self.version"
-    },
-    "autoload": {
-        "psr-4": { "Arqel\\": "src/" }
-    },
-    "extra": {
-        "laravel": {
-            "providers": ["Arqel\\ArqelServiceProvider"]
-        }
+        "arqel-dev/core": "^0.8.0",
+        "arqel-dev/auth": "^0.8.0",
+        "arqel-dev/fields": "^0.8.0",
+        "arqel-dev/form": "^0.8.0",
+        "arqel-dev/actions": "^0.8.0",
+        "arqel-dev/nav": "^0.8.0",
+        "arqel-dev/table": "^0.8.0",
+        "inertiajs/inertia-laravel": "^1.0|^2.0|^3.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true

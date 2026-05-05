@@ -468,7 +468,7 @@ Arqel **não** é:
 
 ## 7. Dependências mínimas runtime (resume)
 
-### 7.1 composer.json core (arqel-dev/arqel)
+### 7.1 composer.json meta-package (arqel-dev/framework)
 
 ```json
 {

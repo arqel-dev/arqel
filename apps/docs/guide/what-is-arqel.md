@@ -53,16 +53,16 @@ Policies, Gates, FormRequest, Eloquent — used directly. Arqel has no `Role` mo
 ### One-line installation
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 ```
 
-The `arqel-dev/arqel` meta-package pulls the entire PHP stack. If you want to know what's underneath:
+The `arqel-dev/framework` meta-package pulls the entire PHP stack. If you want to know what's underneath:
 
 ### PHP
 
 | Package | Responsibility |
 |---|---|
-| `arqel-dev/arqel` | Meta-package — bundles everything below |
+| `arqel-dev/framework` | Meta-package — bundles everything below |
 | `arqel-dev/core` | Panels, Resources, polymorphic routes, Inertia bridge, command palette, telemetry |
 | `arqel-dev/auth` | Login/Register/Forgot/Reset/Verify bundled (Inertia React pages) + AbilityRegistry |
 | `arqel-dev/fields` | 21 field types + ValidationBridge |

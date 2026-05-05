@@ -473,7 +473,7 @@ POST /api/marketplace/plugins/acme-stripe-card/versions
 ## Anti-patterns comuns
 
 - ❌ **Não embarque assets JS no pacote PHP**. Use companion npm package.
-- ❌ **Não require `arqel-dev/arqel` inteiro** — declare apenas `arqel-dev/core` + os pacotes que você de fato usa.
+- ❌ **Não require `arqel-dev/framework` inteiro** — declare apenas `arqel-dev/core` + os pacotes que você de fato usa.
 - ❌ **Não use `setMeta()` raw** ao invés de criar setters tipados — perde DX e quebra autocomplete.
 - ❌ **Não chame `Stripe::setApiKey()` global** dentro do field — vaza estado entre requests.
 - ❌ **Não force `arqel: ^1` quando seu plugin precisa de feature `^1.5`** — coloque `^1.5` para falhar no `composer require`, não em runtime.

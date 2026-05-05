@@ -117,7 +117,7 @@ final readonly class SetupScriptGenerator
             $lines[] = "composer require {$monorepoSpec} -W";
         } else {
             $lines[] = 'echo "==> Installing arqel-dev/arqel"';
-            $lines[] = 'composer require arqel-dev/arqel';
+            $lines[] = 'composer require arqel-dev/framework';
         }
 
         foreach ($this->extraComposerRequires() as $pkg) {
@@ -181,7 +181,7 @@ final readonly class SetupScriptGenerator
             $lines[] = "composer require {$monorepoSpec} -W";
         } else {
             $lines[] = 'Write-Host "==> Installing arqel-dev/arqel"';
-            $lines[] = 'composer require arqel-dev/arqel';
+            $lines[] = 'composer require arqel-dev/framework';
         }
 
         foreach ($this->extraComposerRequires() as $pkg) {

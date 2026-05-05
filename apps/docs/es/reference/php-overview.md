@@ -5,17 +5,17 @@ Una referencia curada por paquete (PHP 8.3+). Cada página documenta las clases 
 ## Instalación en una línea
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 php artisan arqel:install
 ```
 
-`arqel-dev/arqel` es el **meta-paquete** que agrega cada paquete core vía `composer.json` y expone el `ArqelServiceProvider` raíz con el comando `arqel:install`. Las apps consumidoras no necesitan declarar dependencias individuales.
+`arqel-dev/framework` es el **meta-paquete** que agrega cada paquete core vía `composer.json` y expone el `ArqelServiceProvider` raíz con el comando `arqel:install`. Las apps consumidoras no necesitan declarar dependencias individuales.
 
 ## Paquetes
 
 | Paquete | Contenido | Página |
 |---|---|---|
-| `arqel-dev/arqel` | Meta-paquete + `InstallCommand` + `MakeUserCommand` | [Core →](/es/reference/php/core) |
+| `arqel-dev/framework` | Meta-paquete + `InstallCommand` + `MakeUserCommand` | [Core →](/es/reference/php/core) |
 | `arqel-dev/core` | Resource, ResourceRegistry, Panel, PanelRegistry, controller, middleware | [Core →](/es/reference/php/core) |
 | `arqel-dev/fields` | Field abstracto, FieldFactory, 21 tipos de Field, ValidationBridge | [Fields →](/es/reference/php/fields) |
 | `arqel-dev/table` | Table builder, 9 tipos de columna, 6 tipos de filtro, TableQueryBuilder | [Table →](/es/reference/php/table) |

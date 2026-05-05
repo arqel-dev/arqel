@@ -44,7 +44,7 @@ composer create-project laravel/laravel my-admin-app
 cd my-admin-app
 
 # 2. Instala o Arqel
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 
 # 3. Corre o instalador
 php artisan arqel:install
@@ -67,7 +67,7 @@ O instalador faz scaffold do Service Provider, do middleware `HandleInertiaReque
 ```
 arqel/
 ├── packages/             # Pacotes PHP (Composer)
-│   ├── arqel/            # meta-package (composer require arqel-dev/arqel)
+│   ├── arqel/            # meta-package (composer require arqel-dev/framework)
 │   ├── core/             # panels, resources, rotas polimórficas, Inertia bridge
 │   ├── auth/             # login / register / reset / verify bundled
 │   ├── fields/           # tipos de Field schema

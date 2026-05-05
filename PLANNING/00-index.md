@@ -7,7 +7,7 @@
 **Arqel** é um package Laravel que permite:
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 php artisan arqel:install
 php artisan arqel:resource User
 ```
@@ -86,7 +86,7 @@ php artisan arqel:resource User
 
 ### Distribuição
 
-- **Packagist:** `arqel-dev/arqel` (principal), `arqel-dev/core`, `arqel-dev/ui`, `arqel-dev/fields`, `arqel-dev/table`, `arqel-dev/form`, `arqel-dev/actions`, etc.
+- **Packagist:** `arqel-dev/framework` (principal), `arqel-dev/core`, `arqel-dev/ui`, `arqel-dev/fields`, `arqel-dev/table`, `arqel-dev/form`, `arqel-dev/actions`, etc.
 - **npm:** `@arqel-dev/ui`, `@arqel-dev/fields`, `@arqel-dev/table`, `@arqel-dev/hooks`, `@arqel-dev/types` (componentes React e types)
 - **Domínio principal:** `arqel.dev`
 - **GitHub org:** `github.com/arqel`
@@ -124,7 +124,7 @@ Avisos, armadilhas, dicas.
 
 **PHP packages (Packagist):**
 - `CORE` — `arqel-dev/core` (traits, contracts, service provider)
-- `PANEL` — `arqel-dev/arqel` (meta-package, instalação)
+- `PANEL` — `arqel-dev/framework` (meta-package, instalação)
 - `FIELDS` — `arqel-dev/fields`
 - `TABLE` — `arqel-dev/table`
 - `FORM` — `arqel-dev/form`

@@ -713,7 +713,7 @@ Como registar Arqel numa Laravel app.
 
 ### Rationale
 
-- **Zero-config install:** `composer require arqel-dev/arqel` + `php artisan arqel:install` → funciona.
+- **Zero-config install:** `composer require arqel-dev/framework` + `php artisan arqel:install` → funciona.
 - **Padrão Laravel package development.**
 - **Opt-out possível** via `extra.laravel.dont-discover`.
 

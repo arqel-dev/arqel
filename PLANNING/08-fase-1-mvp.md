@@ -20,7 +20,7 @@
 
 ## 1. Visão geral da fase
 
-**Objetivo declarado** (ver `07-roadmap-fases.md` §3): entregar um framework Laravel funcional que permita instalar via `composer require arqel-dev/arqel`, declarar Resources em PHP, e obter CRUD completo renderizado em React+ShadCN via Inertia — com 20 field types, tabela funcional, formulários, ações básicas e autorização via Laravel Policies.
+**Objetivo declarado** (ver `07-roadmap-fases.md` §3): entregar um framework Laravel funcional que permita instalar via `composer require arqel-dev/framework`, declarar Resources em PHP, e obter CRUD completo renderizado em React+ShadCN via Inertia — com 20 field types, tabela funcional, formulários, ações básicas e autorização via Laravel Policies.
 
 **Duração:** 4-7 meses com 2-3 devs.
 
@@ -4653,7 +4653,7 @@ Ponte server-side para authorization check usado em React `<CanAccess>`. Cobre R
 
 **Contexto**
 
-Hoje Arqel não publica `/login`/`/logout`, delegando a Breeze/Jetstream/Fortify. Apps que rodaram só `composer require arqel-dev/arqel` (sem `arqel new`) ficam sem essas páginas — quebra de DX comparado a Filament e Nova, que oferecem login pronto out-of-the-box.
+Hoje Arqel não publica `/login`/`/logout`, delegando a Breeze/Jetstream/Fortify. Apps que rodaram só `composer require arqel-dev/framework` (sem `arqel new`) ficam sem essas páginas — quebra de DX comparado a Filament e Nova, que oferecem login pronto out-of-the-box.
 
 Aqui shipamos páginas Inertia-React de login/logout dentro de `arqel-dev/auth`, opt-in via `Panel::configure()->login()`. Compatível com starter kits já instalados (não conflita) e independente deles quando ativo.
 
@@ -4777,7 +4777,7 @@ React:
 
 **Notas de implementação**
 
-- AUTH-006/007/008 juntos fecham a lacuna de DX vs Filament/Nova. Após shipados, `composer require arqel-dev/arqel` + `php artisan arqel:install` é suficiente; starter kit deixa de ser obrigatório.
+- AUTH-006/007/008 juntos fecham a lacuna de DX vs Filament/Nova. Após shipados, `composer require arqel-dev/framework` + `php artisan arqel:install` é suficiente; starter kit deixa de ser obrigatório.
 
 ---
 
@@ -5952,7 +5952,7 @@ Página `guide/getting-started.md` com:
 
 1. Prerequisites (PHP 8.3+, Laravel 12+, Node 20.9+, pnpm)
 2. Create fresh Laravel project
-3. Install Arqel: `composer require arqel-dev/arqel` + `php artisan arqel:install`
+3. Install Arqel: `composer require arqel-dev/framework` + `php artisan arqel:install`
 4. Install frontend: `pnpm add @arqel-dev/react @arqel-dev/ui @arqel-dev/hooks @arqel-dev/fields @arqel-dev/types`
 5. Configure `resources/js/app.tsx` com `createArqelApp`
 6. Gerar primeiro Resource: `php artisan arqel:resource User --from-model --with-policy`

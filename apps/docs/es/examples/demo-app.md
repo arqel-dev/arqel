@@ -27,7 +27,7 @@ pnpm install
 ./apps/demo/scripts/recreate.sh
 # under the hood:
 #   composer create-project laravel/laravel apps/demo
-#   composer -d apps/demo require arqel-dev/arqel
+#   composer -d apps/demo require arqel-dev/framework
 #   php artisan arqel:install   # publishes configs, shadcn (new-york) theme, sidebar and login
 #   php artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
 

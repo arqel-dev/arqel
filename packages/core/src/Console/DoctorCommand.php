@@ -446,7 +446,7 @@ final class DoctorCommand extends Command
     /**
      * Detecta se a app instalou um Laravel starter kit (Breeze, Jetstream
      * ou Fortify). Arqel não publica login/register hoje — delega ao
-     * starter kit. Apps que rodaram só `composer require arqel-dev/arqel`
+     * starter kit. Apps que rodaram só `composer require arqel-dev/framework`
      * sem CLI ficam sem essas páginas.
      *
      * @return array{name: string, status: string, message: string, details?: mixed}

@@ -107,7 +107,7 @@ cd ~/PhpstormProjects/arqel-test
 
 Validar:
 
-- `composer require arqel-dev/arqel:X.Y.Z` sem conflitos (meta-package que já agrega core, auth, etc.).
+- `composer require arqel-dev/framework:X.Y.Z` sem conflitos (meta-package que já agrega core, auth, etc.).
 - `php artisan arqel:install` regista provider/middleware e gera o scaffold.
 - `pnpm add @arqel-dev/ui@X.Y.Z @arqel-dev/react@X.Y.Z ...` instala.
 - `pnpm dev` + `php artisan serve` — admin panel carrega.

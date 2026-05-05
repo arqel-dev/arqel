@@ -34,5 +34,5 @@ features:
     details: Collaborative editing with Yjs + Laravel Reverb baked in. Multiple admins editing the same record sees live cursors.
   - icon: 🔌
     title: One-line install
-    details: composer require arqel-dev/arqel + php artisan arqel:install. Provider, middleware, Vite config — all auto-scaffolded.
+    details: composer require arqel-dev/framework + php artisan arqel:install. Provider, middleware, Vite config — all auto-scaffolded.
 ---

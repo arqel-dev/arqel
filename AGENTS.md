@@ -31,7 +31,7 @@
 Fluxo one-line (gerado pelo `arqel:install`):
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 php artisan arqel:install
 ```
 

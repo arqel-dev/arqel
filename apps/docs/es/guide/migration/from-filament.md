@@ -416,7 +416,7 @@ return back()->with('flash', ['message' => 'Saved', 'type' => 'success']);
 ## Checklist paso a paso
 
 1. [ ] Audita Models, Migrations, Policies — **no cambian**.
-2. [ ] Instala Arqel: `composer require arqel-dev/arqel` seguido de `php artisan arqel:install` (instala core + table + actions + fields, publica configs y el tema shadcn (new-york) sobre Radix UI).
+2. [ ] Instala Arqel: `composer require arqel-dev/framework` seguido de `php artisan arqel:install` (instala core + table + actions + fields, publica configs y el tema shadcn (new-york) sobre Radix UI).
 3. [ ] Configura un panel paralelo en `/admin-v2` (coexistiendo con Filament).
 4. [ ] Migra primero los Resources más simples (CRUD shallow, sin relaciones).
 5. [ ] Porta `form()` → `fields()` + ajusta nombres de hooks (`mutateFormDataBeforeCreate` → `beforeCreate`).

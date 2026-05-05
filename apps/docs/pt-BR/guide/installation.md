@@ -28,10 +28,10 @@ Se já tens uma app Laravel 12 a correr, salta este passo.
 ## Passo 2 — Instala o meta-package
 
 ```bash
-composer require arqel-dev/arqel
+composer require arqel-dev/framework
 ```
 
-O meta-package `arqel-dev/arqel` puxa o stack inteiro do Arqel + `inertiajs/inertia-laravel`:
+O meta-package `arqel-dev/framework` puxa o stack inteiro do Arqel + `inertiajs/inertia-laravel`:
 
 - `arqel-dev/core` — panels, resources, rotas polimórficas, Inertia bridge, command palette, telemetry
 - `arqel-dev/auth` — login / register / forgot / reset / verify-email bundled

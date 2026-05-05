@@ -567,6 +567,9 @@ export default defineConfig({
   description: 'Admin panels for Laravel, forged in PHP, rendered in React.',
   cleanUrls: true,
   lastUpdated: true,
+  sitemap: {
+    hostname: 'https://arqel.dev',
+  },
   srcExclude: ['**/SKILL.md', '**/README.md'],
   // Multi-language migration in progress: existing markdown still uses
   // absolute /guide/... paths instead of /<locale>/guide/.... We'll

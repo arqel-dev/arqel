@@ -1,5 +1,5 @@
 {
-    "name": "arqel-dev/arqel",
+    "name": "arqel-dev/framework",
     "version": "0.9.0",
     "description": "Arqel — admin panels for Laravel, forged in PHP, rendered in React. Meta-package that requires the full Arqel stack (core, auth, fields, form, actions, nav, table) plus inertia-laravel.",
     "type": "metapackage",

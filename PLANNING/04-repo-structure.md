@@ -108,7 +108,7 @@ packages-js/<name>/
 
 ## 3. Packages Composer detalhados
 
-### 3.1 `arqel-dev/arqel` (meta-package)
+### 3.1 `arqel-dev/framework` (meta-package)
 
 O que o usuário instala: `composer require arqel-dev/framework`.
 

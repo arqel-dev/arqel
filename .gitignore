@@ -69,3 +69,7 @@ apps/*/public/storage
 *.bak
 *~
 /apps/demo/vendor/
+
+# Phase-1 transient audit worksheets
+/docs/superpowers/plans/phase1-audit.txt
+/docs/superpowers/plans/phase1-*.tmp

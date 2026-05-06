@@ -30,7 +30,7 @@ final readonly class SetupScriptGenerator
     public const array TENANCIES = ['none', 'simple', 'stancl', 'spatie'];
 
     /**
-     * Packages required when expanding `arqel-dev/arqel` against a local monorepo.
+     * Packages required when expanding `arqel-dev/framework` against a local monorepo.
      * Mirrors the meta-package contents — keep in sync when adding new packages.
      *
      * @var list<string>
@@ -116,7 +116,7 @@ final readonly class SetupScriptGenerator
             $monorepoSpec = implode(' ', array_map(static fn (string $p): string => "{$p}:dev-main", self::MONOREPO_PACKAGES));
             $lines[] = "composer require {$monorepoSpec} -W";
         } else {
-            $lines[] = 'echo "==> Installing arqel-dev/arqel"';
+            $lines[] = 'echo "==> Installing arqel-dev/framework"';
             $lines[] = 'composer require arqel-dev/framework';
         }
 
@@ -180,7 +180,7 @@ final readonly class SetupScriptGenerator
             $monorepoSpec = implode(' ', array_map(static fn (string $p): string => "{$p}:dev-main", self::MONOREPO_PACKAGES));
             $lines[] = "composer require {$monorepoSpec} -W";
         } else {
-            $lines[] = 'Write-Host "==> Installing arqel-dev/arqel"';
+            $lines[] = 'Write-Host "==> Installing arqel-dev/framework"';
             $lines[] = 'composer require arqel-dev/framework';
         }
 

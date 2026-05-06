@@ -94,6 +94,52 @@ it('buildShowData mirrors buildEditData', function (): void {
     expect($data)->toHaveKeys(['resource', 'record', 'recordTitle', 'recordSubtitle', 'fields']);
 });
 
+final class SchemaArrayFieldsResource extends Resource
+{
+    public static string $model = Stub::class;
+
+    public function fields(): array
+    {
+        return [
+            ['name' => 'name', 'type' => 'text', 'required' => true],
+            ['name' => 'email', 'type' => 'text', 'label' => 'E-mail'],
+            ['name' => 'hidden_in_table', 'visibility' => ['table' => false]],
+            ['name' => '', 'type' => 'text'],            // skipped (empty name)
+            ['type' => 'text'],                           // skipped (no name)
+            'not-an-array',                               // skipped (string)
+        ];
+    }
+}
+
+it('buildIndexData derives columns from array-style fields when no Table is declared', function (): void {
+    Illuminate\Support\Facades\Schema::create('stubs', function ($table) {
+        $table->increments('id');
+        $table->string('name')->nullable();
+        $table->string('email')->nullable();
+        $table->timestamps();
+    });
+
+    Stub::query()->insert([
+        ['id' => 1, 'name' => 'Alice', 'email' => 'a@x.test'],
+        ['id' => 2, 'name' => 'Bob', 'email' => 'b@x.test'],
+    ]);
+
+    $data = $this->builder->buildIndexData(new SchemaArrayFieldsResource, new Request);
+
+    expect($data['columns'])->toHaveCount(2)
+        ->and($data['columns'][0])->toMatchArray([
+            'name' => 'name',
+            'type' => 'text',
+            'label' => 'Name',
+            'sortable' => false,
+            'searchable' => false,
+        ])
+        ->and($data['columns'][1])->toMatchArray([
+            'name' => 'email',
+            'label' => 'E-mail',
+        ]);
+});
+
 it('delegates field serialisation to FieldSchemaSerializer', function (): void {
     $data = $this->builder->buildCreateData(new FakeFieldedResource, new Request);
 

@@ -108,28 +108,50 @@ final class InertiaDataBuilder
     {
         $columns = [];
         foreach ($fields as $field) {
-            if (! is_object($field)) {
+            if (is_object($field)) {
+                // Honour visibility.table when the field exposes the
+                // visibility oracle from `HasVisibility` — defaults to
+                // visible when the trait is absent.
+                if (method_exists($field, 'isVisibleIn') && $field->isVisibleIn('table') === false) {
+                    continue;
+                }
+
+                $name = method_exists($field, 'getName') ? $field->getName() : null;
+                if (! is_string($name) || $name === '') {
+                    continue;
+                }
+
+                $label = method_exists($field, 'getLabel') ? $field->getLabel() : ucfirst($name);
+                $label = is_string($label) ? $label : ucfirst($name);
+            } elseif (is_array($field)) {
+                // Schema-style array (the shape that `arqel:install`
+                // scaffolds in the default UserResource): honour the
+                // `visibility.table` flag if present, accept any
+                // string `name`, and fall back to `ucfirst(name)` when
+                // no `label` is given.
+                if (
+                    isset($field['visibility'])
+                    && is_array($field['visibility'])
+                    && ($field['visibility']['table'] ?? true) === false
+                ) {
+                    continue;
+                }
+
+                $name = $field['name'] ?? null;
+                if (! is_string($name) || $name === '') {
+                    continue;
+                }
+
+                $rawLabel = $field['label'] ?? null;
+                $label = is_string($rawLabel) && $rawLabel !== '' ? $rawLabel : ucfirst($name);
+            } else {
                 continue;
             }
-
-            // Honour visibility.table when the field exposes the
-            // visibility oracle from `HasVisibility` — defaults to
-            // visible when the trait is absent.
-            if (method_exists($field, 'isVisibleIn') && $field->isVisibleIn('table') === false) {
-                continue;
-            }
-
-            $name = method_exists($field, 'getName') ? $field->getName() : null;
-            if (! is_string($name) || $name === '') {
-                continue;
-            }
-
-            $label = method_exists($field, 'getLabel') ? $field->getLabel() : ucfirst($name);
 
             $columns[] = [
                 'name' => $name,
                 'type' => 'text',
-                'label' => is_string($label) ? $label : ucfirst($name),
+                'label' => $label,
                 'sortable' => false,
                 'searchable' => false,
             ];

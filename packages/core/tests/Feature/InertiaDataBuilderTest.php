@@ -133,7 +133,14 @@ it('buildIndexData derives columns from array-style fields when no Table is decl
             'label' => 'Name',
             'sortable' => false,
             'searchable' => false,
+            'copyable' => false,
+            'hidden' => false,
+            'hiddenOnMobile' => false,
+            'align' => 'start',
+            'width' => null,
+            'tooltip' => null,
         ])
+        ->and($data['columns'][0]['props'])->toBeObject()
         ->and($data['columns'][1])->toMatchArray([
             'name' => 'email',
             'label' => 'E-mail',

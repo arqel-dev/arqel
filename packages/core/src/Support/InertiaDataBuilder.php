@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use stdClass;
 
 /**
  * Assembles the Inertia payloads for the index/create/edit/show
@@ -154,6 +155,13 @@ final class InertiaDataBuilder
                 'label' => $label,
                 'sortable' => false,
                 'searchable' => false,
+                'copyable' => false,
+                'hidden' => false,
+                'hiddenOnMobile' => false,
+                'align' => 'start',
+                'width' => null,
+                'tooltip' => null,
+                'props' => new stdClass,
             ];
         }
 

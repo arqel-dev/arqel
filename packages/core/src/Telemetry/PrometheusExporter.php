@@ -65,7 +65,7 @@ final readonly class PrometheusExporter
     }
 
     /**
-     * @param  array<string, string>  $labels
+     * @param array<string, string> $labels
      */
     private function formatLabels(array $labels): string
     {

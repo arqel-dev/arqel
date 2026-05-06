@@ -29,7 +29,7 @@ final class MetricsCollector
     /**
      * Increment (or create) a counter.
      *
-     * @param  array<string, scalar|null>  $labels
+     * @param array<string, scalar|null> $labels
      */
     public function counter(string $name, float $value = 1.0, array $labels = []): void
     {
@@ -50,7 +50,7 @@ final class MetricsCollector
     /**
      * Set (or create) a gauge to the given value.
      *
-     * @param  array<string, scalar|null>  $labels
+     * @param array<string, scalar|null> $labels
      */
     public function gauge(string $name, float $value, array $labels = []): void
     {
@@ -67,7 +67,7 @@ final class MetricsCollector
     /**
      * Append an observation to a histogram.
      *
-     * @param  array<string, scalar|null>  $labels
+     * @param array<string, scalar|null> $labels
      */
     public function histogram(string $name, float $value, array $labels = []): void
     {
@@ -128,7 +128,8 @@ final class MetricsCollector
     }
 
     /**
-     * @param  array<string, scalar|null>  $labels
+     * @param array<string, scalar|null> $labels
+     *
      * @return array<string, string>
      */
     private function normalizeLabels(array $labels): array
@@ -157,7 +158,7 @@ final class MetricsCollector
     }
 
     /**
-     * @param  array<string, string>  $labels
+     * @param array<string, string> $labels
      */
     private function buildKey(string $name, array $labels): string
     {

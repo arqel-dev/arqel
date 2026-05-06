@@ -203,6 +203,7 @@ Más detalles en [Theming](/es/guide/theming).
 - [Resources](/es/guide/resources) — fields, columnas, filtros, actions
 - [Fields](/es/guide/fields) — los 21 tipos de Field
 - [Tutorial: Primer CRUD](/es/guide/tutorial-first-crud) — guía más detallada
+- [Servidor MCP](/es/guide/mcp-server) — da a Claude Code, Cursor y otros asistentes de IA acceso project-aware a los docs de Arqel y al scaffolding
 
 ## Resolución de problemas
 

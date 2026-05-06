@@ -10,6 +10,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 _Placeholder para próximo ciclo (pós v0.8.1)._
 
 ### Added
+
+- **`@arqel-dev/mcp-server` v0.9.0** (post-MVP, MCP-001..008): servidor MCP oficial distribuído como pacote npm com binário stdio `arqel-mcp`. Expõe 7 tools (`search_docs`, `get_adr`, `get_api_reference`, `list_resources`, `describe_resource`, `generate_resource`, `generate_field`) que dão a assistentes de IA (Claude Code, Cursor, Copilot CLI, Gemini CLI) acesso à documentação do Arqel, ADRs, API reference, introspecção de projetos Laravel e scaffolding canónico. Documentação em [`/guide/mcp-server`](apps/docs/guide/mcp-server.md). Roadmap pós-MVP em [`PLANNING/13-pos-mvp-mcp-server.md`](PLANNING/13-pos-mvp-mcp-server.md).
+
 ### Changed
 ### Fixed
 ### Removed

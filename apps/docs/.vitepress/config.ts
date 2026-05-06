@@ -46,6 +46,7 @@ type SidebarText = {
   firstCrud: string;
   collab: string;
   agents: string;
+  mcpServer: string;
   a11yGuide: string;
   releaseChecklist: string;
   contribute: string;
@@ -132,6 +133,7 @@ const T = {
     firstCrud: 'First CRUD walkthrough',
     collab: 'Collaborative editing (Yjs + Reverb)',
     agents: 'AGENTS.md (LLMs)',
+    mcpServer: 'MCP server',
     a11yGuide: 'a11y guide (WCAG 2.1 AA)',
     releaseChecklist: 'Release checklist',
     contribute: 'Contributing',
@@ -216,6 +218,7 @@ const T = {
     firstCrud: 'Primeiro CRUD completo',
     collab: 'Edição colaborativa (Yjs + Reverb)',
     agents: 'AGENTS.md (LLMs)',
+    mcpServer: 'MCP server',
     a11yGuide: 'Guia a11y (WCAG 2.1 AA)',
     releaseChecklist: 'Release checklist',
     contribute: 'Contribuir',
@@ -300,6 +303,7 @@ const T = {
     firstCrud: 'Primer CRUD completo',
     collab: 'Edición colaborativa (Yjs + Reverb)',
     agents: 'AGENTS.md (LLMs)',
+    mcpServer: 'Servidor MCP',
     a11yGuide: 'Guía a11y (WCAG 2.1 AA)',
     releaseChecklist: 'Release checklist',
     contribute: 'Contribuir',
@@ -422,7 +426,13 @@ function buildSidebar(prefix: string, t: SidebarText): DefaultTheme.Sidebar {
       },
       { text: t.tutorial, items: [{ text: t.firstCrud, link: `${p}/guide/tutorial-first-crud` }] },
       { text: t.realtime, items: [{ text: t.collab, link: `${p}/guide/realtime-collab` }] },
-      { text: t.integrations, items: [{ text: t.agents, link: `${p}/guide/agents` }] },
+      {
+        text: t.integrations,
+        items: [
+          { text: t.agents, link: `${p}/guide/agents` },
+          { text: t.mcpServer, link: `${p}/guide/mcp-server` },
+        ],
+      },
       { text: t.a11y, items: [{ text: t.a11yGuide, link: `${p}/guide/a11y` }] },
       {
         text: t.release,

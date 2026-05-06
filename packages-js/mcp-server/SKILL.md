@@ -30,6 +30,22 @@ pnpm --filter @arqel-dev/mcp-server build
 claude mcp add arqel npx -- -y @arqel-dev/mcp-server
 ```
 
+## Scaffolding source of truth
+
+As tools `generate_resource` e `generate_field` (MCP-007) emitem **código PHP** via templating. A fonte canónica das convenções é o gerador PHP:
+
+- `packages/core/src/Generators/ResourceGenerator.php` — HEREDOC para o ficheiro Resource + métodos auxiliares para Policy / FormRequest / teste Pest.
+- `packages/core/stubs/resource.stub` — stub usado pelo `MakeResourceCommand` quando não há fields.
+- `packages/fields/src/Types/*.php` — lista canónica de tipos de Field (`TextField`, `EmailField`, etc.).
+
+Implementação JS:
+
+- `packages-js/mcp-server/stubs/resource.stub` — versão estendida do stub upstream com um token `{{fields}}` adicional. Esta divergência existe porque o stub PHP não suporta interpolação de campos (o `ResourceGenerator` em vez disso usa HEREDOC). Manter a mesma estrutura — só a área dentro de `fields(): array` difere.
+- `packages-js/mcp-server/src/scaffolding/field-types.ts` — espelha `packages/fields/src/Types/`. Adicionar uma row sempre que um Field type novo entrar.
+- O prebuild (`scripts/copy-resources.mjs`) copia o stub upstream para `stubs/resource.upstream.stub` para deteção de drift — se o ficheiro mudar em git, é sinal para reavaliar o template JS.
+
+Snapshots Vitest em `tests/scaffolding/__snapshots__/` capturam o output PHP exato — qualquer diff precisa de revisão manual.
+
 ## Anti-patterns
 
 - Não reimplementar lógica de Resource/Panel registry em TS — sempre passar pelo Artisan command.

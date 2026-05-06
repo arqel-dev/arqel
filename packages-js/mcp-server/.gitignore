@@ -1,5 +1,6 @@
 dist
 /docs
 /planning
+/stubs/resource.upstream.stub
 node_modules
 *.tsbuildinfo

@@ -1,0 +1,48 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderField > renders Select with options array 1`] = `
+{
+  "imports": [
+    "use Arqel\\Fields\\Types\\SelectField;",
+  ],
+  "notes": [],
+  "snippet": "SelectField::make('status')
+    ->options(['draft' => 'Draft', 'published' => 'Published']),",
+}
+`;
+
+exports[`renderField > renders default + helpText snapshot 1`] = `
+{
+  "imports": [
+    "use Arqel\\Fields\\Types\\NumberField;",
+  ],
+  "notes": [],
+  "snippet": "NumberField::make('age')
+    ->default(0)
+    ->helpText('Optional.'),",
+}
+`;
+
+exports[`renderField > renders nullable boolean default 1`] = `
+{
+  "imports": [
+    "use Arqel\\Fields\\Types\\BooleanField;",
+  ],
+  "notes": [],
+  "snippet": "BooleanField::make('active')
+    ->nullable()
+    ->default(false),",
+}
+`;
+
+exports[`renderField > renders required + placeholder snapshot 1`] = `
+{
+  "imports": [
+    "use Arqel\\Fields\\Types\\EmailField;",
+  ],
+  "notes": [],
+  "snippet": "EmailField::make('email')
+    ->required()
+    ->placeholder('user@example.com'),",
+}
+`;

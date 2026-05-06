@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{namespace}};
+
+use {{modelClass}};
+use Arqel\Core\Resources\Resource;
+
+final class {{class}} extends Resource
+{
+    public static string $model = {{model}}::class;
+
+    public function fields(): array
+    {
+        return [
+{{fields}}
+        ];
+    }
+}

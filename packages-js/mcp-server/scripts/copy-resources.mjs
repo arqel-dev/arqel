@@ -19,6 +19,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ROOT = resolve(HERE, '..');
 const DOCS_DEST = resolve(PACKAGE_ROOT, 'docs');
 const PLANNING_DEST = resolve(PACKAGE_ROOT, 'planning');
+const STUBS_DEST = resolve(PACKAGE_ROOT, 'stubs');
+const UPSTREAM_STUB_NAME = 'resource.upstream.stub';
 
 /** Files under `PLANNING/` that we ship. */
 const PLANNING_FILES = ['03-adrs.md', '05-api-php.md', '06-api-react.md'];
@@ -82,3 +84,21 @@ for (const filename of PLANNING_FILES) {
 process.stdout.write(
   `[copy-resources] Bundled ${planningCount} planning file(s) -> ${PLANNING_DEST}\n`,
 );
+
+/* ----- stubs ------------------------------------------------------ */
+
+// `stubs/resource.stub` is checked-in (the JS-flavoured copy with `{{fields}}`
+// token), so the package works in dev without prebuild having run. We
+// additionally mirror the upstream PHP stub as `resource.upstream.stub` for
+// drift detection — if the two diverge in non-trivial ways, maintainers see it
+// in `git status` and can update the JS template accordingly.
+mkdirSync(STUBS_DEST, { recursive: true });
+const upstreamStubSrc = resolve(repoRoot, 'packages', 'core', 'stubs', 'resource.stub');
+if (existsSync(upstreamStubSrc)) {
+  copyFileSync(upstreamStubSrc, resolve(STUBS_DEST, UPSTREAM_STUB_NAME));
+  process.stdout.write(
+    `[copy-resources] Mirrored upstream stub -> ${resolve(STUBS_DEST, UPSTREAM_STUB_NAME)}\n`,
+  );
+} else {
+  process.stderr.write('[copy-resources] upstream resource.stub missing — skipped.\n');
+}

@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * its branching logic (404 toggle, 403 gate, 200 success body)
  * without booting the full HTTP kernel.
  */
-
 it('aborts 404 when metrics endpoint is disabled', function (): void {
     config()->set('arqel.telemetry.metrics_endpoint_enabled', false);
 
@@ -48,7 +47,7 @@ it('returns 200 with prometheus content-type when enabled', function (): void {
 
 it('aborts 403 when viewMetrics gate is defined and denies', function (): void {
     config()->set('arqel.telemetry.metrics_endpoint_enabled', true);
-    \Illuminate\Support\Facades\Gate::define('viewMetrics', fn () => false);
+    Illuminate\Support\Facades\Gate::define('viewMetrics', fn () => false);
 
     $controller = new MetricsController;
     $exporter = $this->app->make(PrometheusExporter::class);

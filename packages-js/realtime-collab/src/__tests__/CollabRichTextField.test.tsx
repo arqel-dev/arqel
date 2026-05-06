@@ -63,9 +63,10 @@ describe('CollabRichTextField', () => {
 
     await vi.advanceTimersByTimeAsync(600);
 
-    const postCalls = fetchMock.mock.calls.filter((c) => {
-      const init = c[1] as RequestInit | undefined;
-      return init?.method === 'POST';
+    const postCalls = (
+      fetchMock.mock.calls as unknown as Array<[unknown, RequestInit | undefined]>
+    ).filter((c) => {
+      return c[1]?.method === 'POST';
     });
     expect(postCalls.length).toBe(1);
     expect(postCalls[0]?.[0]).toBe('/admin/posts/1/collab/body');

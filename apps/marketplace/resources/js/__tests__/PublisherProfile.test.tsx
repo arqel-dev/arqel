@@ -5,6 +5,7 @@ vi.mock('@inertiajs/react', () => ({
   Link: ({ children, ...rest }: { children: React.ReactNode } & Record<string, unknown>) => (
     <a {...rest}>{children}</a>
   ),
+  Head: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 }));
 
 import PublisherProfile from '../Pages/Marketplace/PublisherProfile';

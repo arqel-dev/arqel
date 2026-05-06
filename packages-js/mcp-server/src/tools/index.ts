@@ -11,6 +11,28 @@ export {
   describeResource,
   describeResourceTool,
 } from './describe-resource.js';
+export type {
+  GenerateFieldErrorResponse,
+  GenerateFieldInput,
+  GenerateFieldOkResponse,
+  GenerateFieldResponse,
+} from './generate-field.js';
+export {
+  GenerateFieldInputSchema,
+  generateField,
+  generateFieldTool,
+} from './generate-field.js';
+export type {
+  GenerateResourceErrorResponse,
+  GenerateResourceInput,
+  GenerateResourceOkResponse,
+  GenerateResourceResponse,
+} from './generate-resource.js';
+export {
+  GenerateResourceInputSchema,
+  generateResource,
+  generateResourceTool,
+} from './generate-resource.js';
 export type { GetAdrErrorCode, GetAdrInput, GetAdrResponse } from './get-adr.js';
 export { GetAdrInputSchema, getAdr, getAdrTool } from './get-adr.js';
 export type {
@@ -46,6 +68,8 @@ export type {
 export { SearchDocsInputSchema, searchDocs, searchDocsTool } from './search-docs.js';
 
 import { describeResourceTool } from './describe-resource.js';
+import { generateFieldTool } from './generate-field.js';
+import { generateResourceTool } from './generate-resource.js';
 import { getAdrTool } from './get-adr.js';
 import { getApiReferenceTool } from './get-api-reference.js';
 import { listResourcesTool } from './list-resources.js';
@@ -62,4 +86,6 @@ export const tools = [
   getApiReferenceTool,
   listResourcesTool,
   describeResourceTool,
+  generateResourceTool,
+  generateFieldTool,
 ] as const;

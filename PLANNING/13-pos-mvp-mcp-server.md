@@ -18,7 +18,7 @@ Um MCP oficial resolve os três: docs sempre atuais, introspection do projeto La
 ## 2. Objetivos
 
 - **Público duplo:** dev consumidor do framework + contribuidor do monorepo Arqel.
-- **8 tools no MVP** distribuídas em 3 categorias (docs, introspection, scaffolding).
+- **7 tools no MVP** distribuídas em 3 categorias: 3 docs (`search_docs`, `get_adr`, `get_api_reference`), 2 introspection (`list_resources`, `describe_resource`), 2 scaffolding (`generate_resource`, `generate_field`).
 - **Distribuição via npm stdio** (`@arqel-dev/mcp-server`), instalável com `claude mcp add` e equivalentes.
 - **Servidor HTTP hospedado** fica fora do escopo desta iniciativa (avaliar depois conforme demanda).
 
@@ -199,6 +199,16 @@ Um MCP oficial resolve os três: docs sempre atuais, introspection do projeto La
 - Pacote `@arqel-dev/mcp-server` publicado em npm com pelo menos uma versão estável.
 - Página de documentação publicada em `arqel.dev`.
 - Smoke E2E demonstrando o servidor a responder via Claude Code num projeto Laravel real (`apps/demo/`).
+
+### Nota de coordenação de release
+
+O job `publish-npm` em `.github/workflows/release.yml` itera todos pacotes `packages-js/*` não-private e exige que cada `package.json` tenha `version` igual à tag git (`v<version>`). Como o `@arqel-dev/mcp-server` arranca com `0.9.0` e os outros pacotes JS estão actualmente em `0.8.x`, qualquer corte de tag `v0.9.0` para publicar este pacote requer **uma das três opções**:
+
+1. **Bump coordenado** — bumpar todos os pacotes `packages-js/*` para `0.9.0` antes da tag (alinhamento total de versões).
+2. **Carve-out no workflow** — adicionar um `skip-list` ao step de verificação que excepciona pacotes com versão diferente da tag.
+3. **Tag dedicada** — usar uma tag separada para o mcp-server (e.g., `mcp-server-v0.9.0`) com um job dedicado que só publica este pacote.
+
+Opção (1) é a mais simples se o framework estiver a aproximar-se duma release coordenada de qualquer forma; (2) é flexível mas adiciona complexidade ao workflow; (3) é mais limpa a longo prazo se o ciclo de release do MCP server for genuinamente independente. Decisão fica para o momento da publicação.
 
 ## 6. Fora de escopo (follow-ups)
 

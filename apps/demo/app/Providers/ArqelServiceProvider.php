@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Arqel\Resources\PostResource;
 use App\Arqel\Resources\UserResource;
 use App\Http\Middleware\HandleInertiaRequests;
 use Arqel\Core\Panel\PanelRegistry;
@@ -58,6 +59,7 @@ final class ArqelServiceProvider extends ServiceProvider
             ->registration()
             ->resources([
                 UserResource::class,
+                PostResource::class,
             ]);
 
         $registry->setCurrent('admin');

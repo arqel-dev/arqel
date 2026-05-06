@@ -9,7 +9,7 @@
     "emitDeclarationOnly": false,
     "noEmit": false,
     "composite": false,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["dist", "node_modules"]

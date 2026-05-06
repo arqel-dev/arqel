@@ -1,0 +1,60 @@
+{
+  "name": "@arqel-dev/mcp-server",
+  "version": "0.0.1",
+  "description": "Official MCP (Model Context Protocol) server for Arqel — gives AI assistants access to Arqel docs, project introspection, and scaffolding.",
+  "license": "MIT",
+  "homepage": "https://arqel.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arqel-dev/arqel.git",
+    "directory": "packages-js/mcp-server"
+  },
+  "keywords": [
+    "arqel",
+    "laravel",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "claude",
+    "cursor"
+  ],
+  "type": "module",
+  "bin": {
+    "arqel-mcp": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check --diagnostic-level=error src tests",
+    "format": "biome format --write src tests",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

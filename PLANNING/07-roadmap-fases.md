@@ -471,10 +471,19 @@ Track mensalmente:
 | Contributors | 5 | 20 | 100 |
 | Monthly GitHub Sponsors | $500 | $5.000 | $20.000 |
 
-## 13. Próximos documentos
+## 13. Iniciativas pós-MVP
+
+Iniciativas que correm em paralelo às fases após o fecho da Fase 1 (v0.8.x). Cada uma tem o seu próprio documento de planeamento e ciclo de release independente.
+
+| Doc | Iniciativa | Status |
+|---|---|---|
+| `13-pos-mvp-mcp-server.md` | MCP Server oficial (`@arqel-dev/mcp-server`) — integração com assistentes de IA via Model Context Protocol | Em planeamento |
+
+## 14. Próximos documentos
 
 - **`08-fase-1-mvp.md`** — tickets detalhados Fase 1 (~120 tickets)
 - **`09-fase-2-essenciais.md`** — tickets Fase 2 (~90)
 - **`10-fase-3-avancadas.md`** — tickets Fase 3 (~70)
 - **`11-fase-4-ecossistema.md`** — tickets Fase 4 (~45)
 - **`12-processos-qa.md`** — processos, CI/CD, release
+- **`13-pos-mvp-mcp-server.md`** — iniciativa pós-MVP MCP Server (8 tickets)

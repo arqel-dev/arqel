@@ -10,6 +10,7 @@ use Arqel\Auth\Http\Controllers\LoginController;
 use Arqel\Auth\Http\Controllers\LogoutController;
 use Arqel\Auth\Http\Controllers\RegisterController;
 use Arqel\Auth\Http\Controllers\ResetPasswordController;
+use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
 use Arqel\Core\Panel\Panel;
 use Illuminate\Support\Facades\Route;
 
@@ -57,15 +58,15 @@ final class Routes
         $logoutUrl = self::deriveLogoutUrl($loginUrl);
 
         Route::get($loginUrl, [LoginController::class, 'showForm'])
-            ->middleware(['web'])
+            ->middleware(['web', HandleArqelInertiaRequests::class])
             ->name('login');
 
         Route::post($loginUrl, LoginController::class)
-            ->middleware(['web', 'throttle:5,1'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'throttle:5,1'])
             ->name('arqel.auth.login.attempt');
 
         Route::post($logoutUrl, LogoutController::class)
-            ->middleware(['web', 'auth'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'auth'])
             ->name('logout');
 
         self::$registered = true;
@@ -91,11 +92,11 @@ final class Routes
         $registerUrl = self::deriveSiblingUrl($panel->getLoginUrl(), 'register');
 
         Route::get($registerUrl, [RegisterController::class, 'showForm'])
-            ->middleware(['web'])
+            ->middleware(['web', HandleArqelInertiaRequests::class])
             ->name('register');
 
         Route::post($registerUrl, RegisterController::class)
-            ->middleware(['web', 'throttle:10,60'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'throttle:10,60'])
             ->name('arqel.auth.register.attempt');
 
         self::$registrationRegistered = true;
@@ -121,15 +122,15 @@ final class Routes
         $base = self::deriveSiblingUrl($panel->getLoginUrl(), 'email/verify');
 
         Route::get($base, [EmailVerificationController::class, 'notice'])
-            ->middleware(['web', 'auth'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'auth'])
             ->name('verification.notice');
 
         Route::get($base.'/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-            ->middleware(['web', 'auth', 'signed', 'throttle:6,1'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'auth', 'signed', 'throttle:6,1'])
             ->name('verification.verify');
 
         Route::post($base.'/resend', [EmailVerificationController::class, 'resend'])
-            ->middleware(['web', 'auth', 'throttle:6,1'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'auth', 'throttle:6,1'])
             ->name('verification.send');
 
         self::$verificationRegistered = true;
@@ -158,19 +159,19 @@ final class Routes
         $base = self::deriveBasePath($panel?->getLoginUrl() ?? '/admin/login');
 
         Route::get($base.'/forgot-password', [ForgotPasswordController::class, 'showForm'])
-            ->middleware(['web', 'guest'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest'])
             ->name('password.request');
 
         Route::post($base.'/forgot-password', ForgotPasswordController::class)
-            ->middleware(['web', 'guest', 'throttle:6,1'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest', 'throttle:6,1'])
             ->name('password.email');
 
         Route::post($base.'/reset-password', ResetPasswordController::class)
-            ->middleware(['web', 'guest', 'throttle:6,1'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest', 'throttle:6,1'])
             ->name('password.update');
 
         Route::get($base.'/reset-password/{token}', [ResetPasswordController::class, 'showForm'])
-            ->middleware(['web', 'guest'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest'])
             ->name('password.reset');
 
         self::$passwordResetRegistered = true;

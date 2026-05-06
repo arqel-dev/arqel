@@ -9,7 +9,7 @@
 Esta aplicação usa **Arqel** (dev-main) — admin panels declarativos em
 PHP, renderizados em React via Inertia. Stack:
 
-- **PHP** 8.4+ • **Laravel** 12.58.0+
+- **PHP** 8.4+ • **Laravel** 13.8.0+
 - **Inertia** 3 + **React** 19+ + **Tailwind** v4
 - Arqel Resources vivem em `app/Arqel/Resources/`
 - Pages Inertia geradas em `resources/js/Pages/Arqel/`

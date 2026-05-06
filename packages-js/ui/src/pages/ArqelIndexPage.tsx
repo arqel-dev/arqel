@@ -10,6 +10,13 @@
  * Wires the standard table interactions — search / filter / sort /
  * pagination — into Inertia partial `router.get` visits so the
  * server can re-run TableQueryBuilder with the new query string.
+ *
+ * Query-string contract (matches `Arqel\Table\TableQueryBuilder`):
+ *   - `?search=foo`              global search
+ *   - `?sort=column&direction=asc|desc`
+ *   - `?page=N&per_page=M`
+ *   - `?filter[name]=value`      one entry per filter
+ *
  * `search` is debounced (300ms) so typing doesn't hammer the
  * backend; the rest fire immediately.
  */
@@ -22,7 +29,7 @@ import { ResourceIndex } from '../resource/ResourceIndex.js';
 
 type FilterValue = unknown;
 
-function pruneEmpty(values: Record<string, FilterValue>): Record<string, FilterValue> {
+function pruneEmptyFilters(values: Record<string, FilterValue>): Record<string, FilterValue> {
   const out: Record<string, FilterValue> = {};
   for (const [k, v] of Object.entries(values)) {
     if (v === undefined || v === null || v === '') continue;
@@ -32,18 +39,39 @@ function pruneEmpty(values: Record<string, FilterValue>): Record<string, FilterV
   return out;
 }
 
+interface VisitParams {
+  filters: Record<string, FilterValue>;
+  search: string;
+  sort?: { column: string | null; direction: string | null } | null;
+  page?: number;
+  perPage?: number;
+}
+
+function buildQuery(params: VisitParams): Record<string, unknown> {
+  const data: Record<string, unknown> = {};
+  const filters = pruneEmptyFilters(params.filters);
+  if (Object.keys(filters).length > 0) data['filter'] = filters;
+  if (params.search) data['search'] = params.search;
+  if (params.sort?.column) {
+    data['sort'] = params.sort.column;
+    if (params.sort.direction) data['direction'] = params.sort.direction;
+  }
+  if (params.page && params.page > 1) data['page'] = params.page;
+  if (params.perPage) data['per_page'] = params.perPage;
+  return data;
+}
+
 export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(): JSX.Element {
   const page = usePage();
   const props = page.props as unknown as ResourceIndexProps<TRecord>;
 
   const initialFilters = useMemo(() => {
+    if (typeof window === 'undefined') return {};
+    const sp = new URLSearchParams(window.location.search);
     const fromUrl: Record<string, FilterValue> = {};
-    if (typeof window !== 'undefined') {
-      const search = new URLSearchParams(window.location.search);
-      for (const [key, value] of search.entries()) {
-        if (key === 'search' || key === 'sort' || key === 'direction' || key === 'page') continue;
-        fromUrl[key] = value;
-      }
+    for (const [key, value] of sp.entries()) {
+      const m = key.match(/^filter\[([^\]]+)\]$/);
+      if (m?.[1]) fromUrl[m[1]] = value;
     }
     return fromUrl;
   }, []);
@@ -52,54 +80,38 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
   const [searchValue, setSearchValue] = useState<string>(props.search ?? '');
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const visit = (next: Record<string, FilterValue>): void => {
-    const data = pruneEmpty(next) as Record<string, string | number | boolean | undefined>;
+  const visit = (data: Record<string, unknown>): void => {
     const url = typeof window !== 'undefined' ? window.location.pathname : page.url.split('?')[0];
-    router.get(url ?? '/', data, {
+    router.get(url ?? '/', data as Record<string, string | number | boolean | undefined>, {
       preserveState: true,
       preserveScroll: true,
       replace: true,
     });
   };
 
-  const buildBase = (): Record<string, FilterValue> => ({
-    ...filterValues,
-    ...(searchValue ? { search: searchValue } : {}),
-    ...(props.sort?.column ? { sort: props.sort.column, direction: props.sort.direction } : {}),
-  });
+  const currentSort = props.sort ?? null;
 
   const handleFilterChange = (name: string, value: FilterValue): void => {
-    const next = { ...filterValues };
+    const nextFilters = { ...filterValues };
     if (value === undefined || value === null || value === '') {
-      delete next[name];
+      delete nextFilters[name];
     } else {
-      next[name] = value;
+      nextFilters[name] = value;
     }
-    setFilterValues(next);
-    visit({
-      ...next,
-      ...(searchValue ? { search: searchValue } : {}),
-      ...(props.sort?.column ? { sort: props.sort.column, direction: props.sort.direction } : {}),
-    });
+    setFilterValues(nextFilters);
+    visit(buildQuery({ filters: nextFilters, search: searchValue, sort: currentSort }));
   };
 
   const handleClearFilters = (): void => {
     setFilterValues({});
-    visit({
-      ...(searchValue ? { search: searchValue } : {}),
-      ...(props.sort?.column ? { sort: props.sort.column, direction: props.sort.direction } : {}),
-    });
+    visit(buildQuery({ filters: {}, search: searchValue, sort: currentSort }));
   };
 
   const handleSearchChange = (value: string): void => {
     setSearchValue(value);
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     searchDebounceRef.current = setTimeout(() => {
-      visit({
-        ...filterValues,
-        ...(value ? { search: value } : {}),
-        ...(props.sort?.column ? { sort: props.sort.column, direction: props.sort.direction } : {}),
-      });
+      visit(buildQuery({ filters: filterValues, search: value, sort: currentSort }));
     }, 300);
   };
 
@@ -111,15 +123,35 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
   );
 
   const handleSortChange = (column: string, direction: SortDirection): void => {
-    visit({ ...buildBase(), sort: column, direction });
+    visit(
+      buildQuery({
+        filters: filterValues,
+        search: searchValue,
+        sort: { column, direction },
+      }),
+    );
   };
 
   const handlePageChange = (pageNum: number): void => {
-    visit({ ...buildBase(), page: pageNum });
+    visit(
+      buildQuery({
+        filters: filterValues,
+        search: searchValue,
+        sort: currentSort,
+        page: pageNum,
+      }),
+    );
   };
 
   const handlePerPageChange = (perPage: number): void => {
-    visit({ ...buildBase(), per_page: perPage });
+    visit(
+      buildQuery({
+        filters: filterValues,
+        search: searchValue,
+        sort: currentSort,
+        perPage,
+      }),
+    );
   };
 
   return (

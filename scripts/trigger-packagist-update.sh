@@ -15,6 +15,7 @@ PACKAGES=(
   actions ai audit auth cli core export
   fields fields-advanced form marketplace mcp
   nav realtime table tenant versioning widgets workflow
+  framework
 )
 
 trigger_one() {
@@ -37,7 +38,7 @@ trigger_one() {
   fi
 }
 
-echo "Triggering update for 19 packages..."
+echo "Triggering update for ${#PACKAGES[@]} packages..."
 fail=0
 for pkg in "${PACKAGES[@]}"; do
   trigger_one "$pkg" || fail=$((fail + 1))

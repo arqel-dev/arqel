@@ -30,10 +30,12 @@
   },
   "files": [
     "dist",
+    "docs",
     "README.md",
     "SKILL.md"
   ],
   "scripts": {
+    "prebuild": "node scripts/copy-docs.mjs",
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
@@ -43,7 +45,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.25.0 || ^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

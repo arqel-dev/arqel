@@ -1,7 +1,9 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 import packageJson from '../package.json' with { type: 'json' };
+import { tools } from './tools/index.js';
 
 export interface CreateServerOptions {
   name?: string;
@@ -9,7 +11,7 @@ export interface CreateServerOptions {
 }
 
 export function createServer(options: CreateServerOptions = {}): Server {
-  return new Server(
+  const server = new Server(
     {
       name: options.name ?? packageJson.name,
       version: options.version ?? packageJson.version,
@@ -20,6 +22,24 @@ export function createServer(options: CreateServerOptions = {}): Server {
       },
     },
   );
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: tools.map((tool) => tool.definition),
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+    const tool = tools.find((candidate) => candidate.definition.name === name);
+    if (!tool) {
+      return {
+        content: [{ type: 'text', text: `Unknown tool: ${name}` }],
+        isError: true,
+      };
+    }
+    return tool.handle(args ?? {});
+  });
+
+  return server;
 }
 
 export async function runServer(server: Server): Promise<void> {

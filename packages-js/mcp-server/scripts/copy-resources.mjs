@@ -5,6 +5,8 @@
  *
  *   - `apps/docs`  → `<package>/docs/`     (corpus searched by `search_docs`)
  *   - `PLANNING/03-adrs.md` → `<package>/planning/03-adrs.md` (used by `get_adr`)
+ *   - `PLANNING/05-api-php.md`, `PLANNING/06-api-react.md` →
+ *     `<package>/planning/` (used by `get_api_reference`)
  *
  * Idempotent: removes any pre-existing destinations first, then mirrors each
  * source while skipping `node_modules`, VitePress build artefacts and dotfiles.
@@ -18,8 +20,8 @@ const PACKAGE_ROOT = resolve(HERE, '..');
 const DOCS_DEST = resolve(PACKAGE_ROOT, 'docs');
 const PLANNING_DEST = resolve(PACKAGE_ROOT, 'planning');
 
-/** Files under `PLANNING/` that we ship. Extend with MCP-005's planning files. */
-const PLANNING_FILES = ['03-adrs.md'];
+/** Files under `PLANNING/` that we ship. */
+const PLANNING_FILES = ['03-adrs.md', '05-api-php.md', '06-api-react.md'];
 
 function findRepoRoot(start) {
   let dir = start;

@@ -36,7 +36,13 @@ export function createServer(options: CreateServerOptions = {}): Server {
         isError: true,
       };
     }
-    return tool.handle(args ?? {});
+    const result = await (
+      tool.handle as (input: unknown) => Promise<{
+        content: Array<{ type: 'text'; text: string }>;
+        isError?: boolean;
+      }>
+    )(args ?? {});
+    return result;
   });
 
   return server;

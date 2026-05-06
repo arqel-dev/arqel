@@ -88,6 +88,9 @@ jobs:
       - name: Install npm dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build all packages (resolves workspace subpath imports for typecheck)
+        run: pnpm -r --if-present run build
+
       - name: tsc --noEmit (workspace-wide)
         run: pnpm run typecheck
 
@@ -108,11 +111,11 @@ jobs:
       - name: Install npm dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build all packages (resolves workspace subpath imports for tests)
+        run: pnpm -r --if-present run build
+
       - name: Vitest (workspace-wide)
         run: pnpm run test
-
-      - name: Build MCP server (for stdio smoke)
-        run: pnpm --filter @arqel-dev/mcp-server build
 
       - name: Smoke test MCP server stdio handshake
         run: pnpm --filter @arqel-dev/mcp-server smoke

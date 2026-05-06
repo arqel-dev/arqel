@@ -36,7 +36,7 @@ final class NewCommand extends Command
             ->addOption('mcp', null, InputOption::VALUE_NEGATABLE, 'Wire arqel-dev/mcp integration.', false)
             ->addOption('no-prompts', null, InputOption::VALUE_NONE, 'Skip interactive prompts.')
             ->addOption('platform', null, InputOption::VALUE_REQUIRED, 'Force script platform (bash|powershell).')
-            ->addOption('monorepo-path', null, InputOption::VALUE_REQUIRED, 'Path to a local Arqel monorepo. When set, the generated script wires a path repository and installs arqel/* as :dev-main, instead of pulling arqel-dev/arqel from Packagist.');
+            ->addOption('monorepo-path', null, InputOption::VALUE_REQUIRED, 'Path to a local Arqel monorepo. When set, the generated script wires a path repository and installs arqel/* as :dev-main, instead of pulling arqel-dev/framework from Packagist.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

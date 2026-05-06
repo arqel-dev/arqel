@@ -28,7 +28,7 @@ Os pacotes específicos (`arqel-dev/fields`, `arqel-dev/table`, `arqel-dev/form`
 composer require arqel-dev/core
 ```
 
-> Normalmente instala-se via o meta-pacote `arqel-dev/arqel`, que puxa `arqel-dev/core` e companheiros obrigatórios.
+> Normalmente instala-se via o meta-pacote `arqel-dev/framework`, que puxa `arqel-dev/core` e companheiros obrigatórios.
 
 ## Convenções
 

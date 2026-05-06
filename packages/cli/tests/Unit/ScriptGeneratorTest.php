@@ -106,7 +106,7 @@ it('renders a PowerShell script with the expected commands', function (): void {
     expect($script)
         ->toContain('$ErrorActionPreference = "Stop"')
         ->toContain('Set-Location win-app')
-        ->toContain('Write-Host "==> Installing arqel-dev/arqel"')
+        ->toContain('Write-Host "==> Installing arqel-dev/framework"')
         ->toContain('composer require arqel-dev/tenant')
         ->toContain('laravel new win-app --react');
 });

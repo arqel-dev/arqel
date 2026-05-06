@@ -1,4 +1,4 @@
-# arqel-dev/arqel
+# arqel-dev/framework
 
 Meta-package that requires the full Arqel stack:
 

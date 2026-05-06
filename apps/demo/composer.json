@@ -7,7 +7,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.3",
-    "arqel-dev/arqel": "@dev",
+    "arqel-dev/framework": "@dev",
     "laravel/framework": "^12.0",
     "laravel/tinker": "^2.10.1"
   },

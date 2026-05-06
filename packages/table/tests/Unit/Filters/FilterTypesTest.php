@@ -45,6 +45,16 @@ it('SelectFilter: closure-based options resolved at serialise time', function ()
     expect($filter->resolveOptions())->toBe([10 => 'A', 20 => 'B']);
 });
 
+it('SelectFilter: getTypeSpecificProps normalizes options to {value, label} array for the React side', function (): void {
+    $filter = SelectFilter::make('status')
+        ->options(['draft' => 'Draft', 'published' => 'Published']);
+
+    expect($filter->getTypeSpecificProps()['options'])->toBe([
+        ['value' => 'draft', 'label' => 'Draft'],
+        ['value' => 'published', 'label' => 'Published'],
+    ]);
+});
+
 it('SelectFilter: relationship metadata recorded for controller-side resolution', function (): void {
     $filter = SelectFilter::make('cat')->optionsRelationship('category', 'name');
 
@@ -184,5 +194,7 @@ it('Filter.toArray serialises label, default, persist, and props', function (): 
         ->and($payload['label'])->toBe('Função')
         ->and($payload['default'])->toBe(1)
         ->and($payload['persist'])->toBeFalse()
-        ->and($payload['props']['options'])->toBe([1 => 'Admin']);
+        ->and($payload['props']['options'])->toBe([
+            ['value' => 1, 'label' => 'Admin'],
+        ]);
 });

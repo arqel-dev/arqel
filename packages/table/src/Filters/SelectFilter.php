@@ -116,12 +116,35 @@ class SelectFilter extends Filter
     }
 
     /**
+     * Normalize an associative `[value => label]` array into the
+     * canonical `[{value, label}]` shape that `@arqel-dev/types`
+     * declares for `SelectFilterProps.options`. Closures and
+     * relationship-resolved options flow through the same path.
+     *
+     * @param array<int|string, mixed> $options
+     *
+     * @return array<int, array{value: int|string, label: string}>
+     */
+    private static function normalizeOptions(array $options): array
+    {
+        $normalized = [];
+        foreach ($options as $value => $label) {
+            $normalized[] = [
+                'value' => $value,
+                'label' => is_scalar($label) ? (string) $label : (string) $value,
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function getTypeSpecificProps(): array
     {
         return [
-            'options' => $this->resolveOptions(),
+            'options' => self::normalizeOptions($this->resolveOptions()),
             'optionsRelation' => $this->optionsRelation,
             'column' => $this->getColumn(),
         ];

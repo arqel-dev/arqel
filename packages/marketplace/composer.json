@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/marketplace",
-    "version": "0.8.1",
+    "version": "0.9.0",
     "description": "Plugin marketplace backend for Arqel — schema, models e REST API para descoberta/publicação de plugins community.",
     "type": "library",
     "license": "MIT",

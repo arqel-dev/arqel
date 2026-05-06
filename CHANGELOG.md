@@ -7,15 +7,26 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-_Placeholder para próximo ciclo (pós v0.8.1)._
+_Placeholder para próximo ciclo._
+
+---
+
+## [0.9.0] - 2026-05-06
+
+Primeiro release pós-MVP. Bump coordenado de todos os pacotes (`packages-js/*` e `packages/*`) para `0.9.0` para acompanhar a entrada do `@arqel-dev/mcp-server` no ecossistema.
 
 ### Added
 
 - **`@arqel-dev/mcp-server` v0.9.0** (post-MVP, MCP-001..008): servidor MCP oficial distribuído como pacote npm com binário stdio `arqel-mcp`. Expõe 7 tools (`search_docs`, `get_adr`, `get_api_reference`, `list_resources`, `describe_resource`, `generate_resource`, `generate_field`) que dão a assistentes de IA (Claude Code, Cursor, Copilot CLI, Gemini CLI) acesso à documentação do Arqel, ADRs, API reference, introspecção de projetos Laravel e scaffolding canónico. Documentação em [`/guide/mcp-server`](apps/docs/guide/mcp-server.md). Roadmap pós-MVP em [`PLANNING/13-pos-mvp-mcp-server.md`](PLANNING/13-pos-mvp-mcp-server.md).
+- **`arqel:introspect` Artisan command** (`arqel-dev/core` MCP-002): emite snapshot JSON read-only de Panels, Resources e Fields registados. Consumido pelo MCP server via subprocess; útil também para diagnostics manual. Suporta `--scope={panels|resources|fields|all}`.
 
 ### Changed
-### Fixed
-### Removed
+
+- **Versionamento coordenado:** todos os pacotes públicos (`packages-js/*` e `packages/*`) bumpados de `0.8.1` para `0.9.0`. Composer requires inter-package permanecem em `self.version` (resolvido pelo splitsh-lite no momento do split); npm requires permanecem em `workspace:*` (resolvidos pelo `pnpm publish`).
+
+### Notes
+
+- O meta-package `arqel-dev/framework` (repo separado `github.com/arqel-dev/framework`) requer atualização independente: bumpar requires de `^0.8.0` para `^0.9.0` e taggar `v0.9.0` lá.
 
 ---
 

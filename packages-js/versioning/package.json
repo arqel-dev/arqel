@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/versioning",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "React components for Arqel Versioning — VersionTimeline + VersionDiff viewer.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

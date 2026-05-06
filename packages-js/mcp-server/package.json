@@ -31,11 +31,12 @@
   "files": [
     "dist",
     "docs",
+    "planning",
     "README.md",
     "SKILL.md"
   ],
   "scripts": {
-    "prebuild": "node scripts/copy-docs.mjs",
+    "prebuild": "node scripts/copy-resources.mjs",
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",

@@ -73,3 +73,6 @@ apps/*/public/storage
 # Phase-1 transient audit worksheets
 /docs/superpowers/plans/phase1-audit.txt
 /docs/superpowers/plans/phase1-*.tmp
+
+# Phase-2 transient backup of pre-recreate apps/demo
+/apps/demo-old/

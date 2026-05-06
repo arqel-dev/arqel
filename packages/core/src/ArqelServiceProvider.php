@@ -15,6 +15,7 @@ use Arqel\Core\Commands\MakeUserCommand;
 use Arqel\Core\Console\AuditCommand;
 use Arqel\Core\Console\CloudInfoCommand;
 use Arqel\Core\Console\DoctorCommand;
+use Arqel\Core\Console\IntrospectCommand;
 use Arqel\Core\Console\PulseInfoCommand;
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\DevTools\PolicyLogCollector;
@@ -52,6 +53,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
                 MakeResourceCommand::class,
                 MakeUserCommand::class,
                 DoctorCommand::class,
+                IntrospectCommand::class,
                 AuditCommand::class,
                 CloudInfoCommand::class,
                 PulseInfoCommand::class,

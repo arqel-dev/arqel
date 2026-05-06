@@ -286,6 +286,46 @@ Summary: 8 ok • 2 warn • 0 fail
 
 **Exit code:** `0` se nenhum `fail` (e em `--strict`, também sem `warn`); `1` caso contrário. Usável directamente em pipelines de deploy e em healthcheck endpoints.
 
+## Introspecção (MCP-002 / Introspect)
+
+Comando Artisan `arqel:introspect` (em `src/Console/IntrospectCommand.php`) emite um snapshot JSON dos Panels, Resources e Fields registados na app. É **read-only** e **best-effort**: cada peça de metadata é capturada com `try/catch` e devolve `null` em vez de fazer crash. Foi desenhado para ser invocado como subprocess pelo `@arqel-dev/mcp-server`.
+
+**Signature:**
+
+```
+php artisan arqel:introspect {--json} {--scope=all : panels|resources|fields|all}
+```
+
+- `--json` é o default (flag presente para futura saída human-readable).
+- `--scope` filtra a secção emitida; secções fora do scope ficam como `[]` para manter o shape estável.
+
+**Schema de saída (estável):**
+
+```json
+{
+  "version": "0.8.1",
+  "scope": "all",
+  "panels": [{ "id": "admin", "path": "/admin", "label": "My Admin" }],
+  "resources": [{
+    "class": "App\\Arqel\\Resources\\PostResource",
+    "model": "App\\Models\\Post",
+    "label": "Post",
+    "pluralLabel": "Posts",
+    "slug": "posts",
+    "fields": [{ "name": "title", "type": "text" }],
+    "policies": ["App\\Policies\\PostPolicy"]
+  }],
+  "fields": [{ "type": "text", "class": "Arqel\\Fields\\Types\\TextField" }]
+}
+```
+
+**Fontes dos dados:**
+
+- `panels` — `PanelRegistry::all()` + `Panel::getBrand()['name']` como label (fallback para o id).
+- `resources` — `ResourceRegistry::all()`; para cada Resource lê `getModel`, `getLabel`, `getPluralLabel`, `getSlug` e instancia para chamar `fields()`. Cada elemento de `fields()` é serializado se expor `getName()` + `getType()` (duck-typing — não depende de `arqel-dev/fields`).
+- `policies` — combina o que `HasPolicies::getPolicy()` declara (quando o Resource implementa o contract) com o resultado de `Gate::getPolicyFor($model)`.
+- `fields` (registry global) — `Arqel\Fields\FieldFactory::getRegisteredTypes()` quando o pacote `arqel-dev/fields` está instalado; lista vazia caso contrário.
+
 ## Resource generator interactivo (CLI-TUI-002)
 
 `arqel:resource` opera em dois modos:

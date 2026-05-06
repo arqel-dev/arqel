@@ -33,7 +33,7 @@ Paralelo a tudo acima: GOV-001 (SECURITY.md) e GOV-003 (CONTRIBUTING.md + DCO bo
 
 ## Planejamento completo
 
-**13 documentos** em `PLANNING/` (22.335 linhas, 328 tickets). Ler na ordem indicada:
+**14 documentos** em `PLANNING/`. Ler na ordem indicada:
 
 | Doc | Quando consultar |
 |---|---|
@@ -50,6 +50,7 @@ Paralelo a tudo acima: GOV-001 (SECURITY.md) e GOV-003 (CONTRIBUTING.md + DCO bo
 | `10-fase-3-avancadas.md` | Fase 3 — 70 tickets (futuro) |
 | `11-fase-4-ecossistema.md` | Fase 4 — 45 tickets (futuro) |
 | `12-processos-qa.md` | **Sempre consultar** — CI/CD, testes, release, governança |
+| `13-pos-mvp-mcp-server.md` | Iniciativa pós-MVP — MCP Server oficial (`@arqel-dev/mcp-server`), 8 tickets MCP-001..MCP-008 |
 
 **Regra crítica:** Se houver conflito entre `CLAUDE.md` e `PLANNING/`, **`PLANNING/` vence** (é a fonte canônica).
 

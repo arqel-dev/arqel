@@ -155,28 +155,46 @@ final class Form
      */
     public function toArray(): array
     {
-        $schema = [];
-        foreach ($this->schema as $item) {
-            if ($item instanceof Field) {
-                $schema[] = [
-                    'kind' => 'field',
-                    'name' => $item->getName(),
-                    'type' => $item->getType(),
-                ];
-            } elseif ($item instanceof Component) {
-                $schema[] = [
-                    'kind' => 'layout',
-                    ...$item->toArray(),
-                ];
-            }
-        }
-
         return [
-            'schema' => $schema,
+            'schema' => $this->serializeSchema($this->schema),
             'columns' => $this->columns,
             'model' => $this->model,
             'inline' => $this->inline,
             'disabled' => $this->disabled,
         ];
+    }
+
+    /**
+     * Recursively serialise a schema array (top-level or component
+     * children). Components emit `entry.schema` populated with their
+     * children; `Component::toArray()` itself remains "without
+     * descending the schema" — Form descends, Component only emits
+     * its own props.
+     *
+     * @param array<int, Component|Field> $items
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeSchema(array $items): array
+    {
+        $entries = [];
+
+        foreach ($items as $item) {
+            if ($item instanceof Field) {
+                $entries[] = [
+                    'kind' => 'field',
+                    'name' => $item->getName(),
+                    'type' => $item->getType(),
+                ];
+            } elseif ($item instanceof Component) {
+                $entries[] = [
+                    'kind' => 'layout',
+                    ...$item->toArray(),
+                    'schema' => $this->serializeSchema($item->getSchema()),
+                ];
+            }
+        }
+
+        return $entries;
     }
 }

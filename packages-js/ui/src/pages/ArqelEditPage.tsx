@@ -43,7 +43,8 @@ export default function ArqelEditPage<TRecord extends RecordType = RecordType>()
     e.preventDefault();
     const id = String((record as { id?: string | number } | undefined)?.id ?? '');
     const slug = props.resource?.slug ?? '';
-    router.put(`/${slug}/${id}`, form.data as Record<string, never>, {
+    const basePath = props.resource?.panelPath ?? '/admin';
+    router.put(`${basePath}/${slug}/${id}`, form.data as Record<string, never>, {
       preserveScroll: true,
     });
   };

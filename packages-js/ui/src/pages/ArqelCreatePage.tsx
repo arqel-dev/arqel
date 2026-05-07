@@ -43,7 +43,8 @@ export default function ArqelCreatePage(): JSX.Element {
   const submit = (e: FormEvent): void => {
     e.preventDefault();
     const slug = props.resource?.slug ?? '';
-    router.post(`/${slug}`, form.data as Record<string, never>, {
+    const basePath = props.resource?.panelPath ?? '/admin';
+    router.post(`${basePath}/${slug}`, form.data as Record<string, never>, {
       preserveScroll: true,
     });
   };

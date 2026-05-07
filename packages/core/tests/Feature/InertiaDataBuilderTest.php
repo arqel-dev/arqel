@@ -161,3 +161,19 @@ it('delegates field serialisation to FieldSchemaSerializer', function (): void {
         ->and($data['fields'][1]['name'])->toBe('created_at')
         ->and($data['fields'][1]['type'])->toBe('datetime');
 });
+
+it('resourceMeta includes panelPath defaulting to /admin when no panel is registered', function (): void {
+    $resource = new UserResource;
+    $data = $this->builder->buildCreateData($resource, new Request);
+
+    expect($data['resource']['panelPath'])->toBe('/admin');
+});
+
+it('resourceMeta panelPath honours custom arqel.path config', function (): void {
+    config()->set('arqel.path', 'dashboard');
+
+    $resource = new UserResource;
+    $data = $this->builder->buildCreateData($resource, new Request);
+
+    expect($data['resource']['panelPath'])->toBe('/dashboard');
+});

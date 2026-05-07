@@ -85,6 +85,9 @@ it('serialises fields and layout components with their kind', function (): void 
                 'component' => 'StubLayout',
                 'columnSpan' => 1,
                 'props' => ['label' => 'Personal', 'count' => 1],
+                'schema' => [
+                    ['kind' => 'field', 'name' => 'email', 'type' => 'text'],
+                ],
             ],
         ]);
 });

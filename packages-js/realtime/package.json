@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/realtime",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Laravel Echo + Reverb setup helper para Arqel — bootstrap WebSocket realtime pipeline.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

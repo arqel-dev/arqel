@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/a11y",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Accessibility helpers (focus trap, announcer, skip link) for Arqel admin panels.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

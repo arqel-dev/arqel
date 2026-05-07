@@ -11,6 +11,16 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.9.3] - 2026-05-07
+
+### Fixed
+
+- **actions:** stock factories (edit/delete/view/restore/deleteBulk) now serialise with conventional URLs + methods when used inside a Resource (BUG-VAL-010 part 1)
+- **core:** `InertiaDataBuilder::serializeMany` propagates the Resource to per-action serialisation
+- **core:** new `POST admin/{resource}/bulk/{action}` route + `ResourceController::bulkAction` method dispatches bulk actions over selected records (BUG-VAL-010 part 2)
+
+---
+
 ## [0.9.2] - 2026-05-07
 
 ### Fixed

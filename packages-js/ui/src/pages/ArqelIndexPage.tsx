@@ -43,8 +43,8 @@ interface VisitParams {
   filters: Record<string, FilterValue>;
   search: string;
   sort?: { column: string | null; direction: string | null } | null;
-  page?: number;
-  perPage?: number;
+  page?: number | undefined;
+  perPage?: number | undefined;
 }
 
 function buildQuery(params: VisitParams): Record<string, unknown> {
@@ -78,6 +78,7 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
 
   const [filterValues, setFilterValues] = useState<Record<string, FilterValue>>(initialFilters);
   const [searchValue, setSearchValue] = useState<string>(props.search ?? '');
+  const [perPage, setPerPage] = useState<number | undefined>(props.pagination?.perPage);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const visit = (data: Record<string, unknown>): void => {
@@ -99,19 +100,19 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
       nextFilters[name] = value;
     }
     setFilterValues(nextFilters);
-    visit(buildQuery({ filters: nextFilters, search: searchValue, sort: currentSort }));
+    visit(buildQuery({ filters: nextFilters, search: searchValue, sort: currentSort, perPage }));
   };
 
   const handleClearFilters = (): void => {
     setFilterValues({});
-    visit(buildQuery({ filters: {}, search: searchValue, sort: currentSort }));
+    visit(buildQuery({ filters: {}, search: searchValue, sort: currentSort, perPage }));
   };
 
   const handleSearchChange = (value: string): void => {
     setSearchValue(value);
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     searchDebounceRef.current = setTimeout(() => {
-      visit(buildQuery({ filters: filterValues, search: value, sort: currentSort }));
+      visit(buildQuery({ filters: filterValues, search: value, sort: currentSort, perPage }));
     }, 300);
   };
 
@@ -128,6 +129,7 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
         filters: filterValues,
         search: searchValue,
         sort: { column, direction },
+        perPage,
       }),
     );
   };
@@ -139,17 +141,19 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
         search: searchValue,
         sort: currentSort,
         page: pageNum,
+        perPage,
       }),
     );
   };
 
-  const handlePerPageChange = (perPage: number): void => {
+  const handlePerPageChange = (newPerPage: number): void => {
+    setPerPage(newPerPage);
     visit(
       buildQuery({
         filters: filterValues,
         search: searchValue,
         sort: currentSort,
-        perPage,
+        perPage: newPerPage,
       }),
     );
   };

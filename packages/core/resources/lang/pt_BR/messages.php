@@ -22,6 +22,9 @@ return [
         'updated' => 'Registro atualizado.',
         'deleted' => 'Registro excluído.',
         'restored' => 'Registro restaurado.',
+        'no_selection' => 'Nenhum registro selecionado.',
+        'bulk_completed' => 'Ação em massa concluída.',
+        'bulk_action_no_callback' => "A ação em massa ':action' não tem callback.",
     ],
     'errors' => [
         'forbidden' => 'Você não tem permissão para executar esta ação.',

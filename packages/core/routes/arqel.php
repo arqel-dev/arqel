@@ -59,4 +59,12 @@ Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
         ->name('destroy')
         ->where('resource', $reservedSlugs)
         ->where('id', '[0-9a-zA-Z\-_]+');
+
+    // Bulk action dispatch (BUG-VAL-010). The React side POSTs the
+    // selected `record_ids` to this endpoint; the controller resolves
+    // the BulkAction by name on the resource's table and executes it.
+    Route::post('{resource}/bulk/{action}', [ResourceController::class, 'bulkAction'])
+        ->name('bulk')
+        ->where('resource', $reservedSlugs)
+        ->where('action', '[a-z][a-z0-9_-]*');
 });

@@ -73,7 +73,7 @@ function buildQuery(params: VisitParams): Record<string, unknown> {
   const data: Record<string, unknown> = {};
   const filters = pruneEmptyFilters(params.filters);
   if (Object.keys(filters).length > 0) data['filter'] = filters;
-  if (params.search) data['search'] = params.search;
+  if (params.search !== undefined) data['search'] = params.search;
   if (params.sort?.column) {
     data['sort'] = params.sort.column;
     if (params.sort.direction) data['direction'] = params.sort.direction;

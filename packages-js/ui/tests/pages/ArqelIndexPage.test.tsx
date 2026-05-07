@@ -271,3 +271,26 @@ describe('ArqelIndexPage — bulk actions render after selection', () => {
     expect(bulkBtn).toBeInTheDocument();
   });
 });
+
+describe('ArqelIndexPage — clearing search emits empty string', () => {
+  it('emits search="" (not undefined) when input is cleared', async () => {
+    const props = makeProps({ search: 'foo' });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    render(<ArqelIndexPage />);
+
+    const searchInput = screen.getByPlaceholderText(/search posts/i) as HTMLInputElement;
+    expect(searchInput.value).toBe('foo');
+    fireEvent.change(searchInput, { target: { value: '' } });
+
+    await waitFor(() => {
+      expect(routerGetSpy).toHaveBeenCalled();
+    });
+
+    const lastCall = routerGetSpy.mock.calls[routerGetSpy.mock.calls.length - 1];
+    expect(lastCall).toBeDefined();
+    const [, data] = lastCall as [string, Record<string, unknown>, unknown];
+
+    expect(data['search']).toBe('');
+  });
+});

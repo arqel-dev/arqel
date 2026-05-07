@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/hooks",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Reusable React hooks for Arqel admin panels.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

@@ -11,6 +11,23 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.9.1] - 2026-05-06
+
+Patch release publicando os fixes do walkthrough e2e validados em #3.
+
+### Fixed
+
+- **`arqel-dev/table`**: filtros agora são serializados como `filter[name]=value` no query string via `TableQueryBuilder`, alinhando com o contrato esperado pelo backend.
+- **`arqel-dev/core`**: `deriveColumnsFromFields` emite a shape canônica completa de `ColumnBase` (incluindo derivação a partir de fields no formato array).
+- **`arqel-dev/auth`**: `HandleArqelInertiaRequests` middleware agora é wired nas rotas de auth bundled.
+- **`@arqel-dev/ui`**: `ArqelIndexPage` wired ao Inertia router para filters/search/sort/pagination; normalização de options em `SelectFilter`.
+
+### Changed
+
+- **Versionamento coordenado:** todos os pacotes públicos (`packages-js/*` e `packages/*`) bumpados de `0.9.0` para `0.9.1`.
+
+---
+
 ## [0.9.0] - 2026-05-06
 
 Primeiro release pós-MVP. Bump coordenado de todos os pacotes (`packages-js/*` e `packages/*`) para `0.9.0` para acompanhar a entrada do `@arqel-dev/mcp-server` no ecossistema.

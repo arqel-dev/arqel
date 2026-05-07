@@ -11,6 +11,17 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.9.2] - 2026-05-07
+
+### Fixed
+
+- **ui:** preserve `perPage` across pagination/filter/search handlers (BUG-VAL-001)
+- **ui:** map server `actions.row` to `rowActions` render-prop via `<ActionMenu>` (BUG-VAL-002)
+- **ui:** map server `actions.bulk` to toolbar bulk actions + selection state (BUG-VAL-003)
+- **ui:** emit empty search param to clear the server-side filter (BUG-VAL-004)
+
+---
+
 ## [0.9.1] - 2026-05-06
 
 Patch release publicando os fixes do walkthrough e2e validados em #3.

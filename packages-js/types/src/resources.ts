@@ -30,6 +30,15 @@ export interface ResourceMeta {
   pluralLabel: string;
   navigationIcon: string | null;
   navigationGroup: string | null;
+  /**
+   * Panel base path (leading slash, no trailing). Server emits this
+   * via `InertiaDataBuilder::resolvePanelPath`. Edit/Create pages
+   * use it to construct absolute submit URLs.
+   *
+   * Optional for backwards compatibility with v0.9.x payloads that
+   * predate this field.
+   */
+  panelPath?: string;
 }
 
 /**

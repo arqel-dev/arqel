@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Core\Support;
 
 use ArgumentCountError;
+use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\Resource;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -355,7 +356,25 @@ final class InertiaDataBuilder
             'pluralLabel' => $class::getPluralLabel(),
             'navigationIcon' => $class::getNavigationIcon(),
             'navigationGroup' => $class::getNavigationGroup(),
+            'panelPath' => $this->resolvePanelPath(),
         ];
+    }
+
+    /**
+     * Mirror of `ArqelServiceProvider::registerResourceRoutes` panel
+     * path resolution, exposed in the Inertia payload so client-side
+     * pages (Edit, Create) construct absolute URLs without hardcoding
+     * `/admin`.
+     *
+     * Returns a leading-slash, no-trailing-slash form (e.g. `/admin`).
+     */
+    private function resolvePanelPath(): string
+    {
+        $panel = app(PanelRegistry::class)->getCurrent();
+        $configPath = config('arqel.path', 'admin');
+        $rawPath = $panel?->getPath() ?? (is_string($configPath) ? $configPath : 'admin');
+
+        return '/'.trim($rawPath, '/');
     }
 
     /**

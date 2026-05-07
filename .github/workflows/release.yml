@@ -69,32 +69,33 @@ jobs:
           echo "Resolved: tag=$tag version=$version dry_run=$dry"
 
   split-php:
-    name: Split PHP — ${{ matrix.package }}
+    name: Split PHP — ${{ matrix.name }}
     needs: resolve
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        package:
-          - actions
-          - ai
-          - audit
-          - auth
-          - cli
-          - core
-          - export
-          - fields
-          - fields-advanced
-          - form
-          - marketplace
-          - mcp
-          - nav
-          - realtime
-          - table
-          - tenant
-          - versioning
-          - widgets
-          - workflow
+        include:
+          - { name: actions, path: packages/actions }
+          - { name: ai, path: packages/ai }
+          - { name: audit, path: packages/audit }
+          - { name: auth, path: packages/auth }
+          - { name: cli, path: packages/cli }
+          - { name: core, path: packages/core }
+          - { name: export, path: packages/export }
+          - { name: fields, path: packages/fields }
+          - { name: fields-advanced, path: packages/fields-advanced }
+          - { name: form, path: packages/form }
+          - { name: marketplace, path: packages/marketplace }
+          - { name: mcp, path: packages/mcp }
+          - { name: nav, path: packages/nav }
+          - { name: realtime, path: packages/realtime }
+          - { name: table, path: packages/table }
+          - { name: tenant, path: packages/tenant }
+          - { name: versioning, path: packages/versioning }
+          - { name: widgets, path: packages/widgets }
+          - { name: workflow, path: packages/workflow }
+          - { name: framework, path: packages/arqel }
     steps:
       - name: Checkout monorepo (full history)
         uses: actions/checkout@v6
@@ -115,47 +116,48 @@ jobs:
       - name: Ensure sub-repo exists (auto-create if missing)
         env:
           GH_TOKEN: ${{ secrets.ARQEL_BOT_TOKEN }}
-          PKG: ${{ matrix.package }}
+          PKG_NAME: ${{ matrix.name }}
         run: |
-          if ! gh repo view "$GH_ORG/$PKG" >/dev/null 2>&1; then
-            echo "Creating $GH_ORG/$PKG"
-            gh repo create "$GH_ORG/$PKG" \
+          if ! gh repo view "$GH_ORG/$PKG_NAME" >/dev/null 2>&1; then
+            echo "Creating $GH_ORG/$PKG_NAME"
+            gh repo create "$GH_ORG/$PKG_NAME" \
               --public \
-              --description "Subtree split of arqel-dev/$PKG (read-only — open issues/PRs in arqel-dev/arqel)" \
+              --description "Subtree split of arqel-dev/$PKG_NAME (read-only — open issues/PRs in arqel-dev/arqel)" \
               --homepage "https://arqel.dev"
           else
-            echo "Repo $GH_ORG/$PKG already exists"
+            echo "Repo $GH_ORG/$PKG_NAME already exists"
           fi
 
       - name: Compute split SHA
         id: split
         env:
-          PKG: ${{ matrix.package }}
+          PKG_NAME: ${{ matrix.name }}
+          PKG_PATH: ${{ matrix.path }}
         run: |
-          sha="$(splitsh-lite --prefix="packages/$PKG" --quiet)"
+          sha="$(splitsh-lite --prefix="$PKG_PATH" --quiet)"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-          echo "Split SHA for packages/$PKG → $sha"
+          echo "Split SHA for $PKG_PATH → $sha"
 
       - name: Push split to sub-repo
         if: needs.resolve.outputs.dry_run != 'true'
         env:
-          PKG: ${{ matrix.package }}
+          PKG_NAME: ${{ matrix.name }}
           SHA: ${{ steps.split.outputs.sha }}
           TAG: ${{ needs.resolve.outputs.tag }}
           GH_TOKEN: ${{ secrets.ARQEL_BOT_TOKEN }}
         run: |
-          remote="https://x-access-token:$GH_TOKEN@github.com/$GH_ORG/$PKG.git"
+          remote="https://x-access-token:$GH_TOKEN@github.com/$GH_ORG/$PKG_NAME.git"
           git push "$remote" "$SHA:refs/heads/main" --force
           git push "$remote" "$SHA:refs/tags/$TAG" --force
 
       - name: Dry-run summary
         if: needs.resolve.outputs.dry_run == 'true'
         env:
-          PKG: ${{ matrix.package }}
+          PKG_NAME: ${{ matrix.name }}
           SHA: ${{ steps.split.outputs.sha }}
           TAG: ${{ needs.resolve.outputs.tag }}
         run: |
-          echo "DRY RUN: would push $SHA -> $GH_ORG/$PKG main + tag $TAG"
+          echo "DRY RUN: would push $SHA -> $GH_ORG/$PKG_NAME main + tag $TAG"
 
   publish-npm:
     name: Publish npm packages

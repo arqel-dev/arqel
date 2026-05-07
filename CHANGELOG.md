@@ -11,6 +11,24 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.10.0] - 2026-05-07
+
+### Added
+
+- **types:** `ResourceMeta.panelPath` (optional) emitted by `InertiaDataBuilder::resourceMeta`. Mirrors the panel path resolution from `ArqelServiceProvider::registerResourceRoutes` (current panel → `arqel.path` config → `admin` default).
+
+### Fixed
+
+- **release:** `.github/workflows/release.yml` matrix converts string list to `include` objects with `name` + `path`, so the `framework` metapackage (sourced from `packages/arqel/`) is split alongside the 19 sub-packages. Eliminates the manual subtree split workaround used in every v0.9.x tag.
+- **form:** `Form::toArray` now recursively serialises layout component schemas, so Section/Fieldset/Tabs entries emit `entry.schema` populated with their child entries. Edit/Create forms previously rendered Section headers with no inputs.
+- **ui:** `ArqelEditPage` and `ArqelCreatePage` build absolute URLs from `props.resource.panelPath` instead of relative `/${slug}/...`. Save now works in apps with custom panel paths.
+
+### Changed
+
+- **form:** `Form::toArray` body refactored to use a private recursive helper. `Component::toArray()` continues to emit only its own props ("without descending the schema") — `Form` descends.
+
+---
+
 ## [0.9.4] - 2026-05-07
 
 ### Fixed

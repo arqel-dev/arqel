@@ -12,7 +12,7 @@ import type {
   ResourceMeta,
 } from '@arqel-dev/types/resources';
 import type { ColumnSchema, FilterSchema, TableSort } from '@arqel-dev/types/tables';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ArqelIndexPage from '../../src/pages/ArqelIndexPage.js';
@@ -83,6 +83,17 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+function makeTextFilter(name: string, label: string): FilterSchema {
+  return {
+    type: 'text',
+    name,
+    label,
+    persist: false,
+    default: null,
+    props: {},
+  };
+}
+
 describe('ArqelIndexPage — pagination preserves perPage', () => {
   it('emits visit with both ?page and ?per_page when handlePageChange runs after handlePerPageChange', async () => {
     const props = makeProps({
@@ -107,5 +118,60 @@ describe('ArqelIndexPage — pagination preserves perPage', () => {
 
     expect(data['page']).toBe(2);
     expect(data['per_page']).toBe(10);
+  });
+});
+
+describe('ArqelIndexPage — filter change preserves perPage', () => {
+  it('emits visit including ?per_page when a filter changes after perPage was set', async () => {
+    const props = makeProps({
+      pagination: { currentPage: 1, perPage: 25, lastPage: 1, total: 5 },
+      filters: [makeTextFilter('title', 'Title')],
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    const { container } = render(<ArqelIndexPage />);
+
+    await user.selectOptions(container.querySelector('select') as HTMLSelectElement, '10');
+
+    const titleInput = screen.getByLabelText(/title/i) as HTMLInputElement;
+    await user.type(titleInput, 'foo');
+
+    const lastCall = routerGetSpy.mock.calls[routerGetSpy.mock.calls.length - 1];
+    expect(lastCall).toBeDefined();
+    const [, data] = lastCall as [string, Record<string, unknown>, unknown];
+
+    expect(data['per_page']).toBe(10);
+    expect(data['filter']).toMatchObject({ title: 'foo' });
+  });
+});
+
+describe('ArqelIndexPage — search change preserves perPage', () => {
+  it('emits debounced visit including ?per_page after search input', async () => {
+    const props = makeProps({
+      pagination: { currentPage: 1, perPage: 25, lastPage: 1, total: 5 },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    const { container } = render(<ArqelIndexPage />);
+
+    await user.selectOptions(container.querySelector('select') as HTMLSelectElement, '10');
+
+    const searchInput = screen.getByPlaceholderText(/search posts/i) as HTMLInputElement;
+    fireEvent.change(searchInput, { target: { value: 'hello' } });
+
+    await waitFor(() => {
+      const calls = routerGetSpy.mock.calls;
+      const last = calls[calls.length - 1];
+      expect(last).toBeDefined();
+      const [, data] = last as [string, Record<string, unknown>, unknown];
+      expect(data['search']).toBe('hello');
+    });
+
+    const lastCall = routerGetSpy.mock.calls[routerGetSpy.mock.calls.length - 1];
+    const [, data] = lastCall as [string, Record<string, unknown>, unknown];
+    expect(data['per_page']).toBe(10);
+    expect(data['search']).toBe('hello');
   });
 });

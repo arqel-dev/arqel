@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/widgets",
-    "version": "0.9.3",
+    "version": "0.9.4",
     "description": "Dashboard widgets for Arqel — Stat/Chart/Table/Custom widgets with deferred loading and polling.",
     "type": "library",
     "license": "MIT",

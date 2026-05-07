@@ -11,6 +11,14 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.9.4] - 2026-05-07
+
+### Fixed
+
+- **actions:** row stock URLs now emit `{id}` placeholder when serialised at table level (record=null); frontend substitutes per-row at click time. Fixes regression in v0.9.3 where row Edit/Delete dispatched to a 404.
+
+---
+
 ## [0.9.3] - 2026-05-07
 
 ### Fixed

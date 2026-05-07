@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/export",
-    "version": "0.9.3",
+    "version": "0.9.4",
     "description": "Export pipeline for Arqel — CSV/XLSX/PDF exporters and the ExportAction bulk action.",
     "type": "library",
     "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/theme",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Tokens semânticos + dark-mode + ThemeProvider/ThemeToggle para painéis Arqel.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

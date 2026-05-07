@@ -5,7 +5,17 @@
 
 ## 🎯 Ticket corrente
 
-**Pós-tag QoL polish (Batches #27..#55): i18n (en + pt_BR) + LocaleSwitcher + dark-mode/theme tokens + a11y helpers + audit guide. 3 novos pacotes JS: @arqel-dev/i18n, @arqel-dev/theme, @arqel-dev/a11y. Total ≈ 269 core (+16 i18n) + 181 ai + 70 auth + 74 realtime + 67 workflow PHP + 58 versioning PHP + 84 cli + 163 marketplace + 39 marketplace app + 10 demo app + 17 workflow JS + 19 realtime JS + 56 ai JS + 17 versioning JS + 69 devtools-extension + 52 react + 25 auth JS + 22 cli-ink + 15 realtime-collab JS + 3 demo JS + 12 i18n JS + 27 theme JS + 18 a11y JS = ~1.371 testes diretos.** Próximo: ship tag manual `git tag -s v0.8.0-rc.1` (todos critérios atingidos), comunicar release em GitHub Discussions/Discord.
+**v0.9.2 UI hotfix sprint** — bloqueante de Fase 2 do roadmap. Validação externa contra Packagist real (relatório em `docs/superpowers/reports/2026-05-06-e2e-validation-report.md`) expôs 3 P0 reproduzíveis em primeiro contacto:
+
+- **BUG-VAL-001** — paginação não navega (provável wiring `onPageChange` quebrado em `<ResourceIndex>`)
+- **BUG-VAL-002** — row actions (Edit, Delete) declaradas em `Table::actions([...])` não renderizam botões na lista
+- **BUG-VAL-003** — bulk action button não aparece após selecionar rows
+
+P1 paralelo: **BUG-VAL-004** (clear search não restaura), **BUG-VAL-007** (release pipeline omite framework metapackage da matrix).
+
+Backlog não-bloqueante: BUG-VAL-005 (resource auto-discovery vestigial), BUG-VAL-006 (widget API absente apesar de install criar a pasta), BUG-VAL-008 (doctor false positive auth), BUG-VAL-009 (peer deps `@inertiajs/react` 2.x vs 3.x).
+
+Fluxo: hotfix UI → bump v0.9.2 → re-rodar Fase 1-4 do plano `docs/superpowers/plans/2026-05-06-external-validation-mcp-integration.md` no `~/PhpstormProjects/arqel-test/` → relatório de re-validação → só então abrir Fase 2 do roadmap.
 
 **Fase:** 1 (MVP)
 

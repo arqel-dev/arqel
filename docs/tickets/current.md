@@ -5,17 +5,25 @@
 
 ## 🎯 Ticket corrente
 
-**v0.9.2 UI hotfix sprint** — bloqueante de Fase 2 do roadmap. Validação externa contra Packagist real (relatório em `docs/superpowers/reports/2026-05-06-e2e-validation-report.md`) expôs 3 P0 reproduzíveis em primeiro contacto:
+**Fase 2 do roadmap inicial — sprint dedicada (v0.10.0)**. Quatro hotfixes táticos (v0.9.1 → v0.9.2 → v0.9.3 → v0.9.4) corrigiram 3/4 BUG-VAL bloqueantes mas o último walkthrough revelou 2 bugs novos no caminho de write (create/edit forms). Relatório consolidado em `docs/superpowers/reports/2026-05-07-e2e-revalidation-v0.9.x-consolidated-report.md`.
 
-- **BUG-VAL-001** — paginação não navega (provável wiring `onPageChange` quebrado em `<ResourceIndex>`)
-- **BUG-VAL-002** — row actions (Edit, Delete) declaradas em `Table::actions([...])` não renderizam botões na lista
-- **BUG-VAL-003** — bulk action button não aparece após selecionar rows
+**Bloqueantes Fase 2 (devem ser resolvidos antes de qualquer feature nova):**
 
-P1 paralelo: **BUG-VAL-004** (clear search não restaura), **BUG-VAL-007** (release pipeline omite framework metapackage da matrix).
+- **BUG-VAL-007** — release pipeline `release.yml` matrix omite o meta-package `framework` (insustentável; usado workaround manual em todas as 4 releases v0.9.1-0.9.4). Tag obrigatória.
+- **BUG-VAL-011** — `Section::schema([...])` não emite children no payload Inertia. `<FormRenderer>` walka schema vazio → form de edit/create renderiza Section headers sem inputs.
+- **BUG-VAL-012** — `ArqelEditPage.tsx:46` e `ArqelCreatePage.tsx:46` fazem `router.put('/{slug}/{id}')` / `router.post('/{slug}')` sem panel prefix `/admin/`. Save retorna 404.
+- **E2E smoke set** — adicionar Playwright (ou Inertia full-stack assertions) cobrindo: login, list, filter, sort, page, search, bulk delete, **row delete**, **edit form render + save**, **create form render + save**. Sem isto, próxima cadeia repete.
 
-Backlog não-bloqueante: BUG-VAL-005 (resource auto-discovery vestigial), BUG-VAL-006 (widget API absente apesar de install criar a pasta), BUG-VAL-008 (doctor false positive auth), BUG-VAL-009 (peer deps `@inertiajs/react` 2.x vs 3.x).
+**Backlog Fase 2 não-bloqueante:**
 
-Fluxo: hotfix UI → bump v0.9.2 → re-rodar Fase 1-4 do plano `docs/superpowers/plans/2026-05-06-external-validation-mcp-integration.md` no `~/PhpstormProjects/arqel-test/` → relatório de re-validação → só então abrir Fase 2 do roadmap.
+- BUG-VAL-005 — resource auto-discovery vestigial (`config/arqel.php` advertises `resources.path` mas `ResourceRegistry::discover()` nunca é chamado; user-land deve registar via `PanelRegistry::resources([...])`)
+- BUG-VAL-006 — widget API ausente (`arqel:install` cria `app/Arqel/Widgets/` mas nenhum base class shipped)
+- BUG-VAL-008 — `arqel:doctor` reporta "no auth starter kit detected" mesmo quando Arqel ships login route próprio
+- BUG-VAL-009 — peer deps `@inertiajs/react@^2.0.0` em pacotes JS, instalado é 3.1.0
+
+**Lição metodológica:** os testes feature do monorepo (`apps/demo`) passam mas não exercitam a UI. Vitest cobre só `ArqelIndexPage`. Cada camada (render → URL → placeholder → form schema) falhou no primeiro contacto externo. **E2E é blocker.**
+
+Tag prevista: `v0.10.0` (minor por scope, não patch).
 
 **Fase:** 1 (MVP)
 

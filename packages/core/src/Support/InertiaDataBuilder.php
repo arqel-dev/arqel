@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Support;
 
+use ArgumentCountError;
 use Arqel\Core\Resources\Resource;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -203,9 +204,9 @@ final class InertiaDataBuilder
             'columns' => $this->serializeMany($this->callTableArray($table, 'getColumns')),
             'filters' => $this->serializeMany($this->callTableArray($table, 'getFilters')),
             'actions' => [
-                'row' => $this->serializeMany($rowActions, $user),
-                'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions'), $user),
-                'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions'), $user),
+                'row' => $this->serializeMany($rowActions, $user, $resource),
+                'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions'), $user, $resource),
+                'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions'), $user, $resource),
             ],
             'search' => $request->input('search'),
             'sort' => [
@@ -434,7 +435,7 @@ final class InertiaDataBuilder
      *
      * @return list<array<string, mixed>>
      */
-    private function serializeMany(array $items, ?Authenticatable $user = null): array
+    private function serializeMany(array $items, ?Authenticatable $user = null, ?Resource $resource = null): array
     {
         $serialized = [];
         foreach ($items as $item) {
@@ -442,7 +443,7 @@ final class InertiaDataBuilder
                 continue;
             }
 
-            $payload = $this->callToArray($item, $user);
+            $payload = $this->callToArray($item, $user, $resource);
             if (is_array($payload)) {
                 $clean = [];
                 foreach ($payload as $key => $value) {
@@ -465,24 +466,32 @@ final class InertiaDataBuilder
      * so the dynamic dispatch is safe — PHPStan can't see that
      * across the call boundary, hence the explicit phpstan-ignore.
      */
-    private function callToArray(object $item, ?Authenticatable $user): mixed
+    private function callToArray(object $item, ?Authenticatable $user, ?Resource $resource = null): mixed
     {
-        if ($user === null) {
-            return $item->toArray(); // @phpstan-ignore method.notFound
-        }
-
         try {
             $reflection = new ReflectionMethod($item, 'toArray');
             $params = $reflection->getNumberOfParameters();
         } catch (ReflectionException) {
-            return $item->toArray(); // @phpstan-ignore method.notFound
+            return $item->toArray();
         }
 
-        if ($params >= 1) {
-            return $item->toArray($user); // @phpstan-ignore method.notFound
-        }
+        // Action::toArray($user, $record, $resource). Forward resource
+        // for action-shaped objects (3+ params); fall back gracefully
+        // for column/filter objects with fewer params. Wrapped in a
+        // try/catch for any duck-typed object that hasn't yet adopted
+        // the 3-arg signature.
+        try {
+            if ($params >= 3) {
+                return $item->toArray($user, null, $resource);
+            }
+            if ($params >= 1) {
+                return $item->toArray($user);
+            }
 
-        return $item->toArray(); // @phpstan-ignore method.notFound
+            return $item->toArray();
+        } catch (ArgumentCountError) {
+            return $item->toArray();
+        }
     }
 
     /**

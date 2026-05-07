@@ -283,10 +283,29 @@ abstract class Action
     /**
      * Serialise the action for the Inertia payload.
      *
+     * The optional `$resource` parameter is duck-typed (`?object`)
+     * to avoid an `arqel-dev/actions` ↔ `arqel-dev/core` cycle. When
+     * supplied and the action declared neither `->url()` nor
+     * `->action()`, `resolveStockUrl()` emits a conventional URL
+     * for the 5 stock verbs (view/edit/delete/restore + bulk delete).
+     *
      * @return array<string, mixed>
      */
-    public function toArray(?Authenticatable $user = null, mixed $record = null): array
-    {
+    public function toArray(
+        ?Authenticatable $user = null,
+        mixed $record = null,
+        ?object $resource = null,
+    ): array {
+        $url = $this->resolveUrl($record);
+        $method = $this->method;
+
+        if ($url === null && ! $this->hasCallback() && $resource !== null) {
+            $stock = $this->resolveStockUrl($resource, $record);
+            if ($stock !== null) {
+                [$url, $method] = $stock;
+            }
+        }
+
         return array_filter([
             'name' => $this->name,
             'type' => $this->type,
@@ -294,8 +313,8 @@ abstract class Action
             'icon' => $this->icon,
             'color' => $this->color,
             'variant' => $this->variant,
-            'method' => $this->method,
-            'url' => $this->resolveUrl($record),
+            'method' => $method,
+            'url' => $url,
             'tooltip' => $this->tooltip,
             'disabled' => $this->isDisabledFor($record) ?: null,
             'requiresConfirmation' => $this->isRequiringConfirmation() ?: null,
@@ -305,5 +324,39 @@ abstract class Action
             'successNotification' => $this->successNotification,
             'failureNotification' => $this->failureNotification,
         ], fn ($v) => $v !== null);
+    }
+
+    /**
+     * Resolve a conventional URL + HTTP method for a stock action
+     * (one of view/edit/delete/restore as row, or delete as bulk)
+     * when the user-land action has not specified them explicitly.
+     *
+     * Returns `null` when the resource has no slug, when a row-level
+     * stock verb has no record key available, or when the action
+     * name does not match any stock verb.
+     *
+     * @return array{0: string, 1: string}|null
+     */
+    private function resolveStockUrl(object $resource, mixed $record): ?array
+    {
+        $slug = $resource::$slug ?? null;
+        if (! is_string($slug) || $slug === '') {
+            return null;
+        }
+
+        $id = is_object($record) && method_exists($record, 'getKey')
+            ? $record->getKey()
+            : null;
+
+        $idString = is_scalar($id) ? (string) $id : null;
+
+        return match ([$this->type, $this->name]) {
+            ['row', 'view'] => $idString !== null ? ["/admin/{$slug}/{$idString}", 'GET'] : null,
+            ['row', 'edit'] => $idString !== null ? ["/admin/{$slug}/{$idString}/edit", 'GET'] : null,
+            ['row', 'delete'] => $idString !== null ? ["/admin/{$slug}/{$idString}", 'DELETE'] : null,
+            ['row', 'restore'] => $idString !== null ? ["/admin/{$slug}/{$idString}/restore", 'POST'] : null,
+            ['bulk', 'delete'] => ["/admin/{$slug}/bulk/delete", 'POST'],
+            default => null,
+        };
     }
 }

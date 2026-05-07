@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/tenant",
-    "version": "0.9.3",
+    "version": "0.9.4",
     "description": "Multi-tenancy primitives for Arqel — TenantManager, resolver, scoped Eloquent traits, and adapters for stancl/tenancy + spatie/laravel-multitenancy.",
     "type": "library",
     "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/workflow",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "React components for Arqel Workflow — StateTransition pill, transitions list, history timeline.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

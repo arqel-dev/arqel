@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/mcp-server",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Official MCP (Model Context Protocol) server for Arqel — gives AI assistants access to Arqel docs, project introspection, and scaffolding.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

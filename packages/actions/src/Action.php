@@ -348,13 +348,13 @@ abstract class Action
             ? $record->getKey()
             : null;
 
-        $idString = is_scalar($id) ? (string) $id : null;
+        $idSegment = is_scalar($id) ? (string) $id : '{id}';
 
         return match ([$this->type, $this->name]) {
-            ['row', 'view'] => $idString !== null ? ["/admin/{$slug}/{$idString}", 'GET'] : null,
-            ['row', 'edit'] => $idString !== null ? ["/admin/{$slug}/{$idString}/edit", 'GET'] : null,
-            ['row', 'delete'] => $idString !== null ? ["/admin/{$slug}/{$idString}", 'DELETE'] : null,
-            ['row', 'restore'] => $idString !== null ? ["/admin/{$slug}/{$idString}/restore", 'POST'] : null,
+            ['row', 'view'] => ["/admin/{$slug}/{$idSegment}", 'GET'],
+            ['row', 'edit'] => ["/admin/{$slug}/{$idSegment}/edit", 'GET'],
+            ['row', 'delete'] => ["/admin/{$slug}/{$idSegment}", 'DELETE'],
+            ['row', 'restore'] => ["/admin/{$slug}/{$idSegment}/restore", 'POST'],
             ['bulk', 'delete'] => ["/admin/{$slug}/bulk/delete", 'POST'],
             default => null,
         };

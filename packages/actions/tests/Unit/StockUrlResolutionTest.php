@@ -73,3 +73,12 @@ it('Actions::edit()->toArray() without args remains backwards-compatible (no url
 
     expect($array)->not->toHaveKey('url');
 });
+
+it('Actions::edit() emits {id} placeholder when no record is provided (table-level serialisation)', function (): void {
+    $resource = new StubResourceWithSlug;
+
+    $array = Actions::edit()->toArray(null, null, $resource);
+
+    expect($array['url'])->toBe('/admin/posts/{id}/edit')
+        ->and($array['method'])->toBe('GET');
+});

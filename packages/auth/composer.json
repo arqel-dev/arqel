@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/auth",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "description": "Authorization layer for Arqel — wraps Laravel Policies + Gate with conveniences for Resources and panels.",
     "type": "library",
     "license": "MIT",

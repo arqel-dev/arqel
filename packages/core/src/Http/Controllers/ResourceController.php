@@ -123,6 +123,87 @@ final class ResourceController
             ->with('success', __('arqel::messages.flash.deleted'));
     }
 
+    /**
+     * Dispatch a bulk action (BUG-VAL-010). Looks up the action by
+     * name on the resource's table BulkAction list, authorises via
+     * Gate (`delete` ability for the stock delete fallback), then
+     * either invokes the user-defined callback or applies the stock
+     * `delete` semantics.
+     *
+     * The frontend POSTs `{ record_ids: [...] }` from the table's
+     * selection state. Empty selections short-circuit with a flash
+     * error rather than touching the DB.
+     */
+    public function bulkAction(Request $request, string $resource, string $action): RedirectResponse
+    {
+        $instance = $this->resolveOrFail($resource);
+        $modelClass = $instance::getModel();
+
+        $bulkAction = $this->findBulkAction($instance, $action);
+
+        if ($bulkAction === null) {
+            abort(HttpResponse::HTTP_NOT_FOUND);
+        }
+
+        // Stock delete uses the model-level `delete` ability; user-defined
+        // bulk actions get the same gate by default — finer-grained
+        // authorisation lives on Action::canBeExecutedBy (ACTIONS-005).
+        $this->authorize('delete', $modelClass);
+
+        $recordIds = $request->input('record_ids', []);
+        if (! is_array($recordIds) || $recordIds === []) {
+            return back()->with('error', __('arqel::messages.flash.no_selection'));
+        }
+
+        $records = $modelClass::query()->whereIn('id', $recordIds)->get();
+
+        $payload = $request->except(['_token', '_method', 'resource', 'action', 'record_ids']);
+        $data = [];
+        foreach ($payload as $key => $value) {
+            $data[(string) $key] = $value;
+        }
+
+        if (method_exists($bulkAction, 'hasCallback') && $bulkAction->hasCallback()) {
+            $bulkAction->execute($records, $data);
+        } elseif ($action === 'delete') {
+            $modelClass::query()->whereIn('id', $recordIds)->delete();
+        } else {
+            return back()->with('error', __('arqel::messages.flash.bulk_action_no_callback', ['action' => $action]));
+        }
+
+        return back()->with('success', __('arqel::messages.flash.bulk_completed'));
+    }
+
+    /**
+     * Walk the resource's table BulkAction list duck-typed (so this
+     * file keeps no hard dep on `arqel-dev/actions`). Returns null
+     * when the table or action is not found.
+     */
+    private function findBulkAction(Resource $instance, string $action): ?object
+    {
+        $table = $instance->table();
+        if (! is_object($table) || ! method_exists($table, 'getBulkActions')) {
+            return null;
+        }
+
+        $bulkActions = $table->getBulkActions();
+        if (! is_array($bulkActions)) {
+            return null;
+        }
+
+        foreach ($bulkActions as $candidate) {
+            if (! is_object($candidate) || ! method_exists($candidate, 'getName')) {
+                continue;
+            }
+
+            if ($candidate->getName() === $action) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
     private function resolveOrFail(string $slug): Resource
     {
         $class = $this->registry->findBySlug($slug);

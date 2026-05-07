@@ -22,6 +22,9 @@ return [
         'updated' => 'Record updated.',
         'deleted' => 'Record deleted.',
         'restored' => 'Record restored.',
+        'no_selection' => 'No records selected.',
+        'bulk_completed' => 'Bulk action completed.',
+        'bulk_action_no_callback' => "Bulk action ':action' has no callback.",
     ],
     'errors' => [
         'forbidden' => 'You are not authorized to perform this action.',

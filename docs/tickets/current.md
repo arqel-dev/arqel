@@ -5,25 +5,30 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 2 do roadmap inicial — sprint dedicada (v0.10.0)**. Quatro hotfixes táticos (v0.9.1 → v0.9.2 → v0.9.3 → v0.9.4) corrigiram 3/4 BUG-VAL bloqueantes mas o último walkthrough revelou 2 bugs novos no caminho de write (create/edit forms). Relatório consolidado em `docs/superpowers/reports/2026-05-07-e2e-revalidation-v0.9.x-consolidated-report.md`.
+**v0.10.1 sprint dedicada a Playwright E2E smoke set.**
 
-**Bloqueantes Fase 2 (devem ser resolvidos antes de qualquer feature nova):**
+**Fase 1 do roadmap está fechada.** v0.10.0 publicada com sucesso total — todos os 8 BUG-VAL bloqueantes resolvidos e validados externamente em `~/PhpstormProjects/arqel-test/`. Release workflow auto-publica `arqel-dev/framework` (BUG-VAL-007), Form Section children renderizam (BUG-VAL-011), Edit/Create save funciona (BUG-VAL-012). Relatório em `docs/superpowers/reports/2026-05-07-e2e-revalidation-v0.10.0-report.md`.
 
-- **BUG-VAL-007** — release pipeline `release.yml` matrix omite o meta-package `framework` (insustentável; usado workaround manual em todas as 4 releases v0.9.1-0.9.4). Tag obrigatória.
-- **BUG-VAL-011** — `Section::schema([...])` não emite children no payload Inertia. `<FormRenderer>` walka schema vazio → form de edit/create renderiza Section headers sem inputs.
-- **BUG-VAL-012** — `ArqelEditPage.tsx:46` e `ArqelCreatePage.tsx:46` fazem `router.put('/{slug}/{id}')` / `router.post('/{slug}')` sem panel prefix `/admin/`. Save retorna 404.
-- **E2E smoke set** — adicionar Playwright (ou Inertia full-stack assertions) cobrindo: login, list, filter, sort, page, search, bulk delete, **row delete**, **edit form render + save**, **create form render + save**. Sem isto, próxima cadeia repete.
+**Scope v0.10.1:**
 
-**Backlog Fase 2 não-bloqueante:**
+- Adicionar Playwright (ou Inertia full-stack assertions equivalente) ao monorepo
+- Smoke set obrigatório cobrindo: login, list, filter, sort, page, search, bulk delete, **row delete**, **edit form render + save**, **create form render + save**
+- Integração no CI como required check
+- Documentação em SKILL.md / contributing guide
 
-- BUG-VAL-005 — resource auto-discovery vestigial (`config/arqel.php` advertises `resources.path` mas `ResourceRegistry::discover()` nunca é chamado; user-land deve registar via `PanelRegistry::resources([...])`)
-- BUG-VAL-006 — widget API ausente (`arqel:install` cria `app/Arqel/Widgets/` mas nenhum base class shipped)
-- BUG-VAL-008 — `arqel:doctor` reporta "no auth starter kit detected" mesmo quando Arqel ships login route próprio
-- BUG-VAL-009 — peer deps `@inertiajs/react@^2.0.0` em pacotes JS, instalado é 3.1.0
+**Recomendação:** **bloquear features novas Fase 2** até E2E ship. Sem isto, próxima cadeia de bugs latentes pode repetir-se (lição da cadeia v0.9.1 → v0.10.0).
 
-**Lição metodológica:** os testes feature do monorepo (`apps/demo`) passam mas não exercitam a UI. Vitest cobre só `ArqelIndexPage`. Cada camada (render → URL → placeholder → form schema) falhou no primeiro contacto externo. **E2E é blocker.**
+**Backlog Fase 2 não-bloqueante (paralelo):**
 
-Tag prevista: `v0.10.0` (minor por scope, não patch).
+- BUG-VAL-005 — resource auto-discovery vestigial
+- BUG-VAL-006 — widget API ausente
+- BUG-VAL-008 — doctor false positive auth
+- BUG-VAL-009 — peer deps `@inertiajs/react` 2.x vs 3.x
+- **BUG-VAL-013** — `<FlashContainer>` não montado no layout default (descoberto no walkthrough v0.10.0; flash messages não aparecem após Save apesar do backend emitir)
+
+**Operational note (v0.9.x → v0.10.0 upgrade):** consumers com `"arqel-dev/framework": "^0.9.1"` não recebem v0.10.0 via `composer update` (caret SemVer não cruza minor). Documentar no GitHub release notes e/ou `arqel:upgrade` command.
+
+Tag prevista para próxima sprint: `v0.10.1`.
 
 **Fase:** 1 (MVP)
 

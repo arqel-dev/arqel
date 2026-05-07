@@ -239,3 +239,35 @@ describe('ArqelIndexPage — row actions render per row', () => {
     expect(screen.queryByRole('button', { name: /edit/i })).toBeNull();
   });
 });
+
+describe('ArqelIndexPage — bulk actions render after selection', () => {
+  it('shows bulk action button only after a row is selected', async () => {
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [
+        { id: 1, title: 'first' },
+        { id: 2, title: 'second' },
+      ],
+      actions: {
+        row: [],
+        bulk: [makeAction('deleteBulk', 'Delete selected', 'bulk')],
+        toolbar: [],
+      },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    render(<ArqelIndexPage />);
+
+    expect(screen.queryByRole('button', { name: /delete selected/i })).toBeNull();
+
+    const checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+    expect(checkboxes.length).toBeGreaterThanOrEqual(1);
+    const firstCheckbox = checkboxes[0];
+    if (!firstCheckbox) throw new Error('expected at least one row checkbox');
+    await user.click(firstCheckbox);
+
+    const bulkBtn = await screen.findByRole('button', { name: /delete selected/i });
+    expect(bulkBtn).toBeInTheDocument();
+  });
+});

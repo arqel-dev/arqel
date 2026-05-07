@@ -21,10 +21,12 @@
  * backend; the rest fire immediately.
  */
 
+import type { ActionSchema } from '@arqel-dev/types/actions';
 import type { RecordType, ResourceIndexProps } from '@arqel-dev/types/resources';
 import type { SortDirection } from '@arqel-dev/types/tables';
 import { router, usePage } from '@inertiajs/react';
 import { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionMenu } from '../action/ActionMenu.js';
 import { ResourceIndex } from '../resource/ResourceIndex.js';
 
 type FilterValue = unknown;
@@ -45,6 +47,26 @@ interface VisitParams {
   sort?: { column: string | null; direction: string | null } | null;
   page?: number | undefined;
   perPage?: number | undefined;
+}
+
+function invokeAction(
+  action: ActionSchema,
+  record: { id: string | number } | null,
+  formValues?: Record<string, unknown>,
+): void {
+  const recordId = record?.id;
+  const url = action.url
+    ? action.url.replace('{id}', String(recordId ?? ''))
+    : `/arqel-dev/actions/${action.name}`;
+  const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
+  const data: Record<string, unknown> = { ...(formValues ?? {}) };
+  if (recordId !== undefined) data['record_id'] = recordId;
+
+  router.visit(url, {
+    method: method as never,
+    data: data as never,
+    preserveScroll: true,
+  });
 }
 
 function buildQuery(params: VisitParams): Record<string, unknown> {
@@ -158,6 +180,19 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
     );
   };
 
+  const rowActionsList = props.actions?.row ?? [];
+  const rowActions =
+    rowActionsList.length > 0
+      ? (record: TRecord) => (
+          <ActionMenu
+            actions={rowActionsList}
+            onInvoke={(action, formValues) =>
+              invokeAction(action, record as { id: string | number }, formValues)
+            }
+          />
+        )
+      : undefined;
+
   return (
     <ResourceIndex<TRecord>
       {...props}
@@ -169,6 +204,7 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
       onPageChange={handlePageChange}
       onPerPageChange={handlePerPageChange}
       search={searchValue}
+      {...(rowActions ? { rowActions } : {})}
     />
   );
 }

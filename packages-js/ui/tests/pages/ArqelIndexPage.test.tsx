@@ -83,6 +83,34 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+function makeTextColumn(name: string, label: string): ColumnSchema {
+  return {
+    type: 'text',
+    name,
+    label,
+    sortable: true,
+    searchable: false,
+    copyable: false,
+    hidden: false,
+    hiddenOnMobile: false,
+    align: 'start',
+    width: null,
+    tooltip: null,
+    props: {},
+  };
+}
+
+function makeAction(name: string, label: string, type: 'row' | 'bulk' = 'row'): ActionSchema {
+  return {
+    name,
+    type,
+    label,
+    color: 'primary',
+    variant: 'default',
+    method: 'POST',
+  };
+}
+
 function makeTextFilter(name: string, label: string): FilterSchema {
   return {
     type: 'text',
@@ -173,5 +201,41 @@ describe('ArqelIndexPage — search change preserves perPage', () => {
     const [, data] = lastCall as [string, Record<string, unknown>, unknown];
     expect(data['per_page']).toBe(10);
     expect(data['search']).toBe('hello');
+  });
+});
+
+describe('ArqelIndexPage — row actions render per row', () => {
+  it('renders row action buttons when actions.row is non-empty', () => {
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [
+        { id: 1, title: 'first' },
+        { id: 2, title: 'second' },
+      ],
+      actions: {
+        row: [makeAction('edit', 'Edit'), makeAction('delete', 'Delete')],
+        bulk: [],
+        toolbar: [],
+      },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    render(<ArqelIndexPage />);
+
+    const editButtons = screen.getAllByRole('button', { name: /edit/i });
+    expect(editButtons.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders no row action buttons when actions.row is empty', () => {
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [{ id: 1, title: 'first' }],
+      actions: { row: [], bulk: [], toolbar: [] },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    render(<ArqelIndexPage />);
+
+    expect(screen.queryByRole('button', { name: /edit/i })).toBeNull();
   });
 });

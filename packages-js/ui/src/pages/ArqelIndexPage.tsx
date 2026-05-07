@@ -101,6 +101,7 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
   const [filterValues, setFilterValues] = useState<Record<string, FilterValue>>(initialFilters);
   const [searchValue, setSearchValue] = useState<string>(props.search ?? '');
   const [perPage, setPerPage] = useState<number | undefined>(props.pagination?.perPage);
+  const [selectedIds, setSelectedIds] = useState<ReadonlyArray<string | number>>([]);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const visit = (data: Record<string, unknown>): void => {
@@ -180,6 +181,37 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
     );
   };
 
+  const bulkActionsList = props.actions?.bulk ?? [];
+  const bulkActions =
+    bulkActionsList.length > 0 && selectedIds.length > 0 ? (
+      <div className="flex items-center gap-2">
+        {bulkActionsList.map((action) => (
+          <button
+            key={action.name}
+            type="button"
+            onClick={() => {
+              const url = action.url ?? `/arqel-dev/actions/${action.name}`;
+              const method = action.method.toLowerCase() as
+                | 'get'
+                | 'post'
+                | 'put'
+                | 'patch'
+                | 'delete';
+              router.visit(url, {
+                method: method as never,
+                data: { record_ids: selectedIds as readonly (string | number)[] } as never,
+                preserveScroll: true,
+                onSuccess: () => setSelectedIds([]),
+              });
+            }}
+            className="inline-flex h-8 items-center gap-1 rounded-sm border border-destructive/40 bg-destructive/10 px-3 text-xs font-medium text-destructive hover:bg-destructive/20"
+          >
+            {action.label}
+          </button>
+        ))}
+      </div>
+    ) : undefined;
+
   const rowActionsList = props.actions?.row ?? [];
   const rowActions =
     rowActionsList.length > 0
@@ -204,7 +236,10 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
       onPageChange={handlePageChange}
       onPerPageChange={handlePerPageChange}
       search={searchValue}
+      selectedIds={selectedIds}
+      onSelectionChange={(ids) => setSelectedIds(ids)}
       {...(rowActions ? { rowActions } : {})}
+      {...(bulkActions ? { bulkActions } : {})}
     />
   );
 }

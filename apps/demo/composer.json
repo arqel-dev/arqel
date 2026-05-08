@@ -9,7 +9,7 @@
     "php": "^8.3",
     "laravel/framework": "^13.7",
     "laravel/tinker": "^3.0",
-    "arqel-dev/framework": "0.8.1"
+    "arqel-dev/framework": "0.10.1"
   },
   "repositories": [
     { "type": "path", "url": "../../packages/arqel", "options": { "symlink": true } },
@@ -19,7 +19,8 @@
     { "type": "path", "url": "../../packages/form", "options": { "symlink": true } },
     { "type": "path", "url": "../../packages/actions", "options": { "symlink": true } },
     { "type": "path", "url": "../../packages/nav", "options": { "symlink": true } },
-    { "type": "path", "url": "../../packages/table", "options": { "symlink": true } }
+    { "type": "path", "url": "../../packages/table", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/widgets", "options": { "symlink": true } }
   ],
   "require-dev": {
     "fakerphp/faker": "^1.23",

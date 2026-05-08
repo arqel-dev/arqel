@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Arqel\Dashboards\MainDashboard;
 use App\Arqel\Resources\PostResource;
 use App\Arqel\Resources\UserResource;
 use App\Http\Middleware\HandleInertiaRequests;
 use Arqel\Core\Panel\PanelRegistry;
+use Arqel\Widgets\DashboardRegistry;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
@@ -71,6 +73,17 @@ final class ArqelServiceProvider extends ServiceProvider
         // `arqel-dev/auth` estiver instalado.
         if (class_exists(\Arqel\Auth\Routes::class) && $panel->loginEnabled()) {
             \Arqel\Auth\Routes::register($panel);
+        }
+
+        // Regista os dashboards do painel admin. O `arqel-dev/widgets`
+        // expõe `/admin` e `/admin/dashboards/{id}` via routes/admin.php
+        // — o `DashboardController` resolve cada id no `DashboardRegistry`.
+        if (class_exists(DashboardRegistry::class)) {
+            /** @var DashboardRegistry $dashboards */
+            $dashboards = $this->app->make(DashboardRegistry::class);
+            if (! $dashboards->has('main')) {
+                $dashboards->register(MainDashboard::make());
+            }
         }
     }
 }

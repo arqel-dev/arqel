@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 // Anchoring with `$` alone only catches single-segment URLs because the
 // captured `{resource}` value never includes a slash; multi-segment URLs
 // end the captured group before the `$` anchor would trigger.
-$reservedSlugs = '(?!(?:login|logout|register|forgot-password|reset-password|email)(?:/|$))[^/]+';
+$reservedSlugs = '(?!(?:login|logout|register|forgot-password|reset-password|email|dashboards)(?:/|$))[^/]+';
 
 Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
     Route::get('{resource}', [ResourceController::class, 'index'])

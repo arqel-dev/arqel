@@ -31,9 +31,12 @@ export const arqelPages: Record<string, LazyPage> = {
     import('./ArqelCreatePage.js') as Promise<{ default: ComponentType<unknown> }>,
   'arqel::edit': () => import('./ArqelEditPage.js') as Promise<{ default: ComponentType<unknown> }>,
   'arqel::show': () => import('./ArqelShowPage.js') as Promise<{ default: ComponentType<unknown> }>,
+  'arqel::dashboard': () =>
+    import('./ArqelDashboardPage.js') as Promise<{ default: ComponentType<unknown> }>,
 };
 
 export { default as ArqelCreatePage } from './ArqelCreatePage.js';
+export { default as ArqelDashboardPage } from './ArqelDashboardPage.js';
 export { default as ArqelEditPage } from './ArqelEditPage.js';
 export { default as ArqelIndexPage } from './ArqelIndexPage.js';
 export { default as ArqelShowPage } from './ArqelShowPage.js';

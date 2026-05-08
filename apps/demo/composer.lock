@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "556a561af92f604d21d4bea34ce9b2e3",
+    "content-hash": "11bbd28dfb3df7ed8b2fd3ecf6ae22df",
     "packages": [
         {
             "name": "arqel-dev/actions",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/actions",
-                "reference": "357d4c896d908a5d3f826462b7b6d07c632af8ca"
+                "reference": "5e87121e799189942ec0b04aa157bf682832058e"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -84,11 +84,11 @@
         },
         {
             "name": "arqel-dev/auth",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/auth",
-                "reference": "19e84a34808cbbc434aa2da0f2b7c7dc6f4b0a97"
+                "reference": "3abcdc5da7eda3b07f35b532e320bdd7bab9b36a"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -163,11 +163,11 @@
         },
         {
             "name": "arqel-dev/core",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/core",
-                "reference": "12dd5c4dba9e52ad286035abbf8e266be8b9656f"
+                "reference": "9c31a66c31b785148fa728c19a40c4c379c41689"
             },
             "require": {
                 "inertiajs/inertia-laravel": "^3.0",
@@ -242,11 +242,11 @@
         },
         {
             "name": "arqel-dev/fields",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/fields",
-                "reference": "6c67f82ea6104a01a5a7db70a53c1cafb265c592"
+                "reference": "5181daa323d5cf6a6f2859f47d785bf17a7a0d34"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -317,11 +317,11 @@
         },
         {
             "name": "arqel-dev/form",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/form",
-                "reference": "0bf1e5edfb00502677d9c5445191e90005661801"
+                "reference": "6a7caea0015ee6e6eebc5bfe09a6d3558f746e1f"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -392,11 +392,11 @@
         },
         {
             "name": "arqel-dev/framework",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/arqel",
-                "reference": "22b54d9f63e598e9f9c5775741379d6fdcad899f"
+                "reference": "e461cd04b1daee5b452b192697c4cbba08539158"
             },
             "require": {
                 "arqel-dev/actions": "self.version",
@@ -406,6 +406,7 @@
                 "arqel-dev/form": "self.version",
                 "arqel-dev/nav": "self.version",
                 "arqel-dev/table": "self.version",
+                "arqel-dev/widgets": "self.version",
                 "inertiajs/inertia-laravel": "^1.0|^2.0|^3.0",
                 "php": "^8.3"
             },
@@ -419,7 +420,7 @@
                     "homepage": "https://github.com/arqel-dev/arqel"
                 }
             ],
-            "description": "Arqel — admin panels for Laravel, forged in PHP, rendered in React. Meta-package that requires the full Arqel stack (core, auth, fields, form, actions, nav, table) plus inertia-laravel.",
+            "description": "Arqel — admin panels for Laravel, forged in PHP, rendered in React. Meta-package that requires the full Arqel stack (core, auth, fields, form, actions, nav, table, widgets) plus inertia-laravel.",
             "homepage": "https://arqel.dev",
             "keywords": [
                 "admin",
@@ -443,11 +444,11 @@
         },
         {
             "name": "arqel-dev/nav",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/nav",
-                "reference": "e0764b0fa9422c1ab6fb7421894e487c272210dd"
+                "reference": "5f42c5c622fbad02155d642a83ccb11eab594aad"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -519,11 +520,11 @@
         },
         {
             "name": "arqel-dev/table",
-            "version": "0.8.1",
+            "version": "0.10.1",
             "dist": {
                 "type": "path",
                 "url": "../../packages/table",
-                "reference": "d4b5d4bd314d963f35aa6c58c1e50b4d1d3d3519"
+                "reference": "5d352e663e73203037ff8d37b9a2af75d4c0aacc"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -581,6 +582,82 @@
                 "datatable",
                 "laravel",
                 "table"
+            ],
+            "support": {
+                "issues": "https://github.com/arqel-dev/arqel/issues",
+                "source": "https://github.com/arqel-dev/arqel",
+                "docs": "https://arqel.dev/docs"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "arqel-dev/widgets",
+            "version": "0.10.1",
+            "dist": {
+                "type": "path",
+                "url": "../../packages/widgets",
+                "reference": "465f0887db3b52028f72d260305e5fef5ca45fc4"
+            },
+            "require": {
+                "arqel-dev/core": "@dev",
+                "laravel/framework": "^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Arqel\\Widgets\\WidgetsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Arqel\\Widgets\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Arqel\\Widgets\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test:coverage": [
+                    "vendor/bin/pest --coverage --min=90"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "lint": [
+                    "pint --test"
+                ],
+                "format": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Dashboard widgets for Arqel — Stat/Chart/Table/Custom widgets with deferred loading and polling.",
+            "homepage": "https://arqel.dev",
+            "keywords": [
+                "arqel",
+                "dashboard",
+                "kpi",
+                "laravel",
+                "widgets"
             ],
             "support": {
                 "issues": "https://github.com/arqel-dev/arqel/issues",
@@ -8969,5 +9046,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

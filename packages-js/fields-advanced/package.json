@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/fields-advanced",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Advanced React input components for Arqel — RichText, Markdown, Code, Repeater, Builder, KeyValue, Tags, Wizard.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

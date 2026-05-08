@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/workflow",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "description": "State-machine workflow integration for Arqel — fluent definition + HasWorkflow trait wrapping spatie/laravel-model-states.",
     "type": "library",
     "license": "MIT",

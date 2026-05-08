@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/i18n",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Internationalization primitives for Arqel admin panels (Inertia-driven, no runtime deps).",
   "license": "MIT",
   "homepage": "https://arqel.dev",

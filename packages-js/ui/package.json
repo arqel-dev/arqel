@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/ui",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Structural React components (AppShell, DataTable, FormRenderer, etc.) for Arqel admin panels.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

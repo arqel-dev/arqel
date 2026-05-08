@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/realtime-collab",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Yjs collaborative editing client for Arqel — sync via Laravel Echo + Reverb.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

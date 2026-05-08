@@ -11,6 +11,14 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.10.1] - 2026-05-07
+
+### Added
+
+- **testing:** Playwright E2E smoke set in `apps/demo/tests/e2e/` covering 10 critical CRUD paths (login, list, filter, sort, search, pagination, row Edit/Delete, bulk Delete). Required CI check `Tests E2E (Playwright)` blocks merges that regress these paths. Run locally via `pnpm test:e2e`.
+
+---
+
 ## [0.10.0] - 2026-05-07
 
 ### Added

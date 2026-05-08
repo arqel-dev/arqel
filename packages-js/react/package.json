@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/react",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "React + Inertia bindings, providers, and utilities for Arqel.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

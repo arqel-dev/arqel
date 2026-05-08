@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/nav",
-    "version": "0.10.1",
+    "version": "0.11.0",
     "description": "Navigation primitives for Arqel — sidebar items, groups, breadcrumbs.",
     "type": "library",
     "license": "MIT",

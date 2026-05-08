@@ -5,21 +5,33 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 2 do roadmap aberta.** v0.10.1 publicada com Playwright E2E smoke set + required CI check. **BUG-VAL-014 resolvido** (config-only no GitHub UI: `code_scanning` rule removida do ruleset; CodeQL continua a correr advisory mas não gating). Sem release v0.10.2 necessária — a fix foi pure config.
+**Fase 2 sprint 1 (WIDGETS) fechada.** v0.11.0 publicada com Dashboard frontend integration end-to-end (`ArqelDashboardPage` + `MainDashboard` demo + 1 E2E spec novo). `arqel-dev/widgets` agora parte do framework metapackage — **BUG-VAL-006 fechado**. Smoke set passa a 11 cenários. Relatório em `docs/superpowers/reports/2026-05-08-e2e-revalidation-v0.11.0-report.md`.
 
-**Próxima decisão:** scope concreto da Fase 2. Roadmap canónico em `PLANNING/09-fase-2-essenciais.md` — escolher próximos tickets via brainstorm dedicado.
+**Próxima decisão:** scope concreto da próxima sprint Fase 2. Candidatos:
 
-**Backlog não-bloqueante:**
+- **TENANT** — multi-tenancy SaaS B2B (15 tickets, ~3-4 semanas)
+- **FIELDS-ADV** — 8 advanced field types: RichText (Tiptap), Markdown, Code (Shiki), Repeater, Builder, KeyValue, Tags, Wizard (20 tickets)
+- **TABLE-V2** — virtual scrolling, inline editing, QueryBuilder (10 tickets)
+- **EXPORT** — CSV/Excel/PDF (7 tickets)
+- **CMDPAL** — extend command palette (5 tickets)
+- **AUDIT** — audit log (4 tickets)
+- **MCP-enhance** — adicionar mais tools ao MCP server existente (10 tickets)
+- **Backlog cleanup** — BUG-VAL-005 (auto-discovery), BUG-VAL-008 (doctor), BUG-VAL-009 (peer deps), BUG-VAL-013 (FlashContainer)
+
+Decidir via brainstorm dedicado. Roadmap canónico em `PLANNING/09-fase-2-essenciais.md`.
+
+**Backlog não-bloqueante (paralelo):**
 
 - BUG-VAL-005 — resource auto-discovery vestigial
-- BUG-VAL-006 — widget API ausente
 - BUG-VAL-008 — doctor false positive auth
 - BUG-VAL-009 — peer deps `@inertiajs/react` 2.x vs 3.x
 - BUG-VAL-013 — `<FlashContainer>` não montado no layout default
 
 **Decisão futura paralela:** abrir o repo público activaria CodeQL real gating sem custo (Arqel é open source MIT). Envolve security audit + CONTRIBUTING.md polish — sprint dedicada quando pronto.
 
-**Operational note (v0.9.x → v0.10.0 upgrade):** consumers com `"arqel-dev/framework": "^0.9.1"` não recebem v0.10.0 via `composer update` (caret SemVer não cruza minor). Documentar no GitHub release notes e/ou `arqel:upgrade` command.
+**Operational note (caret SemVer):** consumers com `"arqel-dev/framework": "^0.X.0"` não recebem `0.X+1.0` via `composer update`. Cada sprint major requer constraint bump explicit (`composer require arqel-dev/framework:^0.X+1.0 --no-update`). Documentar no GitHub release notes ou `arqel:upgrade` command quando criado.
+
+**Cadência:** cada feature nova ship com pelo menos 1 E2E spec adicional (precedente estabelecido v0.10.1, mantido v0.11.0).
 
 **Fase:** 1 (MVP)
 

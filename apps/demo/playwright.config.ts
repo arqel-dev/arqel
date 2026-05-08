@@ -16,6 +16,6 @@ export default defineConfig({
     command: 'php artisan serve --port=8000',
     url: 'http://localhost:8000/admin/login',
     reuseExistingServer: !process.env.CI,
-    timeout: 30_000,
+    timeout: 120_000,
   },
 });

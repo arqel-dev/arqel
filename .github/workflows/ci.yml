@@ -192,6 +192,12 @@ jobs:
           php artisan key:generate
           touch database/database.sqlite
 
+      - name: Migrate + seed initial DB (so /admin/login renders before Playwright probes webServer)
+        working-directory: apps/demo
+        run: |
+          php artisan migrate:fresh --seed --force
+          php artisan arqel:make-user --email=admin@arqel.test --password=password --name=Admin
+
       - name: Run E2E tests
         working-directory: apps/demo
         run: pnpm exec playwright test

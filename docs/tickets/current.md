@@ -5,20 +5,18 @@
 
 ## 🎯 Ticket corrente
 
-**v0.10.1 sprint dedicada a Playwright E2E smoke set.**
+**Fase 2 do roadmap aberta.** v0.10.1 ship-ed com sucesso: Playwright E2E smoke set (10 cenários cobrindo todos os caminhos críticos onde a cadeia v0.9.x descobriu bugs) + novo required CI check `Tests E2E (Playwright)` na branch protection da `main`. Relatório em `docs/superpowers/reports/2026-05-08-e2e-revalidation-v0.10.1-report.md`.
 
-**Fase 1 do roadmap está fechada.** v0.10.0 publicada com sucesso total — todos os 8 BUG-VAL bloqueantes resolvidos e validados externamente em `~/PhpstormProjects/arqel-test/`. Release workflow auto-publica `arqel-dev/framework` (BUG-VAL-007), Form Section children renderizam (BUG-VAL-011), Edit/Create save funciona (BUG-VAL-012). Relatório em `docs/superpowers/reports/2026-05-07-e2e-revalidation-v0.10.0-report.md`.
+**Imediato (recurring blocker):**
 
-**Scope v0.10.1:**
+- **BUG-VAL-014** — branch protection ruleset main has `code_scanning` rule that rejects PRs when CodeQL returns SKIPPED (frequente em PRs que não tocam paths relevantes). Causou admin merge bypass em PR #27 da v0.10.1 sprint. **Cada novo PR vai precisar admin merge até resolver.** Hotfix v0.10.2 ou primeiro ticket Fase 2.
 
-- Adicionar Playwright (ou Inertia full-stack assertions equivalente) ao monorepo
-- Smoke set obrigatório cobrindo: login, list, filter, sort, page, search, bulk delete, **row delete**, **edit form render + save**, **create form render + save**
-- Integração no CI como required check
-- Documentação em SKILL.md / contributing guide
+**Scope candidato Fase 2** (decidir via brainstorm dedicado):
 
-**Recomendação:** **bloquear features novas Fase 2** até E2E ship. Sem isto, próxima cadeia de bugs latentes pode repetir-se (lição da cadeia v0.9.1 → v0.10.0).
+- BUG-VAL-014 (acima) — primeiro
+- Roadmap canónico em `PLANNING/09-fase-2-essenciais.md`
 
-**Backlog Fase 2 não-bloqueante (paralelo):**
+**Backlog não-bloqueante (paralelo):**
 
 - BUG-VAL-005 — resource auto-discovery vestigial
 - BUG-VAL-006 — widget API ausente

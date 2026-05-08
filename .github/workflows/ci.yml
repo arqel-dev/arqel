@@ -145,3 +145,61 @@ jobs:
 
       - name: Lint PR commit range
         run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
+
+  e2e:
+    name: Tests E2E (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: sqlite, mbstring, xml, curl
+          coverage: none
+
+      - uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install Composer deps in apps/demo
+        run: composer install --working-dir=apps/demo --no-interaction --prefer-dist
+
+      - name: Install npm deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages (resolves workspace subpath imports)
+        run: pnpm -r --if-present run build
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('apps/demo/package.json', 'pnpm-lock.yaml') }}
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @arqel-dev/demo exec playwright install --with-deps chromium
+
+      - name: Setup .env + SQLite + key
+        working-directory: apps/demo
+        run: |
+          cp .env.example .env || true
+          php artisan key:generate
+          touch database/database.sqlite
+
+      - name: Run E2E tests
+        working-directory: apps/demo
+        run: pnpm exec playwright test
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/demo/playwright-report/
+          retention-days: 14

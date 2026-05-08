@@ -19,6 +19,7 @@
     "build": "pnpm -r --if-present run build",
     "dev": "pnpm -r --parallel --if-present run dev",
     "test": "pnpm -r --if-present run test",
+    "test:e2e": "pnpm --filter @arqel-dev/demo test:e2e",
     "test:all": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",

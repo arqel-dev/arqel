@@ -5,28 +5,21 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 2 do roadmap aberta.** v0.10.1 ship-ed com sucesso: Playwright E2E smoke set (10 cenários cobrindo todos os caminhos críticos onde a cadeia v0.9.x descobriu bugs) + novo required CI check `Tests E2E (Playwright)` na branch protection da `main`. Relatório em `docs/superpowers/reports/2026-05-08-e2e-revalidation-v0.10.1-report.md`.
+**Fase 2 do roadmap aberta.** v0.10.1 publicada com Playwright E2E smoke set + required CI check. **BUG-VAL-014 resolvido** (config-only no GitHub UI: `code_scanning` rule removida do ruleset; CodeQL continua a correr advisory mas não gating). Sem release v0.10.2 necessária — a fix foi pure config.
 
-**Imediato (recurring blocker):**
+**Próxima decisão:** scope concreto da Fase 2. Roadmap canónico em `PLANNING/09-fase-2-essenciais.md` — escolher próximos tickets via brainstorm dedicado.
 
-- **BUG-VAL-014** — branch protection ruleset main has `code_scanning` rule that rejects PRs when CodeQL returns SKIPPED (frequente em PRs que não tocam paths relevantes). Causou admin merge bypass em PR #27 da v0.10.1 sprint. **Cada novo PR vai precisar admin merge até resolver.** Hotfix v0.10.2 ou primeiro ticket Fase 2.
-
-**Scope candidato Fase 2** (decidir via brainstorm dedicado):
-
-- BUG-VAL-014 (acima) — primeiro
-- Roadmap canónico em `PLANNING/09-fase-2-essenciais.md`
-
-**Backlog não-bloqueante (paralelo):**
+**Backlog não-bloqueante:**
 
 - BUG-VAL-005 — resource auto-discovery vestigial
 - BUG-VAL-006 — widget API ausente
 - BUG-VAL-008 — doctor false positive auth
 - BUG-VAL-009 — peer deps `@inertiajs/react` 2.x vs 3.x
-- **BUG-VAL-013** — `<FlashContainer>` não montado no layout default (descoberto no walkthrough v0.10.0; flash messages não aparecem após Save apesar do backend emitir)
+- BUG-VAL-013 — `<FlashContainer>` não montado no layout default
+
+**Decisão futura paralela:** abrir o repo público activaria CodeQL real gating sem custo (Arqel é open source MIT). Envolve security audit + CONTRIBUTING.md polish — sprint dedicada quando pronto.
 
 **Operational note (v0.9.x → v0.10.0 upgrade):** consumers com `"arqel-dev/framework": "^0.9.1"` não recebem v0.10.0 via `composer update` (caret SemVer não cruza minor). Documentar no GitHub release notes e/ou `arqel:upgrade` command.
-
-Tag prevista para próxima sprint: `v0.10.1`.
 
 **Fase:** 1 (MVP)
 

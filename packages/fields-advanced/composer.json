@@ -1,6 +1,6 @@
 {
     "name": "arqel-dev/fields-advanced",
-    "version": "0.10.1",
+    "version": "0.11.0",
     "description": "Advanced field types for Arqel — RichText (Tiptap), Markdown, Code, Repeater, Builder, KeyValue, Tags, Wizard.",
     "type": "library",
     "license": "MIT",

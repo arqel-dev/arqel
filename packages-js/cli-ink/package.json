@@ -1,6 +1,6 @@
 {
   "name": "@arqel-dev/cli-ink",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Rich terminal UI for Arqel apps — Ink + React dashboards, resource browser, log tailer.",
   "license": "MIT",
   "homepage": "https://arqel.dev",

@@ -11,6 +11,21 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.11.0] - 2026-05-08
+
+### Added
+
+- **widgets:** `ArqelDashboardPage` Inertia entry in `@arqel-dev/ui/pages` binds the existing `arqel-dev/widgets` PHP package and the existing widget React components in `@arqel-dev/ui/widgets`. Dashboards now render end-to-end out of the box.
+- **framework:** `arqel-dev/widgets` is now a `require` of the `arqel-dev/framework` metapackage. Resolves BUG-VAL-006 in external consumers — the widget API is available without separately requiring the package.
+- **demo:** `MainDashboard.php` example with 3 widgets (Total posts stat, Posts per day bar chart, Recent posts mini-table using TextColumn/BadgeColumn/DateColumn).
+- **testing:** Playwright `10-dashboard.spec.ts` joins the smoke set as a regression-protect.
+
+### Fixed
+
+- **core:** `dashboards` added to the reserved-slugs regex in `routes/arqel.php` so `/admin/dashboards/{id}` no longer collides with the polymorphic `admin/{resource}/{id}` route.
+
+---
+
 ## [0.10.1] - 2026-05-07
 
 ### Added

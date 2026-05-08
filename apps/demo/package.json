@@ -1,13 +1,17 @@
 {
   "$schema": "https://www.schemastore.org/package.json",
+  "name": "@arqel-dev/demo",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "devDependencies": {
     "@inertiajs/react": "^3.0.3",
+    "@playwright/test": "^1.48.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

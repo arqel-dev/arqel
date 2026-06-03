@@ -1,17 +1,19 @@
 {
-  "type": "boolean",
-  "component": "Checkbox",
-  "name": "is_active",
-  "label": "Is Active",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": false,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": ["boolean"],
-  "props": {
-    "inline": true
-  }
+    "type": "boolean",
+    "component": "Checkbox",
+    "name": "is_active",
+    "label": "Is Active",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": false,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [
+        "boolean"
+    ],
+    "props": {
+        "inline": true
+    }
 }

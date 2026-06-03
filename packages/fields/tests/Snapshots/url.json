@@ -1,15 +1,17 @@
 {
-  "type": "url",
-  "component": "UrlInput",
-  "name": "homepage",
-  "label": "Homepage",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": ["url"],
-  "props": []
+    "type": "url",
+    "component": "UrlInput",
+    "name": "homepage",
+    "label": "Homepage",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [
+        "url"
+    ],
+    "props": []
 }

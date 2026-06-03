@@ -1,23 +1,29 @@
 {
-  "type": "file",
-  "component": "FileInput",
-  "name": "document",
-  "label": "Document",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": ["file", "max:5120", "mimetypes:application/pdf"],
-  "props": {
-    "disk": "s3",
-    "visibility": "private",
-    "maxSize": 5120,
-    "acceptedFileTypes": ["application/pdf"],
-    "multiple": false,
-    "reorderable": false,
-    "strategy": "direct"
-  }
+    "type": "file",
+    "component": "FileInput",
+    "name": "document",
+    "label": "Document",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [
+        "file",
+        "max:5120",
+        "mimetypes:application/pdf"
+    ],
+    "props": {
+        "disk": "s3",
+        "visibility": "private",
+        "maxSize": 5120,
+        "acceptedFileTypes": [
+            "application/pdf"
+        ],
+        "multiple": false,
+        "reorderable": false,
+        "strategy": "direct"
+    }
 }

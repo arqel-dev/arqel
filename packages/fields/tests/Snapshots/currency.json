@@ -1,20 +1,22 @@
 {
-  "type": "currency",
-  "component": "CurrencyInput",
-  "name": "price",
-  "label": "Price",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": ["numeric"],
-  "props": {
-    "decimals": 2,
-    "prefix": "R$",
-    "thousandsSeparator": ".",
-    "decimalSeparator": ","
-  }
+    "type": "currency",
+    "component": "CurrencyInput",
+    "name": "price",
+    "label": "Price",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [
+        "numeric"
+    ],
+    "props": {
+        "decimals": 2,
+        "prefix": "R$",
+        "thousandsSeparator": ".",
+        "decimalSeparator": ","
+    }
 }

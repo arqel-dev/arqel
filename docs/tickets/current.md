@@ -14,11 +14,18 @@
 Fase 1 (MVP) e Fase 2 (essenciais) estão entregues; Fases 3 e 4 têm pacotes funcionais
 não rastreados neste arquivo (ver "Drift" abaixo). Última release: **v0.11.0**.
 
-**Sprint atual:** **v0.12.0 — TENANT integration** (branch `feat/v0.12.0-tenant-integration`).
-Plano: `docs/superpowers/plans/2026-05-08-v0.12.0-tenant-integration.md`. Estado: a Fase 1 do
-plano (JS `<TenantSwitcher>` + tipos `TenantSummary`) está feita; `apps/tenant-demo` + E2E
-ainda faltam (ver "v0.12.0" abaixo). **Atenção: o trabalho v0.12.0 está não-commitado na
-working tree** (o commit P0 `0f609e3` cobre só os blockers de CI/segurança abaixo).
+**Sprint atual:** **v0.12.0 — TENANT integration ✅ MERGED em `main`** via PR #39 (2026-06-03).
+Plano: `docs/superpowers/plans/2026-05-08-v0.12.0-tenant-integration.md`. Entregue: `<TenantSwitcher>`
++ tipos `TenantSummary`/`TenantContextProps`, `apps/tenant-demo` (bootável, scoped, switcher
+funcional via `AuthUserResolver`), E2E `01-tenant-switching`, e CI estendido. O mesmo PR carregou
+os fixes P0 de CI/segurança e a reconciliação deste arquivo.
+
+**Próximo passo (não feito):** **release v0.12.0** — `chore(release): bump 0.11.0 → 0.12.0` + tag
+(Fase 6 do plano). Decisão outward-facing — aguarda confirmação.
+
+**CI no merge:** 17 checks verdes. `composer audit`/`pnpm audit` falham por advisories
+**pré-existentes** em laravel/symfony (os ~50 alertas Dependabot) — não introduzidos pela v0.12.0;
+exigem sprint de segurança dedicada (`composer update` dessas libs).
 
 ### ✅ P0 — blockers de CI/segurança resolvidos (commit `0f609e3`, 2026-06-03)
 

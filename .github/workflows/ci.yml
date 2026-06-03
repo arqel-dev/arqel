@@ -228,6 +228,24 @@ jobs:
         working-directory: apps/tenant-demo
         run: php artisan migrate:fresh --seed --force
 
+      - name: Smoke-check tenant-demo server boots (surfaces boot errors)
+        working-directory: apps/tenant-demo
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8001 > /tmp/tenant-demo-serve.log 2>&1 &
+          server_pid=$!
+          ok=0
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8001/admin/login || true)
+            if [ "$code" = "200" ]; then echo "tenant-demo up (200)"; ok=1; break; fi
+            sleep 1
+          done
+          kill "$server_pid" 2>/dev/null || true
+          if [ "$ok" != "1" ]; then
+            echo "tenant-demo failed to return 200 from /admin/login. Server log:"
+            cat /tmp/tenant-demo-serve.log
+            exit 1
+          fi
+
       - name: Run E2E tests (apps/tenant-demo)
         working-directory: apps/tenant-demo
         run: pnpm exec playwright test

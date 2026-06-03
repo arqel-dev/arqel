@@ -15,3 +15,4 @@ export { isFieldEntry, isLayoutEntry, resolveFieldEntry } from './forms.js';
 export type * from './inertia.js';
 export type * from './resources.js';
 export type * from './tables.js';
+export type * from './tenant.js';

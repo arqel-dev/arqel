@@ -5,37 +5,56 @@
 
 ## 🎯 Ticket corrente
 
-**Fase 2 sprint 1 (WIDGETS) fechada.** v0.11.0 publicada com Dashboard frontend integration end-to-end (`ArqelDashboardPage` + `MainDashboard` demo + 1 E2E spec novo). `arqel-dev/widgets` agora parte do framework metapackage — **BUG-VAL-006 fechado**. Smoke set passa a 11 cenários. Relatório em `docs/superpowers/reports/2026-05-08-e2e-revalidation-v0.11.0-report.md`.
+> **Reconciliado em 2026-06-03** após auditoria minuciosa (workflow multi-agente).
+> O topo deste arquivo estava contraditório ("Fase 2 fechada" vs "Fase: 1" vs "8/123 tickets")
+> e listava como *candidatos futuros* pacotes que **já existem em disco e passam testes**
+> (TENANT, EXPORT, AUDIT, FIELDS-ADV). A realidade abaixo reflete o disco, não o histórico.
 
-**Próxima decisão:** scope concreto da próxima sprint Fase 2. Candidatos:
+**Estado real:** o monorepo tem **20 pacotes PHP + 18 pacotes JS** em disco, cobrindo Fases 1-4.
+Fase 1 (MVP) e Fase 2 (essenciais) estão entregues; Fases 3 e 4 têm pacotes funcionais
+não rastreados neste arquivo (ver "Drift" abaixo). Última release: **v0.11.0**.
 
-- **TENANT** — multi-tenancy SaaS B2B (15 tickets, ~3-4 semanas)
-- **FIELDS-ADV** — 8 advanced field types: RichText (Tiptap), Markdown, Code (Shiki), Repeater, Builder, KeyValue, Tags, Wizard (20 tickets)
-- **TABLE-V2** — virtual scrolling, inline editing, QueryBuilder (10 tickets)
-- **EXPORT** — CSV/Excel/PDF (7 tickets)
-- **CMDPAL** — extend command palette (5 tickets)
-- **AUDIT** — audit log (4 tickets)
-- **MCP-enhance** — adicionar mais tools ao MCP server existente (10 tickets)
-- **Backlog cleanup** — BUG-VAL-005 (auto-discovery), BUG-VAL-008 (doctor), BUG-VAL-009 (peer deps), BUG-VAL-013 (FlashContainer)
+**Sprint atual:** **v0.12.0 — TENANT integration** (branch `feat/v0.12.0-tenant-integration`).
+Plano: `docs/superpowers/plans/2026-05-08-v0.12.0-tenant-integration.md`. Estado: a Fase 1 do
+plano (JS `<TenantSwitcher>` + tipos `TenantSummary`) está feita; `apps/tenant-demo` + E2E
+ainda faltam (ver "v0.12.0" abaixo). **Atenção: o trabalho v0.12.0 está não-commitado na
+working tree** (o commit P0 `0f609e3` cobre só os blockers de CI/segurança abaixo).
 
-Decidir via brainstorm dedicado. Roadmap canónico em `PLANNING/09-fase-2-essenciais.md`.
+### ✅ P0 — blockers de CI/segurança resolvidos (commit `0f609e3`, 2026-06-03)
 
-**Backlog não-bloqueante (paralelo):**
+A auditoria encontrou e fechamos:
 
-- BUG-VAL-005 — resource auto-discovery vestigial
-- BUG-VAL-008 — doctor false positive auth
-- BUG-VAL-009 — peer deps `@inertiajs/react` 2.x vs 3.x
-- BUG-VAL-013 — `<FlashContainer>` não montado no layout default
+- **fields** — 21 snapshots regenerados (4 espaços) + `tests/Snapshots/` excluído do Biome (raiz do mismatch). 195/195.
+- **auth** — testsuite `Unit` inexistente removido do `phpunit.xml`. 70/70.
+- **mcp** — prefixo `arqel/` → `arqel-dev/` em `SkillResource` + fixtures. 93/93.
+- **BUG-VAL-009** — peer `@inertiajs/react`/`@inertiajs/core` unificado em `^3.0.0` (era split ^2/^3). **Fechado.**
+- **CVE-2025-55182** — `react` peer/dev bump `^19.0.0` → `^19.2.0` (ADR-004). Fechado.
+- **Segurança** — `ResourceController` agora falha fechado quando o extractor de regras quebra (era mass assignment silencioso). Cobertura em `packages/form`.
 
-**Decisão futura paralela:** abrir o repo público activaria CodeQL real gating sem custo (Arqel é open source MIT). Envolve security audit + CONTRIBUTING.md polish — sprint dedicada quando pronto.
+### 🟡 Drift do tracker (pendente de reconciliação completa)
 
-**Operational note (caret SemVer):** consumers com `"arqel-dev/framework": "^0.X.0"` não recebem `0.X+1.0` via `composer update`. Cada sprint major requer constraint bump explicit (`composer require arqel-dev/framework:^0.X+1.0 --no-update`). Documentar no GitHub release notes ou `arqel:upgrade` command quando criado.
+Pacotes em disco **não logados como concluídos** neste arquivo, por fase:
 
-**Cadência:** cada feature nova ship com pelo menos 1 E2E spec adicional (precedente estabelecido v0.10.1, mantido v0.11.0).
+- **Fase 3** (avançadas): `ai` (AI-*), `realtime` (RT-*), `versioning` (VERS-*), `workflow` (WF-*) — PHP + JS, todos com testes verdes.
+- **Fase 4** (ecossistema): `marketplace` (MKTPLC-*), `devtools-extension` (DEVTOOLS-*), `i18n`, `a11y`, `theme` (este sem ticket no PLANNING).
+- **Fase 2**: `audit` e `export` existem e passam testes — sair da lista de "candidatos".
 
-**Fase:** 1 (MVP)
+**Backlog genuinamente não-construído** (sem código em disco): `SEARCH`, `OPENAPI`, `PDF`, `CLI-TUI`, `CERT`, `VIZ`, `CMDPAL`, `LCLOUD`.
 
-> **Status:** **PHP:** CORE-001..013 + CORE-006/007/010 ✅. TABLE-001..006 ✅. ACTIONS-001..006/009 ✅. NAV-001..004 + NAV-005 parcial ✅. AUTH-001..004 + AUTH-005 parcial ✅. FORM-001..005/007/008 + FORM-010 parcial ✅. FIELDS-001..022 ✅. **JS:** TYPES-001/002 + TYPES-004 parcial ✅. REACT-001..004 ✅. HOOKS-001 ✅ (10 hooks). UI-001..007 ✅ (shell + table + form + action + flash + utility, 70 testes). FIELDS-JS-001..006 ✅ (21 rich inputs via FieldRegistry, 23 testes). Adiados: CORE-014/015 + TABLE-007/008 + FORM-006 + ACTIONS-007/008 + TYPES-003 (spatie), HOOKS-002..006 (Zod validate / URL sync — coberto minimally em HOOKS-001).
+### Backlog não-bloqueante (gaps de design ainda abertos)
+
+- **BUG-VAL-005** — `ResourceRegistry::discover()` nunca chamado no boot (auto-discovery vestigial). Ainda presente (auditoria 2026-06-03).
+- **Gap fields()/form()** — validação extrai de `fields()`, schema do form de `form()->getFields()`; resource layout-aware deve re-declarar campos. Ainda presente.
+- **BUG-VAL-008** — doctor false positive auth.
+- **BUG-VAL-013** — `<FlashContainer>` não montado no layout default.
+
+**Decisão futura:** abrir o repo público activaria CodeQL gating sem custo (MIT). Envolve security audit + CONTRIBUTING.md polish.
+
+**Operational note (caret SemVer):** consumers com `"arqel-dev/framework": "^0.X.0"` não recebem `0.X+1.0` via `composer update`. Cada sprint major requer constraint bump explicit.
+
+**Cadência:** cada feature nova ship com pelo menos 1 E2E spec adicional (precedente v0.10.1, mantido v0.11.0).
+
+**Fase:** Fase 1 + Fase 2 entregues; Fase 3/4 parcialmente em disco. Sprint corrente: v0.12.0 (TENANT integration).
 
 ## 📋 Sprint 0 — Backlog sequencial
 
@@ -1368,9 +1387,21 @@ Relatório do dogfooding do `arqel-test` apontou 9 bugs (1 blocker, 4 high, 2 me
 
 ## 📊 Progresso geral
 
-**Fase 1 MVP:** 8/123 tickets (6.5%)
-**Sprint 0 (Setup):** 7/7 ✅ 🎉
-**Sprint 1 (CORE):** 10/15 tickets (CORE-001..005 ✅, CORE-008 ✅, CORE-009 ✅, CORE-011 ✅ via CORE-002, CORE-012 ✅, CORE-013 ✅) — CORE-006/007/010/014/015 adiados (todos precisam de `Field`)
+> Reconstruído por fase em 2026-06-03 a partir do disco + auditoria de testes.
+> O contador antigo ("8/123, 6.5%") refletia só o início da Fase 1 e estava obsoleto.
+
+| Fase | Pacotes em disco | Estado | Testes (auditoria 2026-06-03) |
+|---|---|---|---|
+| **1 — MVP** | core, fields, form, table, actions, nav, auth, cli, framework | ✅ Entregue | core 286, fields 195, form 41, table 171, actions 56, nav 24, auth 70, cli 82+2* |
+| **2 — Essenciais** | tenant, widgets, fields-advanced, mcp, export, audit | ✅ Entregue | tenant 157, widgets 146, fields-advanced 130, mcp 93, export 51+1*, audit 36 |
+| **3 — Avançadas** | ai, realtime, versioning, workflow | 🟡 Em disco, não logado | ai 181, realtime 74, versioning 58, workflow 67 |
+| **4 — Ecossistema** | marketplace, devtools-extension, i18n, a11y, theme | 🟡 Em disco, não logado | marketplace 163, + contrapartes JS verdes |
+
+\* falhas residuais não-bloqueantes: `cli` 2 (expectativas stale do slug antigo), `export` 1 (XlsxExporter data→float). Detalhe na auditoria.
+
+**JS:** 18 pacotes, todos verdes (typecheck + testes) com Inertia v3 unificado e react ^19.2.0 após o commit P0 `0f609e3`. Cobertura efetiva baixa em `@arqel-dev/versioning` (16/17 testes skipped) — triagem pendente.
+
+**Release atual:** v0.11.0 · **Sprint corrente:** v0.12.0 (TENANT integration, em curso).
 
 ## 🔄 Ao completar o ticket ativo
 
@@ -1396,4 +1427,4 @@ Todos os 5 tickets INFRA completos + verificação:
 
 ---
 
-**Última atualização:** 2026-04-29 (UI-007 completo — `@arqel-dev/ui` totalmente scaffolded com 70 testes Vitest passando)
+**Última atualização:** 2026-06-03 (auditoria minuciosa + reconciliação do tracker; P0 de CI/segurança fechado em `0f609e3`; topo e "Progresso geral" reescritos para refletir o disco)

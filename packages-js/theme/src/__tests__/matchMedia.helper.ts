@@ -36,6 +36,12 @@ export function installMatchMedia(initialDark = false): MockMedia {
     dispatchEvent: vi.fn(),
   };
 
+  // jsdom does not define `window.matchMedia`, and Vitest 4's `vi.spyOn`
+  // refuses to spy on a non-function. Install a stub first when absent so
+  // the spy has something to replace.
+  if (typeof window.matchMedia !== 'function') {
+    window.matchMedia = (() => media) as unknown as typeof window.matchMedia;
+  }
   vi.spyOn(window, 'matchMedia').mockImplementation(() => media as unknown as MediaQueryList);
   return state;
 }

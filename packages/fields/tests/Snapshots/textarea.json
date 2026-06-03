@@ -1,18 +1,18 @@
 {
-  "type": "textarea",
-  "component": "TextareaInput",
-  "name": "bio",
-  "label": "Bio",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": [],
-  "props": {
-    "maxLength": 500,
-    "rows": 6
-  }
+    "type": "textarea",
+    "component": "TextareaInput",
+    "name": "bio",
+    "label": "Bio",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [],
+    "props": {
+        "maxLength": 500,
+        "rows": 6
+    }
 }

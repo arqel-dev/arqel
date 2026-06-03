@@ -1,19 +1,24 @@
 {
-  "type": "slug",
-  "component": "SlugInput",
-  "name": "slug",
-  "label": "Slug",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": ["string", "not_in:admin"],
-  "props": {
-    "fromField": "title",
-    "separator": "-",
-    "reservedSlugs": ["admin"]
-  }
+    "type": "slug",
+    "component": "SlugInput",
+    "name": "slug",
+    "label": "Slug",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [
+        "string",
+        "not_in:admin"
+    ],
+    "props": {
+        "fromField": "title",
+        "separator": "-",
+        "reservedSlugs": [
+            "admin"
+        ]
+    }
 }

@@ -1,15 +1,15 @@
 {
-  "type": "hidden",
-  "component": "HiddenInput",
-  "name": "team_id",
-  "label": "Team Id",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": [],
-  "props": []
+    "type": "hidden",
+    "component": "HiddenInput",
+    "name": "team_id",
+    "label": "Team Id",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [],
+    "props": []
 }

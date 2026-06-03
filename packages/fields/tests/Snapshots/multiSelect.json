@@ -1,26 +1,26 @@
 {
-  "type": "multiSelect",
-  "component": "MultiSelectInput",
-  "name": "tags",
-  "label": "Tags",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": [],
-  "props": {
-    "options": {
-      "php": "PHP",
-      "js": "JS"
-    },
-    "searchable": false,
-    "multiple": true,
-    "native": false,
-    "creatable": false,
-    "allowCustomValues": false,
-    "optionsRelation": null
-  }
+    "type": "multiSelect",
+    "component": "MultiSelectInput",
+    "name": "tags",
+    "label": "Tags",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [],
+    "props": {
+        "options": {
+            "php": "PHP",
+            "js": "JS"
+        },
+        "searchable": false,
+        "multiple": true,
+        "native": false,
+        "creatable": false,
+        "allowCustomValues": false,
+        "optionsRelation": null
+    }
 }

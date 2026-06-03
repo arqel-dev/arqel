@@ -1,19 +1,23 @@
 {
-  "type": "number",
-  "component": "NumberInput",
-  "name": "age",
-  "label": "Age",
-  "readonly": false,
-  "placeholder": null,
-  "helperText": null,
-  "defaultValue": null,
-  "columnSpan": 1,
-  "live": false,
-  "liveDebounce": null,
-  "rules": ["integer", "min:0", "max:120"],
-  "props": {
-    "min": 0,
-    "max": 120,
-    "integer": true
-  }
+    "type": "number",
+    "component": "NumberInput",
+    "name": "age",
+    "label": "Age",
+    "readonly": false,
+    "placeholder": null,
+    "helperText": null,
+    "defaultValue": null,
+    "columnSpan": 1,
+    "live": false,
+    "liveDebounce": null,
+    "rules": [
+        "integer",
+        "min:0",
+        "max:120"
+    ],
+    "props": {
+        "min": 0,
+        "max": 120,
+        "integer": true
+    }
 }

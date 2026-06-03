@@ -54,7 +54,7 @@
     "ink-testing-library": "^4.0.0",
     "tsup": "^8.5.0",
     "typescript": "^5.6.3",
-    "vitest": "^3.0.0"
+    "vitest": "^4.1.0"
   },
   "publishConfig": {
     "access": "public"

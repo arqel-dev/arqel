@@ -11,6 +11,28 @@ _Placeholder para próximo ciclo._
 
 ---
 
+## [0.12.0] - 2026-06-03
+
+### Added
+
+- **ui/types:** `<TenantSwitcher>` component in `@arqel-dev/ui/shell` + `TenantSummary`/`TenantContextProps` in `@arqel-dev/types`. Dropdown that lists the tenants a user can access and switches between them via `POST /admin/tenants/{id}/switch`.
+- **demo:** `apps/tenant-demo` — reference Laravel app demonstrating multi-tenancy end-to-end with the `AuthUserResolver` pattern. `Project` model scoped via `BelongsToTenant`, seeder with 2 tenants × 5 projects + an admin in both, tenant context shared to Inertia as `tenantContext`.
+- **testing:** Playwright `01-tenant-switching.spec.ts` joins the smoke set (login → Acme list → switch → Globex list). CI E2E job now runs both `apps/demo` and `apps/tenant-demo`.
+
+### Fixed
+
+- **core:** `ResourceController` now fails closed when the field-rule extractor is present but broken, instead of silently accepting unvalidated input (mass-assignment hole).
+- **mcp:** `SkillResource` emits the `arqel-dev/` package-name prefix (was `arqel/`).
+- **fields:** JSON serialization snapshots excluded from Biome so lint-staged stops reformatting the PHP-generated 4-space output (was re-breaking the snapshot suite).
+- **auth:** removed a non-existent `Unit` testsuite from `phpunit.xml` that aborted the default `pest` run.
+- **react:** `createArqelApp` resolver adapted to Inertia v3's `ResolvedComponent` contract.
+
+### Changed
+
+- **deps:** unified `@inertiajs/react`/`@inertiajs/core` peer to `^3.0.0` across all JS packages (was split `^2`/`^3`, breaking host installs — BUG-VAL-009). Bumped `react` peer to `^19.2.0` (CVE-2025-55182).
+
+---
+
 ## [0.11.0] - 2026-05-08
 
 ### Added

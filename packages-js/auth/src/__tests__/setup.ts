@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { afterEach, type Mock, vi } from 'vitest';
 
 interface MockFormState {
   data: Record<string, unknown>;
@@ -22,7 +22,9 @@ const mockPage: MockPageState = {
   props: { flash: {} },
 };
 
-export const postSpy = vi.fn();
+// Explicit type: Vitest 4's inferred `vi.fn()` type references an internal
+// @vitest/spy path that isn't portable across the package boundary (TS2742).
+export const postSpy: Mock = vi.fn();
 
 export function setMockErrors(errors: Record<string, string>): void {
   mockState.errors = errors;

@@ -11,6 +11,20 @@ import {
 describe('storage', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    // jsdom omits window.matchMedia; Vitest 4's vi.spyOn refuses to spy a
+    // non-function, so install a stub the spies can replace.
+    if (typeof window.matchMedia !== 'function') {
+      window.matchMedia = (() => ({
+        matches: false,
+        media: '',
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      })) as unknown as typeof window.matchMedia;
+    }
   });
 
   afterEach(() => {

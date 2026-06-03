@@ -9,7 +9,9 @@ const { echoCtor, pusherSentinel } = vi.hoisted(() => ({
 }));
 
 vi.mock('laravel-echo', () => ({
-  default: vi.fn().mockImplementation((opts: unknown) => {
+  // Must be a regular function (not an arrow): the SUT calls `new Echo(opts)`,
+  // and Vitest 4 will not `new` an arrow-function mock implementation.
+  default: vi.fn().mockImplementation(function (this: unknown, opts: unknown) {
     echoCtor(opts);
     return { __echo: true, opts };
   }),

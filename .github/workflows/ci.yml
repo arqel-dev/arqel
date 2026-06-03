@@ -231,20 +231,29 @@ jobs:
       - name: Smoke-check tenant-demo server boots (surfaces boot errors)
         working-directory: apps/tenant-demo
         run: |
+          echo "manifest present: $(ls -la public/build/manifest.json 2>&1)"
           php artisan serve --host=127.0.0.1 --port=8001 > /tmp/tenant-demo-serve.log 2>&1 &
           server_pid=$!
           ok=0
-          for i in $(seq 1 30); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8001/admin/login || true)
-            if [ "$code" = "200" ]; then echo "tenant-demo up (200)"; ok=1; break; fi
+          last_code=000
+          for i in $(seq 1 40); do
+            last_code=$(curl -s -o /tmp/login-body.html -w '%{http_code}' http://127.0.0.1:8001/admin/login || echo 000)
+            echo "attempt $i: HTTP $last_code (serve pid alive: $(kill -0 "$server_pid" 2>/dev/null && echo yes || echo no))"
+            if [ "$last_code" = "200" ]; then echo "tenant-demo up (200)"; ok=1; break; fi
             sleep 1
           done
-          kill "$server_pid" 2>/dev/null || true
           if [ "$ok" != "1" ]; then
-            echo "tenant-demo failed to return 200 from /admin/login. Server log:"
-            cat /tmp/tenant-demo-serve.log
+            echo "=== tenant-demo failed (last HTTP $last_code). Server log: ==="
+            cat /tmp/tenant-demo-serve.log || true
+            echo "=== Response body (first 4KB): ==="
+            head -c 4096 /tmp/login-body.html 2>/dev/null || true
+            echo ""
+            echo "=== Laravel log tail: ==="
+            tail -n 40 storage/logs/laravel.log 2>/dev/null || echo "(no laravel.log)"
+            kill "$server_pid" 2>/dev/null || true
             exit 1
           fi
+          kill "$server_pid" 2>/dev/null || true
 
       - name: Run E2E tests (apps/tenant-demo)
         working-directory: apps/tenant-demo

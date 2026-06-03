@@ -91,7 +91,7 @@ beforeEach(function (): void {
     // does not hit the real packages/* filesystem during integration.
     $this->app->instance(SkillResource::class, new SkillResource(
         packagesResolver: static fn (): array => ['core', 'mcp'],
-        contentReader: static fn (string $package): string => "# SKILL.md fixture for arqel/{$package}",
+        contentReader: static fn (string $package): string => "# SKILL.md fixture for arqel-dev/{$package}",
     ));
 
     /** @var McpServer $server */

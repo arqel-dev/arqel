@@ -38,7 +38,7 @@ it('returns an empty list when the resolver yields no packages', function (): vo
 it('reads contents wrapped in the MCP resource shape', function (): void {
     $resource = new SkillResource(
         packagesResolver: static fn (): array => ['core'],
-        contentReader: static fn (string $package): string => "# SKILL.md for arqel/{$package}",
+        contentReader: static fn (string $package): string => "# SKILL.md for arqel-dev/{$package}",
     );
 
     $payload = $resource->read('arqel-skill://core');

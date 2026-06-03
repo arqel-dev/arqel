@@ -29,7 +29,8 @@
       "!**/.husky/_",
       "!composer.json",
       "!pint.json",
-      "!packages/**/composer.json"
+      "!packages/**/composer.json",
+      "!packages/**/tests/Snapshots/"
     ]
   },
   "formatter": {

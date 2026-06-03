@@ -146,6 +146,67 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@25.6.0)(jsdom@25.0.1)(lightningcss@1.32.0)
 
+  apps/tenant-demo:
+    dependencies:
+      '@arqel-dev/auth':
+        specifier: workspace:^
+        version: link:../../packages-js/auth
+      '@arqel-dev/fields':
+        specifier: workspace:^
+        version: link:../../packages-js/fields-js
+      '@arqel-dev/hooks':
+        specifier: workspace:^
+        version: link:../../packages-js/hooks
+      '@arqel-dev/react':
+        specifier: workspace:^
+        version: link:../../packages-js/react
+      '@arqel-dev/types':
+        specifier: workspace:^
+        version: link:../../packages-js/types
+      '@arqel-dev/ui':
+        specifier: workspace:^
+        version: link:../../packages-js/ui
+    devDependencies:
+      '@inertiajs/react':
+        specifier: ^3.0.3
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@playwright/test':
+        specifier: ^1.48.0
+        version: 1.59.1
+      '@tailwindcss/vite':
+        specifier: ^4.0.0
+        version: 4.2.4(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      '@vitejs/plugin-react':
+        specifier: ^4.7.0
+        version: 4.7.0(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
+      concurrently:
+        specifier: ^9.0.1
+        version: 9.2.1
+      laravel-vite-plugin:
+        specifier: ^2.1.0
+        version: 2.1.0(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
+      react:
+        specifier: ^19.2.5
+        version: 19.2.5
+      react-dom:
+        specifier: ^19.2.5
+        version: 19.2.5(react@19.2.5)
+      tailwindcss:
+        specifier: ^4.0.0
+        version: 4.2.4
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.3.2
+        version: 7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3)
+
   packages-js/a11y:
     devDependencies:
       '@testing-library/jest-dom':
@@ -170,10 +231,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -219,10 +280,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -240,11 +301,11 @@ importers:
         specifier: workspace:*
         version: link:../ui
       '@inertiajs/core':
-        specifier: ^2.0.0
-        version: 2.3.21
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)
       '@inertiajs/react':
-        specifier: ^2.0.0
-        version: 2.3.21(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
@@ -264,10 +325,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -291,7 +352,7 @@ importers:
         specifier: ^13.2.0
         version: 13.2.0
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
     devDependencies:
       '@types/node':
@@ -341,10 +402,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       typescript:
         specifier: ^5.6.3
@@ -414,10 +475,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -439,8 +500,8 @@ importers:
         specifier: workspace:*
         version: link:../ui
       '@inertiajs/react':
-        specifier: ^2.0.0
-        version: 2.3.21(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
@@ -460,10 +521,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -485,11 +546,11 @@ importers:
         specifier: workspace:*
         version: link:../react
       '@inertiajs/core':
-        specifier: ^2.0.0
-        version: 2.3.21
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)
       '@inertiajs/react':
-        specifier: ^2.0.0
-        version: 2.3.21(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
@@ -509,10 +570,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -530,11 +591,11 @@ importers:
         specifier: workspace:*
         version: link:../ui
       '@inertiajs/core':
-        specifier: ^2.0.0
-        version: 2.3.21
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)
       '@inertiajs/react':
-        specifier: ^2.0.0
-        version: 2.3.21(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
@@ -551,10 +612,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -595,8 +656,8 @@ importers:
         version: link:../types
     devDependencies:
       '@inertiajs/react':
-        specifier: ^2.0.0
-        version: 2.3.21(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
@@ -616,10 +677,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -659,10 +720,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -699,10 +760,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -729,10 +790,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -787,8 +848,8 @@ importers:
         specifier: ^1.0.0-alpha.0
         version: 1.0.0-rc.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@inertiajs/react':
-        specifier: ^2.0.0
-        version: 2.3.21(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.15.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-table':
         specifier: ^8.20.0
         version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -817,10 +878,10 @@ importers:
         specifier: ^0.468.0
         version: 0.468.0(react@19.2.5)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       recharts:
         specifier: ^2.15.0
@@ -866,10 +927,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0
@@ -912,10 +973,10 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.0
         version: 19.2.5(react@19.2.5)
       tsup:
         specifier: ^8.5.0

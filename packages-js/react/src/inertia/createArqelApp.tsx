@@ -1,5 +1,9 @@
-import { createInertiaApp, router as inertiaRouter } from '@inertiajs/react';
-import type { ComponentType, ReactNode } from 'react';
+import {
+  createInertiaApp,
+  router as inertiaRouter,
+  type ResolvedComponent,
+} from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
 import {
@@ -79,7 +83,10 @@ export async function createArqelApp(options: ArqelAppOptions = {}): Promise<unk
     progress: progress === false ? false : progress === true ? {} : progress,
     resolve: async (name) => {
       const module = await resolveArqelPage([pages], name);
-      const Component = module.default as ComponentType<unknown> & {
+      // Inertia v3's ComponentResolver resolves to a `ResolvedComponent`
+      // (its exported `ReactComponent`), optionally carrying a persistent
+      // `layout`. Cast to that contract so the resolver type-checks.
+      const Component = module.default as ResolvedComponent & {
         layout?: (page: ReactNode) => ReactNode;
       };
 
@@ -87,7 +94,11 @@ export async function createArqelApp(options: ArqelAppOptions = {}): Promise<unk
         Component.layout = layout;
       }
 
-      return module;
+      // Resolver is async, so return the component directly as
+      // `Promise<ResolvedComponent>`. Inertia v3 does not accept the
+      // `Promise<{ default }>` shape — only a bare component or a
+      // synchronous `{ default }`.
+      return Component;
     },
     setup({ el, App, props }) {
       const node = (

@@ -63,6 +63,7 @@ apps/*/public/storage
 # Claude Code
 .claude/local-settings.json
 .claude/logs/
+.claude/scheduled_tasks.lock
 
 # Temporários
 *.tmp

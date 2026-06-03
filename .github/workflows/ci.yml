@@ -209,3 +209,33 @@ jobs:
           name: playwright-report
           path: apps/demo/playwright-report/
           retention-days: 14
+
+      # --- apps/tenant-demo (multi-tenancy reference app) ---
+      # Reuses the Node deps, built packages, and cached Playwright
+      # browser from the apps/demo run above.
+
+      - name: Install Composer deps in apps/tenant-demo
+        run: composer install --working-dir=apps/tenant-demo --no-interaction --prefer-dist
+
+      - name: Setup tenant-demo .env + SQLite + key
+        working-directory: apps/tenant-demo
+        run: |
+          cp .env.example .env || true
+          php artisan key:generate
+          touch database/database.sqlite
+
+      - name: Migrate + seed tenant-demo DB
+        working-directory: apps/tenant-demo
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Run E2E tests (apps/tenant-demo)
+        working-directory: apps/tenant-demo
+        run: pnpm exec playwright test
+
+      - name: Upload Playwright report (tenant-demo) on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-tenant-demo
+          path: apps/tenant-demo/playwright-report/
+          retention-days: 14

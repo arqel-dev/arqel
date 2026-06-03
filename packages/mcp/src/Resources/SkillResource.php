@@ -67,7 +67,7 @@ final class SkillResource
         foreach ($packages as $package) {
             $entries[] = [
                 'uri' => "arqel-skill://{$package}",
-                'name' => "SKILL.md for arqel/{$package}",
+                'name' => "SKILL.md for arqel-dev/{$package}",
                 'description' => "AI agent context for the {$package} package",
                 'mimeType' => 'text/markdown',
             ];
@@ -92,7 +92,7 @@ final class SkillResource
                 ? ($this->contentReader)($package)
                 : $this->defaultRead($package);
         } catch (Throwable $e) {
-            throw new RuntimeException("SKILL.md not found for arqel/{$package}", 0, $e);
+            throw new RuntimeException("SKILL.md not found for arqel-dev/{$package}", 0, $e);
         }
 
         return [

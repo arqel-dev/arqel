@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 use ReflectionClass;
 use ReflectionException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
@@ -267,20 +269,26 @@ final class ResourceController
     {
         $rules = $this->extractRules($resource);
 
-        if ($rules !== []) {
-            $validated = $request->validate($rules);
+        // `null` means the rule extractor is genuinely absent
+        // (`arqel-dev/form` not installed) — the documented permissive
+        // fallback. An empty array means the extractor ran and the
+        // Resource declared no rules. We must NOT treat an infra failure
+        // (extractor present but broken) as "no rules": that path
+        // fails closed inside extractRules() by throwing, never here.
+        if ($rules === null) {
+            $data = $request->except(['_token', '_method', 'resource', 'id']);
+
             $clean = [];
-            foreach ($validated as $key => $value) {
+            foreach ($data as $key => $value) {
                 $clean[(string) $key] = $value;
             }
 
             return $clean;
         }
 
-        $data = $request->except(['_token', '_method', 'resource', 'id']);
-
+        $validated = $request->validate($rules);
         $clean = [];
-        foreach ($data as $key => $value) {
+        foreach ($validated as $key => $value) {
             $clean[(string) $key] = $value;
         }
 
@@ -288,28 +296,53 @@ final class ResourceController
     }
 
     /**
-     * @return array<string, array<int, mixed>>
+     * Extract validation rules from the Resource's Field schema.
+     *
+     * Returns `null` when the extractor is genuinely unavailable
+     * (`arqel-dev/form` not installed) — the caller then applies the
+     * documented permissive fallback. Returns an array (possibly empty)
+     * when the extractor ran successfully.
+     *
+     * Fails CLOSED on infrastructure errors: if the extractor class
+     * exists but cannot be instantiated, lacks an `extract()` method, or
+     * throws, we raise a RuntimeException (HTTP 500) rather than silently
+     * collapsing to "no rules" — which would accept unvalidated input
+     * (mass assignment). The failure is logged for operators.
+     *
+     * @return array<string, array<int, mixed>>|null
      */
-    private function extractRules(Resource $resource): array
+    private function extractRules(Resource $resource): ?array
     {
         $extractorClass = 'Arqel\\Form\\FieldRulesExtractor';
 
         if (! class_exists($extractorClass)) {
-            return [];
+            return null;
         }
 
         try {
             $reflection = new ReflectionClass($extractorClass);
             $extractor = $reflection->newInstance();
-        } catch (ReflectionException) {
-            return [];
-        }
 
-        if (! method_exists($extractor, 'extract')) {
-            return [];
-        }
+            if (! method_exists($extractor, 'extract')) {
+                throw new RuntimeException(
+                    "[{$extractorClass}] exists but has no extract() method; refusing to skip validation.",
+                );
+            }
 
-        $rules = $extractor->extract($resource->fields());
+            $rules = $extractor->extract($resource->fields());
+        } catch (ReflectionException|RuntimeException $e) {
+            Log::error('Arqel: field-rule extraction failed; refusing to accept unvalidated input.', [
+                'resource' => $resource::class,
+                'extractor' => $extractorClass,
+                'exception' => $e->getMessage(),
+            ]);
+
+            throw new RuntimeException(
+                'Field-rule extraction failed; refusing to skip validation.',
+                0,
+                $e,
+            );
+        }
 
         if (! is_array($rules)) {
             return [];

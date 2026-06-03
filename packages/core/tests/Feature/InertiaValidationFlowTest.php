@@ -60,3 +60,19 @@ it('store: permissive fallback strips route + CSRF params', function (): void {
 
     expect($response->getStatusCode())->toBe(302);
 });
+
+/**
+ * Fail-closed guard (FORM-007 security): `extractRules()` returns `null`
+ * ONLY when the extractor class is genuinely absent (`arqel-dev/form`
+ * not installed). When the class exists but is broken — cannot be
+ * instantiated, lacks `extract()`, or throws — the controller raises a
+ * RuntimeException instead of silently accepting unvalidated input
+ * (which would permit mass assignment).
+ *
+ * The "broken extractor" branch is exercised in `arqel-dev/form`, where
+ * a real `Arqel\Form\FieldRulesExtractor` exists and can be stubbed
+ * without synthesising classes into the shared autoload (which would
+ * leak into the rest of this suite). Here in core we only assert the
+ * permissive-fallback contract above, since `arqel-dev/form` is not a
+ * dependency of the core test bench.
+ */

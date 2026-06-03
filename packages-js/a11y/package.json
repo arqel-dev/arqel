@@ -42,7 +42,7 @@
     "audit:scan": "tsx scripts/audit.ts"
   },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "react": "^19.2.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
@@ -52,8 +52,8 @@
     "@types/react-dom": "^19.0.0",
     "axe-core": "^4.10.2",
     "jsdom": "^25.0.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "tsup": "^8.5.0",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",

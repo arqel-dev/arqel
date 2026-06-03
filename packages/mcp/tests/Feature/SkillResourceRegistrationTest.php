@@ -10,7 +10,7 @@ beforeEach(function (): void {
     // never hit the real filesystem during package boot.
     $this->app->instance(SkillResource::class, new SkillResource(
         packagesResolver: static fn (): array => ['core', 'mcp'],
-        contentReader: static fn (string $package): string => "# SKILL.md fixture for arqel/{$package}",
+        contentReader: static fn (string $package): string => "# SKILL.md fixture for arqel-dev/{$package}",
     ));
 
     // Re-run the boot block now that we've replaced the binding. We

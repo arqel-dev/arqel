@@ -6,5 +6,7 @@ export type { MainContentMaxWidth, MainContentProps } from './MainContent.js';
 export { MainContent } from './MainContent.js';
 export type { SidebarProps } from './Sidebar.js';
 export { Sidebar } from './Sidebar.js';
+export type { TenantSwitcherProps } from './TenantSwitcher.js';
+export { TenantSwitcher } from './TenantSwitcher.js';
 export type { TopbarProps } from './Topbar.js';
 export { Topbar } from './Topbar.js';

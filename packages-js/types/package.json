@@ -46,6 +46,10 @@
     "./inertia": {
       "types": "./dist/inertia.d.ts",
       "import": "./dist/inertia.js"
+    },
+    "./tenant": {
+      "types": "./dist/tenant.d.ts",
+      "import": "./dist/tenant.js"
     }
   },
   "files": [

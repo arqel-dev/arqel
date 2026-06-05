@@ -1,0 +1,35 @@
+{
+  "$schema": "https://www.schemastore.org/package.json",
+  "name": "@arqel-dev/showcase",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@inertiajs/react": "^3.0.3",
+    "@playwright/test": "^1.48.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.0.1",
+    "laravel-vite-plugin": "^2.1.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2"
+  },
+  "dependencies": {
+    "@arqel-dev/auth": "workspace:^",
+    "@arqel-dev/fields": "workspace:^",
+    "@arqel-dev/hooks": "workspace:^",
+    "@arqel-dev/react": "workspace:^",
+    "@arqel-dev/types": "workspace:^",
+    "@arqel-dev/ui": "workspace:^"
+  }
+}

@@ -9,8 +9,19 @@
     "php": "^8.3",
     "laravel/framework": "^13.7",
     "laravel/tinker": "^3.0",
-    "arqel-dev/framework": "^0.11.0",
-    "arqel-dev/tenant": "^0.11.0"
+    "arqel-dev/framework": "^0.12.0",
+    "arqel-dev/tenant": "^0.12.0",
+    "arqel-dev/nav": "^0.12.0",
+    "arqel-dev/widgets": "^0.12.0",
+    "arqel-dev/fields-advanced": "^0.12.0",
+    "arqel-dev/export": "^0.12.0",
+    "arqel-dev/audit": "^0.12.0",
+    "arqel-dev/versioning": "^0.12.0",
+    "arqel-dev/workflow": "^0.12.0",
+    "arqel-dev/realtime": "^0.12.0",
+    "arqel-dev/ai": "^0.12.0",
+    "arqel-dev/mcp": "^0.12.0",
+    "spatie/laravel-activitylog": "^4.10"
   },
   "repositories": [
     { "type": "path", "url": "../../packages/arqel", "options": { "symlink": true } },
@@ -22,7 +33,15 @@
     { "type": "path", "url": "../../packages/nav", "options": { "symlink": true } },
     { "type": "path", "url": "../../packages/table", "options": { "symlink": true } },
     { "type": "path", "url": "../../packages/widgets", "options": { "symlink": true } },
-    { "type": "path", "url": "../../packages/tenant", "options": { "symlink": true } }
+    { "type": "path", "url": "../../packages/tenant", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/fields-advanced", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/export", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/audit", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/versioning", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/workflow", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/realtime", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/ai", "options": { "symlink": true } },
+    { "type": "path", "url": "../../packages/mcp", "options": { "symlink": true } }
   ],
   "require-dev": {
     "fakerphp/faker": "^1.23",

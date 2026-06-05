@@ -35,9 +35,9 @@ final class TenantShareTest extends TestCase
         $response->assertOk();
         $response->assertInertia(
             fn ($page) => $page
-                ->has('tenantContext.current')
-                ->where('tenantContext.current.name', 'Acme')
-                ->has('tenantContext.available', 2),
+                ->has('tenant.current')
+                ->where('tenant.current.name', 'Acme')
+                ->has('tenant.available', 2),
         );
     }
 }

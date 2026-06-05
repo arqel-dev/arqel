@@ -13,13 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Resolve the tenant from the authenticated user on every web
-        // request. `optional` is a no-op when there's no user/tenant
-        // (e.g. the login page), so it is safe to apply group-wide; the
-        // core panel route registration does not reliably honour the
-        // Panel's own middleware stack, so we wire it here instead.
-        // The `arqel.tenant` alias is registered by TenantServiceProvider.
-        $middleware->appendToGroup('web', 'arqel.tenant:optional');
+        //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

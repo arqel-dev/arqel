@@ -6,14 +6,8 @@ namespace App\Providers;
 
 use App\Arqel\Resources\ProjectResource;
 use App\Http\Middleware\HandleInertiaRequests;
-use App\Models\Tenant as TenantModel;
 use Arqel\Core\Panel\PanelRegistry;
-use Arqel\Tenant\Contracts\TenantResolver;
-use Arqel\Tenant\Resolvers\AuthUserResolver;
-use Arqel\Tenant\TenantManager;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 
@@ -29,27 +23,6 @@ use Inertia\Inertia;
  */
 final class ArqelServiceProvider extends ServiceProvider
 {
-    /**
-     * Override the tenant resolver so it reads the active tenant from
-     * the user's `currentTenant` relation. The package default is
-     * `currentTeam` (Jetstream convention) and the config wiring only
-     * forwards model + identifier_column, so the `relation` argument
-     * must be set here via an explicit binding. `availableRelation`
-     * (`tenants`) and `foreignKeyColumn` (`current_tenant_id`) keep
-     * their defaults, which already match this app.
-     */
-    public function register(): void
-    {
-        $this->app->bind(
-            TenantResolver::class,
-            fn (): AuthUserResolver => new AuthUserResolver(
-                modelClass: TenantModel::class,
-                identifierColumn: 'slug',
-                relation: 'currentTenant',
-            ),
-        );
-    }
-
     public function boot(): void
     {
         // Auto-register the app's HandleInertiaRequests middleware in the
@@ -69,13 +42,6 @@ final class ArqelServiceProvider extends ServiceProvider
             Inertia::setRootView($rootView);
         }
 
-        // Share the tenant context GLOBALLY so it reaches the panel resource
-        // pages. Key is `tenantContext` (NOT `tenant`): the core's
-        // `final HandleArqelInertiaRequests` reserves a `tenant` key as a
-        // Phase-1 stub that always returns null and would override ours via
-        // array_merge. `tenantContext` sidesteps that collision.
-        Inertia::share('tenantContext', fn (): array => $this->tenantContext());
-
         /** @var PanelRegistry $registry */
         $registry = $this->app->make(PanelRegistry::class);
 
@@ -89,10 +55,6 @@ final class ArqelServiceProvider extends ServiceProvider
                 ProjectResource::class,
             ]);
 
-        // Tenant resolution is wired in bootstrap/app.php (appended to the
-        // `web` group), because the core route registration does not
-        // reliably apply the Panel's own middleware stack.
-
         $registry->setCurrent('admin');
 
         // Ensure /admin/login etc. exist even if AuthServiceProvider booted
@@ -100,45 +62,5 @@ final class ArqelServiceProvider extends ServiceProvider
         if (class_exists(\Arqel\Auth\Routes::class) && $panel->loginEnabled()) {
             \Arqel\Auth\Routes::register($panel);
         }
-    }
-
-    /**
-     * Tenant context for the shared Inertia prop consumed by
-     * `<TenantSwitcher>`: the active tenant plus the set the current
-     * user may switch to.
-     *
-     * @return array{current: array<string, mixed>|null, available: array<int, array<string, mixed>>}
-     */
-    private function tenantContext(): array
-    {
-        $manager = $this->app->make(TenantManager::class);
-        $user = Auth::user();
-
-        return [
-            'current' => $this->serialiseTenant($manager->current()),
-            'available' => $user !== null
-                ? array_values(array_filter(array_map(
-                    fn (Model $tenant): ?array => $this->serialiseTenant($tenant),
-                    $manager->availableFor($user),
-                )))
-                : [],
-        ];
-    }
-
-    /**
-     * @return array{id: int|string, name: string|null, slug: string|null, logo: string|null}|null
-     */
-    private function serialiseTenant(?Model $tenant): ?array
-    {
-        if ($tenant === null) {
-            return null;
-        }
-
-        return [
-            'id' => $tenant->getKey(),
-            'name' => $tenant->getAttribute('name'),
-            'slug' => $tenant->getAttribute('slug'),
-            'logo' => $tenant->getAttribute('logo'),
-        ];
     }
 }

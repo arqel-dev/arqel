@@ -18,4 +18,13 @@ interface HasFields
      * @return array<int, mixed>
      */
     public function fields(): array;
+
+    /**
+     * The effective field list — the form's fields when a layout-aware
+     * form is declared, otherwise the flat fields(). Validation and
+     * rendering both read this, so a form() needn't re-declare fields().
+     *
+     * @return array<int, mixed>
+     */
+    public function effectiveFields(): array;
 }

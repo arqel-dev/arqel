@@ -117,7 +117,7 @@ final class TenantServiceProvider extends PackageServiceProvider
             $name = $param->getName();
             $value = $configByParam[$name] ?? null;
 
-            if ($value !== null) {
+            if (is_string($value)) {
                 $args[] = $value;
 
                 continue;
@@ -129,7 +129,11 @@ final class TenantServiceProvider extends PackageServiceProvider
                 continue;
             }
 
-            break;
+            // No config value and no default: skip it and let PHP raise a
+            // precise ArgumentCountError naming the missing parameter when
+            // the resolver is constructed (a truly required custom param
+            // the framework cannot supply).
+            continue;
         }
 
         /** @var TenantResolver $instance */

@@ -103,12 +103,19 @@ final class TenantServiceProvider extends PackageServiceProvider
         // Map config keys -> constructor parameter names. Build the
         // positional argument list by walking the constructor params in
         // order, using config when present, else the param's default.
+        //
+        // NOTE: the resolver's `foreignKeyColumn` is the column ON THE USER
+        // that stores the active tenant (e.g. `current_tenant_id`), read
+        // from `arqel.tenancy.switch_column`. It is NOT `arqel.tenancy.
+        // foreign_key`, which is the BelongsToTenant FK on the tenant-owned
+        // model (e.g. `tenant_id` on `projects`). Conflating the two breaks
+        // tenant switching (`UPDATE users SET tenant_id = ...`).
         $configByParam = [
             'modelClass' => $modelClass,
             'identifierColumn' => $config->get('arqel.tenancy.identifier_column'),
             'relation' => $config->get('arqel.tenancy.relation'),
             'availableRelation' => $config->get('arqel.tenancy.available_relation'),
-            'foreignKeyColumn' => $config->get('arqel.tenancy.foreign_key'),
+            'foreignKeyColumn' => $config->get('arqel.tenancy.switch_column'),
         ];
 
         $constructor = new ReflectionMethod($resolverClass, '__construct');

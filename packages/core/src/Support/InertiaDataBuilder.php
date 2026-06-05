@@ -300,9 +300,9 @@ final class InertiaDataBuilder
 
     /**
      * Returns the field list to serialise plus the optional layout
-     * payload. When `Resource::form()` is declared, the schema (with
-     * Section/Tabs/etc.) goes through `Form::toArray()` and the
-     * field list is sourced from `Form::getFields()` (flatten).
+     * payload. The field list comes from `Resource::effectiveFields()`
+     * (the same source validation reads). When `form()` exposes
+     * `toArray()`, the Section/Tabs/Grid layout payload is computed here.
      *
      * Duck-typed against `arqel-dev/form` so `arqel-dev/core` does not need
      * a hard dep.

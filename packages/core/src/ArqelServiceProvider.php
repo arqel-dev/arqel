@@ -298,7 +298,18 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $panel = $registry->getCurrent();
         $configPath = config('arqel.path', 'admin');
         $path = $panel?->getPath() ?? (is_string($configPath) ? $configPath : 'admin');
-        $middleware = $panel?->getMiddleware() ?? ['web', HandleArqelInertiaRequests::class];
+        $panelMiddleware = $panel?->getMiddleware();
+        $configMiddleware = config('arqel.middleware');
+
+        if (is_array($panelMiddleware) && $panelMiddleware !== ['web']) {
+            // Panel declared a non-default stack — honour it.
+            $middleware = $panelMiddleware;
+        } elseif (is_array($configMiddleware) && $configMiddleware !== []) {
+            // Config-driven stack (known before boot, so it always applies).
+            $middleware = array_values(array_filter($configMiddleware, 'is_string'));
+        } else {
+            $middleware = ['web', HandleArqelInertiaRequests::class];
+        }
 
         if (! in_array(HandleArqelInertiaRequests::class, $middleware, true)) {
             $middleware[] = HandleArqelInertiaRequests::class;

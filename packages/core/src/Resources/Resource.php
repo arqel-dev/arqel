@@ -154,6 +154,30 @@ abstract class Resource implements HasActions, HasFields, HasResource
         return null;
     }
 
+    /**
+     * The effective field list for this Resource: the form's fields when
+     * a form() schema is declared, otherwise the flat fields(). This is
+     * the single source both validation (rule extraction) and rendering
+     * read, so a layout-aware form() does not require re-declaring every
+     * field in fields().
+     *
+     * @return array<int, mixed>
+     */
+    public function effectiveFields(): array
+    {
+        $form = $this->form();
+
+        if (is_object($form) && method_exists($form, 'getFields')) {
+            $fields = $form->getFields();
+
+            if (is_array($fields)) {
+                return array_values($fields);
+            }
+        }
+
+        return $this->fields();
+    }
+
     public function recordTitle(Model $record): string
     {
         $attribute = static::$recordTitleAttribute;

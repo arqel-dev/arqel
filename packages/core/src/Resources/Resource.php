@@ -161,6 +161,9 @@ abstract class Resource implements HasActions, HasFields, HasResource
      * read, so a layout-aware form() does not require re-declaring every
      * field in fields().
      *
+     * Only `getFields()` is required here; the layout-payload path in
+     * InertiaDataBuilder additionally needs `toArray()`.
+     *
      * @return array<int, mixed>
      */
     public function effectiveFields(): array

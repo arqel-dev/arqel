@@ -301,6 +301,9 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $panelMiddleware = $panel?->getMiddleware();
         $configMiddleware = config('arqel.middleware');
 
+        // `['web']` is Panel's default stack (Panel::$middleware), so it is
+        // the sentinel for "the app left the panel middleware untouched" —
+        // in that case we prefer the config-driven stack below.
         if (is_array($panelMiddleware) && $panelMiddleware !== ['web']) {
             // Panel declared a non-default stack — honour it.
             $middleware = $panelMiddleware;

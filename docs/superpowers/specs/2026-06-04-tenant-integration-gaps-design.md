@@ -22,7 +22,7 @@ Building `apps/tenant-demo` surfaced four gaps where the framework forced app-le
 
 - `relation` → constructor param `relation`
 - `available_relation` → constructor param `availableRelation`
-- `foreign_key` → constructor param `foreignKeyColumn`
+- `switch_column` → constructor param `foreignKeyColumn` (the column ON THE USER that stores the active tenant, e.g. `current_tenant_id`). **Note:** this is deliberately NOT `arqel.tenancy.foreign_key`, which is the `BelongsToTenant` FK on the tenant-owned model (e.g. `tenant_id` on `projects`). Reusing `foreign_key` for both would make a tenant switch run `UPDATE users SET tenant_id = ...` and fail.
 
 Resolution: read the constructor's parameter list via `ReflectionMethod`, then build the call's positional argument array by walking those parameters in order. For each parameter, use the matching config value when present (config key → param name: `model`→`modelClass`, `identifier_column`→`identifierColumn`, `relation`→`relation`, `available_relation`→`availableRelation`, `foreign_key`→`foreignKeyColumn`); otherwise fall back to the parameter's declared default. This handles the positional constructor correctly — e.g. to set `relation` (3rd param) it also supplies `identifierColumn` (2nd) from config or its default. Params with no matching config key and no default are left to fail loudly (a misconfigured custom resolver). Existing apps (no new keys) get identical behavior because every param falls back to its default.
 

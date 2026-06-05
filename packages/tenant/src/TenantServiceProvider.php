@@ -13,6 +13,7 @@ use Arqel\Tenant\Middleware\ResolveTenantMiddleware;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Routing\Router;
+use ReflectionMethod;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -99,8 +100,37 @@ final class TenantServiceProvider extends PackageServiceProvider
             return null;
         }
 
-        $identifierColumn = $config->get('arqel.tenancy.identifier_column', 'id');
-        $args = is_string($identifierColumn) ? [$modelClass, $identifierColumn] : [$modelClass];
+        // Map config keys -> constructor parameter names. Build the
+        // positional argument list by walking the constructor params in
+        // order, using config when present, else the param's default.
+        $configByParam = [
+            'modelClass' => $modelClass,
+            'identifierColumn' => $config->get('arqel.tenancy.identifier_column'),
+            'relation' => $config->get('arqel.tenancy.relation'),
+            'availableRelation' => $config->get('arqel.tenancy.available_relation'),
+            'foreignKeyColumn' => $config->get('arqel.tenancy.foreign_key'),
+        ];
+
+        $constructor = new ReflectionMethod($resolverClass, '__construct');
+        $args = [];
+        foreach ($constructor->getParameters() as $param) {
+            $name = $param->getName();
+            $value = $configByParam[$name] ?? null;
+
+            if ($value !== null) {
+                $args[] = $value;
+
+                continue;
+            }
+
+            if ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+
+                continue;
+            }
+
+            break;
+        }
 
         /** @var TenantResolver $instance */
         $instance = new $resolverClass(...$args);

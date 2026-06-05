@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 use Arqel\Tenant\Contracts\TenantResolver;
+use Arqel\Tenant\Resolvers\AuthUserResolver;
 use Arqel\Tenant\Resolvers\HeaderResolver;
 use Arqel\Tenant\TenantManager;
 use Arqel\Tenant\Tests\Fixtures\Tenant;
+use ReflectionClass;
 
 it('boots the tenant service provider in a Testbench app', function (): void {
     expect(true)->toBeTrue();
@@ -66,4 +68,51 @@ it('returns null TenantResolver when configured class does not implement TenantR
     $resolver = app(TenantResolver::class);
 
     expect($resolver)->toBeNull();
+});
+
+it('forwards arqel.tenancy.relation/available_relation/foreign_key to the resolver', function (): void {
+    config([
+        'arqel.tenancy.resolver' => AuthUserResolver::class,
+        'arqel.tenancy.model' => Tenant::class,
+        'arqel.tenancy.identifier_column' => 'slug',
+        'arqel.tenancy.relation' => 'currentTenant',
+        'arqel.tenancy.available_relation' => 'workspaces',
+        'arqel.tenancy.foreign_key' => 'active_tenant_id',
+    ]);
+
+    app()->forgetInstance(TenantResolver::class);
+    app()->forgetInstance(TenantManager::class);
+
+    $resolver = app(TenantResolver::class);
+    expect($resolver)->toBeInstanceOf(AuthUserResolver::class);
+
+    $ref = new ReflectionClass($resolver);
+    $relation = $ref->getProperty('relation');
+    $relation->setAccessible(true);
+    $available = $ref->getProperty('availableRelation');
+    $available->setAccessible(true);
+    $fk = $ref->getProperty('foreignKeyColumn');
+    $fk->setAccessible(true);
+
+    expect($relation->getValue($resolver))->toBe('currentTenant')
+        ->and($available->getValue($resolver))->toBe('workspaces')
+        ->and($fk->getValue($resolver))->toBe('active_tenant_id');
+});
+
+it('keeps resolver constructor defaults when the optional config keys are absent', function (): void {
+    config([
+        'arqel.tenancy.resolver' => AuthUserResolver::class,
+        'arqel.tenancy.model' => Tenant::class,
+        'arqel.tenancy.identifier_column' => 'id',
+    ]);
+
+    app()->forgetInstance(TenantResolver::class);
+    app()->forgetInstance(TenantManager::class);
+
+    $resolver = app(TenantResolver::class);
+    $ref = new ReflectionClass($resolver);
+    $relation = $ref->getProperty('relation');
+    $relation->setAccessible(true);
+
+    expect($relation->getValue($resolver))->toBe('currentTeam');
 });

@@ -14,15 +14,22 @@ tenants" setup, à la Jetstream/Spark).
 - The active tenant persists in `users.current_tenant_id`; the resolver reads
   it from the authenticated user on every request.
 
-## Wiring (see `app/Providers/ArqelServiceProvider.php`)
+## Wiring (see `config/arqel.php`)
 
-- Binds a custom `AuthUserResolver` with `relation: 'currentTenant'` (the
-  package default is `currentTeam`, and the config wiring only forwards
-  model + identifier column).
-- Shares the tenant context to Inertia under the **`tenantContext`** key (the
-  core reserves `tenant` as a stub that would otherwise override it).
-- Tenant resolution is appended to the `web` middleware group in
-  `bootstrap/app.php` (`arqel.tenant:optional`).
+Everything is config-driven — no custom resolver bind, Inertia share, or
+bootstrap middleware append is needed.
+
+- `arqel.tenancy.resolver` + `model` + `identifier_column` + `relation`
+  (`currentTenant`) configure the `AuthUserResolver`; `TenantServiceProvider`
+  builds it from these keys (the package default `relation` is `currentTeam`).
+- `arqel.tenancy.switch_column` (`current_tenant_id`) is the USER column the
+  resolver writes when switching tenants. It is distinct from
+  `arqel.tenancy.foreign_key` (`tenant_id`), the `BelongsToTenant` FK on
+  tenant-owned rows like `projects`.
+- `arqel.middleware` (`['web', 'auth', 'arqel.tenant:optional']`) is applied
+  to the admin resource routes by the core, so tenant resolution runs there.
+- The Arqel core natively populates the `tenant` Inertia prop
+  (`{current, available}`), which `<TenantSwitcher>` consumes.
 
 ## Run it
 

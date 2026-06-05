@@ -311,16 +311,12 @@ final class InertiaDataBuilder
      */
     private function resolveFormFields(Resource $resource): array
     {
+        $fields = $resource->effectiveFields();
         $form = $resource->form();
 
-        if (is_object($form)
-            && method_exists($form, 'getFields')
-            && method_exists($form, 'toArray')
-        ) {
-            $fields = $form->getFields();
+        if (is_object($form) && method_exists($form, 'toArray')) {
             $payload = $form->toArray();
 
-            $normalisedFields = is_array($fields) ? array_values($fields) : $resource->fields();
             $normalisedPayload = null;
             if (is_array($payload)) {
                 $normalisedPayload = [];
@@ -329,10 +325,10 @@ final class InertiaDataBuilder
                 }
             }
 
-            return [$normalisedFields, $normalisedPayload];
+            return [$fields, $normalisedPayload];
         }
 
-        return [$resource->fields(), null];
+        return [$fields, null];
     }
 
     private function currentUser(): ?Authenticatable

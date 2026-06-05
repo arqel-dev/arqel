@@ -8,6 +8,11 @@ return [
     'resources' => [
         'path' => app_path('Arqel/Resources'),
         'namespace' => 'App\\Arqel\\Resources',
+
+        // Resources are hand-registered in ArqelServiceProvider via
+        // Panel::resources([...]); auto-discovery stays off so the
+        // explicit set is the single source of truth.
+        'discover' => false,
     ],
 
     'auth' => [

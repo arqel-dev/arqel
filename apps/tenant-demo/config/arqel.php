@@ -14,19 +14,22 @@ return [
         'guard' => 'web',
     ],
 
-    // Multi-tenancy (arqel-dev/tenant). The AuthUserResolver reads the
-    // active tenant from the authenticated user's `current_tenant_id`
-    // column and enumerates the available set via the user's `tenants`
-    // relation — both its constructor defaults, so only resolver + model
-    // + identifier_column need declaring here.
+    // Multi-tenancy (arqel-dev/tenant). AuthUserResolver reads the active
+    // tenant from the user's `currentTenant` relation (`relation`) and
+    // enumerates the switchable set from the user's `tenants` relation
+    // (the resolver's `available_relation` default).
+    //
+    // Two distinct columns — do NOT conflate:
+    //   foreign_key    'tenant_id'         BelongsToTenant FK on tenant-OWNED rows (projects)
+    //   switch_column  'current_tenant_id' column on the USER that holds the active tenant
     'tenancy' => [
         'enabled' => true,
         'resolver' => Arqel\Tenant\Resolvers\AuthUserResolver::class,
         'model' => App\Models\Tenant::class,
-        'foreign_key' => 'tenant_id',
-        'switch_column' => 'current_tenant_id',
         'identifier_column' => 'slug',
         'relation' => 'currentTenant',
+        'foreign_key' => 'tenant_id',
+        'switch_column' => 'current_tenant_id',
     ],
 
     // Panel-wide middleware. Resolved before boot, so it reliably applies

@@ -7,7 +7,6 @@ use Arqel\Tenant\Resolvers\AuthUserResolver;
 use Arqel\Tenant\Resolvers\HeaderResolver;
 use Arqel\Tenant\TenantManager;
 use Arqel\Tenant\Tests\Fixtures\Tenant;
-use ReflectionClass;
 
 it('boots the tenant service provider in a Testbench app', function (): void {
     expect(true)->toBeTrue();

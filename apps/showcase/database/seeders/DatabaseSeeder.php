@@ -8,6 +8,7 @@ use App\Models\Author;
 use App\Models\Category;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\Ticket;
 use App\Models\User;
@@ -78,6 +79,10 @@ final class DatabaseSeeder extends Seeder
 
         if (Ticket::query()->count() === 0) {
             Ticket::factory()->count(8)->create();
+        }
+
+        if (Setting::query()->count() === 0) {
+            Setting::factory()->count(3)->create();
         }
 
         $admin = User::firstOrCreate(

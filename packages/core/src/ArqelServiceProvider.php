@@ -325,15 +325,6 @@ final class ArqelServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Walk every registered Panel and copy its `resources([...])`
-     * declaration into the global `ResourceRegistry`. The
-     * controller resolves slugs against the registry, not against
-     * Panel state, so this sync is mandatory for `/admin/{slug}`
-     * to ever resolve.
-     *
-     * Idempotent: `ResourceRegistry::register()` skips duplicates.
-     */
-    /**
      * When `arqel.resources.discover` is enabled, scan the configured
      * resources path/namespace and register every HasResource class into
      * the global ResourceRegistry. No-op by default.
@@ -354,6 +345,15 @@ final class ArqelServiceProvider extends PackageServiceProvider
         $this->app->make(ResourceRegistry::class)->discover($path, $namespace);
     }
 
+    /**
+     * Walk every registered Panel and copy its `resources([...])`
+     * declaration into the global `ResourceRegistry`. The
+     * controller resolves slugs against the registry, not against
+     * Panel state, so this sync is mandatory for `/admin/{slug}`
+     * to ever resolve.
+     *
+     * Idempotent: `ResourceRegistry::register()` skips duplicates.
+     */
     protected function syncPanelResourcesIntoRegistry(): void
     {
         $panelRegistry = $this->app->make(PanelRegistry::class);

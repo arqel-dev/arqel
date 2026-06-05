@@ -23,7 +23,10 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   treeshake: true,
-  splitting: false,
+  // Keep splitting ON so module-level singletons (e.g. the FieldRegistry Map
+  // in src/form/FieldRegistry.tsx) are hoisted to a single shared chunk
+  // instead of being inlined into each entry. See #45.
+  splitting: true,
   minify: false,
   external: [
     'react',

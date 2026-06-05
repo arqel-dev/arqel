@@ -7,7 +7,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-_Placeholder para próximo ciclo._
+### Fixed
+
+- **ui:** `@arqel-dev/ui` agora builda com `splitting: true` no tsup, unificando o `Map` de nível de módulo do `FieldRegistry` em um único chunk compartilhado. Antes, com `splitting: false`, cada entry (`form.js`, `pages.js`, ...) recebia sua própria cópia do registry — campos registrados via `@arqel-dev/ui/form` (usado por `@arqel-dev/fields/register`) ficavam invisíveis ao renderer de `@arqel-dev/ui/pages`, então campos avançados caíam no fallback HTML nativo e submits boolean/datetime retornavam 422 (#45).
 
 ---
 

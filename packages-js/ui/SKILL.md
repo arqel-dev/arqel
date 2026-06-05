@@ -89,6 +89,7 @@ export default function UsersIndex(props: ResourceIndexProps<User>) {
 - Componentes presentational — callbacks lifted (sem fetch interno)
 - `peerDependencies`: `radix-ui`, `@tanstack/react-table`, `lucide-react`, `@arqel-dev/{react,hooks}`
 - Props com `undefined` explícito quando opcionais (`exactOptionalPropertyTypes: true`)
+- **`splitting: true` no `tsup.config.ts` é obrigatório** — singletons de nível de módulo (ex.: o `Map` do `FieldRegistry` em `src/form/FieldRegistry.tsx`) precisam ser içados para um único chunk compartilhado. Com `splitting: false` o tsup inlinava o `Map` em cada entry (`form.js`, `pages.js`, ...), então campos registrados via `@arqel-dev/ui/form` ficavam invisíveis ao renderer de `@arqel-dev/ui/pages` (#45). O registry agora é uma única instância compartilhada entre todos os entrypoints.
 
 ## Anti-patterns
 
@@ -100,6 +101,7 @@ export default function UsersIndex(props: ResourceIndexProps<User>) {
 - ❌ **Estado local em ResourceIndex/DataTable** — sempre lifted via callbacks
 - ❌ **Duplicar `useFlash({ onMessage })`** — um único `<FlashContainer>` no AppShell
 - ❌ **Recriar variants `success`/`warning` no `Badge`** — foram removidas; usa `default`/`secondary`/`outline` ou compõe com `className`
+- ❌ **Voltar `splitting` para `false`** — duplica singletons de módulo (FieldRegistry) por entry e quebra o registro cross-entrypoint de campos (#45)
 
 ## Testing
 

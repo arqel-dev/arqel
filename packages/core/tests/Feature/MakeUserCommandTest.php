@@ -57,3 +57,14 @@ it('updates an existing user with --force and exits 0', function (): void {
     expect($row->name)->toBe('New Name')
         ->and(DB::table('users')->count())->toBe(1);
 });
+
+it('creates the user with --force when the email does not yet exist', function (): void {
+    $this->artisan('arqel:make-user', [
+        '--name' => 'Fresh',
+        '--email' => 'fresh@x.test',
+        '--password' => 'secret',
+        '--force' => true,
+    ])->assertExitCode(0);
+
+    expect(DB::table('users')->where('email', 'fresh@x.test')->count())->toBe(1);
+});

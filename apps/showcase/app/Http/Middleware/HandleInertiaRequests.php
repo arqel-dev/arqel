@@ -15,10 +15,10 @@ use Inertia\Middleware;
  * through `HandleArqelInertiaRequests` from the core — still
  * render under the same root template.
  *
- * The tenant context (`{ current, available }`) is shared GLOBALLY via
- * `Inertia::share` in `ArqelServiceProvider`, so it reaches the panel
- * resource pages (which run through the core's Inertia middleware, not
- * this one) too.
+ * The tenant context (`{ current, available }`) is NOT shared here:
+ * it is populated natively by the core's `HandleArqelInertiaRequests`
+ * on the panel resource pages (which run through that middleware, not
+ * this one). This app-level middleware only adds `auth`/`app`.
  */
 final class HandleInertiaRequests extends Middleware
 {

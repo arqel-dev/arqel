@@ -28,7 +28,8 @@ final class MakeUserCommand extends Command
     protected $signature = 'arqel:make-user
                             {--name= : Nome completo do usuário}
                             {--email= : E-mail (login)}
-                            {--password= : Senha em texto puro (será passada por Hash::make)}';
+                            {--password= : Senha em texto puro (será passada por Hash::make)}
+                            {--force : Update the user when the email already exists}';
 
     /** @var string */
     protected $description = 'Create a new admin user.';
@@ -52,11 +53,19 @@ final class MakeUserCommand extends Command
         }
 
         try {
-            /** @var Authenticatable&\Illuminate\Database\Eloquent\Model $user */
-            $user = new $modelClass;
+            if ($this->option('force')) {
+                /** @var Authenticatable&\Illuminate\Database\Eloquent\Model $user */
+                $user = $modelClass::query()->firstOrNew(['email' => $email]);
+            } else {
+                /** @var Authenticatable&\Illuminate\Database\Eloquent\Model $user */
+                $user = new $modelClass;
+                $user->setAttribute('email', $email);
+            }
+
+            // forceFill bypasses mass-assignment guards, matching the
+            // original behaviour and working with any User model.
             $user->forceFill([
                 'name' => $name,
-                'email' => $email,
                 'password' => Hash::make($plainPassword),
                 'email_verified_at' => now(),
             ])->save();

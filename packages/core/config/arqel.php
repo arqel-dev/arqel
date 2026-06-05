@@ -8,6 +8,13 @@ return [
     'resources' => [
         'path' => app_path('Arqel/Resources'),
         'namespace' => 'App\\Arqel\\Resources',
+
+        // When true, the framework scans `path`/`namespace` at boot and
+        // registers every HasResource class it finds, making them
+        // reachable at `/admin/{slug}` without manual registration. Off
+        // by default — apps that hand-register via
+        // PanelRegistry::resources([...]) are unaffected.
+        'discover' => false,
     ],
 
     'auth' => [

@@ -14,6 +14,10 @@ return new class extends Migration
             $t->id();
             $t->string('key')->unique();
             $t->json('value')->nullable();
+            $t->json('items')->nullable();
+            $t->json('tags')->nullable();
+            $t->text('snippet')->nullable();
+            $t->text('notes')->nullable();
             $t->timestamps();
         });
     }

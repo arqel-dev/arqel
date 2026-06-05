@@ -96,6 +96,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
         // sync to `app->booted` so we always see the final list of panels
         // and resources, regardless of provider order.
         $this->app->booted(function (): void {
+            $this->discoverResourcesIfEnabled();
             $this->syncPanelResourcesIntoRegistry();
             $this->electDefaultCurrentPanel();
         });
@@ -332,6 +333,27 @@ final class ArqelServiceProvider extends PackageServiceProvider
      *
      * Idempotent: `ResourceRegistry::register()` skips duplicates.
      */
+    /**
+     * When `arqel.resources.discover` is enabled, scan the configured
+     * resources path/namespace and register every HasResource class into
+     * the global ResourceRegistry. No-op by default.
+     */
+    protected function discoverResourcesIfEnabled(): void
+    {
+        if (! (bool) config('arqel.resources.discover', false)) {
+            return;
+        }
+
+        $path = config('arqel.resources.path');
+        $namespace = config('arqel.resources.namespace');
+
+        if (! is_string($path) || ! is_string($namespace)) {
+            return;
+        }
+
+        $this->app->make(ResourceRegistry::class)->discover($path, $namespace);
+    }
+
     protected function syncPanelResourcesIntoRegistry(): void
     {
         $panelRegistry = $this->app->make(PanelRegistry::class);

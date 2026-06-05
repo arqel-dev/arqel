@@ -75,7 +75,12 @@ final class MakeUserCommand extends Command
             return self::FAILURE;
         }
 
-        info(sprintf('User created: %s <%s>', $name, $email));
+        info(sprintf(
+            'User %s: %s <%s>',
+            $user->wasRecentlyCreated ? 'created' : 'updated',
+            $name,
+            $email,
+        ));
 
         return self::SUCCESS;
     }

@@ -69,14 +69,16 @@ it('returns null TenantResolver when configured class does not implement TenantR
     expect($resolver)->toBeNull();
 });
 
-it('forwards arqel.tenancy.relation/available_relation/foreign_key to the resolver', function (): void {
+it('forwards arqel.tenancy.relation/available_relation/switch_column to the resolver', function (): void {
     config([
         'arqel.tenancy.resolver' => AuthUserResolver::class,
         'arqel.tenancy.model' => Tenant::class,
         'arqel.tenancy.identifier_column' => 'slug',
         'arqel.tenancy.relation' => 'currentTenant',
         'arqel.tenancy.available_relation' => 'workspaces',
-        'arqel.tenancy.foreign_key' => 'active_tenant_id',
+        // switch_column is the user column the resolver writes on switch —
+        // distinct from foreign_key (the BelongsToTenant model FK).
+        'arqel.tenancy.switch_column' => 'active_tenant_id',
     ]);
 
     app()->forgetInstance(TenantResolver::class);

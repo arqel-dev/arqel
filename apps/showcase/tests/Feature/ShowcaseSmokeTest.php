@@ -61,7 +61,11 @@ final class ShowcaseSmokeTest extends TestCase
             $this->actingAs($admin)
                 ->get("/admin/{$slug}")
                 ->assertOk()
-                ->assertInertia(fn ($page) => $page->component('arqel::index', false));
+                ->assertInertia(fn ($page) => $page
+                    ->component('arqel::index', false)
+                    // For `posts` specifically, also prove the index payload
+                    // wires its records prop (the table-shaped `records` key).
+                    ->when($slug === 'posts', fn ($page) => $page->has('records')));
         }
     }
 
@@ -82,10 +86,12 @@ final class ShowcaseSmokeTest extends TestCase
     {
         $admin = $this->makeAdmin();
 
-        // Invalid payload: `title` is required, `author_id` is required.
+        // Invalid payload: validation rules come from the form() schema
+        // (via Resource::effectiveFields()), where both `title` and
+        // `author_id` are ->required() — so the empty POST errors on both.
         $this->actingAs($admin)
             ->post('/admin/posts', [])
-            ->assertSessionHasErrors(['title']);
+            ->assertSessionHasErrors(['title', 'author_id']);
 
         $author = Author::factory()->create();
 
@@ -148,7 +154,7 @@ final class ShowcaseSmokeTest extends TestCase
         $globex = Tenant::where('slug', 'globex')->firstOrFail();
         $author = Author::factory()->create();
 
-        Post::factory()->state([
+        $acmePost = Post::factory()->state([
             'tenant_id' => $acme->id,
             'author_id' => $author->id,
         ])->create();
@@ -163,7 +169,14 @@ final class ShowcaseSmokeTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->has('tenant.current')
                 ->where('tenant.current.name', 'Acme')
-                ->has('tenant.available', 2));
+                ->has('tenant.available', 2)
+                // Data-scope: the BelongsToTenant global scope must restrict
+                // the index listing to the current tenant (Acme), so exactly
+                // one record surfaces and it is the Acme post. A broken scope
+                // (returning everything) would fail this.
+                ->has('records', 1)
+                ->where('records.0.id', $acmePost->id)
+                ->where('records.0.tenant_id', $acme->id));
     }
 
     public function test_post_resource_exposes_export_bulk_action(): void

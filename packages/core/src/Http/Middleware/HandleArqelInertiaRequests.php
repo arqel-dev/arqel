@@ -236,10 +236,55 @@ final class HandleArqelInertiaRequests extends Middleware
         return $items;
     }
 
+    /**
+     * Tenant context for the shared `tenant` Inertia prop.
+     *
+     * Resolves `Arqel\Tenant\TenantManager` via the container by class
+     * name (duck-typed) so `arqel-dev/core` keeps no hard dependency on
+     * `arqel-dev/tenant`. Returns null when the package is not installed.
+     *
+     * @return array{current: array<string, mixed>|null, available: array<int, array<string, mixed>>}|null
+     */
     private function currentTenant(Request $request): mixed
     {
-        // Tenant scaffold for Phase 2 — stays null in Phase 1.
-        return null;
+        $managerClass = 'Arqel\\Tenant\\TenantManager';
+        if (! app()->bound($managerClass)) {
+            return null;
+        }
+
+        $manager = app($managerClass);
+        if (! method_exists($manager, 'current') || ! method_exists($manager, 'availableFor')) {
+            return null;
+        }
+
+        $user = $request->user();
+
+        return [
+            'current' => $this->serialiseTenant($manager->current()),
+            'available' => $user !== null
+                ? array_values(array_filter(array_map(
+                    fn ($tenant): ?array => $this->serialiseTenant($tenant),
+                    $manager->availableFor($user),
+                )))
+                : [],
+        ];
+    }
+
+    /**
+     * @return array{id: mixed, name: mixed, slug: mixed, logo: mixed}|null
+     */
+    private function serialiseTenant(mixed $tenant): ?array
+    {
+        if (! $tenant instanceof \Illuminate\Database\Eloquent\Model) {
+            return null;
+        }
+
+        return [
+            'id' => $tenant->getKey(),
+            'name' => $tenant->getAttribute('name'),
+            'slug' => $tenant->getAttribute('slug'),
+            'logo' => $tenant->getAttribute('logo'),
+        ];
     }
 
     /**

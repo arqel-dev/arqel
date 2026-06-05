@@ -20,19 +20,18 @@ type LayoutFn = (page: ReactNode) => ReactNode;
 type LayoutComponent = ComponentType<unknown> & { layout?: LayoutFn };
 
 interface SharedTenantProps {
-  // Shared as `tenantContext` (not `tenant`): the Arqel core reserves a
-  // `tenant` prop as a stub, so the app shares its real context here.
-  tenantContext?: TenantContextProps;
+  tenant?: TenantContextProps;
 }
 
 /**
- * Reads the shared `tenantContext` prop and renders the switcher. Lives
- * as a component (not inline) so it can call `usePage()`. Renders
- * nothing until a current tenant is shared, so auth pages stay clean.
+ * Reads the native `tenant` prop (populated by the Arqel core) and
+ * renders the switcher. Lives as a component (not inline) so it can call
+ * `usePage()`. Renders nothing until a current tenant is shared, so auth
+ * pages stay clean.
  */
 function TenantSwitcherSlot(): JSX.Element | null {
   const { props } = usePage<SharedTenantProps>();
-  const tenant = props.tenantContext;
+  const tenant = props.tenant;
   if (!tenant?.current) {
     return null;
   }

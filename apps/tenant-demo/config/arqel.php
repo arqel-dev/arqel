@@ -24,8 +24,14 @@ return [
         'resolver' => Arqel\Tenant\Resolvers\AuthUserResolver::class,
         'model' => App\Models\Tenant::class,
         'foreign_key' => 'tenant_id',
+        'switch_column' => 'current_tenant_id',
         'identifier_column' => 'slug',
+        'relation' => 'currentTenant',
     ],
+
+    // Panel-wide middleware. Resolved before boot, so it reliably applies
+    // to the admin resource routes (unlike Panel::middleware()).
+    'middleware' => ['web', 'auth', 'arqel.tenant:optional'],
 
     'inertia' => [
         // Default Blade root view used by Inertia. `arqel:install`

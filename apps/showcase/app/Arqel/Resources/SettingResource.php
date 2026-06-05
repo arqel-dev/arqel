@@ -17,10 +17,12 @@ use Arqel\Table\Columns\TextColumn;
 use Arqel\Table\Table;
 
 /**
- * Advanced-fields probe: repeater (nested schema), tags, code and
- * markdown editors. Only `key` and `value` are persisted columns; the
- * tags/snippet/notes fields exist purely to exercise the advanced
- * field renderers in the dogfood loop (no backing columns).
+ * Advanced-fields probe: key-value editor (`value`), repeater with a
+ * nested schema (`items`), tags (`tags`), code (`snippet`) and markdown
+ * (`notes`) editors. Every field is backed by a real column on the
+ * `settings` table — `value`/`items`/`tags` are json (array casts),
+ * `snippet`/`notes` are plain text — so all of them round-trip through
+ * `fill()`/save and the dogfood loop sees genuine persistence.
  */
 final class SettingResource extends Resource
 {
@@ -48,7 +50,8 @@ final class SettingResource extends Resource
     {
         return [
             (new TextField('key'))->required(),
-            RepeaterField::make('value')->schema([
+            Field::keyValue('value'),
+            RepeaterField::make('items')->schema([
                 Field::text('label'),
                 Field::text('content'),
             ]),
@@ -69,7 +72,8 @@ final class SettingResource extends Resource
                     ->schema([
                         (new TextField('key'))
                             ->required(),
-                        RepeaterField::make('value')->schema([
+                        Field::keyValue('value'),
+                        RepeaterField::make('items')->schema([
                             Field::text('label'),
                             Field::text('content'),
                         ]),

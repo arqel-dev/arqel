@@ -14,10 +14,12 @@ final class Setting extends Model
     use HasFactory;
 
     /** @var list<string> */
-    protected $fillable = ['key', 'value'];
+    protected $fillable = ['key', 'value', 'items', 'tags', 'snippet', 'notes'];
 
     /** @var array<string, string> */
     protected $casts = [
         'value' => 'array',
+        'items' => 'array',
+        'tags' => 'array',
     ];
 }

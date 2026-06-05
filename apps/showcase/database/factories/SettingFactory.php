@@ -22,7 +22,17 @@ final class SettingFactory extends Factory
     {
         return [
             'key' => Str::slug(fake()->unique()->words(2, true), '.'),
-            'value' => ['enabled' => fake()->boolean()],
+            // Associative map — matches the KeyValueField (asObject) shape.
+            'value' => ['enabled' => 'true', 'theme' => 'dark'],
+            // List of rows — matches the RepeaterField schema.
+            'items' => [
+                ['label' => 'Item A', 'content' => '1'],
+                ['label' => 'Item B', 'content' => '2'],
+            ],
+            // List of scalars — matches the TagsField shape.
+            'tags' => ['alpha', 'beta'],
+            'snippet' => '{"k":"v"}',
+            'notes' => '# Notes',
         ];
     }
 }

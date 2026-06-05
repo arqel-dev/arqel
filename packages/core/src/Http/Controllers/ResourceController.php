@@ -329,7 +329,7 @@ final class ResourceController
                 );
             }
 
-            $rules = $extractor->extract($resource->fields());
+            $rules = $extractor->extract($resource->effectiveFields());
         } catch (ReflectionException|RuntimeException $e) {
             Log::error('Arqel: field-rule extraction failed; refusing to accept unvalidated input.', [
                 'resource' => $resource::class,

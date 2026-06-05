@@ -76,3 +76,22 @@ it('store: permissive fallback strips route + CSRF params', function (): void {
  * permissive-fallback contract above, since `arqel-dev/form` is not a
  * dependency of the core test bench.
  */
+it('extracts validation rules from the form fields, not just fields()', function (): void {
+    // A form-like object whose getFields() differs from fields().
+    $form = new class
+    {
+        public function getFields(): array
+        {
+            return ['form-only-field'];
+        }
+    };
+
+    $resource = Mockery::mock(MockableResource::class)->makePartial();
+    $resource->shouldReceive('form')->andReturn($form);
+    $resource->shouldReceive('fields')->andReturn(['flat-only-field']);
+
+    // effectiveFields() is a concrete method on Resource; the partial mock
+    // runs the real one, which must pick the form's fields — the same
+    // source ResourceController::extractRules() now reads.
+    expect($resource->effectiveFields())->toBe(['form-only-field']);
+});

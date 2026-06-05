@@ -27,6 +27,7 @@
   "dependencies": {
     "@arqel-dev/auth": "workspace:^",
     "@arqel-dev/fields": "workspace:^",
+    "@arqel-dev/fields-advanced": "workspace:^",
     "@arqel-dev/hooks": "workspace:^",
     "@arqel-dev/react": "workspace:^",
     "@arqel-dev/types": "workspace:^",

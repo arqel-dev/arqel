@@ -10,6 +10,7 @@ import type { TenantContextProps } from '@arqel-dev/types/tenant';
 import { arqelPages } from '@arqel-dev/ui/pages';
 import { AppShell, Sidebar, TenantSwitcher, Topbar } from '@arqel-dev/ui/shell';
 import '@arqel-dev/fields/register';
+import '@arqel-dev/fields-advanced/register';
 import { usePage } from '@inertiajs/react';
 import type { ComponentType, JSX, ReactNode } from 'react';
 
@@ -46,10 +47,10 @@ function TenantSwitcherSlot(): JSX.Element | null {
 const adminLayout: LayoutFn = (page) => (
   <AppShell
     variant="sidebar-left"
-    sidebar={<Sidebar brand={<span className="font-semibold">{'Arqel Tenant Demo'}</span>} />}
+    sidebar={<Sidebar brand={<span className="font-semibold">{'Arqel Showcase'}</span>} />}
     topbar={
       <Topbar
-        brand={<span className="font-medium">{'Arqel Tenant Demo'}</span>}
+        brand={<span className="font-medium">{'Arqel Showcase'}</span>}
         tenantSwitcher={<TenantSwitcherSlot />}
       />
     }

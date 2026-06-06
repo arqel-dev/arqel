@@ -190,7 +190,13 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
             key={action.name}
             type="button"
             onClick={() => {
-              const url = action.url ?? `/arqel-dev/actions/${action.name}`;
+              // Every bulk action carries a stock url (core resolves
+              // /admin/{slug}/bulk/{name} for any bulk action without an
+              // explicit url), so there is no client-side fallback route.
+              const url = action.url;
+              if (url === undefined) {
+                return;
+              }
               const method = action.method.toLowerCase() as
                 | 'get'
                 | 'post'

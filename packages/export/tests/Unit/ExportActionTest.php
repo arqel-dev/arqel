@@ -49,3 +49,19 @@ it('exposes a fluent dryRun setter', function (): void {
 
     expect($returned)->toBe($action);
 });
+
+it('serialises a stock bulk url targeting the core bulk route (#48)', function (): void {
+    // ExportAction overrides execute() and never declares a callback or
+    // url, so before the fix toArray() shipped no url and the frontend
+    // POSTed to an unregistered route. The base bulk stock-url arm must
+    // now emit /admin/{slug}/bulk/{name} via POST.
+    $resource = new class
+    {
+        public static ?string $slug = 'posts';
+    };
+
+    $array = ExportAction::make('export')->toArray(null, null, $resource);
+
+    expect($array['url'])->toBe('/admin/posts/bulk/export')
+        ->and($array['method'])->toBe('POST');
+});

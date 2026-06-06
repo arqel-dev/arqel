@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Actions\Actions;
+use Arqel\Actions\Types\BulkAction;
 
 final class StubResourceWithSlug
 {
@@ -65,6 +66,15 @@ it('Actions::deleteBulk() resolves to POST /admin/{slug}/bulk/delete with no rec
     $array = Actions::deleteBulk()->toArray(null, null, $resource);
 
     expect($array['url'])->toBe('/admin/posts/bulk/delete')
+        ->and($array['method'])->toBe('POST');
+});
+
+it('a non-delete bulk action with no explicit url resolves to POST /admin/{slug}/bulk/{name} (#48)', function (): void {
+    $resource = new StubResourceWithSlug;
+
+    $array = BulkAction::make('export')->toArray(null, null, $resource);
+
+    expect($array['url'])->toBe('/admin/posts/bulk/export')
         ->and($array['method'])->toBe('POST');
 });
 

@@ -165,12 +165,16 @@ final class ResourceController
             $data[(string) $key] = $value;
         }
 
-        if (method_exists($bulkAction, 'hasCallback') && $bulkAction->hasCallback()) {
-            $bulkAction->execute($records, $data);
-        } elseif ($action === 'delete') {
+        // Stock `delete` keeps its fast-path (no Action callback exists for
+        // it — the semantics live here). Every other bulk action is run
+        // through `execute()`, which safely no-ops when the action carries
+        // neither a callback nor an overridden execute(). This is what lets
+        // callback-less actions like ExportAction (which override execute()
+        // directly) actually run instead of error-flashing (#48).
+        if ($action === 'delete' && ! (method_exists($bulkAction, 'hasCallback') && $bulkAction->hasCallback())) {
             $modelClass::query()->whereIn('id', $recordIds)->delete();
-        } else {
-            return back()->with('error', __('arqel::messages.flash.bulk_action_no_callback', ['action' => $action]));
+        } elseif (method_exists($bulkAction, 'execute')) {
+            $bulkAction->execute($records, $data);
         }
 
         return back()->with('success', __('arqel::messages.flash.bulk_completed'));

@@ -23,8 +23,11 @@ use Throwable;
  * are caught and surfaced as `loadError` on the payload so the
  * React side can render an error state instead of crashing the
  * entire dashboard.
+ *
+ * Not `final`: the `arqel:widget --type=table` generator scaffolds a
+ * subclass of this base, so it must remain extensible.
  */
-final class TableWidget extends Widget
+class TableWidget extends Widget
 {
     protected string $type = 'table';
 

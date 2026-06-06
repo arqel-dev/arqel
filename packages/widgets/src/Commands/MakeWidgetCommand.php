@@ -18,7 +18,8 @@ use Illuminate\Support\Str;
  *   - `stat` (default) → extends `StatWidget`
  *   - `chart` → extends `ChartWidget`
  *   - `table` → extends `TableWidget`
- *   - `custom` → extends `CustomWidget`
+ *   - `custom` → factory composing `CustomWidget::make()` (the base is
+ *     `final`, so the stub builds an instance instead of subclassing)
  *
  * Snake-cased widget name (used as the constructor `name` arg) is derived
  * from the class name (e.g., `TotalUsers` → `total_users`).

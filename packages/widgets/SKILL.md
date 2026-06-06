@@ -21,10 +21,10 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **Concrete widget types (WIDGETS-002..005):**
 
-- `StatWidget` (final) — KPI card; setters value/description/icon/color/trend.
-- `ChartWidget` (final) — config Recharts serializada (sem hard dep em libs JS).
-- `TableWidget` (final) — mini-tabela; sem hard dep em `arqel-dev/table` (duck-typing).
-- `CustomWidget` (final) — escape-hatch para componentes React arbitrários.
+- `StatWidget` (extensível) — KPI card; setters value/description/icon/color/trend. **Não-final**: o gerador `arqel:widget --type=stat` cria uma subclasse desta base.
+- `ChartWidget` (extensível) — config Recharts serializada (sem hard dep em libs JS). **Não-final** (subclassada pelo gerador `--type=chart`).
+- `TableWidget` (extensível) — mini-tabela; sem hard dep em `arqel-dev/table` (duck-typing). **Não-final** (subclassada pelo gerador `--type=table`).
+- `CustomWidget` (final) — escape-hatch para componentes React arbitrários. Permanece `final`; o gerador `--type=custom` **compõe** via `CustomWidget::make()` em vez de subclassar.
 
 **HTTP layer (WIDGETS-007..008):**
 
@@ -42,7 +42,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **Scaffolders (WIDGETS-013):**
 
-- `Commands\MakeWidgetCommand` (final) — `arqel:widget <Name> --type=stat|chart|table|custom --force`. Gera `app/Widgets/<Name>.php`; snake_case do class name vira o `name` arg do construtor (e.g. `TotalUsers` → `'total_users'`). Idempotente (skip sem `--force`). Stubs em `stubs/widgets/{stat,chart,table,custom}.stub`.
+- `Commands\MakeWidgetCommand` (final) — `arqel:widget <Name> --type=stat|chart|table|custom --force`. Gera `app/Widgets/<Name>.php`; snake_case do class name vira o `name` arg do construtor (e.g. `TotalUsers` → `'total_users'`). Idempotente (skip sem `--force`). Stubs em `stubs/widgets/{stat,chart,table,custom}.stub`. `stat`/`chart`/`table` geram uma subclasse `final` da base correspondente; `custom` gera uma factory `final` com `make(): CustomWidget` (compõe a base `final`, não a subclassa — referenciar via `App\Widgets\<Name>::make()` no `->widgets([...])` do dashboard).
 - `Commands\MakeDashboardCommand` (final) — `arqel:dashboard <Name> --id=<custom> --force`. Gera `app/Dashboards/<Name>.php` com factory static `make(): Dashboard`. `--id` default = snake_case; `label` humanised. Stub em `stubs/dashboards/dashboard.stub`.
 
 **Coverage:** ~154 testes Pest passando. Fixture `EchoFiltersWidget` usada em WIDGETS-008/009 e nos testes de enforcement do gate de dashboard + seeding de defaults no fetch.
@@ -55,7 +55,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 ## Conventions
 
-- `declare(strict_types=1)` obrigatório; bases `abstract`, subclasses (`Widget`, `Filter`) `final`.
+- `declare(strict_types=1)` obrigatório; `Widget`/`Filter` `abstract`. As bases concretas geradas pelo scaffolder (`StatWidget`/`ChartWidget`/`TableWidget`) são **não-final** (precisam ser subclassadas); `CustomWidget` permanece `final` (escape-hatch composto via `make()`, nunca subclassado).
 - **Sem hard dep** em libs de chart (Recharts é JS-side; `ChartWidget` só serializa config).
 - `columnSpan(int)` 1..12; `columnSpan(string)` aceita atalhos (`'full'`, `'1/2'`).
 - `deferred` widgets devem ter um `WidgetDataController` endpoint para fetch (entregue em WIDGETS-008).

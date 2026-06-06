@@ -6,13 +6,21 @@ namespace {{namespace}};
 
 use Arqel\Widgets\CustomWidget;
 
-final class {{class}} extends CustomWidget
+/**
+ * Custom widget factory.
+ *
+ * `CustomWidget` is the framework's `final` escape-hatch, so we compose
+ * it via `make()` rather than subclassing it. Reference this factory
+ * when declaring a dashboard, e.g.:
+ *
+ *   Dashboard::make('overview', 'Overview')
+ *       ->widgets([\{{namespace}}\{{class}}::make()]);
+ */
+final class {{class}}
 {
-    public function __construct()
+    public static function make(): CustomWidget
     {
-        parent::__construct('{{snakeName}}', '{{class}}');
-
-        $this
+        return CustomWidget::make('{{snakeName}}', '{{class}}')
             ->heading('{{class}}')
             ->withData([]);
     }

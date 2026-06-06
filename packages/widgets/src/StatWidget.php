@@ -30,8 +30,11 @@ use Closure;
  *
  * `value()` and the description/chart helpers accept either a
  * scalar (for static values) or a Closure (resolved in `data()`).
+ *
+ * Not `final`: the `arqel:widget --type=stat` generator scaffolds a
+ * subclass of this base, so it must remain extensible.
  */
-final class StatWidget extends Widget
+class StatWidget extends Widget
 {
     public const string COLOR_PRIMARY = 'primary';
 

@@ -38,7 +38,7 @@ A partir da migração para shadcn, o pacote é construído sobre **shadcn (styl
 **Custom components (sobre as primitivas):**
 
 - `<AppShell variant>`: 4 variants (`sidebar-left | sidebar-right | topbar-only | full-width`) com `SidebarProvider` interno
-- `<Sidebar>` (block `sidebar-07` + collapsible icon + items via `useNavigation()` ou prop `items`, groups, badges, `aria-current="page"`)
+- `<Sidebar>` (block `sidebar-07` + collapsible icon + items via `useNavigation()` ou prop `items`, groups, badges, ícone lucide por item via `item.icon` + `resolveLucideIcon`, `aria-current="page"`)
 - `<Topbar>`: brand + theme toggle + `SidebarTrigger` mobile + slots search/userMenu/tenantSwitcher
 - `<MainContent>` (`SidebarInset` wrapper) com padding responsivo + `maxWidth` (`md..7xl | none`)
 - `<DataTable>` (TanStack Table v8) — 9 cell renderers, seleção controlada, sticky header, `aria-sort`

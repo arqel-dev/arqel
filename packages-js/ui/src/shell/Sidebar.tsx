@@ -22,6 +22,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '../shadcn/ui/sidebar.js';
+import { resolveLucideIcon } from '../utils/icon.js';
 
 export interface SidebarProps {
   items?: NavigationItemPayload[];
@@ -48,19 +49,29 @@ export function Sidebar({ items: itemsProp, brand, footer, className }: SidebarP
             {group ? <SidebarGroupLabel>{group}</SidebarGroupLabel> : null}
             <SidebarGroupContent>
               <SidebarMenu>
-                {list.map((item) => (
-                  <SidebarMenuItem key={item.url ?? item.label}>
-                    <SidebarMenuButton asChild={Boolean(item.url)} isActive={Boolean(item.active)}>
-                      {item.url ? (
-                        <a href={item.url}>
-                          <span>{item.label}</span>
-                        </a>
-                      ) : (
-                        <span>{item.label}</span>
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {list.map((item) => {
+                  const Icon = resolveLucideIcon(item.icon);
+                  return (
+                    <SidebarMenuItem key={item.url ?? item.label}>
+                      <SidebarMenuButton
+                        asChild={Boolean(item.url)}
+                        isActive={Boolean(item.active)}
+                      >
+                        {item.url ? (
+                          <a href={item.url}>
+                            {Icon ? <Icon /> : null}
+                            <span>{item.label}</span>
+                          </a>
+                        ) : (
+                          <>
+                            {Icon ? <Icon /> : null}
+                            <span>{item.label}</span>
+                          </>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

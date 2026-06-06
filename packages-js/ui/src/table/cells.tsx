@@ -19,8 +19,8 @@ import type {
   RelationshipColumnSchema,
   TextColumnSchema,
 } from '@arqel-dev/types/tables';
-import { icons as lucideIcons } from 'lucide-react';
 import { cn } from '../utils/cn.js';
+import { resolveLucideIcon } from '../utils/icon.js';
 
 export interface CellProps {
   column: ColumnSchema;
@@ -106,16 +106,6 @@ const BADGE_COLOR_CLASS: Record<string, string> = {
 };
 
 const BADGE_MUTED_CLASS = 'bg-muted text-foreground';
-
-/** Resolve a lucide icon name (`'check-circle'`, `'pencil'`) to its component. */
-function resolveLucideIcon(name: string) {
-  const pascal = name
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
-  return lucideIcons[pascal as keyof typeof lucideIcons];
-}
 
 function BadgeCell({ column, value }: { column: BadgeColumnSchema; value: unknown }) {
   const key = asString(value);

@@ -6,8 +6,11 @@ namespace Arqel\Realtime\Http\Controllers;
 
 use Arqel\Realtime\Collab\YjsDocument;
 use Arqel\Realtime\Events\YjsUpdateReceived;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Throwable;
 
 /**
  * Controller REST para snapshot persistence de Y.Docs (RT-005 scaffold).
@@ -26,6 +29,8 @@ final class CollabDocumentController
 {
     public function show(Request $request, string $resource, string $id, string $field): JsonResponse
     {
+        $this->authorizeRecord($request, $resource, $id, 'view');
+
         $document = YjsDocument::query()
             ->where('model_type', $resource)
             ->where('model_id', $id)
@@ -52,6 +57,8 @@ final class CollabDocumentController
 
     public function store(Request $request, string $resource, string $id, string $field): JsonResponse
     {
+        $this->authorizeRecord($request, $resource, $id, 'update');
+
         $rawState = $request->input('state');
         $rawVersion = $request->input('version', 0);
 
@@ -136,5 +143,96 @@ final class CollabDocumentController
         $id = $user->getAuthIdentifier();
 
         return is_int($id) ? $id : (is_numeric($id) ? (int) $id : null);
+    }
+
+    /**
+     * Enforce record-level authorization before reading/writing a collab
+     * snapshot. Mirrors `AwarenessChannelAuthorizer` (the WebSocket side):
+     * resolve the owning model from `{resource}` (slug or FQCN) + `{id}`,
+     * then honour the `view`/`update` Gate OR Policy. Aborts 404 when the
+     * record can't be resolved (unknown resource, missing record), and 403
+     * when the ability is denied.
+     *
+     * Scaffold mode: when no named Gate AND no Policy exists for the model,
+     * access is open — consistent with the awareness authorizer's
+     * presence-channel-style default.
+     */
+    private function authorizeRecord(Request $request, string $resource, string $id, string $ability): void
+    {
+        $modelClass = $this->resolveModelClass($resource);
+
+        if ($modelClass === null) {
+            \abort(404);
+        }
+
+        try {
+            /** @var Model|null $record */
+            $record = $modelClass::query()->find($id);
+        } catch (Throwable) {
+            $record = null;
+        }
+
+        if ($record === null) {
+            \abort(404);
+        }
+
+        // Honour authorization when the app defines a named Gate for the
+        // ability OR registers a Policy for the model. `Gate::has()` only
+        // sees named Gates (never Policies), so without the `getPolicyFor()`
+        // check a Policy-protected record would fall through to allow-all
+        // and leak the snapshot. Mirror of `AwarenessChannelAuthorizer`.
+        if (Gate::has($ability) || Gate::getPolicyFor($record) !== null) {
+            Gate::forUser($request->user())->authorize($ability, $record);
+        }
+
+        // No Gate and no Policy => open (scaffold mode).
+    }
+
+    /**
+     * Resolve `$resource` (a Resource slug or a model FQCN) to an Eloquent
+     * model class. Mirrors `AwarenessChannelAuthorizer::resolveModelClass`
+     * but keyed by slug via the optional `arqel-dev/core` registry.
+     *
+     * @return class-string<Model>|null
+     */
+    private function resolveModelClass(string $resource): ?string
+    {
+        if (class_exists($resource) && is_subclass_of($resource, Model::class)) {
+            /** @var class-string<Model> $resource */
+            return $resource;
+        }
+
+        $registryClass = 'Arqel\\Core\\Resources\\ResourceRegistry';
+
+        if (! app()->bound($registryClass)) {
+            return null;
+        }
+
+        $registry = app($registryClass);
+
+        if (! method_exists($registry, 'findBySlug')) {
+            return null;
+        }
+
+        /** @var class-string|null $resourceClass */
+        $resourceClass = $registry->findBySlug($resource);
+
+        if ($resourceClass === null || ! method_exists($resourceClass, 'getModel')) {
+            return null;
+        }
+
+        try {
+            /** @var class-string $modelClass */
+            $modelClass = $resourceClass::getModel();
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! is_subclass_of($modelClass, Model::class)) {
+            return null;
+        }
+
+        /** @var class-string<Model> $modelClass */
+        return $modelClass;
     }
 }

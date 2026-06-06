@@ -2,10 +2,56 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\Resources\Resource;
 use Arqel\Realtime\Collab\YjsDocument;
 use Arqel\Realtime\Events\YjsUpdateReceived;
+use Arqel\Realtime\Tests\TestCase;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Backing model + Resource so the collab REST endpoints can resolve the
+ * `posts/42` record and pass record-level authorization (scaffold mode,
+ * no Gate/Policy => open).
+ */
+final class YjsBroadcastFakePost extends Model
+{
+    public $timestamps = false;
+
+    protected $table = 'yjs_broadcast_fake_posts';
+
+    protected $guarded = [];
+}
+
+final class YjsBroadcastFakePostResource extends Resource
+{
+    /** @var class-string<Model> */
+    public static string $model = YjsBroadcastFakePost::class;
+
+    public static ?string $slug = 'posts';
+
+    public function fields(): array
+    {
+        return [];
+    }
+}
+
+beforeEach(function (): void {
+    if (! Schema::hasTable('yjs_broadcast_fake_posts')) {
+        Schema::create('yjs_broadcast_fake_posts', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('title')->nullable();
+        });
+    }
+
+    YjsBroadcastFakePost::query()->firstOrCreate(['id' => 42], ['title' => 'Post 42']);
+
+    app()->singleton('Arqel\\Core\\Resources\\ResourceRegistry');
+    app('Arqel\\Core\\Resources\\ResourceRegistry')->register(YjsBroadcastFakePostResource::class);
+});
 
 function authedYjsBroadcastUser(): AuthUser
 {
@@ -18,7 +64,7 @@ function authedYjsBroadcastUser(): AuthUser
 it('dispatches YjsUpdateReceived after creating a new collab document', function (): void {
     Event::fake([YjsUpdateReceived::class]);
 
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedYjsBroadcastUser())
         ->postJson('/admin/posts/42/collab/body', [
             'state' => base64_encode('hello'),
@@ -48,7 +94,7 @@ it('dispatches YjsUpdateReceived after updating an existing collab document', fu
 
     Event::fake([YjsUpdateReceived::class]);
 
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedYjsBroadcastUser())
         ->postJson('/admin/posts/42/collab/body', [
             'state' => base64_encode('new'),
@@ -123,7 +169,7 @@ it('does not dispatch the event on version conflict (409)', function (): void {
 
     Event::fake([YjsUpdateReceived::class]);
 
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedYjsBroadcastUser())
         ->postJson('/admin/posts/42/collab/body', [
             'state' => base64_encode('stale'),

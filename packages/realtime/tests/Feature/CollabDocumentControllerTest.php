@@ -2,8 +2,57 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\Resources\Resource;
 use Arqel\Realtime\Collab\YjsDocument;
+use Arqel\Realtime\Tests\TestCase;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as AuthUser;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Real Eloquent model the collab REST endpoints resolve from the
+ * `posts` slug for record-level authorization. With no Gate/Policy
+ * registered the controller runs in scaffold mode (allow), matching
+ * the awareness-channel authorizer's open-by-default behaviour.
+ */
+final class CollabControllerFakePost extends Model
+{
+    public $timestamps = false;
+
+    protected $table = 'collab_controller_fake_posts';
+
+    protected $guarded = [];
+}
+
+final class CollabControllerFakePostResource extends Resource
+{
+    /** @var class-string<Model> */
+    public static string $model = CollabControllerFakePost::class;
+
+    public static ?string $slug = 'posts';
+
+    public function fields(): array
+    {
+        return [];
+    }
+}
+
+beforeEach(function (): void {
+    if (! Schema::hasTable('collab_controller_fake_posts')) {
+        Schema::create('collab_controller_fake_posts', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('title')->nullable();
+        });
+    }
+
+    // Seed record #42 so the controller resolves `posts/42` and the
+    // existing snapshot scenarios keep exercising the happy path.
+    CollabControllerFakePost::query()->firstOrCreate(['id' => 42], ['title' => 'Post 42']);
+
+    app()->singleton('Arqel\\Core\\Resources\\ResourceRegistry');
+    app('Arqel\\Core\\Resources\\ResourceRegistry')->register(CollabControllerFakePostResource::class);
+});
 
 function authedCollabUser(): AuthUser
 {
@@ -14,7 +63,7 @@ function authedCollabUser(): AuthUser
 }
 
 it('returns empty state when document does not exist', function (): void {
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedCollabUser())
         ->getJson('/admin/posts/42/collab/body');
 
@@ -36,7 +85,7 @@ it('returns persisted state encoded as base64', function (): void {
         'updated_at' => now(),
     ]);
 
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedCollabUser())
         ->getJson('/admin/posts/42/collab/body');
 
@@ -48,7 +97,7 @@ it('returns persisted state encoded as base64', function (): void {
 });
 
 it('creates a new document on POST and returns version 1', function (): void {
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedCollabUser())
         ->postJson('/admin/posts/42/collab/body', [
             'state' => base64_encode('hello'),
@@ -75,7 +124,7 @@ it('updates the document and increments version when incoming.version >= current
         'updated_at' => now(),
     ]);
 
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedCollabUser())
         ->postJson('/admin/posts/42/collab/body', [
             'state' => base64_encode('new'),
@@ -100,7 +149,7 @@ it('returns 409 conflict when incoming version is older than server', function (
         'updated_at' => now(),
     ]);
 
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedCollabUser())
         ->postJson('/admin/posts/42/collab/body', [
             'state' => base64_encode('stale'),
@@ -112,14 +161,14 @@ it('returns 409 conflict when incoming version is older than server', function (
 });
 
 it('returns 401 (or redirects) when unauthenticated', function (): void {
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->getJson('/admin/posts/42/collab/body');
 
     expect(in_array($response->status(), [401, 403, 302], true))->toBeTrue();
 });
 
 it('returns 422 when state is missing or invalid base64', function (): void {
-    /** @var Arqel\Realtime\Tests\TestCase $this */
+    /** @var TestCase $this */
     $response = $this->actingAs(authedCollabUser())
         ->postJson('/admin/posts/42/collab/body', ['state' => '', 'version' => 0]);
 

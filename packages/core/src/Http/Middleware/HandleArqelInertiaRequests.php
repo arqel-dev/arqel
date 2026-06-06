@@ -201,6 +201,16 @@ final class HandleArqelInertiaRequests extends Middleware
      * `useNavigation()` (`@arqel-dev/hooks`) and renders grouped menu
      * items with icons + active highlighting.
      *
+     * Items are emitted already grouped + ordered so the client's
+     * first-encounter grouping ({@see Sidebar} `groupItems()`) yields the
+     * right group order without any client-side knowledge of the explicit
+     * list. Group order honors `Panel::navigationGroups([...])` when set;
+     * groups absent from that list (and the ungrouped bucket) fall back
+     * after the listed ones, ordered by their minimum item `navigationSort`
+     * — which preserves today's pure per-item-sort behavior when no
+     * explicit list is configured. Within each group, items keep their
+     * per-item `navigationSort` ordering.
+     *
      * @return array<int, array<string, mixed>>
      */
     private function buildNavigation(\Arqel\Core\Panel\Panel $panel): array
@@ -231,9 +241,84 @@ final class HandleArqelInertiaRequests extends Middleware
             ];
         }
 
-        usort($items, static fn (array $a, array $b): int => $a['sort'] <=> $b['sort']);
+        return $this->orderNavigationItems($items, $panel->getNavigationGroups());
+    }
 
-        return $items;
+    /**
+     * Reorder the flat navigation list so groups appear in the order
+     * defined by `$explicitGroups`, with unlisted groups (and the
+     * ungrouped bucket) following — ordered by their minimum item sort —
+     * and items within each group ordered by their per-item sort.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @param array<int, string> $explicitGroups
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function orderNavigationItems(array $items, array $explicitGroups): array
+    {
+        if ($items === []) {
+            return [];
+        }
+
+        // Bucket items by group key (ungrouped items share the '' key) so
+        // we can order the buckets independently of their members. The
+        // insertion order of $buckets is the first-encounter group order.
+        $buckets = [];
+        foreach ($items as $item) {
+            $group = $item['group'] ?? null;
+            $key = is_string($group) ? $group : '';
+            $buckets[$key][] = $item;
+        }
+
+        // Rank of each group in the explicit list (lower = earlier).
+        $rank = [];
+        foreach ($explicitGroups as $index => $group) {
+            $rank[$group] = $index;
+        }
+
+        // Build a sortable list of group keys carrying their first-encounter
+        // index and minimum per-item sort for deterministic tie-breaking.
+        $groupKeys = array_keys($buckets);
+        $sortable = [];
+        foreach ($groupKeys as $encounter => $key) {
+            $minSort = min(array_map(
+                static function (array $i): int {
+                    $sort = $i['sort'] ?? 0;
+
+                    return is_numeric($sort) ? (int) $sort : 0;
+                },
+                $buckets[$key],
+            ));
+
+            $sortable[] = [
+                'key' => $key,
+                // Listed groups sort before unlisted ones, by list order;
+                // unlisted groups fall back after, ordered by their minimum
+                // item sort — equivalent to today's pure per-item-sort order
+                // when no explicit list is configured.
+                'listed' => array_key_exists($key, $rank) ? 0 : 1,
+                'rank' => $rank[$key] ?? 0,
+                'minSort' => $minSort,
+                'encounter' => $encounter,
+            ];
+        }
+
+        usort($sortable, static function (array $a, array $b): int {
+            return [$a['listed'], $a['rank'], $a['minSort'], $a['encounter']]
+                <=> [$b['listed'], $b['rank'], $b['minSort'], $b['encounter']];
+        });
+
+        $result = [];
+        foreach ($sortable as $group) {
+            $bucket = $buckets[$group['key']];
+            usort($bucket, static fn (array $a, array $b): int => $a['sort'] <=> $b['sort']);
+            foreach ($bucket as $item) {
+                $result[] = $item;
+            }
+        }
+
+        return $result;
     }
 
     /**

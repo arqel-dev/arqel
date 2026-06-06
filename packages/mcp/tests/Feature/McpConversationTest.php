@@ -244,7 +244,7 @@ it('completes a prompts/list → prompts/get cycle for review_resource', functio
             ->toBe('Review an existing Arqel Resource for issues, code smells, and improvement opportunities')
             ->and($responses[1]['result']['messages'])->toHaveCount(1);
 
-        $text = $responses[1]['result']['messages'][0]['content'][0]['text'];
+        $text = $responses[1]['result']['messages'][0]['content']['text'];
         expect($text)->toContain('class ConversationFixture');
 
         fclose($input);

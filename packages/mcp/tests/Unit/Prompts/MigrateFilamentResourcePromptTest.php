@@ -35,9 +35,9 @@ it('builds the migration envelope inlining the file contents via the injected re
         ->and($payload['description'])->toBe('Migration guidance: Filament Resource -> Arqel')
         ->and($payload['messages'])->toHaveCount(1)
         ->and($payload['messages'][0]['role'])->toBe('user')
-        ->and($payload['messages'][0]['content'][0]['type'])->toBe('text');
+        ->and($payload['messages'][0]['content']['type'])->toBe('text');
 
-    $text = $payload['messages'][0]['content'][0]['text'];
+    $text = $payload['messages'][0]['content']['text'];
     expect($text)->toContain('app/Filament/Resources/UserResource.php')
         ->and($text)->toContain($fixture)
         ->and($text)->toContain('```php')

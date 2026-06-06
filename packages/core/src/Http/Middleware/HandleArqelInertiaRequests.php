@@ -9,7 +9,9 @@ use Arqel\Core\I18n\TranslationLoader;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
+use Throwable;
 
 /**
  * Inertia middleware for the Arqel admin panel.
@@ -75,7 +77,7 @@ final class HandleArqelInertiaRequests extends Middleware
                 'user' => $this->userPayload($user),
                 'can' => $this->resolveAbilities($user),
             ],
-            'panel' => fn () => $this->currentPanel(),
+            'panel' => fn () => $this->currentPanel($user),
             'tenant' => fn () => $this->currentTenant($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
@@ -174,7 +176,7 @@ final class HandleArqelInertiaRequests extends Middleware
     /**
      * @return array<string, mixed>|null
      */
-    private function currentPanel(): ?array
+    private function currentPanel(?Authenticatable $user): ?array
     {
         if (! app()->bound(PanelRegistry::class)) {
             return null;
@@ -191,7 +193,7 @@ final class HandleArqelInertiaRequests extends Middleware
             'id' => $panel->id,
             'path' => $panel->getPath(),
             'brand' => $panel->getBrand(),
-            'navigation' => $this->buildNavigation($panel),
+            'navigation' => $this->buildNavigation($panel, $user),
         ];
     }
 
@@ -213,7 +215,7 @@ final class HandleArqelInertiaRequests extends Middleware
      *
      * @return array<int, array<string, mixed>>
      */
-    private function buildNavigation(\Arqel\Core\Panel\Panel $panel): array
+    private function buildNavigation(\Arqel\Core\Panel\Panel $panel, ?Authenticatable $user = null): array
     {
         $items = [];
         $request = request();
@@ -222,6 +224,10 @@ final class HandleArqelInertiaRequests extends Middleware
 
         foreach ($panel->getResources() as $resourceClass) {
             if (! class_exists($resourceClass) || ! is_subclass_of($resourceClass, \Arqel\Core\Resources\Resource::class)) {
+                continue;
+            }
+
+            if ($this->resourceViewAnyDenied($resourceClass, $user)) {
                 continue;
             }
 
@@ -242,6 +248,34 @@ final class HandleArqelInertiaRequests extends Middleware
         }
 
         return $this->orderNavigationItems($items, $panel->getNavigationGroups());
+    }
+
+    /**
+     * Decide whether a Resource's nav item must be hidden because the
+     * current user is denied `viewAny` on its model.
+     *
+     * Mirrors {@see \Arqel\Core\Http\Controllers\ResourceController}'s
+     * `authorize()`: only consult the Gate when a `viewAny` gate OR a
+     * Policy for the model exists. When neither does (scaffold apps), the
+     * item is always shown — denying nothing — so today's behavior holds.
+     *
+     * @param class-string<\Arqel\Core\Resources\Resource> $resourceClass
+     */
+    private function resourceViewAnyDenied(string $resourceClass, ?Authenticatable $user): bool
+    {
+        try {
+            $modelClass = $resourceClass::getModel();
+        } catch (Throwable) {
+            // Resource without a declared model (scaffold/fixture) — there
+            // is nothing to authorize against, so never hide it.
+            return false;
+        }
+
+        if (! Gate::has('viewAny') && ! Gate::getPolicyFor($modelClass)) {
+            return false;
+        }
+
+        return Gate::forUser($user)->denies('viewAny', $modelClass);
     }
 
     /**

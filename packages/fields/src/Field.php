@@ -198,6 +198,21 @@ abstract class Field
         return $this->default;
     }
 
+    /**
+     * Nested validation rules keyed by a dotted path (e.g.
+     * `{name}.*`), for fields whose value is a collection of
+     * elements that each need their own rules. Most fields have
+     * none; array-valued fields (multi-select) override this so the
+     * controller can merge element-level constraints into the
+     * validator alongside the top-level `{name}` rules.
+     *
+     * @return array<string, array<int, string|object>>
+     */
+    public function getNestedValidationRules(): array
+    {
+        return [];
+    }
+
     public function isReadonly(): bool
     {
         return $this->readonly;

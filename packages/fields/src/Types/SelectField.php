@@ -183,6 +183,82 @@ class SelectField extends Field
     }
 
     /**
+     * Derive validation rules from the option set.
+     *
+     * A closed-option select (one whose value must be one of the
+     * declared option keys) contributes an `in:` rule so tampered
+     * requests cannot persist out-of-range values — mirroring what
+     * the rendered `<select>` already enforces client-side.
+     *
+     * The rule is emitted only when:
+     * - options are **statically** known (a literal array — closure
+     *   and relationship options are resolved with runtime/owner
+     *   context the field does not have here, so they degrade
+     *   gracefully to no rule rather than a wrong one), AND
+     * - the select is not `creatable()` and does not
+     *   `allowCustomValues()` (both opt out of the closed set).
+     *
+     * For `multiple()` selects the field value is an array, so the
+     * top-level rule is `array` and the per-element `in:` constraint
+     * is exposed via {@see getNestedValidationRules()} under
+     * `{name}.*`.
+     *
+     * @return array<int, string>
+     */
+    public function getDefaultRules(): array
+    {
+        if ($this->multiple) {
+            return ['array'];
+        }
+
+        $inRule = $this->inRuleFromStaticOptions();
+
+        return $inRule !== null ? [$inRule] : [];
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function getNestedValidationRules(): array
+    {
+        if (! $this->multiple) {
+            return [];
+        }
+
+        $inRule = $this->inRuleFromStaticOptions();
+
+        if ($inRule === null) {
+            return [];
+        }
+
+        return [$this->getName().'.*' => [$inRule]];
+    }
+
+    /**
+     * Build an `in:key1,key2,...` rule from statically-known option
+     * keys, or null when the option set is open (creatable /
+     * allowCustomValues) or not statically resolvable (closure /
+     * relationship / empty).
+     */
+    protected function inRuleFromStaticOptions(): ?string
+    {
+        if ($this->creatable || $this->allowCustomValues) {
+            return null;
+        }
+
+        if ($this->staticOptions === null || $this->staticOptions === []) {
+            return null;
+        }
+
+        $keys = array_map(
+            static fn (int|string $key): string => (string) $key,
+            array_keys($this->staticOptions),
+        );
+
+        return 'in:'.implode(',', $keys);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function getTypeSpecificProps(): array

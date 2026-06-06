@@ -93,6 +93,10 @@ trait HasForm
         $rules = [];
         foreach ($this->form as $field) {
             $rules[$field->getName()] = $field->getValidationRules();
+
+            foreach ($field->getNestedValidationRules() as $path => $nestedRules) {
+                $rules[$path] = $nestedRules;
+            }
         }
 
         return $rules;

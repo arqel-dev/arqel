@@ -10,7 +10,9 @@
     "columnSpan": 1,
     "live": false,
     "liveDebounce": null,
-    "rules": [],
+    "rules": [
+        "array"
+    ],
     "props": {
         "options": {
             "php": "PHP",

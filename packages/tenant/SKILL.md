@@ -35,6 +35,7 @@ A escolha é **não reinventar**: oferece uma abstração leve que cobre 80% dos
 
 - Contract `Contracts\SupportsTenantSwitching`: `availableFor(Authenticatable)` / `canSwitchTo` / `switchTo`.
 - `AbstractTenantResolver` implementa-o com defaults sensatos (relação `tenants`, coluna `current_tenant_id`); `AuthUserResolver` aceita `availableRelation` + `foreignKeyColumn`.
+- `SessionResolver` sobrescreve `switchTo()` para persistir na **mesma session key** que o seu `resolve()` lê (`app('session')->put($sessionKey, $tenant->getKey())`), em vez de escrever uma coluna no user que ele nunca lê — sem isso o switch sobreviveria só ao request corrente (#81). Os resolvers URL-driven (`Subdomain`/`Path`/`Header`) ainda herdam o `switchTo()` de coluna no user, irrelevante para eles (o switch vai pela URL) — follow-up de baixa prioridade.
 - `TenantManager` ganha `availableFor`/`canSwitchTo`/`switchTo` (delega; lança `LogicException` se resolver não suporta).
 - Event `TenantSwitched` (final, readonly `?Model $from`, `Model $to`, `Authenticatable $user`).
 - `Http\Controllers\TenantSwitcherController`: `POST /admin/tenants/{tenantId}/switch` (404/403/dispatch+redirect intended) + `GET /admin/tenants/available` (`{current, available[]}`). Rotas registadas via `$package->hasRoute('admin')`.

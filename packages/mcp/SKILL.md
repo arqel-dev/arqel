@@ -22,6 +22,7 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 - API: `registerTool/Resource/Prompt`, `getTools/Resources/Prompts` (sem callables), `handleRequest` (público para testes), `serve()` (stdio loop newline-delimited)
 - Códigos de erro: `-32600` (envelope inválido), `-32601` (method not found), `-32602` (params/lookup inválido), `-32603` (handler throw); notifications (sem `id`) → `[]`
 - Wrapping: tool result → `{content: [{type:'text', text}]}`; resource → `{contents: [{uri, text, mimeType?}]}`; prompt → `{description, messages}`
+- **Fetcher de resource devolve o corpo CRU** (string ou valor stringificado) — `readResource()` o embrulha **uma vez** na envelope `contents`. Retornar a envelope completa do próprio fetcher causa duplo-embrulho + serialização JSON (era o bug #117). `registerResource(uri, name, description, fetcher, ?mimeType)` — o `mimeType` opcional aparece em `resources/list` e `resources/read`.
 
 **MCP-003 — `Tools\ListResourcesTool` (final):**
 

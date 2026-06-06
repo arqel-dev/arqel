@@ -26,7 +26,9 @@ beforeEach(function (): void {
             $uri,
             $entry['name'],
             $entry['description'],
-            static fn (string $resourceUri): array => $skillResource->read($resourceUri),
+            // Fetcher returns RAW markdown; McpServer wraps it once (#117).
+            static fn (string $resourceUri): string => $skillResource->read($resourceUri)['contents'][0]['text'],
+            $entry['mimeType'],
         );
     }
 });
@@ -54,7 +56,28 @@ it('dispatches resources/read for a registered SKILL.md URI and returns the mark
         'params' => ['uri' => 'arqel-skill://mcp'],
     ]);
 
-    expect($response['result']['contents'][0]['uri'])->toBe('arqel-skill://mcp')
-        ->and($response['result']['contents'][0]['text'])
-        ->toContain('# SKILL.md fixture for arqel-dev/mcp');
+    $content = $response['result']['contents'][0];
+    // Raw markdown payload + threaded mimeType — not a double-wrapped
+    // JSON envelope (#117).
+    expect($content['uri'])->toBe('arqel-skill://mcp')
+        ->and($content['text'])->toBe('# SKILL.md fixture for arqel-dev/mcp')
+        ->and($content['mimeType'])->toBe('text/markdown')
+        ->and($content['text'])->not->toContain('"contents"');
+});
+
+it('surfaces mimeType in resources/list for each registered SKILL.md', function (): void {
+    /** @var McpServer $server */
+    $server = $this->app->make(McpServer::class);
+
+    $response = $server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 43,
+        'method' => 'resources/list',
+    ]);
+
+    $entries = collect($response['result']['resources'])
+        ->keyBy('uri');
+
+    expect($entries['arqel-skill://mcp']['mimeType'])->toBe('text/markdown')
+        ->and($entries['arqel-skill://core']['mimeType'])->toBe('text/markdown');
 });

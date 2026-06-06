@@ -46,9 +46,16 @@ class SessionResolver extends AbstractTenantResolver
      * switch would be lost on the next request (#81). The signature
      * carries no Request, so we resolve the active session store from
      * the container.
+     *
+     * Persist the IDENTIFIER-COLUMN value (via `identifierFor()`), not
+     * the primary key: `resolve()` reads the value back through
+     * `findByIdentifier()`, which queries `where(identifierColumn, …)`.
+     * With a non-PK `identifier_column` (e.g. `slug`) storing the PK
+     * would make the next request run `where('slug', <pk>)` -> no row
+     * -> the tenant lost (#131, the #81 symptom for non-PK columns).
      */
     public function switchTo(Authenticatable $user, Model $tenant): void
     {
-        app('session')->put($this->sessionKey, $tenant->getKey());
+        app('session')->put($this->sessionKey, $this->identifierFor($tenant));
     }
 }

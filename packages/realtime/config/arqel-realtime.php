@@ -55,6 +55,13 @@ return [
     | dead channel name. `channel_pattern` accepts the placeholders
     | `{resource}` (Resource slug) and `{recordId}` (primary key).
     |
+    | `routes/channels.php` registers the broadcast authorization callback from
+    | this SAME pattern (via `PresenceChannelResolver::pattern()`), so a custom
+    | value keeps the subscribed and authorized channels in sync. A custom
+    | pattern MUST keep both `{resource}` and `{recordId}` placeholder tokens:
+    | Laravel binds the presence route parameters positionally by name into the
+    | channel callback.
+    |
     */
     'presence' => [
         'enabled' => env('ARQEL_REALTIME_PRESENCE_ENABLED', true),

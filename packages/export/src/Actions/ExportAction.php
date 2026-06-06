@@ -10,6 +10,7 @@ use Arqel\Export\Exporters\CsvExporter;
 use Arqel\Export\Exporters\PdfExporter;
 use Arqel\Export\Exporters\XlsxExporter;
 use Arqel\Export\ExportFormat;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Traversable;
 
@@ -28,14 +29,21 @@ use Traversable;
  * the right `Exporter` and write the file synchronously, returning a
  * payload describing the produced artifact.
  *
- * TODO(EXPORT-006): the original EXPORT-005 spec also covers (a) a
- * form-modal step to let the user pick the format/columns at runtime,
- * (b) a queue-threshold heuristic that dispatches `ProcessExportJob`
- * for large selections, and (c) a flash notification + signed download
- * URL. All three pieces require cross-package work into
+ * The artifact is written under `storage/app/arqel-exports` (the dir
+ * the bundled `ExportDownloadController` serves) with an `export-<uuid>`
+ * filename whose id matches that controller's route constraint + glob,
+ * so a produced file is retrievable end to end (#67). The controller's
+ * caller (`ResourceController::bulkAction`) flashes the download URL.
+ *
+ * TODO(EXPORT-006/007/008): the original EXPORT-005 spec also covers
+ * (a) a form-modal step to let the user pick the format/columns at
+ * runtime, (b) a queue-threshold heuristic that dispatches
+ * `ProcessExportJob` for large selections, and (c) the full flash
+ * notification + SIGNED download URL backed by an `Export` model with
+ * ownership + expiry. Those pieces require cross-package work into
  * `arqel-dev/actions` form integration plus the `Export` model + jobs
- * (EXPORT-006/007/008). They are deliberately deferred — this action
- * is currently a synchronous, in-process exporter wrapper.
+ * and remain deliberately deferred — this action stays a synchronous,
+ * in-process exporter wrapper whose download URL is unsigned.
  */
 final class ExportAction extends Action
 {
@@ -55,9 +63,35 @@ final class ExportAction extends Action
         $action = new self($name);
         $action->label('Export');
         $action->icon('download');
-        $action->destinationDir = sys_get_temp_dir();
+        // Default to the dir the bundled ExportDownloadController globs
+        // (#67 B), so a freshly produced file is reachable end to end
+        // without extra wiring. Apps can override via withDestinationDir().
+        $action->destinationDir = self::defaultDestinationDir();
 
         return $action;
+    }
+
+    /**
+     * The dir the download controller reads from: the configured
+     * `arqel-export.destination_dir`, else `storage/app/arqel-exports`.
+     * Falls back to the system temp dir only when the Laravel container
+     * is unavailable (e.g. isolated unit construction).
+     */
+    private static function defaultDestinationDir(): string
+    {
+        if (function_exists('config')) {
+            /** @var mixed $configured */
+            $configured = config('arqel-export.destination_dir');
+            if (is_string($configured) && $configured !== '') {
+                return $configured;
+            }
+        }
+
+        if (function_exists('storage_path')) {
+            return storage_path('app/arqel-exports');
+        }
+
+        return sys_get_temp_dir();
     }
 
     public function format(ExportFormat $format): self
@@ -117,10 +151,17 @@ final class ExportAction extends Action
             throw new InvalidArgumentException('ExportAction::execute expects an iterable of records');
         }
 
-        $filename = 'export-'.date('Ymd-His').'.'.$this->format->extension();
-        $destination = rtrim($this->destinationDir, '/').'/'.$filename;
+        // UUID id keeps filenames collision-free and matches the
+        // download controller's `[a-f0-9-]+` route constraint + glob,
+        // so the produced file is retrievable by id (#67 B).
+        $filename = 'export-'.Str::uuid()->toString().'.'.$this->format->extension();
+        $dir = rtrim($this->destinationDir, '/');
+        $destination = $dir.'/'.$filename;
 
         if (! $this->dryRun) {
+            if (! is_dir($dir)) {
+                mkdir($dir, 0o755, true);
+            }
             $this->resolveExporter()->export($record, $this->columns, $destination);
         }
 

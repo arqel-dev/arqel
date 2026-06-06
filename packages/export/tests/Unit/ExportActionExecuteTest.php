@@ -121,7 +121,7 @@ it('throws InvalidArgumentException when record is a scalar string', function ()
         ->execute('not iterable');
 })->throws(InvalidArgumentException::class, 'expects an iterable');
 
-it('embeds the format extension in the filename', function (): void {
+it('embeds a uuid id and the format extension in the filename', function (): void {
     $payload = ExportAction::make('export')
         ->format(ExportFormat::CSV)
         ->withColumns([['name' => 'id', 'label' => 'ID']])
@@ -129,7 +129,9 @@ it('embeds the format extension in the filename', function (): void {
         ->dryRun()
         ->execute([]);
 
-    expect($payload['filename'])->toMatch('/^export-\d{8}-\d{6}\.csv$/');
+    // export-<uuid>.csv — the uuid matches the download controller's
+    // `[a-f0-9-]+` route constraint + glob (#67 B).
+    expect($payload['filename'])->toMatch('/^export-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.csv$/');
 });
 
 it('produces a CSV with empty columns without throwing', function (): void {

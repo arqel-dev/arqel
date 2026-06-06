@@ -23,9 +23,15 @@ use Illuminate\Support\Facades\Gate;
  * bound — apps sem core (ex.: standalone CLI) ainda podem usar o
  * trait `Versionable`, mesmo que esta rota não seja útil.
  *
- * Authorization: quando há policy `view` registrada no Gate para o
- * model, é honrada; sem policy registrada, libera o acesso. Apps
- * que precisem de hard-gate devem registrar a policy explicitamente.
+ * Authorization: o `view` é exigido quando existe um named gate
+ * (`Gate::define`) OU uma Policy registrada para o model
+ * (`Gate::getPolicyFor`). Só em scaffold-mode — sem named gate e sem
+ * policy — o acesso é liberado. Espelha o padrão canónico de
+ * `Arqel\Core\Http\Controllers\ResourceController::authorize`.
+ *
+ * Nota: `Gate::has()` sozinho NÃO consulta Policies, então gatear apenas
+ * por `Gate::has('view')` deixava models protegidos por Policy
+ * vazarem o snapshot (`?include=payload`) — issue #91.
  */
 final class VersionHistoryController
 {
@@ -70,7 +76,7 @@ final class VersionHistoryController
             ], 422);
         }
 
-        if (Gate::has('view') && ! Gate::allows('view', $model)) {
+        if ($this->deniesView($model)) {
             return new JsonResponse(['message' => 'Forbidden'], 403);
         }
 
@@ -121,6 +127,23 @@ final class VersionHistoryController
                 'total' => $paginator->total(),
             ],
         ]);
+    }
+
+    /**
+     * Decide se o `view` deve ser negado, honrando named gates E Policies.
+     *
+     * `Gate::has()` só conhece abilities de `Gate::define()`; nunca
+     * consulta Policies (`Gate::getPolicyFor()`). Exigimos a checagem
+     * quando existe named gate OU policy para o model; só liberamos
+     * (scaffold-mode) quando NENHUM dos dois existe.
+     */
+    private function deniesView(Model $model): bool
+    {
+        if (! Gate::has('view') && ! Gate::getPolicyFor($model)) {
+            return false;
+        }
+
+        return Gate::denies('view', $model);
     }
 
     private function resolveRegistry(): ?object

@@ -5,8 +5,10 @@ declare(strict_types=1);
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Versioning\Http\Controllers\VersionRestoreController;
 use Arqel\Versioning\Models\Version;
+use Arqel\Versioning\Tests\Fixtures\AllowUpdatePolicy;
 use Arqel\Versioning\Tests\Fixtures\Article;
 use Arqel\Versioning\Tests\Fixtures\ArticleResource;
+use Arqel\Versioning\Tests\Fixtures\DenyUpdatePolicy;
 use Arqel\Versioning\Tests\Fixtures\PlainWidget;
 use Arqel\Versioning\Tests\Fixtures\PlainWidgetResource;
 use Illuminate\Database\Eloquent\Model;
@@ -135,6 +137,78 @@ it('returns 403 when Gate update ability denies', function (): void {
     ]));
 
     $response->assertForbidden();
+});
+
+it('returns 403 when a Policy denies update (no named gate) and does NOT mutate', function (): void {
+    // No Gate::define('update') — authorization is resolved purely via Policy.
+    Gate::policy(Article::class, DenyUpdatePolicy::class);
+
+    $article = Article::create(['title' => 'v1', 'body' => 'b', 'status' => 'draft']);
+    $article->update(['title' => 'v2']);
+
+    /** @var Version $first */
+    $first = Version::query()->where('versionable_type', $article->getMorphClass())->where('versionable_id', $article->getKey())->orderBy('id', 'asc')->first();
+
+    $countBefore = Version::query()->count();
+
+    $response = $this->postJson(route('arqel.versioning.restore.test', [
+        'resource' => 'articles',
+        'id' => $article->getKey(),
+        'versionId' => $first->id,
+    ]));
+
+    $response->assertForbidden();
+
+    // The record must NOT have been rolled back, and no new version created.
+    /** @var Article $fresh */
+    $fresh = Article::query()->findOrFail($article->getKey());
+    expect($fresh->title)->toBe('v2');
+    expect(Version::query()->count())->toBe($countBefore);
+});
+
+it('returns 200 when a Policy allows update (positive policy path)', function (): void {
+    Gate::policy(Article::class, AllowUpdatePolicy::class);
+
+    $article = Article::create(['title' => 'v1', 'body' => 'b', 'status' => 'draft']);
+    $article->update(['title' => 'v2']);
+
+    /** @var Version $first */
+    $first = Version::query()->where('versionable_type', $article->getMorphClass())->where('versionable_id', $article->getKey())->orderBy('id', 'asc')->first();
+
+    $response = $this->postJson(route('arqel.versioning.restore.test', [
+        'resource' => 'articles',
+        'id' => $article->getKey(),
+        'versionId' => $first->id,
+    ]));
+
+    $response->assertOk();
+    $response->assertJsonPath('restored', true);
+
+    /** @var Article $fresh */
+    $fresh = Article::query()->findOrFail($article->getKey());
+    expect($fresh->title)->toBe('v1');
+});
+
+it('allows restore in scaffold mode (no gate, no policy => Hello World path)', function (): void {
+    // Neither Gate::define nor Gate::policy registered for Article.
+    $article = Article::create(['title' => 'v1', 'body' => 'b', 'status' => 'draft']);
+    $article->update(['title' => 'v2']);
+
+    /** @var Version $first */
+    $first = Version::query()->where('versionable_type', $article->getMorphClass())->where('versionable_id', $article->getKey())->orderBy('id', 'asc')->first();
+
+    $response = $this->postJson(route('arqel.versioning.restore.test', [
+        'resource' => 'articles',
+        'id' => $article->getKey(),
+        'versionId' => $first->id,
+    ]));
+
+    $response->assertOk();
+    $response->assertJsonPath('restored', true);
+
+    /** @var Article $fresh */
+    $fresh = Article::query()->findOrFail($article->getKey());
+    expect($fresh->title)->toBe('v1');
 });
 
 it('returns the new version id created by the restore', function (): void {

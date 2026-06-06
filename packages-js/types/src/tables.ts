@@ -56,6 +56,10 @@ export interface BadgeOption {
 export interface BadgeColumnProps {
   options?: BadgeOption[];
   pill?: boolean;
+  /** Map of cell value → colour token (e.g. `{ published: 'green' }`). */
+  colors?: Record<string, string>;
+  /** Map of cell value → lucide icon name (e.g. `{ draft: 'pencil' }`). */
+  icons?: Record<string, string>;
 }
 
 export interface BooleanColumnProps {

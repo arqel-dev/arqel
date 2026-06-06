@@ -19,6 +19,7 @@ import type {
   RelationshipColumnSchema,
   TextColumnSchema,
 } from '@arqel-dev/types/tables';
+import { icons as lucideIcons } from 'lucide-react';
 import { cn } from '../utils/cn.js';
 
 export interface CellProps {
@@ -74,17 +75,68 @@ function TextCell({ column, value }: { column: TextColumnSchema; value: unknown 
   );
 }
 
+/**
+ * Colour token → Tailwind classes for `BadgeColumn::colors()`.
+ *
+ * Tokens mirror the values the PHP producer emits (e.g. `'green'`,
+ * `'yellow'`, `'blue'`). Classes are written out in full so Tailwind's
+ * JIT can statically discover them. Unknown tokens fall back to muted.
+ */
+const BADGE_COLOR_CLASS: Record<string, string> = {
+  gray: 'bg-muted text-foreground',
+  slate: 'bg-slate-100 text-slate-800 dark:bg-slate-800/40 dark:text-slate-200',
+  zinc: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800/40 dark:text-zinc-200',
+  red: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200',
+  orange: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200',
+  amber: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200',
+  yellow: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200',
+  lime: 'bg-lime-100 text-lime-800 dark:bg-lime-900/40 dark:text-lime-200',
+  green: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200',
+  emerald: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200',
+  teal: 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-200',
+  cyan: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-200',
+  sky: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200',
+  blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200',
+  indigo: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200',
+  violet: 'bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-200',
+  purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200',
+  fuchsia: 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/40 dark:text-fuchsia-200',
+  pink: 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-200',
+  rose: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200',
+};
+
+const BADGE_MUTED_CLASS = 'bg-muted text-foreground';
+
+/** Resolve a lucide icon name (`'check-circle'`, `'pencil'`) to its component. */
+function resolveLucideIcon(name: string) {
+  const pascal = name
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+  return lucideIcons[pascal as keyof typeof lucideIcons];
+}
+
 function BadgeCell({ column, value }: { column: BadgeColumnSchema; value: unknown }) {
+  const key = asString(value);
   const option = column.props.options?.find((o) => o.value === value);
-  const label = option?.label ?? asString(value);
+  const label = option?.label ?? key;
+
+  const colorToken = column.props.colors?.[key];
+  const colorClass = (colorToken && BADGE_COLOR_CLASS[colorToken]) || BADGE_MUTED_CLASS;
+
+  const iconName = column.props.icons?.[key];
+  const Icon = iconName ? resolveLucideIcon(iconName) : undefined;
+
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2 py-0.5 text-xs',
+        'inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium',
         column.props.pill ? 'rounded-full' : 'rounded-sm',
-        'bg-muted text-foreground',
+        colorClass,
       )}
     >
+      {Icon ? <Icon className="size-3 shrink-0" aria-hidden /> : null}
       {label}
     </span>
   );

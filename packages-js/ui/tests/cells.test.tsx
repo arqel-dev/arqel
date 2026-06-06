@@ -46,6 +46,42 @@ describe('TableCell', () => {
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
+  it('badge applies the colour-token class from props.colors[value]', () => {
+    const column: BadgeColumnSchema = {
+      ...baseColumn,
+      type: 'badge',
+      props: { colors: { published: 'green', draft: 'gray' } },
+    };
+    render(<TableCell column={column} value="published" />);
+    const badge = screen.getByText('published');
+    // The green token must produce a green class, never the hardcoded muted fallback.
+    expect(badge.className).toContain('green');
+    expect(badge.className).not.toContain('bg-muted');
+  });
+
+  it('badge falls back to the muted class when no colour matches the value', () => {
+    const column: BadgeColumnSchema = {
+      ...baseColumn,
+      type: 'badge',
+      props: { colors: { published: 'green' } },
+    };
+    render(<TableCell column={column} value="archived" />);
+    expect(screen.getByText('archived')).toHaveClass('bg-muted');
+  });
+
+  it('badge renders the lucide icon named by props.icons[value]', () => {
+    const column: BadgeColumnSchema = {
+      ...baseColumn,
+      type: 'badge',
+      props: { icons: { draft: 'pencil' }, colors: { draft: 'gray' } },
+    };
+    const { container } = render(<TableCell column={column} value="draft" />);
+    // lucide-react renders an <svg> tagged with a `lucide` class.
+    const svg = container.querySelector('svg');
+    expect(svg).not.toBeNull();
+    expect(svg?.getAttribute('class') ?? '').toContain('lucide');
+  });
+
   it('boolean cell announces true/false via aria-label', () => {
     const column: BooleanColumnSchema = {
       ...baseColumn,

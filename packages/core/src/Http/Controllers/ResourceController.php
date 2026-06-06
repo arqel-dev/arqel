@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 use ReflectionClass;
@@ -165,19 +166,118 @@ final class ResourceController
             $data[(string) $key] = $value;
         }
 
+        // Forward the table's serialised columns to any bulk action that
+        // accepts them (#67 A). Without this, column-driven actions like
+        // ExportAction defaulted to an empty column list and produced a
+        // BOM-only empty CSV. Duck-typed so core keeps no hard dep on
+        // `arqel-dev/table` / `arqel-dev/export`.
+        $table = $instance->table();
+        if (method_exists($bulkAction, 'withColumns') && is_object($table) && method_exists($table, 'getColumns')) {
+            $columns = $table->getColumns();
+            if (is_array($columns)) {
+                $bulkAction->withColumns($this->serializeColumns($columns));
+            }
+        }
+
         // Stock `delete` keeps its fast-path (no Action callback exists for
         // it — the semantics live here). Every other bulk action is run
         // through `execute()`, which safely no-ops when the action carries
         // neither a callback nor an overridden execute(). This is what lets
         // callback-less actions like ExportAction (which override execute()
         // directly) actually run instead of error-flashing (#48).
+        $result = null;
         if ($action === 'delete' && ! (method_exists($bulkAction, 'hasCallback') && $bulkAction->hasCallback())) {
             $modelClass::query()->whereIn('id', $recordIds)->delete();
         } elseif (method_exists($bulkAction, 'execute')) {
-            $bulkAction->execute($records, $data);
+            $result = $bulkAction->execute($records, $data);
         }
 
-        return back()->with('success', __('arqel::messages.flash.bulk_completed'));
+        $redirect = back()->with('success', __('arqel::messages.flash.bulk_completed'));
+
+        // Surface a retrievable download URL when the action produced a
+        // downloadable artifact (#67 B). The export package writes
+        // `export-<id>.<ext>` into the dir its download controller globs;
+        // we derive the id from the filename and flash the URL for the
+        // `arqel.export.download` route when it is registered. Duck-typed
+        // to avoid a core -> export dependency.
+        //
+        // NOTE: the full flash-notification + signed-URL pipeline remains
+        // deferred to EXPORT-006/007/008; this is the minimal coherent
+        // round-trip that makes the produced file reachable by the user.
+        $downloadUrl = $this->resolveDownloadUrl($result);
+        if ($downloadUrl !== null) {
+            $redirect = $redirect->with('download_url', $downloadUrl);
+        }
+
+        return $redirect;
+    }
+
+    /**
+     * Serialise a list of table column descriptors to the plain-array
+     * shape exporters consume (`{type, name, label, ...}`). Column
+     * objects expose `toArray()`; already-array descriptors pass through.
+     *
+     * @param array<mixed> $columns
+     *
+     * @return array<int, array<mixed>>
+     */
+    private function serializeColumns(array $columns): array
+    {
+        $serialized = [];
+
+        foreach ($columns as $column) {
+            if (is_array($column)) {
+                $serialized[] = $column;
+
+                continue;
+            }
+
+            if (is_object($column) && method_exists($column, 'toArray')) {
+                $asArray = $column->toArray();
+                if (is_array($asArray)) {
+                    $serialized[] = $asArray;
+                }
+            }
+        }
+
+        return $serialized;
+    }
+
+    /**
+     * Build a download URL from a bulk action's return payload when it
+     * describes a produced file. Expects an array carrying a `filename`
+     * shaped `export-<id>.<ext>`; returns null otherwise, or when the
+     * `arqel.export.download` route is not registered (export package
+     * absent or routing disabled).
+     */
+    private function resolveDownloadUrl(mixed $result): ?string
+    {
+        if (! is_array($result)) {
+            return null;
+        }
+
+        $filename = $result['filename'] ?? null;
+        if (! is_string($filename) || $filename === '') {
+            return null;
+        }
+
+        if (preg_match('/^export-(.+)\.[^.]+$/', $filename, $matches) !== 1) {
+            return null;
+        }
+
+        $exportId = $matches[1];
+
+        // The download route constrains the id to `[a-f0-9-]+`; bail out
+        // rather than emit a URL the route would reject.
+        if (preg_match('/^[a-f0-9-]+$/', $exportId) !== 1) {
+            return null;
+        }
+
+        if (! Route::has('arqel.export.download')) {
+            return null;
+        }
+
+        return route('arqel.export.download', ['exportId' => $exportId]);
     }
 
     /**

@@ -58,6 +58,13 @@
 - **Rota** `routes/admin.php` → `GET /admin/exports/{exportId}/download` (name `arqel.export.download`, where `[a-f0-9-]+`)
 - Tests: 6 ProcessExportJob + 4 ExportDownloadController + 1 ServiceProvider binding
 
+**Corrigido (#67 — bulk export coerente end-to-end):**
+
+- **Colunas finalmente ligadas (A):** `ResourceController::bulkAction()` agora serializa `Table::getColumns()` (objetos `Column` → `toArray()`; descritores já-array passam through) e chama `withColumns()` na bulk action quando esta o suporta. Antes, `ExportAction` recebia `columns = []` e o `CsvExporter` escrevia só o BOM (`\xEF\xBB\xBF\n\n`). Agora o CSV tem headers reais + uma linha por registro selecionado. Wiring duck-typed — core não ganha dep em `arqel-dev/table`/`arqel-dev/export`
+- **Arquivo retrievable (B):** `ExportAction::make()` passa a default `destinationDir` para `storage_path('app/arqel-exports')` (o diretório que o `ExportDownloadController` lê; respeita `config('arqel-export.destination_dir')`), `execute()` garante o diretório (`mkdir` recursivo) e o filename muda de `export-<Ymd-His>` para `export-<uuid>` — o UUID casa o route constraint `[a-f0-9-]+` + glob do controller e elimina colisões no mesmo segundo. `ResourceController::bulkAction()` deixa de descartar o retorno de `execute()`: extrai o `exportId` do filename e faz flash de `download_url` (`route('arqel.export.download')`) quando a rota está registrada
+- Tests: `packages/core/tests/Feature/BulkActionColumnInjectionTest.php` (forward de colunas) + `packages/export/tests/Feature/BulkExportRoundTripTest.php` (CSV populado + URL de download via o seam real controller→action→exporter)
+- **Ainda deferred (EXPORT-007/008+):** o flash-notification completo + **signed URL** com `Export` model (ownership + expiry) + queue threshold. O `download_url` flashado hoje é não-assinado e a rota não impõe authorization (consumer wraps com middleware — ver docblock do `ExportDownloadController`)
+
 **Por chegar (EXPORT-007..010):**
 
 - Override de template Blade (`Resource::pdfView()` + `pdfOrientation()`) — EXPORT-007

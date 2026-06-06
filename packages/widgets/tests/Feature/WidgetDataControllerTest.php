@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Widgets\Dashboard;
 use Arqel\Widgets\DashboardRegistry;
+use Arqel\Widgets\Filters\SelectFilter;
 use Arqel\Widgets\Http\Controllers\WidgetDataController;
 use Arqel\Widgets\Tests\Fixtures\EchoFiltersWidget;
 use Illuminate\Http\Request;
@@ -38,6 +39,56 @@ it('returns 404 when the widget id is unknown but dashboard exists', function ()
 
     expect(fn () => $controller->show($request, $this->registry, 'main', 'missing'))
         ->toThrow(HttpException::class);
+});
+
+it('returns 403 when the dashboard canSee() denies the user', function (): void {
+    $widget = new EchoFiltersWidget('totals');
+    $dashboard = Dashboard::make('main', 'Main')
+        ->widgets([$widget])
+        ->canSee(fn () => false);
+    $this->registry->register($dashboard);
+
+    $controller = new WidgetDataController;
+    $request = Request::create('/admin/dashboards/main/widgets/echo:totals/data', 'GET');
+
+    expect(fn () => $controller->show($request, $this->registry, 'main', 'echo:totals'))
+        ->toThrow(HttpException::class);
+});
+
+it('seeds declared dashboard filter defaults when the request supplies no filters', function (): void {
+    $widget = new EchoFiltersWidget('totals');
+    $dashboard = Dashboard::make('main', 'Main')
+        ->filters([SelectFilter::make('segment')->default('all')])
+        ->widgets([$widget]);
+    $this->registry->register($dashboard);
+
+    $controller = new WidgetDataController;
+    $request = Request::create('/admin/dashboards/main/widgets/echo:totals/data', 'GET');
+
+    $response = $controller->show($request, $this->registry, 'main', 'echo:totals');
+    $payload = $response->getData(true);
+
+    expect($payload['data']['filters'])->toBe(['segment' => 'all']);
+});
+
+it('lets request filters win over declared dashboard filter defaults', function (): void {
+    $widget = new EchoFiltersWidget('totals');
+    $dashboard = Dashboard::make('main', 'Main')
+        ->filters([SelectFilter::make('segment')->default('all')])
+        ->widgets([$widget]);
+    $this->registry->register($dashboard);
+
+    $controller = new WidgetDataController;
+    $request = Request::create(
+        '/admin/dashboards/main/widgets/echo:totals/data',
+        'GET',
+        ['filters' => ['segment' => 'active']],
+    );
+
+    $response = $controller->show($request, $this->registry, 'main', 'echo:totals');
+    $payload = $response->getData(true);
+
+    expect($payload['data']['filters'])->toBe(['segment' => 'active']);
 });
 
 it('returns 403 when canBeSeenBy rejects the user', function (): void {

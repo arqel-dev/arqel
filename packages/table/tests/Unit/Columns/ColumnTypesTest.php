@@ -47,6 +47,27 @@ it('honours alignment shortcuts and width', function (): void {
         ->and($end->getAlignment())->toBe('end');
 });
 
+it('toArray serialises alignment under the "align" key matching the TS contract', function (): void {
+    $payload = TextColumn::make('x')->alignCenter()->toArray();
+
+    expect($payload)->toHaveKey('align')
+        ->and($payload['align'])->toBe('center')
+        ->and($payload)->not->toHaveKey('alignment');
+});
+
+it('toArray defaults align to "start" when no alignment is set', function (): void {
+    $payload = TextColumn::make('x')->toArray();
+
+    expect($payload['align'])->toBe('start');
+});
+
+it('toArray serialises a schema-level "tooltip" key (null by default)', function (): void {
+    $payload = TextColumn::make('x')->toArray();
+
+    expect($payload)->toHaveKey('tooltip')
+        ->and($payload['tooltip'])->toBeNull();
+});
+
 it('BadgeColumn: colors and icons maps appear in props when set', function (): void {
     $column = BadgeColumn::make('status')
         ->colors(['draft' => 'gray', 'published' => 'emerald'])

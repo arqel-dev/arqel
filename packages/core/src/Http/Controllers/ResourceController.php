@@ -7,6 +7,7 @@ namespace Arqel\Core\Http\Controllers;
 use Arqel\Core\Resources\Resource;
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Core\Support\InertiaDataBuilder;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,6 +69,7 @@ final class ResourceController
         $this->authorize('create', $instance::getModel());
 
         $data = $this->validated($request, $instance);
+        $data = $this->pruneUnauthorizedFields($data, $instance, $this->resolveUser($request), null);
 
         $record = $instance->runCreate($data);
 
@@ -104,6 +106,7 @@ final class ResourceController
         $this->authorize('update', $record);
 
         $data = $this->validated($request, $instance);
+        $data = $this->pruneUnauthorizedFields($data, $instance, $this->resolveUser($request), $record);
 
         $instance->runUpdate($record, $data);
 
@@ -402,6 +405,72 @@ final class ResourceController
         }
 
         return $clean;
+    }
+
+    /**
+     * Resolve the active user as a typed `?Authenticatable`. The
+     * request macro returns `mixed`; we narrow it with an instanceof
+     * guard so the field-auth oracles get the precise type they
+     * declare (and PHPStan stays happy without a cast).
+     */
+    private function resolveUser(Request $request): ?Authenticatable
+    {
+        $user = $request->user();
+
+        return $user instanceof Authenticatable ? $user : null;
+    }
+
+    /**
+     * Strip from the validated payload any field whose field-level
+     * authorization denies a write for this user/record (#102).
+     *
+     * Field `canSee()`/`canEdit()` predicates drove only the render
+     * payload (readonly/hidden flags in `FieldSchemaSerializer`); they
+     * were never consulted on the write path, so a user shown a
+     * read-only or hidden field could still submit its value and have
+     * it persisted (mass-assignment bypass).
+     *
+     * We reuse the same oracle the serializer uses to compute the
+     * `readonly` flag — `canBeEditedBy($user, $record)`, which already
+     * returns false when the field is not even visible
+     * (`HasAuthorization` chains `canBeSeenBy` into `canBeEditedBy`).
+     * So pruning on `canBeEditedBy` covers both `canEdit(false)` and
+     * `canSee(false)`, keeping render and write in agreement.
+     *
+     * Fields without a predicate default to allowed and are untouched,
+     * so the mainstream path (no field-auth declared) is unaffected.
+     * The fields are duck-typed (`getName()` + `canBeEditedBy()`) so
+     * `arqel-dev/core` keeps no hard dependency on `arqel-dev/fields`.
+     *
+     * On create `$record` is null (no row exists yet); on update it is
+     * the loaded record, so per-record predicates see the right state.
+     *
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    private function pruneUnauthorizedFields(
+        array $data,
+        Resource $resource,
+        ?Authenticatable $user,
+        ?Model $record,
+    ): array {
+        foreach ($resource->effectiveFields() as $field) {
+            if (! is_object($field) || ! method_exists($field, 'canBeEditedBy') || ! method_exists($field, 'getName')) {
+                continue;
+            }
+
+            $name = $field->getName();
+            if (! is_string($name) || ! array_key_exists($name, $data)) {
+                continue;
+            }
+
+            if (! $field->canBeEditedBy($user, $record)) {
+                unset($data[$name]);
+            }
+        }
+
+        return $data;
     }
 
     /**

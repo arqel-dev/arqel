@@ -226,6 +226,76 @@
       "pr": 89,
       "round": 3,
       "note": "empty-transitions=free-form contract preserved; enforcement only when transitions declared."
+    },
+    {
+      "signature": "versioning::version-restore-gate-policy-bypass",
+      "package": "versioning",
+      "status": "fixed",
+      "issue": 91,
+      "pr": 100,
+      "round": 4
+    },
+    {
+      "signature": "versioning::version-history-gate-policy-bypass",
+      "package": "versioning",
+      "status": "fixed",
+      "issue": 91,
+      "pr": 100,
+      "round": 4
+    },
+    {
+      "signature": "realtime::awareness-channel-gate-policy-bypass",
+      "package": "realtime",
+      "status": "fixed",
+      "issue": 92,
+      "pr": 98,
+      "round": 4
+    },
+    {
+      "signature": "widgets::dashboard-cansee-not-enforced",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 93,
+      "pr": 99,
+      "round": 4
+    },
+    {
+      "signature": "widgets::deferred-drops-filter-defaults",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 93,
+      "pr": 99,
+      "round": 4
+    },
+    {
+      "signature": "fields::search-upload-uses-fields-not-effectivefields",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 94,
+      "pr": 97,
+      "round": 4
+    },
+    {
+      "signature": "tenant::scopedunique-no-hascolumn-guard",
+      "package": "tenant",
+      "status": "fixed",
+      "issue": 95,
+      "pr": 96,
+      "round": 4
+    },
+    {
+      "signature": "fields::fileupload-mimetypes-extensions",
+      "package": "fields",
+      "status": "app-misuse",
+      "round": 4,
+      "note": "refuted: acceptedFileTypes() is contracted to take MIME types not extensions; mimetypes: rule is correct. Passing extensions violates the documented contract."
+    },
+    {
+      "signature": "nav::navigationitem-missing-admin-prefix",
+      "package": "nav",
+      "status": "not-a-bug",
+      "round": 4,
+      "note": "refuted: arqel-dev/nav NavigationItem/BreadcrumbsBuilder emit /{slug} without /admin, but the package is UNWIRED — the real Sidebar uses HandleArqelInertiaRequests::buildNavigation() which prepends the panel path. Dead/parallel code, no app-facing 404."
     }
   ]
 }

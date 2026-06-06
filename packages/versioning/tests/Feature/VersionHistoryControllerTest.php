@@ -3,13 +3,17 @@
 declare(strict_types=1);
 
 use Arqel\Core\Resources\ResourceRegistry;
+use Arqel\Versioning\Tests\Fixtures\AllowViewPolicy;
 use Arqel\Versioning\Tests\Fixtures\Article;
 use Arqel\Versioning\Tests\Fixtures\ArticleResource;
+use Arqel\Versioning\Tests\Fixtures\DenyViewPolicy;
 use Arqel\Versioning\Tests\Fixtures\PlainArticle;
 use Arqel\Versioning\Tests\Fixtures\PlainArticleResource;
 use Arqel\Versioning\Tests\TestCase;
 use Illuminate\Foundation\Auth\User as AuthUser;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 function authedUserForVersionHistory(): AuthUser
 {
@@ -20,7 +24,7 @@ function authedUserForVersionHistory(): AuthUser
 }
 
 /**
- * @return TestResponse<Symfony\Component\HttpFoundation\Response>
+ * @return TestResponse<Response>
  */
 function getVersionHistory(TestCase $case, string $resourceSlug, int|string $id, string $query = ''): TestResponse
 {
@@ -168,6 +172,58 @@ it('omits payload by default and exposes it with ?include=payload', function ():
     /** @var array<string, mixed> $payload */
     $payload = $dataB[0]['payload'];
     expect($payload['title'] ?? null)->toBe('Secret');
+});
+
+it('returns 403 when a Policy denies view (no named gate) and leaks no payload', function (): void {
+    // No Gate::define('view') — authorization resolved purely via Policy.
+    Gate::policy(Article::class, DenyViewPolicy::class);
+
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(ArticleResource::class);
+
+    $article = Article::create(['title' => 'Secret', 'body' => 'leak', 'status' => 'draft']);
+
+    /** @var TestCase $this */
+    $response = getVersionHistory($this, 'articles', $article->id, 'include=payload');
+
+    $response->assertStatus(403);
+    // The snapshot payload must never reach a policy-denied user.
+    $response->assertJsonMissingPath('versions');
+    expect($response->getContent())->not->toContain('leak');
+});
+
+it('returns 200 when a Policy allows view (positive policy path)', function (): void {
+    Gate::policy(Article::class, AllowViewPolicy::class);
+
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(ArticleResource::class);
+
+    $article = Article::create(['title' => 'V1', 'body' => 'b', 'status' => 'draft']);
+
+    /** @var TestCase $this */
+    $response = getVersionHistory($this, 'articles', $article->id);
+
+    $response->assertOk();
+    $body = (array) $response->json();
+    expect($body)->toHaveKey('versions');
+});
+
+it('allows history in scaffold mode (no gate, no policy => Hello World path)', function (): void {
+    // Neither Gate::define nor Gate::policy registered for Article.
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(ArticleResource::class);
+
+    $article = Article::create(['title' => 'V1', 'body' => 'b', 'status' => 'draft']);
+
+    /** @var TestCase $this */
+    $response = getVersionHistory($this, 'articles', $article->id);
+
+    $response->assertOk();
+    $body = (array) $response->json();
+    expect($body)->toHaveKey('versions');
 });
 
 it('exposes meta.keep_versions reflecting the current config', function (): void {

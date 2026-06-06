@@ -65,7 +65,12 @@ user-land Eloquent models):
 middleware `web,auth`). Resolve `ResourceRegistry` por FQCN-string e
 devolve `404` quando ele não está bound. Valida via
 `class_uses_recursive` que o model alvo usa o trait (`422` caso
-contrário). Honra Gate `view` quando registrada (`403` se nega).
+contrário). Autorização `view` exigida quando existe um named gate
+(`Gate::define`) **OU** uma Policy registrada para o model
+(`Gate::getPolicyFor`) — `403 {message: "Forbidden"}` no deny, sem
+vazar o snapshot via `?include=payload`; sem gate **e** sem policy
+(scaffold-mode) o acesso é liberado. `Gate::has()` sozinho **não**
+consulta Policies, por isso a checagem inclui `getPolicyFor` (#91).
 Pagination: `?per_page=20` default, **clamped a `[1, 100]`**. Eager-load
 `with('user')` apenas quando `Version::user()` resolve. Resposta inclui
 `meta.keep_versions` e `meta.total`. Slice React (B39) consome esta
@@ -81,9 +86,13 @@ PII / segredos; controller só inclui mediante `?include=payload`.
 
 **Restore endpoint (VERS-005).** `Http\Controllers\VersionRestoreController`
 single-action, `POST /admin/{resource}/{id}/versions/{versionId}/restore`.
-Mesma resolução defensiva do registry. Valida trait (`422`); autoriza
-via `Gate::authorize('update', $record)` quando registrada (`403` no
-deny). `404` para slug/record/version desconhecida ou cross-record.
+Mesma resolução defensiva do registry. Valida trait (`422`); a
+autorização `update` é exigida quando existe um named gate
+(`Gate::define`) **OU** uma Policy registrada para o model
+(`Gate::getPolicyFor`) — `403` no deny (via `AuthorizationException`);
+sem gate **e** sem policy (scaffold-mode) o pedido é liberado.
+`Gate::has()` sozinho **não** consulta Policies, por isso a checagem
+inclui `getPolicyFor` (#91). `404` para slug/record/version desconhecida ou cross-record.
 Sucesso → `200 {restored: true, new_version_id: <int>}`. Falha
 inesperada → `Log::error('arqel.versioning.restore_failed', …)` +
 `500 {restored: false, message: …}`.

@@ -26,9 +26,15 @@ use Throwable;
  * Resolve `ResourceRegistry` defensivamente via FQCN-string para evitar
  * acoplamento hard com `arqel-dev/core` em ambientes de teste minimalistas.
  *
- * Authorization é gated por `Gate::authorize('update', $record)` quando
- * a Gate está definida; caso contrário (sem ability registrada) o
- * pedido é permitido — pattern usado por outros controllers do projeto.
+ * Authorization: o `update` é exigido quando existe um named gate
+ * (`Gate::define`) OU uma Policy registrada para o model
+ * (`Gate::getPolicyFor`). Só em scaffold-mode — sem named gate e sem
+ * policy — o pedido é liberado ("Hello World" path). Espelha o padrão
+ * canónico de `Arqel\Core\Http\Controllers\ResourceController::authorize`.
+ *
+ * Nota: `Gate::has()` sozinho NÃO consulta Policies, então gatear apenas
+ * por `Gate::has('update')` deixava models protegidos por Policy
+ * passarem sem checagem (issue #91).
  */
 final class VersionRestoreController
 {
@@ -49,9 +55,7 @@ final class VersionRestoreController
                 ], 422);
             }
 
-            if (Gate::has('update')) {
-                Gate::authorize('update', $record);
-            }
+            $this->authorize('update', $record);
 
             /** @var Version|null $version */
             $version = Version::query()
@@ -100,6 +104,23 @@ final class VersionRestoreController
                 'message' => 'Restore failed.',
             ], 500);
         }
+    }
+
+    /**
+     * Autoriza a ability via Gate, honrando named gates E Policies.
+     *
+     * `Gate::has()` só conhece abilities registradas com `Gate::define()`;
+     * nunca consulta Policies (resolvidas via `Gate::getPolicyFor()`).
+     * Por isso exigimos a checagem quando existe named gate OU policy para
+     * o model. Só liberamos (scaffold-mode) quando NENHUM dos dois existe.
+     */
+    private function authorize(string $ability, Model $record): void
+    {
+        if (! Gate::has($ability) && ! Gate::getPolicyFor($record)) {
+            return;
+        }
+
+        Gate::authorize($ability, $record);
     }
 
     /**

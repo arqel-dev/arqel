@@ -239,7 +239,9 @@ abstract class Widget
             'description' => $this->description,
             'sort' => $this->sort,
             'columnSpan' => $this->columnSpan,
-            'pollingInterval' => $this->pollingInterval,
+            // Emitted as `poll` (not `pollingInterval`) to match the key the
+            // React renderer reads (`WidgetRenderer.tsx` → `widget.poll`).
+            'poll' => $this->pollingInterval,
             'deferred' => $this->deferred,
             'filters' => $this->filters,
             'data' => $this->deferred ? null : $this->data(),

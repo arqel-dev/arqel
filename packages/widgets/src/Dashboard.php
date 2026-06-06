@@ -300,7 +300,15 @@ final class Dashboard
             'label' => $this->label,
             'path' => $this->path,
             'widgets' => array_map(
-                fn (Widget $widget): array => $widget->toArray($user),
+                // Inject the parent dashboard id and the widget's stable `id()`
+                // so the React renderer can target the data endpoint
+                // `/dashboards/{dashboardId}/widgets/{widgetId}/data`. `widgetId`
+                // is the full `id()` (`<type>:<name>`) so `findWidget` matches.
+                fn (Widget $widget): array => [
+                    ...$widget->toArray($user),
+                    'dashboardId' => $this->id,
+                    'widgetId' => $widget->id(),
+                ],
                 $resolved,
             ),
             'filters' => $this->filters,

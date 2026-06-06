@@ -25,6 +25,7 @@ import { StatCard } from './StatCard.js';
 import { TableCard } from './TableCard.js';
 
 export interface WidgetPayload {
+  id?: string;
   name: string;
   type: string;
   component?: string;
@@ -48,7 +49,10 @@ export function WidgetRenderer({ widget, filterValues, fetcher }: WidgetRenderer
   filterRef.current = filterValues;
 
   const dashboardId = widget.dashboardId;
-  const widgetId = widget.widgetId ?? widget.name;
+  // `Dashboard::findWidget` matches on `id()` (`<type>:<name>`), so the refetch
+  // must target that — `Dashboard::resolve` now injects `widgetId`. Fall back to
+  // the serialized `id` (also the full `id()`) before the bare `name`.
+  const widgetId = widget.widgetId ?? widget.id ?? widget.name;
   const poll = typeof widget.poll === 'number' ? widget.poll : 0;
   const deferred = widget.deferred === true;
   // Capture the initial-payload presence in a ref so the effect doesn't

@@ -30,19 +30,28 @@ it('value() coerces non-scalar Closure return to null', function (): void {
 });
 
 it('statDescription() handles string and Closure', function (): void {
+    // `StatCard.tsx` reads `statDescription` — the data() key must match so the
+    // secondary line renders and never clobbers the chrome `description`.
     expect(
-        StatWidget::make('a')->statDescription('static line')->data()['description'],
+        StatWidget::make('a')->statDescription('static line')->data()['statDescription'],
     )->toBe('static line');
 
     expect(
-        StatWidget::make('b')->statDescription(fn () => '+12% vs last week')->data()['description'],
+        StatWidget::make('b')->statDescription(fn () => '+12% vs last week')->data()['statDescription'],
     )->toBe('+12% vs last week');
+});
+
+it('data() does not emit the `description` key (reserved for chrome subtitle)', function (): void {
+    $data = StatWidget::make('a')->statDescription('static line')->data();
+
+    expect($data)->not->toHaveKey('description')
+        ->and($data)->toHaveKey('statDescription');
 });
 
 it('statDescription() Closure non-string returns null', function (): void {
     $widget = StatWidget::make('x')->statDescription(fn () => 42);
 
-    expect($widget->data()['description'])->toBeNull();
+    expect($widget->data()['statDescription'])->toBeNull();
 });
 
 it('color() honours canonical palette and falls back to primary on unknown', function (): void {

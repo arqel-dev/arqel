@@ -90,10 +90,19 @@ it('toArray emits data: null when deferred', function (): void {
         ->and($payload['data'])->toBeNull();
 });
 
-it('toArray includes pollingInterval when poll() was called', function (): void {
+it('toArray emits the JS-facing `poll` key when poll() was called', function (): void {
     $payload = (new CounterWidget('x'))->poll(15)->toArray();
 
-    expect($payload['pollingInterval'])->toBe(15);
+    // `WidgetRenderer.tsx` reads `widget.poll`; the serialized key must match.
+    expect($payload)->toHaveKey('poll')
+        ->and($payload['poll'])->toBe(15)
+        ->and($payload)->not->toHaveKey('pollingInterval');
+});
+
+it('toArray emits `poll: null` when polling is disabled', function (): void {
+    $payload = (new CounterWidget('x'))->toArray();
+
+    expect($payload['poll'])->toBeNull();
 });
 
 it('toArray includes filters and heading/description', function (): void {

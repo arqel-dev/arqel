@@ -112,6 +112,46 @@ describe('WidgetRenderer polling', () => {
     expect(screen.queryByText('—')).not.toBeInTheDocument();
   });
 
+  it('fetches a deferred widget using the REAL PHP payload shape (issue #83 A)', async () => {
+    // Mirror exactly what `Dashboard::resolve()` + `Widget::toArray()` now emit:
+    // `data: null` + `deferred: true` + injected `dashboardId` + `widgetId` set
+    // to the full `id()` (`<type>:<name>`, NOT the bare name) + `poll` key.
+    // Before the fix PHP omitted dashboardId/widgetId and emitted
+    // `pollingInterval`, so the renderer's guard returned early → no fetch.
+    const fetcher = vi.fn().mockResolvedValue({
+      data: { value: 99, color: 'success', statDescription: '+12% vs last week' },
+    });
+    const widget: WidgetPayload = {
+      id: 'stat:revenue',
+      name: 'revenue',
+      type: 'stat',
+      heading: 'Revenue',
+      description: 'Monthly recurring',
+      value: null,
+      color: 'primary',
+      poll: null,
+      deferred: true,
+      data: null,
+      dashboardId: 'overview',
+      widgetId: 'stat:revenue',
+    };
+    render(<WidgetRenderer widget={widget} fetcher={fetcher} />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    // Refetch must target the full `id()` so `Dashboard::findWidget` matches
+    // (a bare `name` would 404).
+    expect(fetcher).toHaveBeenCalledWith('/admin/dashboards/overview/widgets/stat:revenue/data');
+    expect(screen.getByText('99')).toBeInTheDocument();
+    // The fetched `statDescription` renders, and the chrome `description`
+    // subtitle survives (the merged payload keeps both keys distinct).
+    expect(screen.getByText('+12% vs last week')).toBeInTheDocument();
+    expect(screen.getByText('Monthly recurring')).toBeInTheDocument();
+  });
+
   it('appends the live dashboard filters to the fetch URL (issue #68 defect B)', async () => {
     const fetcher = vi.fn().mockResolvedValue({ data: { value: 5, color: 'primary' } });
     const widget: WidgetPayload = {

@@ -35,6 +35,22 @@ describe('StatCard', () => {
     expect(screen.getByTestId('stat-card-icon')).toHaveTextContent('trending-up');
   });
 
+  it('renders the secondary line from `statDescription` alongside the chrome `description` (issue #83 B)', () => {
+    // `StatWidget::data()` now emits `statDescription` (not `description`), so
+    // the chrome subtitle and the comparison line are distinct keys and both
+    // render — the data key no longer clobbers the chrome subtitle.
+    render(
+      <StatCard
+        widget={makeWidget({
+          description: 'Monthly recurring',
+          statDescription: '+12% vs last week',
+        })}
+      />,
+    );
+    expect(screen.getByText('Monthly recurring')).toBeInTheDocument();
+    expect(screen.getByText('+12% vs last week')).toBeInTheDocument();
+  });
+
   it('renders sparkline polyline when chart array present', () => {
     const { container } = render(<StatCard widget={makeWidget({ chart: [1, 5, 2, 8, 3, 6] })} />);
     const svg = screen.getByTestId('stat-card-sparkline');

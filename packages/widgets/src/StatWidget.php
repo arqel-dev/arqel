@@ -16,7 +16,7 @@ use Closure;
  *   StatWidget::make('total_users')
  *     ->heading('Total Users')
  *     ->value(fn () => User::count())
- *     ->description(fn () => '+12% vs last week')
+ *     ->statDescription(fn () => '+12% vs last week')
  *     ->descriptionIcon('trending-up')
  *     ->color('success')
  *     ->chart(fn () => User::selectRaw('COUNT(*) as c')->...)
@@ -168,7 +168,11 @@ final class StatWidget extends Widget
     {
         return [
             'value' => $this->resolveValue(),
-            'description' => $this->resolveStatDescription(),
+            // Emitted as `statDescription` (not `description`) to match the key
+            // `StatCard.tsx` reads, and to avoid clobbering the chrome
+            // `description` subtitle when `WidgetRenderer.mergeData` spreads
+            // `{...widget, ...data}`.
+            'statDescription' => $this->resolveStatDescription(),
             'descriptionIcon' => $this->descriptionIcon,
             'color' => $this->color,
             'icon' => $this->icon,

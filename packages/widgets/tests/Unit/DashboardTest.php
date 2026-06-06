@@ -154,6 +154,25 @@ it('resolve() returns the canonical 8-key shape', function (): void {
         ->and($payload['description'])->toBe('KPIs');
 });
 
+it('resolve() injects dashboardId and widgetId into each serialized widget', function (): void {
+    $widget = (new CounterWidget('signups'))->poll(15);
+
+    $payload = Dashboard::make('overview', 'Overview', '/overview')
+        ->widgets([$widget])
+        ->resolve();
+
+    $serialized = $payload['widgets'][0];
+
+    // The renderer guards `if (!dashboardId || !widgetId) return` and targets
+    // `/dashboards/{dashboardId}/widgets/{widgetId}/data` — `widgetId` must be
+    // the full `id()` (`<type>:<name>`) so `Dashboard::findWidget` matches.
+    expect($serialized['dashboardId'])->toBe('overview')
+        ->and($serialized['widgetId'])->toBe('counter:signups')
+        ->and($serialized['widgetId'])->toBe($widget->id())
+        // The renderer reads `widget.poll`; PHP must emit that exact key.
+        ->and($serialized['poll'])->toBe(15);
+});
+
 it('resolve() instantiates class-string widgets via the container', function (): void {
     Container::getInstance()->bind(CounterWidget::class, fn () => new CounterWidget('from-container'));
 

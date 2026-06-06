@@ -12,10 +12,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * Streaming XLSX exporter backed by `spatie/simple-excel` (OpenSpout under the hood).
  *
- * Mirrors {@see CsvExporter} structure, but preserves native cell types
- * where Excel benefits from them — `DateTimeInterface` instances are
- * passed through unchanged so Excel renders them as dates rather than
- * literal strings; numerics flow through as-is.
+ * Mirrors {@see CsvExporter}/{@see PdfExporter} cell formatting: `date`
+ * columns are formatted to a `Y-m-d` string (see {@see self::formatCell()}).
+ * Passing a raw `DateTimeInterface` through would make OpenSpout write the
+ * Excel serial value (e.g. 46141.4375) under the General number format with
+ * no date numFmt attached, so Excel/LibreOffice would display the literal
+ * number rather than a date (issue #106). Formatting to a string trades
+ * Excel's native date typing for a cell that reads correctly everywhere and
+ * stays consistent with the other exporters; numerics flow through as-is.
  *
  * Header styling (bold) and frozen-row support are intentionally omitted:
  * coupling to OpenSpout internals via `setHeaderStyle()` proved fragile
@@ -122,7 +126,7 @@ final class XlsxExporter implements Exporter
 
         return match ($type) {
             'date' => $value instanceof DateTimeInterface
-                ? $value
+                ? $value->format('Y-m-d')
                 : ($value === null ? '' : (string) $value),
             'boolean' => $value ? 'Yes' : 'No',
             default => $value ?? '',

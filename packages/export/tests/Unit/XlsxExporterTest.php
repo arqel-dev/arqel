@@ -36,6 +36,25 @@ function readXlsxRows(string $path): array
     return $rows;
 }
 
+/**
+ * Return the raw `xl/worksheets/sheet1.xml` markup of an XLSX file.
+ *
+ * Reading the worksheet XML directly bypasses the OpenSpout reader, which
+ * reconstructs a value from the stored cell and so masks how the cell is
+ * actually rendered by Excel/LibreOffice (issue #106): a date written as a
+ * bare Excel serial under the General number format shows up as the literal
+ * number, never a date.
+ */
+function rawXlsxSheetXml(string $path): string
+{
+    $zip = new ZipArchive;
+    $zip->open($path);
+    $xml = (string) $zip->getFromName('xl/worksheets/sheet1.xml');
+    $zip->close();
+
+    return $xml;
+}
+
 it('writes header and rows to the destination path and returns it', function (): void {
     $columns = [
         ['name' => 'id', 'label' => 'ID', 'type' => 'string'],
@@ -96,23 +115,35 @@ it('formats boolean cells as Yes/No', function (): void {
     ]);
 });
 
-it('preserves DateTime instances so Excel renders them as dates', function (): void {
+it('renders date cells as readable Y-m-d text, not a bare Excel serial', function (): void {
+    // Regression for #106: the previous implementation passed the
+    // DateTimeInterface straight through, so OpenSpout wrote the Excel serial
+    // (e.g. 46141.4375) under the General number format with no date numFmt
+    // attached — Excel/LibreOffice then displayed the literal number instead
+    // of a date. We now format dates to a string like CsvExporter/PdfExporter,
+    // guaranteeing a readable cell everywhere. The old assertion (round-trip
+    // via the reader yields a DateTime) encoded the bug: the reader is the
+    // only place the serial ever looked like a date.
     $columns = [
         ['name' => 'created_at', 'label' => 'Created', 'type' => 'date'],
     ];
 
     (new XlsxExporter)->export(
-        [['created_at' => new DateTime('2026-04-29 10:00:00')]],
+        [['created_at' => new DateTimeImmutable('2026-04-29 10:00:00')]],
         $columns,
         $this->tempFile,
     );
 
-    $parsed = readXlsxRows($this->tempFile);
+    $xml = rawXlsxSheetXml($this->tempFile);
 
+    // The cell holds the formatted date as inline text, not a numeric serial.
+    expect($xml)->toContain('2026-04-29');
+    expect($xml)->not->toContain('46141'); // Excel serial for 2026-04-29.
+
+    // And the reader sees the same string, not a reconstructed DateTime.
+    $parsed = readXlsxRows($this->tempFile);
     expect($parsed[0])->toBe(['Created']);
-    // OpenSpout returns a DateTimeInterface for cells written as native dates.
-    expect($parsed[1][0])->toBeInstanceOf(DateTimeInterface::class);
-    expect($parsed[1][0]->format('Y-m-d'))->toBe('2026-04-29');
+    expect($parsed[1][0])->toBe('2026-04-29');
 });
 
 it('uses display_path for relationship columns', function (): void {

@@ -88,9 +88,15 @@ final class McpServiceProvider extends PackageServiceProvider
                 $uri,
                 $entry['name'],
                 $entry['description'],
-                static function (string $resourceUri) use ($skillResource): array {
-                    return $skillResource->read($resourceUri);
+                // Return the RAW markdown body. McpServer::readResource()
+                // wraps it into the single MCP `contents` envelope; passing
+                // the full envelope here would double-wrap + JSON-encode it
+                // so clients received a JSON blob instead of the SKILL.md
+                // markdown (#117).
+                static function (string $resourceUri) use ($skillResource): string {
+                    return $skillResource->read($resourceUri)['contents'][0]['text'];
                 },
+                $entry['mimeType'],
             );
         }
 

@@ -78,15 +78,27 @@ final class McpServer
     /**
      * Register an MCP resource keyed by URI.
      *
-     * @param callable(string): mixed $fetcher Invoked with the resource URI.
+     * The fetcher must return the RAW resource body (string or a value
+     * stringified via {@see stringifyResult()}); {@see readResource()}
+     * wraps it into the single `{contents: [{uri, text, mimeType?}]}`
+     * MCP envelope. Returning an already-wrapped envelope would be
+     * double-wrapped and JSON-encoded.
+     *
+     * @param callable(string): mixed $fetcher Invoked with the resource URI; returns the raw body.
+     * @param string|null $mimeType Optional MIME type surfaced in `resources/list` and `resources/read`.
      */
-    public function registerResource(string $uri, string $name, string $description, callable $fetcher): void
+    public function registerResource(string $uri, string $name, string $description, callable $fetcher, ?string $mimeType = null): void
     {
-        $this->resources[$uri] = [
+        $entry = [
             'name' => $name,
             'description' => $description,
             'fetcher' => $fetcher,
         ];
+        if ($mimeType !== null) {
+            $entry['mimeType'] = $mimeType;
+        }
+
+        $this->resources[$uri] = $entry;
     }
 
     /**

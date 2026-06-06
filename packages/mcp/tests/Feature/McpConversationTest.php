@@ -103,7 +103,11 @@ beforeEach(function (): void {
             $entry['uri'],
             $entry['name'],
             $entry['description'],
-            static fn (string $resourceUri): array => $skillResource->read($resourceUri),
+            // The fetcher must return RAW markdown — McpServer::readResource()
+            // wraps it into the single MCP envelope. Returning the full
+            // envelope here would double-wrap and JSON-encode it (#117).
+            static fn (string $resourceUri): string => $skillResource->read($resourceUri)['contents'][0]['text'],
+            $entry['mimeType'],
         );
     }
 });
@@ -205,9 +209,14 @@ it('completes a resources/list → resources/read cycle for SkillResource', func
     expect($uris)->toContain('arqel-skill://core')
         ->and($uris)->toContain('arqel-skill://mcp');
 
-    expect($responses[1]['result']['contents'][0]['uri'])->toBe('arqel-skill://mcp')
-        ->and($responses[1]['result']['contents'][0]['text'])
-        ->toContain('# SKILL.md fixture for arqel-dev/mcp');
+    $content = $responses[1]['result']['contents'][0];
+    // Raw markdown — NOT a JSON blob double-wrapping the envelope (#117).
+    expect($content['uri'])->toBe('arqel-skill://mcp')
+        ->and($content['text'])->toBe('# SKILL.md fixture for arqel-dev/mcp')
+        ->and($content['mimeType'])->toBe('text/markdown')
+        // The text is raw markdown, not a JSON-encoded envelope.
+        ->and($content['text'])->not->toContain('"contents"')
+        ->and(json_decode($content['text'], true))->toBeNull();
 
     fclose($input);
     fclose($output);

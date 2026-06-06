@@ -102,6 +102,7 @@ export default function UsersIndex(props: ResourceIndexProps<User>) {
 - ❌ **Duplicar `useFlash({ onMessage })`** — um único `<FlashContainer>` no AppShell
 - ❌ **Recriar variants `success`/`warning` no `Badge`** — foram removidas; usa `default`/`secondary`/`outline` ou compõe com `className`
 - ❌ **Voltar `splitting` para `false`** — duplica singletons de módulo (FieldRegistry) por entry e quebra o registro cross-entrypoint de campos (#45)
+- ❌ **Despachar bulk actions por um `<button>` cru** — a barra de bulk actions do `ArqelIndexPage` deve rotear por `<ActionButton>` (que abre o `<ConfirmDialog>` quando `action.requiresConfirmation`), igual às row actions. Um `<button>` cru que dispara `router.visit` no `onClick` ignora `requiresConfirmation`/`confirmation`, então um bulk delete destrutivo roda sem confirmação num único clique (#70)
 
 ## Testing
 

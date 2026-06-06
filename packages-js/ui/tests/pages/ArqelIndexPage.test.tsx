@@ -311,6 +311,93 @@ describe('ArqelIndexPage — bulk actions render after selection', () => {
   });
 });
 
+describe('ArqelIndexPage — bulk actions honor requiresConfirmation (#70)', () => {
+  it('opens the confirm dialog and defers router.visit until confirmed', async () => {
+    const deleteBulk: ActionSchema = {
+      ...makeAction('deleteBulk', 'Delete selected', 'bulk'),
+      color: 'destructive',
+      variant: 'destructive',
+      method: 'DELETE',
+      url: '/admin/posts/bulk/deleteBulk',
+      requiresConfirmation: true,
+      confirmation: { heading: 'Delete these records?', submitLabel: 'Delete' },
+    };
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [
+        { id: 1, title: 'first' },
+        { id: 2, title: 'second' },
+      ],
+      actions: { row: [], bulk: [deleteBulk], toolbar: [] },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    render(<ArqelIndexPage />);
+
+    const checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+    const firstCheckbox = checkboxes[0];
+    if (!firstCheckbox) throw new Error('expected at least one row checkbox');
+    await user.click(firstCheckbox);
+
+    const bulkBtn = await screen.findByRole('button', { name: /delete selected/i });
+    await user.click(bulkBtn);
+
+    // Confirm dialog appears and the request has NOT fired yet.
+    expect(screen.getByText('Delete these records?')).toBeInTheDocument();
+    expect(routerVisitSpy).not.toHaveBeenCalled();
+
+    // Confirm -> request fires with the same dispatch payload.
+    const confirmBtn = screen.getByRole('button', { name: 'Delete' });
+    await user.click(confirmBtn);
+
+    expect(routerVisitSpy).toHaveBeenCalledTimes(1);
+    const lastCall = routerVisitSpy.mock.calls[routerVisitSpy.mock.calls.length - 1];
+    expect(lastCall).toBeDefined();
+    const [url, options] = lastCall as [
+      string,
+      { method: string; data: { record_ids: unknown[] } },
+    ];
+    expect(url).toBe('/admin/posts/bulk/deleteBulk');
+    expect(options.method).toBe('delete');
+    expect(options.data.record_ids).toEqual([1]);
+  });
+
+  it('fires router.visit directly for a bulk action without requiresConfirmation', async () => {
+    const exportAction: ActionSchema = {
+      ...makeAction('export', 'Export', 'bulk'),
+      url: '/admin/posts/bulk/export',
+    };
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [{ id: 1, title: 'first' }],
+      actions: { row: [], bulk: [exportAction], toolbar: [] },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    render(<ArqelIndexPage />);
+
+    const checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+    const firstCheckbox = checkboxes[0];
+    if (!firstCheckbox) throw new Error('expected at least one row checkbox');
+    await user.click(firstCheckbox);
+
+    const exportBtn = await screen.findByRole('button', { name: /export/i });
+    await user.click(exportBtn);
+
+    // No dialog, fires immediately.
+    expect(routerVisitSpy).toHaveBeenCalledTimes(1);
+    const lastCall = routerVisitSpy.mock.calls[routerVisitSpy.mock.calls.length - 1];
+    const [url, options] = lastCall as [
+      string,
+      { method: string; data: { record_ids: unknown[] } },
+    ];
+    expect(url).toBe('/admin/posts/bulk/export');
+    expect(options.data.record_ids).toEqual([1]);
+  });
+});
+
 describe('ArqelIndexPage — clearing search emits empty string', () => {
   it('emits search="" (not undefined) when input is cleared', async () => {
     const props = makeProps({ search: 'foo' });

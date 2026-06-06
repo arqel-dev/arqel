@@ -7,8 +7,19 @@ use Arqel\Workflow\Tests\Fixtures\PaidState;
 use Arqel\Workflow\Tests\Fixtures\PendingState;
 use Arqel\Workflow\Tests\Fixtures\SampleSpatieTransition;
 use Arqel\Workflow\Tests\Fixtures\WorkflowOrder;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
+
+// `WorkflowOrder`'s declared transitions carry no `authorizeFor()`, so the
+// deny-by-default `TransitionAuthorizer` (WF-006) would block them. These
+// tests exercise the audit event, not the policy — grant the documented
+// Gate abilities so the transitions are legal + authorized.
+beforeEach(function (): void {
+    Gate::define('transition-pending-to-paid', static fn (?Authenticatable $user): bool => true);
+    Gate::define('transition-*-to-cancelled', static fn (?Authenticatable $user): bool => true);
+});
 
 it('dispatches StateTransitioned when transitionTo is called', function (): void {
     Event::fake([StateTransitioned::class]);

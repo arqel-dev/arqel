@@ -1,28 +1,72 @@
+import type { NavigationItemPayload } from '@arqel-dev/hooks';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import type { ReactNode } from 'react';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { SidebarProvider } from '../src/shadcn/ui/sidebar.js';
 import { Sidebar } from '../src/shell/Sidebar.js';
 
-const items = [
-  { label: 'Dashboard', url: '/admin', active: true },
-  { label: 'Users', url: '/admin/users', group: 'Team', badge: 4 },
-  { label: 'Roles', url: '/admin/roles', group: 'Team' },
-];
+// Sidebar reads navigation from Inertia shared props via useNavigation(). When an
+// explicit `items` prop is passed the shared props are unused, but usePage() is
+// still called, so stub it to an empty panel.
+vi.mock('@inertiajs/react', () => ({
+  usePage: () => ({ props: { panel: { navigation: [] } }, url: '/admin' }),
+}));
 
-// FIXME(post-shadcn-migration): Sidebar tests require usePage from Inertia and a
-// SidebarProvider context post-migration. Skipped to unblock v0.9.0; address in a
-// follow-up PR with proper provider wrapping.
+// The shadcn sidebar block calls window.matchMedia (use-mobile); jsdom lacks it.
+beforeAll(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }),
+  });
+});
+
+function renderSidebar(items: NavigationItemPayload[], brand?: ReactNode) {
+  return render(
+    <SidebarProvider>
+      <Sidebar items={items} brand={brand} />
+    </SidebarProvider>,
+  );
+}
+
 describe('Sidebar', () => {
-  it.skip('renders explicit items grouped with active highlight + badge', () => {
-    render(<Sidebar items={items} brand={<span>Acme</span>} />);
-    expect(screen.getByText('Acme')).toBeInTheDocument();
-    expect(screen.getByText('Team')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByText('4')).toBeInTheDocument();
+  it('renders a lucide icon for items that declare item.icon', () => {
+    const { container } = renderSidebar([
+      { label: 'Posts', url: '/admin/posts', icon: 'file-text' },
+    ]);
+
+    expect(screen.getByText('Posts')).toBeInTheDocument();
+    // lucide-react renders an <svg> tagged with the kebab-case icon name.
+    const svg = container.querySelector('svg.lucide-file-text');
+    expect(svg).not.toBeNull();
   });
 
-  it.skip('returns desktop-only when no open prop is passed', () => {
-    const { container } = render(<Sidebar items={items} />);
-    // No Dialog overlay rendered
-    expect(container.querySelector('[role="dialog"]')).toBeNull();
+  it('renders items without an icon without crashing', () => {
+    const { container } = renderSidebar([{ label: 'Roles', url: '/admin/roles' }]);
+
+    expect(screen.getByText('Roles')).toBeInTheDocument();
+    expect(container.querySelector('svg.lucide')).toBeNull();
+  });
+
+  it('keeps grouping, active highlight and the brand slot', () => {
+    renderSidebar(
+      [
+        { label: 'Dashboard', url: '/admin', icon: 'home', active: true },
+        { label: 'Users', url: '/admin/users', group: 'Team', icon: 'users' },
+      ],
+      <span>Acme</span>,
+    );
+
+    expect(screen.getByText('Acme')).toBeInTheDocument();
+    expect(screen.getByText('Team')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Dashboard/ })).toHaveAttribute('data-active', 'true');
   });
 });

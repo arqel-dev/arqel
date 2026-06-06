@@ -76,5 +76,7 @@ it('writes the chosen tenant key under the configured (non-default) session key'
 
     $resolver->switchTo(switchUser(), $tenantB);
 
-    expect(app('session')->driver()->get('workspace_id'))->toBe(7);
+    // After the #131 fix `switchTo()` persists `identifierFor($tenant)`,
+    // which returns the identifier-column value coerced to string.
+    expect(app('session')->driver()->get('workspace_id'))->toBe('7');
 });

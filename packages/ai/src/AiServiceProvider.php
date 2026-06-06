@@ -29,7 +29,7 @@ final class AiServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel-ai')
             ->hasConfigFile('arqel-ai')
-            ->hasMigration('create_ai_usage_table')
+            ->hasMigration('2026_05_01_000000_create_ai_usage_table')
             ->hasRoute('web');
     }
 

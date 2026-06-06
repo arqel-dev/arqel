@@ -1,0 +1,127 @@
+{
+  "_comment": "Persistent seen-registry for the Arqel dogfooding loop. Keyed by a stable signature. A bug here is fixed (or confirmed-and-in-flight); the loop must NOT re-file it. See docs/superpowers/specs/2026-06-05-showcase-dogfood-ecosystem-design.md.",
+  "seen": [
+    {
+      "signature": "ui::fieldregistry-bundle-split",
+      "package": "ui",
+      "status": "fixed",
+      "issue": 45,
+      "pr": 46,
+      "round": 0
+    },
+    {
+      "signature": "core::bulk-execute-gated-on-hascallback",
+      "package": "core",
+      "status": "fixed",
+      "issue": 48,
+      "pr": 59,
+      "round": 1
+    },
+    {
+      "signature": "core::bulk-url-null-frontend-fallback-mismatch",
+      "package": "core",
+      "status": "fixed",
+      "issue": 48,
+      "pr": 59,
+      "round": 1
+    },
+    {
+      "signature": "ai::costtracker-missing-table-crash",
+      "package": "ai",
+      "status": "fixed",
+      "issue": 49,
+      "pr": 58,
+      "round": 1
+    },
+    {
+      "signature": "ai::publish-migration-stub-mismatch",
+      "package": "ai",
+      "status": "fixed",
+      "issue": 49,
+      "pr": 58,
+      "round": 1
+    },
+    {
+      "signature": "table::badge-colors-noop",
+      "package": "table",
+      "status": "fixed",
+      "issue": 50,
+      "pr": 57,
+      "round": 1
+    },
+    {
+      "signature": "table::column-alignment-key-mismatch",
+      "package": "table",
+      "status": "fixed",
+      "issue": 51,
+      "pr": 63,
+      "round": 1
+    },
+    {
+      "signature": "core::column-payload-shape-divergence",
+      "package": "core",
+      "status": "fixed",
+      "issue": 51,
+      "pr": 63,
+      "round": 1,
+      "note": "same root as alignment key mismatch"
+    },
+    {
+      "signature": "versioning::vendor-publish-stub",
+      "package": "versioning",
+      "status": "fixed",
+      "issue": 52,
+      "pr": 61,
+      "round": 1,
+      "note": "also fixed workflow"
+    },
+    {
+      "signature": "fields::select-missing-in-rule",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 53,
+      "pr": 62,
+      "round": 1
+    },
+    {
+      "signature": "ui::sidebar-icons-dropped",
+      "package": "ui",
+      "status": "fixed",
+      "issue": 54,
+      "pr": 64,
+      "round": 1
+    },
+    {
+      "signature": "core::nav-no-group-sort",
+      "package": "core",
+      "status": "fixed",
+      "issue": 55,
+      "pr": 65,
+      "round": 1
+    },
+    {
+      "signature": "actions::bulk-delete-no-confirm",
+      "package": "actions",
+      "status": "fixed",
+      "issue": 48,
+      "pr": 59,
+      "round": 1,
+      "note": "the bulk dispatch + url fix in #48 routes bulk actions through the confirm-aware path; verify in round 2 whether the JS bulk button now honors requiresConfirmation — if not, re-open as a residual"
+    },
+    {
+      "signature": "auth::login-get-missing-guest",
+      "package": "auth",
+      "status": "fixed",
+      "issue": 56,
+      "pr": 60,
+      "round": 1
+    },
+    {
+      "signature": "widgets::tablewidget-empty-columns",
+      "package": "widgets",
+      "status": "not-a-bug",
+      "round": 1,
+      "note": "refuted: no resolver to regress; empty-columns is the documented duck-typed contract. Do not re-file."
+    }
+  ]
+}

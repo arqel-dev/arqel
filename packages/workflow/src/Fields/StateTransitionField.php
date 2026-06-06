@@ -8,6 +8,7 @@ use Arqel\Fields\Field;
 use Arqel\Workflow\Authorization\TransitionAuthorizer;
 use Arqel\Workflow\Concerns\HasWorkflow;
 use Arqel\Workflow\Models\StateTransition;
+use Arqel\Workflow\Support\TransitionTargetResolver;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
@@ -354,24 +355,7 @@ final class StateTransitionField extends Field
      */
     private static function transitionTo(string $transition): string
     {
-        if (method_exists($transition, 'to')) {
-            try {
-                $reflection = new ReflectionMethod($transition, 'to');
-
-                if ($reflection->isStatic() && $reflection->isPublic()) {
-                    /** @var mixed $result */
-                    $result = $reflection->invoke(null);
-
-                    if (is_string($result) && $result !== '') {
-                        return $result;
-                    }
-                }
-            } catch (Throwable) {
-                // fall through to label-based default
-            }
-        }
-
-        return self::shortName($transition);
+        return TransitionTargetResolver::resolve($transition);
     }
 
     /**

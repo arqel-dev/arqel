@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Realtime\Channels\ResourceChannelAuthorizer;
 use Arqel\Realtime\Collab\AwarenessChannelAuthorizer;
+use Arqel\Realtime\Presence\PresenceChannelResolver;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
@@ -23,6 +24,14 @@ use Illuminate\Support\Facades\Gate;
 | Os 3 primeiros delegam ao `ResourceChannelAuthorizer` (testável de
 | forma isolada). O presence channel mantém o callback inline porque
 | precisa devolver o payload `{id, name, avatar}` (não bool).
+|
+| O pattern do presence channel é derivado de
+| `PresenceChannelResolver::pattern()` (config
+| `arqel-realtime.presence.channel_pattern`), o MESMO valor que o
+| resolver usa para construir o canal que o cliente assina. Assim um
+| pattern customizado mantém registro e assinatura em sincronia
+| (issue #130). Um pattern custom DEVE preservar os placeholders
+| `{resource}`/`{recordId}` (Laravel faz binding posicional por nome).
 |
 */
 
@@ -56,7 +65,7 @@ Broadcast::channel(
 );
 
 Broadcast::channel(
-    'arqel.presence.{resource}.{recordId}',
+    PresenceChannelResolver::pattern(),
     /**
      * @return array{id: int|string|null, name: string|null, avatar: string|null}|false
      */

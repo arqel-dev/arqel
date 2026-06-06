@@ -26,7 +26,7 @@ A integração foca em três blocos:
 
 **Trait de auto-dispatch (RT-002).** `Concerns\BroadcastsResourceUpdates` é o entry point único — sobrescreve o `protected afterUpdate(Model $record): void` do core `Resource` e dispara `ResourceUpdated::dispatch(static::class, $record, $userId)`. Honra `arqel-realtime.auto_dispatch.resource_updated` (kill switch). Resolve user id via `auth()->id()` defensivamente (só passa adiante se for `int` — UUIDs/string ids viram `null`). **Decisão arquitetural**: trait em vez de patching no `Resource` base — `arqel-dev/core` e `arqel-dev/realtime` são pacotes independentes; mutação cross-package empurraria todos os consumidores de `arqel-dev/core` para a stack de broadcasting. Trait é opt-in explícito por Resource. Subclasses que precisam de lógica adicional em `afterUpdate` chamam `parent::afterUpdate($record)` para não silenciar o broadcast.
 
-**Presence channels (RT-004).** `routes/channels.php` registra `arqel.presence.{resource}.{recordId}` via `Broadcast::channel()`; o callback retorna `{id, name, avatar}` para o user autenticado, ou `false` quando o Gate opcional `view-resource-presence` é registrado pela app e nega. `Presence\PresenceChannelResolver` (final readonly) expõe o helper estático `forResource(string $slug, int|string $recordId): string` — lê o pattern (placeholders `{resource}` + `{recordId}`); placeholders extras (`{tenant}`, etc.) ficam literais; pattern não-string ou vazio cai no default `arqel.presence.{resource}.{recordId}`. Levanta `Exceptions\RealtimeException` quando `presence.enabled === false` (programmer error). `Exceptions\RealtimeException` (final, extends `RuntimeException`) é a base runtime exception do pacote.
+**Presence channels (RT-004).** `routes/channels.php` registra o presence channel via `Broadcast::channel(PresenceChannelResolver::pattern(), ...)` — o pattern vem da MESMA config `arqel-realtime.presence.channel_pattern` que o resolver lê, então registro e assinatura ficam em sincronia mesmo com pattern custom (#130). O callback retorna `{id, name, avatar}` para o user autenticado, ou `false` quando o Gate opcional `view-resource-presence` é registrado pela app e nega. `Presence\PresenceChannelResolver` (final readonly) expõe `pattern(): string` (fonte única do pattern, lida da config, com fallback ao default `arqel.presence.{resource}.{recordId}` quando não-string/vazio) e `forResource(string $slug, int|string $recordId): string` (resolve o canal concreto). Um pattern custom DEVE preservar os tokens `{resource}` + `{recordId}` (binding posicional por nome do Laravel); placeholders extras (`{tenant}`, etc.) ficam literais em ambos os lados. Levanta `Exceptions\RealtimeException` quando `presence.enabled === false` (programmer error). `Exceptions\RealtimeException` (final, extends `RuntimeException`) é a base runtime exception do pacote.
 
 **Channel authorization (RT-009).** `routes/channels.php` registra os 4 patterns canónicos (list, per-record, action progress, presence). `Channels\ResourceChannelAuthorizer` (final readonly) concentra a lógica de Gate-checking em 3 métodos estáticos:
 
@@ -45,6 +45,7 @@ Cada método encapsula a lógica em `try/catch \Throwable` e regista via `Log::w
 - `Unit/ResourceUpdatedTest` (5): canais list+detail, omissão sem id, fallback de slug em throw, payload completo, payload com nulls.
 - `Feature/BroadcastsResourceUpdatesTraitTest` (3): dispatch via `afterUpdate`, kill switch, captura `auth()->id()`.
 - `Unit/Presence/PresenceChannelResolverTest` (5) + `Feature/PresenceChannelTest` (4): pattern default + custom + fallback + Gate opcional.
+- `Feature/PresenceChannelPatternTest` (3): paridade registro↔resolver — `pattern()` lê a config, e `routes/channels.php` registra o canal sob o pattern custom configurado (#130).
 - `Unit/Channels/ResourceChannelAuthorizerTest` (10) + `Feature/ChannelAuthorizationTest` (5): cada método × allow/deny/registry-unbound/cache-miss.
 - `Unit/Coverage/RealtimeCoverageGapsTest` (11): chave string no `broadcastWith`, slug vazio, pluralização (`Category` → `categories`), dispatch sem dirty, auth UUID coerce, placeholders extras preservados, pattern array (fallback), registry sem `findBySlug`, resource sem `getModel()`, `authorizeRecord` com registry unbound, `authorizeActionJob` com type mismatch (string vs int).
 
@@ -199,10 +200,19 @@ use Arqel\Realtime\Presence\PresenceChannelResolver;
 $channel = PresenceChannelResolver::forResource('posts', 42);
 // → "arqel.presence.posts.42"
 
-// Pattern custom via config (placeholders extras ficam literais):
-config(['arqel-realtime.presence.channel_pattern' => 'tenant.{tenant}.{resource}-{recordId}']);
+// Pattern (placeholder form) — fonte única compartilhada pelo resolver E
+// pela registração em routes/channels.php:
+PresenceChannelResolver::pattern();
+// → "arqel.presence.{resource}.{recordId}"
+
+// Pattern custom via config. routes/channels.php registra o callback de
+// autorização a partir DESTE mesmo pattern (via pattern()), então o canal
+// assinado e o canal autorizado ficam sempre em sincronia (#130).
+// REGRA: um pattern custom DEVE preservar os placeholders {resource} e
+// {recordId} (Laravel faz binding posicional por nome no callback).
+config(['arqel-realtime.presence.channel_pattern' => 'tenant.{resource}.{recordId}']);
 PresenceChannelResolver::forResource('orders', 7);
-// → "tenant.{tenant}.orders-7"
+// → "tenant.orders.7"  (e routes/channels.php autoriza "tenant.{resource}.{recordId}")
 ```
 
 ### Channel authorization custom

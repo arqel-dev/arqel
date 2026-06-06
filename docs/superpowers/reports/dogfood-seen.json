@@ -127,7 +127,7 @@
       "issue": 67,
       "pr": 76,
       "round": 2,
-      "note": "minimal coherent round-trip shipped; full signed-URL/Export-model/queue is DEFERRED feature work EXPORT-007/008 per ExportAction docblock — do NOT re-file the deferred surface as a bug."
+      "note": "minimal coherent round-trip shipped; full signed-URL/Export-model/queue is DEFERRED feature work EXPORT-007/008 per ExportAction docblock \u2014 do NOT re-file the deferred surface as a bug."
     },
     {
       "signature": "widgets::widgetdata-envelope-mismatch",
@@ -295,7 +295,7 @@
       "package": "nav",
       "status": "not-a-bug",
       "round": 4,
-      "note": "refuted: arqel-dev/nav NavigationItem/BreadcrumbsBuilder emit /{slug} without /admin, but the package is UNWIRED — the real Sidebar uses HandleArqelInertiaRequests::buildNavigation() which prepends the panel path. Dead/parallel code, no app-facing 404."
+      "note": "refuted: arqel-dev/nav NavigationItem/BreadcrumbsBuilder emit /{slug} without /admin, but the package is UNWIRED \u2014 the real Sidebar uses HandleArqelInertiaRequests::buildNavigation() which prepends the panel path. Dead/parallel code, no app-facing 404."
     },
     {
       "signature": "core::field-canedit-not-enforced-write-path",
@@ -358,14 +358,14 @@
       "package": "audit",
       "status": "app-misuse",
       "round": 5,
-      "note": "refuted: follows the established web+auth convention (sibling export ExportDownloadController has the identical pattern + an explicit SECURITY NOTE delegating authz to the consumer app). Gap = audit lacks that delegation docblock — a doc/hardening note, not a behavioral bug."
+      "note": "refuted: follows the established web+auth convention (sibling export ExportDownloadController has the identical pattern + an explicit SECURITY NOTE delegating authz to the consumer app). Gap = audit lacks that delegation docblock \u2014 a doc/hardening note, not a behavioral bug."
     },
     {
       "signature": "audit::logsactivity-logs-all-attributes",
       "package": "audit",
       "status": "app-misuse",
       "round": 5,
-      "note": "refuted: documented anti-pattern in SKILL.md (override é obrigatório); ['*'] fallback is canonical intended behavior; no baseline model uses $guarded=[]+trait."
+      "note": "refuted: documented anti-pattern in SKILL.md (override \u00e9 obrigat\u00f3rio); ['*'] fallback is canonical intended behavior; no baseline model uses $guarded=[]+trait."
     },
     {
       "signature": "fields::unique-no-update-ignore",
@@ -373,6 +373,47 @@
       "status": "not-a-bug",
       "round": 5,
       "note": "refuted: explicitly DEFERRED to CORE-006 (unchecked ticket box in PLANNING/08, documented workaround Rule::unique()->ignore). Same category as EXPORT-007/008."
+    },
+    {
+      "signature": "form::layout-visibility-not-enforced",
+      "package": "form",
+      "status": "fixed",
+      "issue": 115,
+      "pr": 124,
+      "round": 6
+    },
+    {
+      "signature": "realtime::collab-slug-vs-fqcn-mismatch",
+      "package": "realtime",
+      "status": "fixed",
+      "issue": 116,
+      "pr": 121,
+      "round": 6,
+      "note": "exposed by the #103 fix (controller got findBySlug, authorizer didn't)"
+    },
+    {
+      "signature": "mcp::resources-read-double-wrap",
+      "package": "mcp",
+      "status": "fixed",
+      "issue": 117,
+      "pr": 120,
+      "round": 6
+    },
+    {
+      "signature": "core::nav-no-viewany-policy-gate",
+      "package": "core",
+      "status": "fixed",
+      "issue": 118,
+      "pr": 122,
+      "round": 6
+    },
+    {
+      "signature": "workflow::statetransitionfield-to-token-divergence",
+      "package": "workflow",
+      "status": "fixed",
+      "issue": 119,
+      "pr": 123,
+      "round": 6
     }
   ]
 }

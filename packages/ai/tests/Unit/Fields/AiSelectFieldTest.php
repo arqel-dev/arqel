@@ -96,6 +96,46 @@ it('also normalizes trailing punctuation like dots and semicolons', function ():
     expect($field->classify([]))->toBe('finance');
 });
 
+it('matches mixed-case option keys and returns the original-case key', function (): void {
+    $fake = new ConfigurableFakeProvider('fake');
+    $fake->textToReturn = 'Open';
+    app()->instance(AiManager::class, new AiManager(['fake' => $fake]));
+
+    $field = (new AiSelectField('status'))
+        ->options(['Open' => 'Open', 'InProgress' => 'In Progress', 'Resolved' => 'Resolved'])
+        ->prompt('p')
+        ->provider('fake');
+
+    expect($field->classify([]))->toBe('Open');
+});
+
+it('matches a CamelCase key returned by the AI and preserves its original case', function (): void {
+    $fake = new ConfigurableFakeProvider('fake');
+    $fake->textToReturn = 'InProgress';
+    app()->instance(AiManager::class, new AiManager(['fake' => $fake]));
+
+    $field = (new AiSelectField('status'))
+        ->options(['Open' => 'Open', 'InProgress' => 'In Progress', 'Resolved' => 'Resolved'])
+        ->prompt('p')
+        ->provider('fake');
+
+    expect($field->classify([]))->toBe('InProgress');
+});
+
+it('falls back when no mixed-case key matches', function (): void {
+    $fake = new ConfigurableFakeProvider('fake');
+    $fake->textToReturn = 'Nonsense';
+    app()->instance(AiManager::class, new AiManager(['fake' => $fake]));
+
+    $field = (new AiSelectField('status'))
+        ->options(['Open' => 'Open', 'InProgress' => 'In Progress'])
+        ->fallbackOption('Open')
+        ->prompt('p')
+        ->provider('fake');
+
+    expect($field->classify([]))->toBe('Open');
+});
+
 it('passes formData to a closure prompt', function (): void {
     $fake = new ConfigurableFakeProvider('fake');
     $fake->textToReturn = 'tech';

@@ -35,6 +35,10 @@ final class FieldRulesExtractor
             }
 
             $rules[$field->getName()] = $field->getValidationRules();
+
+            foreach ($field->getNestedValidationRules() as $path => $nestedRules) {
+                $rules[$path] = $nestedRules;
+            }
         }
 
         return $rules;

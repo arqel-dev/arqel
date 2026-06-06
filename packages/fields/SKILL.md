@@ -156,6 +156,7 @@ ValidationBridge::register('shouty', function (?string $arg, \Arqel\Fields\Trans
 - `declare(strict_types=1)` obrigatório
 - Subclasses concretas são `final` por convenção; bases (Text, Number, Date, File, Boolean, Select) são extensíveis intencionalmente
 - Closures em props (`disabled`, `dehydrated`, `minDate`, `maxDate`) são avaliadas em `getTypeSpecificProps()` — non-string returns (em `minDate`/`maxDate`) são descartados graciosamente
+- **Selects fechados são validados server-side**: `SelectField`/`RadioField` com options de array estático emitem uma regra `in:<keys>` derivada das chaves; `MultiSelectField` emite `array` no campo + `{name}.*` ⇒ `in:<keys>` (via `getNestedValidationRules()`). Opte por sair com `allowCustomValues()` ou `creatable()`. Options de Closure/relationship degradam graciosamente (sem regra `in:`, pois não são estaticamente conhecidas aqui)
 - **Sem dependência inversa para `arqel-dev/core`**: core não depende de fields. Fields depende de core (precisa de `HasResource` para BelongsTo/HasMany)
 - Snapshot tests obrigatórios para cada tipo novo
 

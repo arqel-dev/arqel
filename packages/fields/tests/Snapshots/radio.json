@@ -10,7 +10,9 @@
     "columnSpan": 1,
     "live": false,
     "liveDebounce": null,
-    "rules": [],
+    "rules": [
+        "in:s,l"
+    ],
     "props": {
         "options": {
             "s": "S",

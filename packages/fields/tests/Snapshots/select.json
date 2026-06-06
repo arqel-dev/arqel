@@ -10,7 +10,9 @@
     "columnSpan": 1,
     "live": false,
     "liveDebounce": null,
-    "rules": [],
+    "rules": [
+        "in:draft,published"
+    ],
     "props": {
         "options": {
             "draft": "Draft",

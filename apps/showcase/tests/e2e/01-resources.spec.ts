@@ -144,9 +144,12 @@ test.describe('Post resource', () => {
     await page.locator('table thead input[type="checkbox"][aria-label="Select all rows"]').check();
 
     // The bulk-action bar appears once rows are selected; deleteBulk() renders a
-    // "Delete selected" button that fires immediately via Inertia (no confirm
-    // dialog, unlike the per-row delete action).
+    // "Delete selected" button that opens a ConfirmDialog before dispatching via
+    // Inertia, mirroring the per-row delete action. Confirm to commit the delete.
     await page.getByRole('button', { name: 'Delete selected' }).click();
+    const dialog = page.locator('[role="dialog"], [role="alertdialog"]');
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'Delete' }).click();
 
     // After deleting every selected row the table is empty: no row checkboxes
     // remain and the empty-state placeholder is shown instead.

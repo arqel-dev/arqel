@@ -50,12 +50,11 @@ it('scaffolds a stat widget by default', function (): void {
     expect($contents)->toContain("parent::__construct('total_users')");
 });
 
-it('scaffolds each of the 4 widget types with the right base class', function (): void {
+it('scaffolds the data-bearing types by extending the matching base class', function (): void {
     $cases = [
         'stat' => 'StatWidget',
         'chart' => 'ChartWidget',
         'table' => 'TableWidget',
-        'custom' => 'CustomWidget',
     ];
 
     foreach ($cases as $type => $base) {
@@ -66,6 +65,75 @@ it('scaffolds each of the 4 widget types with the right base class', function ()
         $path = $this->tempBase.'/app/Widgets/'.$name.'.php';
         $contents = (string) file_get_contents($path);
         expect($contents)->toContain('extends '.$base);
+    }
+});
+
+it('scaffolds a custom widget by composing CustomWidget::make (not subclassing the final base)', function (): void {
+    $exit = runMakeWidget($this->tempBase, 'OnboardingProgress', 'custom');
+    expect($exit)->toBe(0);
+
+    $path = $this->tempBase.'/app/Widgets/OnboardingProgress.php';
+    $contents = (string) file_get_contents($path);
+
+    // CustomWidget is the documented final escape-hatch; the stub must compose
+    // it via make(), never subclass it (which would fatal on autoload).
+    expect($contents)->not->toContain('extends CustomWidget');
+    expect($contents)->toContain('CustomWidget::make(');
+    expect($contents)->toContain('public static function make()');
+});
+
+/**
+ * Require the generated file in a fresh PHP subprocess (so a fatal
+ * "cannot extend final class" surfaces as a non-zero exit instead of
+ * killing the test runner) and instantiate / build the widget.
+ *
+ * Returns the subprocess exit code (0 = loaded + is a usable Widget).
+ */
+function requireAndInstantiate(string $generatedFile, string $fqcn, bool $compose): int
+{
+    $autoload = __DIR__.'/../../vendor/autoload.php';
+    $build = $compose
+        // Custom widgets are composed: the generated class exposes a static
+        // make() returning a CustomWidget instance.
+        ? sprintf('$w = \\%s::make();', $fqcn)
+        // Data-bearing widgets are subclasses instantiated directly.
+        : sprintf('$w = new \\%s();', $fqcn);
+
+    $script = sprintf(
+        'require %s; require %s; %s exit($w instanceof \\Arqel\\Widgets\\Widget ? 0 : 2);',
+        var_export($autoload, true),
+        var_export($generatedFile, true),
+        $build,
+    );
+
+    $cmd = escapeshellarg(PHP_BINARY).' -r '.escapeshellarg($script).' 2>/dev/null';
+    exec($cmd, $out, $code);
+
+    return $code;
+}
+
+it('generates widgets that actually load and instantiate without fataling', function (): void {
+    $cases = [
+        // type => [class name, compose-via-make?]
+        'stat' => ['StatExample', false],
+        'chart' => ['ChartExample', false],
+        'table' => ['TableExample', false],
+        'custom' => ['CustomExample', true],
+    ];
+
+    foreach ($cases as $type => [$name, $compose]) {
+        $exit = runMakeWidget($this->tempBase, $name, $type);
+        expect($exit)->toBe(0);
+
+        $path = $this->tempBase.'/app/Widgets/'.$name.'.php';
+        $code = requireAndInstantiate($path, 'App\\Widgets\\'.$name, $compose);
+
+        expect($code)->toBe(0, sprintf(
+            'Generated %s widget [%s] failed to load/instantiate as a Widget (exit %d).',
+            $type,
+            $name,
+            $code,
+        ));
     }
 });
 

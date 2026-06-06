@@ -23,8 +23,11 @@ use Closure;
  *
  * Closures are resolved at `data()` time so callers can defer heavy
  * computation behind `deferred(true)` or polling.
+ *
+ * Not `final`: the `arqel:widget --type=chart` generator scaffolds a
+ * subclass of this base, so it must remain extensible.
  */
-final class ChartWidget extends Widget
+class ChartWidget extends Widget
 {
     public const CHART_LINE = 'line';
 

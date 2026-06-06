@@ -75,10 +75,16 @@ final readonly class AwarenessChannelAuthorizer
     /**
      * Resolve `$modelType` para uma classe Eloquent FQCN.
      *
-     * Estratégia:
+     * Estratégia (espelha `CollabDocumentController::resolveModelClass`, de
+     * modo que o lado WS aceita exatamente as chaves que o lado REST emite):
      *  1. Se for FQCN válido subclass de Model → retorna direto.
-     *  2. Se `ResourceRegistry` está bound, itera para encontrar Resource
-     *     cujo `getModel()` bate exatamente com `$modelType`.
+     *  2. Se `ResourceRegistry` está bound, procura um Resource cujo
+     *     `getModel()` bate exatamente com `$modelType` (chave por FQCN).
+     *  3. Ainda no registry, resolve `$modelType` como slug de Resource via
+     *     `findBySlug()`. É essa a chave que o REST persiste em
+     *     `YjsDocument::$model_type` e na qual `YjsUpdateReceived`
+     *     broadcasta (`arqel.collab.{slug}.{id}.{field}`); sem este passo o
+     *     authorizer negaria o próprio canal para o qual o write transmite.
      *
      * @return class-string<Model>|null
      */
@@ -95,31 +101,52 @@ final readonly class AwarenessChannelAuthorizer
 
         $registry = app(self::RESOURCE_REGISTRY_CLASS);
 
-        if (! method_exists($registry, 'all')) {
+        if (method_exists($registry, 'all')) {
+            /** @var iterable<int, class-string> $resources */
+            $resources = $registry->all();
+
+            foreach ($resources as $resourceClass) {
+                if (! method_exists($resourceClass, 'getModel')) {
+                    continue;
+                }
+
+                try {
+                    /** @var class-string $modelClass */
+                    $modelClass = $resourceClass::getModel();
+                } catch (Throwable) {
+                    continue;
+                }
+
+                if ($modelClass === $modelType && is_subclass_of($modelClass, Model::class)) {
+                    /** @var class-string<Model> $modelClass */
+                    return $modelClass;
+                }
+            }
+        }
+
+        if (! method_exists($registry, 'findBySlug')) {
             return null;
         }
 
-        /** @var iterable<int, class-string> $resources */
-        $resources = $registry->all();
+        /** @var class-string|null $resourceClass */
+        $resourceClass = $registry->findBySlug($modelType);
 
-        foreach ($resources as $resourceClass) {
-            if (! method_exists($resourceClass, 'getModel')) {
-                continue;
-            }
-
-            try {
-                /** @var class-string $modelClass */
-                $modelClass = $resourceClass::getModel();
-            } catch (Throwable) {
-                continue;
-            }
-
-            if ($modelClass === $modelType && is_subclass_of($modelClass, Model::class)) {
-                /** @var class-string<Model> $modelClass */
-                return $modelClass;
-            }
+        if ($resourceClass === null || ! method_exists($resourceClass, 'getModel')) {
+            return null;
         }
 
-        return null;
+        try {
+            /** @var class-string $modelClass */
+            $modelClass = $resourceClass::getModel();
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! is_subclass_of($modelClass, Model::class)) {
+            return null;
+        }
+
+        /** @var class-string<Model> $modelClass */
+        return $modelClass;
     }
 }

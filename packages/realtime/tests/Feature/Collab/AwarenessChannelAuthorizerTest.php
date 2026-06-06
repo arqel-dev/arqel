@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\Resources\Resource;
 use Arqel\Realtime\Collab\AwarenessChannelAuthorizer;
+use Arqel\Realtime\Events\YjsUpdateReceived;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -19,6 +21,24 @@ final class CollabAuthorizerFakePost extends Model
     protected $table = 'collab_authorizer_fake_posts';
 
     protected $guarded = [];
+}
+
+/**
+ * Resource mapping the slug `posts` to {@see CollabAuthorizerFakePost}, so the
+ * authorizer can resolve the same slug-keyed channel the REST endpoint
+ * broadcasts on.
+ */
+final class CollabAuthorizerFakePostResource extends Resource
+{
+    /** @var class-string<Model> */
+    public static string $model = CollabAuthorizerFakePost::class;
+
+    public static ?string $slug = 'posts';
+
+    public function fields(): array
+    {
+        return [];
+    }
 }
 
 /**
@@ -163,6 +183,59 @@ it('allows access when no view Gate is registered (consistent with presence patt
         authedCollabAuthUser(),
         CollabAuthorizerFakePost::class,
         $post->getKey(),
+        'body',
+    ))->toBeTrue();
+});
+
+it('resolves the model from a Resource slug via the registry and authorizes', function (): void {
+    $post = CollabAuthorizerFakePost::query()->create(['title' => 'Slug-keyed']);
+    /** @var int $postId */
+    $postId = $post->getKey();
+
+    app()->singleton('Arqel\\Core\\Resources\\ResourceRegistry');
+    app('Arqel\\Core\\Resources\\ResourceRegistry')->register(CollabAuthorizerFakePostResource::class);
+
+    Gate::define('view', static fn ($user, $record): bool => true);
+
+    $authorizer = new AwarenessChannelAuthorizer;
+
+    // `posts` is the slug the REST controller persists and broadcasts on —
+    // not an FQCN — so before the fix the authorizer resolved null and denied.
+    expect($authorizer->authorize(
+        authedCollabAuthUser(),
+        'posts',
+        $postId,
+        'body',
+    ))->toBeTrue();
+});
+
+it('authorizes the very channel YjsUpdateReceived broadcasts to (cross-half consistency)', function (): void {
+    $post = CollabAuthorizerFakePost::query()->create(['title' => 'Synced']);
+    /** @var int $postId */
+    $postId = $post->getKey();
+
+    app()->singleton('Arqel\\Core\\Resources\\ResourceRegistry');
+    app('Arqel\\Core\\Resources\\ResourceRegistry')->register(CollabAuthorizerFakePostResource::class);
+
+    Gate::define('view', static fn ($user, $record): bool => true);
+
+    // The REST `store()` dispatches the event keyed by the Resource slug.
+    $slug = CollabAuthorizerFakePostResource::getSlug();
+    $event = new YjsUpdateReceived($slug, $postId, 'body', base64_encode('y'), 1, 7);
+
+    [$channel] = $event->broadcastOn();
+    $expectedChannel = "arqel.collab.{$slug}.{$postId}.body";
+
+    // Pin the broadcast channel to the slug-keyed name…
+    expect($channel->name)->toBe("private-{$expectedChannel}");
+
+    // …and confirm the authorizer accepts that exact (modelType, id, field).
+    $authorizer = new AwarenessChannelAuthorizer;
+
+    expect($authorizer->authorize(
+        authedCollabAuthUser(),
+        $slug,
+        $postId,
         'body',
     ))->toBeTrue();
 });

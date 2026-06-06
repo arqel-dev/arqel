@@ -9,6 +9,16 @@ it('persists allowed locale in the session', function (): void {
     expect(session('locale'))->toBe('pt_BR');
 });
 
+it('queues the arqel_locale cookie so the choice survives session expiry', function (): void {
+    $response = $this->from('/admin')->post('/admin/locale', ['locale' => 'pt_BR']);
+
+    $response->assertRedirect('/admin');
+    // tier-1: within-session source remains unchanged
+    expect(session('locale'))->toBe('pt_BR');
+    // tier-2: cross-session source the SetLocaleMiddleware reads on a fresh session
+    $response->assertCookie('arqel_locale', 'pt_BR');
+});
+
 it('rejects locale outside the allowlist', function (): void {
     $response = $this->post('/admin/locale', ['locale' => 'xx_YY']);
 

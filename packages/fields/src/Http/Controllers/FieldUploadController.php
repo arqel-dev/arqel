@@ -134,7 +134,7 @@ final class FieldUploadController
 
     private function resolveFieldOrFail(Resource $resource, string $name): Field
     {
-        foreach ($resource->fields() as $field) {
+        foreach ($resource->effectiveFields() as $field) {
             if ($field instanceof Field && $field->getName() === $name) {
                 return $field;
             }

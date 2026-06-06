@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Fields\Http\Controllers\FieldUploadController;
+use Arqel\Fields\Tests\Fixtures\Resources\FormOnlyUploadingResource;
 use Arqel\Fields\Tests\Fixtures\Resources\UploadingResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -16,6 +17,7 @@ beforeEach(function (): void {
     $this->registry = app(ResourceRegistry::class);
     $this->registry->clear();
     $this->registry->register(UploadingResource::class);
+    $this->registry->register(FormOnlyUploadingResource::class);
 
     $this->controller = new FieldUploadController($this->registry);
 });
@@ -68,3 +70,20 @@ it('destroy: removes a stored file', function (): void {
 it('destroy: 422 when path is missing', function (): void {
     $this->controller->destroy(Request::create('/upload', 'DELETE'), 'uploading-resources', 'avatar');
 })->throws(HttpException::class);
+
+it('store: resolves a FileField declared only inside form() (#94)', function (): void {
+    $file = UploadedFile::fake()->create('form-avatar.png', 100, 'image/png');
+
+    $request = Request::create('/upload', 'POST');
+    $request->files->set('file', $file);
+
+    // Before the fix this 404'd because the controller iterated fields()
+    // (empty here) instead of effectiveFields() (the form's field list).
+    $response = $this->controller->store($request, 'form-only-uploading-resources', 'avatar');
+    $payload = $response->getData(true);
+
+    expect($payload)->toHaveKeys(['path', 'size', 'originalName'])
+        ->and($payload['originalName'])->toBe('form-avatar.png');
+
+    Storage::disk('local')->assertExists($payload['path']);
+});

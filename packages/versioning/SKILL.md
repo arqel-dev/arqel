@@ -50,7 +50,11 @@ user-land Eloquent models):
   ao record.
 - `pruneOldVersions(): int` aplica retention 'count' por record;
   invocado automaticamente após cada `writeVersion`. Suporta `strategy
-  != 'count'` (early-return 0) e `keep=0` (unbounded).
+  != 'count'` (early-return 0) e `keep=0` (unbounded). O predicado de
+  prune filtra `versionable_type` por `getMorphClass()` (não pelo FQCN
+  cru), casando o valor que `associate()` persiste — logo respeita
+  `Relation::enforceMorphMap()` (sob morph map o type é o alias, não a
+  classe).
 - `resolveAuditUserId()` privado: resolve callable string em
   `arqel-versioning.audit_user` (`'FQCN::method'` ou
   `'callable_string'`); fallback `Auth::id()`; ambos null → `null`.

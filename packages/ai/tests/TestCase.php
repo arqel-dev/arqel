@@ -35,8 +35,10 @@ abstract class TestCase extends Orchestra
         ]);
     }
 
-    protected function defineDatabaseMigrations(): void
-    {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-    }
+    // NOTE: the `ai_usage` migration is loaded by AiServiceProvider itself
+    // (spatie `runsMigrations`), so we deliberately do NOT call
+    // `loadMigrationsFrom()` here — doing so would register the same
+    // migration twice and the Laravel 12.61+ migrator runs both, raising
+    // "table ai_usage already exists". Offline-safety tests drop the table
+    // explicitly inside a RefreshDatabase transaction.
 }

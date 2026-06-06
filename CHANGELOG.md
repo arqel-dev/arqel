@@ -9,6 +9,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Fixed
 
+- **ai:** `CostTracker` agora é offline-safe e honra `arqel-ai.cost_tracking.enabled` (#49). Antes, `AiManager::complete()` chamava `assertWithinLimit()` que consultava `ai_usage` incondicionalmente — como `daily_limit_usd` tem default positivo (`10.0`), a primeira chamada AI crashava com `QueryException: no such table: ai_usage` quando a tabela não estava migrada. Agora as leituras degradam para custo `0.0` via `Schema::hasTable`, e `enabled === false` desliga totalmente o tracker (espelhando `AiCache`). Adicionalmente, o registo da migration passou a usar o nome **datado** (`hasMigration('2026_05_01_000000_create_ai_usage_table')`) que bate com o ficheiro shipado, destravando `vendor:publish --tag=arqel-ai-migrations`.
 - **ui:** `@arqel-dev/ui` agora builda com `splitting: true` no tsup, unificando o `Map` de nível de módulo do `FieldRegistry` em um único chunk compartilhado. Antes, com `splitting: false`, cada entry (`form.js`, `pages.js`, ...) recebia sua própria cópia do registry — campos registrados via `@arqel-dev/ui/form` (usado por `@arqel-dev/fields/register`) ficavam invisíveis ao renderer de `@arqel-dev/ui/pages`, então campos avançados caíam no fallback HTML nativo e submits boolean/datetime retornavam 422 (#45).
 
 ---

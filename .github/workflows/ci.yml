@@ -266,3 +266,60 @@ jobs:
           name: playwright-report-tenant-demo
           path: apps/tenant-demo/playwright-report/
           retention-days: 14
+
+      # --- apps/showcase (comprehensive dogfooding app — all 20 packages) ---
+      # Reuses the Node deps, built packages, and cached Playwright
+      # browser from the apps/demo run above.
+
+      - name: Install Composer deps in apps/showcase
+        run: composer install --working-dir=apps/showcase --no-interaction --prefer-dist
+
+      - name: Setup showcase .env + SQLite + key
+        working-directory: apps/showcase
+        run: |
+          cp .env.example .env || true
+          php artisan key:generate
+          touch database/database.sqlite
+
+      - name: Migrate + seed showcase DB
+        working-directory: apps/showcase
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Smoke-check showcase server boots (surfaces boot errors)
+        working-directory: apps/showcase
+        run: |
+          echo "manifest present: $(ls -la public/build/manifest.json 2>&1)"
+          php artisan serve --host=127.0.0.1 --port=8002 > /tmp/showcase-serve.log 2>&1 &
+          server_pid=$!
+          ok=0
+          last_code=000
+          for i in $(seq 1 40); do
+            last_code=$(curl -s -o /tmp/showcase-login-body.html -w '%{http_code}' http://127.0.0.1:8002/admin/login || echo 000)
+            echo "attempt $i: HTTP $last_code (serve pid alive: $(kill -0 "$server_pid" 2>/dev/null && echo yes || echo no))"
+            if [ "$last_code" = "200" ]; then echo "showcase up (200)"; ok=1; break; fi
+            sleep 1
+          done
+          if [ "$ok" != "1" ]; then
+            echo "=== showcase failed (last HTTP $last_code). Server log: ==="
+            cat /tmp/showcase-serve.log || true
+            echo "=== Response body (first 4KB): ==="
+            head -c 4096 /tmp/showcase-login-body.html 2>/dev/null || true
+            echo ""
+            echo "=== Laravel log tail: ==="
+            tail -n 40 storage/logs/laravel.log 2>/dev/null || echo "(no laravel.log)"
+            kill "$server_pid" 2>/dev/null || true
+            exit 1
+          fi
+          kill "$server_pid" 2>/dev/null || true
+
+      - name: Run E2E tests (apps/showcase)
+        working-directory: apps/showcase
+        run: pnpm exec playwright test
+
+      - name: Upload Playwright report (showcase) on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-showcase
+          path: apps/showcase/playwright-report/
+          retention-days: 14

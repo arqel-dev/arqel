@@ -9,6 +9,7 @@ use Arqel\Workflow\Events\StateTransitioned;
 use Arqel\Workflow\Exceptions\IllegalTransitionException;
 use Arqel\Workflow\Exceptions\UnauthorizedTransitionException;
 use Arqel\Workflow\Models\StateTransition;
+use Arqel\Workflow\Support\TransitionTargetResolver;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -345,32 +346,7 @@ trait HasWorkflow
             return null;
         }
 
-        if (method_exists($transition, 'to')) {
-            try {
-                $reflection = new ReflectionMethod($transition, 'to');
-
-                if ($reflection->isStatic() && $reflection->isPublic()) {
-                    /** @var mixed $result */
-                    $result = $reflection->invoke(null);
-
-                    if (is_string($result) && $result !== '') {
-                        return $result;
-                    }
-                }
-            } catch (Throwable) {
-                // fall through to the class-name convention
-            }
-        }
-
-        $short = str_contains($transition, '\\')
-            ? (string) substr($transition, (int) strrpos($transition, '\\') + 1)
-            : $transition;
-
-        if (preg_match('/To([A-Z][A-Za-z0-9]*)$/', $short, $matches) === 1) {
-            return $matches[1];
-        }
-
-        return $short;
+        return TransitionTargetResolver::resolve($transition);
     }
 
     /**

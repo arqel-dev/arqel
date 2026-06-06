@@ -138,7 +138,10 @@ it('preserves transition declaration order in StateTransitionField::resolveAvail
 
     $transitions = $field->resolveAvailableTransitions();
 
-    // PendingToPaid declarada antes de AnyToCancelled em WorkflowOrder.
+    // PendingToPaid declarada antes de AnyToCancelled em WorkflowOrder. O token
+    // `to` é o segmento de destino derivado da convenção `XxxToYyy` (`Paid`,
+    // `Cancelled`), igual ao write-path/authorizer — nunca o short name da
+    // classe (`PendingToPaid`), que divergia e quebrava a transition (#119).
     $tos = array_map(static fn (array $t): string => $t['to'], $transitions);
 
     // Encontra os índices manualmente para manter PHPStan strict (array_search
@@ -146,10 +149,10 @@ it('preserves transition declaration order in StateTransitionField::resolveAvail
     $pendingIdx = -1;
     $cancelIdx = -1;
     foreach ($tos as $idx => $to) {
-        if ($to === 'PendingToPaid' && $pendingIdx === -1) {
+        if ($to === 'Paid' && $pendingIdx === -1) {
             $pendingIdx = $idx;
         }
-        if ($to === 'AnyToCancelled' && $cancelIdx === -1) {
+        if ($to === 'Cancelled' && $cancelIdx === -1) {
             $cancelIdx = $idx;
         }
     }

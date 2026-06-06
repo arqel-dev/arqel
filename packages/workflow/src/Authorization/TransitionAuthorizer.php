@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Workflow\Authorization;
 
+use Arqel\Workflow\Support\TransitionTargetResolver;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Gate;
 use ReflectionMethod;
@@ -184,41 +185,7 @@ final readonly class TransitionAuthorizer
      */
     private static function resolveTo(string $transitionClass): string
     {
-        if (method_exists($transitionClass, 'to')) {
-            try {
-                $reflection = new ReflectionMethod($transitionClass, 'to');
-
-                if ($reflection->isStatic() && $reflection->isPublic()) {
-                    /** @var mixed $result */
-                    $result = $reflection->invoke(null);
-
-                    if (is_string($result) && $result !== '') {
-                        return $result;
-                    }
-                }
-            } catch (Throwable) {
-                // fall through
-            }
-        }
-
-        $short = self::shortName($transitionClass);
-
-        if (preg_match('/To([A-Z][A-Za-z0-9]*)$/', $short, $matches) === 1) {
-            return $matches[1];
-        }
-
-        return $short;
-    }
-
-    private static function shortName(string $value): string
-    {
-        if (! str_contains($value, '\\')) {
-            return $value;
-        }
-
-        $pos = strrpos($value, '\\');
-
-        return $pos === false ? $value : substr($value, $pos + 1);
+        return TransitionTargetResolver::resolve($transitionClass);
     }
 
     /**

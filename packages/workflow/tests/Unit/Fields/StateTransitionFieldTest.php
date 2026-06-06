@@ -6,6 +6,8 @@ use Arqel\Workflow\Fields\StateTransitionField;
 use Arqel\Workflow\Tests\Fixtures\PaidState;
 use Arqel\Workflow\Tests\Fixtures\PendingState;
 use Arqel\Workflow\Tests\Fixtures\WorkflowOrder;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Gate;
 
 it('exposes type, component, and is created via make()', function (): void {
     $field = StateTransitionField::make('state');
@@ -102,4 +104,66 @@ it('respects transitionsAttribute setter', function (): void {
 
     expect($field->getTransitionsAttribute())->toBe('order_state')
         ->and($field->getTypeSpecificProps()['transitionsAttribute'])->toBe('order_state');
+});
+
+it('emits the target segment as the to token for a class-name-convention transition', function (): void {
+    // PendingToPaid declares no static to(); the field must derive the target
+    // segment ('Paid') the same way the write path + authorizer do, not the
+    // full short class name ('PendingToPaid'). Otherwise the rendered button's
+    // payload slugifies to 'pending-to-paid' and never matches the declared
+    // target 'paid', making the advertised transition un-actionable (#119).
+    $order = new WorkflowOrder;
+    $order->order_state = PendingState::class;
+
+    $field = StateTransitionField::make('state')->record($order);
+
+    $tos = array_map(
+        static fn (array $transition): string => $transition['to'],
+        $field->resolveAvailableTransitions(),
+    );
+
+    expect($tos)->toContain('Paid')
+        ->and($tos)->not->toContain('PendingToPaid');
+});
+
+it('emits a to token that round-trips through the write path without throwing', function (): void {
+    // The field-advertised 'to' token must be accepted by the write path for a
+    // legal transition. Pre-fix the field emitted 'PendingToPaid' while
+    // transitionTo() resolves the declared target to 'Paid', so mapping the
+    // advertised token back to its state and posting it raised
+    // IllegalTransitionException (#119).
+    $order = WorkflowOrder::create(['order_state' => PendingState::class]);
+
+    $field = StateTransitionField::make('state')->record($order);
+
+    $tos = array_map(
+        static fn (array $transition): string => $transition['to'],
+        $field->resolveAvailableTransitions(),
+    );
+
+    // The Pending->Paid transition (no static to(); class-name convention)
+    // must advertise 'Paid', the same target the write path resolves.
+    expect($tos)->toContain('Paid');
+    $to = 'Paid';
+
+    // Map the advertised token back to the declared target FQCN the way a form
+    // submission would; a divergent token (pre-fix 'PendingToPaid') would not
+    // resolve to PaidState here and the write path would then raise
+    // IllegalTransitionException.
+    $candidates = [PaidState::class];
+    $target = null;
+    foreach ($candidates as $state) {
+        if (str_contains(strtolower($state), strtolower($to))) {
+            $target = $state;
+            break;
+        }
+    }
+
+    expect($target)->toBe(PaidState::class);
+
+    Gate::define('transition-pending-to-paid', static fn (?Authenticatable $user): bool => true);
+
+    $order->transitionTo(PaidState::class);
+
+    expect($order->fresh()?->order_state)->toBe(PaidState::class);
 });

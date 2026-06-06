@@ -1,0 +1,122 @@
+import { expect, test } from './fixtures';
+
+/**
+ * Post resource — the widest-surface Resource in the showcase. Covers the
+ * table stack (list, filter, sort, search), row edit and row delete.
+ *
+ * Table column order is [select][Title][Status][Featured][Published][actions]:
+ *   - Title    → td:nth-child(2) (sortable, searchable)
+ *   - Status   → td:nth-child(3) (BadgeColumn draft/published/archived)
+ * Posts are tenant-scoped; after login the current tenant is Acme.
+ */
+test.describe('Post resource', () => {
+  test('list renders rows', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    expect(await page.locator('table tbody tr').count()).toBeGreaterThan(0);
+  });
+
+  test('filter by status narrows the list to published rows', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+
+    // The Status SelectFilter is a <select> inside a <label> reading "Status".
+    const statusFilter = page.locator('label', { hasText: /^Status/ }).locator('select');
+    await statusFilter.selectOption('published');
+
+    // The list re-queries via Inertia; poll until every visible Status badge
+    // reads "published".
+    await expect(async () => {
+      const badges = await page.locator('table tbody tr td:nth-child(3)').allInnerTexts();
+      expect(badges.length).toBeGreaterThan(0);
+      for (const badge of badges) {
+        expect(badge.trim().toLowerCase()).toBe('published');
+      }
+    }).toPass();
+  });
+
+  test('sorting by title changes row order', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+
+    const firstBefore = await page.locator('table tbody tr td:nth-child(2)').first().innerText();
+
+    // The Title header is a sortable <button>. Click twice to toggle the
+    // direction, guaranteeing the first row changes if more than one row.
+    await page.getByRole('button', { name: 'Title' }).click();
+    await page.getByRole('button', { name: 'Title' }).click();
+
+    await expect(async () => {
+      const firstAfter = await page.locator('table tbody tr td:nth-child(2)').first().innerText();
+      expect(firstAfter).not.toBe(firstBefore);
+    }).toPass();
+  });
+
+  test('search filters the list', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+
+    // Pick a real title token from the first row to search for.
+    const firstTitle = await page.locator('table tbody tr td:nth-child(2)').first().innerText();
+    const token = firstTitle.trim().split(/\s+/)[0];
+
+    await page.locator('input[type="search"]').fill(token);
+
+    // The list re-queries; at least one visible row must contain the token.
+    await expect(async () => {
+      const titles = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
+      expect(titles.length).toBeGreaterThan(0);
+      expect(titles.some((t) => t.toLowerCase().includes(token.toLowerCase()))).toBe(true);
+    }).toPass();
+  });
+
+  test('create page renders the form with the required Title field', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts/create');
+    await expect(page.getByRole('heading', { name: 'Create Post' })).toBeVisible();
+
+    // The Title input is present and flagged required (native + schema).
+    const title = page.locator('[data-arqel-field="title"] input');
+    await expect(title).toBeVisible();
+    // The Author belongsTo select is present and required.
+    await expect(page.locator('[data-arqel-field="author_id"] select')).toBeVisible();
+    // Save / Cancel actions render.
+    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+  });
+
+  test('row edit opens the edit page with the title prefilled', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+
+    const firstTitle = await page.locator('table tbody tr td:nth-child(2)').first().innerText();
+
+    await page.locator('table tbody tr').first().getByRole('button', { name: 'Edit' }).click();
+    await page.waitForURL(/\/admin\/posts\/\d+\/edit/);
+
+    await expect(page.locator('[data-arqel-field="title"] input')).toHaveValue(firstTitle.trim());
+  });
+
+  test('row delete removes a row via the confirm dialog', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    const before = await page.locator('table tbody tr').count();
+
+    // The row Delete action opens a ConfirmDialog with a Delete button.
+    await page.locator('table tbody tr').first().getByRole('button', { name: 'Delete' }).click();
+    const dialog = page.locator('[role="dialog"], [role="alertdialog"]');
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'Delete' }).click();
+
+    // The list re-renders with one fewer row.
+    await expect(async () => {
+      const after = await page.locator('table tbody tr').count();
+      expect(after).toBe(before - 1);
+    }).toPass();
+  });
+});

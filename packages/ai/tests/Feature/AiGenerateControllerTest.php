@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Arqel\Ai\AiManager;
 use Arqel\Ai\Tests\Fixtures\FakeAiResource;
 use Arqel\Ai\Tests\Fixtures\FakeProvider;
+use Arqel\Ai\Tests\Fixtures\FormOnlyAiTextResource;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -69,4 +70,19 @@ it('returns 422 when the field is not an AiTextField on the resource', function 
     $response = postGenerate($this, 'ai-articles', 'title', ['formData' => []]);
 
     $response->assertStatus(422);
+});
+
+it('resolves an AiTextField declared only inside form() (#104)', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FormOnlyAiTextResource::class);
+    app()->instance(AiManager::class, new AiManager(['fake' => new FakeProvider('fake')]));
+
+    // Before the fix this 422'd because the controller iterated fields()
+    // (empty here) instead of effectiveFields() (the form's field list).
+    /** @var TestCase $this */
+    $response = postGenerate($this, 'form-only-ai-articles', 'summary', ['formData' => ['title' => 'Hello world']]);
+
+    $response->assertOk()
+        ->assertJson(['text' => 'echo:Summarize Hello world']);
 });

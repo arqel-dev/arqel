@@ -6,6 +6,7 @@ use Arqel\Ai\AiManager;
 use Arqel\Ai\Tests\Fixtures\ConfigurableFakeProvider;
 use Arqel\Ai\Tests\Fixtures\FakeAiResource;
 use Arqel\Ai\Tests\Fixtures\FakeAiSelectResource;
+use Arqel\Ai\Tests\Fixtures\FormOnlyAiSelectResource;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -86,4 +87,26 @@ it('returns 422 when the field is not an AiSelectField on the resource', functio
     ]);
 
     $response->assertStatus(422);
+});
+
+it('resolves an AiSelectField declared only inside form() (#104)', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FormOnlyAiSelectResource::class);
+
+    $fake = new ConfigurableFakeProvider('fake');
+    $fake->textToReturn = 'tech';
+    app()->instance(AiManager::class, new AiManager(['fake' => $fake]));
+
+    // Before the fix this 422'd because the controller iterated fields()
+    // (empty here) instead of effectiveFields() (the form's field list).
+    /** @var TestCase $this */
+    $response = postClassify($this, 'form-only-ai-posts', 'category', [
+        'formData' => ['title' => 'New CPU', 'description' => 'Apple M5 launched'],
+    ]);
+
+    $response->assertOk();
+    /** @var array<string, mixed> $body */
+    $body = (array) $response->json();
+    expect($body)->toBe(['key' => 'tech', 'label' => 'Technology']);
 });

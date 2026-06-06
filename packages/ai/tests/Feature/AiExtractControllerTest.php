@@ -6,6 +6,7 @@ use Arqel\Ai\AiManager;
 use Arqel\Ai\Tests\Fixtures\ConfigurableFakeProvider;
 use Arqel\Ai\Tests\Fixtures\FakeAiExtractResource;
 use Arqel\Ai\Tests\Fixtures\FakeAiResource;
+use Arqel\Ai\Tests\Fixtures\FormOnlyAiExtractResource;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -109,4 +110,31 @@ it('returns 422 when the AI response cannot be parsed as JSON', function (): voi
 
     $response->assertStatus(422);
     expect((array) $response->json())->toHaveKey('message');
+});
+
+it('resolves an AiExtractField declared only inside form() (#104)', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FormOnlyAiExtractResource::class);
+
+    $fake = new ConfigurableFakeProvider('fake');
+    $fake->textToReturn = '{"invoice_number":"INV-42","date":"2026-04-30"}';
+    app()->instance(AiManager::class, new AiManager(['fake' => $fake]));
+
+    // Before the fix this 422'd because the controller iterated fields()
+    // (empty here) instead of effectiveFields() (the form's field list).
+    /** @var TestCase $this */
+    $response = postExtract($this, 'form-only-ai-invoices', 'extracted', [
+        'sourceText' => 'Invoice #INV-42 issued on 2026-04-30',
+    ]);
+
+    $response->assertOk();
+    /** @var array<string, mixed> $body */
+    $body = (array) $response->json();
+    expect($body)->toBe([
+        'extracted' => [
+            'invoice_number' => 'INV-42',
+            'date' => '2026-04-30',
+        ],
+    ]);
 });

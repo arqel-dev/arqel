@@ -4,6 +4,17 @@ declare(strict_types=1);
 
 use Arqel\Versioning\Models\Version;
 use Arqel\Versioning\Tests\Fixtures\Article;
+use Illuminate\Database\Eloquent\Relations\Relation;
+
+// `enforceMorphMap` mutates a process-wide static registry on the Relation
+// class AND sets the `requireMorphMap` flag. Reset both after every test so the
+// morph-map prune case below does not leak into the other tests (which assume
+// the no-morph-map default where `getMorphClass()` === FQCN and an unmapped
+// model is allowed).
+afterEach(function (): void {
+    Relation::morphMap([], false);
+    Relation::requireMorphMap(false);
+});
 
 it('creates a version on insert and on each effective update', function (): void {
     $article = Article::create(['title' => 'Hello', 'body' => 'World', 'status' => 'draft']);
@@ -92,6 +103,27 @@ it('prunes old versions when keep_versions is set', function (): void {
     /** @var Version $latest */
     $latest = $article->versions()->first();
     expect($latest->payload['title'])->toBe('P3');
+});
+
+it('prunes old versions even under a custom morph map', function (): void {
+    // `writeVersion` persists `versionable_type` via `associate()`, which uses
+    // `getMorphClass()` — so under this map rows are stored as the alias
+    // 'versioning_article', not the FQCN. Pruning must key on the same value.
+    Relation::enforceMorphMap(['versioning_article' => Article::class]);
+
+    config()->set('arqel-versioning.keep_versions', 2);
+
+    $article = Article::create(['title' => 'M0', 'body' => 'b', 'status' => 'draft']);
+    $article->update(['title' => 'M1']);
+    $article->update(['title' => 'M2']);
+    $article->update(['title' => 'M3']);
+
+    expect($article->versions()->count())->toBe(2);
+
+    // Guard against false-positives: confirm the rows really were stored under
+    // the morph alias (not the FQCN) so the prune predicate is the thing tested.
+    expect(Version::query()->where('versionable_type', 'versioning_article')->count())->toBe(2);
+    expect(Version::query()->where('versionable_type', Article::class)->count())->toBe(0);
 });
 
 it('is a no-op when versioning is disabled in config', function (): void {

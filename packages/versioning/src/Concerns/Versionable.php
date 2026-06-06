@@ -209,7 +209,7 @@ trait Versionable
         }
 
         $stale = Version::query()
-            ->where('versionable_type', $model::class)
+            ->where('versionable_type', $model->getMorphClass())
             ->where('versionable_id', $model->getKey())
             ->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc')

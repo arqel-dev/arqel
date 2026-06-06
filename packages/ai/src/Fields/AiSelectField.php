@@ -215,8 +215,19 @@ final class AiSelectField extends Field
 
         $candidate = $this->normalize($result->text);
 
-        if ($candidate !== '' && array_key_exists($candidate, $this->options)) {
-            return $candidate;
+        if ($candidate !== '') {
+            // `normalize()` lowercases the candidate, so the membership
+            // check is done against a lowercased-key => original-key map.
+            // This keeps mixed-case option keys matchable while still
+            // returning the original-case key (option-key contract).
+            $byLower = [];
+            foreach (array_keys($this->options) as $optionKey) {
+                $byLower[mb_strtolower($optionKey)] = $optionKey;
+            }
+
+            if (array_key_exists($candidate, $byLower)) {
+                return $byLower[$candidate];
+            }
         }
 
         return $this->fallbackOption;

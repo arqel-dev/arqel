@@ -36,7 +36,7 @@ O pacote é provider-agnóstico por design: o consumidor escolhe `claude`, `open
 |---|---|---|---|
 | `AiTextField` (estende `TextField`) | `generate(formData): string` — placeholders `{name}` resolvidos server-side, trunca por `maxLength` | `POST /admin/{r}/fields/{f}/generate` | entregue |
 | `AiTranslateField` | `translate(text, target, ?source)`, `translateAll(translations, source)` — só preenche idiomas vazios, nunca sobrescreve traduções manuais | `POST .../translate` | follow-up |
-| `AiSelectField` | `classify(formData): ?string` — normaliza output (trim/lower/strip) e valida contra `options`, cai em `fallbackOption` quando inválido | `POST .../classify` | follow-up |
+| `AiSelectField` | `classify(formData): ?string` — normaliza output (trim/lower/strip) e valida contra `options` de forma case-insensitive (retorna a chave na grafia original), cai em `fallbackOption` quando inválido | `POST .../classify` | follow-up |
 | `AiExtractField` | `extract(sourceText): array` — JSON mode opcional, fallback regex `\{[\s\S]*\}` para prosa misturada, filtra keys extras, injeta `null` para keys ausentes | `POST .../extract` | follow-up |
 | `AiImageField` | `analyze(imageUrlOrBase64): array<key,string>` — uma chamada por análise declarada via `aiAnalysis`, `populateFields` mapeia para form fields | `POST .../analyze-image` | entregue (`AiImageInput.tsx`) |
 

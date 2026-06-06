@@ -445,6 +445,13 @@ final class ResourceController
      * On create `$record` is null (no row exists yet); on update it is
      * the loaded record, so per-record predicates see the right state.
      *
+     * Layout-level visibility is enforced too (#115): a field whose only
+     * guard is an enclosing hidden layout (`Section::canSee(...)`) is
+     * absent from `effectiveFields($record)`. Such a field is dropped from
+     * the payload by comparing against the record-agnostic field set, so a
+     * value submitted for a layout the record cannot see is never
+     * persisted — matching the render payload, which also omits it.
+     *
      * @param array<string, mixed> $data
      *
      * @return array<string, mixed>
@@ -455,7 +462,37 @@ final class ResourceController
         ?Authenticatable $user,
         ?Model $record,
     ): array {
+        $visibleFields = $resource->effectiveFields($record);
+
+        // Fields present in the schema but excluded for THIS record by an
+        // enclosing hidden layout must have their submitted value dropped.
+        $visibleNames = [];
+        foreach ($visibleFields as $field) {
+            if (is_object($field) && method_exists($field, 'getName')) {
+                $name = $field->getName();
+                if (is_string($name)) {
+                    $visibleNames[$name] = true;
+                }
+            }
+        }
+
         foreach ($resource->effectiveFields() as $field) {
+            if (! is_object($field) || ! method_exists($field, 'getName')) {
+                continue;
+            }
+
+            $name = $field->getName();
+            if (! is_string($name) || ! array_key_exists($name, $data)) {
+                continue;
+            }
+
+            if (! isset($visibleNames[$name])) {
+                unset($data[$name]);
+            }
+        }
+
+        // Per-field write auth (#102): drop values the user cannot edit.
+        foreach ($visibleFields as $field) {
             if (! is_object($field) || ! method_exists($field, 'canBeEditedBy') || ! method_exists($field, 'getName')) {
                 continue;
             }

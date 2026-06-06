@@ -17,12 +17,15 @@ use Illuminate\Database\Eloquent\Model;
  *
  * `getFields()` flattens the schema recursively so validation and
  * controllers have a flat list of fields without losing the
- * layout tree used for rendering.
+ * layout tree used for rendering. It accepts the current record so
+ * layout-level visibility (`canSee`/`visibleIf`) is honoured: a
+ * field whose only guard is an enclosing hidden layout is pruned
+ * from the flat list (and therefore never leaks to render or write).
  *
- * `toArray()` serialises the schema for the Inertia payload. Per-
- * field auth (`canSee`/`canEdit`) and per-field visibility
- * (`isVisibleIn`) are respected by the controller (CORE-006) when
- * the payload is materialised; the Form itself does not filter.
+ * `toArray()` serialises the schema for the Inertia payload and skips
+ * any layout component the record cannot see (alongside its children).
+ * Per-field auth (`canSee`/`canEdit`) is still enforced downstream by
+ * the controller (CORE-006); the Form only filters layout containers.
  */
 final class Form
 {
@@ -113,13 +116,15 @@ final class Form
 
     /**
      * Flatten the schema into a list of fields, descending through
-     * any layout components recursively.
+     * any layout components recursively. Fields enclosed by a layout
+     * the given record cannot see (`canSee`/`visibleIf`) are pruned,
+     * so the flat list never exposes them to render or write.
      *
      * @return array<int, Field>
      */
-    public function getFields(): array
+    public function getFields(?Model $record = null): array
     {
-        return self::flatten($this->schema);
+        return self::flatten($this->schema, $record);
     }
 
     /**
@@ -127,7 +132,7 @@ final class Form
      *
      * @return array<int, Field>
      */
-    private static function flatten(array $items): array
+    private static function flatten(array $items, ?Model $record = null): array
     {
         $fields = [];
 
@@ -139,7 +144,11 @@ final class Form
             }
 
             if ($item instanceof Component) {
-                foreach (self::flatten($item->getSchema()) as $field) {
+                if (! $item->isVisibleFor($record)) {
+                    continue;
+                }
+
+                foreach (self::flatten($item->getSchema(), $record) as $field) {
                     $fields[] = $field;
                 }
             }
@@ -149,14 +158,17 @@ final class Form
     }
 
     /**
-     * Serialise the form for the Inertia payload.
+     * Serialise the form for the Inertia payload. Layout components the
+     * given record cannot see are omitted entirely (with their children),
+     * so a field guarded only by an enclosing hidden layout never reaches
+     * the client.
      *
      * @return array<string, mixed>
      */
-    public function toArray(): array
+    public function toArray(?Model $record = null): array
     {
         return [
-            'schema' => $this->serializeSchema($this->schema),
+            'schema' => $this->serializeSchema($this->schema, $record),
             'columns' => $this->columns,
             'model' => $this->model,
             'inline' => $this->inline,
@@ -169,13 +181,13 @@ final class Form
      * children). Components emit `entry.schema` populated with their
      * children; `Component::toArray()` itself remains "without
      * descending the schema" — Form descends, Component only emits
-     * its own props.
+     * its own props. A component the record cannot see is skipped.
      *
      * @param array<int, Component|Field> $items
      *
      * @return array<int, array<string, mixed>>
      */
-    private function serializeSchema(array $items): array
+    private function serializeSchema(array $items, ?Model $record = null): array
     {
         $entries = [];
 
@@ -187,10 +199,14 @@ final class Form
                     'type' => $item->getType(),
                 ];
             } elseif ($item instanceof Component) {
+                if (! $item->isVisibleFor($record)) {
+                    continue;
+                }
+
                 $entries[] = [
                     'kind' => 'layout',
                     ...$item->toArray(),
-                    'schema' => $this->serializeSchema($item->getSchema()),
+                    'schema' => $this->serializeSchema($item->getSchema(), $record),
                 ];
             }
         }

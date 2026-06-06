@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
@@ -28,6 +29,13 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  * The label callback (`optionLabel(Closure)`) on the field is
  * honoured per record; without it we use the related Resource's
  * `recordTitle`.
+ *
+ * Authorization (#128): beyond the panel middleware (authentication),
+ * the endpoint gates the *related* model against its `viewAny` Policy
+ * before querying it, so a user without read access to the related
+ * Resource cannot enumerate its records' labels/PII. When no Policy is
+ * registered the gate silently allows (scaffold mode), mirroring
+ * `ResourceController::authorize()`.
  */
 final class FieldSearchController
 {
@@ -56,6 +64,8 @@ final class FieldSearchController
         $relatedResourceClass = $fieldInstance->getRelatedResource();
         /** @var class-string<Model> $relatedModelClass */
         $relatedModelClass = $relatedResourceClass::getModel();
+
+        $this->authorizeViewAny($relatedModelClass, $request);
 
         /** @var Builder<Model> $builder */
         $builder = $relatedModelClass::query();
@@ -106,6 +116,27 @@ final class FieldSearchController
         }
 
         return response()->json($payload);
+    }
+
+    /**
+     * Gate the related model against its `viewAny` Policy before we
+     * read it. Mirrors `ResourceController::authorize()`: when no
+     * Policy (and no matching ability gate) exists, allow silently so
+     * scaffold usage keeps working.
+     *
+     * @param class-string<Model> $modelClass
+     */
+    private function authorizeViewAny(string $modelClass, Request $request): void
+    {
+        $ability = 'viewAny';
+
+        if (! Gate::has($ability) && ! Gate::getPolicyFor($modelClass)) {
+            return;
+        }
+
+        if (Gate::forUser($request->user())->denies($ability, $modelClass)) {
+            abort(HttpResponse::HTTP_FORBIDDEN);
+        }
     }
 
     private function resolveResourceOrFail(string $slug): Resource

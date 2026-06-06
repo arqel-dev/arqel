@@ -11,6 +11,8 @@ use Arqel\Fields\Types\FileField;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
@@ -27,8 +29,16 @@ use Throwable;
  * mirrors the planning spec: `{path, url, size, originalName}`.
  *
  * The DELETE counterpart accepts a `path` form field and removes
- * it from the configured disk. Both endpoints expect the user to
- * be authenticated through the panel middleware.
+ * it from the configured disk.
+ *
+ * Authorization (#128): beyond the panel middleware (authentication),
+ * both endpoints gate against the *owner* Resource's Policy — `create`
+ * for uploads and `delete` for removals — and honour the field's own
+ * `canBeEditedBy()` oracle. When no Policy is registered for the model
+ * the gate silently allows (scaffold mode), mirroring
+ * `ResourceController::authorize()`. The DELETE handler additionally
+ * constrains the supplied `path` to the field's configured directory
+ * so it can never be used to delete arbitrary files on the disk.
  */
 final class FieldUploadController
 {
@@ -44,6 +54,9 @@ final class FieldUploadController
         if (! $fieldInstance instanceof FileField) {
             abort(HttpResponse::HTTP_BAD_REQUEST, 'Field is not a file upload.');
         }
+
+        $this->authorize($instance, 'create', $request);
+        $this->authorizeField($fieldInstance);
 
         $rules = ['file' => $this->buildFileRules($fieldInstance)];
         $request->validate($rules);
@@ -88,14 +101,101 @@ final class FieldUploadController
             abort(HttpResponse::HTTP_BAD_REQUEST, 'Field is not a file upload.');
         }
 
+        $this->authorize($instance, 'delete', $request);
+        $this->authorizeField($fieldInstance);
+
         $path = $request->input('path');
         if (! is_string($path) || $path === '') {
             abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, 'Missing file path.');
         }
 
+        $path = $this->containedPathOrFail($fieldInstance, $path);
+
         Storage::disk($fieldInstance->getDisk())->delete($path);
 
         return response()->json(['deleted' => true]);
+    }
+
+    /**
+     * Gate the operation against the owner Resource's Policy. Mirrors
+     * `ResourceController::authorize()`: when no Policy is registered
+     * for the model (and no matching ability gate exists) we silently
+     * allow so scaffold ("Hello World") usage keeps working. The
+     * `update` ability is consulted as a fallback so a Resource that
+     * only exposes `update` still guards both upload and delete.
+     */
+    private function authorize(Resource $resource, string $ability, Request $request): void
+    {
+        $modelClass = $resource::getModel();
+        $user = $request->user();
+
+        foreach ([$ability, 'update'] as $candidate) {
+            if (! Gate::has($candidate) && ! Gate::getPolicyFor($modelClass)) {
+                continue;
+            }
+
+            if (Gate::forUser($user)->denies($candidate, $modelClass)) {
+                abort(HttpResponse::HTTP_FORBIDDEN);
+            }
+
+            return;
+        }
+    }
+
+    /**
+     * Honour the field's own `canBeEditedBy()` oracle (HasAuthorization
+     * trait, mirrors #102). Aborts 403 on deny. The record is unknown
+     * at upload time, so only the user-level edit gate is consulted.
+     */
+    private function authorizeField(FileField $field): void
+    {
+        if (! $field->canBeEditedBy(Auth::user())) {
+            abort(HttpResponse::HTTP_FORBIDDEN);
+        }
+    }
+
+    /**
+     * Reject any `path` that escapes the field's configured directory.
+     * Absolute paths, `..` traversal segments, and null bytes are
+     * refused; the returned value is the normalised relative path that
+     * is safe to hand to the disk's `delete()`.
+     */
+    private function containedPathOrFail(FileField $field, string $path): string
+    {
+        if (str_contains($path, "\0")) {
+            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, 'Invalid file path.');
+        }
+
+        // Reject absolute paths (POSIX `/...` and Windows `C:\...`).
+        if (str_starts_with($path, '/') || str_starts_with($path, '\\') || preg_match('#^[A-Za-z]:#', $path) === 1) {
+            abort(HttpResponse::HTTP_FORBIDDEN, 'File path is outside the allowed directory.');
+        }
+
+        $normalised = str_replace('\\', '/', $path);
+        $segments = [];
+        foreach (explode('/', $normalised) as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+
+            if ($segment === '..') {
+                abort(HttpResponse::HTTP_FORBIDDEN, 'File path is outside the allowed directory.');
+            }
+
+            $segments[] = $segment;
+        }
+
+        $clean = implode('/', $segments);
+
+        $directory = trim($field->getDirectory() ?? '', '/');
+        if ($directory !== '') {
+            $prefix = $directory.'/';
+            if ($clean !== $directory && ! str_starts_with($clean, $prefix)) {
+                abort(HttpResponse::HTTP_FORBIDDEN, 'File path is outside the allowed directory.');
+            }
+        }
+
+        return $clean;
     }
 
     /**

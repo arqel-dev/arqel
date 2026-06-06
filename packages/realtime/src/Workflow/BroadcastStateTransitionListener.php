@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Realtime\Workflow;
 
 use Arqel\Realtime\Events\ResourceUpdated;
+use Arqel\Workflow\Events\StateTransitioned;
 
 /**
  * Listener default que liga `Arqel\Workflow\Events\StateTransitioned` ao
@@ -50,14 +51,49 @@ final readonly class BroadcastStateTransitionListener
             return;
         }
 
-        /** @var \Arqel\Workflow\Events\StateTransitioned $event */
+        /** @var StateTransitioned $event */
         $record = $event->record;
 
         ResourceUpdated::dispatch(
-            $record::class,
+            $this->resolveResourceClass($record::class),
             $record,
             $event->userId,
         );
+    }
+
+    /**
+     * Resolve the registered Resource class for the given model so the
+     * broadcast lands on the Resource slug channel (`arqel.{slug}`) instead
+     * of the `class_basename` fallback `ResourceUpdated::resolveSlug()` uses
+     * when handed a bare model FQCN.
+     *
+     * Falls back to the model class when the `arqel-dev/core` registry is
+     * unbound (standalone realtime) or has no Resource for the model — the
+     * basename slug is then the only thing available, preserving the prior
+     * behaviour for those setups.
+     *
+     * @param class-string $modelClass
+     *
+     * @return class-string
+     */
+    private function resolveResourceClass(string $modelClass): string
+    {
+        $registryClass = 'Arqel\\Core\\Resources\\ResourceRegistry';
+
+        if (! app()->bound($registryClass)) {
+            return $modelClass;
+        }
+
+        $registry = app($registryClass);
+
+        if (! method_exists($registry, 'findByModel')) {
+            return $modelClass;
+        }
+
+        /** @var class-string|null $resourceClass */
+        $resourceClass = $registry->findByModel($modelClass);
+
+        return $resourceClass ?? $modelClass;
     }
 
     private function shouldBroadcast(): bool

@@ -56,7 +56,9 @@ final class AiTranslateController
         try {
             /** @var object $instance */
             $instance = app($resourceClass);
-            $fields = method_exists($instance, 'fields') ? $instance->fields() : [];
+            $fields = method_exists($instance, 'effectiveFields')
+                ? $instance->effectiveFields()
+                : (method_exists($instance, 'fields') ? $instance->fields() : []);
         } catch (Throwable $e) {
             return new JsonResponse(['message' => 'Failed to resolve resource fields: '.$e->getMessage()], 500);
         }

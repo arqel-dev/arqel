@@ -7,6 +7,7 @@ use Arqel\Ai\Tests\Fixtures\ConfigurableFakeProvider;
 use Arqel\Ai\Tests\Fixtures\FakeAiImageResource;
 use Arqel\Ai\Tests\Fixtures\FakeAiResource;
 use Arqel\Ai\Tests\Fixtures\FakeProvider;
+use Arqel\Ai\Tests\Fixtures\FormOnlyAiImageResource;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -120,4 +121,34 @@ it('returns 422 when the field is not an AiImageField on the resource', function
     ]);
 
     $response->assertStatus(422);
+});
+
+it('resolves an AiImageField declared only inside form() (#104)', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FormOnlyAiImageResource::class);
+
+    $fake = new ConfigurableFakeProvider('fake');
+    $fake->textsToReturn = ['A red apple.', 'fruit, red, healthy'];
+    app()->instance(AiManager::class, new AiManager(['fake' => $fake]));
+
+    // Before the fix this 422'd because the controller iterated fields()
+    // (empty here) instead of effectiveFields() (the form's field list).
+    /** @var TestCase $this */
+    $response = postAnalyzeImage($this, 'form-only-ai-photos', 'cover', [
+        'imageUrl' => 'https://example.com/apple.jpg',
+    ]);
+
+    $response->assertOk();
+    $body = (array) $response->json();
+    expect($body)->toMatchArray([
+        'analyses' => [
+            'alt_text' => 'A red apple.',
+            'tags' => 'fruit, red, healthy',
+        ],
+        'populateMapping' => [
+            'alt_text' => 'cover_alt',
+            'tags' => 'cover_tags',
+        ],
+    ]);
 });

@@ -8,6 +8,7 @@ use Arqel\Widgets\Http\Controllers\DashboardController;
 use Arqel\Widgets\Tests\Fixtures\CounterWidget;
 use Illuminate\Http\Request;
 use Inertia\Response as InertiaResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /*
@@ -102,6 +103,43 @@ it('passes the filters query parameter through as filterValues', function (): vo
 
     expect($props)->toHaveKey('filterValues');
     expect($props['filterValues'])->toBe(['range' => '7d']);
+});
+
+it('aborts with 403 when the dashboard canSee() denies the user', function (): void {
+    /** @var DashboardRegistry $registry */
+    $registry = app(DashboardRegistry::class);
+
+    $registry->register(
+        Dashboard::make('secret', 'Secret')
+            ->widgets([new CounterWidget('hits')])
+            ->canSee(fn () => false),
+    );
+
+    $controller = new DashboardController;
+    $request = Request::create('/admin/dashboards/secret', 'GET');
+
+    expect(fn () => $controller->show($request, $registry, 'secret'))
+        ->toThrow(HttpException::class);
+});
+
+it('renders the dashboard when canSee() allows the user', function (): void {
+    /** @var DashboardRegistry $registry */
+    $registry = app(DashboardRegistry::class);
+
+    $registry->register(
+        Dashboard::make('visible', 'Visible')
+            ->widgets([new CounterWidget('hits')])
+            ->canSee(fn () => true),
+    );
+
+    $controller = new DashboardController;
+    $request = Request::create('/admin/dashboards/visible', 'GET');
+
+    $response = $controller->show($request, $registry, 'visible');
+
+    $props = readInertiaProps($response);
+
+    expect($props['dashboard']['id'])->toBe('visible');
 });
 
 it('resolves dashboards with a custom id via the explicit route param', function (): void {

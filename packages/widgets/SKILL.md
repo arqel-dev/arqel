@@ -28,8 +28,8 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **HTTP layer (WIDGETS-007..008):**
 
-- `Http\Controllers\DashboardController` (final) — `show(Request, DashboardRegistry, ?string $dashboardId='main'): Inertia\Response`. 404 quando ausente; render `'arqel::dashboard'` com `dashboard` + `filterValues`.
-- `Http\Controllers\WidgetDataController` (final) — `show(Request, DashboardRegistry, string $dashboardId, string $widgetId): JsonResponse`. 404 dashboard/widget desconhecido, 403 `canBeSeenBy` reject. Aplica `$widget->filters($request->input('filters'))` quando array; retorna `{data: $widget->data()}`. Cobre RF-W-04 (Polling) + RF-W-05 (Deferred).
+- `Http\Controllers\DashboardController` (final) — `show(Request, DashboardRegistry, ?string $dashboardId='main'): Inertia\Response`. 404 quando ausente; **403 quando `Dashboard::canBeSeenBy($request->user())` nega** (gate ao nível do dashboard, enforçado antes de `resolve()`); render `'arqel::dashboard'` com `dashboard` + `filterValues`.
+- `Http\Controllers\WidgetDataController` (final) — `show(Request, DashboardRegistry, string $dashboardId, string $widgetId): JsonResponse`. 404 dashboard/widget desconhecido; **403 quando `Dashboard::canBeSeenBy($request->user())` nega** (mesmo gate de dashboard, antes de resolver o widget) **ou** quando `Widget::canBeSeenBy()` reject. Antes de `data()`, semeia os defaults de filtro declarados do dashboard por baixo dos do request: `$widget->filters(array_merge($dashboard->getFilters(), $request->input('filters')))` (request vence), espelhando `resolve()` para o primeiro fetch deferred bater com o SSR. Retorna `{data: $widget->data()}`. Cobre RF-W-04 (Polling) + RF-W-05 (Deferred).
 - Rotas em `routes/admin.php` (middleware `web` + `auth`): `GET /admin`, `GET /admin/dashboards/{dashboardId}`, `GET /admin/dashboards/{dashboardId}/widgets/{widgetId}/data` (`arqel.dashboard.widget-data`).
 
 **Filters (WIDGETS-009):**
@@ -45,7 +45,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 - `Commands\MakeWidgetCommand` (final) — `arqel:widget <Name> --type=stat|chart|table|custom --force`. Gera `app/Widgets/<Name>.php`; snake_case do class name vira o `name` arg do construtor (e.g. `TotalUsers` → `'total_users'`). Idempotente (skip sem `--force`). Stubs em `stubs/widgets/{stat,chart,table,custom}.stub`.
 - `Commands\MakeDashboardCommand` (final) — `arqel:dashboard <Name> --id=<custom> --force`. Gera `app/Dashboards/<Name>.php` com factory static `make(): Dashboard`. `--id` default = snake_case; `label` humanised. Stub em `stubs/dashboards/dashboard.stub`.
 
-**Coverage:** ~139 testes Pest passando. Fixture `EchoFiltersWidget` usada em WIDGETS-008/009.
+**Coverage:** ~154 testes Pest passando. Fixture `EchoFiltersWidget` usada em WIDGETS-008/009 e nos testes de enforcement do gate de dashboard + seeding de defaults no fetch.
 
 **Por chegar (WIDGETS-010..012, 014..015):**
 
@@ -59,7 +59,8 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 - **Sem hard dep** em libs de chart (Recharts é JS-side; `ChartWidget` só serializa config).
 - `columnSpan(int)` 1..12; `columnSpan(string)` aceita atalhos (`'full'`, `'1/2'`).
 - `deferred` widgets devem ter um `WidgetDataController` endpoint para fetch (entregue em WIDGETS-008).
-- Filters propagam via merge: `dashboard defaults` ← `widget filters(request values)` (request wins).
+- Filters propagam via merge: `dashboard defaults` ← `widget filters(request values)` (request wins). Vale tanto no SSR (`Dashboard::resolve()`) quanto no fetch deferred/poll (`WidgetDataController`), que semeia `$dashboard->getFilters()` por baixo de `$request->input('filters')`.
+- Autorização ao nível do dashboard (`Dashboard::canSee()`) é enforçada nos **dois** controllers (`abort_unless($dashboard->canBeSeenBy($user), 403)`) — não confiar só no gate por-widget.
 
 ## Anti-patterns
 

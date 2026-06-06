@@ -20,13 +20,18 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  * Flow:
  *   1. Resolve the dashboard via `DashboardRegistry::get` — 404 if
  *      unknown.
- *   2. Resolve the widget via `Dashboard::findWidget` (class-string
+ *   2. Authorise via `Dashboard::canBeSeenBy($request->user())` — 403
+ *      when the dashboard-level `canSee()` gate denies the user, so a
+ *      restricted dashboard cannot be drained widget-by-widget.
+ *   3. Resolve the widget via `Dashboard::findWidget` (class-string
  *      entries are container-instantiated) — 404 if unknown.
- *   3. Authorise via `Widget::canBeSeenBy($request->user())` — 403
+ *   4. Authorise via `Widget::canBeSeenBy($request->user())` — 403
  *      otherwise.
- *   4. Apply request-supplied filters (passthrough array) before
- *      computing data so the client can drive segmentation.
- *   5. Return `{ data: <widget->data()> }` as JSON.
+ *   5. Seed the dashboard's declared filter defaults under any
+ *      request-supplied filters (request wins) before computing data,
+ *      mirroring `Dashboard::resolve()` so a deferred widget's first
+ *      lazy fetch matches the SSR payload.
+ *   6. Return `{ data: <widget->data()> }` as JSON.
  */
 final class WidgetDataController
 {
@@ -41,20 +46,25 @@ final class WidgetDataController
             abort(HttpResponse::HTTP_NOT_FOUND);
         }
 
+        $user = $request->user();
+        $authUser = $user instanceof Authenticatable ? $user : null;
+        abort_unless($dashboard->canBeSeenBy($authUser), HttpResponse::HTTP_FORBIDDEN);
+
         $widget = $dashboard->findWidget($widgetId);
         if ($widget === null) {
             abort(HttpResponse::HTTP_NOT_FOUND);
         }
 
-        $user = $request->user();
-        $authUser = $user instanceof Authenticatable ? $user : null;
         abort_unless($widget->canBeSeenBy($authUser), HttpResponse::HTTP_FORBIDDEN);
 
-        $filters = $request->input('filters');
-        if (is_array($filters)) {
-            /** @var array<string, mixed> $filters */
-            $widget->filters($filters);
-        }
+        // Merge the dashboard's declared filter defaults UNDER any
+        // request-supplied filters so deferred fetches start from the
+        // same baseline as the SSR `resolve()` path while still letting
+        // client-driven filters win.
+        $requestFilters = $request->input('filters');
+        /** @var array<string, mixed> $requestFilters */
+        $requestFilters = is_array($requestFilters) ? $requestFilters : [];
+        $widget->filters(array_merge($dashboard->getFilters(), $requestFilters));
 
         return response()->json([
             'data' => $widget->data(),

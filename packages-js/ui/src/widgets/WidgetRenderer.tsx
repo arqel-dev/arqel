@@ -11,8 +11,12 @@
  *      `null`, fetch once on mount.
  *
  * Both call the canonical endpoint
- * `/admin/dashboards/{dashboardId}/widgets/{widgetId}/data` so the
- * payload shape stays identical to the SSR / Inertia path.
+ * `/admin/dashboards/{dashboardId}/widgets/{widgetId}/data`. The
+ * controller wraps the payload under `{ data: ... }`, so `doFetch`
+ * unwraps that envelope before storing — the resulting shape matches
+ * the SSR / Inertia path, which already seeds from `widget.data`. The
+ * active `DashboardFilters` selection is forwarded as `filters[k]=v`
+ * query params so deferred / poll refetches stay segmented.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -54,12 +58,24 @@ export function WidgetRenderer({ widget, filterValues, fetcher }: WidgetRenderer
   useEffect(() => {
     if (!dashboardId || !widgetId) return undefined;
 
-    const url = `/admin/dashboards/${dashboardId}/widgets/${widgetId}/data`;
+    const baseUrl = `/admin/dashboards/${dashboardId}/widgets/${widgetId}/data`;
     const doFetch = async () => {
       try {
-        const result = fetcher
+        // Build the URL with the *live* filters so deferred / poll refetches
+        // honour the dashboard's `DashboardFilters` selection. The server
+        // reads `$request->input('filters')` as an array, so each entry is
+        // serialised as `filters[key]=value`.
+        const url = withFilters(baseUrl, filterRef.current);
+        const body = fetcher
           ? await fetcher(url)
           : await fetch(url, { headers: { Accept: 'application/json' } }).then((r) => r.json());
+        // Unwrap the controller envelope (`{ data: ... }`) so the fetch
+        // payload shape matches the SSR / Inertia path, which already seeds
+        // from the unwrapped `widget.data`. Defensive: accept bare payloads.
+        const result =
+          body && typeof body === 'object' && 'data' in (body as Record<string, unknown>)
+            ? (body as Record<string, unknown>)['data']
+            : body;
         setData(result);
       } catch {
         // Swallow — the inline payload (or the previous successful poll) stays.
@@ -99,6 +115,24 @@ export function WidgetRenderer({ widget, filterValues, fetcher }: WidgetRenderer
         </div>
       );
   }
+}
+
+/**
+ * Append non-empty filter values as `filters[key]=value` query params so the
+ * Laravel controller resolves them via `$request->input('filters')`. Skips
+ * `null` / `undefined` / empty-string values to keep the URL clean.
+ */
+function withFilters(baseUrl: string, filters: Record<string, unknown> | undefined): string {
+  if (!filters) return baseUrl;
+
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value === null || value === undefined || value === '') continue;
+    params.append(`filters[${key}]`, String(value));
+  }
+
+  const query = params.toString();
+  return query ? `${baseUrl}?${query}` : baseUrl;
 }
 
 function mergeData(widget: WidgetPayload, data: unknown): Record<string, unknown> {

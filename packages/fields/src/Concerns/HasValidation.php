@@ -166,6 +166,20 @@ trait HasValidation
             $resolved[$key] = $value;
         }
 
+        // An optional typed field (e.g. date/email/url/numeric) ships only
+        // its bare type rule, which rejects the explicit JSON `null` the
+        // framework's own typed inputs emit when cleared. Inject `nullable`
+        // ahead of the type rule so a cleared optional field saves instead
+        // of 422'ing. Required wins over nullable, and an explicit
+        // `->nullable()` is preserved as-is — both already carry their key.
+        $needsNullable = $resolved !== []
+            && ! isset($resolved['required'])
+            && ! isset($resolved['nullable']);
+
+        if ($needsNullable) {
+            $resolved = ['nullable' => 'nullable'] + $resolved;
+        }
+
         /** @var list<string|object> $list */
         $list = array_values($resolved);
 

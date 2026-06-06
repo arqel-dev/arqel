@@ -36,7 +36,7 @@ final class WorkflowServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel-workflow')
             ->hasConfigFile('arqel-workflow')
-            ->hasMigration('create_arqel_state_transitions_table');
+            ->hasMigration('2026_05_01_000000_create_arqel_state_transitions_table');
     }
 
     public function packageBooted(): void

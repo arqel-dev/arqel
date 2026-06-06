@@ -30,7 +30,7 @@ final class VersioningServiceProvider extends PackageServiceProvider
         $package
             ->name('arqel-versioning')
             ->hasConfigFile('arqel-versioning')
-            ->hasMigration('create_arqel_versions_table')
+            ->hasMigration('2026_05_01_000000_create_arqel_versions_table')
             ->hasRoute('web')
             ->hasCommand(PruneVersionsCommand::class);
     }

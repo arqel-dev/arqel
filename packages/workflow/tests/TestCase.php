@@ -47,6 +47,11 @@ abstract class TestCase extends Orchestra
         ]);
     }
 
+    // The suite does not use RefreshDatabase, so spatie's `runsMigrations`
+    // auto-run never fires (it only runs through the migrator). This hook is
+    // the single source that creates `arqel_state_transitions` for the test
+    // DB; it runs once per app boot, so there is no double-load with the
+    // dated migration name now registered via `hasMigration()`.
     protected function defineDatabaseMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');

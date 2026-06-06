@@ -39,9 +39,10 @@ final class AiCache
             return null;
         }
 
+        /** @var mixed $value */
         $value = $this->store()->get($this->key($prompt, $options));
 
-        return $value instanceof AiCompletionResult ? $value : null;
+        return is_array($value) ? $this->rehydrate($value) : null;
     }
 
     /**
@@ -56,7 +57,73 @@ final class AiCache
         /** @var int $ttl */
         $ttl = config('arqel-ai.caching.ttl', 3600);
 
-        $this->store()->put($this->key($prompt, $options), $result, $ttl);
+        // Store a plain array snapshot rather than the result object. Laravel's
+        // default database cache driver (Laravel 13, cache.serializable_classes
+        // = false) unserializes any stored object into a __PHP_Incomplete_Class,
+        // which would make get() miss forever and silently double-count cost
+        // (issue #82). An array round-trips losslessly on every driver.
+        $this->store()->put($this->key($prompt, $options), $this->snapshot($result), $ttl);
+    }
+
+    /**
+     * @return array{
+     *     text: string,
+     *     inputTokens: int,
+     *     outputTokens: int,
+     *     estimatedCost: float|null,
+     *     model: string|null,
+     *     raw: array<string, mixed>|null,
+     * }
+     */
+    private function snapshot(AiCompletionResult $result): array
+    {
+        return [
+            'text' => $result->text,
+            'inputTokens' => $result->inputTokens,
+            'outputTokens' => $result->outputTokens,
+            'estimatedCost' => $result->estimatedCost,
+            'model' => $result->model,
+            'raw' => $result->raw,
+        ];
+    }
+
+    /**
+     * Rebuild an `AiCompletionResult` from a cached array snapshot. Returns
+     * null for malformed/legacy payloads so the caller treats them as a miss.
+     *
+     * @param array<array-key, mixed> $value
+     */
+    private function rehydrate(array $value): ?AiCompletionResult
+    {
+        if (! is_string($value['text'] ?? null)
+            || ! is_int($value['inputTokens'] ?? null)
+            || ! is_int($value['outputTokens'] ?? null)) {
+            return null;
+        }
+
+        $estimatedCost = $value['estimatedCost'] ?? null;
+        $model = $value['model'] ?? null;
+        $raw = $value['raw'] ?? null;
+
+        if (is_array($raw)) {
+            /** @var array<string, mixed> $normalisedRaw */
+            $normalisedRaw = [];
+            foreach ($raw as $rawKey => $rawValue) {
+                $normalisedRaw[(string) $rawKey] = $rawValue;
+            }
+            $raw = $normalisedRaw;
+        } else {
+            $raw = null;
+        }
+
+        return new AiCompletionResult(
+            text: $value['text'],
+            inputTokens: $value['inputTokens'],
+            outputTokens: $value['outputTokens'],
+            estimatedCost: is_float($estimatedCost) || is_int($estimatedCost) ? (float) $estimatedCost : null,
+            model: is_string($model) ? $model : null,
+            raw: $raw,
+        );
     }
 
     /**

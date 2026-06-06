@@ -26,6 +26,7 @@ import type { RecordType, ResourceIndexProps } from '@arqel-dev/types/resources'
 import type { SortDirection } from '@arqel-dev/types/tables';
 import { router, usePage } from '@inertiajs/react';
 import { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionButton } from '../action/ActionButton.js';
 import { ActionMenu } from '../action/ActionMenu.js';
 import { ResourceIndex } from '../resource/ResourceIndex.js';
 
@@ -181,39 +182,38 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
     );
   };
 
+  const dispatchBulkAction = (action: ActionSchema): void => {
+    // Every bulk action carries a stock url (core resolves
+    // /admin/{slug}/bulk/{name} for any bulk action without an
+    // explicit url), so there is no client-side fallback route.
+    const url = action.url;
+    if (url === undefined) {
+      return;
+    }
+    const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
+    router.visit(url, {
+      method: method as never,
+      data: { record_ids: selectedIds as readonly (string | number)[] } as never,
+      preserveScroll: true,
+      onSuccess: () => setSelectedIds([]),
+    });
+  };
+
   const bulkActionsList = props.actions?.bulk ?? [];
   const bulkActions =
     bulkActionsList.length > 0 && selectedIds.length > 0 ? (
       <div className="flex items-center gap-2">
         {bulkActionsList.map((action) => (
-          <button
+          // Route through ActionButton so destructive bulk actions that set
+          // requiresConfirmation open the ConfirmDialog before dispatching,
+          // matching row-action behaviour. Non-confirming actions fire
+          // immediately. The visit payload is unchanged.
+          <ActionButton
             key={action.name}
-            type="button"
-            onClick={() => {
-              // Every bulk action carries a stock url (core resolves
-              // /admin/{slug}/bulk/{name} for any bulk action without an
-              // explicit url), so there is no client-side fallback route.
-              const url = action.url;
-              if (url === undefined) {
-                return;
-              }
-              const method = action.method.toLowerCase() as
-                | 'get'
-                | 'post'
-                | 'put'
-                | 'patch'
-                | 'delete';
-              router.visit(url, {
-                method: method as never,
-                data: { record_ids: selectedIds as readonly (string | number)[] } as never,
-                preserveScroll: true,
-                onSuccess: () => setSelectedIds([]),
-              });
-            }}
-            className="inline-flex h-8 items-center gap-1 rounded-sm border border-destructive/40 bg-destructive/10 px-3 text-xs font-medium text-destructive hover:bg-destructive/20"
-          >
-            {action.label}
-          </button>
+            action={action}
+            onInvoke={() => dispatchBulkAction(action)}
+            size="sm"
+          />
         ))}
       </div>
     ) : undefined;

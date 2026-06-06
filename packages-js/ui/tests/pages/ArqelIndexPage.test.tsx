@@ -270,6 +270,45 @@ describe('ArqelIndexPage — bulk actions render after selection', () => {
     const bulkBtn = await screen.findByRole('button', { name: /delete selected/i });
     expect(bulkBtn).toBeInTheDocument();
   });
+
+  it('POSTs the selected record_ids to action.url when a bulk action is clicked (#48)', async () => {
+    const exportAction: ActionSchema = {
+      ...makeAction('export', 'Export', 'bulk'),
+      url: '/admin/posts/bulk/export',
+    };
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [
+        { id: 1, title: 'first' },
+        { id: 2, title: 'second' },
+      ],
+      actions: { row: [], bulk: [exportAction], toolbar: [] },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    render(<ArqelIndexPage />);
+
+    const checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+    const firstCheckbox = checkboxes[0];
+    if (!firstCheckbox) throw new Error('expected at least one row checkbox');
+    await user.click(firstCheckbox);
+
+    const exportBtn = await screen.findByRole('button', { name: /export/i });
+    await user.click(exportBtn);
+
+    expect(routerVisitSpy).toHaveBeenCalled();
+    const lastCall = routerVisitSpy.mock.calls[routerVisitSpy.mock.calls.length - 1];
+    expect(lastCall).toBeDefined();
+    const [url, options] = lastCall as [
+      string,
+      { method: string; data: { record_ids: unknown[] } },
+    ];
+
+    expect(url).toBe('/admin/posts/bulk/export');
+    expect(options.method).toBe('post');
+    expect(options.data.record_ids).toEqual([1]);
+  });
 });
 
 describe('ArqelIndexPage — clearing search emits empty string', () => {

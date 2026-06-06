@@ -47,6 +47,7 @@
 - **`withColumns(array)`**, **`withDestinationDir(string)`**, **`dryRun(bool=true)`** — fluent setters. `dryRun` bypassa exporter e devolve `['path' => 'dry-run', ...]` para tests + previews
 - Pest tests `tests/Unit/ExportActionExecuteTest.php` (9 cenários)
 - **Form modal + queue threshold dispatch + signed URLs** deferred para EXPORT-006/008+
+- **Dispatch sync no core (#48):** `ResourceController::bulkAction()` corre qualquer bulk action encontrada via `execute($records, $data)` — não exige callback. Como `ExportAction` faz override de `execute()` sem nunca chamar `->action()`, `hasCallback()` é `false`; o dispatcher antigo no-opava com flash de erro. Agora só o stock `delete` (sem callback) mantém o fast-path de DB; tudo o resto passa por `execute()`. A `url` serializada da action aponta para `POST /admin/{slug}/bulk/{name}` (stock url de bulk em `arqel-dev/actions`), portanto o botão de bulk no frontend invoca a rota real registada
 
 **Entregue (EXPORT-006 — escopo reduzido):**
 

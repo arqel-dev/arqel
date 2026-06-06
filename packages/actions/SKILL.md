@@ -52,7 +52,7 @@ Oracles públicos:
 - `resolveUrl(?$record): ?string` — string literal ou closure resolvida
 - `canBeExecutedBy(?Authenticatable, ?$record): bool` — `authorize` closure (default true)
 - `execute(?$record, array $data): mixed` — invoca callback (returna `null` sem callback)
-- `toArray(?Authenticatable, ?$record): array<string, mixed>` — payload Inertia (chaves null filtradas)
+- `toArray(?Authenticatable, ?$record, ?object $resource): array<string, mixed>` — payload Inertia (chaves null filtradas). Quando o action não declarou `->url()` nem `->action()` e um `$resource` (com `::$slug`) é passado, `resolveStockUrl()` emite a URL convencional: row `view/edit/delete/restore` em `/admin/{slug}/{id}[/...]`, e **qualquer** action `type==='bulk'` (não só `delete`) em `POST /admin/{slug}/bulk/{name}` — assim bulk actions sem callback (ex.: `ExportAction`) sempre carregam uma `url` e o frontend nunca recai num route inexistente (#48)
 
 ### Tipos concretos
 

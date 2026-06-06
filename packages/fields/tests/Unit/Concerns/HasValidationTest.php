@@ -126,5 +126,8 @@ it('dedupes default rules against fluent rules by base name', function (): void 
 
     $field->minLength(5);
 
-    expect($field->getValidationRules())->toBe(['min:5']);
+    // The fluent `min:5` overrides the default `min:0` by base name, and a
+    // leading `nullable` is injected because the field is optional (not
+    // required, no explicit nullable) yet carries a rule — see issue #80.
+    expect($field->getValidationRules())->toBe(['nullable', 'min:5']);
 });

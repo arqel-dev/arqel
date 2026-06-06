@@ -21,6 +21,29 @@ final class CollabAuthorizerFakePost extends Model
     protected $guarded = [];
 }
 
+/**
+ * Policy that always denies `view` — registered via Gate::policy() with no
+ * named Gate, exercising the path that Gate::has() cannot see.
+ */
+final class CollabAuthorizerDenyingPolicy
+{
+    public function view(mixed $user, mixed $record): bool
+    {
+        return false;
+    }
+}
+
+/**
+ * Policy that always allows `view`.
+ */
+final class CollabAuthorizerAllowingPolicy
+{
+    public function view(mixed $user, mixed $record): bool
+    {
+        return true;
+    }
+}
+
 beforeEach(function (): void {
     if (! Schema::hasTable('collab_authorizer_fake_posts')) {
         Schema::create('collab_authorizer_fake_posts', static function (Blueprint $table): void {
@@ -66,6 +89,41 @@ it('denies access when Gate view denies the record', function (): void {
         $post->getKey(),
         'body',
     ))->toBeFalse();
+});
+
+it('denies access when a Policy denies view and no named Gate exists', function (): void {
+    $post = CollabAuthorizerFakePost::query()->create(['title' => 'Secret']);
+
+    Gate::policy(CollabAuthorizerFakePost::class, CollabAuthorizerDenyingPolicy::class);
+
+    // No named Gate is registered — Gate::has() cannot see the Policy.
+    expect(Gate::has('view'))->toBeFalse();
+
+    $authorizer = new AwarenessChannelAuthorizer;
+
+    expect($authorizer->authorize(
+        authedCollabAuthUser(),
+        CollabAuthorizerFakePost::class,
+        $post->getKey(),
+        'body',
+    ))->toBeFalse();
+});
+
+it('allows access when a Policy allows view and no named Gate exists', function (): void {
+    $post = CollabAuthorizerFakePost::query()->create(['title' => 'Shared']);
+
+    Gate::policy(CollabAuthorizerFakePost::class, CollabAuthorizerAllowingPolicy::class);
+
+    expect(Gate::has('view'))->toBeFalse();
+
+    $authorizer = new AwarenessChannelAuthorizer;
+
+    expect($authorizer->authorize(
+        authedCollabAuthUser(),
+        CollabAuthorizerFakePost::class,
+        $post->getKey(),
+        'body',
+    ))->toBeTrue();
 });
 
 it('denies when registry is unbound and modelType is not a real FQCN', function (): void {

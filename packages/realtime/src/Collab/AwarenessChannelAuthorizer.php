@@ -46,12 +46,18 @@ final readonly class AwarenessChannelAuthorizer
                 return false;
             }
 
-            // Se a app definir Gate `view`, honre — caso contrário allow
-            // (consistente com pattern do PresenceChannel).
-            if (Gate::has('view')) {
+            // Honre a autorização quando a app definir um Gate `view` OU
+            // registrar uma Policy para o model. `Gate::has()` só enxerga
+            // Gates nomeados (nunca Policies), então sem o check de
+            // `getPolicyFor()` um record protegido por Policy cairia no
+            // allow-all abaixo e vazaria o canal de colaboração. Mirror do
+            // `ResourceController::authorize()` em arqel-dev/core.
+            if (Gate::has('view') || Gate::getPolicyFor($record) !== null) {
                 return Gate::forUser($user)->check('view', $record);
             }
 
+            // Sem Gate E sem Policy => aberto (scaffold mode), consistente
+            // com o pattern do PresenceChannel.
             return true;
         } catch (Throwable $e) {
             Log::warning('Arqel realtime: failed to authorize collab awareness channel', [

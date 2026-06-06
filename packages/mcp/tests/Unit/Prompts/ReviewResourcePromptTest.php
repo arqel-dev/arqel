@@ -34,9 +34,9 @@ it('builds the review envelope inlining the file contents via the injected reade
     expect($captured)->toBe('app/Arqel/Resources/PostResource.php')
         ->and($payload['description'])->toBe('Arqel Resource review')
         ->and($payload['messages'][0]['role'])->toBe('user')
-        ->and($payload['messages'][0]['content'][0]['type'])->toBe('text');
+        ->and($payload['messages'][0]['content']['type'])->toBe('text');
 
-    $text = $payload['messages'][0]['content'][0]['text'];
+    $text = $payload['messages'][0]['content']['text'];
     expect($text)->toContain('app/Arqel/Resources/PostResource.php')
         ->and($text)->toContain($fixture)
         ->and($text)->toContain('N+1')

@@ -46,7 +46,7 @@ it('dispatches prompts/get for migrate_filament_resource using a real file under
             ->and($response['result']['messages'])->toHaveCount(1)
             ->and($response['result']['messages'][0]['role'])->toBe('user');
 
-        $text = $response['result']['messages'][0]['content'][0]['text'];
+        $text = $response['result']['messages'][0]['content']['text'];
         expect($text)->toContain('class FixtureResource')
             ->and($text)->toContain($relative);
     } finally {

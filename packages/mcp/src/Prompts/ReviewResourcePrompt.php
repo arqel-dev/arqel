@@ -54,7 +54,7 @@ final class ReviewResourcePrompt
     /**
      * @param array<string, mixed> $args
      *
-     * @return array{description: string, messages: array<int, array{role: string, content: array<int, array{type: string, text: string}>}>}
+     * @return array{description: string, messages: array<int, array{role: string, content: array{type: string, text: string}}>}
      */
     public function generate(array $args): array
     {
@@ -100,9 +100,7 @@ TEXT;
             'messages' => [
                 [
                     'role' => 'user',
-                    'content' => [
-                        ['type' => 'text', 'text' => $promptText],
-                    ],
+                    'content' => ['type' => 'text', 'text' => $promptText],
                 ],
             ],
         ];

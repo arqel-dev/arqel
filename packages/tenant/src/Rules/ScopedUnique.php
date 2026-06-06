@@ -9,6 +9,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\ConnectionResolverInterface;
+use Throwable;
 
 /**
  * Validation rule asserting that `<column>` is unique inside the
@@ -74,7 +75,10 @@ final class ScopedUnique implements ValidationRule
             $manager = $container->make(TenantManager::class);
             $tenant = $manager->current();
 
-            if ($tenant !== null) {
+            // Skip the tenant filter when the FK column is absent from the
+            // target table — graceful global-unique fallback, as documented.
+            // Without this guard MySQL/Postgres raise "Unknown column".
+            if ($tenant !== null && $this->tableHasColumn($connection, $tenantKey)) {
                 $query->where($tenantKey, $tenant->getKey());
             }
         }
@@ -85,6 +89,31 @@ final class ScopedUnique implements ValidationRule
                 : sprintf('The %s has already been taken.', $attribute);
 
             $fail(is_string($message) ? $message : sprintf('The %s has already been taken.', $attribute));
+        }
+    }
+
+    /**
+     * Whether the target table carries the given column. Used to decide
+     * if the tenant filter can be applied. Defensive: any failure to
+     * introspect the schema (driver quirk, stub connection) is treated
+     * as "column present" so existing tenant-scoped behaviour is kept.
+     */
+    private function tableHasColumn(object $connection, string $column): bool
+    {
+        if (! method_exists($connection, 'getSchemaBuilder')) {
+            return true;
+        }
+
+        try {
+            $schema = $connection->getSchemaBuilder();
+
+            if (! is_object($schema) || ! method_exists($schema, 'hasColumn')) {
+                return true;
+            }
+
+            return (bool) $schema->hasColumn($this->table, $column);
+        } catch (Throwable) {
+            return true;
         }
     }
 

@@ -40,22 +40,44 @@ function recordingQueryBuilder(bool $existsResult, array &$captured): object
     };
 }
 
-function fakeConnectionResolver(object $queryBuilder, ?string &$tableSeen = null): ConnectionResolverInterface
+/**
+ * Schema-builder stub reporting whether a column exists on a table.
+ * Mirrors the slice of Illuminate's schema builder the rule consults.
+ *
+ * @param array<string, bool> $columns map of column name => present?
+ */
+function recordingSchemaBuilder(array $columns): object
 {
-    $resolver = new class($queryBuilder, $tableSeen) implements ConnectionResolverInterface
+    return new class($columns)
+    {
+        /** @param  array<string, bool>  $columns */
+        public function __construct(private readonly array $columns) {}
+
+        public function hasColumn(string $table, string $column): bool
+        {
+            return $this->columns[$column] ?? false;
+        }
+    };
+}
+
+function fakeConnectionResolver(object $queryBuilder, ?string &$tableSeen = null, ?object $schemaBuilder = null): ConnectionResolverInterface
+{
+    $resolver = new class($queryBuilder, $tableSeen, $schemaBuilder) implements ConnectionResolverInterface
     {
         public function __construct(
             private readonly object $queryBuilder,
             private ?string &$tableSeen,
+            private readonly ?object $schemaBuilder,
         ) {}
 
         public function connection($name = null): object
         {
-            return new class($this->queryBuilder, $this->tableSeen)
+            return new class($this->queryBuilder, $this->tableSeen, $this->schemaBuilder)
             {
                 public function __construct(
                     private readonly object $queryBuilder,
                     private ?string &$tableSeen,
+                    private readonly ?object $schemaBuilder,
                 ) {}
 
                 public function table(string $table): object
@@ -63,6 +85,19 @@ function fakeConnectionResolver(object $queryBuilder, ?string &$tableSeen = null
                     $this->tableSeen = $table;
 
                     return $this->queryBuilder;
+                }
+
+                public function getSchemaBuilder(): object
+                {
+                    // Default: every column present (back-compat with the
+                    // pre-existing tests that never supplied a schema stub).
+                    return $this->schemaBuilder ?? new class
+                    {
+                        public function hasColumn(string $table, string $column): bool
+                        {
+                            return true;
+                        }
+                    };
                 }
             };
         }
@@ -215,6 +250,57 @@ it('honours an explicit tenantForeignKey override', function (): void {
 
     expect($where)->not->toBeNull()
         ->and($where['value'])->toBe(7);
+});
+
+it('skips the tenant filter when the tenant FK column is absent (global fallback)', function (): void {
+    /** @var TenantManager $manager */
+    $manager = app(TenantManager::class);
+    $manager->set(new Tenant(['id' => 42]));
+
+    $captured = [];
+    $tableSeen = null;
+    app()->instance(
+        ConnectionResolverInterface::class,
+        fakeConnectionResolver(
+            recordingQueryBuilder(false, $captured),
+            $tableSeen,
+            recordingSchemaBuilder(['slug' => true, 'tenant_id' => false]),
+        ),
+    );
+
+    $failed = false;
+    (new ScopedUnique('users', 'slug'))->validate('slug', 'hello', function () use (&$failed): void {
+        $failed = true;
+    });
+
+    $tenantWhere = collect($captured)->firstWhere('column', 'tenant_id');
+
+    expect($tenantWhere)->toBeNull()
+        ->and($failed)->toBeFalse();
+});
+
+it('still applies the tenant filter when the FK column exists', function (): void {
+    /** @var TenantManager $manager */
+    $manager = app(TenantManager::class);
+    $manager->set(new Tenant(['id' => 42]));
+
+    $captured = [];
+    $tableSeen = null;
+    app()->instance(
+        ConnectionResolverInterface::class,
+        fakeConnectionResolver(
+            recordingQueryBuilder(false, $captured),
+            $tableSeen,
+            recordingSchemaBuilder(['slug' => true, 'tenant_id' => true]),
+        ),
+    );
+
+    (new ScopedUnique('posts', 'slug'))->validate('slug', 'hello', fn () => null);
+
+    $tenantWhere = collect($captured)->firstWhere('column', 'tenant_id');
+
+    expect($tenantWhere)->not->toBeNull()
+        ->and($tenantWhere['value'])->toBe(42);
 });
 
 // Note: the "no-DB-resolver-bound" defer-to-other-rules guard

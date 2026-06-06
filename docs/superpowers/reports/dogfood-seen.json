@@ -296,6 +296,83 @@
       "status": "not-a-bug",
       "round": 4,
       "note": "refuted: arqel-dev/nav NavigationItem/BreadcrumbsBuilder emit /{slug} without /admin, but the package is UNWIRED — the real Sidebar uses HandleArqelInertiaRequests::buildNavigation() which prepends the panel path. Dead/parallel code, no app-facing 404."
+    },
+    {
+      "signature": "core::field-canedit-not-enforced-write-path",
+      "package": "core",
+      "status": "fixed",
+      "issue": 102,
+      "pr": 108,
+      "round": 5
+    },
+    {
+      "signature": "realtime::collab-rest-no-authz",
+      "package": "realtime",
+      "status": "fixed",
+      "issue": 103,
+      "pr": 112,
+      "round": 5
+    },
+    {
+      "signature": "realtime::workflow-broadcast-model-vs-resource-slug",
+      "package": "realtime",
+      "status": "fixed",
+      "issue": 103,
+      "pr": 112,
+      "round": 5
+    },
+    {
+      "signature": "ai::controllers-use-fields-not-effectivefields",
+      "package": "ai",
+      "status": "fixed",
+      "issue": 104,
+      "pr": 111,
+      "round": 5
+    },
+    {
+      "signature": "core::locale-cookie-never-written",
+      "package": "core",
+      "status": "fixed",
+      "issue": 105,
+      "pr": 113,
+      "round": 5
+    },
+    {
+      "signature": "export::xlsx-date-serial",
+      "package": "export",
+      "status": "fixed",
+      "issue": 106,
+      "pr": 110,
+      "round": 5
+    },
+    {
+      "signature": "mcp::prompt-content-shape",
+      "package": "mcp",
+      "status": "fixed",
+      "issue": 107,
+      "pr": 109,
+      "round": 5
+    },
+    {
+      "signature": "audit::activity-log-no-tenant-scope-no-authz",
+      "package": "audit",
+      "status": "app-misuse",
+      "round": 5,
+      "note": "refuted: follows the established web+auth convention (sibling export ExportDownloadController has the identical pattern + an explicit SECURITY NOTE delegating authz to the consumer app). Gap = audit lacks that delegation docblock — a doc/hardening note, not a behavioral bug."
+    },
+    {
+      "signature": "audit::logsactivity-logs-all-attributes",
+      "package": "audit",
+      "status": "app-misuse",
+      "round": 5,
+      "note": "refuted: documented anti-pattern in SKILL.md (override é obrigatório); ['*'] fallback is canonical intended behavior; no baseline model uses $guarded=[]+trait."
+    },
+    {
+      "signature": "fields::unique-no-update-ignore",
+      "package": "fields",
+      "status": "not-a-bug",
+      "round": 5,
+      "note": "refuted: explicitly DEFERRED to CORE-006 (unchecked ticket box in PLANNING/08, documented workaround Rule::unique()->ignore). Same category as EXPORT-007/008."
     }
   ]
 }

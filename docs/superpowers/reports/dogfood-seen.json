@@ -177,6 +177,55 @@
       "issue": 72,
       "pr": 75,
       "round": 2
+    },
+    {
+      "signature": "fields::optional-typed-null-422",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 80,
+      "pr": 86,
+      "round": 3
+    },
+    {
+      "signature": "tenant::sessionresolver-switchto-noop",
+      "package": "tenant",
+      "status": "fixed",
+      "issue": 81,
+      "pr": 85,
+      "round": 3
+    },
+    {
+      "signature": "ai::aicache-database-driver-broken",
+      "package": "ai",
+      "status": "fixed",
+      "issue": 82,
+      "pr": 87,
+      "round": 3
+    },
+    {
+      "signature": "widgets::polling-deferred-key-mismatch",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 83,
+      "pr": 88,
+      "round": 3
+    },
+    {
+      "signature": "widgets::statcard-description-key-mismatch",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 83,
+      "pr": 88,
+      "round": 3
+    },
+    {
+      "signature": "workflow::transitionto-no-authorizer",
+      "package": "workflow",
+      "status": "fixed",
+      "issue": 84,
+      "pr": 89,
+      "round": 3,
+      "note": "empty-transitions=free-form contract preserved; enforcement only when transitions declared."
     }
   ]
 }

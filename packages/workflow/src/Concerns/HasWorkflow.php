@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Arqel\Workflow\Concerns;
 
+use Arqel\Workflow\Authorization\TransitionAuthorizer;
 use Arqel\Workflow\Events\StateTransitioned;
+use Arqel\Workflow\Exceptions\IllegalTransitionException;
+use Arqel\Workflow\Exceptions\UnauthorizedTransitionException;
 use Arqel\Workflow\Models\StateTransition;
 use Arqel\Workflow\WorkflowDefinition;
 use BackedEnum;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 use ReflectionException;
 use ReflectionMethod;
+use Throwable;
 
 /**
  * Trait applied by user-land Eloquent models to expose a workflow.
@@ -119,8 +124,15 @@ trait HasWorkflow
         assert($this instanceof Model);
 
         if (is_object($currentValue) && method_exists($currentValue, 'transitionTo')) {
+            // Spatie path: keep its own guards/casts intact — unchanged.
             $currentValue->transitionTo($newState);
         } else {
+            // Fallback path (raw string / enum / slug). Enforce the
+            // model's declared workflow graph + the TransitionAuthorizer
+            // (WF-006) *before* mutating and persisting. Models that
+            // declare no transitions stay free-form (no enforcement).
+            $this->assertTransitionAllowed($definition, $fromKey, $newState);
+
             $this->{$field} = $newState;
             $this->save();
         }
@@ -235,5 +247,146 @@ trait HasWorkflow
         }
 
         return false;
+    }
+
+    /**
+     * Enforce the declared workflow graph + the central authorizer before a
+     * fallback-path transition mutates and persists (WF-006).
+     *
+     * Behaviour:
+     * - When the model declares **no** transitions the workflow is free-form
+     *   (mirrors the showcase `Ticket`): no eligibility nor authorization is
+     *   imposed, any target state is accepted.
+     * - Otherwise the target must be reachable: at least one declared
+     *   transition whose `from()` includes the current state (or which is
+     *   open / has no `from()`) must resolve to `$newState`. If none does,
+     *   the transition is illegal.
+     * - Among the matching transitions, at least one must be authorized by
+     *   {@see TransitionAuthorizer::authorize()} for the current user +
+     *   record. The authorizer is deny-by-default, mirroring the read-only
+     *   UI flag in `StateTransitionField`.
+     *
+     * @throws IllegalTransitionException when no declared transition reaches the target
+     * @throws UnauthorizedTransitionException when a path exists but the user is not allowed
+     */
+    private function assertTransitionAllowed(WorkflowDefinition $definition, string $fromKey, string $newState): void
+    {
+        $transitions = $definition->getTransitions();
+
+        // No declared transitions => free-form workflow, no enforcement.
+        if ($transitions === []) {
+            return;
+        }
+
+        $currentKey = $fromKey === '' ? null : $fromKey;
+
+        /** @var list<class-string> $matching */
+        $matching = [];
+
+        foreach ($transitions as $transition) {
+            if (! self::transitionApplies($transition, $currentKey)) {
+                continue;
+            }
+
+            if (! self::transitionTargets($transition, $newState)) {
+                continue;
+            }
+
+            $matching[] = $transition;
+        }
+
+        if ($matching === []) {
+            throw IllegalTransitionException::for($fromKey, $newState);
+        }
+
+        $user = self::resolveCurrentUser();
+
+        foreach ($matching as $transition) {
+            if (TransitionAuthorizer::authorize($transition, $user, $this)) {
+                return;
+            }
+        }
+
+        throw UnauthorizedTransitionException::for($newState);
+    }
+
+    /**
+     * Whether the given transition declares `$newState` as its target.
+     *
+     * Comparison is done on the canonical slug used by the authorizer so a
+     * transition declaring its `to` as a short token (e.g. derived from the
+     * class name `PendingToPaid` => `Paid`) still matches a FQCN target such
+     * as `App\States\PaidState`.
+     *
+     * @param class-string $transition
+     */
+    private static function transitionTargets(string $transition, string $newState): bool
+    {
+        $target = self::resolveTransitionTo($transition);
+
+        if ($target === null) {
+            return false;
+        }
+
+        return TransitionAuthorizer::slugifyState($target)
+            === TransitionAuthorizer::slugifyState($newState);
+    }
+
+    /**
+     * Resolve a transition's declared target state. Prefers a public static
+     * `to()` method; otherwise derives it from the `XxxToYyy` class-name
+     * convention. Mirrors `TransitionAuthorizer::resolveTo()`.
+     *
+     * @param class-string $transition
+     */
+    private static function resolveTransitionTo(string $transition): ?string
+    {
+        if (! class_exists($transition)) {
+            return null;
+        }
+
+        if (method_exists($transition, 'to')) {
+            try {
+                $reflection = new ReflectionMethod($transition, 'to');
+
+                if ($reflection->isStatic() && $reflection->isPublic()) {
+                    /** @var mixed $result */
+                    $result = $reflection->invoke(null);
+
+                    if (is_string($result) && $result !== '') {
+                        return $result;
+                    }
+                }
+            } catch (Throwable) {
+                // fall through to the class-name convention
+            }
+        }
+
+        $short = str_contains($transition, '\\')
+            ? (string) substr($transition, (int) strrpos($transition, '\\') + 1)
+            : $transition;
+
+        if (preg_match('/To([A-Z][A-Za-z0-9]*)$/', $short, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return $short;
+    }
+
+    /**
+     * Resolve the acting user the same defensive way `StateTransitionField`
+     * does: `Auth::user()` when the facade is bound, `null` otherwise.
+     */
+    private static function resolveCurrentUser(): ?Authenticatable
+    {
+        try {
+            if (Auth::getFacadeRoot()) {
+                return Auth::user();
+            }
+        } catch (Throwable) {
+            return null;
+        }
+
+        return null;
     }
 }

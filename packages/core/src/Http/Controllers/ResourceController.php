@@ -158,7 +158,12 @@ final class ResourceController
             return back()->with('error', __('arqel::messages.flash.no_selection'));
         }
 
-        $records = $modelClass::query()->whereIn('id', $recordIds)->get();
+        // Resolve records by the model's real primary key (#69). Hardcoding
+        // `id` silently matched zero records for models with a custom key
+        // (`protected $primaryKey = 'uuid'`). Mirrors ActionController::invokeBulk.
+        $keyName = (new $modelClass)->getKeyName();
+
+        $records = $modelClass::query()->whereIn($keyName, $recordIds)->get();
 
         $payload = $request->except(['_token', '_method', 'resource', 'action', 'record_ids']);
         $data = [];
@@ -187,7 +192,7 @@ final class ResourceController
         // directly) actually run instead of error-flashing (#48).
         $result = null;
         if ($action === 'delete' && ! (method_exists($bulkAction, 'hasCallback') && $bulkAction->hasCallback())) {
-            $modelClass::query()->whereIn('id', $recordIds)->delete();
+            $modelClass::query()->whereIn($keyName, $recordIds)->delete();
         } elseif (method_exists($bulkAction, 'execute')) {
             $result = $bulkAction->execute($records, $data);
         }

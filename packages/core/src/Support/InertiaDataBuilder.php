@@ -237,7 +237,7 @@ final class InertiaDataBuilder
     public function buildCreateData(Resource $resource, Request $request): array
     {
         $user = $this->currentUser();
-        [$fields, $form] = $this->resolveFormFields($resource);
+        [$fields, $form] = $this->resolveFormFields($resource, null);
 
         $payload = [
             'resource' => $this->resourceMeta($resource),
@@ -258,7 +258,7 @@ final class InertiaDataBuilder
     public function buildEditData(Resource $resource, Model $record, Request $request): array
     {
         $user = $this->currentUser();
-        [$fields, $form] = $this->resolveFormFields($resource);
+        [$fields, $form] = $this->resolveFormFields($resource, $record);
 
         $payload = [
             'resource' => $this->resourceMeta($resource),
@@ -281,7 +281,7 @@ final class InertiaDataBuilder
     public function buildShowData(Resource $resource, Model $record, Request $request): array
     {
         $user = $this->currentUser();
-        [$fields, $form] = $this->resolveFormFields($resource);
+        [$fields, $form] = $this->resolveFormFields($resource, $record);
 
         $payload = [
             'resource' => $this->resourceMeta($resource),
@@ -307,15 +307,21 @@ final class InertiaDataBuilder
      * Duck-typed against `arqel-dev/form` so `arqel-dev/core` does not need
      * a hard dep.
      *
+     * The current record is threaded into both `effectiveFields()` and the
+     * form's `toArray()` so layout-level visibility (`canSee`/`visibleIf`)
+     * is honoured: a field guarded only by an enclosing hidden layout is
+     * absent from both the field list and the serialised schema (#115).
+     * On create no record exists, so `$record` is null.
+     *
      * @return array{0: array<int, mixed>, 1: ?array<string, mixed>}
      */
-    private function resolveFormFields(Resource $resource): array
+    private function resolveFormFields(Resource $resource, ?Model $record = null): array
     {
-        $fields = $resource->effectiveFields();
+        $fields = $resource->effectiveFields($record);
         $form = $resource->form();
 
         if (is_object($form) && method_exists($form, 'toArray')) {
-            $payload = $form->toArray();
+            $payload = $form->toArray($record);
 
             $normalisedPayload = null;
             if (is_array($payload)) {

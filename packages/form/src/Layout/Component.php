@@ -14,9 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  *
  * Layout components hold a heterogeneous schema (fields + nested
  * components), declare a column span for placement inside the
- * outer grid, and accept per-record visibility predicates that
- * the controller (CORE-006) evaluates when serialising the
- * payload.
+ * outer grid, and accept per-record visibility predicates
+ * (`canSee`/`visibleIf`). `Form::toArray()`/`getFields()` thread the
+ * current record through and skip any component `isVisibleFor()`
+ * denies — alongside the fields it encloses — so a hidden layout
+ * omits its fields from both the render payload and the write path
+ * (#115). A component with no predicate is always visible.
  */
 abstract class Component
 {

@@ -164,14 +164,19 @@ abstract class Resource implements HasActions, HasFields, HasResource
      * Only `getFields()` is required here; the layout-payload path in
      * InertiaDataBuilder additionally needs `toArray()`.
      *
+     * When `$record` is supplied, layout-level visibility is honoured:
+     * fields whose only guard is an enclosing hidden layout
+     * (`canSee`/`visibleIf`) are pruned, so they never leak to render or
+     * write (#115). On create the caller passes `null`.
+     *
      * @return array<int, mixed>
      */
-    public function effectiveFields(): array
+    public function effectiveFields(?Model $record = null): array
     {
         $form = $this->form();
 
         if (is_object($form) && method_exists($form, 'getFields')) {
-            $fields = $form->getFields();
+            $fields = $form->getFields($record);
 
             if (is_array($fields)) {
                 return array_values($fields);

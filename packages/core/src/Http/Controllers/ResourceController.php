@@ -452,6 +452,12 @@ final class ResourceController
      * value submitted for a layout the record cannot see is never
      * persisted — matching the render payload, which also omits it.
      *
+     * Non-persisting modifiers are enforced too (#127): `dehydrated(false)`
+     * (the documented don't-persist contract), `disabled()` and `readonly()`
+     * are display-only/computed, so a value submitted for them is dropped
+     * rather than mass-assigned. The oracles default to the persisting state,
+     * leaving plain fields (no modifier) untouched.
+     *
      * @param array<string, mixed> $data
      *
      * @return array<string, mixed>
@@ -503,6 +509,43 @@ final class ResourceController
             }
 
             if (! $field->canBeEditedBy($user, $record)) {
+                unset($data[$name]);
+            }
+        }
+
+        // Non-persisting modifiers (#127): drop values for fields the
+        // framework renders as display-only or computed. `dehydrated(false)`
+        // is the documented "don't persist" contract; `disabled()` and
+        // `readonly()` are serialised display-only, so a value submitted
+        // for one is a mass-assignment of a field the developer never
+        // meant to accept. Each oracle defaults to the persisting state
+        // (readonly=false, disabled=false, dehydrated=true), so a plain
+        // field with no modifier is untouched and the mainstream path is
+        // unaffected. Oracles are duck-typed to keep core decoupled from
+        // `arqel-dev/fields`.
+        foreach ($visibleFields as $field) {
+            if (! is_object($field) || ! method_exists($field, 'getName')) {
+                continue;
+            }
+
+            $name = $field->getName();
+            if (! is_string($name) || ! array_key_exists($name, $data)) {
+                continue;
+            }
+
+            if (method_exists($field, 'isDehydrated') && $field->isDehydrated($record) === false) {
+                unset($data[$name]);
+
+                continue;
+            }
+
+            if (method_exists($field, 'isDisabled') && $field->isDisabled($record) === true) {
+                unset($data[$name]);
+
+                continue;
+            }
+
+            if (method_exists($field, 'isReadonly') && $field->isReadonly() === true) {
                 unset($data[$name]);
             }
         }

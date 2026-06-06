@@ -52,6 +52,18 @@ it('renders the Inertia login page on GET /admin/login', function (): void {
     expect($payload['component'] ?? null)->toBe('arqel-dev/auth/Login');
 });
 
+it('redirects an already-authenticated user away from GET /admin/login', function (): void {
+    $user = LoginUser::create([
+        'email' => 'foo@bar.com',
+        'password' => Hash::make('secret123'),
+    ]);
+
+    $response = $this->actingAs($user)->get('/admin/login');
+
+    $response->assertRedirect();
+    expect($response->getStatusCode())->toBe(302);
+});
+
 it('authenticates with valid credentials and redirects', function (): void {
     LoginUser::create([
         'email' => 'foo@bar.com',

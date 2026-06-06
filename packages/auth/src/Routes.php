@@ -58,11 +58,11 @@ final class Routes
         $logoutUrl = self::deriveLogoutUrl($loginUrl);
 
         Route::get($loginUrl, [LoginController::class, 'showForm'])
-            ->middleware(['web', HandleArqelInertiaRequests::class])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest'])
             ->name('login');
 
         Route::post($loginUrl, LoginController::class)
-            ->middleware(['web', HandleArqelInertiaRequests::class, 'throttle:5,1'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest', 'throttle:5,1'])
             ->name('arqel.auth.login.attempt');
 
         Route::post($logoutUrl, LogoutController::class)
@@ -92,11 +92,11 @@ final class Routes
         $registerUrl = self::deriveSiblingUrl($panel->getLoginUrl(), 'register');
 
         Route::get($registerUrl, [RegisterController::class, 'showForm'])
-            ->middleware(['web', HandleArqelInertiaRequests::class])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest'])
             ->name('register');
 
         Route::post($registerUrl, RegisterController::class)
-            ->middleware(['web', HandleArqelInertiaRequests::class, 'throttle:10,60'])
+            ->middleware(['web', HandleArqelInertiaRequests::class, 'guest', 'throttle:10,60'])
             ->name('arqel.auth.register.attempt');
 
         self::$registrationRegistered = true;

@@ -60,16 +60,23 @@ test.describe('Post resource', () => {
     await page.goto('/admin/posts');
     await expect(page.locator('table tbody tr').first()).toBeVisible();
 
+    // Capture the unfiltered row count so we can assert the list narrows.
+    const before = await page.locator('table tbody tr').count();
+
     // Pick a real title token from the first row to search for.
     const firstTitle = await page.locator('table tbody tr td:nth-child(2)').first().innerText();
     const token = firstTitle.trim().split(/\s+/)[0];
 
     await page.locator('input[type="search"]').fill(token);
 
-    // The list re-queries; at least one visible row must contain the token.
+    // The list re-queries; at least one visible row must contain the token and
+    // the result set must not be larger than the unfiltered list. Titles are
+    // `fake()->unique()->words(4)`, so a token match is typically a single row;
+    // we assert `<= before` to stay robust against rare shared tokens.
     await expect(async () => {
       const titles = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
       expect(titles.length).toBeGreaterThan(0);
+      expect(titles.length).toBeLessThanOrEqual(before);
       expect(titles.some((t) => t.toLowerCase().includes(token.toLowerCase()))).toBe(true);
     }).toPass();
   });
@@ -117,6 +124,34 @@ test.describe('Post resource', () => {
     await expect(async () => {
       const after = await page.locator('table tbody tr').count();
       expect(after).toBe(before - 1);
+    }).toPass();
+  });
+
+  test('bulk delete removes selected rows', async ({ loggedInPage }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+
+    // Count real data rows by their selection checkbox: the empty-state is a
+    // single placeholder <tr> ("No records found.") with no checkbox, so this
+    // excludes it both before and after the delete.
+    const dataRows = page.locator('table tbody tr td input[type="checkbox"]');
+    const before = await dataRows.count();
+    expect(before).toBeGreaterThan(0);
+
+    // Acme has 15 posts and defaultPerPage is 25, so every row fits on one page
+    // and the header "select all" selects the whole visible list.
+    await page.locator('table thead input[type="checkbox"][aria-label="Select all rows"]').check();
+
+    // The bulk-action bar appears once rows are selected; deleteBulk() renders a
+    // "Delete selected" button that fires immediately via Inertia (no confirm
+    // dialog, unlike the per-row delete action).
+    await page.getByRole('button', { name: 'Delete selected' }).click();
+
+    // After deleting every selected row the table is empty: no row checkboxes
+    // remain and the empty-state placeholder is shown instead.
+    await expect(async () => {
+      expect(await dataRows.count()).toBe(0);
     }).toPass();
   });
 });

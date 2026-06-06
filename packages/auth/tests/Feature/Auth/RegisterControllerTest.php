@@ -54,6 +54,19 @@ it('renders the Inertia register page on GET /admin/register', function (): void
     expect($payload['component'] ?? null)->toBe('arqel-dev/auth/Register');
 });
 
+it('redirects an already-authenticated user away from GET /admin/register', function (): void {
+    $user = RegisterUser::create([
+        'name' => 'Existing',
+        'email' => 'existing@example.com',
+        'password' => Hash::make('whatever'),
+    ]);
+
+    $response = $this->actingAs($user)->get('/admin/register');
+
+    $response->assertRedirect();
+    expect($response->getStatusCode())->toBe(302);
+});
+
 it('creates user, dispatches Registered event, auto-logs in and redirects', function (): void {
     Event::fake([Registered::class]);
 

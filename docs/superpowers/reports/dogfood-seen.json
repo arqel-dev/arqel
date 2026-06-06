@@ -1,5 +1,5 @@
 {
-  "_comment": "Persistent seen-registry for the Arqel dogfooding loop. Keyed by a stable signature. A bug here is fixed (or confirmed-and-in-flight); the loop must NOT re-file it. See docs/superpowers/specs/2026-06-05-showcase-dogfood-ecosystem-design.md.",
+  "_comment": "Persistent seen-registry for the Arqel dogfooding loop. Keyed by a stable signature. A bug here is fixed (or confirmed-and-in-flight, or a deferred-feature non-bug); the loop must NOT re-file it. See docs/superpowers/specs/2026-06-05-showcase-dogfood-ecosystem-design.md.",
   "seen": [
     {
       "signature": "ui::fieldregistry-bundle-split",
@@ -63,8 +63,7 @@
       "status": "fixed",
       "issue": 51,
       "pr": 63,
-      "round": 1,
-      "note": "same root as alignment key mismatch"
+      "round": 1
     },
     {
       "signature": "versioning::vendor-publish-stub",
@@ -72,8 +71,7 @@
       "status": "fixed",
       "issue": 52,
       "pr": 61,
-      "round": 1,
-      "note": "also fixed workflow"
+      "round": 1
     },
     {
       "signature": "fields::select-missing-in-rule",
@@ -100,15 +98,6 @@
       "round": 1
     },
     {
-      "signature": "actions::bulk-delete-no-confirm",
-      "package": "actions",
-      "status": "fixed",
-      "issue": 48,
-      "pr": 59,
-      "round": 1,
-      "note": "the bulk dispatch + url fix in #48 routes bulk actions through the confirm-aware path; verify in round 2 whether the JS bulk button now honors requiresConfirmation — if not, re-open as a residual"
-    },
-    {
       "signature": "auth::login-get-missing-guest",
       "package": "auth",
       "status": "fixed",
@@ -121,7 +110,73 @@
       "package": "widgets",
       "status": "not-a-bug",
       "round": 1,
-      "note": "refuted: no resolver to regress; empty-columns is the documented duck-typed contract. Do not re-file."
+      "note": "refuted: documented duck-typed contract."
+    },
+    {
+      "signature": "core::exportaction-bulk-export-empty-csv",
+      "package": "core",
+      "status": "fixed",
+      "issue": 67,
+      "pr": 76,
+      "round": 2
+    },
+    {
+      "signature": "export::download-roundtrip-broken",
+      "package": "export",
+      "status": "fixed",
+      "issue": 67,
+      "pr": 76,
+      "round": 2,
+      "note": "minimal coherent round-trip shipped; full signed-URL/Export-model/queue is DEFERRED feature work EXPORT-007/008 per ExportAction docblock — do NOT re-file the deferred surface as a bug."
+    },
+    {
+      "signature": "widgets::widgetdata-envelope-mismatch",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 68,
+      "pr": 74,
+      "round": 2
+    },
+    {
+      "signature": "widgets::filters-not-sent",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 68,
+      "pr": 74,
+      "round": 2
+    },
+    {
+      "signature": "core::bulkaction-hardcoded-id-pk",
+      "package": "core",
+      "status": "fixed",
+      "issue": 69,
+      "pr": 77,
+      "round": 2
+    },
+    {
+      "signature": "actions::bulk-delete-no-confirm-residual",
+      "package": "actions",
+      "status": "fixed",
+      "issue": 70,
+      "pr": 78,
+      "round": 2,
+      "note": "the Round-1 residual; #78 routed bulk through the confirm-aware ActionButton + updated showcase E2E to confirm the dialog."
+    },
+    {
+      "signature": "ai::aiselectfield-classify-case",
+      "package": "ai",
+      "status": "fixed",
+      "issue": 71,
+      "pr": 73,
+      "round": 2
+    },
+    {
+      "signature": "versioning::prune-morphclass",
+      "package": "versioning",
+      "status": "fixed",
+      "issue": 72,
+      "pr": 75,
+      "round": 2
     }
   ]
 }

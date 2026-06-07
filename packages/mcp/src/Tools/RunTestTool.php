@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arqel\Mcp\Tools;
 
+use Arqel\Mcp\McpDispatchException;
 use Closure;
-use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -25,7 +25,8 @@ use Symfony\Component\Process\Process;
  *
  * The `path` parameter is validated to disallow absolute paths and parent
  * directory traversals (`..`). Any violation throws
- * {@see InvalidArgumentException} before the runner is invoked.
+ * {@see McpDispatchException} (mapped to JSON-RPC `-32602 Invalid params`)
+ * before the runner is invoked.
  *
  * Timeout:
  *
@@ -74,7 +75,7 @@ final class RunTestTool
         $path = $params['path'] ?? null;
         if (is_string($path) && $path !== '') {
             if (str_starts_with($path, '/') || str_contains($path, '..')) {
-                throw new InvalidArgumentException("path must be relative and may not contain '..'");
+                throw McpDispatchException::invalidParams("path must be relative and may not contain '..'");
             }
             $cmd[] = $path;
         }

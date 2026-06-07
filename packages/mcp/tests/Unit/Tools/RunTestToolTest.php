@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Mcp\McpDispatchException;
 use Arqel\Mcp\Tools\RunTestTool;
 
 it('exposes the canonical tool schema', function (): void {
@@ -86,17 +87,29 @@ it('forwards --coverage when coverage flag is true', function (): void {
     expect($capturedCmd)->toContain('--coverage');
 });
 
-it('rejects path containing parent directory traversal', function (): void {
+it('rejects path containing parent directory traversal (-32602)', function (): void {
     $tool = new RunTestTool(fn (array $cmd, int $timeout): array => ['exitCode' => 0, 'output' => '', 'errorOutput' => '']);
 
-    $tool(['path' => '../etc']);
-})->throws(InvalidArgumentException::class, "path must be relative and may not contain '..'");
+    try {
+        $tool(['path' => '../etc']);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toBe("path must be relative and may not contain '..'")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
-it('rejects absolute paths', function (): void {
+it('rejects absolute paths (-32602)', function (): void {
     $tool = new RunTestTool(fn (array $cmd, int $timeout): array => ['exitCode' => 0, 'output' => '', 'errorOutput' => '']);
 
-    $tool(['path' => '/etc']);
-})->throws(InvalidArgumentException::class, "path must be relative and may not contain '..'");
+    try {
+        $tool(['path' => '/etc']);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toBe("path must be relative and may not contain '..'")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
 it('clamps timeout above the maximum to 600 seconds', function (): void {
     $capturedTimeout = 0;

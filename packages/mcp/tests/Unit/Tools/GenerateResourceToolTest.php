@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Mcp\McpDispatchException;
 use Arqel\Mcp\Tools\GenerateResourceTool;
 
 it('exposes the canonical tool schema', function (): void {
@@ -45,17 +46,29 @@ it('runs the happy path and returns success payload', function (): void {
         ]);
 });
 
-it('throws InvalidArgumentException when model is missing', function (): void {
+it('throws McpDispatchException (-32602) when model is missing', function (): void {
     $tool = new GenerateResourceTool(fn (array $args): array => ['exitCode' => 0, 'output' => '']);
 
-    $tool([]);
-})->throws(InvalidArgumentException::class, "'model' parameter is required and must be a string");
+    try {
+        $tool([]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toBe("'model' parameter is required and must be a string")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
-it('throws InvalidArgumentException when model is not a string', function (): void {
+it('throws McpDispatchException (-32602) when model is not a string', function (): void {
     $tool = new GenerateResourceTool(fn (array $args): array => ['exitCode' => 0, 'output' => '']);
 
-    $tool(['model' => 42]);
-})->throws(InvalidArgumentException::class, "'model' parameter is required and must be a string");
+    try {
+        $tool(['model' => 42]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toBe("'model' parameter is required and must be a string")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
 it('forwards fromModel and withPolicy flags to the runner', function (): void {
     $captured = [];

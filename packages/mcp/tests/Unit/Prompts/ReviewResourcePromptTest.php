@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Mcp\McpDispatchException;
 use Arqel\Mcp\Prompts\ReviewResourcePrompt;
 
 it('exposes the canonical MCP schema shape', function (): void {
@@ -43,21 +44,33 @@ it('builds the review envelope inlining the file contents via the injected reade
         ->and($text)->toContain('Policy');
 });
 
-it('throws InvalidArgumentException when resource_file is missing', function (): void {
+it('throws McpDispatchException (-32602) when resource_file is missing', function (): void {
     $prompt = new ReviewResourcePrompt(
         fileReader: static fn (string $path): string => 'never',
     );
 
-    $prompt->generate([]);
-})->throws(InvalidArgumentException::class, "'resource_file' parameter is required");
+    try {
+        $prompt->generate([]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toContain("'resource_file' parameter is required")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
-it('throws InvalidArgumentException when resource_file is not a string', function (): void {
+it('throws McpDispatchException (-32602) when resource_file is not a string', function (): void {
     $prompt = new ReviewResourcePrompt(
         fileReader: static fn (string $path): string => 'never',
     );
 
-    $prompt->generate(['resource_file' => 123]);
-})->throws(InvalidArgumentException::class, "'resource_file' parameter is required");
+    try {
+        $prompt->generate(['resource_file' => 123]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toContain("'resource_file' parameter is required")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
 it('blocks path traversal and never invokes the file reader', function (): void {
     $invocations = 0;
@@ -71,9 +84,10 @@ it('blocks path traversal and never invokes the file reader', function (): void 
 
     try {
         $prompt->generate(['resource_file' => 'app/../../secrets.php']);
-        expect()->fail('Expected InvalidArgumentException');
-    } catch (InvalidArgumentException $e) {
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
         expect($e->getMessage())->toContain('..')
+            ->and($e->getCode())->toBe(-32602)
             ->and($invocations)->toBe(0);
     }
 });

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Mcp\McpDispatchException;
 use Arqel\Mcp\Tools\DescribeResourceTool;
 
 /**
@@ -131,17 +132,29 @@ it('returns the full metadata payload for a known slug', function (): void {
         ->and($result['navigationSort'])->toBe(10);
 });
 
-it('throws InvalidArgumentException when slug is missing', function (): void {
+it('throws McpDispatchException (-32602) when slug is missing', function (): void {
     $tool = new DescribeResourceTool(fn (string $slug): ?string => null);
 
-    $tool([]);
-})->throws(InvalidArgumentException::class, "'slug' parameter is required and must be a string");
+    try {
+        $tool([]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toBe("'slug' parameter is required and must be a string")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
-it('throws InvalidArgumentException when slug is not a string', function (): void {
+it('throws McpDispatchException (-32602) when slug is not a string', function (): void {
     $tool = new DescribeResourceTool(fn (string $slug): ?string => null);
 
-    $tool(['slug' => 42]);
-})->throws(InvalidArgumentException::class, "'slug' parameter is required and must be a string");
+    try {
+        $tool(['slug' => 42]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toBe("'slug' parameter is required and must be a string")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
 it('throws RuntimeException when slug is unknown', function (): void {
     $tool = new DescribeResourceTool(fn (string $slug): ?string => null);

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Arqel\Mcp\Prompts;
 
+use Arqel\Mcp\McpDispatchException;
 use Closure;
 use Illuminate\Container\Container;
-use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -61,11 +61,11 @@ final class ReviewResourcePrompt
         $relativePath = $args['resource_file'] ?? null;
 
         if (! is_string($relativePath) || $relativePath === '') {
-            throw new InvalidArgumentException("'resource_file' parameter is required and must be a non-empty string");
+            throw McpDispatchException::invalidParams("'resource_file' parameter is required and must be a non-empty string");
         }
 
         if (str_contains($relativePath, '..')) {
-            throw new InvalidArgumentException("'resource_file' must not contain '..' path traversal segments");
+            throw McpDispatchException::invalidParams("'resource_file' must not contain '..' path traversal segments");
         }
 
         $contents = $this->fileReader !== null

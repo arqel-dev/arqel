@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Arqel\Mcp\Tools;
 
 use Arqel\Core\Resources\ResourceRegistry;
+use Arqel\Mcp\McpDispatchException;
 use Closure;
 use Illuminate\Container\Container;
-use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -58,7 +58,7 @@ final class DescribeResourceTool
         $slug = $params['slug'] ?? null;
 
         if (! is_string($slug)) {
-            throw new InvalidArgumentException("'slug' parameter is required and must be a string");
+            throw McpDispatchException::invalidParams("'slug' parameter is required and must be a string");
         }
 
         $class = $this->resolver !== null

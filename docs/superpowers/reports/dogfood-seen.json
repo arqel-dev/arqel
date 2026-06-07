@@ -582,6 +582,54 @@
       "pr": 159,
       "round": 9,
       "note": "doc inaccuracy \u2014 ::make() documented but no field has it"
+    },
+    {
+      "signature": "table::querybuilderfilter-500-malformed-value",
+      "package": "table",
+      "status": "fixed",
+      "issue": 163,
+      "pr": 168,
+      "round": 10
+    },
+    {
+      "signature": "workflow::history-morphmap-fqcn",
+      "package": "workflow",
+      "status": "fixed",
+      "issue": 164,
+      "pr": 171,
+      "round": 10
+    },
+    {
+      "signature": "widgets::daterangefilter-raw-datetime-default",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 165,
+      "pr": 169,
+      "round": 10
+    },
+    {
+      "signature": "fields::multiple-filefield-no-element-rules",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 166,
+      "pr": 172,
+      "round": 10
+    },
+    {
+      "signature": "fields::fileupload-controller-ignores-imagefield-rule",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 166,
+      "pr": 172,
+      "round": 10
+    },
+    {
+      "signature": "versioning::audit-user-closure-ignored",
+      "package": "versioning",
+      "status": "fixed",
+      "issue": 167,
+      "pr": 170,
+      "round": 10
     }
   ]
 }

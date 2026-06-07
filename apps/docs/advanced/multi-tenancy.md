@@ -73,7 +73,7 @@ Resolvers in `src/Resolvers/` are intentionally `class` (non-final): apps custom
 
 - `BelongsToTenant` trait — registers the global `TenantScope` + auto-fills `tenant_id` on `creating`. Foreign key resolves by: `$tenantForeignKey` on the model → `config('arqel.tenancy.foreign_key')` → `'tenant_id'`.
 - `withoutTenant()` / `forTenant($id)` — explicit escapes.
-- `Rules\ScopedUnique` — tenant-aware substitute for Laravel's `unique` rule; applies `where(<tenant_fk>, <id>)` when there is a current tenant.
+- `Rules\ScopedUnique` — tenant-aware substitute for Laravel's `unique` rule; applies `where(<tenant_fk>, <id>)` when there is a current tenant. Falls back to a global unique check when no tenant is current, **or** when the tenant FK column is absent from the target table (guarded via `hasColumn`, so a misconfigured table degrades gracefully instead of raising "Unknown column").
 
 ### Multi-DB adapters
 
@@ -90,6 +90,8 @@ Endpoint shipped:
 - `GET /admin/tenants/available` — returns `{current, available[]}`.
 
 Resolvers gain the `SupportsTenantSwitching` contract (`availableFor` / `canSwitchTo` / `switchTo`).
+
+`SessionResolver::switchTo()` persists the active tenant into the same session key its `resolve()` reads back, storing the **identifier-column value** (`identifierFor()`), not the primary key — so a switch survives navigation even when `identifier_column` is a non-PK column such as `slug`.
 
 ### Theming
 

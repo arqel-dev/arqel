@@ -24,7 +24,7 @@ A escolha é **não reinventar**: oferece uma abstração leve que cobre 80% dos
 
 - `Scopes\TenantScope` (final, `implements Scope<Model>`) — global scope no-op gracioso quando não há tenant ou container não bind manager.
 - `Concerns\BelongsToTenant` — registra `TenantScope` + auto-fill na criação. Foreign key resolve via `$tenantForeignKey` → `config('arqel.tenancy.foreign_key')` → `'tenant_id'`. Scopes `withoutTenant()` / `forTenant(Model|int|string)`.
-- `Rules\ScopedUnique` — substituto tenant-aware da `unique` Laravel; aplica `where(<tenant_fk>, <id>)` quando há current tenant; fallback global quando não há.
+- `Rules\ScopedUnique` — substituto tenant-aware da `unique` Laravel; aplica `where(<tenant_fk>, <id>)` quando há current tenant; fallback global quando não há. Antes de aplicar o filtro guarda `hasColumn` na tabela-alvo: se a coluna FK do tenant não existe, o filtro é **omitido** (fallback global-unique gracioso, sem "Unknown column" no MySQL/Postgres) (#95). Introspecção de schema defensiva — qualquer falha ao inspecionar trata a coluna como presente (mantém o comportamento tenant-scoped).
 
 **Adapters (TENANT-007..008):**
 
@@ -35,7 +35,7 @@ A escolha é **não reinventar**: oferece uma abstração leve que cobre 80% dos
 
 - Contract `Contracts\SupportsTenantSwitching`: `availableFor(Authenticatable)` / `canSwitchTo` / `switchTo`.
 - `AbstractTenantResolver` implementa-o com defaults sensatos (relação `tenants`, coluna `current_tenant_id`); `AuthUserResolver` aceita `availableRelation` + `foreignKeyColumn`.
-- `SessionResolver` sobrescreve `switchTo()` para persistir na **mesma session key** que o seu `resolve()` lê (`app('session')->put($sessionKey, $tenant->getKey())`), em vez de escrever uma coluna no user que ele nunca lê — sem isso o switch sobreviveria só ao request corrente (#81). Os resolvers URL-driven (`Subdomain`/`Path`/`Header`) ainda herdam o `switchTo()` de coluna no user, irrelevante para eles (o switch vai pela URL) — follow-up de baixa prioridade.
+- `SessionResolver` sobrescreve `switchTo()` para persistir na **mesma session key** que o seu `resolve()` lê (`app('session')->put($sessionKey, $this->identifierFor($tenant))`), em vez de escrever uma coluna no user que ele nunca lê — sem isso o switch sobreviveria só ao request corrente (#81). Persiste o valor da **identifier-column** (via `identifierFor()`), **não** a PK: `resolve()` relê o valor por `findByIdentifier()`, que faz `where(identifier_column, …)`. Com um `identifier_column` não-PK (ex.: `slug`), guardar a PK faria o próximo request rodar `where('slug', <pk>)` → sem row → tenant perdido (#131 — o sintoma do #81 para colunas não-PK). Os resolvers URL-driven (`Subdomain`/`Path`/`Header`) ainda herdam o `switchTo()` de coluna no user, irrelevante para eles (o switch vai pela URL) — follow-up de baixa prioridade.
 - `TenantManager` ganha `availableFor`/`canSwitchTo`/`switchTo` (delega; lança `LogicException` se resolver não suporta).
 - Event `TenantSwitched` (final, readonly `?Model $from`, `Model $to`, `Authenticatable $user`).
 - `Http\Controllers\TenantSwitcherController`: `POST /admin/tenants/{tenantId}/switch` (404/403/dispatch+redirect intended) + `GET /admin/tenants/available` (`{current, available[]}`). Rotas registadas via `$package->hasRoute('admin')`.
@@ -147,7 +147,7 @@ public function share(Request $request): array
 
 - [ ] Todo model com `tenant_id` usa o trait `BelongsToTenant` (global scope ativo).
 - [ ] Migrations declaram `tenant_id` com FK + index composto onde fizer sentido (`['tenant_id', 'slug']`).
-- [ ] Validation `unique` substituída por `Rules\ScopedUnique` quando o constraint é por-tenant.
+- [ ] Validation `unique` substituída por `Rules\ScopedUnique` quando o constraint é por-tenant (a tabela-alvo precisa carregar a coluna FK do tenant — sem ela o `ScopedUnique` degrada para global-unique, #95).
 - [ ] Background jobs hidratados via `TenantManager::runFor($job->tenant, fn () => ...)` antes de tocar Eloquent.
 - [ ] Queries cross-tenant explícitas usam `forTenant($id)` ou `withoutTenant()` — nunca `withoutGlobalScope` sem comentário justificando.
 - [ ] Switcher endpoints chamam `canSwitchTo` antes de `switchTo` (controller já faz, mas não bypass).

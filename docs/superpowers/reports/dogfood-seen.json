@@ -530,6 +530,58 @@
       "pr": 146,
       "round": 8,
       "note": "per-handler McpDispatchException::invalidParams; widened to 5 handlers"
+    },
+    {
+      "signature": "fields::filefield-edit-save-422",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 150,
+      "pr": 158,
+      "round": 9
+    },
+    {
+      "signature": "tenant::cssvars-css-injection",
+      "package": "tenant",
+      "status": "fixed",
+      "issue": 151,
+      "pr": 157,
+      "round": 9,
+      "note": "security: stored CSS injection via } breakout; per-slot allowlist"
+    },
+    {
+      "signature": "export::relationship-column-display-path",
+      "package": "export",
+      "status": "fixed",
+      "issue": 152,
+      "pr": 156,
+      "round": 9,
+      "note": "data leak: full related-model JSON in export cell"
+    },
+    {
+      "signature": "auth::emailverification-default-guard",
+      "package": "auth",
+      "status": "fixed",
+      "issue": 153,
+      "pr": 161,
+      "round": 9,
+      "note": "completed #139 dead-guard sweep (missed controller)"
+    },
+    {
+      "signature": "workflow::statetransitionfield-duplicate-multi-from",
+      "package": "workflow",
+      "status": "fixed",
+      "issue": 154,
+      "pr": 160,
+      "round": 9
+    },
+    {
+      "signature": "ai::aifield-make-factory-missing",
+      "package": "ai",
+      "status": "fixed",
+      "issue": 155,
+      "pr": 159,
+      "round": 9,
+      "note": "doc inaccuracy \u2014 ::make() documented but no field has it"
     }
   ]
 }

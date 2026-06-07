@@ -12,9 +12,7 @@
     "liveDebounce": null,
     "rules": [
         "nullable",
-        "file",
-        "max:5120",
-        "mimetypes:application/pdf"
+        "Closure"
     ],
     "props": {
         "disk": "s3",

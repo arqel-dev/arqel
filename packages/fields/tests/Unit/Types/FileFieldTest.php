@@ -51,16 +51,19 @@ it('honours disk/directory/visibility/maxSize/mimeTypes overrides', function ():
     ]);
 });
 
-it('produces single-file Laravel rules including mimetypes and max size', function (): void {
+it('produces a single closure rule for a single-file field (#150)', function (): void {
+    // The single-file rule is a closure that tolerates a stored-path string
+    // on edit (#150) yet still enforces file/max/mimetypes on a real upload.
+    // The behavioural assertions live in the Feature suite (a booted app is
+    // needed for the Validator facade); here we just pin the rule shape.
     $field = (new FileField('doc'))
         ->maxSize(2048)
         ->acceptedFileTypes(['application/pdf']);
 
-    expect($field->getDefaultRules())->toBe([
-        'file',
-        'max:2048',
-        'mimetypes:application/pdf',
-    ]);
+    $rules = $field->getDefaultRules();
+
+    expect($rules)->toHaveCount(1)
+        ->and($rules[0])->toBeInstanceOf(Closure::class);
 });
 
 it('produces array Laravel rule when multiple is enabled', function (): void {
@@ -89,8 +92,14 @@ it('exposes ImageField defaults including image mime gate', function (): void {
 
     expect($field->getType())->toBe('image')
         ->and($field->getComponent())->toBe('ImageInput')
-        ->and($field->getAcceptedFileTypes())->toBe(['image/jpeg', 'image/png', 'image/webp'])
-        ->and($field->getDefaultRules())->toBe(['image']);
+        ->and($field->getAcceptedFileTypes())->toBe(['image/jpeg', 'image/png', 'image/webp']);
+
+    // The single-image rule is a closure (#150): it gates an actual upload on
+    // `image` while tolerating an unchanged stored-path string on edit. The
+    // behaviour is asserted in the Feature suite (needs a booted app).
+    $rules = $field->getDefaultRules();
+    expect($rules)->toHaveCount(1)
+        ->and($rules[0])->toBeInstanceOf(Closure::class);
 });
 
 it('serialises ImageField crop and resize hints when set', function (): void {

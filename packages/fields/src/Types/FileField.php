@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Arqel\Fields\Types;
 
 use Arqel\Fields\Field;
+use Closure;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * File upload input.
@@ -156,17 +159,75 @@ class FileField extends Field
     }
 
     /**
-     * @return array<int, string>
+     * @return array<int, string|Closure>
      */
     public function getDefaultRules(): array
     {
-        $rules = [$this->multiple ? 'array' : 'file'];
+        if ($this->multiple) {
+            return ['array'];
+        }
 
-        if (! $this->multiple && $this->maxSize !== null) {
+        return [$this->uploadRule()];
+    }
+
+    /**
+     * Build the single-file validation rule.
+     *
+     * The frontend re-submits the record's stored attribute — the path
+     * STRING — when a populated file field is edited without re-uploading
+     * (#150). The bare `file` rule rejects any non-`UploadedFile`, and
+     * `nullable` does not skip a non-null string, so saving 422'd. We emit a
+     * closure that:
+     *
+     *   - passes for a stored-path string (the unchanged value) and for an
+     *     empty/null value (the optional/required gate is enforced separately
+     *     by the injected `nullable`/`required` rule);
+     *   - runs the real upload checks (`file`/`image` + `max` + `mimetypes`)
+     *     when the submitted value IS an actual `UploadedFile`, so genuine
+     *     uploads are never under-validated;
+     *   - rejects any other non-string scalar/array (e.g. an int) that is
+     *     neither a stored path nor an upload.
+     */
+    protected function uploadRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            // Unchanged stored path on edit, or an empty/null value: the
+            // upload-implying checks do not apply. Required-ness is enforced
+            // by the separate required/nullable rule.
+            if ($value === null || $value === '' || is_string($value)) {
+                return;
+            }
+
+            // An actual upload (or any other non-string value, e.g. an int)
+            // is run through the real file rules. A non-`UploadedFile` value
+            // is rejected by the `file`/`image` rule, so this still fails for
+            // a value that is neither a stored path nor a genuine upload.
+            $validator = Validator::make(
+                [$attribute => $value],
+                [$attribute => $this->uploadFileRules()],
+            );
+
+            foreach ($validator->errors()->get($attribute) as $message) {
+                $fail($message);
+            }
+        };
+    }
+
+    /**
+     * The Laravel rules applied to an actual uploaded file. Overridden by
+     * `ImageField` to gate on `image` rather than `file`.
+     *
+     * @return array<int, string>
+     */
+    protected function uploadFileRules(): array
+    {
+        $rules = ['file'];
+
+        if ($this->maxSize !== null) {
             $rules[] = 'max:'.$this->maxSize;
         }
 
-        if (! $this->multiple && $this->acceptedFileTypes !== []) {
+        if ($this->acceptedFileTypes !== []) {
             $rules[] = 'mimetypes:'.implode(',', $this->acceptedFileTypes);
         }
 

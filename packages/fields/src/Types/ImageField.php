@@ -50,11 +50,25 @@ final class ImageField extends FileField
     }
 
     /**
+     * Gate an actual uploaded image on `image` rather than `file`. The
+     * stored-path-string tolerance for edit-save (#150) is inherited from
+     * `FileField::uploadRule()`, which calls this for real uploads only.
+     *
      * @return array<int, string>
      */
-    public function getDefaultRules(): array
+    protected function uploadFileRules(): array
     {
-        return $this->multiple ? ['array'] : ['image'];
+        $rules = ['image'];
+
+        if ($this->getMaxSize() !== null) {
+            $rules[] = 'max:'.$this->getMaxSize();
+        }
+
+        if ($this->getAcceptedFileTypes() !== []) {
+            $rules[] = 'mimetypes:'.implode(',', $this->getAcceptedFileTypes());
+        }
+
+        return $rules;
     }
 
     /**

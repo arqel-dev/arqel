@@ -12,7 +12,7 @@
     "liveDebounce": null,
     "rules": [
         "nullable",
-        "image"
+        "Closure"
     ],
     "props": {
         "disk": "local",

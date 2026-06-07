@@ -519,7 +519,9 @@ final class InertiaDataBuilder
      * Render a single record for index payloads. Adds Arqel-side
      * meta (recordTitle/recordSubtitle) on top of the model's
      * default `toArray`, plus the per-row visible-actions list
-     * (resolved against `Action::isVisibleFor` + `canBeExecutedBy`).
+     * (resolved against `Action::isVisibleFor` + `canBeExecutedBy`)
+     * and per-row action overrides (`url`/`disabled`) for actions that
+     * are record-dependent (closure URL or closure disabled, #140).
      *
      * @param array<int, mixed> $rowActions Row actions declared on Resource::table
      *
@@ -548,9 +550,81 @@ final class InertiaDataBuilder
             'title' => $resource->recordTitle($record),
             'subtitle' => $resource->recordSubtitle($record),
             'actions' => $this->resolveVisibleActionNames($rowActions, $record, $user),
+            'actionOverrides' => $this->resolveActionOverrides($rowActions, $record, $resource, $user),
         ];
 
         return $payload;
+    }
+
+    /**
+     * Resolve per-record overrides (`url`/`disabled`) for row actions
+     * whose URL or disabled state depends on the record (#140).
+     *
+     * The table-level action list is serialised once with a `null`
+     * record, so a `url(Closure)` collapsed to a single broken URL
+     * shared by every row and a `disabled(Closure)` was evaluated once.
+     * Here we re-resolve those record-dependent values against the
+     * actual row and emit a lean `{actionName: {url?, disabled?}}` map.
+     * Stock `{id}`-template and static-URL actions carry no override, so
+     * the payload only grows for the actions that genuinely need it.
+     *
+     * Duck-typed against `arqel-dev/actions` (no hard dep). Only visible
+     * + executable actions are considered, mirroring the names list.
+     *
+     * @param array<int, mixed> $actions
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function resolveActionOverrides(array $actions, Model $record, Resource $resource, ?Authenticatable $user): array
+    {
+        $overrides = [];
+        foreach ($actions as $action) {
+            if (! is_object($action)) {
+                continue;
+            }
+
+            $name = method_exists($action, 'getName') ? $action->getName() : null;
+            if (! is_string($name) || $name === '') {
+                continue;
+            }
+
+            if (method_exists($action, 'isVisibleFor') && $action->isVisibleFor($record) === false) {
+                continue;
+            }
+
+            if (method_exists($action, 'canBeExecutedBy') && $action->canBeExecutedBy($user, $record) === false) {
+                continue;
+            }
+
+            $recordDependentUrl = method_exists($action, 'hasRecordDependentUrl')
+                && $action->hasRecordDependentUrl() === true;
+            $recordDependentDisabled = method_exists($action, 'hasRecordDependentDisabled')
+                && $action->hasRecordDependentDisabled() === true;
+
+            if (! $recordDependentUrl && ! $recordDependentDisabled) {
+                continue;
+            }
+
+            $override = [];
+
+            if ($recordDependentUrl && method_exists($action, 'resolveUrl')) {
+                $url = $action->resolveUrl($record);
+                if (is_string($url) && $url !== '') {
+                    $override['url'] = $url;
+                }
+            }
+
+            if ($recordDependentDisabled && method_exists($action, 'isDisabledFor')
+                && $action->isDisabledFor($record) === true) {
+                $override['disabled'] = true;
+            }
+
+            if ($override !== []) {
+                $overrides[$name] = $override;
+            }
+        }
+
+        return $overrides;
     }
 
     /**

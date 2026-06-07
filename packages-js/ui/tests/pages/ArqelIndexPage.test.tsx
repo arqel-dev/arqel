@@ -240,6 +240,85 @@ describe('ArqelIndexPage — row actions render per row', () => {
   });
 });
 
+describe('ArqelIndexPage — closure-URL row actions resolve per record (#140)', () => {
+  it('visits the per-row resolved URL from arqel.actionOverrides, not a shared one', async () => {
+    // The table-level action carries the closure-collapsed URL `/posts/`
+    // (resolved once with a null record); each record carries its own
+    // resolved override under arqel.actionOverrides.
+    const viewAction: ActionSchema = {
+      ...makeAction('view', 'View', 'row'),
+      method: 'GET',
+      url: '/posts/',
+    };
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [
+        { id: 1, title: 'first', arqel: { actionOverrides: { view: { url: '/posts/1' } } } },
+        { id: 2, title: 'second', arqel: { actionOverrides: { view: { url: '/posts/2' } } } },
+      ],
+      actions: { row: [viewAction], bulk: [], toolbar: [] },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    render(<ArqelIndexPage />);
+
+    const viewButtons = screen.getAllByRole('button', { name: /view/i });
+    expect(viewButtons.length).toBe(2);
+
+    const firstButton = viewButtons[0];
+    const secondButton = viewButtons[1];
+    if (!firstButton || !secondButton) throw new Error('expected two view buttons');
+
+    await user.click(firstButton);
+    await user.click(secondButton);
+
+    expect(routerVisitSpy).toHaveBeenCalledTimes(2);
+    const firstUrl = (routerVisitSpy.mock.calls[0] as [string, unknown])[0];
+    const secondUrl = (routerVisitSpy.mock.calls[1] as [string, unknown])[0];
+
+    expect(firstUrl).toBe('/posts/1');
+    expect(secondUrl).toBe('/posts/2');
+  });
+
+  it('disables a row action for the record flagged via arqel.actionOverrides', async () => {
+    const editAction: ActionSchema = {
+      ...makeAction('edit', 'Edit', 'row'),
+      method: 'GET',
+      url: '/posts/{id}/edit',
+    };
+    const props = makeProps({
+      columns: [makeTextColumn('title', 'Title')],
+      records: [
+        { id: 1, title: 'first', arqel: { actionOverrides: { edit: { disabled: true } } } },
+        { id: 2, title: 'second' },
+      ],
+      actions: { row: [editAction], bulk: [], toolbar: [] },
+    });
+    usePageMock.mockReturnValue({ props, url: '/admin/posts' });
+
+    const user = userEvent.setup();
+    render(<ArqelIndexPage />);
+
+    const editButtons = screen.getAllByRole('button', { name: /edit/i }) as HTMLButtonElement[];
+    expect(editButtons.length).toBe(2);
+
+    // Row 1 disabled, row 2 enabled.
+    expect(editButtons[0]?.disabled).toBe(true);
+    expect(editButtons[1]?.disabled).toBe(false);
+
+    // Clicking the disabled action is a no-op.
+    await user.click(editButtons[0] as HTMLButtonElement);
+    expect(routerVisitSpy).not.toHaveBeenCalled();
+
+    // The enabled one still works (with {id} template substitution).
+    await user.click(editButtons[1] as HTMLButtonElement);
+    expect(routerVisitSpy).toHaveBeenCalledTimes(1);
+    const url = (routerVisitSpy.mock.calls[0] as [string, unknown])[0];
+    expect(url).toBe('/posts/2/edit');
+  });
+});
+
 describe('ArqelIndexPage — bulk actions render after selection', () => {
   it('shows bulk action button only after a row is selected', async () => {
     const props = makeProps({

@@ -56,6 +56,24 @@ it('resolves a Closure URL with the record', function (): void {
     expect($action->resolveUrl(['id' => 42]))->toBe('/posts/42');
 });
 
+it('flags a closure URL as record-dependent and a static URL as not (#140)', function (): void {
+    $closure = RowAction::make('view')->url(fn ($r) => "/posts/{$r['id']}");
+    $static = RowAction::make('docs')->url('/docs', 'GET');
+    $none = RowAction::make('save')->action(fn () => null);
+
+    expect($closure->hasRecordDependentUrl())->toBeTrue()
+        ->and($static->hasRecordDependentUrl())->toBeFalse()
+        ->and($none->hasRecordDependentUrl())->toBeFalse();
+});
+
+it('flags a closure disabled predicate as record-dependent (#140)', function (): void {
+    $closure = RowAction::make('edit')->disabled(fn ($r) => $r['locked'] === true);
+    $plain = RowAction::make('edit');
+
+    expect($closure->hasRecordDependentDisabled())->toBeTrue()
+        ->and($plain->hasRecordDependentDisabled())->toBeFalse();
+});
+
 it('respects visible/disabled/hidden flags', function (): void {
     $hidden = RowAction::make('x')->hidden();
     $invisible = RowAction::make('x')->visible(fn ($r) => $r === 'show');

@@ -70,6 +70,45 @@ function invokeAction(
   });
 }
 
+/**
+ * Resolve the row-action list for a single record (#140).
+ *
+ * Row actions are defined once at table level (label / icon / color /
+ * confirmation / form), but `url(Closure)` and `disabled(Closure)`
+ * actions depend on the row. The server emits those resolved values
+ * per record under `record.arqel.actionOverrides`; here we merge them
+ * onto the shared definitions so each row links to its own URL and
+ * carries its own disabled state.
+ *
+ * When the server also emits `record.arqel.actions` (the visible +
+ * executable action names) we filter the list against it so per-row
+ * authorization/visibility is honoured.
+ */
+function resolveRecordActions(
+  tableActions: ActionSchema[],
+  record: {
+    arqel?: {
+      actions?: string[];
+      actionOverrides?: Record<string, { url?: string; disabled?: true }>;
+    };
+  },
+): ActionSchema[] {
+  const visibleNames = record.arqel?.actions;
+  const overrides = record.arqel?.actionOverrides ?? {};
+
+  return tableActions
+    .filter((action) => (visibleNames ? visibleNames.includes(action.name) : true))
+    .map((action) => {
+      const override = overrides[action.name];
+      if (override === undefined) return action;
+      return {
+        ...action,
+        ...(override.url !== undefined ? { url: override.url } : {}),
+        ...(override.disabled === true ? { disabled: true as const } : {}),
+      };
+    });
+}
+
 function buildQuery(params: VisitParams): Record<string, unknown> {
   const data: Record<string, unknown> = {};
   const filters = pruneEmptyFilters(params.filters);
@@ -223,7 +262,10 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
     rowActionsList.length > 0
       ? (record: TRecord) => (
           <ActionMenu
-            actions={rowActionsList}
+            // Resolve actions against this row so closure-URL /
+            // closure-disabled actions get their per-record values
+            // (#140) instead of the table-level placeholder.
+            actions={resolveRecordActions(rowActionsList, record)}
             onInvoke={(action, formValues) =>
               invokeAction(action, record as { id: string | number }, formValues)
             }

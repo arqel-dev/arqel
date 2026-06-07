@@ -231,6 +231,24 @@ abstract class Action
         return $this->url !== null;
     }
 
+    /**
+     * True when the URL is a closure that depends on the record, so it
+     * must be resolved per row rather than once at table level (#140).
+     */
+    public function hasRecordDependentUrl(): bool
+    {
+        return $this->url instanceof Closure;
+    }
+
+    /**
+     * True when the disabled predicate is a closure that depends on the
+     * record, so it must be evaluated per row rather than once (#140).
+     */
+    public function hasRecordDependentDisabled(): bool
+    {
+        return $this->disabled instanceof Closure;
+    }
+
     public function isVisibleFor(mixed $record = null): bool
     {
         if ($this->hidden) {

@@ -17,6 +17,19 @@ export type RecordType = Record<string, unknown> & {
   arqel?: {
     title?: string;
     subtitle?: string | null;
+    /**
+     * Names of row actions visible + executable for this record
+     * (`InertiaDataBuilder::resolveVisibleActionNames`).
+     */
+    actions?: string[];
+    /**
+     * Per-record overrides for row actions whose `url` or `disabled`
+     * state depends on the record — a `url(Closure)` or
+     * `disabled(Closure)` resolved against the actual row (#140). Keyed
+     * by action name; only record-dependent actions appear here, so
+     * stock `{id}`-template actions carry no override.
+     */
+    actionOverrides?: Record<string, { url?: string; disabled?: true }>;
   };
 };
 

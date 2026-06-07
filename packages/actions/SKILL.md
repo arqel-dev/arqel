@@ -18,6 +18,7 @@
 - `Actions` factory para verbos comuns (view/edit/delete/restore/create/deleteBulk)
 - `Http\Controllers\ActionController` (ACTIONS-006) — 4 endpoints `invokeRow/invokeHeader/invokeToolbar/invokeBulk` sob `arqel.actions.{name}`. Resolve Resource via `ResourceRegistry::findBySlug`, action por nome em coleções duck-typed (`actions/headerActions/toolbarActions/bulkActions`), autoriza via `canBeExecutedBy`, valida payload do form modal, executa callback e flasha success/failure (ACTIONS-006)
 - Integração com Table — `InertiaDataBuilder::serializeMany` agora aceita `?Authenticatable $user` e via `ReflectionMethod::getNumberOfParameters` passa-o para `Action::toArray($user, $record)` quando a assinatura aceita; permite resolução user-aware de `disabled`/`url` no payload. Per-row visibility via `arqel.actions: ['view','edit']` lista os nomes habilitados para `(user, record)` cada record (ACTIONS-007)
+- Per-record URL/disabled (#140) — actions de tabela são serializadas **uma vez** com `$record=null` (definição compartilhada), mas `url(Closure)`/`disabled(Closure)` dependem da linha. `InertiaDataBuilder::serializeRecord` emite por registro `arqel.actionOverrides: {actionName: {url?, disabled?}}` resolvido contra a linha real, **só** para actions record-dependent (detectadas via `Action::hasRecordDependentUrl()`/`hasRecordDependentDisabled()`). Stock `{id}`-template e URL estática não geram override (payload enxuto). O frontend mescla os overrides sobre a definição de tabela por linha
 - **49 testes Pest passando** (era 30): cobertura nova de `Confirmable` (8 tests), `HasAuthorization` (4 tests), `ActionController` Feature (7 tests cobrindo 404 slug, 404 action name, success notification, deny via authorize → 403, failure notification, 422 sem ids[], duck-typed collection lookup) (ACTIONS-008)
 
 **Por chegar:**
@@ -50,6 +51,7 @@ Oracles públicos:
 - `isVisibleFor(?$record): bool` — `hidden` flag, depois `visible` closure
 - `isDisabledFor(?$record): bool` — `disabled` closure
 - `resolveUrl(?$record): ?string` — string literal ou closure resolvida
+- `hasRecordDependentUrl(): bool` / `hasRecordDependentDisabled(): bool` — `true` quando `url`/`disabled` é uma `Closure` (precisa resolver por linha, #140)
 - `canBeExecutedBy(?Authenticatable, ?$record): bool` — `authorize` closure (default true)
 - `execute(?$record, array $data): mixed` — invoca callback (returna `null` sem callback)
 - `toArray(?Authenticatable, ?$record, ?object $resource): array<string, mixed>` — payload Inertia (chaves null filtradas). Quando o action não declarou `->url()` nem `->action()` e um `$resource` (com `::$slug`) é passado, `resolveStockUrl()` emite a URL convencional: row `view/edit/delete/restore` em `/admin/{slug}/{id}[/...]`, e **qualquer** action `type==='bulk'` (não só `delete`) em `POST /admin/{slug}/bulk/{name}` — assim bulk actions sem callback (ex.: `ExportAction`) sempre carregam uma `url` e o frontend nunca recai num route inexistente (#48)

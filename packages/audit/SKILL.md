@@ -78,6 +78,17 @@ A escolha é **integrar, não reinventar**: ActivityLog do Spatie é maduro, bem
 - **Hard dep em `spatie/laravel-activitylog ^4.10`** é design intent, não acidente: este pacote *é* o wrapper. Diferente de `arqel-dev/tenant` (que mantém `stancl/tenancy` e `spatie/laravel-multitenancy` como `suggest`/optional), `arqel-dev/audit` não tem razão de existir sem o ActivityLog do Spatie. A dependência também garante que migrations e bindings sejam auto-discovered no app consumidor
 - `spatie/laravel-package-tools` é dep direta (não vem via `arqel-dev/core`) porque o pacote pode ser usado standalone, sem o resto do stack Arqel
 
+## Security — autorização das rotas de leitura (#181)
+
+As duas rotas de leitura do activity-log rodam atrás de `['web','auth']` **e** aplicam autorização no controller (não confie só no `auth` middleware):
+
+- **Log global** — `GET /admin/audit/activity` (`GlobalActivityLogController::index`). Expõe nome/email do causer + diffs completos de **todos** os usuários/subjects, então é gateado numa ability **global** de auditoria. Autorize de qualquer um destes modos:
+  - `Gate::define('view-audit-log', fn ($user) => $user->isAdmin())` — named ability dedicada; **ou**
+  - um gate/Policy `viewAny` mapeado ao model `Spatie\Activitylog\Models\Activity` (`Gate::define('viewAny', ...)` ou `Gate::policy(Activity::class, ...)`).
+  - A checagem só é **exigida** quando uma das duas existe. Em **scaffold mode** (sem named ability `view-audit-log` **e** sem gate/policy de `Activity`) o log fica aberto — o caminho "Hello World" da showcase. Defina a ability para fechar.
+- **Activity de um record** — `GET /admin/audit/{subjectType}/{subjectId}/activity` (`RecordActivityController::show`). Honra a Policy **`view`** do subject model (mesmo padrão `deniesView()` do `versioning/VersionHistoryController`, #91): `Gate::has('view') || Gate::getPolicyFor($subject)` ⇒ `Gate::denies('view', $subject)` ⇒ 403. Registre uma `Gate::policy(App\Models\Post::class, PostPolicy::class)` com método `view` e a timeline daquele record passa a respeitar o acesso. Sem named gate `view` **e** sem Policy ⇒ allow (scaffold).
+- **Nota:** `{subjectType}` aceita o FQCN cru do model (constraint `->where('subjectType','.*')`) — um atacante pode passar **qualquer** classe Eloquent; é justamente por isso que a Policy `view` do subject é aplicada antes de qualquer query.
+
 ## Anti-patterns
 
 - ❌ **Logar atributos sensíveis sem override** — `getAuditableAttributes()` defaulta a `$fillable`; se o model tem `password`, `api_token`, dados PII no `$fillable`, **override é obrigatório** para mascarar antes de cair na tabela `activity_log`

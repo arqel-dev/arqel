@@ -10,7 +10,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Activitylog\Models\Activity;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 /**
@@ -27,12 +29,56 @@ use Throwable;
  * `arqel-dev/table` Column/Filter API and is deferred to a follow-up
  * ticket. The config flags exposed here (`config('audit')`) give that
  * future Resource a stable url + nav metadata to consume.
+ *
+ * SECURITY (issue #181): the global log exposes every causer's
+ * name/email plus full property diffs, so it must not be readable by any
+ * authenticated user. We gate it on a global audit ability — a named
+ * gate `view-audit-log` (`Gate::define`) OR a gate/Policy mapped to the
+ * `Activity` model via the `viewAny` ability. The check is only enforced
+ * when one of those exists; in scaffold mode (no gate, no policy) the log
+ * stays open so the showcase isn't broken. Mirrors the deny-when-defined
+ * convention used by `versioning/VersionHistoryController`.
  */
 final class GlobalActivityLogController extends Controller
 {
     private const ALLOWED_EVENTS = ['created', 'updated', 'deleted', 'restored'];
 
+    /**
+     * Named ability gating read access to the global audit log. Apps may
+     * authorize via `Gate::define('view-audit-log', ...)` or by mapping a
+     * `viewAny` gate/Policy onto the spatie `Activity` model.
+     */
+    private const ABILITY = 'view-audit-log';
+
     public function index(Request $request): JsonResponse
+    {
+        $this->authorizeGlobalLog();
+
+        return $this->buildResponse($request);
+    }
+
+    /**
+     * Enforce the global audit ability when (and only when) the app has
+     * defined one. Default-allow in scaffold mode keeps the showcase open.
+     */
+    private function authorizeGlobalLog(): void
+    {
+        $hasNamedAbility = Gate::has(self::ABILITY);
+        $hasActivityGate = Gate::has('viewAny') || Gate::getPolicyFor(Activity::class) !== null;
+
+        if (! $hasNamedAbility && ! $hasActivityGate) {
+            return;
+        }
+
+        $allowed = ($hasNamedAbility && Gate::allows(self::ABILITY))
+            || ($hasActivityGate && Gate::allows('viewAny', Activity::class));
+
+        if (! $allowed) {
+            throw new HttpException(403, 'Forbidden');
+        }
+    }
+
+    private function buildResponse(Request $request): JsonResponse
     {
         $logName = $this->stringQuery($request, 'log_name');
         $event = $this->stringQuery($request, 'event');

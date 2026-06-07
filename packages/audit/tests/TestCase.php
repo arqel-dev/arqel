@@ -48,6 +48,10 @@ abstract class TestCase extends Orchestra
     protected function defineEnvironment($app): void
     {
         /** @var Application $app */
+        // The activity-log read routes run behind the `web` middleware
+        // group, whose EncryptCookies middleware needs an app key. Set a
+        // deterministic test key so route-level (HTTP) tests can boot.
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',

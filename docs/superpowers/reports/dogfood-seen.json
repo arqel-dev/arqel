@@ -488,6 +488,48 @@
       "status": "not-a-bug",
       "round": 7,
       "note": "refuted: structurally impossible (embed returns raw vector, no token/cost data); spec-conformant; documented deliberate; closing it = a public-contract-changing enhancement."
+    },
+    {
+      "signature": "auth::panel-authguard-dead-config",
+      "package": "auth",
+      "status": "fixed",
+      "issue": 139,
+      "pr": 147,
+      "round": 8
+    },
+    {
+      "signature": "actions::row-action-closure-url-null-record",
+      "package": "actions",
+      "status": "fixed",
+      "issue": 140,
+      "pr": 148,
+      "round": 8
+    },
+    {
+      "signature": "table::sortable-relationshipcolumn-invalid-sql",
+      "package": "table",
+      "status": "fixed",
+      "issue": 141,
+      "pr": 145,
+      "round": 8,
+      "note": "exclude-safe; full JOIN deferred to TABLE-005"
+    },
+    {
+      "signature": "fields::filefield-visibility-not-applied",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 142,
+      "pr": 144,
+      "round": 8
+    },
+    {
+      "signature": "mcp::error-code-32603-vs-32602",
+      "package": "mcp",
+      "status": "fixed",
+      "issue": 143,
+      "pr": 146,
+      "round": 8,
+      "note": "per-handler McpDispatchException::invalidParams; widened to 5 handlers"
     }
   ]
 }

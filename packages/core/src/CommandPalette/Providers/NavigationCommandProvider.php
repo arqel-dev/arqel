@@ -7,6 +7,7 @@ namespace Arqel\Core\CommandPalette\Providers;
 use Arqel\Core\CommandPalette\Command;
 use Arqel\Core\CommandPalette\CommandProvider;
 use Arqel\Core\Resources\ResourceRegistry;
+use Arqel\Core\Support\ResourceAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Throwable;
 
@@ -28,12 +29,15 @@ use Throwable;
  * brings down the whole palette — the offending entry is silently
  * skipped, the rest still ship.
  *
- * The `?Authenticatable $user` and `string $query` parameters are
- * accepted to satisfy the {@see CommandProvider} contract but are
- * not consulted here: query filtering is the registry's job
- * (FuzzyMatcher) and we do not yet gate navigation by Policy.
- * Policy-gated providers (CreateCommandProvider, RecordSearchProvider)
- * are deferred to follow-up work.
+ * The `$user` is consulted to gate navigation by the `viewAny` Policy:
+ * a Resource the user is denied `viewAny` on is skipped, so the palette
+ * never lists a "Go to" shortcut for a feature the sidebar already hides
+ * (issue #129 — symmetric with the #118 sidebar fix). Both surfaces share
+ * one guard, {@see ResourceAuthorization::viewAnyDenied()}. When no gate
+ * or policy exists (scaffold apps) every Resource is listed, so the
+ * no-policy baseline is unchanged. The `string $query` parameter is
+ * accepted to satisfy the {@see CommandProvider} contract but not used
+ * here: query filtering is the registry's job (FuzzyMatcher).
  */
 final class NavigationCommandProvider implements CommandProvider
 {
@@ -49,6 +53,10 @@ final class NavigationCommandProvider implements CommandProvider
         $commands = [];
 
         foreach ($this->registry->all() as $resourceClass) {
+            if (ResourceAuthorization::viewAnyDenied($resourceClass, $user)) {
+                continue;
+            }
+
             $command = $this->buildCommand($resourceClass);
 
             if ($command !== null) {

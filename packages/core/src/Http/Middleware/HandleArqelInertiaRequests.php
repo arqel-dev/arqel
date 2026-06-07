@@ -7,11 +7,10 @@ namespace Arqel\Core\Http\Middleware;
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\I18n\TranslationLoader;
 use Arqel\Core\Panel\PanelRegistry;
+use Arqel\Core\Support\ResourceAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
-use Throwable;
 
 /**
  * Inertia middleware for the Arqel admin panel.
@@ -254,28 +253,16 @@ final class HandleArqelInertiaRequests extends Middleware
      * Decide whether a Resource's nav item must be hidden because the
      * current user is denied `viewAny` on its model.
      *
-     * Mirrors {@see \Arqel\Core\Http\Controllers\ResourceController}'s
-     * `authorize()`: only consult the Gate when a `viewAny` gate OR a
-     * Policy for the model exists. When neither does (scaffold apps), the
-     * item is always shown — denying nothing — so today's behavior holds.
+     * Delegates to {@see ResourceAuthorization::viewAnyDenied()} — the
+     * single source of truth shared with the command palette
+     * ({@see \Arqel\Core\CommandPalette\Providers\NavigationCommandProvider})
+     * so both navigation surfaces stay symmetric (issues #118 and #129).
      *
      * @param class-string<\Arqel\Core\Resources\Resource> $resourceClass
      */
     private function resourceViewAnyDenied(string $resourceClass, ?Authenticatable $user): bool
     {
-        try {
-            $modelClass = $resourceClass::getModel();
-        } catch (Throwable) {
-            // Resource without a declared model (scaffold/fixture) — there
-            // is nothing to authorize against, so never hide it.
-            return false;
-        }
-
-        if (! Gate::has('viewAny') && ! Gate::getPolicyFor($modelClass)) {
-            return false;
-        }
-
-        return Gate::forUser($user)->denies('viewAny', $modelClass);
+        return ResourceAuthorization::viewAnyDenied($resourceClass, $user);
     }
 
     /**

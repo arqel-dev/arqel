@@ -57,6 +57,32 @@ it('store: validates and writes the upload to the configured disk', function ():
     Storage::disk('local')->assertExists($payload['path']);
 });
 
+it('store: persists the field\'s public visibility on a private-default disk (#142)', function (): void {
+    // Storage::fake defaults to private visibility; a visibility('public')
+    // field must override that so url() works on e.g. an s3 disk. Before the
+    // fix the store() call dropped the field's visibility and the object kept
+    // the disk default (private), so this assertion failed.
+    $file = UploadedFile::fake()->create('public.png', 100, 'image/png');
+
+    $request = Request::create('/upload', 'POST');
+    $request->files->set('file', $file);
+
+    $payload = $this->controller->store($request, 'uploading-resources', 'public_avatar')->getData(true);
+
+    expect(Storage::disk('local')->getVisibility($payload['path']))->toBe('public');
+});
+
+it('store: persists the field\'s private visibility (#142)', function (): void {
+    $file = UploadedFile::fake()->create('private.png', 100, 'image/png');
+
+    $request = Request::create('/upload', 'POST');
+    $request->files->set('file', $file);
+
+    $payload = $this->controller->store($request, 'uploading-resources', 'private_avatar')->getData(true);
+
+    expect(Storage::disk('local')->getVisibility($payload['path']))->toBe('private');
+});
+
 it('store: rejects when the file is missing', function (): void {
     $this->controller->store(Request::create('/upload', 'POST'), 'uploading-resources', 'avatar');
 })->throws(Illuminate\Validation\ValidationException::class);

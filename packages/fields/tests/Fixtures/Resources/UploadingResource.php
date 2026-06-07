@@ -10,9 +10,11 @@ use Arqel\Fields\Types\FileField;
 use Arqel\Fields\Types\TextField;
 
 /**
- * Fixture used by the upload controller tests. Exposes both an
- * upload-capable field (`avatar`) and a non-upload field (`name`)
- * so the 400 branch is reachable.
+ * Fixture used by the upload controller tests. Exposes an
+ * upload-capable field (`avatar`), a non-upload field (`name`)
+ * so the 400 branch is reachable, plus two upload fields with an
+ * explicit visibility (`public_avatar`, `private_avatar`) used to
+ * assert the stored object's ACL matches the field config (#142).
  */
 final class UploadingResource extends Resource
 {
@@ -25,6 +27,8 @@ final class UploadingResource extends Resource
         return [
             new TextField('name'),
             (new FileField('avatar'))->disk('local'),
+            (new FileField('public_avatar'))->disk('local')->visibility(FileField::VISIBILITY_PUBLIC),
+            (new FileField('private_avatar'))->disk('local')->visibility(FileField::VISIBILITY_PRIVATE),
         ];
     }
 }

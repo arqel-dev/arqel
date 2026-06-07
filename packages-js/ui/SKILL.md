@@ -41,7 +41,7 @@ A partir da migração para shadcn, o pacote é construído sobre **shadcn (styl
 - `<Sidebar>` (block `sidebar-07` + collapsible icon + items via `useNavigation()` ou prop `items`, groups, badges, ícone lucide por item via `item.icon` + `resolveLucideIcon`, `aria-current="page"`)
 - `<Topbar>`: brand + theme toggle + `SidebarTrigger` mobile + slots search/userMenu/tenantSwitcher
 - `<MainContent>` (`SidebarInset` wrapper) com padding responsivo + `maxWidth` (`md..7xl | none`)
-- `<DataTable>` (TanStack Table v8) — 9 cell renderers, seleção controlada, sticky header, `aria-sort`
+- `<DataTable>` (TanStack Table v8) — 9 cell renderers, seleção controlada, sticky header, `aria-sort`. O `BadgeCell` lê `column.props.colors` (value→token de cor → classes Tailwind) e `column.props.icons` (value→nome lucide), renderizando o ícone ao lado do label; valor sem match no map cai no estilo muted (#50)
 - `<TableFilters>` / `<TablePagination>` / `<TableToolbar>` / `<ResourceIndex>`
 - `<FormRenderer>` + `<FieldRenderer>` + `FieldRegistry` + `<FormSection>` / `<FormFieldset>` / `<FormGrid>` / `<FormTabs>` / `<FormActions>`
 - `<ActionButton>` / `<ActionMenu>` (Radix DropdownMenu) / `<ConfirmDialog>` (Radix Dialog) / `<ActionFormModal>` (Radix Dialog hospedando `<FormRenderer>`)

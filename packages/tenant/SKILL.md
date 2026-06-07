@@ -48,7 +48,7 @@ A escolha é **não reinventar**: oferece uma abstração leve que cobre 80% dos
 
 - `Theming\TenantTheme` — readonly value-object com 5 props nullable (`primaryColor`, `logoUrl`, `fontFamily`, `secondaryColor`, `faviconUrl`). Factory `fromTenant(?Model)` lê atributos canônicos defensivamente; `toArray()` + `isEmpty()`.
 - `Theming\TenantThemeResolver` (singleton) — `resolve(): TenantTheme` via `TenantManager::current()`.
-- `Theming\CssVarsRenderer::renderInlineStyle(TenantTheme)` — emite `<style>:root { --color-primary: …; }`. Sanitização anti-injeção: drop silencioso de `<`, `>`, `"`; valores válidos passam por `htmlspecialchars`.
+- `Theming\CssVarsRenderer::renderInlineStyle(TenantTheme)` — emite `<style>:root { --color-primary: …; }`. Sanitização anti-injeção CSS: cada slot é validado contra um allowlist do seu contexto CSS (cores → hex/`rgb()`/`hsl()`/cor nomeada; `font_family` → letras/dígitos/espaço/vírgula/hífen/aspas simples; URLs → `http(s)` ou root-relative emitido como `url('…')` escapado). Valor que falha o allowlist é **omitido** (a custom property não é renderizada), neutralizando payloads de CSS injection com `}`. Drop de `<`, `>`, `"` mantido como defesa em profundidade.
 - **Wiring cross-package deferido**: consumers chamam `app(TenantThemeResolver::class)->resolve()->toArray()` no próprio `HandleInertiaRequests::share()`.
 
 **Feature gates (TENANT-013):**

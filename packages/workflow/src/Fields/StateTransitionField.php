@@ -195,20 +195,21 @@ final class StateTransitionField extends Field
             $to = self::transitionTo($transitionClass);
             $label = self::transitionLabel($transitionClass);
 
-            $eligibleFroms = $froms ?? [$current ?? '*'];
-
-            foreach ($eligibleFroms as $from) {
-                if ($current !== null && $froms !== null && ! in_array($current, $froms, true)) {
-                    continue;
-                }
-
-                $entries[] = [
-                    'from' => $from,
-                    'to' => $to,
-                    'label' => $label,
-                    'authorized' => $this->isAuthorized($transitionClass),
-                ];
+            // Mirror HasWorkflow::getAvailableTransitions: one entry per
+            // applicable transition. A transition whose from() lists multiple
+            // states (including the current one) must NOT emit one entry per
+            // declared from-state — that produced duplicate UI buttons carrying
+            // a `from` that is not the record's current state (#154).
+            if ($current !== null && $froms !== null && ! in_array($current, $froms, true)) {
+                continue;
             }
+
+            $entries[] = [
+                'from' => $current ?? ($froms[0] ?? '*'),
+                'to' => $to,
+                'label' => $label,
+                'authorized' => $this->isAuthorized($transitionClass),
+            ];
         }
 
         return $entries;

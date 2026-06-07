@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Widgets\Dashboard;
+use Arqel\Widgets\Filters\DateRangeFilter;
 use Arqel\Widgets\Filters\SelectFilter;
 use Arqel\Widgets\Tests\Fixtures\EchoFiltersWidget;
 use Illuminate\Container\Container;
@@ -90,6 +91,27 @@ it('declarative mode populates declaredFilters and filterDefaults', function ():
     expect($dash->getDeclaredFilters())->toBe([$segment, $region])
         ->and($dash->getFilterDefaults())->toBe(['segment' => 'all', 'region' => 'us'])
         ->and($dash->getFilters())->toBe(['segment' => 'all', 'region' => 'us']);
+});
+
+it('DateRangeFilter default is seeded into the filters map as Y-m-d strings (issue #165)', function (): void {
+    $widget = new EchoFiltersWidget('a');
+
+    $payload = Dashboard::make('analytics', 'Analytics')
+        ->filters([
+            DateRangeFilter::make('range')->defaultRange(
+                new DateTimeImmutable('2026-01-01'),
+                new DateTimeImmutable('2026-01-31'),
+            ),
+        ])
+        ->widgets([$widget])
+        ->resolve(null);
+
+    // The seed must be the resolved (string) default, never the raw
+    // DateTimeImmutable objects that mangle into a cast array client-side.
+    expect($payload['filters'])->toBe(['range' => ['from' => '2026-01-01', 'to' => '2026-01-31']])
+        ->and($payload['widgets'][0]['data']['filters'])->toBe([
+            'range' => ['from' => '2026-01-01', 'to' => '2026-01-31'],
+        ]);
 });
 
 it('Widget::filterValue reads from the merged filter map with fallback', function (): void {

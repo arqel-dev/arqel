@@ -183,7 +183,11 @@ final class Dashboard
                     continue;
                 }
                 $declared[] = $entry;
-                $defaults[$entry->getName()] = $entry->getDefault();
+                // Seed the resolved (serialisable) default — not the raw
+                // stored value — so e.g. DateRangeFilter's DateTimeInterface
+                // endpoints are seeded as `Y-m-d` strings the client reads
+                // (issue #165), consistent with the filter's own toArray().
+                $defaults[$entry->getName()] = $entry->getResolvedDefault();
             }
 
             $this->declaredFilters = $declared;

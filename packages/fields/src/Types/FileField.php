@@ -171,6 +171,28 @@ class FileField extends Field
     }
 
     /**
+     * For a `multiple()` field the value is an array of uploads, so the
+     * top-level rule is `array` and the real per-file constraints
+     * (`file`/`image` + `max` + `mimetypes`) belong on each element under
+     * `{name}.*`. Mirrors `SelectField`'s `{name}.* => in:…` so the
+     * configured `maxSize`/`acceptedFileTypes` are not silently dropped for
+     * the create/update payload (#166). The leading `nullable` lets an
+     * empty/absent array slot through; presence is enforced by the
+     * top-level rule. `ImageField` inherits the `image`-gated element rules
+     * through its own `uploadFileRules()` override.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public function getNestedValidationRules(): array
+    {
+        if (! $this->multiple) {
+            return [];
+        }
+
+        return [$this->getName().'.*' => array_merge(['nullable'], $this->uploadFileRules())];
+    }
+
+    /**
      * Build the single-file validation rule.
      *
      * The frontend re-submits the record's stored attribute — the path
@@ -217,9 +239,13 @@ class FileField extends Field
      * The Laravel rules applied to an actual uploaded file. Overridden by
      * `ImageField` to gate on `image` rather than `file`.
      *
+     * Public so the direct-upload HTTP path (`FieldUploadController`) can
+     * reuse the exact same rule set the main-form `uploadRule()` closure
+     * applies — keeping the two upload paths in lockstep (#166-B).
+     *
      * @return array<int, string>
      */
-    protected function uploadFileRules(): array
+    public function uploadFileRules(): array
     {
         $rules = ['file'];
 

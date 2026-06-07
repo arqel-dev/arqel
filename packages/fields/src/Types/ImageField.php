@@ -56,7 +56,7 @@ final class ImageField extends FileField
      *
      * @return array<int, string>
      */
-    protected function uploadFileRules(): array
+    public function uploadFileRules(): array
     {
         $rules = ['image'];
 

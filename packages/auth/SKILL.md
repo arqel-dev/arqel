@@ -150,6 +150,7 @@ $can = $gate->snapshot();                          // === $registry->resolveForU
 - Global abilities são para flags **panel-level** (e.g. "user pode entrar no admin", "user pode exportar"); per-record authorization sempre vai por Policies
 - Computed abilities são para checks arbitrários (e.g. "user tem subscription paid") — closures recebem `?Authenticatable $user` e retornam bool
 - Cache de abilities é per-request — não persiste entre requests; isto é deliberado para refletir mudanças em real-time
+- **Guard do painel** (#139): todo o fluxo de auth bundled (login/logout/register/email-verify/password-reset + `EnsureUserCanAccessPanel`) autentica contra o guard resolvido por `Concerns\ResolvesPanelGuard` — single source of truth: `PanelRegistry::getCurrent()?->getAuthGuard()`, com fallback para `config('arqel.auth.guard', 'web')` e depois `web`. As rotas emitem `auth:{guard}`/`guest:{guard}`. Um painel com `->authGuard('admin')` passa a autenticar/gatear no guard `admin`; sem `authGuard`, tudo permanece em `web` (equivalente a `auth`/`guest` puros)
 
 ## Anti-patterns
 

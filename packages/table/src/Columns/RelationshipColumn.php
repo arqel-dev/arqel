@@ -13,9 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * `getState()` walks the relation by its name (declared via the
  * column's `name`) and returns the configured display attribute.
  *
- * Sortable relationship columns require a JOIN; that wiring lives
- * in `TableQueryBuilder` (TABLE-005). The column itself just
- * carries the metadata.
+ * Sorting and searching by a relationship column require a JOIN on
+ * the related table; that wiring is not implemented yet (deferred to
+ * TABLE-005). Until then `TableQueryBuilder` excludes relationship
+ * columns from the sort/search whitelists, so a `->sortable()` or
+ * `->searchable()` declaration degrades to a no-op rather than
+ * emitting an "Unknown column" SQL error.
  */
 final class RelationshipColumn extends TextColumn
 {

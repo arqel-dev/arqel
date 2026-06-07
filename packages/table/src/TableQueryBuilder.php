@@ -152,6 +152,10 @@ final class TableQueryBuilder
         $names = [];
 
         foreach ($this->table->getColumns() as $column) {
+            if ($this->isRelationshipColumn($column)) {
+                continue;
+            }
+
             if ($column instanceof Column && $column->isSearchable()) {
                 $names[] = $column->getName();
             }
@@ -168,12 +172,29 @@ final class TableQueryBuilder
         $names = [];
 
         foreach ($this->table->getColumns() as $column) {
+            if ($this->isRelationshipColumn($column)) {
+                continue;
+            }
+
             if ($column instanceof Column && $column->isSortable()) {
                 $names[] = $column->getName();
             }
         }
 
         return $names;
+    }
+
+    /**
+     * A RelationshipColumn's name is the relation accessor (e.g. "author"),
+     * not a real DB column. Sorting or searching by it would emit invalid
+     * SQL because no JOIN wiring exists yet (deferred to TABLE-005). Such
+     * columns are therefore excluded from the sort/search whitelists, so a
+     * stray `->sortable()`/`->searchable()` declaration degrades safely
+     * instead of raising an "Unknown column" error.
+     */
+    private function isRelationshipColumn(mixed $column): bool
+    {
+        return $column instanceof RelationshipColumn;
     }
 
     /**

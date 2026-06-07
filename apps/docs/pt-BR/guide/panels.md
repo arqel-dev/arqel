@@ -46,6 +46,8 @@ Isso registra um panel `admin` em `/admin` com 1 Resource e auth ativa.
 | `authGuard(string)` | `string` | Guard alternativa (default `web`) |
 | `tenant(class-string)` | `class-string` | Tenant resolver (Phase 2) |
 
+O `authGuard()` é honrado de ponta a ponta pelo fluxo bundled do `arqel-dev/auth`: login, logout, registro, verificação de e-mail, as rotas de password-reset, o middleware `EnsureUserCanAccessPanel` e o middleware de rota emitido (`auth:{guard}` / `guest:{guard}`) todos resolvem contra esse guard (com fallback para `config('arqel.auth.guard', 'web')` e depois `web`). Um painel com `->authGuard('admin')` passa a autenticar e gatear inteiramente no guard `admin`.
+
 ## Multi-panel
 
 ```php

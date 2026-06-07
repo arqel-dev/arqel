@@ -73,7 +73,7 @@ Os resolvers em `src/Resolvers/` são `class` (não-final) propositalmente: apps
 
 - `BelongsToTenant` trait — registra `TenantScope` global + auto-fill `tenant_id` no `creating`. Foreign key resolve por: `$tenantForeignKey` na model → `config('arqel.tenancy.foreign_key')` → `'tenant_id'`.
 - `withoutTenant()` / `forTenant($id)` — escapes explícitos.
-- `Rules\ScopedUnique` — substituto tenant-aware da rule `unique` Laravel; aplica `where(<tenant_fk>, <id>)` quando há current tenant.
+- `Rules\ScopedUnique` — substituto tenant-aware da rule `unique` Laravel; aplica `where(<tenant_fk>, <id>)` quando há current tenant. Faz fallback para um check global-unique quando não há tenant, **ou** quando a coluna FK do tenant não existe na tabela-alvo (guard via `hasColumn`, então uma tabela mal configurada degrada graciosamente em vez de levantar "Unknown column").
 
 ### Adapters multi-DB
 
@@ -90,6 +90,8 @@ Endpoint pronto:
 - `GET /admin/tenants/available` — devolve `{current, available[]}`.
 
 Resolvers ganham o contract `SupportsTenantSwitching` (`availableFor` / `canSwitchTo` / `switchTo`).
+
+`SessionResolver::switchTo()` persiste o tenant ativo na mesma session key que o seu `resolve()` relê, guardando o valor da **identifier-column** (`identifierFor()`), não a primary key — então um switch sobrevive à navegação mesmo quando `identifier_column` é uma coluna não-PK como `slug`.
 
 ### Theming
 
@@ -109,7 +111,7 @@ public function share(Request $request): array
 }
 ```
 
-`CssVarsRenderer::renderInlineStyle()` faz sanitização defensiva (drop de `<`, `>`, `"` + `htmlspecialchars`) — nunca concatenar atributos de tenant direto no HTML.
+`CssVarsRenderer::renderInlineStyle()` valida cada slot de tema contra um allowlist estrito do seu contexto CSS — cores (hex / `rgb()`/`hsl()` / cor nomeada), `font_family` (nomes de família + keywords genéricas) e URLs (`http(s)` ou caminho root-relative, emitido como `url('…')` escapado). Um valor que não casa com o allowlist é **omitido** (a custom property não é renderizada), de modo que um payload de CSS injection com `}` (que tentaria fechar a regra `:root`) simplesmente desaparece. O drop de `<`, `>`, `"` é mantido como defesa em profundidade. Nunca concatene atributos de tenant diretamente em CSS/HTML — sempre passe por `renderInlineStyle()`.
 
 ## Examples
 

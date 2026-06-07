@@ -18,7 +18,7 @@ Esta página describe cómo habilitar **edición colaborativa multi-usuario** en
 
 - Laravel 12+ (testeado en 12.x y 13.x).
 - `arqel-dev/realtime` instalado y booteado (ya incluido en cualquier proyecto que instaló el meta-paquete `arqel-dev/framework`).
-- Setup mínimo de auth y policies — el canal aplica el Gate `view` sobre el registro.
+- Setup mínimo de auth y policies — el canal aplica la ability `view` sobre el registro, honrando tanto un Gate `view` como una Policy registrada (#92).
 
 ## Instalación
 
@@ -125,12 +125,12 @@ Broadcast::channel(
 
 `AwarenessChannelAuthorizer`:
 
-1. Resuelve `$modelType` a una clase Eloquent — directamente vía FQCN o vía `ResourceRegistry::all()` haciendo match por `getModel()`.
+1. Resuelve `$modelType` a una clase Eloquent — directamente vía FQCN, vía `ResourceRegistry::all()` haciendo match por `getModel()`, **o vía `ResourceRegistry::findBySlug()`** para que el **slug** del Resource también se acepte como `modelType` (#116). Esa es exactamente la clave que el endpoint REST persiste en `model_type` y sobre la que `YjsUpdateReceived` hace broadcast, así que las apps basadas en slug sincronizan correctamente.
 2. Carga el registro con `Model::query()->find($modelId)`.
-3. Chequea el Gate `view` (cuando lo registra la app); si no, permite.
+3. Aplica la ability `view` siempre que la app defina un Gate `view` **O** registre una Policy para el model (resuelto vía `Gate::getPolicyFor()`, ya que `Gate::has()` nunca ve Policies, #92); solo permite cuando no hay Gate **ni** Policy (scaffold mode).
 4. Defensivo: cualquier `Throwable` o registry no bound devuelve `false` (deny).
 
-Para policies finas, define `view` en tu `PostPolicy` y realtime lo hereda automáticamente.
+Para policies finas, define `view` en tu `PostPolicy` y realtime lo hereda automáticamente — sin necesidad de registrar un Gate.
 
 ## Concurrencia optimista
 
@@ -160,7 +160,7 @@ Los tests de `arqel-dev/realtime` corren con `BROADCAST_CONNECTION=null` + `Even
 - La integración actual con textarea reBindea todo el `Y.Text` en cada tecla. Para editores ricos (ProseMirror/TipTap), usa el hook directamente + `y-prosemirror`.
 - Aún no hay **awareness** (cursores remotos, highlighting de selección). Roadmap: RT-006.
 - Reconexiones cubiertas vía resync de snapshot — puede haber una ventana de 2s donde updates se "pierden" en el canal pero reaparecen en el siguiente snapshot.
-- El `modelType` en el canal es el FQCN Eloquent — codifícalo en el cliente (e.g. `App\\Models\\Post`) para que matchee con lo que `ResourceRegistry` registra.
+- El `modelType` en el canal puede ser el FQCN Eloquent (e.g. `App\\Models\\Post`) **o** el slug del Resource (e.g. `posts`) — ambos resuelven al mismo model vía `ResourceRegistry` (#116). Cualquiera que codifiques en el cliente, el endpoint REST de snapshot persiste y `YjsUpdateReceived` hace broadcast sobre la misma clave, así que el canal suscrito y el autorizado quedan en sincronía.
 
 ## Próximos pasos (roadmap)
 

@@ -113,7 +113,9 @@ Y define el Gate como de costumbre:
 Gate::define('viewAdminPanel', fn ($user) => $user?->isAdmin());
 ```
 
-El middleware `EnsureUserCanAccessPanel` aborta con 401 para guests y 403 cuando la ability está registrada y deniega — independientemente del starter kit instalado.
+El middleware `EnsureUserCanAccessPanel` aborta con 401 para guests y 403 cuando la ability está registrada y deniega — independientemente del starter kit instalado. Resuelve el usuario autenticado contra el guard configurado del panel (`Panel::authGuard()` / `config('arqel.auth.guard', 'web')`), así que un panel en un guard custom gatea correctamente.
+
+Cuando optas por las páginas de auth bundled (`Panel::login()`/`registration()`), las rutas de login y registro llevan el middleware `guest` (una request de un usuario ya autenticado se redirige fuera del formulario), y todo el flujo — login, logout, registro, verificación de e-mail y password-reset — corre contra el `authGuard()` del panel.
 
 ## Cómo verificar si tu app está en orden
 

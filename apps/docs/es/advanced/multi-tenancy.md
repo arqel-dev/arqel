@@ -73,7 +73,7 @@ Los resolvers en `src/Resolvers/` son intencionalmente `class` (no-final): las a
 
 - Trait `BelongsToTenant` — registra el `TenantScope` global + auto-rellena `tenant_id` en `creating`. La foreign key se resuelve por: `$tenantForeignKey` en el modelo → `config('arqel.tenancy.foreign_key')` → `'tenant_id'`.
 - `withoutTenant()` / `forTenant($id)` — escapes explícitos.
-- `Rules\ScopedUnique` — sustituto tenant-aware para la regla `unique` de Laravel; aplica `where(<tenant_fk>, <id>)` cuando hay tenant actual.
+- `Rules\ScopedUnique` — sustituto tenant-aware para la regla `unique` de Laravel; aplica `where(<tenant_fk>, <id>)` cuando hay tenant actual. Hace fallback a un check global-unique cuando no hay tenant, **o** cuando la columna FK del tenant no existe en la tabla destino (guard vía `hasColumn`, de modo que una tabla mal configurada degrada con gracia en lugar de lanzar "Unknown column").
 
 ### Adapters multi-DB
 
@@ -90,6 +90,8 @@ Endpoint incluido:
 - `GET /admin/tenants/available` — devuelve `{current, available[]}`.
 
 Los resolvers ganan el contrato `SupportsTenantSwitching` (`availableFor` / `canSwitchTo` / `switchTo`).
+
+`SessionResolver::switchTo()` persiste el tenant activo en la misma session key que su `resolve()` vuelve a leer, guardando el valor de la **identifier-column** (`identifierFor()`), no la primary key — así un switch sobrevive a la navegación incluso cuando `identifier_column` es una columna no-PK como `slug`.
 
 ### Theming
 
@@ -109,7 +111,7 @@ public function share(Request $request): array
 }
 ```
 
-`CssVarsRenderer::renderInlineStyle()` realiza sanitización defensiva (descarta `<`, `>`, `"` + `htmlspecialchars`) — nunca concatenes atributos del tenant directamente en HTML.
+`CssVarsRenderer::renderInlineStyle()` valida cada slot del tema contra una allowlist estricta de su contexto CSS — colores (hex / `rgb()`/`hsl()` / color con nombre), `font_family` (nombres de familia + keywords genéricas) y URLs (`http(s)` o ruta root-relative, emitida como `url('…')` escapada). Un valor que no encaja con la allowlist se **omite** (la custom property no se renderiza), de modo que un payload de CSS injection con `}` (que intentaría cerrar la regla `:root`) simplemente desaparece. El descarte de `<`, `>`, `"` se mantiene como defensa en profundidad. Nunca concatenes atributos del tenant directamente en CSS/HTML — siempre pásalos por `renderInlineStyle()`.
 
 ## Ejemplos
 

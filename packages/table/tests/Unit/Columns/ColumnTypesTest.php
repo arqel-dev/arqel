@@ -191,6 +191,23 @@ it('RelationshipColumn: getState walks the relation and returns the display attr
         ->and($column->getState(null))->toBeNull();
 });
 
+it('RelationshipColumn: toArray emits a top-level display_path of name.attribute', function (): void {
+    $column = RelationshipColumn::make('author')->display('name');
+
+    $serialized = $column->toArray();
+
+    expect($serialized)->toHaveKey('display_path')
+        ->and($serialized['display_path'])->toBe('author.name')
+        ->and($serialized['type'])->toBe('relationship')
+        ->and($serialized['props']['displayAttribute'])->toBe('name');
+});
+
+it('RelationshipColumn: display_path defaults to name.name when display() is not called', function (): void {
+    $serialized = RelationshipColumn::make('author')->toArray();
+
+    expect($serialized['display_path'])->toBe('author.name');
+});
+
 it('ComputedColumn: state is produced by getStateUsing, not by attribute lookup', function (): void {
     $record = new class extends Illuminate\Database\Eloquent\Model
     {

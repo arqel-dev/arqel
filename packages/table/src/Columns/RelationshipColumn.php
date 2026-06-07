@@ -62,4 +62,23 @@ final class RelationshipColumn extends TextColumn
             'displayAttribute' => $this->displayAttribute,
         ];
     }
+
+    /**
+     * Serialise the column, adding a top-level `display_path` so the
+     * exporters resolve the related model's display attribute instead
+     * of falling back to the relation name (which yields the whole
+     * related model — leaking every attribute into the cell, see #152).
+     *
+     * The path is `name.displayAttribute` (e.g. `author.name`), which
+     * `data_get($record, 'author.name')` walks straight to the scalar.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            ...parent::toArray(),
+            'display_path' => $this->name.'.'.$this->displayAttribute,
+        ];
+    }
 }

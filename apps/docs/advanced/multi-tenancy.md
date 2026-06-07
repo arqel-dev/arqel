@@ -109,7 +109,7 @@ public function share(Request $request): array
 }
 ```
 
-`CssVarsRenderer::renderInlineStyle()` performs defensive sanitization (drops `<`, `>`, `"` + `htmlspecialchars`) — never concatenate tenant attributes directly into HTML.
+`CssVarsRenderer::renderInlineStyle()` valida cada slot de tema contra um allowlist estrito do seu contexto CSS — cores (hex / `rgb()`/`hsl()` / cor nomeada), `font_family` (nomes de família + keywords genéricas) e URLs (`http(s)` ou caminho root-relative, emitido como `url('…')` escapado). Um valor que não casa com o allowlist é **omitido** (a custom property não é renderizada), de modo que um valor malicioso — incluindo um payload de CSS injection com `}` que tentaria fechar a regra `:root` — simplesmente desaparece. O drop de `<`, `>`, `"` é mantido como defesa em profundidade. Nunca concatene atributos de tenant diretamente em CSS/HTML — sempre passe por `renderInlineStyle()`.
 
 ## Examples
 

@@ -10,6 +10,7 @@ use Arqel\Workflow\Tests\Fixtures\PendingState;
 use Arqel\Workflow\Tests\Fixtures\ShippedState;
 use Arqel\Workflow\Tests\Fixtures\WorkflowOrder;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -21,6 +22,16 @@ beforeEach(function (): void {
     Gate::define('transition-pending-to-paid', static fn (?Authenticatable $user): bool => true);
     Gate::define('transition-paid-to-shipped', static fn (?Authenticatable $user): bool => true);
     Gate::define('transition-*-to-cancelled', static fn (?Authenticatable $user): bool => true);
+});
+
+// `enforceMorphMap` mutates a process-wide static registry on the Relation
+// class AND sets the `requireMorphMap` flag. Reset both after every test so the
+// morph-map case below does not leak into the other tests (which assume the
+// no-morph-map default where `getMorphClass()` === FQCN and an unmapped model
+// is allowed). Mirrors the arqel-dev/versioning #72 morph-map reset.
+afterEach(function (): void {
+    Relation::morphMap([], false);
+    Relation::requireMorphMap(false);
 });
 
 it('persists a StateTransition row when transitionTo is called', function (): void {
@@ -106,4 +117,28 @@ it('returns empty history when no record is bound to the field', function (): vo
     $field = StateTransitionField::make('state');
 
     expect($field->resolveHistory())->toBe([]);
+});
+
+it('finds history via the stateTransitions relationship under a custom morph map', function (): void {
+    // The `stateTransitions()` morphMany queries `model_type = getMorphClass()`.
+    // Under this map that resolves to the alias 'wf_order', so the writer must
+    // store the alias too — keying on the raw FQCN leaves the relation empty.
+    Relation::enforceMorphMap(['wf_order' => WorkflowOrder::class]);
+
+    $order = WorkflowOrder::create(['order_state' => PendingState::class]);
+    $order->transitionTo(PaidState::class, ['reason' => 'webhook']);
+
+    // The documented relation must find the row it persisted.
+    expect($order->stateTransitions()->count())->toBe(1);
+
+    // Guard against false-positives: the row was stored under the morph alias,
+    // not the FQCN, so the morphMany predicate is the thing under test.
+    expect(StateTransition::query()->where('model_type', 'wf_order')->count())->toBe(1)
+        ->and(StateTransition::query()->where('model_type', WorkflowOrder::class)->count())->toBe(0);
+
+    // The field read path must resolve history consistently with the writer.
+    $field = StateTransitionField::make('state')->record($order);
+
+    expect($field->resolveHistory())->toHaveCount(1)
+        ->and($field->resolveHistory()[0]['to'])->toBe(PaidState::class);
 });

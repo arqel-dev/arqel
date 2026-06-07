@@ -26,7 +26,7 @@ final class PersistStateTransitionToHistory
 
         try {
             StateTransition::query()->create([
-                'model_type' => $event->record::class,
+                'model_type' => $event->record->getMorphClass(),
                 'model_id' => $event->record->getKey(),
                 'from_state' => $event->from !== '' ? $event->from : null,
                 'to_state' => $event->to,

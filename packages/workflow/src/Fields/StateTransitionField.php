@@ -240,7 +240,7 @@ final class StateTransitionField extends Field
 
         try {
             $entries = StateTransition::query()
-                ->where('model_type', $this->record::class)
+                ->where('model_type', $this->record->getMorphClass())
                 ->where('model_id', $this->record->getKey())
                 ->orderBy('created_at', 'desc')
                 ->orderBy('id', 'desc')

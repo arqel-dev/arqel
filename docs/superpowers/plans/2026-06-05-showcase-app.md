@@ -39,7 +39,7 @@
 - **versioning:** `use Arqel\Versioning\Concerns\Versionable;` on a Model.
 - **workflow:** `use Arqel\Workflow\Concerns\HasWorkflow;` + `public function arqelWorkflow(): WorkflowDefinition { return WorkflowDefinition::make('status')->states([...])->transitions([...]); }`.
 - **realtime:** `use Arqel\Realtime\Concerns\BroadcastsResourceUpdates;` on a Resource; broadcasting default `log` (no server, degrades gracefully).
-- **ai:** `AiTextField::make('summary')->prompt('...')->provider('test')->contextFields([...])`; config `arqel-ai.default_provider = 'test'` + `providers.test.driver = FakeProvider::class`.
+- **ai:** `(new AiTextField('summary'))->prompt('...')->provider('test')->contextFields([...])`; config `arqel-ai.default_provider = 'test'` + `providers.test.driver = FakeProvider::class`.
 - **mcp:** auto-discovered via `McpServiceProvider`; smoke-only (assert `McpServer` resolves).
 
 ---

@@ -19,7 +19,7 @@ use Arqel\Fields\Field;
  * Exemplo:
  *
  * ```php
- * AiImageField::make('cover')
+ * (new AiImageField('cover'))
  *     ->aiAnalysis([
  *         'alt_text' => 'Describe this image in one sentence.',
  *         'tags' => 'Extract 5 SEO tags as comma-separated values.',

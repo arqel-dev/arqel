@@ -8,6 +8,7 @@ use Arqel\Table\Filter;
 use Arqel\Table\Filters\Constraints\Constraint;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 
 /**
  * Visual query builder filter — accepts a tree of conditions
@@ -139,7 +140,14 @@ final class QueryBuilderFilter extends Filter
                 continue;
             }
 
-            $constraint->apply($query, $opName, $condition['value'] ?? null, $method);
+            try {
+                $constraint->apply($query, $opName, $condition['value'] ?? null, $method);
+            } catch (InvalidArgumentException) {
+                // Graceful degradation: a malformed user-supplied value shape
+                // (e.g. a non-array `between` or a non-numeric comparison)
+                // drops only this leaf instead of propagating an HTTP 500.
+                continue;
+            }
         }
     }
 

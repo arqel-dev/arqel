@@ -10,7 +10,7 @@
 
 **Entregue (FORM-001..008, 010 parcial):**
 
-- `Arqel\Form\Form` — fluent builder (`schema`/`columns`/`model`/`inline`/`disabled`), `getFields()` flatten recursivo, `toArray()` com `kind: field|layout`
+- `Arqel\Form\Form` — fluent builder (`schema`/`columns`/`model`/`inline`/`disabled`), `getFields(?Model $record = null)` flatten recursivo, `toArray(?Model $record = null)` com `kind: field|layout`. **Ambos aceitam o record atual e podam (prune) qualquer layout component (Section/Tab/Group/...) cujo `isVisibleFor($record)` seja `false` (#115)** — ver §"Layout-level visibility enforcement" abaixo
 - `Arqel\Form\Layout\Component` — abstract base partilhada
 - `Section`, `Fieldset`, `Grid`, `Columns`, `Group`, `Tabs`, `Tab`
 - `Arqel\Form\FieldRulesExtractor` — agrega `extract`/`extractMessages`/`extractAttributes` a partir de uma lista de Fields
@@ -39,8 +39,12 @@ Form::make()
 
 Métodos chave:
 - `getSchema(): array<int, Component|Field>` — schema raw (preserva tree)
-- `getFields(): array<int, Field>` — flatten recursivo, descende por todos os layout components
-- `toArray(): array{schema, columns, model, inline, disabled}` — payload Inertia
+- `getFields(?Model $record = null): array<int, Field>` — flatten recursivo, descende por todos os layout components. Quando um `$record` é passado, components ocultos para esse record (`canSee`/`visibleIf` → `isVisibleFor($record) === false`) são podados, **e os fields aninhados neles não entram no flatten** — assim a validação não exige (nem persiste) fields de uma Section invisível (#115)
+- `toArray(?Model $record = null): array{schema, columns, model, inline, disabled}` — payload Inertia. Quando um `$record` é passado, components ocultos para esse record são omitidos da serialização — o cliente nunca recebe (e portanto nunca renderiza) um bloco escondido (#115)
+
+### Layout-level visibility enforcement (#115)
+
+`Section`, `Tab`, `Group`, `Fieldset`, `Grid` e `Columns` expõem `canSee(Closure)` / `visibleIf(Closure)`, resolvidos por `Component::isVisibleFor(?Model $record)`. Antes do fix, esses oracles eram **declarativos** — o `Form` serializava e fazia flatten do schema inteiro independentemente do record, então um bloco "invisível" continuava a ser enviado ao cliente e os seus fields continuavam validados/persistidos no write path. Agora `Form::toArray($record)` e `Form::getFields($record)` **threadam o record** por toda a árvore e cortam qualquer subárvore cujo component-pai `isVisibleFor($record)` seja `false`. Net effect: o que o usuário não pode ver não é serializado, não é validado e não é gravado. A per-field auth (`canSee`/`canEdit` no nível de Field individual) continua a ser enforçada downstream pelo controller/`FieldSchemaSerializer` (não pelo `Form`).
 
 ### `Arqel\Form\Layout\Component` (abstract)
 
@@ -49,7 +53,7 @@ Todos os layout components herdam:
 - `schema(array): static` — define filhos (fields ou outros components)
 - `columnSpan(int|string): static` — placement no grid pai (`'full'`, `1`..`12`, etc.)
 - `visibleIf(Closure): static` / `canSee(Closure): static` — visibilidade contextual
-- `isVisibleFor(?Model): bool` — oracle (canSee primeiro, depois visibleIf)
+- `isVisibleFor(?Model): bool` — oracle (canSee primeiro, depois visibleIf). **Consumido por `Form::toArray($record)`/`getFields($record)` para podar o bloco — não é apenas metadata cosmético (#115)**
 - `toArray(): array{type, component, columnSpan, props}` — final, delega para `getTypeSpecificProps()`
 
 Subclasses só declaram `$type` / `$component` e implementam `getTypeSpecificProps(): array`.
@@ -142,9 +146,9 @@ Group::make()
 
 - `declare(strict_types=1)` obrigatório
 - Layout components são `final` — extensibilidade nasce em FORM-006+ se houver pedido
-- `Form` e Layout components não consultam DB nem auth — apenas declaram intenção; o controller (CORE-006) materializa
-- Per-field auth (`canSee`/`canEdit`) e per-field visibility (`isVisibleIn`) são respeitados pelo controller, não pelo `Form`
-- Quando precisas de visibility no nível do bloco, usa `Component::visibleIf` / `canSee` — não dupliques em todos os fields filhos
+- `Form` e Layout components não consultam DB nem auth por conta própria — apenas declaram intenção via closures puras; é o controller (CORE-006) que injeta o `$record` em `Form::toArray($record)`/`getFields($record)` para materializar payload e regras
+- **Visibility no nível de bloco (`Component::canSee`/`visibleIf`) é agora enforçada pelo próprio `Form`** (em serialize + flatten, #115) — não dupliques em cada field filho; coloca o gate no bloco-pai e os fields aninhados herdam o corte
+- Per-field auth (`canSee`/`canEdit` no nível de Field individual) continua a ser respeitada downstream pelo controller/`FieldSchemaSerializer`, não pelo `Form`
 
 ## Anti-patterns
 

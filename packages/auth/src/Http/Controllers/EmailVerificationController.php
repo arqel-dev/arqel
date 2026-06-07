@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Arqel\Auth\Http\Controllers;
 
+use Arqel\Auth\Concerns\ResolvesPanelGuard;
+use Arqel\Auth\Http\Requests\PanelEmailVerificationRequest;
 use Arqel\Core\Panel\PanelRegistry;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,12 +20,21 @@ use Inertia\Response;
  * - `notice`: GET /admin/email/verify — renderiza Inertia notice page.
  * - `verify`: GET /admin/email/verify/{id}/{hash} — signed URL handler.
  * - `resend`: POST /admin/email/verify/resend — re-envia notification.
+ *
+ * Todas as três ações resolvem o usuário contra o guard configurado do
+ * painel (`Panel::authGuard(...)`) via `ResolvesPanelGuard`, em vez do
+ * guard default `web` — completando o sweep do #139 (#153). A ação
+ * `verify` injeta {@see PanelEmailVerificationRequest}, que sobrescreve
+ * `user()` para que o `authorize()`/`fulfill()` da request leiam o mesmo
+ * guard.
  */
 final class EmailVerificationController
 {
+    use ResolvesPanelGuard;
+
     public function notice(Request $request): Response|RedirectResponse
     {
-        $user = $request->user();
+        $user = Auth::guard($this->resolvePanelGuard())->user();
 
         if ($user !== null && method_exists($user, 'hasVerifiedEmail') && $user->hasVerifiedEmail()) {
             return redirect()->intended($this->afterLoginUrl());
@@ -37,7 +46,7 @@ final class EmailVerificationController
         ]);
     }
 
-    public function verify(EmailVerificationRequest $request): RedirectResponse
+    public function verify(PanelEmailVerificationRequest $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -45,18 +54,17 @@ final class EmailVerificationController
             return redirect()->intended($this->afterLoginUrl().'?verified=1');
         }
 
-        if ($request->fulfill()) {
-            if ($user !== null) {
-                Event::dispatch(new Verified($user));
-            }
-        }
+        // `fulfill()` marks the (panel-guard) user verified and dispatches
+        // the `Verified` event itself; it returns void, so its result must
+        // not be branched on.
+        $request->fulfill();
 
         return redirect()->intended($this->afterLoginUrl().'?verified=1');
     }
 
     public function resend(Request $request): RedirectResponse
     {
-        $user = $request->user();
+        $user = Auth::guard($this->resolvePanelGuard())->user();
 
         if ($user === null) {
             return redirect()->to('/admin/login');

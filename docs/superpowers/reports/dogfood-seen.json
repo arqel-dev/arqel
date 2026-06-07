@@ -630,6 +630,15 @@
       "issue": 167,
       "pr": 170,
       "round": 10
+    },
+    {
+      "signature": "actions::actionsserviceprovider-ignores-config-middleware",
+      "package": "actions",
+      "status": "fixed",
+      "issue": 174,
+      "pr": 175,
+      "round": 11,
+      "note": "investigation found arqel.actions.* routes are dead (frontend uses core dispatch); removed them (vs wiring a 2nd auth-divergent surface)"
     }
   ]
 }

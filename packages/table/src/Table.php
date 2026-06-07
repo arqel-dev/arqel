@@ -22,9 +22,14 @@ use Illuminate\Support\Collection;
  * ships. Apps can pass any structure today; the controller hands
  * the unmodified payload to the React side.
  *
- * Per-record column visibility (`canSee`) is honoured when the
- * controller serialises the row — the table builder itself does
- * not filter columns; that is per-column responsibility.
+ * Per-record column visibility (`canSee`) is honoured by the
+ * controller's row serialiser (`InertiaDataBuilder::serializeRecord`,
+ * #182): a column whose `canSee` predicate returns false for a given
+ * record has its cell stripped from that row's payload, so the value
+ * never reaches the client. The table builder itself does not filter
+ * columns; that is per-column responsibility. A filter's `canSee`
+ * predicate is likewise honoured by `TableQueryBuilder::applyFilters`
+ * — a non-visible filter is never applied to the query.
  */
 final class Table
 {

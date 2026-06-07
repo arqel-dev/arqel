@@ -187,10 +187,11 @@ final class InertiaDataBuilder
         $paginator = $this->runTableQueryBuilder($table, $query, $request);
 
         $rowActions = $this->callTableArray($table, 'getActions');
+        $columns = $this->callTableArray($table, 'getColumns');
         $user = $this->currentUser();
 
         $records = $paginator !== null
-            ? array_map(fn ($r): array => $this->serializeRecord($r, $resource, $rowActions, $user), $paginator->items())
+            ? array_map(fn ($r): array => $this->serializeRecord($r, $resource, $rowActions, $user, $columns), $paginator->items())
             : [];
 
         return [
@@ -523,11 +524,19 @@ final class InertiaDataBuilder
      * and per-row action overrides (`url`/`disabled`) for actions that
      * are record-dependent (closure URL or closure disabled, #140).
      *
+     * Per-record column redaction (#182): a column gated by
+     * `->canSee(fn ($record) => …)` whose predicate returns false for
+     * this row has its cell removed from the payload, so the value
+     * never reaches the client. Duck-typed against `Arqel\Table\Column`
+     * (`getName()` + `isVisibleFor(?Model)`); columns without a
+     * `canSee` predicate stay visible, so the default never regresses.
+     *
      * @param array<int, mixed> $rowActions Row actions declared on Resource::table
+     * @param array<int, mixed> $columns Columns declared on Resource::table
      *
      * @return array<string, mixed>
      */
-    private function serializeRecord(mixed $record, Resource $resource, array $rowActions = [], ?Authenticatable $user = null): array
+    private function serializeRecord(mixed $record, Resource $resource, array $rowActions = [], ?Authenticatable $user = null, array $columns = []): array
     {
         if (! $record instanceof Model) {
             if (! is_array($record)) {
@@ -546,6 +555,11 @@ final class InertiaDataBuilder
         foreach ($record->toArray() as $key => $value) {
             $payload[(string) $key] = $value;
         }
+
+        foreach ($this->resolveRedactedColumnNames($columns, $record) as $name) {
+            unset($payload[$name]);
+        }
+
         $payload['arqel'] = [
             'title' => $resource->recordTitle($record),
             'subtitle' => $resource->recordSubtitle($record),
@@ -554,6 +568,43 @@ final class InertiaDataBuilder
         ];
 
         return $payload;
+    }
+
+    /**
+     * Names of columns whose per-record `canSee` predicate excludes
+     * `$record` and whose cell must therefore be stripped from the row
+     * payload (#182). Duck-typed against `Arqel\Table\Column` so
+     * `arqel-dev/core` keeps no dep on `arqel-dev/table`. A column without
+     * `isVisibleFor`/`getName`, or one that returns visible, contributes
+     * nothing — the default cell stays present.
+     *
+     * @param array<int, mixed> $columns
+     *
+     * @return list<string>
+     */
+    private function resolveRedactedColumnNames(array $columns, Model $record): array
+    {
+        $names = [];
+        foreach ($columns as $column) {
+            if (! is_object($column)) {
+                continue;
+            }
+
+            if (! method_exists($column, 'getName') || ! method_exists($column, 'isVisibleFor')) {
+                continue;
+            }
+
+            $name = $column->getName();
+            if (! is_string($name) || $name === '') {
+                continue;
+            }
+
+            if ($column->isVisibleFor($record) === false) {
+                $names[] = $name;
+            }
+        }
+
+        return $names;
     }
 
     /**

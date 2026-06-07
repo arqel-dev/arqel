@@ -15,6 +15,25 @@ it('instantiates via constructor with a name and exposes type/component', functi
         ->and($field->getComponent())->toBe('AiImageInput');
 });
 
+it('instantiates the canonical PHPDoc example (constructor, not ::make) without error', function (): void {
+    // Guards the class PHPDoc example against issue #155: the canonical form is
+    // `new AiImageField(...)`, never a static `::make()` (which does not exist).
+    $field = (new AiImageField('cover'))
+        ->aiAnalysis([
+            'alt_text' => 'Describe this image in one sentence.',
+            'tags' => 'Extract 5 SEO tags as comma-separated values.',
+            'moderation' => 'Is this image appropriate? yes/no',
+        ])
+        ->populateFields([
+            'alt_text' => 'cover_alt',
+            'tags' => 'cover_tags',
+        ])
+        ->provider('claude');
+
+    expect($field)->toBeInstanceOf(AiImageField::class)
+        ->and(method_exists(AiImageField::class, 'make'))->toBeFalse();
+});
+
 it('exposes fluent setters returning the same instance', function (): void {
     $field = new AiImageField('cover');
 

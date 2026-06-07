@@ -176,6 +176,82 @@ it('QueryBuilderFilter: unknown operator on known field is silently dropped', fu
     ]);
 });
 
+it('QueryBuilderFilter: malformed between value (non-array) is dropped, no exception', function (): void {
+    $filter = QueryBuilderFilter::make('advanced')->constraints([
+        NumberConstraint::make('id'),
+    ]);
+
+    $inner = qbBuilder();
+    // The malformed leaf must NOT reach the builder.
+    $inner->shouldNotReceive('where');
+    $inner->shouldNotReceive('whereBetween');
+
+    $outer = qbBuilder();
+    $outer->shouldReceive('where')->once()->with(Mockery::on(function (Closure $cb) use ($inner): bool {
+        $cb($inner);
+
+        return true;
+    }))->andReturnSelf();
+
+    // Before the fix this propagated an InvalidArgumentException (HTTP 500).
+    $filter->applyToQuery($outer, [
+        'operator' => 'AND',
+        'conditions' => [
+            ['field' => 'id', 'operator' => 'between', 'value' => 'not-an-array'],
+        ],
+    ]);
+});
+
+it('QueryBuilderFilter: malformed numeric value is dropped, no exception', function (): void {
+    $filter = QueryBuilderFilter::make('advanced')->constraints([
+        NumberConstraint::make('id'),
+    ]);
+
+    $inner = qbBuilder();
+    $inner->shouldNotReceive('where');
+
+    $outer = qbBuilder();
+    $outer->shouldReceive('where')->once()->with(Mockery::on(function (Closure $cb) use ($inner): bool {
+        $cb($inner);
+
+        return true;
+    }))->andReturnSelf();
+
+    $filter->applyToQuery($outer, [
+        'operator' => 'AND',
+        'conditions' => [
+            ['field' => 'id', 'operator' => '>', 'value' => 'abc'],
+        ],
+    ]);
+});
+
+it('QueryBuilderFilter: malformed condition is dropped but valid sibling survives', function (): void {
+    $filter = QueryBuilderFilter::make('advanced')->constraints([
+        NumberConstraint::make('id'),
+        TextConstraint::make('name'),
+    ]);
+
+    $inner = qbBuilder();
+    // The valid 'name' leaf must still be applied; the malformed 'id' leaf is dropped.
+    $inner->shouldReceive('where')->once()->with('name', 'LIKE', '%alice%')->andReturnSelf();
+    $inner->shouldNotReceive('whereBetween');
+
+    $outer = qbBuilder();
+    $outer->shouldReceive('where')->once()->with(Mockery::on(function (Closure $cb) use ($inner): bool {
+        $cb($inner);
+
+        return true;
+    }))->andReturnSelf();
+
+    $filter->applyToQuery($outer, [
+        'operator' => 'AND',
+        'conditions' => [
+            ['field' => 'id', 'operator' => 'between', 'value' => 'not-an-array'],
+            ['field' => 'name', 'operator' => 'contains', 'value' => 'alice'],
+        ],
+    ]);
+});
+
 it('QueryBuilderFilter: constraints() filters non-Constraint entries', function (): void {
     $filter = QueryBuilderFilter::make('advanced')->constraints([
         TextConstraint::make('name'),

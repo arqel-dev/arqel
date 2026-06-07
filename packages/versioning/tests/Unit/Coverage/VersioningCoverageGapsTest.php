@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Versioning\Jobs\PruneOldVersionsJob;
 use Arqel\Versioning\Models\Version;
 use Arqel\Versioning\Tests\Fixtures\Article;
+use Arqel\Versioning\Tests\Fixtures\ArticleResource;
 use Arqel\Versioning\Tests\TestCase;
 use Arqel\Versioning\VersionPresenter;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -35,6 +38,14 @@ final class VersioningCoverageGapsResolver
     }
 }
 
+final class VersioningClosureResolverHost
+{
+    public function resolveId(): int
+    {
+        return 7;
+    }
+}
+
 it('resolves audit user via configured callable resolver', function (): void {
     config()->set(
         'arqel-versioning.audit_user',
@@ -47,6 +58,28 @@ it('resolves audit user via configured callable resolver', function (): void {
     $version = $article->versions()->first();
 
     expect($version->created_by_user_id)->toBe(4242);
+});
+
+it('resolves audit user via a Closure resolver (issue #167)', function (): void {
+    config()->set('arqel-versioning.audit_user', fn (): int => 42);
+
+    $article = Article::create(['title' => 'ClosureUser', 'body' => 'b', 'status' => 'draft']);
+
+    /** @var Version $version */
+    $version = $article->versions()->first();
+
+    expect($version->created_by_user_id)->toBe(42);
+});
+
+it('resolves audit user via an array callable resolver (issue #167)', function (): void {
+    config()->set('arqel-versioning.audit_user', [new VersioningClosureResolverHost, 'resolveId']);
+
+    $article = Article::create(['title' => 'ArrayUser', 'body' => 'b', 'status' => 'draft']);
+
+    /** @var Version $version */
+    $version = $article->versions()->first();
+
+    expect($version->created_by_user_id)->toBe(7);
 });
 
 it('falls back to null when audit_user callable returns non-int', function (): void {
@@ -168,14 +201,14 @@ it('summarizes empty-changes array as "No changes"', function (): void {
 });
 
 it('clamps per_page above the max to the controller ceiling', function (): void {
-    /** @var Arqel\Core\Resources\ResourceRegistry $registry */
-    $registry = app(Arqel\Core\Resources\ResourceRegistry::class);
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
     $registry->clear();
-    $registry->register(Arqel\Versioning\Tests\Fixtures\ArticleResource::class);
+    $registry->register(ArticleResource::class);
 
     $article = Article::create(['title' => 'P', 'body' => 'b', 'status' => 'draft']);
 
-    $user = new Illuminate\Foundation\Auth\User;
+    $user = new User;
     $user->forceFill(['id' => 1, 'name' => 'tester', 'email' => 't@e.dev']);
 
     /** @var TestCase $this */
@@ -195,14 +228,14 @@ it('clamps per_page above the max to the controller ceiling', function (): void 
 });
 
 it('clamps per_page below 1 back to the default', function (): void {
-    /** @var Arqel\Core\Resources\ResourceRegistry $registry */
-    $registry = app(Arqel\Core\Resources\ResourceRegistry::class);
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
     $registry->clear();
-    $registry->register(Arqel\Versioning\Tests\Fixtures\ArticleResource::class);
+    $registry->register(ArticleResource::class);
 
     $article = Article::create(['title' => 'D', 'body' => 'b', 'status' => 'draft']);
 
-    $user = new Illuminate\Foundation\Auth\User;
+    $user = new User;
     $user->forceFill(['id' => 1, 'name' => 'tester', 'email' => 't@e.dev']);
 
     /** @var TestCase $this */

@@ -237,7 +237,10 @@ trait Versionable
         /** @var mixed $resolver */
         $resolver = config('arqel-versioning.audit_user');
 
-        if (is_string($resolver) && $resolver !== '' && is_callable($resolver)) {
+        // Honor any callable resolver: string FQCN::method, Closure, or
+        // array callable [$object, 'method']. An empty string is not
+        // callable, so is_callable() subsumes the earlier is_string guards.
+        if (is_callable($resolver)) {
             /** @var mixed $resolved */
             $resolved = call_user_func($resolver);
 

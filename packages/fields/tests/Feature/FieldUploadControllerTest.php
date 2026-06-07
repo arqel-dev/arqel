@@ -135,6 +135,34 @@ it('store: resolves a FileField declared only inside form() (#94)', function ():
 });
 
 /*
+ * #166-B — the HTTP upload path must honour ImageField's `image`
+ * rule, not just a hard-coded `file` + the mimetypes whitelist. With
+ * `acceptedFileTypes([])` the mimetypes gate is cleared, so only the
+ * `image` rule (which decodes the file) can reject a non-image. Before
+ * the fix the controller hard-coded `['required','file']` and accepted
+ * a fake non-image as an "image" upload.
+ */
+
+it('store: ImageField with cleared mimes rejects a non-image upload (#166)', function (): void {
+    $request = Request::create('/upload', 'POST');
+    // A genuinely non-image payload that nonetheless passes the bare `file`
+    // rule. The `image` gate must reject it.
+    $request->files->set('file', UploadedFile::fake()->create('not-an-image.txt', 10, 'text/plain'));
+
+    $this->controller->store($request, 'uploading-resources', 'photo_no_mimes');
+})->throws(Illuminate\Validation\ValidationException::class);
+
+it('store: ImageField with cleared mimes still accepts a real image (#166)', function (): void {
+    $request = Request::create('/upload', 'POST');
+    $request->files->set('file', UploadedFile::fake()->image('real.jpg'));
+
+    $payload = $this->controller->store($request, 'uploading-resources', 'photo_no_mimes')->getData(true);
+
+    expect($payload['originalName'])->toBe('real.jpg');
+    Storage::disk('local')->assertExists($payload['path']);
+});
+
+/*
  * Authorization (#128) — upload/delete must honour the owner
  * resource's Policy and constrain the deleted path to the field's
  * directory. Without these guards any authenticated user could

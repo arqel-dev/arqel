@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Fields\Types\FileField;
 use Arqel\Fields\Types\TextField;
 use Arqel\Form\FieldRulesExtractor;
 
@@ -21,6 +22,19 @@ it('aggregates validation rules per field name', function (): void {
         'email' => ['required', 'email'],
         'bio' => ['nullable'],
     ]);
+});
+
+it('aggregates nested {name}.* element rules for a multiple FileField (#166)', function (): void {
+    $field = (new FileField('docs'))
+        ->multiple()
+        ->maxSize(1024)
+        ->acceptedFileTypes(['application/pdf']);
+
+    $rules = $this->extractor->extract([$field]);
+
+    expect($rules)->toHaveKey('docs')
+        ->and($rules)->toHaveKey('docs.*')
+        ->and($rules['docs.*'])->toBe(['nullable', 'file', 'max:1024', 'mimetypes:application/pdf']);
 });
 
 it('ignores non-Field entries gracefully', function (): void {

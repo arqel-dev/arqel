@@ -206,23 +206,17 @@ final class FieldUploadController
     }
 
     /**
+     * Delegate the per-file rules to the field itself so the HTTP upload
+     * path honours the exact rule set the main-form `uploadRule()` closure
+     * applies — crucially `ImageField`'s `image` gate, which the previous
+     * hard-coded `['required','file']` ignored (#166-B). A direct upload is
+     * always a present file, so `required` is prepended.
+     *
      * @return array<int, string>
      */
     private function buildFileRules(FileField $field): array
     {
-        $rules = ['required', 'file'];
-
-        $maxSize = $field->getMaxSize();
-        if ($maxSize !== null) {
-            $rules[] = 'max:'.$maxSize;
-        }
-
-        $accepted = $field->getAcceptedFileTypes();
-        if ($accepted !== []) {
-            $rules[] = 'mimetypes:'.implode(',', $accepted);
-        }
-
-        return $rules;
+        return array_merge(['required'], $field->uploadFileRules());
     }
 
     private function resolveResourceOrFail(string $slug): Resource

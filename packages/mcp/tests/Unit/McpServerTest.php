@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Arqel\Mcp\McpServer;
+use Arqel\Mcp\Prompts\MigrateFilamentResourcePrompt;
+use Arqel\Mcp\Prompts\ReviewResourcePrompt;
+use Arqel\Mcp\Tools\DescribeResourceTool;
 
 beforeEach(function (): void {
     $this->server = new McpServer;
@@ -182,6 +185,66 @@ it('returns -32603 when a tool handler throws and surfaces the exception message
     expect($response['error']['code'])->toBe(-32603)
         ->and($response['error']['message'])->toBe('Internal error: kaboom')
         ->and($response['error']['data']['exception'])->toBe('kaboom');
+});
+
+it('returns -32602 when prompts/get omits a required prompt argument (#143)', function (): void {
+    $migrate = new MigrateFilamentResourcePrompt;
+    $migrateSchema = $migrate->schema();
+    $this->server->registerPrompt(
+        $migrateSchema['name'],
+        $migrateSchema['description'],
+        $migrateSchema['arguments'],
+        static fn (array $args): array => $migrate->generate($args)['messages'],
+    );
+
+    $response = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 'p-missing-arg',
+        'method' => 'prompts/get',
+        'params' => ['name' => 'migrate_filament_resource', 'arguments' => []],
+    ]);
+
+    expect($response['error']['code'])->toBe(-32602);
+});
+
+it('returns -32602 when review_resource omits its required argument (#143)', function (): void {
+    $review = new ReviewResourcePrompt;
+    $reviewSchema = $review->schema();
+    $this->server->registerPrompt(
+        $reviewSchema['name'],
+        $reviewSchema['description'],
+        $reviewSchema['arguments'],
+        static fn (array $args): array => $review->generate($args)['messages'],
+    );
+
+    $response = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 'p-missing-resource-file',
+        'method' => 'prompts/get',
+        'params' => ['name' => 'review_resource', 'arguments' => []],
+    ]);
+
+    expect($response['error']['code'])->toBe(-32602);
+});
+
+it('returns -32602 when tools/call describe_resource omits the slug argument (#143)', function (): void {
+    $describe = new DescribeResourceTool(static fn (string $slug): ?string => null);
+    $describeSchema = $describe->schema();
+    $this->server->registerTool(
+        $describeSchema['name'],
+        $describeSchema['description'],
+        $describeSchema['inputSchema'],
+        static fn (array $params): array => $describe($params),
+    );
+
+    $response = $this->server->handleRequest([
+        'jsonrpc' => '2.0',
+        'id' => 't-missing-slug',
+        'method' => 'tools/call',
+        'params' => ['name' => 'describe_resource', 'arguments' => []],
+    ]);
+
+    expect($response['error']['code'])->toBe(-32602);
 });
 
 it('lists and reads resources', function (): void {

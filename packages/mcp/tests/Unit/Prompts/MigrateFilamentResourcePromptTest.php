@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Mcp\McpDispatchException;
 use Arqel\Mcp\Prompts\MigrateFilamentResourcePrompt;
 
 it('exposes the canonical MCP schema shape', function (): void {
@@ -44,29 +45,47 @@ it('builds the migration envelope inlining the file contents via the injected re
         ->and($text)->toContain('Inertia 3 + React 19');
 });
 
-it('throws InvalidArgumentException when filament_file is missing', function (): void {
+it('throws McpDispatchException (-32602) when filament_file is missing', function (): void {
     $prompt = new MigrateFilamentResourcePrompt(
         fileReader: static fn (string $path): string => 'never',
     );
 
-    $prompt->generate([]);
-})->throws(InvalidArgumentException::class, "'filament_file' parameter is required");
+    try {
+        $prompt->generate([]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toContain("'filament_file' parameter is required")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
-it('throws InvalidArgumentException when filament_file is not a string', function (): void {
+it('throws McpDispatchException (-32602) when filament_file is not a string', function (): void {
     $prompt = new MigrateFilamentResourcePrompt(
         fileReader: static fn (string $path): string => 'never',
     );
 
-    $prompt->generate(['filament_file' => ['nope']]);
-})->throws(InvalidArgumentException::class, "'filament_file' parameter is required");
+    try {
+        $prompt->generate(['filament_file' => ['nope']]);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toContain("'filament_file' parameter is required")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
-it('throws InvalidArgumentException when filament_file is an empty string', function (): void {
+it('throws McpDispatchException (-32602) when filament_file is an empty string', function (): void {
     $prompt = new MigrateFilamentResourcePrompt(
         fileReader: static fn (string $path): string => 'never',
     );
 
-    $prompt->generate(['filament_file' => '']);
-})->throws(InvalidArgumentException::class, "'filament_file' parameter is required");
+    try {
+        $prompt->generate(['filament_file' => '']);
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
+        expect($e->getMessage())->toContain("'filament_file' parameter is required")
+            ->and($e->getCode())->toBe(-32602);
+    }
+});
 
 it('blocks path traversal and never invokes the file reader', function (): void {
     $invocations = 0;
@@ -80,9 +99,10 @@ it('blocks path traversal and never invokes the file reader', function (): void 
 
     try {
         $prompt->generate(['filament_file' => '../../etc/passwd']);
-        expect()->fail('Expected InvalidArgumentException');
-    } catch (InvalidArgumentException $e) {
+        expect()->fail('Expected McpDispatchException');
+    } catch (McpDispatchException $e) {
         expect($e->getMessage())->toContain('..')
+            ->and($e->getCode())->toBe(-32602)
             ->and($invocations)->toBe(0);
     }
 });

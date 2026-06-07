@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Arqel\Mcp\Tools;
 
+use Arqel\Mcp\McpDispatchException;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
-use InvalidArgumentException;
 
 /**
  * MCP tool: `generate_resource`.
@@ -61,7 +61,7 @@ final class GenerateResourceTool
         $model = $params['model'] ?? null;
 
         if (! is_string($model)) {
-            throw new InvalidArgumentException("'model' parameter is required and must be a string");
+            throw McpDispatchException::invalidParams("'model' parameter is required and must be a string");
         }
 
         $args = [

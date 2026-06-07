@@ -45,6 +45,7 @@ Convenções compartilhadas dos fields:
 - Setters fluentes: `provider(?string)`, `aiOptions(array)`, `buttonLabel(string)` (quando aplicável).
 - Authorization: Gate `use-ai` opt-in — quando não definida, allow por default; quando definida e nega, controllers respondem 403.
 - Controllers single-action retornam 404 para resource ausente, 422 para field do tipo errado, 422 para `AiException` (parse failure, vision unsupported, etc.).
+- **Resolução de field nos 5 controllers** (`generate`/`translate`/`classify`/`extract`/`analyze-image`) passa por `effectiveFields()` quando disponível (fallback `fields()`), de modo que um AI field declarado **apenas** em `form()` — e não em `fields()` — continua resolvível pela rota; antes os controllers liam só `fields()` e devolviam 422 para esses campos (#104).
 - `ConfigurableFakeProvider` (test fixture) suporta `textsToReturn[]` (FIFO) + `promptHistory[]` + `optionsHistory[]` para asserts em testes que disparam múltiplas chamadas sequenciais.
 
 **AI-012 — PromptLibrary**

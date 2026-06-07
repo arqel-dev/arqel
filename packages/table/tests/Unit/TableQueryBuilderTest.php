@@ -153,6 +153,39 @@ it('uses the table default sort when nothing is requested', function (): void {
     (new TableQueryBuilder($table, $builder, Request::create('/')))->build();
 });
 
+it('does not order by the relation name for a sortable relationship column', function (): void {
+    // Relationship columns are keyed by the relation name (e.g. "author"),
+    // which is not a real DB column. Ordering by it would raise an
+    // "Unknown column" SQL error. Relationship sort is deferred to
+    // TABLE-005, so the column must be excluded from the sort whitelist.
+    $table = (new Table)
+        ->columns([
+            RelationshipColumn::make('author')->display('name')->sortable(),
+            TextColumn::make('title'),
+        ]);
+
+    $builder = tqbBuilder();
+    $builder->shouldReceive('with')->andReturnSelf(); // eager loading is unrelated to the defect
+    $builder->shouldNotReceive('orderBy');
+
+    (new TableQueryBuilder($table, $builder, Request::create('/', 'GET', ['sort' => 'author', 'direction' => 'asc'])))->build();
+});
+
+it('does not search against the relation name for a searchable relationship column', function (): void {
+    // Same defect as sort: "author" is a relation accessor, not a column.
+    // A searchable relationship column must not reach the WHERE whitelist.
+    $table = (new Table)
+        ->columns([
+            RelationshipColumn::make('author')->display('name')->searchable(),
+        ]);
+
+    $builder = tqbBuilder();
+    $builder->shouldReceive('with')->andReturnSelf(); // eager loading is unrelated to the defect
+    $builder->shouldNotReceive('where');
+
+    (new TableQueryBuilder($table, $builder, Request::create('/', 'GET', ['search' => 'jane'])))->build();
+});
+
 it('eager loads relationship columns via with()', function (): void {
     $table = (new Table)
         ->columns([

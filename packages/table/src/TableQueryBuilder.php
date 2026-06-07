@@ -82,6 +82,14 @@ final class TableQueryBuilder
                 continue;
             }
 
+            // #182: a filter gated by `->canSee(fn () => false)` must not
+            // touch the query — otherwise its WHERE leaks for viewers who
+            // were never meant to be able to filter by it. Default (no
+            // canSee) stays applied.
+            if (! $filter->isVisibleFor()) {
+                continue;
+            }
+
             $value = $filters[$filter->getName()] ?? $filter->getDefault();
             $filter->applyToQuery($this->query, $value);
         }

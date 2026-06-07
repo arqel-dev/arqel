@@ -100,6 +100,43 @@ it('passes filter default to applyToQuery when request omits the key', function 
     (new TableQueryBuilder($table, $builder, Request::create('/')))->build();
 });
 
+it('skips a filter whose canSee() returns false (#182)', function (): void {
+    $filter = Mockery::mock(SelectFilter::class.'[applyToQuery]', ['status']);
+    // A non-visible filter must never reach applyToQuery, otherwise its
+    // WHERE leaks into the query for users who should not be able to filter.
+    $filter->shouldNotReceive('applyToQuery');
+
+    /** @var SelectFilter $filter */
+    $filter->canSee(fn (): bool => false);
+
+    $table = (new Table)
+        ->columns([TextColumn::make('status')])
+        ->filters([$filter]);
+
+    $builder = tqbBuilder();
+    (new TableQueryBuilder($table, $builder, Request::create('/', 'GET', ['filter' => ['status' => 'published']])))->build();
+
+    expect(true)->toBeTrue();
+});
+
+it('still applies a filter whose canSee() returns true (no regression, #182)', function (): void {
+    $filter = Mockery::mock(SelectFilter::class.'[applyToQuery]', ['status']);
+    $filter->shouldReceive('applyToQuery')
+        ->once()
+        ->with(Mockery::any(), 'published')
+        ->andReturnUsing(fn ($q) => $q);
+
+    /** @var SelectFilter $filter */
+    $filter->canSee(fn (): bool => true);
+
+    $table = (new Table)
+        ->columns([TextColumn::make('status')])
+        ->filters([$filter]);
+
+    $builder = tqbBuilder();
+    (new TableQueryBuilder($table, $builder, Request::create('/', 'GET', ['filter' => ['status' => 'published']])))->build();
+});
+
 it('skips non-Filter entries in the filter list', function (): void {
     $table = (new Table)
         ->columns([TextColumn::make('status')])

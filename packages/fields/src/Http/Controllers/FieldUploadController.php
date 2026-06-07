@@ -69,7 +69,14 @@ final class FieldUploadController
         $directory = $fieldInstance->getDirectory() ?? '';
         $disk = $fieldInstance->getDisk();
 
-        $stored = $upload->store($directory, ['disk' => $disk]);
+        // Pass the field's configured visibility so the stored object gets the
+        // right ACL. Without it Laravel falls back to the disk's default, which
+        // silently breaks url() for a public field on a private-default disk
+        // (e.g. s3) — see #142.
+        $stored = $upload->store($directory, [
+            'disk' => $disk,
+            'visibility' => $fieldInstance->getVisibility(),
+        ]);
         if (! is_string($stored) || $stored === '') {
             abort(HttpResponse::HTTP_INTERNAL_SERVER_ERROR, 'Could not persist uploaded file.');
         }

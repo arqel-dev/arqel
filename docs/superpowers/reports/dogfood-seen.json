@@ -414,6 +414,80 @@
       "issue": 119,
       "pr": 123,
       "round": 6
+    },
+    {
+      "signature": "widgets::make-widget-extends-final",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 126,
+      "pr": 134,
+      "round": 7,
+      "note": "BLOCKER \u2014 generator output fataled on autoload (extends final)"
+    },
+    {
+      "signature": "core::readonly-disabled-fields-persisted",
+      "package": "core",
+      "status": "fixed",
+      "issue": 127,
+      "pr": 133,
+      "round": 7
+    },
+    {
+      "signature": "core::dehydrated-false-persisted",
+      "package": "core",
+      "status": "fixed",
+      "issue": 127,
+      "pr": 133,
+      "round": 7
+    },
+    {
+      "signature": "fields::file-upload-delete-no-authz",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 128,
+      "pr": 136,
+      "round": 7
+    },
+    {
+      "signature": "fields::belongsto-search-no-authz",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 128,
+      "pr": 136,
+      "round": 7
+    },
+    {
+      "signature": "core::command-palette-no-viewany",
+      "package": "core",
+      "status": "fixed",
+      "issue": 129,
+      "pr": 137,
+      "round": 7,
+      "note": "parallel to #118 sidebar; shared ResourceAuthorization::viewAnyDenied helper"
+    },
+    {
+      "signature": "realtime::presence-channel-pattern-unwired",
+      "package": "realtime",
+      "status": "fixed",
+      "issue": 130,
+      "pr": 135,
+      "round": 7
+    },
+    {
+      "signature": "tenant::sessionresolver-non-pk-identifier",
+      "package": "tenant",
+      "status": "fixed",
+      "issue": 131,
+      "pr": 132,
+      "round": 7,
+      "note": "completes #81 for identifier_column != PK"
+    },
+    {
+      "signature": "ai::embed-cost-not-recorded",
+      "package": "ai",
+      "status": "not-a-bug",
+      "round": 7,
+      "note": "refuted: structurally impossible (embed returns raw vector, no token/cost data); spec-conformant; documented deliberate; closing it = a public-contract-changing enhancement."
     }
   ]
 }

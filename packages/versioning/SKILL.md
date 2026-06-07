@@ -20,9 +20,13 @@ bound. Sem hard-dep em `spatie/laravel-eventsourcing`.
 
 **Schema + Service Provider (VERS-001).** `VersioningServiceProvider`
 auto-discovered via `extra.laravel.providers`. Migration
-`create_arqel_versions_table` cria `arqel_versions` com `morphs('versionable')`,
-JSON `payload`, JSON `changes`, `created_by_user_id` (indexed),
-nullable `reason`, `created_at`. Config publicável `arqel-versioning.php`
+`2026_05_01_000000_create_arqel_versions_table` cria `arqel_versions` com
+`morphs('versionable')`, JSON `payload`, JSON `changes`, `created_by_user_id`
+(indexed), nullable `reason`, `created_at`. Registrada via
+`hasMigration('2026_05_01_000000_create_arqel_versions_table')` — o nome
+**datado** (não `create_arqel_versions_table`) tem de bater com o ficheiro
+shipado, senão `vendor:publish` não resolve a publicação (#52). Config
+publicável `arqel-versioning.php`
 expõe `enabled`, `keep_versions`, `prune_strategy`, `audit_user`, `user_model`.
 
 **Model + Relations (VERS-001/002).** `Models\Version` (final,
@@ -55,9 +59,10 @@ user-land Eloquent models):
   cru), casando o valor que `associate()` persiste — logo respeita
   `Relation::enforceMorphMap()` (sob morph map o type é o alias, não a
   classe).
-- `resolveAuditUserId()` privado: resolve callable string em
-  `arqel-versioning.audit_user` (`'FQCN::method'` ou
-  `'callable_string'`); fallback `Auth::id()`; ambos null → `null`.
+- `resolveAuditUserId()` privado: resolve **qualquer callable** em
+  `arqel-versioning.audit_user` via `is_callable()` — string `'FQCN::method'`,
+  `Closure`, ou array `[$object, 'method']` (#167); fallback `Auth::id()`;
+  resultado não-int (ou ambos null) → `null`.
 
 **History endpoint (VERS-003 — slice PHP).**
 `Http\Controllers\VersionHistoryController` single-action,
@@ -146,9 +151,10 @@ serialização do `PruneOldVersionsJob`.
 - Prune por contagem: ao gravar, qualquer version além de
   `keep_versions` (mais antigas) é deletada. `0` = unbounded.
   `strategy != 'count'` é no-op (até time-based ganhar trait support).
-- Audit user: `auth()->id()` por padrão; sobrescrita por callable
-  string (`'FQCN::method'`) em `arqel-versioning.audit_user` — útil
-  em CLI/jobs onde `Auth` não está hidratado.
+- Audit user: `auth()->id()` por padrão; sobrescrita por **qualquer
+  callable** em `arqel-versioning.audit_user` — string `'FQCN::method'`,
+  `Closure` ou array `[$object, 'method']` (#167) — útil em CLI/jobs onde
+  `Auth` não está hidratado.
 - `payload` privado por default na API HTTP — exige `?include=payload`
   explicitamente (PII guard).
 - `declare(strict_types=1)` obrigatório. `Version`, `VersionPresenter`,
@@ -305,6 +311,9 @@ o autor real:
 ```php
 // config/arqel-versioning.php
 'audit_user' => \App\Versioning\AuditUser::class . '::resolve',
+
+// Closure também é aceita (qualquer callable — #167):
+'audit_user' => fn (): ?int => app('current.actor.id'),
 ```
 
 ```php

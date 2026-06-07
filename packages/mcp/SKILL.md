@@ -20,8 +20,8 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 
 - JSON-RPC 2.0 handler aderente ao spec MCP `2024-11-05`
 - API: `registerTool/Resource/Prompt`, `getTools/Resources/Prompts` (sem callables), `handleRequest` (público para testes), `serve()` (stdio loop newline-delimited)
-- Códigos de erro: `-32600` (envelope inválido), `-32601` (method not found), `-32602` (params/lookup inválido), `-32603` (handler throw); notifications (sem `id`) → `[]`
-- Wrapping: tool result → `{content: [{type:'text', text}]}`; resource → `{contents: [{uri, text, mimeType?}]}`; prompt → `{description, messages}`
+- Códigos de erro: `-32600` (envelope inválido), `-32601` (method not found), `-32602` (params/lookup inválido **+ argumentos de call inválidos/ausentes**), `-32603` (handler throw genérico); notifications (sem `id`) → `[]`. **Convenção (#143):** os 5 handlers de validação de argumento (`migrate_filament_resource`, `review_resource`, `describe_resource`, `generate_resource`, `run_test`) lançam `McpDispatchException::invalidParams()` → `-32602 Invalid params` (erro user-correctable), em vez de escaparem pelo catch genérico `-32603 Internal error`. Faltas internas genuínas continuam `RuntimeException` → `-32603`.
+- Wrapping: tool result → `{content: [{type:'text', text}]}`; resource → `{contents: [{uri, text, mimeType?}]}`; prompt → `{description, messages}` onde cada message é `{role, content}` e **`content` é um único `ContentBlock` `{type:'text', text}` — objeto, não array** (o spec MCP define `PromptMessage.content` como bloco único; emitir um array quebrava `prompts/get` em clientes conformes) (#107).
 - **Fetcher de resource devolve o corpo CRU** (string ou valor stringificado) — `readResource()` o embrulha **uma vez** na envelope `contents`. Retornar a envelope completa do próprio fetcher causa duplo-embrulho + serialização JSON (era o bug #117). `registerResource(uri, name, description, fetcher, ?mimeType)` — o `mimeType` opcional aparece em `resources/list` e `resources/read`.
 
 **MCP-003 — `Tools\ListResourcesTool` (final):**
@@ -57,8 +57,8 @@ A escolha é **aderir ao spec do protocol**: nenhum desvio de `modelcontextproto
 **MCP-008 — `Prompts\MigrateFilamentResourcePrompt` + `Prompts\ReviewResourcePrompt` (final):**
 
 - Templates que inlinam o conteúdo de um PHP source dentro de fenced code block + diretrizes
-- `schema()` declara argumento required (`filament_file` ou `resource_file`); `generate()` devolve `{description, messages}`
-- Path traversal guard (`..` → `InvalidArgumentException`) ANTES do reader; reader Closure injetável
+- `schema()` declara argumento required (`filament_file` ou `resource_file`); `generate()` devolve `{description, messages}` com cada message = `{role:'user', content:{type:'text', text}}` (`content` é um único `ContentBlock`, não um array — #107)
+- Argumento ausente/inválido **e** o path traversal guard (`..`) → `McpDispatchException::invalidParams()` (→ `-32602`, ANTES do reader); arquivo inexistente → `RuntimeException` (→ `-32603`); reader Closure injetável
 
 ### Setup
 
@@ -117,6 +117,9 @@ Linha JSON malformada → `-32700` Parse error e o loop segue. Integração manu
 - ❌ **Reusar HTTP middleware do Laravel para auth de MCP sessions** — sessions MCP são JSON-RPC de longa duração, não requests Inertia; auth precisa de pipeline próprio (token-bound, sem CSRF)
 - ❌ **Expor todos os Resources do panel automaticamente** — opt-in explícito via `Resource::exposeToMcp()` ou flag em config. Modelos sensíveis (User, Tenant billing) nunca devem ser readable por default
 - ❌ **Bypass do path traversal guard** em tools que tocam filesystem (`RunTestTool`, prompts) — `..` e paths absolutos sempre rejeitados antes do reader/runner
+- ❌ **Devolver a envelope `contents` completa do próprio fetcher de resource** — o fetcher devolve só o corpo CRU (markdown + valor stringificado); `readResource()` embrulha **uma vez**. Devolver a envelope causava duplo-embrulho + JSON serializado em `resources/read` (#117)
+- ❌ **Emitir `PromptMessage.content` como array de blocos** — o spec define `content` como um **único** `ContentBlock` `{type, text}`; um array quebra `prompts/get` em clientes conformes (#107)
+- ❌ **Reportar argumentos de call ausentes/inválidos como `-32603` Internal error** — são user-correctable; lançar `McpDispatchException::invalidParams()` → `-32602 Invalid params` (#143)
 
 ## Related
 

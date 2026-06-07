@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Auth\Http\Controllers;
 
+use Arqel\Auth\Concerns\ResolvesPanelGuard;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,9 +18,11 @@ use Illuminate\Support\Facades\Auth;
  */
 final class LogoutController
 {
+    use ResolvesPanelGuard;
+
     public function __invoke(Request $request): RedirectResponse
     {
-        Auth::guard()->logout();
+        Auth::guard($this->resolvePanelGuard())->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

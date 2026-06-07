@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Auth\Http\Requests;
 
+use Arqel\Auth\Concerns\ResolvesPanelGuard;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,8 @@ use Illuminate\Validation\ValidationException;
  */
 final class LoginRequest extends FormRequest
 {
+    use ResolvesPanelGuard;
+
     public function authorize(): bool
     {
         return true;
@@ -50,7 +53,7 @@ final class LoginRequest extends FormRequest
             'password' => (string) $this->input('password'),
         ];
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        if (! Auth::guard($this->resolvePanelGuard())->attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

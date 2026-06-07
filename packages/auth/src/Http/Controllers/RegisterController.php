@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Auth\Http\Controllers;
 
+use Arqel\Auth\Concerns\ResolvesPanelGuard;
 use Arqel\Auth\Http\Requests\RegisterRequest;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Auth\Events\Registered;
@@ -22,6 +23,8 @@ use Inertia\Response;
  */
 final class RegisterController
 {
+    use ResolvesPanelGuard;
+
     /**
      * POST /admin/register — cria o user, dispara `Registered`, auto-login e redireciona.
      */
@@ -43,7 +46,7 @@ final class RegisterController
 
         Event::dispatch(new Registered($user));
 
-        Auth::login($user);
+        Auth::guard($this->resolvePanelGuard())->login($user);
 
         $request->session()->regenerate();
 
@@ -62,11 +65,19 @@ final class RegisterController
     }
 
     /**
+     * Resolve the Eloquent model to create, honouring the provider
+     * backing the panel's configured guard. Falls back to the default
+     * `users` provider model when the guard's provider is unknown.
+     *
      * @return class-string
      */
     private function resolveUserModel(): string
     {
-        $model = (string) config('auth.providers.users.model', 'App\\Models\\User');
+        $guard = $this->resolvePanelGuard();
+        $provider = config("auth.guards.{$guard}.provider", 'users');
+        $providerKey = is_string($provider) && $provider !== '' ? $provider : 'users';
+
+        $model = (string) config("auth.providers.{$providerKey}.model", 'App\\Models\\User');
 
         return class_exists($model) ? $model : 'App\\Models\\User';
     }

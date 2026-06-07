@@ -14,12 +14,16 @@ it('DateRangeFilter::make + label + defaultRange produces canonical toArray shap
         ->defaultRange($from, $to)
         ->toArray();
 
+    // The default must serialise to `Y-m-d` strings the React
+    // `<input type="date">` control can read (issue #165). Raw
+    // DateTimeImmutable instances are not JsonSerializable and
+    // would leak the `{date, timezone_type, timezone}` cast shape.
     expect($payload)->toBe([
         'name' => 'period',
         'type' => 'date_range',
         'component' => 'DateRangeFilter',
         'label' => 'Period',
-        'default' => ['from' => $from, 'to' => $to],
+        'default' => ['from' => '2026-01-01', 'to' => '2026-01-31'],
     ]);
 });
 

@@ -29,6 +29,28 @@ final class DateRangeFilter extends Filter
         return $this;
     }
 
+    /**
+     * Format the range endpoints to `Y-m-d` strings so they survive
+     * `json_encode` and populate the React `<input type="date">`
+     * controls, which read string values (issue #165). A plain
+     * `DateTimeInterface` is not `JsonSerializable` and would leak
+     * the `{date, timezone_type, timezone}` cast shape instead.
+     *
+     * @return array{from: ?string, to: ?string}
+     */
+    protected function resolveDefault(): array
+    {
+        $default = is_array($this->default) ? $this->default : [];
+
+        $from = $default['from'] ?? null;
+        $to = $default['to'] ?? null;
+
+        return [
+            'from' => $from instanceof DateTimeInterface ? $from->format('Y-m-d') : null,
+            'to' => $to instanceof DateTimeInterface ? $to->format('Y-m-d') : null,
+        ];
+    }
+
     protected function getTypeSpecificProps(): array
     {
         return [];

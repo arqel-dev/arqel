@@ -84,6 +84,18 @@ abstract class Filter
         return $this->default;
     }
 
+    /**
+     * Public accessor for the serialisable default — the same value
+     * `toArray()` emits under `default`. Use this (not `getDefault()`)
+     * when seeding the value into a filter map, so subclasses that
+     * massage the default (e.g. `DateTimeInterface` ↦ ISO/`Y-m-d`
+     * string) seed the formatted value rather than the raw object.
+     */
+    public function getResolvedDefault(): mixed
+    {
+        return $this->resolveDefault();
+    }
+
     public function getType(): string
     {
         return $this->type;

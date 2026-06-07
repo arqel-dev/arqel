@@ -147,6 +147,51 @@ it('uses display_path for relationship columns', function (): void {
     ]);
 });
 
+it('resolves display_path against a real related model and never leaks the model JSON', function (): void {
+    // Simulates the issue #152 data leak: a relationship column serialised
+    // with the real `display_path` (author.name) must export the display
+    // attribute, not the whole related model (which would expose every
+    // attribute, e.g. secret_token).
+    $author = new class extends Illuminate\Database\Eloquent\Model
+    {
+        protected $guarded = [];
+    };
+    $author->setRawAttributes([
+        'id' => 1,
+        'name' => 'Jane Doe',
+        'secret_token' => 'shhh-do-not-leak',
+    ]);
+
+    $record = new class extends Illuminate\Database\Eloquent\Model
+    {
+        protected $guarded = [];
+    };
+    $record->setRawAttributes(['id' => 42, 'title' => 'A Post']);
+    $record->setRelation('author', $author);
+
+    // The exact shape RelationshipColumn::make('author')->display('name')->toArray() emits.
+    $columns = [
+        [
+            'name' => 'author',
+            'label' => 'Author',
+            'type' => 'relationship',
+            'display_path' => 'author.name',
+        ],
+    ];
+
+    (new CsvExporter)->export([$record], $columns, $this->tempFile);
+
+    $parsed = readCsvRows($this->tempFile);
+    $contents = (string) file_get_contents($this->tempFile);
+
+    expect($parsed)->toBe([
+        ['Author'],
+        ['Jane Doe'],
+    ])
+        ->and($contents)->not->toContain('secret_token')
+        ->and($contents)->not->toContain('shhh-do-not-leak');
+});
+
 it('falls back to the column name when label is missing', function (): void {
     $columns = [
         ['name' => 'sku', 'type' => 'string'],

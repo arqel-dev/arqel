@@ -16,6 +16,7 @@ use Arqel\Table\Columns\TextColumn;
 use Arqel\Table\Filters\SelectFilter;
 use Arqel\Table\Table;
 use Arqel\Workflow\Fields\StateTransitionField;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -34,6 +35,12 @@ final class OrderResource extends Resource
         'shipped' => 'Shipped',
         'delivered' => 'Delivered',
         'cancelled' => 'Cancelled',
+    ];
+
+    /** @var array<string, string> */
+    private const TRASHED_OPTIONS = [
+        'with' => 'With trashed',
+        'only' => 'Only trashed',
     ];
 
     /** @var class-string<Model> */
@@ -101,6 +108,29 @@ final class OrderResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('state')->options(self::STATE_OPTIONS),
+                // The framework ships no trashed/soft-delete filter primitive
+                // (no TrashedFilter; nothing in packages/table calls
+                // withTrashed/onlyTrashed — Round-22 candidate #6). Hand-rolled
+                // via SelectFilter::apply(): 'with' includes trashed rows,
+                // 'only' shows just the 5 soft-deleted orders; default (null)
+                // leaves the SoftDeletes global scope intact so trashed rows
+                // stay hidden.
+                SelectFilter::make('trashed')
+                    ->label('Trashed')
+                    ->options(self::TRASHED_OPTIONS)
+                    ->apply(static function (Builder $query, mixed $value): Builder {
+                        if ($value === 'only') {
+                            /** @var Builder<Order> $query */
+                            return $query->onlyTrashed();
+                        }
+
+                        if ($value === 'with') {
+                            /** @var Builder<Order> $query */
+                            return $query->withTrashed();
+                        }
+
+                        return $query;
+                    }),
             ])
             ->defaultSort('created_at', 'desc')
             ->searchable()

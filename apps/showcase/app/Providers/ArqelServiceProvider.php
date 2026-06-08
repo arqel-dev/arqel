@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Arqel\Dashboards\MainDashboard;
 use App\Arqel\Resources\AuthorResource;
+use App\Arqel\Resources\MediaResource;
+use App\Arqel\Resources\OrderResource;
 use App\Arqel\Resources\PostResource;
 use App\Arqel\Resources\SettingResource;
 use App\Arqel\Resources\TicketResource;
@@ -60,6 +62,8 @@ final class ArqelServiceProvider extends ServiceProvider
                 AuthorResource::class,
                 TicketResource::class,
                 SettingResource::class,
+                OrderResource::class,
+                MediaResource::class,
             ]);
 
         $registry->setCurrent('admin');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Audit\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -17,12 +18,18 @@ use Spatie\Activitylog\Models\Activity;
  * Resolves the activity log entries scoped to a single Eloquent record
  * identified by `(subjectType, subjectId)`.
  *
- * **Subject type resolution is consumer responsibility.** This controller
- * accepts the model FQCN as `$subjectType` (matching what
- * `spatie/laravel-activitylog` stores in `activity_log.subject_type`).
- * Apps that want to expose pretty slugs (`'users'` → `App\Models\User`)
- * should add their own resolver layer (e.g. an Arqel resource registry)
- * and translate before hitting this endpoint.
+ * **Subject type resolution (issue #190).** `spatie/laravel-activitylog`
+ * stores `subject_type` via the subject's `getMorphClass()` — which is the
+ * morph-map ALIAS (`'post'`) when `Relation::enforceMorphMap()` is active,
+ * and the FQCN otherwise. This controller therefore accepts `$subjectType`
+ * as EITHER a model FQCN OR a registered morph alias, resolves it to the
+ * backing model, and queries on `getMorphClass()` (the value actually
+ * stored) — so drilling from the global feed (which serialises the stored
+ * alias via {@see GlobalActivityLogController::serialiseActivity()}) into
+ * this endpoint round-trips, and an FQCN query under a map still matches
+ * the alias-keyed rows. Mirrors the morph-safe write+read pattern used by
+ * `arqel-dev/workflow` (`PersistStateTransitionToHistory` +
+ * `StateTransitionField`, issue #164).
  *
  * SECURITY (issue #181): this endpoint accepts an attacker-controlled FQCN
  * as `$subjectType` (route `->where('subjectType', '.*')`) and returns that
@@ -38,25 +45,30 @@ final class RecordActivityController extends Controller
 {
     public function show(Request $request, string $subjectType, string|int $subjectId): JsonResponse
     {
-        if ($subjectType === '' || ! class_exists($subjectType) || ! is_subclass_of($subjectType, Model::class)) {
+        $modelClass = $this->resolveModelClass($subjectType);
+
+        if ($modelClass === null) {
             return new JsonResponse([
                 'error' => 'invalid_subject_type',
-                'message' => 'subjectType must be a fully-qualified Eloquent model class.',
+                'message' => 'subjectType must be a fully-qualified Eloquent model class or a registered morph alias.',
             ], 400);
         }
 
-        /** @var class-string<Model> $subjectType */
-        $subject = $this->resolveSubject($subjectType, $subjectId);
+        $subject = $this->resolveSubject($modelClass, $subjectId);
 
         if ($this->deniesView($subject)) {
             return new JsonResponse(['message' => 'Forbidden'], 403);
         }
 
+        // Query on the value Spatie actually persists: `getMorphClass()` —
+        // the morph-map alias under an active map, the FQCN otherwise.
+        $morphValue = $subject->getMorphClass();
+
         $perPage = $request->integer('per_page', 20);
         $perPage = max(1, min($perPage, 200));
 
         $paginator = Activity::query()
-            ->where('subject_type', $subjectType)
+            ->where('subject_type', $morphValue)
             ->where('subject_id', $subjectId)
             ->with('causer')
             ->latest()
@@ -103,23 +115,57 @@ final class RecordActivityController extends Controller
     }
 
     /**
+     * Resolve `{subjectType}` (a FQCN OR a morph alias) to the backing
+     * Eloquent model class, or null when it is neither (issue #190).
+     *
+     * - A FQCN that is an Eloquent model resolves to itself (so without a
+     *   map the behaviour is unchanged; with a map `getMorphClass()` on
+     *   the resolved model later yields the stored alias).
+     * - Otherwise we treat it as a morph alias and resolve via
+     *   `Relation::getMorphedModel()`, which returns the FQCN registered in
+     *   the active morph map (or null).
+     *
+     * @return class-string<Model>|null
+     */
+    private function resolveModelClass(string $subjectType): ?string
+    {
+        if ($subjectType === '') {
+            return null;
+        }
+
+        if (class_exists($subjectType) && is_subclass_of($subjectType, Model::class)) {
+            /** @var class-string<Model> $subjectType */
+            return $subjectType;
+        }
+
+        $mapped = Relation::getMorphedModel($subjectType);
+
+        if ($mapped !== null && is_subclass_of($mapped, Model::class)) {
+            /** @var class-string<Model> $mapped */
+            return $mapped;
+        }
+
+        return null;
+    }
+
+    /**
      * Resolve a subject model instance for authorization. We prefer the
      * persisted record so a Policy can inspect its attributes; when it no
      * longer exists we fall back to a fresh instance carrying the key, so
      * a class-level Policy still applies (the activity query itself stays
      * unchanged and may legitimately return an empty paginator).
      *
-     * @param class-string<Model> $subjectType
+     * @param  class-string<Model>  $modelClass
      */
-    private function resolveSubject(string $subjectType, string|int $subjectId): Model
+    private function resolveSubject(string $modelClass, string|int $subjectId): Model
     {
-        $existing = $subjectType::query()->find($subjectId);
+        $existing = $modelClass::query()->find($subjectId);
 
         if ($existing instanceof Model) {
             return $existing;
         }
 
-        $fallback = new $subjectType;
+        $fallback = new $modelClass;
         $fallback->setAttribute($fallback->getKeyName(), $subjectId);
 
         return $fallback;

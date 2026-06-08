@@ -26,7 +26,7 @@ A escolha é **integrar, não reinventar**: ActivityLog do Spatie é maduro, bem
 
 **Entregue (AUDIT-002 PHP slice):**
 
-- **`Arqel\Audit\Http\Controllers\RecordActivityController`** (final) — endpoint per-record `show(Request, string $subjectType, string|int $subjectId): JsonResponse`. Valida `$subjectType` via `class_exists` + `is_subclass_of(Model::class)` (HTTP 400 com `{error: 'invalid_subject_type'}` em caso negativo); query `Activity::where('subject_type', ...)->where('subject_id', ...)->with('causer')->latest()->paginate($perPage)`; mapeia para shape `{id, log_name, description, event, properties, causer: {id, type, name?, email?}|null, created_at}` e devolve no formato paginator default do Laravel (`data, current_page, last_page, per_page, total`). **Decisão:** mapping slug → FQCN é responsabilidade do consumidor (Resource registry no `arqel-dev/core` futuro); o controller aceita FQCN puro porque é exatamente o que o Spatie persiste em `activity_log.subject_type`
+- **`Arqel\Audit\Http\Controllers\RecordActivityController`** (final) — endpoint per-record `show(Request, string $subjectType, string|int $subjectId): JsonResponse`. Resolve `$subjectType` para a model class (FQCN **ou** morph alias — ver §Morph map abaixo) e devolve HTTP 400 `{error: 'invalid_subject_type'}` quando não é nem classe nem alias mapeado; query `Activity::where('subject_type', $subject->getMorphClass())->where('subject_id', ...)->with('causer')->latest()->paginate($perPage)`; mapeia para shape `{id, log_name, description, event, properties, causer: {id, type, name?, email?}|null, created_at}` e devolve no formato paginator default do Laravel (`data, current_page, last_page, per_page, total`). **Decisão:** mapping slug → FQCN é responsabilidade do consumidor (Resource registry no `arqel-dev/core` futuro)
 - **Rota** `GET /admin/audit/{subjectType}/{subjectId}/activity` registrada via `routes/admin.php` + `->hasRoute('admin')` no `AuditServiceProvider::configurePackage()`. Middleware `['web', 'auth']`. Constraint `where('subjectType', '.*')` permite `\` no FQCN. Nome: `arqel.audit.record-activity`
 - **`LogsActivity::activityLog(int $perPage = 20): LengthAwarePaginator`** — helper PHP-side equivalente ao endpoint, para consumidores que preferem buscar sem ir via HTTP (Inertia controllers próprios, Livewire, CLI, testes). Reutiliza `activities()` (morphMany do Spatie) + `with('causer')->latest()->paginate()`
 - Testes adicionados:
@@ -87,7 +87,17 @@ As duas rotas de leitura do activity-log rodam atrás de `['web','auth']` **e** 
   - um gate/Policy `viewAny` mapeado ao model `Spatie\Activitylog\Models\Activity` (`Gate::define('viewAny', ...)` ou `Gate::policy(Activity::class, ...)`).
   - A checagem só é **exigida** quando uma das duas existe. Em **scaffold mode** (sem named ability `view-audit-log` **e** sem gate/policy de `Activity`) o log fica aberto — o caminho "Hello World" da showcase. Defina a ability para fechar.
 - **Activity de um record** — `GET /admin/audit/{subjectType}/{subjectId}/activity` (`RecordActivityController::show`). Honra a Policy **`view`** do subject model (mesmo padrão `deniesView()` do `versioning/VersionHistoryController`, #91): `Gate::has('view') || Gate::getPolicyFor($subject)` ⇒ `Gate::denies('view', $subject)` ⇒ 403. Registre uma `Gate::policy(App\Models\Post::class, PostPolicy::class)` com método `view` e a timeline daquele record passa a respeitar o acesso. Sem named gate `view` **e** sem Policy ⇒ allow (scaffold).
-- **Nota:** `{subjectType}` aceita o FQCN cru do model (constraint `->where('subjectType','.*')`) — um atacante pode passar **qualquer** classe Eloquent; é justamente por isso que a Policy `view` do subject é aplicada antes de qualquer query.
+- **Nota:** `{subjectType}` aceita o FQCN cru do model **ou** um morph alias (constraint `->where('subjectType','.*')`) — um atacante pode passar **qualquer** classe/alias; é justamente por isso que a Policy `view` do subject é aplicada antes de qualquer query.
+
+## Morph map — `{subjectType}` aceita FQCN **ou** alias (#190)
+
+O `spatie/laravel-activitylog` persiste `subject_type` via `getMorphClass()` do subject — que é o **alias** do morph map (`'post'`) quando `Relation::enforceMorphMap()` está ativo, e o FQCN caso contrário. Para o round-trip funcionar sob um morph map, `RecordActivityController::show()`:
+
+- Aceita `{subjectType}` como **FQCN** (`App\Models\Post`) **ou** **morph alias** (`post`). Um FQCN resolve para si mesmo; um alias é resolvido via `Relation::getMorphedModel($alias)`. Nem-classe-nem-alias ⇒ 400 `invalid_subject_type`.
+- Consulta `where('subject_type', $subject->getMorphClass())` — i.e. o valor **realmente armazenado** (alias sob mapa, FQCN sem mapa) — em vez do input cru. Assim drilling do feed global (que serializa o alias armazenado) cai no endpoint per-record com o alias e encontra as linhas; e uma query por FQCN sob um mapa também casa as linhas chaveadas pelo alias.
+- A resolução do subject model para a Policy `view` (#181) usa a **classe resolvida**, valendo tanto para input FQCN quanto alias.
+
+Sem morph map, `getMorphClass()` === FQCN, então apps/testes sem mapa permanecem inalterados (sem regressão). Mesmo padrão morph-safe write+read do `arqel-dev/workflow` (`PersistStateTransitionToHistory` + `StateTransitionField`, #164).
 
 ## Anti-patterns
 

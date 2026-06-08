@@ -155,6 +155,9 @@ importers:
 
   apps/showcase:
     dependencies:
+      '@arqel-dev/a11y':
+        specifier: workspace:^
+        version: link:../../packages-js/a11y
       '@arqel-dev/auth':
         specifier: workspace:^
         version: link:../../packages-js/auth
@@ -167,15 +170,30 @@ importers:
       '@arqel-dev/hooks':
         specifier: workspace:^
         version: link:../../packages-js/hooks
+      '@arqel-dev/i18n':
+        specifier: workspace:^
+        version: link:../../packages-js/i18n
       '@arqel-dev/react':
         specifier: workspace:^
         version: link:../../packages-js/react
+      '@arqel-dev/realtime':
+        specifier: workspace:^
+        version: link:../../packages-js/realtime
+      '@arqel-dev/theme':
+        specifier: workspace:^
+        version: link:../../packages-js/theme
       '@arqel-dev/types':
         specifier: workspace:^
         version: link:../../packages-js/types
       '@arqel-dev/ui':
         specifier: workspace:^
         version: link:../../packages-js/ui
+      '@arqel-dev/versioning':
+        specifier: workspace:^
+        version: link:../../packages-js/versioning
+      '@arqel-dev/workflow':
+        specifier: workspace:^
+        version: link:../../packages-js/workflow
     devDependencies:
       '@inertiajs/react':
         specifier: ^3.0.3
@@ -7389,7 +7407,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.8(@types/node@25.6.0)(@vitest/coverage-v8@4.1.8)(jsdom@25.0.1)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
+      vitest: 4.1.8(@types/node@22.19.17)(@vitest/coverage-v8@4.1.8)(jsdom@25.0.1)(vite@7.3.2(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
 
   '@vitest/expect@4.1.8':
     dependencies:

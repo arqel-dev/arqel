@@ -1,0 +1,50 @@
+# apps/showcase/compose.dogfood.yml
+# Isolated dogfood stack. ALWAYS run with: docker compose -p arqel-dogfood -f compose.dogfood.yml ...
+name: arqel-dogfood
+services:
+  app:
+    build: { context: ., dockerfile: docker/Dockerfile }
+    container_name: arqel-dogfood-app
+    ports: ["8090:80"]
+    env_file: [.env.dogfood]
+    volumes: [".:/var/www/html"]
+    depends_on: [db, redis]
+    networks: [arqel-dogfood-net]
+  vite:
+    image: node:22-alpine
+    container_name: arqel-dogfood-vite
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile=false && pnpm --filter @arqel-dev/showcase exec vite --host 0.0.0.0 --port 5180"
+    ports: ["5180:5180"]
+    volumes: ["../../:/app"]
+    networks: [arqel-dogfood-net]
+  db:
+    image: postgres:18-alpine
+    container_name: arqel-dogfood-db
+    ports: ["5433:5432"]
+    environment:
+      POSTGRES_DB: arqel_dogfood
+      POSTGRES_USER: arqel
+      POSTGRES_PASSWORD: arqel
+    volumes: ["arqel-dogfood-db-data:/var/lib/postgresql/data"]
+    networks: [arqel-dogfood-net]
+  redis:
+    image: redis:7-alpine
+    container_name: arqel-dogfood-redis
+    ports: ["6390:6379"]
+    volumes: ["arqel-dogfood-redis-data:/data"]
+    networks: [arqel-dogfood-net]
+  reverb:
+    build: { context: ., dockerfile: docker/Dockerfile }
+    container_name: arqel-dogfood-reverb
+    command: sh -c "php artisan reverb:start --host=0.0.0.0 --port=8080"
+    ports: ["8091:8080"]
+    env_file: [.env.dogfood]
+    volumes: [".:/var/www/html"]
+    depends_on: [app]
+    networks: [arqel-dogfood-net]
+networks:
+  arqel-dogfood-net: { driver: bridge }
+volumes:
+  arqel-dogfood-db-data: {}
+  arqel-dogfood-redis-data: {}

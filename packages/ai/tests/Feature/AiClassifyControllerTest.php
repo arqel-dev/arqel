@@ -3,14 +3,18 @@
 declare(strict_types=1);
 
 use Arqel\Ai\AiManager;
+use Arqel\Ai\Exceptions\AiException;
+use Arqel\Ai\Exceptions\DailyLimitExceeded;
 use Arqel\Ai\Tests\Fixtures\ConfigurableFakeProvider;
 use Arqel\Ai\Tests\Fixtures\FakeAiResource;
 use Arqel\Ai\Tests\Fixtures\FakeAiSelectResource;
 use Arqel\Ai\Tests\Fixtures\FormOnlyAiSelectResource;
+use Arqel\Ai\Tests\Fixtures\LimitThrowingProvider;
 use Arqel\Ai\Tests\Fixtures\ThrowingProvider;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Testing\TestResponse;
 
 function authedUserForClassify(): AuthUser
@@ -112,11 +116,15 @@ it('resolves an AiSelectField declared only inside form() (#104)', function (): 
     expect($body)->toBe(['key' => 'tech', 'label' => 'Technology']);
 });
 
-it('returns 422 (not 500) when the provider throws an AiException (#205)', function (): void {
+it('returns 422 with a generic message and never reflects the upstream body when the provider throws an AiException (#205 follow-up)', function (): void {
+    Exceptions::fake();
+
     /** @var ResourceRegistry $registry */
     $registry = app(ResourceRegistry::class);
     $registry->register(FakeAiSelectResource::class);
-    app()->instance(AiManager::class, new AiManager(['fake' => new ThrowingProvider('fake')]));
+    app()->instance(AiManager::class, new AiManager([
+        'fake' => new ThrowingProvider('fake', 'OpenAI API error (500): SECRET_UPSTREAM_BODY'),
+    ]));
 
     /** @var TestCase $this */
     $response = postClassify($this, 'ai-posts', 'category', [
@@ -124,5 +132,26 @@ it('returns 422 (not 500) when the provider throws an AiException (#205)', funct
     ]);
 
     $response->assertStatus(422)
-        ->assertJson(['message' => 'provider upstream 503']);
+        ->assertExactJson(['message' => 'AI provider request failed']);
+
+    expect($response->getContent())->not->toContain('SECRET_UPSTREAM_BODY');
+
+    Exceptions::assertReported(AiException::class);
+});
+
+it('preserves the real DailyLimitExceeded message so the user knows they hit a limit', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FakeAiSelectResource::class);
+    app()->instance(AiManager::class, new AiManager([
+        'fake' => new LimitThrowingProvider('fake', new DailyLimitExceeded('Daily AI limit of $5 exceeded')),
+    ]));
+
+    /** @var TestCase $this */
+    $response = postClassify($this, 'ai-posts', 'category', [
+        'formData' => ['title' => 'New CPU', 'description' => 'Apple M5 launched'],
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJson(['message' => 'Daily AI limit of $5 exceeded']);
 });

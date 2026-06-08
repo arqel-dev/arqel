@@ -42,3 +42,18 @@
 **Sub-point (wiring ergonomics):** `StateTransitionField` inside a Resource `form()` gets NO automatic record-binding from core's `InertiaDataBuilder`, so `currentState`/`transitions`/`history` always serialize empty for the edited record unless the Resource explicitly calls `->record($model)`. The field can't show live transition buttons for the current record out of the box. Not a crash — a wiring ergonomics gap.
 
 **⚠️ CLASSIFICATION NOTE for Round 22:** the framework DOCUMENTS this as WF-003+ (planned future work), exactly like EXPORT-007/008 / CORE-006 deferred items that the loop classified as NOT-A-BUG (deferred feature, not a defect). The Round 22 adversarial verifier should likely classify this as a **deferred-feature non-bug** UNLESS the docs/SKILL.md claim the transition endpoint already works (a documented-but-false capability would make it a real bug). Action for Round 22: check whether workflow's SKILL.md / docs advertise a working transition endpoint; if they do, it's a bug; if they honestly mark it WF-003+, it's deferred.
+
+## CANDIDATE #4 — inconsistent Field::make() factory (DX papercut, LOW)
+
+**Surfaced:** Task 3.4 (MediaResource ImageField).
+**Severity (suspected):** LOW — DX footgun, not a crash of framework code (the crash is the app using a non-existent method). Likely a papercut / minor-enhancement, not a bug.
+
+**The inconsistency:** `Column::make($name)` (`packages/table/src/Column.php:80`) and `Action::make($name)` (`packages/actions/src/Action.php:97`) exist on the base classes, so EVERY column/action is constructed via `::make()`. But the base `Field` (`packages/fields/src/Field.php`) has NO static `make()` — fields are constructed with `new TextField(...)`. EXCEPT a handful of field types define their own `make()`: `HasManyField`, `BelongsToField` (`packages/fields/src/Types/`), and `StateTransitionField` (`packages/workflow/src/Fields/`). So the API is inconsistent even within the fields family: `BelongsToField::make()` works, `ImageField::make()` / `TextField::make()` do NOT.
+
+**Reproduction:** `ImageField::make('file_path')` → `Call to undefined method Arqel\Fields\Types\ImageField::make()` — 500 on the form (edit/create) page; the INDEX page masks it (it doesn't build the form). App-side fix: `new ImageField('file_path')`.
+
+**Why it's a footgun:** a developer who learned `Column::make()`/`Action::make()`/`BelongsToField::make()` reasonably expects `ImageField::make()` to work; it silently doesn't, and the error only surfaces on form-building routes, not the index.
+
+**Suggested framework fix:** add a static `make(string $name): static` to the base `Field` (mirroring Column/Action), so ALL fields share the consistent factory. Or, if `new` is the intended idiom for fields, REMOVE the per-type `make()` from HasManyField/BelongsToField/StateTransitionField for consistency + document the `new`-for-fields convention. Either way, make it consistent.
+
+**Classification note for Round 22:** this is a DX/consistency papercut, likely LOW or a not-a-bug-but-enhancement. The app-side error was a usage mistake (calling a method that doesn't exist), so a strict verifier may classify it app-misuse — but the INCONSISTENCY (some fields have make(), most don't) is a genuine framework-side wart worth surfacing.

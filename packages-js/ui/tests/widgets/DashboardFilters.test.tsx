@@ -65,6 +65,107 @@ describe('DashboardFilters', () => {
     });
   });
 
+  it('renders a single-select (combobox) when multiple is absent', () => {
+    const filters: DashboardFilterPayload[] = [
+      {
+        name: 'status',
+        type: 'select',
+        label: 'Status',
+        options: { open: 'Open', closed: 'Closed' },
+      },
+    ];
+    render(<DashboardFilters filters={filters} values={{}} onChange={() => {}} />);
+    const select = screen.getByLabelText('Status') as HTMLSelectElement;
+    expect(select.multiple).toBe(false);
+    expect(screen.getByRole('combobox', { name: 'Status' })).toBeInTheDocument();
+    // single-select keeps the "All" placeholder option
+    expect(screen.getByRole('option', { name: 'All' })).toBeInTheDocument();
+  });
+
+  it('renders a multi-select listbox when multiple is true', () => {
+    const filters: DashboardFilterPayload[] = [
+      {
+        name: 'status',
+        type: 'select',
+        label: 'Status',
+        multiple: true,
+        options: { open: 'Open', closed: 'Closed' },
+      },
+    ];
+    render(<DashboardFilters filters={filters} values={{}} onChange={() => {}} />);
+    const select = screen.getByRole('listbox', { name: 'Status' }) as HTMLSelectElement;
+    expect(select.multiple).toBe(true);
+    // no "All" placeholder for multi-select
+    expect(screen.queryByRole('option', { name: 'All' })).toBeNull();
+  });
+
+  it('reflects an array value as selected options for multiple', () => {
+    const filters: DashboardFilterPayload[] = [
+      {
+        name: 'status',
+        type: 'select',
+        label: 'Status',
+        multiple: true,
+        options: { open: 'Open', closed: 'Closed' },
+      },
+    ];
+    render(
+      <DashboardFilters
+        filters={filters}
+        values={{ status: ['open', 'closed'] }}
+        onChange={() => {}}
+      />,
+    );
+    expect((screen.getByRole('option', { name: 'Open' }) as HTMLOptionElement).selected).toBe(true);
+    expect((screen.getByRole('option', { name: 'Closed' }) as HTMLOptionElement).selected).toBe(
+      true,
+    );
+  });
+
+  it('emits a string[] when selecting multiple options', () => {
+    const onChange = vi.fn();
+    const filters: DashboardFilterPayload[] = [
+      {
+        name: 'status',
+        type: 'select',
+        label: 'Status',
+        multiple: true,
+        options: [
+          { value: 'open', label: 'Open' },
+          { value: 'closed', label: 'Closed' },
+        ],
+      },
+    ];
+    render(<DashboardFilters filters={filters} values={{}} onChange={onChange} />);
+    const select = screen.getByRole('listbox', { name: 'Status' }) as HTMLSelectElement;
+    const openOpt = screen.getByRole('option', { name: 'Open' }) as HTMLOptionElement;
+    const closedOpt = screen.getByRole('option', { name: 'Closed' }) as HTMLOptionElement;
+    openOpt.selected = true;
+    closedOpt.selected = true;
+    fireEvent.change(select);
+    expect(onChange).toHaveBeenCalledWith('status', ['open', 'closed']);
+  });
+
+  it('emits null when all options are deselected for multiple', () => {
+    const onChange = vi.fn();
+    const filters: DashboardFilterPayload[] = [
+      {
+        name: 'status',
+        type: 'select',
+        label: 'Status',
+        multiple: true,
+        options: { open: 'Open', closed: 'Closed' },
+      },
+    ];
+    render(
+      <DashboardFilters filters={filters} values={{ status: ['open'] }} onChange={onChange} />,
+    );
+    const select = screen.getByRole('listbox', { name: 'Status' }) as HTMLSelectElement;
+    (screen.getByRole('option', { name: 'Open' }) as HTMLOptionElement).selected = false;
+    fireEvent.change(select);
+    expect(onChange).toHaveBeenCalledWith('status', null);
+  });
+
   it('drops unknown filter types silently', () => {
     const filters: DashboardFilterPayload[] = [{ name: 'foo', type: 'unsupported', label: 'Foo' }];
     const { container } = render(

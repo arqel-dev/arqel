@@ -68,7 +68,10 @@ final class ResourceController
 
         $this->authorize('create', $instance::getModel());
 
-        $data = $this->validated($request, $instance);
+        // On create there is no record yet — pass null so rule extraction
+        // (and pruning) evaluate record-dependent layout visibility against
+        // null, exactly as the render path does (#198).
+        $data = $this->validated($request, $instance, null);
         $data = $this->pruneUnauthorizedFields($data, $instance, $this->resolveUser($request), null);
 
         $record = $instance->runCreate($data);
@@ -105,7 +108,10 @@ final class ResourceController
 
         $this->authorize('update', $record);
 
-        $data = $this->validated($request, $instance);
+        // Thread the loaded record into rule extraction so a `required` field
+        // wrapped in a layout HIDDEN for this record is not validated — the
+        // user is never shown it and the write-prune drops it anyway (#198).
+        $data = $this->validated($request, $instance, $record);
         $data = $this->pruneUnauthorizedFields($data, $instance, $this->resolveUser($request), $record);
 
         $instance->runUpdate($record, $data);
@@ -375,11 +381,15 @@ final class ResourceController
      * type-hint resolution wires one through the route, this method
      * is bypassed automatically.
      *
+     * `$record` is the loaded row on update (null on create); it is
+     * threaded into rule extraction so record-dependent layout
+     * visibility is honoured on the validation path too (#198).
+     *
      * @return array<string, mixed>
      */
-    private function validated(Request $request, Resource $resource): array
+    private function validated(Request $request, Resource $resource, ?Model $record = null): array
     {
-        $rules = $this->extractRules($resource);
+        $rules = $this->extractRules($resource, $record);
 
         // `null` means the rule extractor is genuinely absent
         // (`arqel-dev/form` not installed) — the documented permissive
@@ -567,9 +577,14 @@ final class ResourceController
      * collapsing to "no rules" — which would accept unvalidated input
      * (mass assignment). The failure is logged for operators.
      *
+     * `$record` (the loaded row on update, null on create) is threaded into
+     * `effectiveFields($record)` so a `required` field wrapped in a layout
+     * the record cannot see is excluded from the rules — matching the render
+     * and write-prune paths, which both omit it (#198, completes #115).
+     *
      * @return array<string, array<int, mixed>>|null
      */
-    private function extractRules(Resource $resource): ?array
+    private function extractRules(Resource $resource, ?Model $record = null): ?array
     {
         $extractorClass = 'Arqel\\Form\\FieldRulesExtractor';
 
@@ -587,7 +602,7 @@ final class ResourceController
                 );
             }
 
-            $rules = $extractor->extract($resource->effectiveFields());
+            $rules = $extractor->extract($resource->effectiveFields($record));
         } catch (ReflectionException|RuntimeException $e) {
             Log::error('Arqel: field-rule extraction failed; refusing to accept unvalidated input.', [
                 'resource' => $resource::class,

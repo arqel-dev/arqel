@@ -107,11 +107,38 @@ function SelectControl({
   onChange: (value: unknown) => void;
 }) {
   const options = normaliseOptions(filter.options);
+  const label = filter.label ?? filter.name;
+
+  if (filter.multiple) {
+    const selected = Array.isArray(value) ? (value as Array<string | number>).map(String) : [];
+    return (
+      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+        {label}
+        <select
+          multiple
+          aria-label={label}
+          className={cn(controlClasses(), 'h-auto min-h-[2.25rem] py-1')}
+          value={selected}
+          onChange={(e) => {
+            const next = Array.from(e.target.selectedOptions, (o) => o.value);
+            onChange(next.length === 0 ? null : next);
+          }}
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
+  }
+
   return (
     <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-      {filter.label ?? filter.name}
+      {label}
       <select
-        aria-label={filter.label ?? filter.name}
+        aria-label={label}
         className={controlClasses()}
         value={value === undefined || value === null ? '' : String(value)}
         onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}

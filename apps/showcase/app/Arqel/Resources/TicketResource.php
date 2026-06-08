@@ -12,9 +12,12 @@ use Arqel\Fields\Types\TextField;
 use Arqel\Form\Form;
 use Arqel\Form\Layout\Section;
 use Arqel\Table\Columns\BadgeColumn;
+use Arqel\Table\Columns\SelectColumn;
 use Arqel\Table\Columns\TextColumn;
 use Arqel\Table\Filters\SelectFilter;
 use Arqel\Table\Table;
+use Arqel\Workflow\Fields\StateTransitionField;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * The Ticket model defines an `arqelWorkflow()` over `status`; this
@@ -30,7 +33,7 @@ final class TicketResource extends Resource
         'resolved' => 'Resolved',
     ];
 
-    /** @var class-string<\Illuminate\Database\Eloquent\Model> */
+    /** @var class-string<Model> */
     public static string $model = Ticket::class;
 
     public static ?string $slug = 'tickets';
@@ -72,6 +75,10 @@ final class TicketResource extends Resource
                             ->columnSpan('full'),
                         Field::select('status')
                             ->options(self::STATUS_OPTIONS),
+                        StateTransitionField::make('status')
+                            ->showHistory()
+                            ->showDescription()
+                            ->columnSpan('full'),
                     ]),
             ]);
     }
@@ -86,6 +93,7 @@ final class TicketResource extends Resource
                     'in_progress' => 'yellow',
                     'resolved' => 'green',
                 ]),
+                SelectColumn::make('status')->options(self::STATUS_OPTIONS),
             ])
             ->filters([
                 SelectFilter::make('status')->options(self::STATUS_OPTIONS),

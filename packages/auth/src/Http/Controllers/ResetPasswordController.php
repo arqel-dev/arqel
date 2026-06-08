@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Auth\Http\Controllers;
 
+use Arqel\Auth\Concerns\ResolvesPanelGuard;
 use Arqel\Auth\Http\Requests\ResetPasswordRequest;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Auth\Events\PasswordReset;
@@ -27,6 +28,8 @@ use Inertia\Response;
  */
 final class ResetPasswordController
 {
+    use ResolvesPanelGuard;
+
     /**
      * POST /admin/reset-password — processa o reset.
      */
@@ -34,7 +37,7 @@ final class ResetPasswordController
     {
         $request->ensureIsNotRateLimited();
 
-        $status = Password::broker()->reset(
+        $status = Password::broker($this->resolvePasswordBroker())->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (Authenticatable $user, string $password): void {
                 /** @var \Illuminate\Database\Eloquent\Model&Authenticatable $user */

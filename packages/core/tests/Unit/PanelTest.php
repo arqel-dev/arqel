@@ -61,3 +61,25 @@ it('can disable dark mode explicitly', function (): void {
 
     expect($panel->isDarkModeEnabled())->toBeFalse();
 });
+
+it('writes the reset expiration to the users broker for a default-guard panel (#191)', function (): void {
+    config()->set('auth.passwords.users.expire', 60);
+    config()->set('auth.passwords.admins.expire', 60);
+
+    (new Panel('admin'))->passwordResetExpirationMinutes(15);
+
+    expect(config('auth.passwords.users.expire'))->toBe(15)
+        ->and(config('auth.passwords.admins.expire'))->toBe(60);
+});
+
+it('writes the reset expiration to the panel-guard broker, not users (#191)', function (): void {
+    config()->set('auth.passwords.users.expire', 60);
+    config()->set('auth.passwords.admins.expire', 60);
+    config()->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
+    config()->set('auth.passwords.admins.provider', 'admins');
+
+    (new Panel('admin'))->authGuard('admin')->passwordResetExpirationMinutes(15);
+
+    expect(config('auth.passwords.admins.expire'))->toBe(15)
+        ->and(config('auth.passwords.users.expire'))->toBe(60);
+});

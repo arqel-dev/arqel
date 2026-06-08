@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Auth\Http\Requests;
 
+use Arqel\Auth\Concerns\ResolvesPanelGuard;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,8 @@ use Throwable;
  */
 final class RegisterRequest extends FormRequest
 {
+    use ResolvesPanelGuard;
+
     public function authorize(): bool
     {
         return true;
@@ -64,9 +67,28 @@ final class RegisterRequest extends FormRequest
         return 'arqel-register|'.$this->ip();
     }
 
+    /**
+     * Resolve the Eloquent model backing the panel guard's provider,
+     * mirroring RegisterController::resolveUserModel() so the email-unique
+     * check targets the same table the controller writes to (#191). Falls
+     * back to the default `users` provider model.
+     *
+     * @return class-string|string
+     */
+    private function resolveUserModel(): string
+    {
+        $guard = $this->resolvePanelGuard();
+        $provider = config("auth.guards.{$guard}.provider", 'users');
+        $providerKey = is_string($provider) && $provider !== '' ? $provider : 'users';
+
+        $model = (string) config("auth.providers.{$providerKey}.model", 'App\\Models\\User');
+
+        return class_exists($model) ? $model : 'App\\Models\\User';
+    }
+
     private function resolveUsersTable(): string
     {
-        $model = (string) config('auth.providers.users.model', 'App\\Models\\User');
+        $model = $this->resolveUserModel();
 
         if (class_exists($model)) {
             try {

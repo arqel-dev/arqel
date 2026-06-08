@@ -363,9 +363,40 @@ final class Panel
     {
         $this->passwordResetExpirationMinutes = max(1, $minutes);
 
-        config(['auth.passwords.users.expire' => $this->passwordResetExpirationMinutes]);
+        $broker = $this->resolvePasswordBroker();
+        config(["auth.passwords.{$broker}.expire" => $this->passwordResetExpirationMinutes]);
 
         return $this;
+    }
+
+    /**
+     * Resolve the Laravel password broker backing this panel's configured
+     * guard (#191), so the reset-token expiration is written to the right
+     * broker rather than always `users`.
+     *
+     * The default `web` guard maps to the `users` provider and the `users`
+     * broker, so the default path resolves to `'users'` unchanged.
+     */
+    private function resolvePasswordBroker(): string
+    {
+        $provider = config("auth.guards.{$this->authGuard}.provider", 'users');
+        $providerKey = is_string($provider) && $provider !== '' ? $provider : 'users';
+
+        $brokers = config('auth.passwords');
+
+        if (is_array($brokers)) {
+            foreach ($brokers as $name => $config) {
+                if (is_array($config) && ($config['provider'] ?? null) === $providerKey) {
+                    return (string) $name;
+                }
+            }
+
+            if (array_key_exists($providerKey, $brokers)) {
+                return $providerKey;
+            }
+        }
+
+        return 'users';
     }
 
     public function getPasswordResetExpirationMinutes(): int

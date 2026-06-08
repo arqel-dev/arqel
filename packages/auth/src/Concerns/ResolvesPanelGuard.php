@@ -37,4 +37,44 @@ trait ResolvesPanelGuard
 
         return is_string($configured) && $configured !== '' ? $configured : 'web';
     }
+
+    /**
+     * Resolve the Laravel password broker that backs the panel's
+     * configured guard (#191).
+     *
+     * Mapping, in order:
+     *   1. From the panel guard, read its provider
+     *      (`config("auth.guards.{$guard}.provider")`).
+     *   2. Find the password broker whose `provider` matches that provider
+     *      (`config('auth.passwords')` entry).
+     *   3. Fall back to a broker named exactly after the provider.
+     *   4. Fall back to `'users'`.
+     *
+     * The default `web` guard maps to the `users` provider, which the
+     * default `users` broker already targets, so the default path resolves
+     * to `'users'` unchanged.
+     */
+    protected function resolvePasswordBroker(): string
+    {
+        $guard = $this->resolvePanelGuard();
+
+        $provider = config("auth.guards.{$guard}.provider", 'users');
+        $providerKey = is_string($provider) && $provider !== '' ? $provider : 'users';
+
+        $brokers = config('auth.passwords');
+
+        if (is_array($brokers)) {
+            foreach ($brokers as $name => $config) {
+                if (is_array($config) && ($config['provider'] ?? null) === $providerKey) {
+                    return (string) $name;
+                }
+            }
+
+            if (array_key_exists($providerKey, $brokers)) {
+                return $providerKey;
+            }
+        }
+
+        return 'users';
+    }
 }

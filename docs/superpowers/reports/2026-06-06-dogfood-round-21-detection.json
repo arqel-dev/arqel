@@ -1,0 +1,16 @@
+{
+  "summary": "Arqel dogfood loop — Round 21: re-detect against main. Seen-filtered (96 sigs), adversarial verify. Round 20 was clean (1/2). Stop after 2 consecutive clean rounds.",
+  "agentCount": 4,
+  "logs": [
+    "Round 21 detection: 0 from clusters = 0 after dedup/seen-filter",
+    "Round 21 verify: 0 confirmed NEW framework bugs"
+  ],
+  "result": {
+    "round": 21,
+    "isClean": true,
+    "confirmedFrameworkBugs": [],
+    "appMisuse": [],
+    "notBugs": [],
+    "note": "SECOND CONSECUTIVE clean round (Round 20 + Round 21). STOP CRITERION MET — the dogfood loop has CONVERGED. 90 framework bugs + 1 security hardening fixed across 21 rounds. Final ecosystem report to follow."
+  }
+}

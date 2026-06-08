@@ -32,6 +32,7 @@ use Arqel\Table\Columns\TextColumn;
 use Arqel\Table\Filters\SelectFilter;
 use Arqel\Table\Filters\TernaryFilter;
 use Arqel\Table\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 /**
@@ -48,7 +49,7 @@ final class PostResource extends Resource
         'archived' => 'Archived',
     ];
 
-    /** @var class-string<\Illuminate\Database\Eloquent\Model> */
+    /** @var class-string<Model> */
     public static string $model = Post::class;
 
     public static ?string $slug = 'posts';
@@ -136,7 +137,7 @@ final class PostResource extends Resource
                                     // visibleIf is invoked with a null record at
                                     // serialization (Component::isVisibleFor(null)),
                                     // so the predicate MUST be null-safe.
-                                    ->visibleIf(fn ($record) => $record?->status === 'archived')
+                                    ->visibleIf(fn ($record) => $record?->status === 'published')
                                     ->schema([
                                         Field::keyValue('meta')
                                             ->columnSpan('full'),
@@ -163,7 +164,7 @@ final class PostResource extends Resource
                     // getStateUsing is invoked with a null record at
                     // serialization (Column::getState(null)), so the
                     // closure MUST be null-safe.
-                    ->getStateUsing(fn ($record) => str_word_count((string) ($record?->body ?? ''))),
+                    ->getStateUsing(fn ($record) => str_word_count(strip_tags((string) ($record?->body ?? '')))),
             ])
             ->filters([
                 SelectFilter::make('status')->options(self::STATUS_OPTIONS),

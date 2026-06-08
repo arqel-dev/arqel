@@ -774,6 +774,15 @@
       "pr": 214,
       "round": 16,
       "note": "HIGH, same family as #203/#204/#206 (documented API never wired at the serialization entry point, CORE-010 incomplete): HasForm::getFormSchemaArray() emitted only {name,type} so Action->form([SelectField->options(...)]) opened an EMPTY modal (FormRenderer dropped every field whose name wasn't in the empty formFields Map). Fix: Action::toArray() now ships formFields via core FieldSchemaSerializer (full schema); ActionButton/ActionMenu read action.formFields; form key stays {name,type} layout. actions->core dep already existed."
+    },
+    {
+      "signature": "export::datecolumn-mode-format-ignored",
+      "package": "export",
+      "status": "fixed",
+      "issue": 217,
+      "pr": 219,
+      "round": 18,
+      "note": "MED data-fidelity: CSV/XLSX/PdfExporter hardcoded ->format('Y-m-d') in every date branch (plain + the #206 state_resolver branch), ignoring DateColumn props.mode/props.format -> ->dateTime() dropped the time, custom ->date('d/m/Y') ignored. Fix: shared formatDateCell(value,column) honoring mode/format across all 3 exporters; plain no-props date still Y-m-d (no #106/#206 regression). PR #218 was accidentally closed by a premature --delete-branch; re-landed as #219."
     }
   ]
 }

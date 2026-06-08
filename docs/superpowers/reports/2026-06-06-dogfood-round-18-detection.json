@@ -1,0 +1,27 @@
+{
+  "summary": "Arqel dogfood loop — Round 18: re-detect against main (88 framework bugs fixed across rounds 0-16). Deepest probes into the least-covered surfaces (audit attribute filtering, realtime broadcast dispatch, mcp tools, cli generators, export xlsx/formatting, i18n/locale, theme, command palette, a11y, edge-case interactions between traits). Seen-filtered (94 sigs), adversarial verify. ROUND 17 WAS CLEAN (consecutive-clean counter now 1/2) — Round 18 is the potential SECOND consecutive clean round that ENDS the loop. A clean (zero-candidate) result is the expected and most likely outcome; report ONLY a concrete, live, reproduced defect at a genuinely distinct entry point. Stop after 2 consecutive clean rounds.",
+  "agentCount": 5,
+  "logs": [
+    "Round 18 detection: 1 from clusters = 1 after dedup/seen-filter",
+    "Round 18 verify: 1 confirmed NEW framework bugs, 0 app-misuse, 0 not-a-bug"
+  ],
+  "result": {
+    "round": 18,
+    "isClean": false,
+    "confirmedFrameworkBugs": [
+      {
+        "signature": "export-datecolumn-mode-format-ignored-Ymd-hardcode",
+        "package": "export",
+        "layer": "php",
+        "title": "DateColumn->dateTime()/custom-format columns export as Y-m-d only — props.mode and props.format ignored, time component dropped",
+        "severity": "medium",
+        "rootCauseFile": "packages/export/src/Exporters/CsvExporter.php:118-124,136-142 (same pattern: XlsxExporter.php:127-133,145-151; PdfExporter.php date branches ~138-167)",
+        "fixSketch": "In each exporter's formatCell, for the 'date' branch read the column's serialized props and use them instead of the hardcoded 'Y-m-d': resolve $fmt = $column['props']['format'] ?? 'Y-m-d' and (for mode 'since') optionally render a diffForHumans-style string, otherwise $value->format($fmt). Factor a shared formatDate(DateTimeInterface $v, array $column) helper so CSV/XLSX/PDF and both the state_resolver and plain branches stay consistent.",
+        "reasoning": "Reproduced live against packages/export/src on disk. CsvExporter::export of a record {created_at: DateTime('2026-05-08 14:30:45')} with column {type:'date', props:{mode:'datetime', format:'Y-m-d H:i:s'}} produced cell '2026-05-08' (time '14:30:45' dropped); expected '2026-05-08 14:30:45'. Verified the data path: DateColumn::getTypeSpecificProps() (packages/table/src/Columns/DateColumn.php:53-59) emits {mode, format}; Column::toArray() (packages/table/src/Column.php:400) places them under 'props'; ResourceController::serializeColumns (core, line 250-280) passes the full toArray() including props to the exporters. But all three exporters' formatCell only read $column['type'], $column['name'], $column['state_resolver'] and hardcode $value->format('Y-m-d') in every 'date' branch (CsvExporter.php:120,138; XlsxExporter.php:129,147; PdfExporter.php:148,166) — $column['props'] is never consulted. So ->dateTime() loses the time component and ->date('d/m/Y') custom formats are ignored across CSV/XLSX/PDF. Not refuted by existing tests: the only date-format tests (CsvExporterTest.php:109, PdfExporterTest.php:100, XlsxExporterTest.php:118) use plain 'date' columns with NO props, so they assert the default truncation, not that datetime/custom-format columns are intentionally collapsed to Y-m-d. Distinct from #106 (Excel-serial-vs-string rationale only) and #206 (state_resolver wiring, which itself repeats the same hardcode). App-misuse ruled out: the app uses the public ->dateTime()/->date(fmt) API correctly; the export layer is what ignores the contract. Severity medium: silent data-fidelity loss in exports (time + custom formats), not a crash/security issue, and the common plain date column still behaves.",
+        "evidence": "All three exporters hardcode the date branch to ->format('Y-m-d') and never consume the column's serialized props.mode/props.format. A table DateColumn carries these via Column::toArray() (packages/table/src/Column.php:400 -> DateColumn::getTypeSpecificProps(), packages/table/src/Columns/DateColumn.php:53-59 emits {mode:'datetime'|'date'|'since', format}), and ResourceController::serializeColumns (packages/core/src/Http/Controllers/ResourceController.php:250-279) hands the full toArray() (props included) to ExportAction::withColumns. But formatCell never reads props: CsvExporter.php:119-120 and :137-138, XlsxExporter.php:128-130 and :146-148, PdfExporter.php:147-149 and :164-167 all do `$value instanceof DateTimeInterface ? $value->format('Y-m-d') : ...`. CONCRETE REPRO (live, via packages/export/vendor autoload): exporting a record {created_at: DateTime('2026-05-08 14:30:45')} with column {type:'date', name:'created_at', props:{mode:'datetime', format:'Y-m-d H:i:s'}} through CsvExporter::export produced cell '2026-05-08' — observed '2026-05-08', expected '2026-05-08 14:30:45'. The time component is silently dropped for every dateTime() column and any custom ->date('d/m/Y') format is ignored across CSV/XLSX/PDF. Distinct from #106 (which only justified string-vs-Excel-serial, not mode/format) and distinct from #206 (state_resolver wiring — which itself repeats the same Y-m-d hardcode in its date branch). No test asserts the Y-m-d hardcode is intentional for datetime columns."
+      }
+    ],
+    "appMisuse": [],
+    "notBugs": []
+  }
+}

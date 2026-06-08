@@ -3,14 +3,18 @@
 declare(strict_types=1);
 
 use Arqel\Ai\AiManager;
+use Arqel\Ai\Exceptions\AiException;
+use Arqel\Ai\Exceptions\UserLimitExceeded;
 use Arqel\Ai\Tests\Fixtures\FakeAiResource;
 use Arqel\Ai\Tests\Fixtures\FakeAiTranslateResource;
 use Arqel\Ai\Tests\Fixtures\FakeProvider;
 use Arqel\Ai\Tests\Fixtures\FormOnlyAiTranslateResource;
+use Arqel\Ai\Tests\Fixtures\LimitThrowingProvider;
 use Arqel\Ai\Tests\Fixtures\ThrowingProvider;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Testing\TestResponse;
 
 function authedUserForTranslate(): AuthUser
@@ -63,11 +67,15 @@ it('returns 200 with translations on the happy path', function (): void {
         ->and($translations['es'])->toStartWith('echo:Translate the following text from en to es');
 });
 
-it('returns 422 (not 500) when the provider throws an AiException (#205)', function (): void {
+it('returns 422 with a generic message and never reflects the upstream body when the provider throws an AiException (#205 follow-up)', function (): void {
+    Exceptions::fake();
+
     /** @var ResourceRegistry $registry */
     $registry = app(ResourceRegistry::class);
     $registry->register(FakeAiTranslateResource::class);
-    app()->instance(AiManager::class, new AiManager(['fake' => new ThrowingProvider('fake')]));
+    app()->instance(AiManager::class, new AiManager([
+        'fake' => new ThrowingProvider('fake', 'OpenAI API error (500): SECRET_UPSTREAM_BODY'),
+    ]));
 
     /** @var TestCase $this */
     $response = postTranslate($this, 'ai-pages', 'description', [
@@ -77,7 +85,30 @@ it('returns 422 (not 500) when the provider throws an AiException (#205)', funct
     ]);
 
     $response->assertStatus(422)
-        ->assertJson(['message' => 'provider upstream 503']);
+        ->assertExactJson(['message' => 'AI provider request failed']);
+
+    expect($response->getContent())->not->toContain('SECRET_UPSTREAM_BODY');
+
+    Exceptions::assertReported(AiException::class);
+});
+
+it('preserves the real UserLimitExceeded message so the user knows they hit a limit', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FakeAiTranslateResource::class);
+    app()->instance(AiManager::class, new AiManager([
+        'fake' => new LimitThrowingProvider('fake', new UserLimitExceeded('User #1 daily AI limit of $2 exceeded')),
+    ]));
+
+    /** @var TestCase $this */
+    $response = postTranslate($this, 'ai-pages', 'description', [
+        'sourceLanguage' => 'en',
+        'sourceText' => 'Hello world',
+        'targetLanguages' => ['pt-BR'],
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJson(['message' => 'User #1 daily AI limit of $2 exceeded']);
 });
 
 it('returns 404 when the resource slug is not registered', function (): void {

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Arqel\Ai\Http\Controllers;
 
 use Arqel\Ai\Exceptions\AiException;
+use Arqel\Ai\Exceptions\DailyLimitExceeded;
+use Arqel\Ai\Exceptions\UserLimitExceeded;
 use Arqel\Ai\Fields\AiSelectField;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
@@ -80,8 +82,16 @@ final class AiClassifyController
 
         try {
             $key = $selectField->classify($formData);
-        } catch (AiException $e) {
+        } catch (DailyLimitExceeded|UserLimitExceeded $e) {
+            // Framework-controlled, user-facing limit messages — safe to show.
             return new JsonResponse(['message' => $e->getMessage()], 422);
+        } catch (AiException $e) {
+            // A bare AiException may embed the raw upstream provider response
+            // body (see OpenAiProvider/OllamaProvider). Never reflect it to the
+            // client; log it server-side and return a fixed generic message.
+            report($e);
+
+            return new JsonResponse(['message' => 'AI provider request failed'], 422);
         }
 
         $options = $selectField->getOptions();

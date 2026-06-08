@@ -17,6 +17,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use stdClass;
+use Throwable;
 
 /**
  * Assembles the Inertia payloads for the index/create/edit/show
@@ -243,7 +244,10 @@ final class InertiaDataBuilder
         $payload = [
             'resource' => $this->resourceMeta($resource),
             'record' => null,
-            'fields' => $this->serializer->serialize($fields, null, $user),
+            // No record exists on create, so a fresh model instance is
+            // threaded as the owner so relationship-backed select
+            // options still resolve (#204).
+            'fields' => $this->serializer->serialize($fields, null, $user, $this->newOwnerModel($resource)),
         ];
 
         if ($form !== null) {
@@ -378,6 +382,28 @@ final class InertiaDataBuilder
         $rawPath = $panel?->getPath() ?? (is_string($configPath) ? $configPath : 'admin');
 
         return '/'.trim($rawPath, '/');
+    }
+
+    /**
+     * Instantiate a fresh, unsaved model for the Resource so the
+     * create payload can resolve relationship-backed select options
+     * (`SelectField::optionsRelationship`) against a real Eloquent
+     * model even though no record exists yet (#204).
+     *
+     * Returns null when the model class cannot be resolved or
+     * instantiated, so the create page degrades to empty options
+     * rather than failing payload assembly.
+     */
+    private function newOwnerModel(Resource $resource): ?Model
+    {
+        try {
+            $modelClass = $resource::getModel();
+            $instance = new $modelClass;
+
+            return $instance instanceof Model ? $instance : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**

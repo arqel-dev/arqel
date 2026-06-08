@@ -20,12 +20,16 @@ use Illuminate\Database\Eloquent\Model;
  * the payload shape — controllers should defer to it rather than
  * hand-rolling per-field arrays.
  *
- * `serialize(fields, ?record, ?user)`:
+ * `serialize(fields, ?record, ?user, ?owner)`:
  *   - filters fields by `canBeSeenBy(user, record)` when present
  *   - resolves `isReadonly` and combines with `canBeEditedBy` to
  *     produce a single `readonly` flag
  *   - emits the canonical shape with `validation`, `visibility`,
  *     `dependsOn`, and per-type `props`.
+ *   - resolves relationship-backed select options (`#204`) against
+ *     the owner model so `props.options` arrives populated. The owner
+ *     defaults to `record`; the create page passes a fresh model
+ *     instance so options resolve even with no record yet.
  */
 final class FieldSchemaSerializer
 {
@@ -34,8 +38,14 @@ final class FieldSchemaSerializer
      *
      * @return list<array<string, mixed>>
      */
-    public function serialize(array $fields, ?Model $record = null, ?Authenticatable $user = null): array
+    public function serialize(array $fields, ?Model $record = null, ?Authenticatable $user = null, ?Model $owner = null): array
     {
+        // The owner model is the Resource model that declares any
+        // relationship-backed options. It defaults to the record being
+        // edited/shown; on create the caller passes a fresh instance so
+        // `optionsRelationship()` selects still resolve (#204).
+        $owner ??= $record;
+
         $serialized = [];
         foreach ($fields as $field) {
             if (! is_object($field)) {
@@ -46,7 +56,7 @@ final class FieldSchemaSerializer
                 continue;
             }
 
-            $serialized[] = $this->serializeOne($field, $record, $user);
+            $serialized[] = $this->serializeOne($field, $record, $user, $owner);
         }
 
         return $serialized;
@@ -55,7 +65,7 @@ final class FieldSchemaSerializer
     /**
      * @return array<string, mixed>
      */
-    private function serializeOne(object $field, ?Model $record, ?Authenticatable $user): array
+    private function serializeOne(object $field, ?Model $record, ?Authenticatable $user, ?Model $owner = null): array
     {
         return [
             'type' => $this->call($field, 'getType') ?? '',
@@ -74,7 +84,7 @@ final class FieldSchemaSerializer
             'validation' => $this->serializeValidation($field),
             'visibility' => $this->serializeVisibility($field, $record, $user),
             'dependsOn' => $this->serializeDependencies($field),
-            'props' => $this->serializeProps($field),
+            'props' => $this->serializeProps($field, $owner),
         ];
     }
 
@@ -140,7 +150,7 @@ final class FieldSchemaSerializer
     /**
      * @return array<string, mixed>
      */
-    private function serializeProps(object $field): array
+    private function serializeProps(object $field, ?Model $owner = null): array
     {
         if (! method_exists($field, 'getTypeSpecificProps')) {
             return [];
@@ -157,7 +167,49 @@ final class FieldSchemaSerializer
             $clean[(string) $key] = $value;
         }
 
-        return $clean;
+        return $this->withResolvedRelationOptions($field, $clean, $owner);
+    }
+
+    /**
+     * Resolve relationship-backed select options against the owner
+     * model and inject them into `props.options` (#204).
+     *
+     * A `SelectField::optionsRelationship('category', 'name')` stores
+     * the relation metadata but cannot pluck the options itself — it
+     * has no owner-model context. The serialiser does: when the field
+     * advertises a relation (`getOptionsRelation() !== null`), exposes
+     * `resolveOptionsForOwner()`, and an owner model is available, the
+     * resolved `{key: label}` map replaces the empty `props.options`.
+     *
+     * Static- and closure-mode selects expose no relation, so their
+     * `props.options` is left byte-identical. The whole step is
+     * duck-typed, so non-Select fields are untouched.
+     *
+     * @param array<string, mixed> $props
+     *
+     * @return array<string, mixed>
+     */
+    private function withResolvedRelationOptions(object $field, array $props, ?Model $owner): array
+    {
+        if ($owner === null) {
+            return $props;
+        }
+
+        if (! method_exists($field, 'getOptionsRelation') || ! method_exists($field, 'resolveOptionsForOwner')) {
+            return $props;
+        }
+
+        if ($field->getOptionsRelation() === null) {
+            return $props;
+        }
+
+        $resolved = $field->resolveOptionsForOwner($owner);
+
+        if (is_array($resolved) && $resolved !== []) {
+            $props['options'] = $resolved;
+        }
+
+        return $props;
     }
 
     private function isVisibleFor(object $field, ?Model $record, ?Authenticatable $user): bool

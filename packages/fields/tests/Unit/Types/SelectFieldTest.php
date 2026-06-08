@@ -44,10 +44,14 @@ it('returns an empty array when a closure returns a non-array', function (): voi
     expect($field->resolveOptions())->toBe([]);
 });
 
-it('stores relationship metadata for controller-side resolution', function (): void {
+it('stores relationship metadata for owner-side resolution', function (): void {
     $query = fn ($q) => $q;
     $field = (new SelectField('cat'))->optionsRelationship('category', 'name', $query);
 
+    // `resolveOptions()` still returns [] because the relationship
+    // needs the owner model context it doesn't have here — the real
+    // resolution happens in `resolveOptionsForOwner()` (#204),
+    // exercised against a live model in the Feature suite.
     expect($field->getOptionsRelation())->toBe('category')
         ->and($field->getOptionsRelationDisplay())->toBe('name')
         ->and($field->getOptionsRelationQuery())->toBe($query)

@@ -122,21 +122,54 @@ export function WidgetRenderer({ widget, filterValues, fetcher }: WidgetRenderer
 }
 
 /**
- * Append non-empty filter values as `filters[key]=value` query params so the
- * Laravel controller resolves them via `$request->input('filters')`. Skips
- * `null` / `undefined` / empty-string values to keep the URL clean.
+ * Append non-empty filter values as query params so the Laravel controller
+ * resolves them via `$request->input('filters')` as a nested array. The shape
+ * must mirror what the SSR / deep-link path produces (`router.get(path,
+ * { filters })`, qs bracket notation) so a deferred / polling widget's lazy
+ * refetch agrees with its SSR payload:
+ *   - **array** → `filters[key][]=el` per element (multi-`SelectControl`, #189)
+ *   - **plain object** → `filters[key][subKey]=val` per leaf (`DateRangeControl`
+ *     emits `{from,to}` → `filters[range][from]=..&filters[range][to]=..`)
+ *   - **scalar** → `filters[key]=value`
+ * `null` / `undefined` / empty-string values (and leaves) are skipped to keep
+ * the URL clean and match the prior scalar behaviour.
  */
 function withFilters(baseUrl: string, filters: Record<string, unknown> | undefined): string {
   if (!filters) return baseUrl;
 
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(filters)) {
-    if (value === null || value === undefined || value === '') continue;
-    params.append(`filters[${key}]`, String(value));
+    appendFilterValue(params, `filters[${key}]`, value);
   }
 
   const query = params.toString();
   return query ? `${baseUrl}?${query}` : baseUrl;
+}
+
+/**
+ * Serialize a single filter value under `prefix`, recursing one level for the
+ * array / plain-object shapes the dashboard filters emit (scalar | string[] |
+ * `{from,to}`). `Array.isArray` is checked before the plain-object branch since
+ * arrays are also objects. Empty leaves are skipped, never appended.
+ */
+function appendFilterValue(params: URLSearchParams, prefix: string, value: unknown): void {
+  if (value === null || value === undefined || value === '') return;
+
+  if (Array.isArray(value)) {
+    for (const el of value) {
+      appendFilterValue(params, `${prefix}[]`, el);
+    }
+    return;
+  }
+
+  if (typeof value === 'object') {
+    for (const [subKey, subVal] of Object.entries(value as Record<string, unknown>)) {
+      appendFilterValue(params, `${prefix}[${subKey}]`, subVal);
+    }
+    return;
+  }
+
+  params.append(prefix, String(value));
 }
 
 function mergeData(widget: WidgetPayload, data: unknown): Record<string, unknown> {

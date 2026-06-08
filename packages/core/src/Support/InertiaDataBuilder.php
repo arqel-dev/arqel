@@ -246,8 +246,9 @@ final class InertiaDataBuilder
             'record' => null,
             // No record exists on create, so a fresh model instance is
             // threaded as the owner so relationship-backed select
-            // options still resolve (#204).
-            'fields' => $this->serializer->serialize($fields, null, $user, $this->newOwnerModel($resource)),
+            // options still resolve (#204); the Resource slug feeds the
+            // searchable BelongsToField's searchRoute (#203).
+            'fields' => $this->serializer->serialize($fields, null, $user, $this->newOwnerModel($resource), $resource::getSlug()),
         ];
 
         if ($form !== null) {
@@ -270,7 +271,7 @@ final class InertiaDataBuilder
             'record' => $record->toArray(),
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
-            'fields' => $this->serializer->serialize($fields, $record, $user),
+            'fields' => $this->serializer->serialize($fields, $record, $user, $record, $resource::getSlug()),
         ];
 
         if ($form !== null) {
@@ -293,7 +294,7 @@ final class InertiaDataBuilder
             'record' => $record->toArray(),
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
-            'fields' => $this->serializer->serialize($fields, $record, $user),
+            'fields' => $this->serializer->serialize($fields, $record, $user, $record, $resource::getSlug()),
         ];
 
         if ($form !== null) {

@@ -7,6 +7,8 @@ namespace Database\Seeders;
 use App\Models\Author;
 use App\Models\Category;
 use App\Models\Comment;
+use App\Models\MediaAsset;
+use App\Models\Order;
 use App\Models\Post;
 use App\Models\Setting;
 use App\Models\Tenant;
@@ -83,6 +85,25 @@ final class DatabaseSeeder extends Seeder
 
         if (Setting::query()->count() === 0) {
             Setting::factory()->count(3)->create();
+        }
+
+        // Orders (idempotent; 20 active + 5 soft-deleted for the primary tenant,
+        // so the soft-delete filter has trashed rows to surface in E2E).
+        if (Order::query()->withTrashed()->count() === 0) {
+            Order::factory()->count(20)->create(['tenant_id' => $acme->id]);
+            Order::factory()->count(5)->create(['tenant_id' => $acme->id])->each->delete();
+        }
+
+        // Media assets (idempotent) for the media-library showcase pages.
+        if (MediaAsset::query()->count() === 0) {
+            MediaAsset::factory()->count(6)->create(['tenant_id' => $acme->id]);
+        }
+
+        // A couple of attachments on the first post (idempotent).
+        $firstPost = Post::query()->withoutGlobalScopes()->first();
+        if ($firstPost !== null && $firstPost->attachments()->count() === 0) {
+            $firstPost->attachments()->create(['label' => 'brief.pdf', 'url' => '/files/brief.pdf']);
+            $firstPost->attachments()->create(['label' => 'notes.txt', 'url' => '/files/notes.txt']);
         }
 
         $admin = User::firstOrCreate(

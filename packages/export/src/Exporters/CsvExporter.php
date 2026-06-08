@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 final class CsvExporter implements Exporter
 {
+    use FormatsDateCells;
+
     /**
      * @param iterable<int, mixed> $rows
      * @param array<int, array<string, mixed>> $columns
@@ -117,7 +119,7 @@ final class CsvExporter implements Exporter
 
             return match ($type) {
                 'date' => $value instanceof DateTimeInterface
-                    ? $value->format('Y-m-d')
+                    ? $this->formatDateCell($value, $column)
                     : ($value === null ? '' : (string) $value),
                 'boolean' => $value ? 'Yes' : 'No',
                 default => $value === null ? '' : (string) $value,
@@ -135,7 +137,7 @@ final class CsvExporter implements Exporter
 
         return match ($type) {
             'date' => $value instanceof DateTimeInterface
-                ? $value->format('Y-m-d')
+                ? $this->formatDateCell($value, $column)
                 : ($value === null ? '' : (string) $value),
             'boolean' => $value ? 'Yes' : 'No',
             default => $value === null ? '' : (string) $value,

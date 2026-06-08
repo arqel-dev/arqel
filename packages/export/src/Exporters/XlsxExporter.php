@@ -35,6 +35,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 final class XlsxExporter implements Exporter
 {
+    use FormatsDateCells;
+
     /**
      * @param iterable<int, mixed> $rows
      * @param array<int, array<string, mixed>> $columns
@@ -126,7 +128,7 @@ final class XlsxExporter implements Exporter
 
             return match ($type) {
                 'date' => $value instanceof DateTimeInterface
-                    ? $value->format('Y-m-d')
+                    ? $this->formatDateCell($value, $column)
                     : ($value === null ? '' : (string) $value),
                 'boolean' => $value ? 'Yes' : 'No',
                 default => $value ?? '',
@@ -144,7 +146,7 @@ final class XlsxExporter implements Exporter
 
         return match ($type) {
             'date' => $value instanceof DateTimeInterface
-                ? $value->format('Y-m-d')
+                ? $this->formatDateCell($value, $column)
                 : ($value === null ? '' : (string) $value),
             'boolean' => $value ? 'Yes' : 'No',
             default => $value ?? '',

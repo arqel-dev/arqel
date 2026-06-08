@@ -182,3 +182,68 @@ it('falls back to the column name when label is missing', function (): void {
         ['ABC-123'],
     ]);
 });
+
+it('retains the time component for datetime-mode date columns as text (#217)', function (): void {
+    // Still a string (no Excel serial) per #106 — just the right format string.
+    $columns = [
+        [
+            'name' => 'created_at',
+            'label' => 'Created',
+            'type' => 'date',
+            'props' => ['mode' => 'datetime', 'format' => 'Y-m-d H:i:s'],
+        ],
+    ];
+
+    (new XlsxExporter)->export(
+        [['created_at' => new DateTimeImmutable('2026-05-08 14:30:45')]],
+        $columns,
+        $this->tempFile,
+    );
+
+    $xml = rawXlsxSheetXml($this->tempFile);
+    expect($xml)->toContain('2026-05-08 14:30:45');
+    expect($xml)->not->toContain('46150'); // would-be Excel serial.
+
+    $parsed = readXlsxRows($this->tempFile);
+    expect($parsed[1][0])->toBe('2026-05-08 14:30:45');
+});
+
+it('honours a custom date format for date-mode columns (#217)', function (): void {
+    $columns = [
+        [
+            'name' => 'created_at',
+            'label' => 'Created',
+            'type' => 'date',
+            'props' => ['mode' => 'date', 'format' => 'd/m/Y'],
+        ],
+    ];
+
+    (new XlsxExporter)->export(
+        [['created_at' => new DateTimeImmutable('2026-05-08 14:30:45')]],
+        $columns,
+        $this->tempFile,
+    );
+
+    $parsed = readXlsxRows($this->tempFile);
+    expect($parsed[1][0])->toBe('08/05/2026');
+});
+
+it('renders a relative string for since-mode date columns (#217)', function (): void {
+    $columns = [
+        [
+            'name' => 'created_at',
+            'label' => 'Created',
+            'type' => 'date',
+            'props' => ['mode' => 'since', 'format' => 'Y-m-d'],
+        ],
+    ];
+
+    (new XlsxExporter)->export(
+        [['created_at' => new DateTimeImmutable('-2 days')]],
+        $columns,
+        $this->tempFile,
+    );
+
+    $parsed = readXlsxRows($this->tempFile);
+    expect($parsed[1][0])->toContain('ago');
+});

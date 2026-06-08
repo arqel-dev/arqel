@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Export\Exporters\CsvExporter;
+use Illuminate\Database\Eloquent\Model;
 
 beforeEach(function (): void {
     $this->tempFile = tempnam(sys_get_temp_dir(), 'arqel-csv-');
@@ -152,7 +153,7 @@ it('resolves display_path against a real related model and never leaks the model
     // with the real `display_path` (author.name) must export the display
     // attribute, not the whole related model (which would expose every
     // attribute, e.g. secret_token).
-    $author = new class extends Illuminate\Database\Eloquent\Model
+    $author = new class extends Model
     {
         protected $guarded = [];
     };
@@ -162,7 +163,7 @@ it('resolves display_path against a real related model and never leaks the model
         'secret_token' => 'shhh-do-not-leak',
     ]);
 
-    $record = new class extends Illuminate\Database\Eloquent\Model
+    $record = new class extends Model
     {
         protected $guarded = [];
     };
@@ -221,4 +222,74 @@ it('treats null values as empty strings alongside other columns', function (): v
         ['ID', 'Name'],
         ['7', ''],
     ]);
+});
+
+it('retains the time component for datetime-mode date columns (#217)', function (): void {
+    $columns = [
+        [
+            'name' => 'created_at',
+            'label' => 'Created',
+            'type' => 'date',
+            'props' => ['mode' => 'datetime', 'format' => 'Y-m-d H:i:s'],
+        ],
+    ];
+
+    (new CsvExporter)->export(
+        [['created_at' => new DateTime('2026-05-08 14:30:45')]],
+        $columns,
+        $this->tempFile,
+    );
+
+    $parsed = readCsvRows($this->tempFile);
+
+    expect($parsed)->toBe([
+        ['Created'],
+        ['2026-05-08 14:30:45'],
+    ]);
+});
+
+it('honours a custom date format for date-mode columns (#217)', function (): void {
+    $columns = [
+        [
+            'name' => 'created_at',
+            'label' => 'Created',
+            'type' => 'date',
+            'props' => ['mode' => 'date', 'format' => 'd/m/Y'],
+        ],
+    ];
+
+    (new CsvExporter)->export(
+        [['created_at' => new DateTime('2026-05-08 14:30:45')]],
+        $columns,
+        $this->tempFile,
+    );
+
+    $parsed = readCsvRows($this->tempFile);
+
+    expect($parsed)->toBe([
+        ['Created'],
+        ['08/05/2026'],
+    ]);
+});
+
+it('renders a relative string for since-mode date columns (#217)', function (): void {
+    $columns = [
+        [
+            'name' => 'created_at',
+            'label' => 'Created',
+            'type' => 'date',
+            'props' => ['mode' => 'since', 'format' => 'Y-m-d'],
+        ],
+    ];
+
+    (new CsvExporter)->export(
+        [['created_at' => new DateTime('-2 days')]],
+        $columns,
+        $this->tempFile,
+    );
+
+    $parsed = readCsvRows($this->tempFile);
+
+    expect($parsed[0])->toBe(['Created']);
+    expect($parsed[1][0])->toContain('ago');
 });

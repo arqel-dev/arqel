@@ -1,0 +1,16 @@
+{
+  "summary": "Arqel dogfood loop — Round 20: re-detect against main (90 framework bugs fixed across rounds 0-19). Seen-filtered (96 sigs), adversarial verify. Round 19 found 1 (nested repeater/builder/wizard schema HIGH). Stop after 2 consecutive clean rounds.",
+  "agentCount": 4,
+  "logs": [
+    "Round 20 detection: 0 from clusters = 0 after dedup/seen-filter",
+    "Round 20 verify: 0 confirmed NEW framework bugs"
+  ],
+  "result": {
+    "round": 20,
+    "isClean": true,
+    "confirmedFrameworkBugs": [],
+    "appMisuse": [],
+    "notBugs": [],
+    "note": "SECOND clean round overall (Round 17 was the first). Consecutive-clean counter 1/2. Round 21 launched as the potential 2nd CONSECUTIVE clean round to end the loop."
+  }
+}

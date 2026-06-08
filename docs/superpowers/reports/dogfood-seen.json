@@ -765,6 +765,15 @@
       "pr": 211,
       "round": 15,
       "note": "SECURITY (info disclosure, automated review on the #205 commit): all 5 AI controllers returned $e->getMessage() for AiException, but OpenAi/OllamaProvider embed the raw upstream $response->body() in it. Fix: two-tier catch — DailyLimitExceeded|UserLimitExceeded keep their static user-facing message; bare AiException -> report($e) + generic 'AI provider request failed' (422). Closes the finding across the whole package, not just #205's 3."
+    },
+    {
+      "signature": "actions::form-fields-not-serialized-to-fieldschema",
+      "package": "actions",
+      "status": "fixed",
+      "issue": 213,
+      "pr": 214,
+      "round": 16,
+      "note": "HIGH, same family as #203/#204/#206 (documented API never wired at the serialization entry point, CORE-010 incomplete): HasForm::getFormSchemaArray() emitted only {name,type} so Action->form([SelectField->options(...)]) opened an EMPTY modal (FormRenderer dropped every field whose name wasn't in the empty formFields Map). Fix: Action::toArray() now ships formFields via core FieldSchemaSerializer (full schema); ActionButton/ActionMenu read action.formFields; form key stays {name,type} layout. actions->core dep already existed."
     }
   ]
 }

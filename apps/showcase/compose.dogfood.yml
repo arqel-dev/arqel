@@ -7,14 +7,23 @@ services:
     container_name: arqel-dogfood-app
     ports: ["8090:80"]
     env_file: [.env.dogfood]
-    volumes: [".:/var/www/html"]
+    # The showcase composer.json uses path repositories symlinked into vendor/
+    # (vendor/arqel-dev/* -> ../../../../packages/*, resolving to /var/packages/*
+    # inside the container). Mount the monorepo packages/ there so those symlinks
+    # resolve and the autoloader can find the arqel-dev/* sources.
+    volumes: [".:/var/www/html", "../../packages:/var/packages"]
     depends_on: [db, redis]
     networks: [arqel-dogfood-net]
   vite:
     image: node:22-alpine
     container_name: arqel-dogfood-vite
     working_dir: /app
-    command: sh -c "corepack enable && pnpm install --frozen-lockfile=false && pnpm --filter @arqel-dev/showcase exec vite --host 0.0.0.0 --port 5180"
+    # CI=true so pnpm can non-interactively reconcile the host-mounted node_modules
+    # (avoids ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY when the store layout differs).
+    # LARAVEL_BYPASS_ENV_CHECK=1 lets the laravel-vite-plugin run the HMR dev server
+    # despite CI=true (it otherwise refuses to start in CI environments).
+    environment: { CI: "true", LARAVEL_BYPASS_ENV_CHECK: "1" }
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile=false --config.confirm-modules-purge=false && pnpm --filter @arqel-dev/showcase exec vite --host 0.0.0.0 --port 5180"
     ports: ["5180:5180"]
     volumes: ["../../:/app"]
     networks: [arqel-dogfood-net]
@@ -37,10 +46,13 @@ services:
   reverb:
     build: { context: ., dockerfile: docker/Dockerfile }
     container_name: arqel-dogfood-reverb
+    # Override the image ENTRYPOINT (php-fpm + nginx) so this container runs the
+    # Reverb WebSocket server instead of the web stack.
+    entrypoint: []
     command: sh -c "php artisan reverb:start --host=0.0.0.0 --port=8080"
     ports: ["8091:8080"]
     env_file: [.env.dogfood]
-    volumes: [".:/var/www/html"]
+    volumes: [".:/var/www/html", "../../packages:/var/packages"]
     depends_on: [app]
     networks: [arqel-dogfood-net]
 networks:

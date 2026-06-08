@@ -7,9 +7,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-### Security
+## [0.13.0] - 2026-06-07
 
-- **ai:** os cinco controllers single-action de AI (`AiGenerateController`, `AiClassifyController`, `AiTranslateController`, `AiExtractController`, `AiAnalyzeImageController`) deixam de **refletir o corpo da resposta upstream do provider** ao cliente (information disclosure, MEDIUM — follow-up de #205). Os providers `OpenAiProvider`/`OllamaProvider` lançam `AiException('OpenAI API error ('.$response->status().'): '.$response->body())` — embutindo o `$response->body()` **cru** do upstream na mensagem (que pode conter detalhe interno do provider, fragmentos da request ecoados, prompts, chaves, etc.). O `catch (AiException $e) { return ...$e->getMessage()...422 }` estabelecido por #205 reenviava essa mensagem diretamente na resposta HTTP. A correção troca o catch único por um catch de duas camadas em **cada** controller: as subclasses user-facing `DailyLimitExceeded`/`UserLimitExceeded` (mensagens estáticas framework-controlled vindas do `CostTracker`, ex.: "Daily AI limit of $X exceeded") são capturadas **primeiro** e **preservadas** — o usuário continua sabendo que estourou um limite; a `AiException` genérica/bare (potencial corpo upstream) é registrada server-side via `report($e)` (o detalhe ainda chega aos logs) e o cliente recebe uma mensagem fixa e genérica `"AI provider request failed"` (HTTP **422** mantido, sem mudança de comportamento de status). Os testes de feature de #205 que asseriam que a mensagem upstream era retornada foram invertidos: agora asseguram a mensagem genérica + a **ausência** do corpo upstream na resposta (`SECRET_UPSTREAM_BODY` nunca presente) + `Exceptions::assertReported(AiException::class)`, enquanto novos testes garantem que as mensagens de `DailyLimitExceeded`/`UserLimitExceeded` continuam intactas.
+### Summary
+
+Esta release consolida o sprint de hardening do dogfood-loop (75 bugs de framework corrigidos em autorização, contratos PHP↔React, builders mortos e validação) mais os follow-ups da integração de tenant da v0.12.0.
 
 ### Fixed
 
@@ -86,6 +88,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **ai:** `CostTracker` agora é offline-safe e honra `arqel-ai.cost_tracking.enabled` (#49). Antes, `AiManager::complete()` chamava `assertWithinLimit()` que consultava `ai_usage` incondicionalmente — como `daily_limit_usd` tem default positivo (`10.0`), a primeira chamada AI crashava com `QueryException: no such table: ai_usage` quando a tabela não estava migrada. Agora as leituras degradam para custo `0.0` via `Schema::hasTable`, e `enabled === false` desliga totalmente o tracker (espelhando `AiCache`). Adicionalmente, o registo da migration passou a usar o nome **datado** (`hasMigration('2026_05_01_000000_create_ai_usage_table')`) que bate com o ficheiro shipado, destravando `vendor:publish --tag=arqel-ai-migrations`.
 - **core:** bulk actions sem callback agora executam de facto. O dispatcher (`ResourceController::bulkAction()`) gateava `execute()` em `hasCallback()`, então `ExportAction` (que faz override de `execute()` e nunca declara callback) no-opava com um flash de erro. Além disso, bulk actions não-`delete` serializavam sem `url`, então o frontend recaía numa rota `/arqel-dev/actions/{name}` inexistente (404). Agora qualquer bulk action encontrada corre via `execute()` (mantendo o fast-path do stock `delete`), e `Action::resolveStockUrl()` emite `POST /admin/{slug}/bulk/{name}` para qualquer bulk action sem `url` explícita (#48).
 - **ui:** `@arqel-dev/ui` agora builda com `splitting: true` no tsup, unificando o `Map` de nível de módulo do `FieldRegistry` em um único chunk compartilhado. Antes, com `splitting: false`, cada entry (`form.js`, `pages.js`, ...) recebia sua própria cópia do registry — campos registrados via `@arqel-dev/ui/form` (usado por `@arqel-dev/fields/register`) ficavam invisíveis ao renderer de `@arqel-dev/ui/pages`, então campos avançados caíam no fallback HTML nativo e submits boolean/datetime retornavam 422 (#45).
+
+### Security
+
+- **ai:** os cinco controllers single-action de AI (`AiGenerateController`, `AiClassifyController`, `AiTranslateController`, `AiExtractController`, `AiAnalyzeImageController`) deixam de **refletir o corpo da resposta upstream do provider** ao cliente (information disclosure, MEDIUM — follow-up de #205). Os providers `OpenAiProvider`/`OllamaProvider` lançam `AiException('OpenAI API error ('.$response->status().'): '.$response->body())` — embutindo o `$response->body()` **cru** do upstream na mensagem (que pode conter detalhe interno do provider, fragmentos da request ecoados, prompts, chaves, etc.). O `catch (AiException $e) { return ...$e->getMessage()...422 }` estabelecido por #205 reenviava essa mensagem diretamente na resposta HTTP. A correção troca o catch único por um catch de duas camadas em **cada** controller: as subclasses user-facing `DailyLimitExceeded`/`UserLimitExceeded` (mensagens estáticas framework-controlled vindas do `CostTracker`, ex.: "Daily AI limit of $X exceeded") são capturadas **primeiro** e **preservadas** — o usuário continua sabendo que estourou um limite; a `AiException` genérica/bare (potencial corpo upstream) é registrada server-side via `report($e)` (o detalhe ainda chega aos logs) e o cliente recebe uma mensagem fixa e genérica `"AI provider request failed"` (HTTP **422** mantido, sem mudança de comportamento de status). Os testes de feature de #205 que asseriam que a mensagem upstream era retornada foram invertidos: agora asseguram a mensagem genérica + a **ausência** do corpo upstream na resposta (`SECRET_UPSTREAM_BODY` nunca presente) + `Exceptions::assertReported(AiException::class)`, enquanto novos testes garantem que as mensagens de `DailyLimitExceeded`/`UserLimitExceeded` continuam intactas.
 
 ---
 
@@ -490,7 +496,8 @@ Primeiro release pós-MVP. Bump coordenado de todos os pacotes (`packages-js/*` 
 
 - _Sem entradas — primeira release tagueada._
 
-[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/arqel-dev/arqel/compare/v0.12.0...v0.13.0
 [0.8.1]: https://github.com/arqel-dev/arqel/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/arqel-dev/arqel/compare/v0.8.0-rc.1...v0.8.0
 [0.8.0-rc.1]: https://github.com/arqel-dev/arqel/releases/tag/v0.8.0-rc.1

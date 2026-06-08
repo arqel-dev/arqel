@@ -231,6 +231,18 @@ final class ResourceController
      * shape exporters consume (`{type, name, label, ...}`). Column
      * objects expose `toArray()`; already-array descriptors pass through.
      *
+     * A column that drives its cell through the Column state pipeline
+     * (`getStateUsing`/`formatStateUsing` — the engine behind
+     * ComputedColumn, #206) also gets a `state_resolver` Closure attached:
+     * `fn ($record) => $column->formatState($column->getState($record), $record)`.
+     * The exporter prefers it over `data_get($record, $name)`, so a
+     * computed/formatted cell exports its resolved value instead of a
+     * blank/raw one. `toArray()` itself cannot carry the closures (they
+     * are stripped for the JSON Inertia payload), so this is the seam
+     * that re-attaches the live pipeline for the export path only.
+     * Columns without a resolver stay plain descriptors (no regression).
+     * Duck-typed against `Arqel\Table\Column`.
+     *
      * @param array<mixed> $columns
      *
      * @return array<int, array<mixed>>
@@ -248,13 +260,58 @@ final class ResourceController
 
             if (is_object($column) && method_exists($column, 'toArray')) {
                 $asArray = $column->toArray();
-                if (is_array($asArray)) {
-                    $serialized[] = $asArray;
+                if (! is_array($asArray)) {
+                    continue;
                 }
+
+                if ($this->columnUsesStateResolver($column)) {
+                    $resolverColumn = $column;
+                    $asArray['state_resolver'] = fn (mixed $record): mixed => $this->resolveColumnState(
+                        $resolverColumn,
+                        $record,
+                    );
+                }
+
+                $serialized[] = $asArray;
             }
         }
 
         return $serialized;
+    }
+
+    /**
+     * Whether a column object exposes the full Column state pipeline
+     * (`usesStateResolver()` + `getState()` + `formatState()`) and
+     * reports that it resolves its cell through it (#206). Duck-typed so
+     * core keeps no hard dep on `arqel-dev/table`.
+     */
+    private function columnUsesStateResolver(object $column): bool
+    {
+        if (
+            ! method_exists($column, 'usesStateResolver')
+            || ! method_exists($column, 'getState')
+            || ! method_exists($column, 'formatState')
+        ) {
+            return false;
+        }
+
+        return $column->usesStateResolver() === true;
+    }
+
+    /**
+     * Resolve a single column's cell value through the Column state
+     * pipeline: `formatState(getState($record), $record)` (#206). The
+     * caller only attaches the resolver after `columnUsesStateResolver()`
+     * confirmed the methods exist; the inline guards keep this safe (and
+     * statically sound) when the resolver runs later in the exporter.
+     */
+    private function resolveColumnState(object $column, mixed $record): mixed
+    {
+        if (! method_exists($column, 'getState') || ! method_exists($column, 'formatState')) {
+            return null;
+        }
+
+        return $column->formatState($column->getState($record), $record);
     }
 
     /**

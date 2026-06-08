@@ -582,6 +582,19 @@ final class InertiaDataBuilder
             $payload[(string) $key] = $value;
         }
 
+        // Resolve columns that drive their cell through the Column state
+        // pipeline (`getStateUsing`/`formatStateUsing` — the engine behind
+        // ComputedColumn, #206) and inject the result under the column's
+        // name, the key the React DataTable reads (`row[col.name]`).
+        // Without this, a ComputedColumn renders BLANK (no backing
+        // attribute) and a formatStateUsing column renders its RAW value.
+        // Resolved BEFORE redaction so a canSee()-gated cell is still
+        // stripped (#182). Plain columns are skipped, so their cell keeps
+        // reading the raw attribute (no regression).
+        foreach ($this->resolveStateColumnValues($columns, $record) as $name => $value) {
+            $payload[$name] = $value;
+        }
+
         foreach ($this->resolveRedactedColumnNames($columns, $record) as $name) {
             unset($payload[$name]);
         }
@@ -631,6 +644,54 @@ final class InertiaDataBuilder
         }
 
         return $names;
+    }
+
+    /**
+     * Resolve the cell value of every column that drives its state
+     * through the Column pipeline (#206). A column qualifies when it is
+     * an object exposing `getName()`, `usesStateResolver()` (returning
+     * true), `getState()` and `formatState()` — duck-typed against
+     * `Arqel\Table\Column` so `arqel-dev/core` keeps no dep on
+     * `arqel-dev/table`. Columns that read a plain attribute
+     * (`usesStateResolver() === false`) contribute nothing, so their
+     * cell stays the raw `toArray()` value. RelationshipColumn keeps
+     * `usesStateResolver() === false` so its `display_path`/nested-object
+     * serialisation (#152) is untouched.
+     *
+     * @param array<int, mixed> $columns
+     *
+     * @return array<string, mixed> Map of column name => resolved cell value.
+     */
+    private function resolveStateColumnValues(array $columns, Model $record): array
+    {
+        $resolved = [];
+        foreach ($columns as $column) {
+            if (! is_object($column)) {
+                continue;
+            }
+
+            if (
+                ! method_exists($column, 'getName')
+                || ! method_exists($column, 'usesStateResolver')
+                || ! method_exists($column, 'getState')
+                || ! method_exists($column, 'formatState')
+            ) {
+                continue;
+            }
+
+            if ($column->usesStateResolver() !== true) {
+                continue;
+            }
+
+            $name = $column->getName();
+            if (! is_string($name) || $name === '') {
+                continue;
+            }
+
+            $resolved[$name] = $column->formatState($column->getState($record), $record);
+        }
+
+        return $resolved;
     }
 
     /**

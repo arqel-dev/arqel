@@ -135,3 +135,48 @@ it('stringifies scalar fallback values and treats null as empty string via forma
     expect($method->invoke($exporter, ['sku' => null], $column))->toBe('');
     expect($method->invoke($exporter, ['sku' => 42], $column))->toBe('42');
 });
+
+it('retains the time component for datetime-mode date columns via formatCell (#217)', function (): void {
+    $exporter = new PdfExporter;
+    $method = (new ReflectionClass($exporter))->getMethod('formatCell');
+    $method->setAccessible(true);
+
+    $column = [
+        'name' => 'created_at',
+        'type' => 'date',
+        'props' => ['mode' => 'datetime', 'format' => 'Y-m-d H:i:s'],
+    ];
+    $record = ['created_at' => new DateTime('2026-05-08 14:30:45')];
+
+    expect($method->invoke($exporter, $record, $column))->toBe('2026-05-08 14:30:45');
+});
+
+it('honours a custom date format for date-mode columns via formatCell (#217)', function (): void {
+    $exporter = new PdfExporter;
+    $method = (new ReflectionClass($exporter))->getMethod('formatCell');
+    $method->setAccessible(true);
+
+    $column = [
+        'name' => 'created_at',
+        'type' => 'date',
+        'props' => ['mode' => 'date', 'format' => 'd/m/Y'],
+    ];
+    $record = ['created_at' => new DateTime('2026-05-08 14:30:45')];
+
+    expect($method->invoke($exporter, $record, $column))->toBe('08/05/2026');
+});
+
+it('renders a relative string for since-mode date columns via formatCell (#217)', function (): void {
+    $exporter = new PdfExporter;
+    $method = (new ReflectionClass($exporter))->getMethod('formatCell');
+    $method->setAccessible(true);
+
+    $column = [
+        'name' => 'created_at',
+        'type' => 'date',
+        'props' => ['mode' => 'since', 'format' => 'Y-m-d'],
+    ];
+    $record = ['created_at' => new DateTime('-2 days')];
+
+    expect($method->invoke($exporter, $record, $column))->toContain('ago');
+});

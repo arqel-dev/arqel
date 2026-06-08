@@ -26,6 +26,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 final class PdfExporter implements Exporter
 {
+    use FormatsDateCells;
+
     private string $orientation = 'portrait';
 
     private string $paperSize = 'a4';
@@ -145,7 +147,7 @@ final class PdfExporter implements Exporter
 
             return match ($type) {
                 'date' => $value instanceof DateTimeInterface
-                    ? $value->format('Y-m-d')
+                    ? $this->formatDateCell($value, $column)
                     : ($value === null ? '' : (string) $value),
                 'boolean' => $value ? 'Yes' : 'No',
                 default => $value === null ? '' : (string) $value,
@@ -163,7 +165,7 @@ final class PdfExporter implements Exporter
 
         return match ($type) {
             'date' => $value instanceof DateTimeInterface
-                ? $value->format('Y-m-d')
+                ? $this->formatDateCell($value, $column)
                 : ($value === null ? '' : (string) $value),
             'boolean' => $value ? 'Yes' : 'No',
             default => $value === null ? '' : (string) $value,

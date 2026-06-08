@@ -78,6 +78,7 @@
 - Hard deps em libs de export (simple-excel, dompdf) ficam em `suggest:` até serem efetivamente exigidas pelo exporter correspondente — apps que só usam CSV não pagam o custo de instalar dompdf
 - `Exporter::export()` recebe `$destination` absoluto (já resolvido pelo caller via `storage_path()` ou disk-aware path); o exporter só escreve, não decide localização
 - `ExportFormat::extension()` devolve sem ponto inicial (`'csv'`, não `'.csv'`); o ponto é responsabilidade do construtor de filename
+- **Células de data honram o `mode`/`format` da `DateColumn`** (#217) via o trait compartilhado `FormatsDateCells::formatDateCell()`, usado pelos três exporters nos branches plano e `state_resolver`: `props.mode` (`date`|`datetime`|`since`) + `props.format` decidem o output, espelhando o que a tabela renderiza — `->dateTime()` retém a hora, `->date('d/m/Y')` aplica o formato custom, e `since` emite a string relativa (`diffForHumans()`). Default sem props continua `Y-m-d`. O XLSX mantém a data como **string** (não serial Excel, #106), só com o formato correto
 
 ## Anti-patterns
 

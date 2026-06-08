@@ -720,6 +720,51 @@
       "pr": 200,
       "round": 14,
       "note": "exposed by #189: WidgetRenderer.withFilters() did String(value) on object/array filter values on deferred/poll refetch -> {from,to}='[object Object]', ['a','b']='a,b'. Now recursive appendFilterValue: arrays -> filters[k][], objects -> filters[k][subKey], scalars unchanged, empties skipped. Matches the SSR qs bracket notation."
+    },
+    {
+      "signature": "fields::belongstofield-searchroute-never-populated",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 203,
+      "pr": 208,
+      "round": 15,
+      "note": "HIGH documented-but-unwired (CORE-006 shipped incomplete): BelongsToInput.tsx is async-only on f.props.searchRoute but NO producer set it -> picker permanently empty, belongsTo never selectable. Fix: FieldSchemaSerializer::serialize gained ?resourceSlug, injects searchRoute=route('arqel.fields.search',[resource,field]) for searchable BelongsTo. preloadedOptions/createRoute still follow-up (component doesn't read them yet)."
+    },
+    {
+      "signature": "fields::selectfield-optionsrelationship-empty",
+      "package": "fields",
+      "status": "fixed",
+      "issue": 204,
+      "pr": 209,
+      "round": 15,
+      "note": "same CORE-006 root cause: SelectField::resolveOptions() returned [] for relationship mode -> empty <select>. Fix: SelectField::resolveOptionsForOwner(Model) plucks display=>key via the relation; FieldSchemaSerializer::serialize gained ?Model owner ($record on edit/show, fresh model on create), injects into props.options. SelectFieldTest broken-[] assertion updated."
+    },
+    {
+      "signature": "ai::controllers-uncaught-aiexception-500",
+      "package": "ai",
+      "status": "fixed",
+      "issue": 205,
+      "pr": 207,
+      "round": 15,
+      "note": "AiGenerate/Classify/Translate controllers didn't catch AiException -> 500 (Extract/AnalyzeImage returned 422). Added try/catch(AiException)->422 to all 3. SUPERSEDED by the #211 security hardening below."
+    },
+    {
+      "signature": "core::column-getstate-formatstate-dead-serialization",
+      "package": "core",
+      "status": "fixed",
+      "issue": 206,
+      "pr": 210,
+      "round": 15,
+      "note": "Column getStateUsing/formatStateUsing/ComputedColumn were dead END-TO-END (verifier corrected scope from export-only): serializeRecord built rows from $record->toArray(), exporters used data_get -> computed cols blank, formatted cols raw, in BOTH table render and export. Fix: serializeRecord resolves $column->formatState($column->getState($record),$record) into the row (reusing the #182 column threading); export path resolves through the Column pipeline too."
+    },
+    {
+      "signature": "ai::controllers-reflect-upstream-error-body",
+      "package": "ai",
+      "status": "fixed",
+      "issue": null,
+      "pr": 211,
+      "round": 15,
+      "note": "SECURITY (info disclosure, automated review on the #205 commit): all 5 AI controllers returned $e->getMessage() for AiException, but OpenAi/OllamaProvider embed the raw upstream $response->body() in it. Fix: two-tier catch — DailyLimitExceeded|UserLimitExceeded keep their static user-facing message; bare AiException -> report($e) + generic 'AI provider request failed' (422). Closes the finding across the whole package, not just #205's 3."
     }
   ]
 }

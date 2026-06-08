@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Ai\Http\Controllers;
 
+use Arqel\Ai\Exceptions\AiException;
 use Arqel\Ai\Fields\AiTranslateField;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
@@ -89,15 +90,19 @@ final class AiTranslateController
         $targetLanguages = (array) $request->input('targetLanguages', []);
 
         $translations = [];
-        foreach ($targetLanguages as $target) {
-            if (! is_string($target) || $target === '') {
-                continue;
+        try {
+            foreach ($targetLanguages as $target) {
+                if (! is_string($target) || $target === '') {
+                    continue;
+                }
+                $translations[$target] = $translateField->translate(
+                    $sourceText,
+                    $target,
+                    $sourceLanguage !== '' ? $sourceLanguage : null,
+                );
             }
-            $translations[$target] = $translateField->translate(
-                $sourceText,
-                $target,
-                $sourceLanguage !== '' ? $sourceLanguage : null,
-            );
+        } catch (AiException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 422);
         }
 
         return new JsonResponse(['translations' => $translations]);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Ai\Http\Controllers;
 
+use Arqel\Ai\Exceptions\AiException;
 use Arqel\Ai\Fields\AiSelectField;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
@@ -77,7 +78,12 @@ final class AiClassifyController
         /** @var array<string, mixed> $formData */
         $formData = (array) $request->input('formData', []);
 
-        $key = $selectField->classify($formData);
+        try {
+            $key = $selectField->classify($formData);
+        } catch (AiException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 422);
+        }
+
         $options = $selectField->getOptions();
         $label = $key !== null ? ($options[$key] ?? null) : null;
 

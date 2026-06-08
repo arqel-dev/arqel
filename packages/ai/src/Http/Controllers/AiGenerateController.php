@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Ai\Http\Controllers;
 
+use Arqel\Ai\Exceptions\AiException;
 use Arqel\Ai\Fields\AiTextField;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Http\JsonResponse;
@@ -69,7 +70,11 @@ final class AiGenerateController
         /** @var array<string, mixed> $formData */
         $formData = (array) $request->input('formData', []);
 
-        $text = $aiField->generate($formData);
+        try {
+            $text = $aiField->generate($formData);
+        } catch (AiException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 422);
+        }
 
         return new JsonResponse(['text' => $text]);
     }

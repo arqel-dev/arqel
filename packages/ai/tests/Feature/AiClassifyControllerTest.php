@@ -7,6 +7,7 @@ use Arqel\Ai\Tests\Fixtures\ConfigurableFakeProvider;
 use Arqel\Ai\Tests\Fixtures\FakeAiResource;
 use Arqel\Ai\Tests\Fixtures\FakeAiSelectResource;
 use Arqel\Ai\Tests\Fixtures\FormOnlyAiSelectResource;
+use Arqel\Ai\Tests\Fixtures\ThrowingProvider;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -109,4 +110,19 @@ it('resolves an AiSelectField declared only inside form() (#104)', function (): 
     /** @var array<string, mixed> $body */
     $body = (array) $response->json();
     expect($body)->toBe(['key' => 'tech', 'label' => 'Technology']);
+});
+
+it('returns 422 (not 500) when the provider throws an AiException (#205)', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FakeAiSelectResource::class);
+    app()->instance(AiManager::class, new AiManager(['fake' => new ThrowingProvider('fake')]));
+
+    /** @var TestCase $this */
+    $response = postClassify($this, 'ai-posts', 'category', [
+        'formData' => ['title' => 'New CPU', 'description' => 'Apple M5 launched'],
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJson(['message' => 'provider upstream 503']);
 });

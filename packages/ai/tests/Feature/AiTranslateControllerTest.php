@@ -7,6 +7,7 @@ use Arqel\Ai\Tests\Fixtures\FakeAiResource;
 use Arqel\Ai\Tests\Fixtures\FakeAiTranslateResource;
 use Arqel\Ai\Tests\Fixtures\FakeProvider;
 use Arqel\Ai\Tests\Fixtures\FormOnlyAiTranslateResource;
+use Arqel\Ai\Tests\Fixtures\ThrowingProvider;
 use Arqel\Ai\Tests\TestCase;
 use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -60,6 +61,23 @@ it('returns 200 with translations on the happy path', function (): void {
     expect($translations)->toHaveKeys(['pt-BR', 'es'])
         ->and($translations['pt-BR'])->toStartWith('echo:Translate the following text from en to pt-BR')
         ->and($translations['es'])->toStartWith('echo:Translate the following text from en to es');
+});
+
+it('returns 422 (not 500) when the provider throws an AiException (#205)', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FakeAiTranslateResource::class);
+    app()->instance(AiManager::class, new AiManager(['fake' => new ThrowingProvider('fake')]));
+
+    /** @var TestCase $this */
+    $response = postTranslate($this, 'ai-pages', 'description', [
+        'sourceLanguage' => 'en',
+        'sourceText' => 'Hello world',
+        'targetLanguages' => ['pt-BR', 'es'],
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJson(['message' => 'provider upstream 503']);
 });
 
 it('returns 404 when the resource slug is not registered', function (): void {

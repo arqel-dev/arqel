@@ -657,6 +657,51 @@
       "pr": 183,
       "round": 12,
       "note": "Column::canSee()/Filter::canSee() per-record predicates had zero callers; serializeRecord now redacts non-visible cells + applyFilters skips non-visible filters; Table.php docblock corrected."
+    },
+    {
+      "signature": "versioning::versionable-snapshot-stores-raw",
+      "package": "versioning",
+      "status": "fixed",
+      "issue": 187,
+      "pr": 195,
+      "round": 13,
+      "note": "HIGH data-corruption: writeVersion snapshotted RAW getAttributes() so a cast attr (array/json/encrypted) was stored as a JSON string; restoreToVersion forceFill+save double-encoded it permanently; updating diff mixed cast getOriginal vs raw getDirty (type-asymmetric). Now cast-aware: per-key getAttribute snapshot, setAttribute-loop restore (re-applies casts, keeps mass-assign bypass), cast values on both diff sides. Casted fixture added."
+    },
+    {
+      "signature": "core::command-palette-nav-url-hardcodes-admin",
+      "package": "core",
+      "status": "fixed",
+      "issue": 188,
+      "pr": 193,
+      "round": 13,
+      "note": "NavigationCommandProvider hardcoded url '/admin/'.slug; now resolves the panel path (PanelRegistry getPath ?? config('arqel.path')) like InertiaDataBuilder::resolvePanelPath, resolved once in provide(). 404 on non-default Panel::path()."
+    },
+    {
+      "signature": "widgets::dashboard-selectfilter-multiple-ignored",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 189,
+      "pr": 192,
+      "round": 13,
+      "note": "SelectFilter::multiple() serialized multiple:true but DashboardFilters.tsx SelectControl ignored it (always single-select); now branches on filter.multiple -> <select multiple> with array value/onChange mirroring TableFilters MultiSelectFilter. value path is unknown-typed end-to-end so array plumbs transparently."
+    },
+    {
+      "signature": "audit::record-activity-morphmap-mismatch",
+      "package": "audit",
+      "status": "fixed",
+      "issue": 190,
+      "pr": 194,
+      "round": 13,
+      "note": "LOW/latent (needs enforceMorphMap): RecordActivityController required class_exists(subjectType) (alias 'post' -> 400) and queried raw FQCN (storage holds alias -> 0 rows). Now resolveModelClass accepts FQCN or alias (Relation::getMorphedModel) and queries getMorphClass(); composes with the #181/#184 view-policy authz on the resolved class."
+    },
+    {
+      "signature": "auth::password-broker-ignores-panel-guard",
+      "package": "auth",
+      "status": "fixed",
+      "issue": 191,
+      "pr": 196,
+      "round": 13,
+      "note": "LOW/latent (needs non-users guard, fails-closed): Forgot/ResetPassword called Password::broker() no-arg (always 'users'); Panel::passwordResetExpirationMinutes + RegisterRequest also hardcoded users. Added resolvePasswordBroker() (guard->provider->broker, fallback users) in ResolvesPanelGuard + mirrored in Panel; all 3 touch-points now panel-guard-aware. Default web/users is a no-op."
     }
   ]
 }

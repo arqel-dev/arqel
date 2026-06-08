@@ -40,6 +40,39 @@ it('emits a navigation command for every registered resource', function (): void
         ->and($postCommand->icon)->toBeNull();
 });
 
+it('resolves navigation urls against a non-default panel path from config', function (): void {
+    config(['arqel.path' => 'manage']);
+
+    $this->registry->register(UserResource::class);
+
+    $commands = $this->provider->provide(null, '');
+
+    expect($commands)->toHaveCount(1)
+        ->and($commands[0]->url)->toBe('/manage/users');
+});
+
+it('normalises panel paths with leading/trailing slashes', function (): void {
+    config(['arqel.path' => '/back-office/']);
+
+    $this->registry->register(UserResource::class);
+
+    $commands = $this->provider->provide(null, '');
+
+    expect($commands)->toHaveCount(1)
+        ->and($commands[0]->url)->toBe('/back-office/users');
+});
+
+it('falls back to /admin when the configured path is not a string', function (): void {
+    config(['arqel.path' => ['unexpected']]);
+
+    $this->registry->register(UserResource::class);
+
+    $commands = $this->provider->provide(null, '');
+
+    expect($commands)->toHaveCount(1)
+        ->and($commands[0]->url)->toBe('/admin/users');
+});
+
 it('returns an empty array when the registry is empty', function (): void {
     expect($this->provider->provide(null, ''))->toBe([]);
 });

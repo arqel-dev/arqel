@@ -6,6 +6,7 @@ namespace Arqel\Core\CommandPalette\Providers;
 
 use Arqel\Core\CommandPalette\Command;
 use Arqel\Core\CommandPalette\CommandProvider;
+use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Core\Support\ResourceAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -20,9 +21,17 @@ use Throwable;
  *
  *     id       = "nav:{slug}"
  *     label    = "Go to {plural label}"
- *     url      = "/admin/{slug}"
+ *     url      = "{panel path}/{slug}"
  *     category = "Navigation"
  *     icon     = $resource::getNavigationIcon()
+ *
+ * The `url` honours the configurable panel path (`Panel::path()` /
+ * `config('arqel.path')`) instead of a hardcoded `/admin`, so a panel
+ * mounted under `/manage` produces `/manage/{slug}` — matching where
+ * `ArqelServiceProvider::registerResourceRoutes` actually mounts the
+ * index route. The resolution mirrors
+ * {@see InertiaDataBuilder::resolvePanelPath()} (the canonical source)
+ * and is computed once per `provide()` call rather than per command.
  *
  * Each metadata read is wrapped in a defensive try/catch so a
  * misbehaving Resource (throwing inside `getSlug()` etc.) never
@@ -51,13 +60,14 @@ final class NavigationCommandProvider implements CommandProvider
     public function provide(?Authenticatable $user, string $query): array
     {
         $commands = [];
+        $panelPath = $this->resolvePanelPath();
 
         foreach ($this->registry->all() as $resourceClass) {
             if (ResourceAuthorization::viewAnyDenied($resourceClass, $user)) {
                 continue;
             }
 
-            $command = $this->buildCommand($resourceClass);
+            $command = $this->buildCommand($resourceClass, $panelPath);
 
             if ($command !== null) {
                 $commands[] = $command;
@@ -75,8 +85,10 @@ final class NavigationCommandProvider implements CommandProvider
      * downgrades to `null` instead of dropping the command.
      *
      * @param class-string $resourceClass
+     * @param string $panelPath leading-slash, no-trailing-slash panel
+     *                          prefix (e.g. `/admin`, `/manage`)
      */
-    private function buildCommand(string $resourceClass): ?Command
+    private function buildCommand(string $resourceClass, string $panelPath): ?Command
     {
         try {
             /** @var string $slug */
@@ -104,10 +116,29 @@ final class NavigationCommandProvider implements CommandProvider
         return new Command(
             id: 'nav:'.$slug,
             label: 'Go to '.$pluralLabel,
-            url: '/admin/'.$slug,
+            url: $panelPath.'/'.$slug,
             description: null,
             category: 'Navigation',
             icon: $icon,
         );
+    }
+
+    /**
+     * Resolve the active panel path the same way the index route is
+     * mounted: current Panel's `getPath()`, else `config('arqel.path')`,
+     * else `admin`. Returns a leading-slash, no-trailing-slash form
+     * (e.g. `/admin`, `/manage`).
+     *
+     * Canonical source: {@see InertiaDataBuilder::resolvePanelPath()} —
+     * replicated inline here (a few lines) to avoid coupling the palette
+     * provider to the Inertia payload builder.
+     */
+    private function resolvePanelPath(): string
+    {
+        $panel = app(PanelRegistry::class)->getCurrent();
+        $configPath = config('arqel.path', 'admin');
+        $rawPath = $panel?->getPath() ?? (is_string($configPath) ? $configPath : 'admin');
+
+        return '/'.trim($rawPath, '/');
     }
 }

@@ -7,6 +7,7 @@ namespace Arqel\Core\Support;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Serialise an `Arqel\Fields\Field` (or any structurally-compatible
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * the payload shape — controllers should defer to it rather than
  * hand-rolling per-field arrays.
  *
- * `serialize(fields, ?record, ?user, ?owner)`:
+ * `serialize(fields, ?record, ?user, ?owner, ?resourceSlug)`:
  *   - filters fields by `canBeSeenBy(user, record)` when present
  *   - resolves `isReadonly` and combines with `canBeEditedBy` to
  *     produce a single `readonly` flag
@@ -30,6 +31,10 @@ use Illuminate\Database\Eloquent\Model;
  *     the owner model so `props.options` arrives populated. The owner
  *     defaults to `record`; the create page passes a fresh model
  *     instance so options resolve even with no record yet.
+ *   - when `$resourceSlug` is given, injects the relationship endpoint
+ *     URLs that depend on the owning Resource + panel routing (e.g. a
+ *     searchable `BelongsToField`'s `searchRoute`, #203) — these can't
+ *     be produced by the Field in isolation.
  */
 final class FieldSchemaSerializer
 {
@@ -38,7 +43,7 @@ final class FieldSchemaSerializer
      *
      * @return list<array<string, mixed>>
      */
-    public function serialize(array $fields, ?Model $record = null, ?Authenticatable $user = null, ?Model $owner = null): array
+    public function serialize(array $fields, ?Model $record = null, ?Authenticatable $user = null, ?Model $owner = null, ?string $resourceSlug = null): array
     {
         // The owner model is the Resource model that declares any
         // relationship-backed options. It defaults to the record being
@@ -56,7 +61,7 @@ final class FieldSchemaSerializer
                 continue;
             }
 
-            $serialized[] = $this->serializeOne($field, $record, $user, $owner);
+            $serialized[] = $this->serializeOne($field, $record, $user, $owner, $resourceSlug);
         }
 
         return $serialized;
@@ -65,7 +70,7 @@ final class FieldSchemaSerializer
     /**
      * @return array<string, mixed>
      */
-    private function serializeOne(object $field, ?Model $record, ?Authenticatable $user, ?Model $owner = null): array
+    private function serializeOne(object $field, ?Model $record, ?Authenticatable $user, ?Model $owner = null, ?string $resourceSlug = null): array
     {
         return [
             'type' => $this->call($field, 'getType') ?? '',
@@ -84,7 +89,7 @@ final class FieldSchemaSerializer
             'validation' => $this->serializeValidation($field),
             'visibility' => $this->serializeVisibility($field, $record, $user),
             'dependsOn' => $this->serializeDependencies($field),
-            'props' => $this->serializeProps($field, $owner),
+            'props' => $this->serializeProps($field, $owner, $resourceSlug),
         ];
     }
 
@@ -150,7 +155,7 @@ final class FieldSchemaSerializer
     /**
      * @return array<string, mixed>
      */
-    private function serializeProps(object $field, ?Model $owner = null): array
+    private function serializeProps(object $field, ?Model $owner = null, ?string $resourceSlug = null): array
     {
         if (! method_exists($field, 'getTypeSpecificProps')) {
             return [];
@@ -167,7 +172,9 @@ final class FieldSchemaSerializer
             $clean[(string) $key] = $value;
         }
 
-        return $this->withResolvedRelationOptions($field, $clean, $owner);
+        $clean = $this->withResolvedRelationOptions($field, $clean, $owner);
+
+        return $this->injectRelationshipRoutes($field, $clean, $resourceSlug);
     }
 
     /**
@@ -208,6 +215,66 @@ final class FieldSchemaSerializer
         if (is_array($resolved) && $resolved !== []) {
             $props['options'] = $resolved;
         }
+
+        return $props;
+    }
+
+    /**
+     * Inject the panel-scoped endpoint URLs that a relationship Field
+     * cannot build on its own because they depend on the owning
+     * Resource slug + named panel routes (#203).
+     *
+     * For a searchable `BelongsToField`, `BelongsToInput.tsx` is
+     * driven entirely by `props.searchRoute`: without it the async
+     * picker short-circuits to an empty list and the relation can
+     * never be selected. We resolve `arqel.fields.search` here, where
+     * the owning Resource slug is known.
+     *
+     * Duck-typed (core has no `arqel-dev/fields` dep): a field is treated
+     * as a searchable BelongsTo when its `props` carry the BelongsTo
+     * signature (`relatedResource` + a truthy `searchable`) and it
+     * exposes `getName()`. The route is only injected when it is both
+     * registered and not already present.
+     *
+     * @param array<string, mixed> $props
+     *
+     * @return array<string, mixed>
+     */
+    private function injectRelationshipRoutes(object $field, array $props, ?string $resourceSlug): array
+    {
+        if ($resourceSlug === null || $resourceSlug === '') {
+            return $props;
+        }
+
+        if (array_key_exists('searchRoute', $props)) {
+            return $props;
+        }
+
+        $isSearchableBelongsTo = array_key_exists('relatedResource', $props)
+            && array_key_exists('searchable', $props)
+            && $props['searchable'] === true;
+
+        if (! $isSearchableBelongsTo) {
+            return $props;
+        }
+
+        if (! method_exists($field, 'getName')) {
+            return $props;
+        }
+
+        $name = $field->getName();
+        if (! is_string($name) || $name === '') {
+            return $props;
+        }
+
+        if (! Route::has('arqel.fields.search')) {
+            return $props;
+        }
+
+        $props['searchRoute'] = route('arqel.fields.search', [
+            'resource' => $resourceSlug,
+            'field' => $name,
+        ]);
 
         return $props;
     }

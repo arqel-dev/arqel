@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Core\Support\FieldSchemaSerializer;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Hand-rolled fixtures with explicit accessors so we don't depend
@@ -173,4 +174,81 @@ it('serialises Closure rules as their string form (skipping callables)', functio
     $payload = (new FieldSchemaSerializer)->serialize([$field]);
 
     expect($payload[0]['validation']['rules'])->toBe(['required', 'max:10']);
+});
+
+/*
+ * #203 — `props.searchRoute` injection for searchable BelongsTo
+ * fields. The serializer resolves `arqel.fields.search` from the
+ * owning Resource slug (passed by `InertiaDataBuilder`) so the React
+ * `BelongsToInput` picker has a URL to query. Duck-typed: a field is a
+ * searchable BelongsTo when its props carry `relatedResource` and a
+ * truthy `searchable`.
+ */
+function stubBelongsToField(string $name, bool $searchable): object
+{
+    return new class($name, $searchable)
+    {
+        public function __construct(
+            private readonly string $name,
+            private readonly bool $searchable,
+        ) {}
+
+        public function getName(): string
+        {
+            return $this->name;
+        }
+
+        public function getType(): string
+        {
+            return 'belongsTo';
+        }
+
+        /** @return array<string, mixed> */
+        public function getTypeSpecificProps(): array
+        {
+            return [
+                'relatedResource' => 'App\\Resources\\OwnerResource',
+                'relationship' => 'owner',
+                'searchable' => $this->searchable,
+                'searchColumns' => [],
+                'preload' => false,
+            ];
+        }
+    };
+}
+
+it('injects searchRoute for a searchable BelongsTo field when a slug is given (#203)', function (): void {
+    Route::get('{resource}/fields/{field}/search', fn () => null)->name('arqel.fields.search');
+    Route::getRoutes()->refreshNameLookups();
+
+    $payload = $this->serializer->serialize([stubBelongsToField('owner_id', true)], null, null, null, 'posts');
+
+    expect($payload[0]['props'])->toHaveKey('searchRoute')
+        ->and($payload[0]['props']['searchRoute'])->toBe(
+            route('arqel.fields.search', ['resource' => 'posts', 'field' => 'owner_id']),
+        );
+});
+
+it('does not inject searchRoute without a resource slug (#203)', function (): void {
+    Route::get('{resource}/fields/{field}/search', fn () => null)->name('arqel.fields.search');
+    Route::getRoutes()->refreshNameLookups();
+
+    $payload = $this->serializer->serialize([stubBelongsToField('owner_id', true)]);
+
+    expect($payload[0]['props'])->not->toHaveKey('searchRoute');
+});
+
+it('does not inject searchRoute when the BelongsTo field is not searchable (#203)', function (): void {
+    Route::get('{resource}/fields/{field}/search', fn () => null)->name('arqel.fields.search');
+    Route::getRoutes()->refreshNameLookups();
+
+    $payload = $this->serializer->serialize([stubBelongsToField('owner_id', false)], null, null, null, 'posts');
+
+    expect($payload[0]['props'])->not->toHaveKey('searchRoute');
+});
+
+it('does not inject searchRoute when the search route is not registered (#203)', function (): void {
+    $payload = $this->serializer->serialize([stubBelongsToField('owner_id', true)], null, null, null, 'posts');
+
+    expect($payload[0]['props'])->not->toHaveKey('searchRoute');
 });

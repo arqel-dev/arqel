@@ -16,9 +16,11 @@ use InvalidArgumentException;
  * Configured via the `make()` factory rather than the constructor
  * because `Field::__construct` is final (FIELDS-002 design intent).
  * The related Resource class-string is captured eagerly so config
- * mistakes surface immediately; everything else (search route,
- * inline option creation, preload payload) is recorded as metadata
- * and resolved by the controller in CORE-006.
+ * mistakes surface immediately. The search metadata (`searchable`,
+ * `searchColumns`, `relatedResource`) is emitted here; the concrete
+ * `searchRoute` URL — which depends on the owning Resource slug and
+ * the panel's named routes — is injected at serialisation time by
+ * `FieldSchemaSerializer` (#203), where that context is known.
  */
 final class BelongsToField extends Field
 {
@@ -157,9 +159,11 @@ final class BelongsToField extends Field
             'searchable' => $this->searchable,
             'searchColumns' => $this->searchColumns,
             'preload' => $this->preload,
-            // Concrete `searchRoute`, `preloadedOptions`, `createRoute`,
-            // and serialised `optionLabel` are filled in by the controller
-            // (CORE-006) once the owner Resource and panel routing exist.
+            // `searchRoute` is injected by `FieldSchemaSerializer` (#203):
+            // it needs the owning Resource slug + panel routing, which the
+            // Field does not know in isolation. `preloadedOptions` /
+            // `createRoute` remain follow-ups (the picker does not read
+            // them yet).
         ];
     }
 }

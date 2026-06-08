@@ -155,7 +155,7 @@ final class RecordActivityController extends Controller
      * a class-level Policy still applies (the activity query itself stays
      * unchanged and may legitimately return an empty paginator).
      *
-     * @param  class-string<Model>  $modelClass
+     * @param class-string<Model> $modelClass
      */
     private function resolveSubject(string $modelClass, string|int $subjectId): Model
     {

@@ -127,7 +127,7 @@
       "issue": 67,
       "pr": 76,
       "round": 2,
-      "note": "minimal coherent round-trip shipped; full signed-URL/Export-model/queue is DEFERRED feature work EXPORT-007/008 per ExportAction docblock \u2014 do NOT re-file the deferred surface as a bug."
+      "note": "minimal coherent round-trip shipped; full signed-URL/Export-model/queue is DEFERRED feature work EXPORT-007/008 per ExportAction docblock — do NOT re-file the deferred surface as a bug."
     },
     {
       "signature": "widgets::widgetdata-envelope-mismatch",
@@ -295,7 +295,7 @@
       "package": "nav",
       "status": "not-a-bug",
       "round": 4,
-      "note": "refuted: arqel-dev/nav NavigationItem/BreadcrumbsBuilder emit /{slug} without /admin, but the package is UNWIRED \u2014 the real Sidebar uses HandleArqelInertiaRequests::buildNavigation() which prepends the panel path. Dead/parallel code, no app-facing 404."
+      "note": "refuted: arqel-dev/nav NavigationItem/BreadcrumbsBuilder emit /{slug} without /admin, but the package is UNWIRED — the real Sidebar uses HandleArqelInertiaRequests::buildNavigation() which prepends the panel path. Dead/parallel code, no app-facing 404."
     },
     {
       "signature": "core::field-canedit-not-enforced-write-path",
@@ -358,14 +358,14 @@
       "package": "audit",
       "status": "app-misuse",
       "round": 5,
-      "note": "refuted: follows the established web+auth convention (sibling export ExportDownloadController has the identical pattern + an explicit SECURITY NOTE delegating authz to the consumer app). Gap = audit lacks that delegation docblock \u2014 a doc/hardening note, not a behavioral bug."
+      "note": "refuted: follows the established web+auth convention (sibling export ExportDownloadController has the identical pattern + an explicit SECURITY NOTE delegating authz to the consumer app). Gap = audit lacks that delegation docblock — a doc/hardening note, not a behavioral bug."
     },
     {
       "signature": "audit::logsactivity-logs-all-attributes",
       "package": "audit",
       "status": "app-misuse",
       "round": 5,
-      "note": "refuted: documented anti-pattern in SKILL.md (override \u00e9 obrigat\u00f3rio); ['*'] fallback is canonical intended behavior; no baseline model uses $guarded=[]+trait."
+      "note": "refuted: documented anti-pattern in SKILL.md (override é obrigatório); ['*'] fallback is canonical intended behavior; no baseline model uses $guarded=[]+trait."
     },
     {
       "signature": "fields::unique-no-update-ignore",
@@ -422,7 +422,7 @@
       "issue": 126,
       "pr": 134,
       "round": 7,
-      "note": "BLOCKER \u2014 generator output fataled on autoload (extends final)"
+      "note": "BLOCKER — generator output fataled on autoload (extends final)"
     },
     {
       "signature": "core::readonly-disabled-fields-persisted",
@@ -581,7 +581,7 @@
       "issue": 155,
       "pr": 159,
       "round": 9,
-      "note": "doc inaccuracy \u2014 ::make() documented but no field has it"
+      "note": "doc inaccuracy — ::make() documented but no field has it"
     },
     {
       "signature": "table::querybuilderfilter-500-malformed-value",
@@ -639,6 +639,24 @@
       "pr": 175,
       "round": 11,
       "note": "investigation found arqel.actions.* routes are dead (frontend uses core dispatch); removed them (vs wiring a 2nd auth-divergent surface)"
+    },
+    {
+      "signature": "audit::read-endpoints-no-authz",
+      "package": "audit",
+      "status": "fixed",
+      "issue": 181,
+      "pr": 184,
+      "round": 12,
+      "note": "reverses the R5 app-misuse verdict on audit::activity-log-no-tenant-scope-no-authz: the global activity-log + per-record activity read endpoints had web,auth only and ZERO controller authz (any authed user reads the full audit log + any record's activity). Gated like versioning history (Gate::has||getPolicyFor, deny when set; scaffold no-policy still allows)."
+    },
+    {
+      "signature": "table::column-filter-cansee-dead",
+      "package": "table",
+      "status": "fixed",
+      "issue": 182,
+      "pr": 183,
+      "round": 12,
+      "note": "Column::canSee()/Filter::canSee() per-record predicates had zero callers; serializeRecord now redacts non-visible cells + applyFilters skips non-visible filters; Table.php docblock corrected."
     }
   ]
 }

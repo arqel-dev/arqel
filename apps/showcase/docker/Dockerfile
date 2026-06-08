@@ -1,5 +1,5 @@
 FROM php:8.4-fpm-alpine AS base
-RUN apk add --no-cache nginx supervisor postgresql-dev oniguruma-dev libzip-dev icu-dev \
+RUN apk add --no-cache nginx postgresql-dev libzip-dev icu-dev \
     && docker-php-ext-install pdo pdo_pgsql bcmath zip intl opcache pcntl \
     && apk add --no-cache --virtual .build-deps autoconf g++ make \
     && pecl install redis \

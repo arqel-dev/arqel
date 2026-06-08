@@ -19,10 +19,15 @@ use Arqel\Fields\Types\DateTimeField;
 use Arqel\Fields\Types\SelectField;
 use Arqel\Fields\Types\TextField;
 use Arqel\Form\Form;
-use Arqel\Form\Layout\Section;
+use Arqel\Form\Layout\Grid;
+use Arqel\Form\Layout\Group;
+use Arqel\Form\Layout\Tab;
+use Arqel\Form\Layout\Tabs;
 use Arqel\Table\Columns\BadgeColumn;
 use Arqel\Table\Columns\BooleanColumn;
+use Arqel\Table\Columns\ComputedColumn;
 use Arqel\Table\Columns\DateColumn;
+use Arqel\Table\Columns\RelationshipColumn;
 use Arqel\Table\Columns\TextColumn;
 use Arqel\Table\Filters\SelectFilter;
 use Arqel\Table\Filters\TernaryFilter;
@@ -96,35 +101,47 @@ final class PostResource extends Resource
     public function form(): Form
     {
         return Form::make()
-            ->columns(2)
+            ->columns(1)
             ->model(Post::class)
             ->schema([
-                Section::make('Content')
-                    ->columns(2)
-                    ->schema([
-                        (new TextField('title'))
-                            ->required()
-                            ->columnSpan('full'),
-                        Field::slug('slug')
-                            ->fromField('title')
-                            ->columnSpan('full'),
-                        Field::richText('body')
-                            ->columnSpan('full'),
-                        Field::select('author_id')
-                            ->options(self::authorOptions())
-                            ->required(),
-                    ]),
-                Section::make('Meta')
-                    ->columns(2)
-                    ->schema([
-                        Field::select('status')
-                            ->options(self::STATUS_OPTIONS),
-                        (new BooleanField('featured'))
-                            ->inline(),
-                        (new DateTimeField('published_at'))
-                            ->columnSpan('full'),
-                        Field::keyValue('meta')
-                            ->columnSpan('full'),
+                Tabs::make()
+                    ->defaultTab('content')
+                    ->tabs([
+                        Tab::make('content', 'Content')
+                            ->schema([
+                                (new TextField('title'))
+                                    ->required()
+                                    ->columnSpan('full'),
+                                Field::slug('slug')
+                                    ->fromField('title')
+                                    ->columnSpan('full'),
+                                Field::richText('body')
+                                    ->columnSpan('full'),
+                            ]),
+                        Tab::make('meta', 'Meta')
+                            ->schema([
+                                Grid::make()
+                                    ->columns(['sm' => 1, 'md' => 2])
+                                    ->schema([
+                                        Field::select('author_id')
+                                            ->options(self::authorOptions())
+                                            ->required(),
+                                        Field::select('status')
+                                            ->options(self::STATUS_OPTIONS),
+                                        (new BooleanField('featured'))
+                                            ->inline(),
+                                        (new DateTimeField('published_at')),
+                                    ]),
+                                Group::make()
+                                    // visibleIf is invoked with a null record at
+                                    // serialization (Component::isVisibleFor(null)),
+                                    // so the predicate MUST be null-safe.
+                                    ->visibleIf(fn ($record) => $record?->status === 'archived')
+                                    ->schema([
+                                        Field::keyValue('meta')
+                                            ->columnSpan('full'),
+                                    ]),
+                            ]),
                     ]),
             ]);
     }
@@ -141,6 +158,12 @@ final class PostResource extends Resource
                 ]),
                 BooleanColumn::make('featured'),
                 DateColumn::make('published_at')->sortable()->dateTime('d/m/Y H:i'),
+                RelationshipColumn::make('author')->display('name')->label('Author'),
+                ComputedColumn::make('word_count')->label('Words')
+                    // getStateUsing is invoked with a null record at
+                    // serialization (Column::getState(null)), so the
+                    // closure MUST be null-safe.
+                    ->getStateUsing(fn ($record) => str_word_count((string) ($record?->body ?? ''))),
             ])
             ->filters([
                 SelectFilter::make('status')->options(self::STATUS_OPTIONS),

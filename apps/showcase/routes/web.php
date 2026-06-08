@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 use App\Http\Controllers\TicketTransitionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::redirect('/', '/admin');
 
-// Demo surface that mounts VersionHistoryDrawer (VersionsDemo.tsx) so the
-// Phase-5 versioning E2E can reach @arqel-dev/versioning's timeline/diff
-// components. Behind web+auth like the rest of the panel.
-Route::get('/admin/versions-demo', static fn () => Inertia::render('VersionsDemo'))
-    ->middleware(['web', 'auth'])
-    ->name('showcase.versions-demo');
+// NOTE: the versions-demo surface lives in AppServiceProvider::boot(), not
+// here. Arqel's panel registers a greedy `admin/{resource}` route in an
+// `app->booted()` callback that shadows single-segment `/admin/*` routes
+// declared in this file, so the route must be registered earlier (provider
+// boot) to win. See AppServiceProvider + the Phase-5 findings ledger.
 
 // The arqel-dev/workflow package ships a StateTransitionField + a
 // Ticket::transitionTo() model method, but NO HTTP endpoint to trigger a

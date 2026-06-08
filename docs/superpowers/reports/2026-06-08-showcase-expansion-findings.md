@@ -89,3 +89,42 @@ Because the contexts are different objects, `@arqel-dev/theme`'s `ThemeToggle`/`
 **Suggested framework fix:** ship a first-class `TrashedFilter` (Filament-style: a select/ternary with `with-trashed` / `only-trashed` / `without-trashed` states) in `packages/table/src/Filters/`, that detects the model uses `SoftDeletes` and applies `withTrashed()`/`onlyTrashed()` itself. Bonus: a `Resource`/`Table` opt-in (e.g. `->softDeletes()`) that auto-registers it + the restore/force-delete row actions.
 
 **Classification note for Round 22:** distinct from #1–#5. This is a genuine missing-primitive gap in the table package (a feature the framework plausibly should ship for any SoftDeletes resource), not app-misuse — the app could not express "show trashed" with any shipped filter and had to drop to a raw closure. A strict verifier may still weigh it as a deferred-enhancement rather than a defect; either way the absence is real and forces per-Resource boilerplate.
+
+## CANDIDATE #7 — three Phase-5 E2E renderer/router gaps: (A) custom RowAction modal renders an empty 404 iframe, (B) duplicate field names in a Form drop their controls, (C) the greedy `admin/{resource}` route shadows app-defined `/admin/*` routes
+
+**Surfaced:** Tasks 5.1/5.2 (Phase-5 E2E for custom actions, workflow, and the versioning-UI demo page).
+**Severity (suspected):** A = MEDIUM/HIGH, B = MEDIUM, C = MEDIUM. Three distinct defects found while writing the E2E specs; each is verified against the running dogfood stack (not a selector mismatch). All three forced an app-side workaround or a "assert-what-renders + document-the-gap" spec.
+
+### (A) Custom RowAction execution modal renders an empty `<iframe>` (404), so confirmations and action forms never render
+
+**The gap:** PostResource declares two custom `RowAction`s — `publish` (`->requiresConfirmation()`) and `change_status` (`->form([SelectField('status')...])`). Both render their dropdown menu items correctly (Edit / Delete / Publish / Change Status under the per-row `aria-label="Actions"` trigger). But **activating either one opens a dialog whose entire body is `<iframe style="...width:100%;height:100%...">` whose document is a plain `404 Not Found`.** So:
+- `publish` never shows its confirmation copy / confirm+cancel buttons (the `requiresConfirmation()` UI is empty).
+- `change_status` never shows its `SelectField('status')` form schema — the modal is the same empty 404 iframe.
+
+The bulk `archive` BulkAction is wired differently and the bulk-action bar (Delete selected / Export / Archive / Clear) renders + functions; only the per-row action *execution modal* is broken.
+
+**Evidence:** dumping the open dialog's `innerHTML` after clicking Publish or Change Status yields exactly `<iframe ...></iframe>` (137 bytes); the iframe's content frame URL is `about:blank` and its body text is `404\nNot Found`. `getByRole('dialog')` resolves to 1 (the modal mounts) but it contains no `combobox`/`select`/`[data-arqel-field]`/buttons/text. The built-in `delete` row action, by contrast, opens NO dialog at all.
+
+**Why it matters:** custom RowActions with `requiresConfirmation()` or `->form([...])` are a headline feature; in this dogfood build neither the confirmation nor the inline action-form renders — the modal tries to load some URL into an iframe and 404s instead of rendering the serialized action schema inline.
+
+**Spec impact:** `05-actions.spec.ts` asserts the action *surfaces* (the menu items + the dialog opening + the bulk bar) — it deliberately does NOT assert the modal's inner select/confirmation copy, which do not render.
+
+### (B) Two Form fields sharing one name (`status`) → both render as a bare `<label>` with no control
+
+**The gap:** TicketResource's `form()` mounts BOTH `Field::select('status')->options(...)` AND `StateTransitionField::make('status')->showHistory()` (two components, same field name `status`). On the edit form, the Subject `TextField` renders its `<input>` and Save/Cancel render fine, but **both `status` nodes render only `<label>Status</label>` with NO `<select>`, NO combobox, NO transition buttons, NO history** — there are `0` `<select>` elements on the entire ticket edit form, and the option labels ("Open"/"Resolved") never appear in the DOM.
+
+**Evidence:** `[data-arqel-field="status"]` resolves to 2 nodes; each `.innerHTML` is just the label element. By contrast, PostResource's single `Field::select('status')` renders a working native `<select>` on its create form (spec 04/06), proving SelectField itself renders correctly when its name is unique. So the trigger is the **duplicate `data-arqel-field="status"`** (the plain select + the StateTransitionField collide; the control is dropped). This compounds the pre-existing CANDIDATE #3 sub-point (StateTransitionField emits no transition UI without a bound record).
+
+**Spec impact:** `08-workflow.spec.ts` asserts the editable form surfaces (Subject input + the two Status labels + Save/Cancel) and documents that the status control / transition UI does not render — rather than forcing a flaky assertion on a control that is absent.
+
+### (C) The panel's greedy `admin/{resource}` route shadows app-defined single-segment `/admin/*` routes → 404
+
+**The gap:** Arqel core registers a greedy `GET admin/{resource}` route (`arqel.resources.index`) during `ArqelServiceProvider::boot()` (`registerResourceRoutes()`), which is inserted into the route collection **before** routes declared in the app's `routes/web.php` or in a normal app provider `boot()`. So any single-segment custom `/admin/*` path (e.g. `/admin/versions-demo`) is matched as `admin/{resource}` with `resource="versions-demo"`, the ResourceController finds no such resource, and returns a hard **404** — even though `route:list` shows the custom route registered.
+
+**Evidence:** `Router::getRoutes()->match(Request::create('/admin/versions-demo'))` resolved to `arqel.resources.index` (uri `admin/{resource}`), not the app's `showcase.versions-demo`. Registration indices: the wildcard sits at collection index 9, the web.php route at 32 — Laravel matches by insertion order, so the wildcard wins. The page therefore 404'd server-side for authenticated users despite the route being defined.
+
+**App-side workaround (taken):** register the `/admin/versions-demo` route in `AppServiceProvider::register()` (AppServiceProvider is listed first in `bootstrap/providers.php`, and `register()` runs before any provider `boot()`), so the static route is inserted into the collection **before** the panel's wildcard and wins the match. Verified: `match()` now resolves `showcase.versions-demo` and the page returns 200. The route was moved out of `routes/web.php` for this reason (a comment there points to AppServiceProvider).
+
+**Suggested framework fix:** constrain the greedy `admin/{resource}` route with a `->where('resource', ...)` (or a registered-resources regex / an excludes list), or register the panel routes with a lower priority than app routes, so a single static `/admin/*` route declared in `routes/web.php` is not silently shadowed into a 404. As-is, every app that wants a custom `/admin/<segment>` page must register it in `register()` (an unobvious requirement) to beat the wildcard.
+
+**Classification note for Round 22:** (A) and (B) are renderer defects (action-modal iframe-404; duplicate-field-name control drop) — both reproduce against the live stack and are distinct from the deferred-feature framing of CANDIDATE #3. (C) is a routing-precedence trap in the core service provider; arguably a framework-side defect (greedy unconstrained wildcard) rather than app-misuse, since the app's correctly-defined route is silently shadowed with no diagnostic.

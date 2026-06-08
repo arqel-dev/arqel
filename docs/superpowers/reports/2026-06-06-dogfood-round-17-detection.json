@@ -1,0 +1,16 @@
+{
+  "summary": "Arqel dogfood loop — Round 17: re-detect against main (88 framework bugs fixed across rounds 0-16). Seen-filtered (94 sigs), adversarial verify. Round 16 found 1 (action modal form fields HIGH). Stop after 2 consecutive clean rounds.",
+  "agentCount": 5,
+  "logs": [
+    "Round 17 detection: 0 from clusters = 0 after dedup/seen-filter",
+    "Round 17 verify: 0 confirmed NEW framework bugs"
+  ],
+  "result": {
+    "round": 17,
+    "isClean": true,
+    "confirmedFrameworkBugs": [],
+    "appMisuse": [],
+    "notBugs": [],
+    "note": "FIRST CLEAN ROUND. Consecutive-clean counter 1/2. All major systemic families exhausted. Round 18 launched as the potential 2nd consecutive clean round to end the loop."
+  }
+}

@@ -14,16 +14,18 @@ use Illuminate\Support\Facades\Auth;
  *
  * Hook único: `static::saved(...)` regista uma `Version` quando o model
  * é criado ou atualizado e tem mudanças efetivas. O snapshot grava o
- * payload completo do model (`$model->getAttributes()`) e o diff em
- * `changes` quando aplicável.
+ * payload completo do model com os casts aplicados (per-key
+ * `$model->getAttribute()` sobre as chaves de `getAttributes()`) e o
+ * diff em `changes` quando aplicável. Ser cast-aware evita corromper
+ * casts array/json/object/collection/encrypted no restore (issue #187).
  *
  * Idempotência: nenhum hook escreve quando `wasChanged()` é `false`
  * (após update sem mudanças reais) ou quando `arqel-versioning.enabled`
  * é `false`.
  *
- * O método `restoreToVersion()` é não-destrutivo — ele faz força-fill
- * dos atributos e salva, o que dispara o hook e cria uma nova Version
- * (permitindo "undo restore").
+ * O método `restoreToVersion()` é não-destrutivo — ele reaplica os
+ * atributos (com casts) e salva, o que dispara o hook e cria uma nova
+ * Version (permitindo "undo restore").
  *
  * @phpstan-require-extends Model
  */
@@ -57,12 +59,20 @@ trait Versionable
             }
 
             $diff = [];
-            foreach ($model->getDirty() as $key => $newValue) {
+            // `getDirty()` only flags actually-changed columns. We read the
+            // CAST value on both sides (issue #187): `getOriginal($key)` is
+            // already cast, and `getAttribute($key)` returns the cast new
+            // value (the attribute is set on the model at `updating` time).
+            // Using the raw `getDirty()` value for the "after" side would make
+            // the diff type-asymmetric (e.g. [array, jsonString]).
+            foreach (array_keys($model->getDirty()) as $key) {
                 if (in_array($key, ['updated_at', 'created_at'], true)) {
                     continue;
                 }
                 /** @var mixed $original */
                 $original = $model->getOriginal($key);
+                /** @var mixed $newValue */
+                $newValue = $model->getAttribute($key);
                 $diff[$key] = [$original, $newValue];
             }
 
@@ -93,12 +103,11 @@ trait Versionable
     }
 
     /**
-     * @param array<string, array{0: mixed, 1: mixed}>|null $diff
+     * @param  array<string, array{0: mixed, 1: mixed}>|null  $diff
      */
     private static function writeVersion(Model $model, ?array $diff): void
     {
-        /** @var array<string, mixed> $payload */
-        $payload = $model->getAttributes();
+        $payload = self::snapshotAttributes($model);
 
         $userId = self::resolveAuditUserId();
 
@@ -113,6 +122,35 @@ trait Versionable
         $version->save();
 
         self::pruneOldVersionsFor($model);
+    }
+
+    /**
+     * Constrói o snapshot do model aplicando os casts (issue #187).
+     *
+     * Itera sobre o MESMO key-set de `getAttributes()` (colunas DB
+     * presentes) mas grava o valor **com cast aplicado** via
+     * `getAttribute($key)`. Isto garante que um cast `array`/`json`/
+     * `object`/`collection`/`encrypted` é persistido como o seu valor
+     * desserializado e não como a string JSON crua — que, ao restaurar,
+     * seria re-encodada pelo Eloquent (double-encoding → corrupção).
+     *
+     * Apenas a aplicação do cast muda; o conjunto de chaves capturadas
+     * é idêntico ao comportamento anterior, preservando o contrato de
+     * `$hidden`/colunas excluídas tal como já era.
+     *
+     * @return array<string, mixed>
+     */
+    private static function snapshotAttributes(Model $model): array
+    {
+        $payload = [];
+
+        foreach (array_keys($model->getAttributes()) as $key) {
+            /** @var mixed $value */
+            $value = $model->getAttribute($key);
+            $payload[$key] = $value;
+        }
+
+        return $payload;
     }
 
     /**
@@ -149,9 +187,10 @@ trait Versionable
     /**
      * Restaura o record para uma version anterior.
      *
-     * Aceita `int` (id) ou instance de `Version`. Faz `forceFill` do
-     * payload e salva — o que dispara o hook `saved` e gera uma nova
-     * Version (restore é versionado, permitindo desfazer).
+     * Aceita `int` (id) ou instance de `Version`. Reaplica os casts
+     * (via `setAttribute` por chave) ao escrever o payload e salva — o
+     * que dispara o hook `saved` e gera uma nova Version (restore é
+     * versionado, permitindo desfazer).
      *
      * Devolve `false` quando a version não pertence a este record
      * (defensive contra cross-record restore acidental).
@@ -177,7 +216,14 @@ trait Versionable
         /** @var array<string, mixed> $payload */
         $payload = $version->payload;
 
-        $this->forceFill($payload);
+        // Re-apply casts on restore (issue #187): `setAttribute` runs the cast
+        // mutators per key, so an array payload round-trips as an array instead
+        // of being re-encoded into a double-encoded JSON string. We keep the
+        // mass-assignment bypass intent of the original `forceFill` by writing
+        // every snapshot key directly (no `$fillable` filtering).
+        foreach ($payload as $key => $value) {
+            $this->setAttribute($key, $value);
+        }
 
         return $this->save();
     }

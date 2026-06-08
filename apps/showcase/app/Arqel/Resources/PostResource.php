@@ -6,13 +6,17 @@ namespace App\Arqel\Resources;
 
 use App\Models\Author;
 use App\Models\Post;
+use Arqel\Actions\Action;
 use Arqel\Actions\Actions;
+use Arqel\Actions\Types\BulkAction;
+use Arqel\Actions\Types\RowAction;
 use Arqel\Core\Resources\Resource;
 use Arqel\Export\Actions\ExportAction;
 use Arqel\Export\ExportFormat;
 use Arqel\Fields\FieldFactory as Field;
 use Arqel\Fields\Types\BooleanField;
 use Arqel\Fields\Types\DateTimeField;
+use Arqel\Fields\Types\SelectField;
 use Arqel\Fields\Types\TextField;
 use Arqel\Form\Form;
 use Arqel\Form\Layout\Section;
@@ -23,6 +27,7 @@ use Arqel\Table\Columns\TextColumn;
 use Arqel\Table\Filters\SelectFilter;
 use Arqel\Table\Filters\TernaryFilter;
 use Arqel\Table\Table;
+use Illuminate\Support\Collection;
 
 /**
  * Widest-surface showcase Resource: rich-text body, key/value meta,
@@ -144,10 +149,32 @@ final class PostResource extends Resource
             ->defaultSort('published_at', 'desc')
             ->searchable()
             ->selectable()
-            ->actions([Actions::edit(), Actions::delete()])
+            ->actions([
+                Actions::edit(),
+                Actions::delete(),
+                RowAction::make('publish')
+                    ->icon('check')
+                    ->color(Action::COLOR_SUCCESS)
+                    ->requiresConfirmation()
+                    ->successNotification('Post published')
+                    ->disabled(fn ($record): bool => $record?->status === 'published')
+                    ->action(fn ($record) => $record->update(['status' => 'published'])),
+                RowAction::make('change_status')
+                    ->icon('refresh-cw')
+                    ->form([
+                        (new SelectField('status'))
+                            ->options(self::STATUS_OPTIONS)
+                            ->required(),
+                    ])
+                    ->action(fn ($record, array $data) => $record->update(['status' => $data['status']])),
+            ])
             ->bulkActions([
                 Actions::deleteBulk(),
                 ExportAction::make('export')->format(ExportFormat::CSV),
+                BulkAction::make('archive')
+                    ->icon('archive')
+                    ->chunkSize(50)
+                    ->action(fn (Collection $records) => $records->each->update(['status' => 'archived'])),
             ]);
     }
 }

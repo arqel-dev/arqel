@@ -1,6 +1,6 @@
 # Showcase Expansion — Round-22 Candidate Findings
 
-> Bugs/gaps surfaced WHILE building the showcase expansion (before the formal Round 22 detection workflow). Each is verified, with evidence. The Round 22 loop (Phase 7) will adversarially re-verify + classify these and file issues for the confirmed framework bugs.
+> **Fluxo (confirmado com o utilizador, 2026-06-08):** estes são candidatos a bug de framework que surgiram ENQUANTO se constrói a expansão da showcase (Fases 1-6), antes do workflow formal de detecção. Cada um é verificado com evidência e um workaround app-side aplicado para a construção prosseguir. **NÃO são ainda issues GitHub.** No **Round 22 (Fase 7)** — tal como nos Rounds 1-21 do loop original — cada candidato passa pelo pipeline completo: verificação adversarial (refutar primeiro → classificar framework-bug vs app-misuse vs not-a-bug) → criar issue GitHub para os confirmados → corrigir via TDD (falha-antes/passa-depois) → PR → merge em CI CLEAN. Este ficheiro é o registo interno que alimenta esse Round 22; o destino final de cada framework-bug confirmado É um issue GitHub + fix PR.
 
 ## CANDIDATE #1 — enforceMorphMap + LogsActivity causer → ClassMorphViolationException (500 on every write)
 

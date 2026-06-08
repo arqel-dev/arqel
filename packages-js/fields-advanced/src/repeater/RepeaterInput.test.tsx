@@ -7,7 +7,7 @@
  */
 
 import type { FieldSchema } from '@arqel-dev/types/fields';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { RepeaterInput } from './RepeaterInput.js';
@@ -56,11 +56,17 @@ vi.mock('@dnd-kit/sortable', async () => {
   };
 });
 
+type SubFieldOptions =
+  | ReadonlyArray<{ value: string | number; label: string }>
+  | Record<string, string>;
+
 interface SubField {
   name: string;
   type: string;
   label?: string;
-  options?: ReadonlyArray<{ value: string | number; label: string }> | Record<string, string>;
+  placeholder?: string;
+  options?: SubFieldOptions;
+  props?: { options?: SubFieldOptions };
 }
 
 interface RepProps {
@@ -372,5 +378,45 @@ describe('<RepeaterInput>', () => {
     await user.selectOptions(select, 'work');
 
     expect(onChange).toHaveBeenLastCalledWith([{ kind: 'work' }]);
+  });
+
+  // #221: nested fields are now serialised through FieldSchemaSerializer,
+  // which nests select options under `props.options` (the canonical shape
+  // the top-level SelectInput consumes) and keeps label/placeholder flat.
+  // Before #221 the nested schema collapsed to `{name, type}` and this
+  // select rendered an empty dropdown.
+  it('renders a nested select from the canonical props.options shape (#221)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <RepeaterInput
+        field={buildField({
+          schema: [
+            { name: 'title', type: 'text', label: 'My Title', placeholder: 'Type here' },
+            {
+              name: 'status',
+              type: 'select',
+              label: 'Status',
+              props: { options: { a: 'Active', b: 'Banned' } },
+            },
+          ],
+        })}
+        value={[{ title: '', status: 'a' }]}
+        onChange={onChange}
+      />,
+    );
+
+    // Nested label + placeholder survive (flat reads).
+    expect(screen.getByText('My Title')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Type here')).toBeInTheDocument();
+
+    // Nested select renders its options from props.options.
+    const select = screen.getByLabelText('Status') as HTMLSelectElement;
+    expect(select).toHaveValue('a');
+    expect(within(select).getByRole('option', { name: 'Active' })).toBeInTheDocument();
+    expect(within(select).getByRole('option', { name: 'Banned' })).toBeInTheDocument();
+
+    await user.selectOptions(select, 'b');
+    expect(onChange).toHaveBeenLastCalledWith([{ title: '', status: 'b' }]);
   });
 });

@@ -7,16 +7,23 @@
  */
 
 import type { FieldSchema } from '@arqel-dev/types/fields';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WizardInput } from './WizardInput.js';
+
+type SubFieldOptions =
+  | ReadonlyArray<{ value: string | number; label: string }>
+  | Record<string, string>;
 
 interface SubField {
   name: string;
   type: string;
   label?: string;
   required?: boolean;
+  placeholder?: string;
+  options?: SubFieldOptions;
+  props?: { options?: SubFieldOptions };
 }
 
 interface StepConfig {
@@ -261,5 +268,44 @@ describe('<WizardInput>', () => {
     await user.type(screen.getByLabelText(/First Name/), 'A');
 
     expect(onChange).toHaveBeenLastCalledWith({ existing: 'keep', firstName: 'A' });
+  });
+
+  // #221: step schemas are now serialised through FieldSchemaSerializer,
+  // which nests select options under `props.options` (the canonical shape
+  // the top-level SelectInput consumes). Before #221 a nested select in a
+  // wizard step rendered an empty dropdown.
+  it('renders a nested step select from the canonical props.options shape (#221)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <WizardInput
+        field={buildField({
+          steps: [
+            {
+              name: 'profile',
+              label: 'Profile',
+              schema: [
+                {
+                  name: 'role',
+                  type: 'select',
+                  label: 'Role',
+                  props: { options: { admin: 'Admin', editor: 'Editor' } },
+                },
+              ],
+            },
+          ],
+        })}
+        value={{ role: 'admin' }}
+        onChange={onChange}
+      />,
+    );
+
+    const select = screen.getByLabelText('Role') as HTMLSelectElement;
+    expect(select).toHaveValue('admin');
+    expect(within(select).getByRole('option', { name: 'Admin' })).toBeInTheDocument();
+    expect(within(select).getByRole('option', { name: 'Editor' })).toBeInTheDocument();
+
+    await user.selectOptions(select, 'editor');
+    expect(onChange).toHaveBeenLastCalledWith({ role: 'editor' });
   });
 });

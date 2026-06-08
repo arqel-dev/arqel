@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\FieldsAdvanced\Steps;
 
+use Arqel\Core\Support\FieldSchemaSerializer;
 use Arqel\Fields\Field;
 use Illuminate\Support\Str;
 
@@ -112,10 +113,16 @@ final class Step
     }
 
     /**
-     * Serialises the step into the payload consumed by the React side.
-     * Each child field is serialised via `toArray()` when available;
-     * otherwise we fall back to a minimal `{name, type}` shape so
-     * misconfigurations never reach the client as `null`.
+     * Serialises the step into the payload consumed by the React
+     * `WizardInput.tsx` component. Each child field is serialised
+     * through the canonical `FieldSchemaSerializer` so it ships the
+     * same rich FieldSchema (`{name, type, label, placeholder, props,
+     * validation, ...}`) the top-level form fields use.
+     *
+     * The previous `method_exists($field, 'toArray')` guard never
+     * matched — no `Field` defines `toArray()` — so every nested field
+     * collapsed to `{name, type}`, dropping options/label/placeholder
+     * and leaving a nested SelectField with an empty dropdown (#221).
      *
      * @return array{
      *     name: string,
@@ -130,22 +137,7 @@ final class Step
             'name' => $this->name,
             'label' => $this->getLabel(),
             'icon' => $this->icon,
-            'schema' => array_map(
-                static function (Field $field): array {
-                    if (method_exists($field, 'toArray')) {
-                        /** @var array<string, mixed> $payload */
-                        $payload = $field->toArray();
-
-                        return $payload;
-                    }
-
-                    return [
-                        'name' => $field->getName(),
-                        'type' => $field->getType(),
-                    ];
-                },
-                $this->schema,
-            ),
+            'schema' => (new FieldSchemaSerializer)->serialize($this->schema),
         ];
     }
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Fields\Field;
+use Arqel\Fields\Types\SelectField;
 use Arqel\Fields\Types\TextField;
 use Arqel\FieldsAdvanced\Blocks\Block;
 
@@ -61,6 +62,34 @@ final class FixtureBareBlock extends Block
     }
 }
 
+/**
+ * Fixture block carrying a SelectField (with options) and a labelled,
+ * placeheld TextField — the regression surface for #221.
+ */
+final class FixtureRichBlock extends Block
+{
+    public static function type(): string
+    {
+        return 'rich';
+    }
+
+    public static function label(): string
+    {
+        return 'Rich';
+    }
+
+    /**
+     * @return array<int, Field>
+     */
+    public function schema(): array
+    {
+        return [
+            (new TextField('title'))->label('My Title')->placeholder('Type here'),
+            (new SelectField('status'))->options(['a' => 'Active', 'b' => 'Banned']),
+        ];
+    }
+}
+
 it('returns the canonical toArray shape', function (): void {
     $payload = (new FixtureTextBlock)->toArray();
 
@@ -70,14 +99,28 @@ it('returns the canonical toArray shape', function (): void {
         ->and($payload['icon'])->toBe('type');
 });
 
-it('serialises each schema entry as an array', function (): void {
+it('serialises each schema entry through the canonical FieldSchema shape (#221)', function (): void {
     $schema = (new FixtureTextBlock)->toArray()['schema'];
 
     expect($schema)->toBeArray()
         ->and($schema)->toHaveCount(1)
         ->and($schema[0])->toBeArray()
         ->and($schema[0]['name'])->toBe('body')
-        ->and($schema[0]['type'])->toBe('text');
+        ->and($schema[0]['type'])->toBe('text')
+        // Rich FieldSchema, not the lossy {name,type} collapse pre-#221.
+        ->and($schema[0])->toHaveKeys(['label', 'placeholder', 'props', 'validation']);
+});
+
+it('preserves a nested SelectField options + a TextField label/placeholder (#221)', function (): void {
+    $schema = (new FixtureRichBlock)->toArray()['schema'];
+
+    expect($schema)->toHaveCount(2)
+        ->and($schema[0]['name'])->toBe('title')
+        ->and($schema[0]['label'])->toBe('My Title')
+        ->and($schema[0]['placeholder'])->toBe('Type here')
+        ->and($schema[1]['name'])->toBe('status')
+        ->and($schema[1]['type'])->toBe('select')
+        ->and($schema[1]['props']['options'])->toBe(['a' => 'Active', 'b' => 'Banned']);
 });
 
 it('returns null for icon when the subclass does not override icon()', function (): void {

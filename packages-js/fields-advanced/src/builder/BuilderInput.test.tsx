@@ -4,7 +4,7 @@
  */
 
 import type { FieldSchema } from '@arqel-dev/types/fields';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { BuilderInput } from './BuilderInput.js';
@@ -52,11 +52,17 @@ vi.mock('@dnd-kit/sortable', async () => {
   };
 });
 
+type SubFieldOptions =
+  | ReadonlyArray<{ value: string | number; label: string }>
+  | Record<string, string>;
+
 interface SubField {
   name: string;
   type: string;
   label?: string;
-  options?: ReadonlyArray<{ value: string | number; label: string }> | Record<string, string>;
+  placeholder?: string;
+  options?: SubFieldOptions;
+  props?: { options?: SubFieldOptions };
 }
 
 interface BlockEntry {
@@ -411,5 +417,54 @@ describe('<BuilderInput>', () => {
     await user.click(screen.getByTestId('builder-picker-backdrop'));
 
     expect(screen.queryByRole('menu', { name: 'Add block' })).toBeNull();
+  });
+
+  // #221: block schemas are now serialised through FieldSchemaSerializer,
+  // which nests select options under `props.options` (the canonical shape
+  // the top-level SelectInput consumes) and keeps label/placeholder flat.
+  // Before #221 the block schema collapsed to `{name, type}` and a nested
+  // select rendered an empty dropdown.
+  it('renders a nested block select from the canonical props.options shape (#221)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <BuilderInput
+        field={buildField({
+          blocks: {
+            cta: {
+              type: 'cta',
+              label: 'Call to action',
+              icon: null,
+              schema: [
+                { name: 'title', type: 'text', label: 'Title', placeholder: 'Type here' },
+                {
+                  name: 'variant',
+                  type: 'select',
+                  label: 'Variant',
+                  props: { options: { primary: 'Primary', ghost: 'Ghost' } },
+                },
+              ],
+            },
+          },
+        })}
+        value={[{ type: 'cta', data: { title: '', variant: 'primary' } }]}
+        onChange={onChange}
+      />,
+    );
+
+    // Nested label + placeholder survive (flat reads).
+    expect(screen.getByText('Title')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Type here')).toBeInTheDocument();
+
+    // Nested select renders its options from props.options.
+    const select = screen.getByLabelText('Variant') as HTMLSelectElement;
+    expect(select).toHaveValue('primary');
+    expect(within(select).getByRole('option', { name: 'Primary' })).toBeInTheDocument();
+    expect(within(select).getByRole('option', { name: 'Ghost' })).toBeInTheDocument();
+
+    await user.selectOptions(select, 'ghost');
+    expect(onChange).toHaveBeenLastCalledWith([
+      { type: 'cta', data: { title: '', variant: 'ghost' } },
+    ]);
   });
 });

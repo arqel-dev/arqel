@@ -37,7 +37,9 @@ A separação core × advanced existe porque estes types arrastam dependências 
 - **`Step`** (value-object, final) — `name`, `label` (fallback humanised via `Str::headline`), `icon(?string)`, `schema(array)`. `toArray()` emite `{name, label, icon, schema}`.
 - **`WizardField`** — `type='wizard'`. Setters: `steps(array)` (filtra não-`Step`; **duplicate names lança `InvalidArgumentException`**), `persistInUrl(bool)`, `skippable(bool)`. Form/FormRenderer integration (tratar Wizard como layout) fica fora do escopo (depende de FORM-005).
 
-**Coverage:** 124 testes Pest passando — 10 ServiceProvider + 10 RichText + 11 Markdown + 12 Code + 15 Repeater + 5 Block + 16 Builder + 14 KeyValue + 14 Tags + 5 Step + 12 Wizard.
+**Serialização de schemas aninhados (#221):** os sub-fields de `RepeaterField::schema()`, `Block::schema()` e `Step::schema()` são serializados pela **FieldSchema canônica completa** via `Arqel\Core\Support\FieldSchemaSerializer::serialize()` — cada child ship a mesma forma rica do form de topo (`{name, type, label, placeholder, props, validation, ...}`, com options de `SelectField` aninhadas sob `props.options`). **Nunca** colapse um child para `{name, type}` (era o bug #221: o guard `method_exists($child,'toArray')` era sempre falso pois nenhum `Field` define `toArray()` → dropdown aninhado vazio). Os inputs React leem options via `field.props?.options ?? field.options` (canônico `props.options`, fallback flat).
+
+**Coverage:** 133 testes Pest passando — 10 ServiceProvider + 11 RichText + 11 Markdown + 12 Code + 16 Repeater + 6 Block + 15 Builder + 14 KeyValue + 14 Tags + 6 Step + 12 Wizard + 6 CrossField.
 
 **Por chegar:**
 

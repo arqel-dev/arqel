@@ -54,12 +54,30 @@ interface BlockSchemaEntry {
   schema: SubFieldSchema[];
 }
 
+type SubFieldOptions =
+  | ReadonlyArray<{ value: string | number; label: string }>
+  | Record<string, string>;
+
 interface SubFieldSchema {
   name: string;
   type: string;
   label?: string;
-  options?: ReadonlyArray<{ value: string | number; label: string }> | Record<string, string>;
+  // Options can arrive flat (`options`) for back-compat or, since #221,
+  // nested under `props.options` — the canonical FieldSchema shape
+  // produced by `FieldSchemaSerializer` and read by the top-level
+  // SelectInput. `subFieldOptions()` reconciles both.
+  options?: SubFieldOptions;
+  props?: { options?: SubFieldOptions } & Record<string, unknown>;
   placeholder?: string;
+}
+
+/**
+ * Resolve a nested sub-field's select options from the canonical
+ * `props.options` shape (FieldSchemaSerializer, #221), falling back to a
+ * flat `options` key for back-compat with hand-built schemas.
+ */
+function subFieldOptions(field: SubFieldSchema): SubFieldOptions | undefined {
+  return field.props?.options ?? field.options;
 }
 
 interface BuilderProps {
@@ -309,10 +327,11 @@ function SubFieldInput({ field, value, onChange, disabled, inputId }: SubFieldIn
   }
 
   if (type === 'select') {
+    const rawOptions = subFieldOptions(field);
     const options = (() => {
-      if (Array.isArray(field.options)) return field.options;
-      if (field.options && typeof field.options === 'object') {
-        return Object.entries(field.options as Record<string, string>).map(([v, label]) => ({
+      if (Array.isArray(rawOptions)) return rawOptions;
+      if (rawOptions && typeof rawOptions === 'object') {
+        return Object.entries(rawOptions as Record<string, string>).map(([v, label]) => ({
           value: v,
           label,
         }));

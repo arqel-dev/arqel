@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Fields\Types\SelectField;
 use Arqel\Fields\Types\TextField;
 use Arqel\FieldsAdvanced\Steps\Step;
 
@@ -54,4 +55,21 @@ it('returns the canonical toArray shape', function (): void {
         ->and($payload['schema'])->toHaveCount(1)
         ->and($payload['schema'][0]['name'])->toBe('name')
         ->and($payload['schema'][0]['type'])->toBe('text');
+});
+
+it('serialises each nested field through the canonical FieldSchema shape (#221)', function (): void {
+    $schema = Step::make('details')
+        ->schema([
+            (new TextField('title'))->label('My Title')->placeholder('Type here'),
+            (new SelectField('status'))->options(['a' => 'Active', 'b' => 'Banned']),
+        ])
+        ->toArray()['schema'];
+
+    expect($schema)->toHaveCount(2)
+        ->and($schema[0]['name'])->toBe('title')
+        ->and($schema[0]['label'])->toBe('My Title')
+        ->and($schema[0]['placeholder'])->toBe('Type here')
+        ->and($schema[1]['name'])->toBe('status')
+        ->and($schema[1]['type'])->toBe('select')
+        ->and($schema[1]['props']['options'])->toBe(['a' => 'Active', 'b' => 'Banned']);
 });

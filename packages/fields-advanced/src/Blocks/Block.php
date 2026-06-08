@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\FieldsAdvanced\Blocks;
 
+use Arqel\Core\Support\FieldSchemaSerializer;
 use Arqel\Fields\Field;
 
 /**
@@ -48,11 +49,15 @@ abstract class Block
 
     /**
      * Serialises the block into the payload consumed by the React
-     * side. Each child Field is serialised through `toArray()` when
-     * available (every concrete `Field` subclass provides one in
-     * downstream packages); otherwise we fall back to a minimal
-     * `{name, type}` shape so misconfigurations never reach the
-     * client as `null`.
+     * `BuilderInput.tsx` component. Each child Field is serialised
+     * through the canonical `FieldSchemaSerializer` so it ships the
+     * same rich FieldSchema (`{name, type, label, placeholder, props,
+     * validation, ...}`) the top-level form fields use.
+     *
+     * The previous `method_exists($field, 'toArray')` guard never
+     * matched — no `Field` defines `toArray()` — so every nested field
+     * collapsed to `{name, type}`, dropping options/label/placeholder
+     * and leaving a nested SelectField with an empty dropdown (#221).
      *
      * @return array{
      *     type: string,
@@ -63,29 +68,16 @@ abstract class Block
      */
     final public function toArray(): array
     {
+        $fields = array_values(array_filter(
+            $this->schema(),
+            static fn (mixed $entry): bool => $entry instanceof Field,
+        ));
+
         return [
             'type' => static::type(),
             'label' => static::label(),
             'icon' => static::icon(),
-            'schema' => array_map(
-                static function (Field $field): array {
-                    if (method_exists($field, 'toArray')) {
-                        /** @var array<string, mixed> $payload */
-                        $payload = $field->toArray();
-
-                        return $payload;
-                    }
-
-                    return [
-                        'name' => $field->getName(),
-                        'type' => $field->getType(),
-                    ];
-                },
-                array_values(array_filter(
-                    $this->schema(),
-                    static fn (mixed $entry): bool => $entry instanceof Field,
-                )),
-            ),
+            'schema' => (new FieldSchemaSerializer)->serialize($fields),
         ];
     }
 }

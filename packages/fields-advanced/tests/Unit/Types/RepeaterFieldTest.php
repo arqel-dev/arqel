@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Fields\FieldFactory;
+use Arqel\Fields\Types\SelectField;
 use Arqel\Fields\Types\TextField;
 use Arqel\FieldsAdvanced\Types\RepeaterField;
 
@@ -138,7 +139,7 @@ it('returns all 8 keys from getTypeSpecificProps()', function (): void {
     ]);
 });
 
-it('serialises children into a [name, type] array when no toArray() is available', function (): void {
+it('serialises each nested child through the canonical FieldSchema shape (#221)', function (): void {
     $field = (new RepeaterField('addresses'))->schema([
         new TextField('street'),
         new TextField('city'),
@@ -146,10 +147,36 @@ it('serialises children into a [name, type] array when no toArray() is available
 
     $schema = $field->getTypeSpecificProps()['schema'];
 
-    expect($schema)->toBe([
-        ['name' => 'street', 'type' => 'text'],
-        ['name' => 'city', 'type' => 'text'],
+    // Each entry is now the rich FieldSchema array (name + type + label +
+    // props + ...), not the lossy `{name, type}` collapse that dropped
+    // every other attribute before #221.
+    expect($schema)->toHaveCount(2)
+        ->and($schema[0])->toMatchArray(['name' => 'street', 'type' => 'text'])
+        ->and($schema[0])->toHaveKeys(['label', 'placeholder', 'props', 'validation'])
+        ->and($schema[1])->toMatchArray(['name' => 'city', 'type' => 'text']);
+});
+
+it('preserves a nested SelectField options + a TextField label/placeholder (#221)', function (): void {
+    $field = (new RepeaterField('items'))->schema([
+        (new TextField('title'))->label('My Title')->placeholder('Type here'),
+        (new SelectField('status'))->options(['a' => 'Active', 'b' => 'Banned']),
     ]);
+
+    $schema = $field->getTypeSpecificProps()['schema'];
+
+    // Text sub-field carries its label + placeholder (flat, matching how
+    // RepeaterInput.tsx reads `sub.label` / `sub.placeholder`).
+    expect($schema[0]['name'])->toBe('title')
+        ->and($schema[0]['label'])->toBe('My Title')
+        ->and($schema[0]['placeholder'])->toBe('Type here');
+
+    // Select sub-field carries its options nested under `props.options`,
+    // the same shape SelectInput consumes at the top level. Before #221
+    // the whole sub-field collapsed to `{name, type}` and the dropdown
+    // rendered empty.
+    expect($schema[1]['name'])->toBe('status')
+        ->and($schema[1]['type'])->toBe('select')
+        ->and($schema[1]['props']['options'])->toBe(['a' => 'Active', 'b' => 'Banned']);
 });
 
 it('serialises the full type-specific props payload end-to-end', function (): void {
@@ -163,14 +190,15 @@ it('serialises the full type-specific props payload end-to-end', function (): vo
         ->itemLabel('{{street}}')
         ->relationship('addresses');
 
-    expect($field->getTypeSpecificProps())->toBe([
-        'schema' => [['name' => 'street', 'type' => 'text']],
-        'minItems' => 1,
-        'maxItems' => 5,
-        'reorderable' => false,
-        'collapsible' => true,
-        'cloneable' => false,
-        'itemLabel' => '{{street}}',
-        'relationship' => 'addresses',
-    ]);
+    $props = $field->getTypeSpecificProps();
+
+    expect($props['minItems'])->toBe(1)
+        ->and($props['maxItems'])->toBe(5)
+        ->and($props['reorderable'])->toBeFalse()
+        ->and($props['collapsible'])->toBeTrue()
+        ->and($props['cloneable'])->toBeFalse()
+        ->and($props['itemLabel'])->toBe('{{street}}')
+        ->and($props['relationship'])->toBe('addresses')
+        ->and($props['schema'])->toHaveCount(1)
+        ->and($props['schema'][0])->toMatchArray(['name' => 'street', 'type' => 'text']);
 });

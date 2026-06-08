@@ -27,16 +27,31 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import type { FieldRendererProps } from '../shared/types.js';
 
+type SubFieldOptions =
+  | ReadonlyArray<{ value: string | number; label: string }>
+  | Record<string, string>;
+
 interface SubFieldSchema {
   name: string;
   type: string;
   label?: string | undefined;
   required?: boolean | undefined;
-  options?:
-    | ReadonlyArray<{ value: string | number; label: string }>
-    | Record<string, string>
-    | undefined;
+  // Options can arrive flat (`options`) for back-compat or, since #221,
+  // nested under `props.options` — the canonical FieldSchema shape
+  // produced by `FieldSchemaSerializer` and read by the top-level
+  // SelectInput. `subFieldOptions()` reconciles both.
+  options?: SubFieldOptions | undefined;
+  props?: ({ options?: SubFieldOptions } & Record<string, unknown>) | undefined;
   placeholder?: string | undefined;
+}
+
+/**
+ * Resolve a nested sub-field's select options from the canonical
+ * `props.options` shape (FieldSchemaSerializer, #221), falling back to a
+ * flat `options` key for back-compat with hand-built schemas.
+ */
+function subFieldOptions(field: SubFieldSchema): SubFieldOptions | undefined {
+  return field.props?.options ?? field.options;
 }
 
 interface WizardStep {
@@ -105,6 +120,12 @@ function readSubField(raw: unknown): SubFieldSchema | null {
     options:
       Array.isArray(r['options']) || (typeof r['options'] === 'object' && r['options'] !== null)
         ? (r['options'] as SubFieldSchema['options'])
+        : undefined,
+    // Preserve the canonical nested `props.options` (#221) so a nested
+    // SelectField's options survive into `subFieldOptions()`.
+    props:
+      typeof r['props'] === 'object' && r['props'] !== null
+        ? (r['props'] as SubFieldSchema['props'])
         : undefined,
     placeholder: typeof r['placeholder'] === 'string' ? r['placeholder'] : undefined,
   };
@@ -221,10 +242,11 @@ function SubFieldInput({ field, value, onChange, disabled, inputId }: SubFieldIn
   }
 
   if (type === 'select') {
+    const rawOptions = subFieldOptions(field);
     const options = (() => {
-      if (Array.isArray(field.options)) return field.options;
-      if (field.options && typeof field.options === 'object') {
-        return Object.entries(field.options as Record<string, string>).map(([v, label]) => ({
+      if (Array.isArray(rawOptions)) return rawOptions;
+      if (rawOptions && typeof rawOptions === 'object') {
+        return Object.entries(rawOptions as Record<string, string>).map(([v, label]) => ({
           value: v,
           label,
         }));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\FieldsAdvanced\Types;
 
+use Arqel\Core\Support\FieldSchemaSerializer;
 use Arqel\Fields\Field;
 use InvalidArgumentException;
 
@@ -168,23 +169,16 @@ final class RepeaterField extends Field
      */
     public function getTypeSpecificProps(): array
     {
+        // Each nested sub-field is serialised through the canonical
+        // `FieldSchemaSerializer` so it ships the same rich FieldSchema
+        // (`{name, type, label, placeholder, props, validation, ...}`) the
+        // top-level form fields use. The previous `method_exists($child,
+        // 'toArray')` guard never matched — no `Field` defines `toArray()`
+        // — so every nested field collapsed to `{name, type}`, dropping
+        // options/label/placeholder and leaving a nested SelectField with
+        // an empty dropdown (#221).
         return [
-            'schema' => array_map(
-                static function (Field $child): array {
-                    if (method_exists($child, 'toArray')) {
-                        /** @var array<string, mixed> $payload */
-                        $payload = $child->toArray();
-
-                        return $payload;
-                    }
-
-                    return [
-                        'name' => $child->getName(),
-                        'type' => $child->getType(),
-                    ];
-                },
-                $this->schema,
-            ),
+            'schema' => (new FieldSchemaSerializer)->serialize($this->schema),
             'minItems' => $this->minItems,
             'maxItems' => $this->maxItems,
             'reorderable' => $this->reorderable,

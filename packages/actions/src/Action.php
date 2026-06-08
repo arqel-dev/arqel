@@ -7,6 +7,7 @@ namespace Arqel\Actions;
 use Arqel\Actions\Concerns\Confirmable;
 use Arqel\Actions\Concerns\HasAuthorization;
 use Arqel\Actions\Concerns\HasForm;
+use Arqel\Core\Support\FieldSchemaSerializer;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Str;
@@ -338,10 +339,37 @@ abstract class Action
             'requiresConfirmation' => $this->isRequiringConfirmation() ?: null,
             'confirmation' => $this->getConfirmationConfig(),
             'form' => $this->hasForm() ? $this->getFormSchemaArray() : null,
+            'formFields' => $this->hasForm() ? $this->serializeFormFields($user) : null,
             'modalSize' => $this->hasForm() ? $this->getModalSize() : null,
             'successNotification' => $this->successNotification,
             'failureNotification' => $this->failureNotification,
         ], fn ($v) => $v !== null);
+    }
+
+    /**
+     * Materialise the full FieldSchema for the action's form fields (#213).
+     *
+     * `getFormSchemaArray()` only ships `{name, type}` as the modal layout
+     * order; the React `<ActionFormModal>` renders each field from the
+     * matching rich FieldSchema (options, label, placeholder, validation,
+     * per-type props) keyed by name. Without it every field — notably a
+     * `SelectField` with options — renders blank.
+     *
+     * We defer to `FieldSchemaSerializer` (CORE-010), the single source of
+     * truth for the payload shape, reused verbatim from the resource form
+     * so action modals and resource forms render identically. Action forms
+     * carry no owning record/resource, so relationship options/routes that
+     * need an owner are left to the field's own static props.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function serializeFormFields(?Authenticatable $user): array
+    {
+        return (new FieldSchemaSerializer)->serialize(
+            $this->getFormFields(),
+            null,
+            $user,
+        );
     }
 
     /**

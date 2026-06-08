@@ -6,6 +6,8 @@
  * absent from the payload rather than `null`.
  */
 
+import type { FieldSchema } from './fields.js';
+
 export type ActionType = 'row' | 'bulk' | 'toolbar' | 'header';
 
 export type ActionColor = 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info';
@@ -69,8 +71,19 @@ export interface ActionSchema {
   requiresConfirmation?: true;
   /** Modal config; absent when confirmation is not required. */
   confirmation?: ConfirmationConfig;
-  /** Form modal field schema; absent when the action has no form. */
+  /**
+   * Form modal *layout* — the `{name, type}` order in which fields are
+   * rendered. The rich per-field payload arrives in `formFields` (#213).
+   */
   form?: ActionFormField[];
+  /**
+   * Full FieldSchema for each form field (options, label, validation,
+   * per-type props), serialised server-side from `Action::form()` via
+   * `FieldSchemaSerializer`. Joined to `form` by `name` so the modal
+   * renders real inputs instead of blanks. Absent when the action has
+   * no form (#213).
+   */
+  formFields?: FieldSchema[];
   /** Modal size for form actions. */
   modalSize?: ModalSize;
   /** Flash message shown on successful execution. */

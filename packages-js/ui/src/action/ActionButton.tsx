@@ -20,8 +20,13 @@ import { ConfirmDialog } from './ConfirmDialog.js';
 
 export interface ActionButtonProps {
   action: ActionSchema;
-  /** Field schemas for any form modal (resolved server-side from Action::form). */
-  formFields?: FieldSchema[];
+  /**
+   * Field schemas for the form modal (resolved server-side from
+   * `Action::form` via `FieldSchemaSerializer`). Optional override — when
+   * omitted the component reads `action.formFields`, the canonical payload
+   * shipped by `Action::toArray()` (#213).
+   */
+  formFields?: FieldSchema[] | undefined;
   onInvoke: (formValues?: Record<string, unknown>) => void;
   processing?: boolean;
   errors?: Record<string, string[]>;
@@ -47,7 +52,7 @@ const VARIANT_OVERRIDE: Partial<Record<ActionVariant, ButtonProps['variant']>> =
 
 export function ActionButton({
   action,
-  formFields = [],
+  formFields,
   onInvoke,
   processing = false,
   errors,
@@ -56,6 +61,10 @@ export function ActionButton({
 }: ActionButtonProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+
+  // Prefer an explicit prop; otherwise read the schema shipped by
+  // `Action::toArray()` so the modal renders real inputs (#213).
+  const resolvedFormFields = formFields ?? action.formFields ?? [];
 
   const variant: ButtonProps['variant'] =
     VARIANT_OVERRIDE[action.variant] ?? COLOR_TO_VARIANT[action.color];
@@ -111,7 +120,7 @@ export function ActionButton({
           open={formOpen}
           onOpenChange={setFormOpen}
           action={action}
-          fields={formFields}
+          fields={resolvedFormFields}
           onSubmit={handleFormSubmit}
           processing={processing}
           errors={errors}

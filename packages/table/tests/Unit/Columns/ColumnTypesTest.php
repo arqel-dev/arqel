@@ -251,3 +251,14 @@ it('formatStateUsing wraps the raw value', function (): void {
 
     expect($column->formatState('alice'))->toBe('ALICE');
 });
+
+it('usesStateResolver reports whether the cell flows through the state pipeline (#206)', function (): void {
+    expect(TextColumn::make('name')->usesStateResolver())->toBeFalse()
+        ->and(TextColumn::make('name')->getStateUsing(fn () => 'x')->usesStateResolver())->toBeTrue()
+        ->and(TextColumn::make('name')->formatStateUsing(fn ($s) => $s)->usesStateResolver())->toBeTrue()
+        ->and(ComputedColumn::make('full_name')->getStateUsing(fn () => 'x')->usesStateResolver())->toBeTrue();
+});
+
+it('RelationshipColumn keeps usesStateResolver false so its display_path path is untouched (#206, #152)', function (): void {
+    expect(RelationshipColumn::make('author')->usesStateResolver())->toBeFalse();
+});

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Export\Exporters;
 
 use Arqel\Export\Contracts\Exporter;
+use Closure;
 use DateTimeInterface;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -114,6 +115,23 @@ final class XlsxExporter implements Exporter
     {
         $type = $column['type'] ?? null;
         $name = (string) ($column['name'] ?? '');
+
+        // Column state pipeline (#206): a `state_resolver` Closure
+        // (getStateUsing/formatStateUsing — ComputedColumn engine) owns
+        // the cell value, so a computed/formatted cell exports its
+        // resolved value instead of a blank/raw `data_get`.
+        $resolver = $column['state_resolver'] ?? null;
+        if ($resolver instanceof Closure) {
+            $value = $resolver($record);
+
+            return match ($type) {
+                'date' => $value instanceof DateTimeInterface
+                    ? $value->format('Y-m-d')
+                    : ($value === null ? '' : (string) $value),
+                'boolean' => $value ? 'Yes' : 'No',
+                default => $value ?? '',
+            };
+        }
 
         if ($type === 'relationship') {
             $path = (string) ($column['display_path'] ?? $name);

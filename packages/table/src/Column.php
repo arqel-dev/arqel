@@ -294,6 +294,28 @@ abstract class Column
     }
 
     /**
+     * Whether this column produces its cell value through the state
+     * pipeline rather than a plain attribute read — i.e. it registered
+     * `getStateUsing` and/or `formatStateUsing`.
+     *
+     * Row serialisation (`InertiaDataBuilder::serializeRecord`, #206)
+     * and the export column descriptors consult this to decide whether
+     * to resolve the cell through `formatState(getState(...))` instead of
+     * `$record->toArray()[$name]` / `data_get($record, $name)`. A plain
+     * column returns `false`, so its cell keeps reading the raw
+     * attribute (no regression).
+     *
+     * `RelationshipColumn` deliberately keeps this `false`: it has its
+     * own serialisation path (`display_path` for export, the nested
+     * relation object for display, #152), so it must NOT be overwritten
+     * with a flat scalar here.
+     */
+    public function usesStateResolver(): bool
+    {
+        return $this->getStateUsing !== null || $this->formatStateUsing !== null;
+    }
+
+    /**
      * Compute the cell's raw state from the record.
      *
      * Default: `$record->{$this->name}`. `getStateUsing` overrides

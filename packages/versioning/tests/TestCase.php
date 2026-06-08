@@ -27,6 +27,15 @@ abstract class TestCase extends Orchestra
             });
         }
 
+        if (! Schema::hasTable('versioning_casted_articles')) {
+            Schema::create('versioning_casted_articles', static function (Blueprint $table): void {
+                $table->id();
+                $table->string('title');
+                $table->json('meta')->nullable();
+                $table->timestamps();
+            });
+        }
+
         if (! Schema::hasTable('versioning_plain_articles')) {
             Schema::create('versioning_plain_articles', static function (Blueprint $table): void {
                 $table->id();

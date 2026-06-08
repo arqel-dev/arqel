@@ -48,10 +48,13 @@ user-land Eloquent models):
   desliga todos os hooks.
 - `versions(): MorphMany<Version>` ordenado por `created_at desc, id desc`.
 - `currentVersion(): ?Version` atalho para `versions()->first()`.
-- `restoreToVersion(int|Version): bool` — não-destrutivo (faz `forceFill`
-  + `save`, dispara hook, gera nova Version, permite "undo restore").
-  Defensive cross-record: devolve `false` quando version não pertence
-  ao record.
+- `restoreToVersion(int|Version): bool` — não-destrutivo. **Cast-aware**
+  (#187): reaplica os casts ao restaurar (`setAttribute` por chave em vez
+  de `forceFill`), mantendo o bypass de mass-assignment mas reserializando
+  corretamente — um payload `array` volta como array, não como string
+  JSON double-encodada. `save` dispara o hook, gera nova Version, permite
+  "undo restore". Defensive cross-record: devolve `false` quando version
+  não pertence ao record.
 - `pruneOldVersions(): int` aplica retention 'count' por record;
   invocado automaticamente após cada `writeVersion`. Suporta `strategy
   != 'count'` (early-return 0) e `keep=0` (unbounded). O predicado de
@@ -142,10 +145,17 @@ serialização do `PruneOldVersionsJob`.
 
 - Trait é **opt-in** — só os models com `use Versionable` geram
   snapshots. Sem behavior global.
-- Snapshots gravam o resultado de `$model->getAttributes()` (payload
-  completo); `changes` traz só o diff (`[old, new]` por campo).
-- Restore é **versionado** — `restoreToVersion()` faz `save()` que
-  dispara o hook e cria nova Version (permite undo).
+- Snapshots são **cast-aware** (#187): gravam o resultado de
+  `$model->getAttribute($key)` (valor **com cast aplicado**) sobre o
+  mesmo key-set de `getAttributes()` — payload completo. Casts
+  `array`/`json`/`object`/`collection`/`encrypted` ficam desserializados,
+  não como string JSON crua (senão o restore re-encodava → corrupção
+  silenciosa). `changes` traz só o diff (`[old, new]` por campo), com
+  **ambos os lados também cast** (antes misturava `getOriginal()` cast com
+  `getDirty()` raw → diff type-assimétrico).
+- Restore é **versionado** e **cast-aware** — `restoreToVersion()`
+  reaplica casts via `setAttribute` por chave e faz `save()` que dispara
+  o hook e cria nova Version (permite undo).
 - Append-only: `Version` tem `$timestamps = false`; única write é o
   insert no hook + delete via prune. Nunca update.
 - Prune por contagem: ao gravar, qualquer version além de
@@ -166,9 +176,10 @@ serialização do `PruneOldVersionsJob`.
   `arqel:versions:prune` agendado) → storage cresce sem limite (GB
   por milhão de records).
 - **Expor `payload` sem filtros sensíveis** — snapshots contêm tudo
-  do `getAttributes()`, incluindo password hashes/tokens. Front-end
-  só deve pedir `?include=payload` em telas internas e/ou após filtrar
-  campos sensíveis no consumer.
+  do model (todas as chaves de `getAttributes()`, com casts aplicados),
+  incluindo password hashes/tokens. Front-end só deve pedir
+  `?include=payload` em telas internas e/ou após filtrar campos
+  sensíveis no consumer.
 - **Restore destrutivo / em loop** — cada `restoreToVersion()` cria
   nova Version e dispara prune. Para migrations bulk, manipule a
   tabela diretamente em vez de iterar restores.

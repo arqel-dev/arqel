@@ -25,12 +25,18 @@
     "vite": "^7.3.2"
   },
   "dependencies": {
+    "@arqel-dev/a11y": "workspace:^",
     "@arqel-dev/auth": "workspace:^",
     "@arqel-dev/fields": "workspace:^",
     "@arqel-dev/fields-advanced": "workspace:^",
     "@arqel-dev/hooks": "workspace:^",
+    "@arqel-dev/i18n": "workspace:^",
     "@arqel-dev/react": "workspace:^",
+    "@arqel-dev/realtime": "workspace:^",
+    "@arqel-dev/theme": "workspace:^",
     "@arqel-dev/types": "workspace:^",
-    "@arqel-dev/ui": "workspace:^"
+    "@arqel-dev/ui": "workspace:^",
+    "@arqel-dev/versioning": "workspace:^",
+    "@arqel-dev/workflow": "workspace:^"
   }
 }

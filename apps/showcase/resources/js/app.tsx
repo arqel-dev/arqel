@@ -5,7 +5,12 @@ import {
   ResetPasswordPage,
   VerifyEmailNoticePage,
 } from '@arqel-dev/auth';
+import { SkipLink } from '@arqel-dev/a11y';
+import { I18nProvider, LocaleSwitcher } from '@arqel-dev/i18n';
 import { createArqelApp } from '@arqel-dev/react/inertia';
+import { ConnectionStatusBanner, setupEcho } from '@arqel-dev/realtime';
+import { ThemeProvider } from '@arqel-dev/theme';
+import '@arqel-dev/theme/tokens.css';
 import type { TenantContextProps } from '@arqel-dev/types/tenant';
 import { arqelPages } from '@arqel-dev/ui/pages';
 import { AppShell, Sidebar, TenantSwitcher, Topbar } from '@arqel-dev/ui/shell';
@@ -13,6 +18,21 @@ import '@arqel-dev/fields/register';
 import '@arqel-dev/fields-advanced/register';
 import { usePage } from '@inertiajs/react';
 import type { ComponentType, JSX, ReactNode } from 'react';
+
+/**
+ * Bootstrap Laravel Echo against the dogfood Reverb stack. Guarded on
+ * `VITE_REVERB_APP_KEY` so the bundle still boots (and CI/build/typecheck
+ * still pass) in environments where Reverb is not configured.
+ */
+const reverbKey = import.meta.env.VITE_REVERB_APP_KEY;
+if (reverbKey) {
+  setupEcho({
+    key: reverbKey,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 8091,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https',
+  });
+}
 
 type LazyPage = () => Promise<{ default: ComponentType<unknown> }>;
 
@@ -45,18 +65,25 @@ function TenantSwitcherSlot(): JSX.Element | null {
  * AppShell.
  */
 const adminLayout: LayoutFn = (page) => (
-  <AppShell
-    variant="sidebar-left"
-    sidebar={<Sidebar brand={<span className="font-semibold">{'Arqel Showcase'}</span>} />}
-    topbar={
-      <Topbar
-        brand={<span className="font-medium">{'Arqel Showcase'}</span>}
-        tenantSwitcher={<TenantSwitcherSlot />}
-      />
-    }
-  >
-    {page}
-  </AppShell>
+  <ThemeProvider defaultTheme="system" storageKey="arqel-theme">
+    <I18nProvider>
+      <SkipLink targetId="arqel-main" />
+      <AppShell
+        variant="sidebar-left"
+        sidebar={<Sidebar brand={<span className="font-semibold">{'Arqel Showcase'}</span>} />}
+        topbar={
+          <Topbar
+            brand={<span className="font-medium">{'Arqel Showcase'}</span>}
+            tenantSwitcher={<TenantSwitcherSlot />}
+            userMenu={<LocaleSwitcher />}
+          />
+        }
+      >
+        <ConnectionStatusBanner pollOnDisconnect pollOnly={['records']} />
+        <div id="arqel-main">{page}</div>
+      </AppShell>
+    </I18nProvider>
+  </ThemeProvider>
 );
 
 /**

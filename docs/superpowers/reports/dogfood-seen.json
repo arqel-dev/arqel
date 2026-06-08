@@ -783,6 +783,15 @@
       "pr": 219,
       "round": 18,
       "note": "MED data-fidelity: CSV/XLSX/PdfExporter hardcoded ->format('Y-m-d') in every date branch (plain + the #206 state_resolver branch), ignoring DateColumn props.mode/props.format -> ->dateTime() dropped the time, custom ->date('d/m/Y') ignored. Fix: shared formatDateCell(value,column) honoring mode/format across all 3 exporters; plain no-props date still Y-m-d (no #106/#206 regression). PR #218 was accidentally closed by a premature --delete-branch; re-landed as #219."
+    },
+    {
+      "signature": "fields-advanced::repeater-builder-nested-schema-drops-options",
+      "package": "fields-advanced",
+      "status": "fixed",
+      "issue": 221,
+      "pr": 222,
+      "round": 19,
+      "note": "HIGH, same documented-but-unwired family as #204/#206/#213 at NEW entry points: RepeaterField::getTypeSpecificProps()/Block::toArray()/Step::toArray() serialized nested sub-fields via method_exists($f,'toArray') which is ALWAYS false (no Field defines toArray) -> nested fields collapsed to {name,type}, dropping options/label/placeholder -> nested SelectField rendered empty. Fix: route all 3 (repeater+builder+wizard) through core FieldSchemaSerializer; Repeater/Builder/WizardInput.tsx read field.props?.options ?? field.options (canonical-first, flat fallback). Agent also swept WizardInput which had the identical defect."
     }
   ]
 }

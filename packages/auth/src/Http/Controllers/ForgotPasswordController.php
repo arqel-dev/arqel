@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Auth\Http\Controllers;
 
+use Arqel\Auth\Concerns\ResolvesPanelGuard;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,6 +24,8 @@ use Inertia\Response;
  */
 final class ForgotPasswordController
 {
+    use ResolvesPanelGuard;
+
     /**
      * POST /admin/forgot-password — envia reset link (resposta genérica).
      */
@@ -36,7 +39,7 @@ final class ForgotPasswordController
 
         RateLimiter::hit($this->throttleKey($request, (string) $data['email']), 3600);
 
-        Password::broker()->sendResetLink(['email' => $data['email']]);
+        Password::broker($this->resolvePasswordBroker())->sendResetLink(['email' => $data['email']]);
 
         return back()->with('status', __('A reset link has been sent if the email exists.'));
     }

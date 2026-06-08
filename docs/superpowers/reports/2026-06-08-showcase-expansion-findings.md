@@ -29,3 +29,16 @@
 **Distinct from #140 (Round 8):** #140 fixed `resolveUrl` (the row-action URL closure) to tolerate a null record. The `isDisabledFor`/`isVisibleFor` predicates are a SEPARATE entry point through the same null-record-template serialization path — they were NOT guarded by #140. Same family ("per-record action predicate invoked with null at template serialization"), distinct entry point — the recurring next-layer pattern.
 
 **Suggested framework fix:** in `isDisabledFor`/`isVisibleFor`, return the static default (false / true) when `$record === null` (short-circuit before invoking the closure), mirroring how `resolveUrl` was hardened in #140. Or document the null-record template contract on the closure-accepting builders.
+
+## CANDIDATE #3 — workflow ships StateTransitionField + transitionTo() but NO HTTP transition endpoint
+
+**Surfaced:** Task 3.3 (TicketResource workflow wiring).
+**Severity (suspected):** MEDIUM — but likely a DEFERRED FEATURE, not a bug (see classification note).
+
+**The gap:** `arqel-dev/workflow` provides the UI field (`StateTransitionField`, renders transition buttons + the `transitions`/`authorized`/`history` payload) and the model method (`HasWorkflow::transitionTo()`), but there is NO HTTP endpoint to fire a transition from a button click. Every consuming app must hand-roll its own route + controller (the showcase added `POST /admin/tickets/{ticket}/transition` → `TicketTransitionController` for this reason).
+
+**Evidence:** `find packages/workflow/src -name "*.php" | xargs grep -l "Route::"` → ZERO matches. `transitionTo` appears only in model concerns/events/exceptions, never in an HTTP controller. `packages/workflow/src/WorkflowServiceProvider.php:21` explicitly comments: "`TransitionController` and React visualizer land in WF-003+."
+
+**Sub-point (wiring ergonomics):** `StateTransitionField` inside a Resource `form()` gets NO automatic record-binding from core's `InertiaDataBuilder`, so `currentState`/`transitions`/`history` always serialize empty for the edited record unless the Resource explicitly calls `->record($model)`. The field can't show live transition buttons for the current record out of the box. Not a crash — a wiring ergonomics gap.
+
+**⚠️ CLASSIFICATION NOTE for Round 22:** the framework DOCUMENTS this as WF-003+ (planned future work), exactly like EXPORT-007/008 / CORE-006 deferred items that the loop classified as NOT-A-BUG (deferred feature, not a defect). The Round 22 adversarial verifier should likely classify this as a **deferred-feature non-bug** UNLESS the docs/SKILL.md claim the transition endpoint already works (a documented-but-false capability would make it a real bug). Action for Round 22: check whether workflow's SKILL.md / docs advertise a working transition endpoint; if they do, it's a bug; if they honestly mark it WF-003+, it's deferred.

@@ -19,6 +19,7 @@ use Arqel\Fields\Types\DateTimeField;
 use Arqel\Fields\Types\SelectField;
 use Arqel\Fields\Types\TextField;
 use Arqel\Form\Form;
+use Arqel\Realtime\Concerns\BroadcastsResourceUpdates;
 use Arqel\Form\Layout\Grid;
 use Arqel\Form\Layout\Group;
 use Arqel\Form\Layout\Tab;
@@ -42,6 +43,8 @@ use Illuminate\Support\Collection;
  */
 final class PostResource extends Resource
 {
+    use BroadcastsResourceUpdates;
+
     /** @var array<string, string> */
     private const STATUS_OPTIONS = [
         'draft' => 'Draft',

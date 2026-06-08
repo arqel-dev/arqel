@@ -39,27 +39,42 @@ test.describe('Advanced fields render', () => {
     await expect(page.locator('[data-arqel-field="notes"] textarea')).toBeVisible();
   });
 
-  test('PostResource create hydrates RichText (body) + KeyValue (meta)', async ({
+  test('PostResource create hydrates RichText (body) on the Content tab', async ({
     loggedInPage,
   }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts/create');
     await expect(page.getByRole('heading', { name: 'Create Post' })).toBeVisible();
 
-    // RichText: an editable region (contenteditable) inside the body field.
+    // The form() is now organised into Tabs (Content + Meta), defaultTab
+    // 'content'. The RichText body lives on the Content tab, which is active
+    // by default, so it hydrates without any tab interaction.
     await expect(
       page.locator(
         '[data-arqel-field="body"] [contenteditable], [data-arqel-field="body"] [role="textbox"]',
       ),
     ).toBeVisible();
+  });
 
-    // KeyValue: hydrates with no rows, so its distinctive control is the
-    // "Add row" button. Clicking it must materialise a key/value input pair,
-    // proving the component is interactive (not a label-only fallback).
-    const meta = page.locator('[data-arqel-field="meta"]');
-    const addRow = meta.getByRole('button', { name: /add .*row/i });
-    await expect(addRow).toBeVisible();
-    await addRow.click();
-    await expect(meta.locator('input').first()).toBeVisible();
+  test('PostResource create Meta tab hydrates its fields (author/status)', async ({
+    loggedInPage,
+  }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts/create');
+    await expect(page.getByRole('heading', { name: 'Create Post' })).toBeVisible();
+
+    // The Meta-tab fields are not in the DOM until the tab is activated.
+    await expect(page.locator('[data-arqel-field="status"]')).toHaveCount(0);
+
+    // Switch to the Meta tab (role="tab", accessible name "Meta").
+    await page.getByRole('tab', { name: 'Meta' }).click();
+
+    // The Meta tab carries the author + status selects in a Grid. They
+    // hydrate as native <select> controls — proving the tab switch reveals
+    // the Meta schema. NB: the KeyValue `meta` field is wrapped in a Group
+    // gated by `visibleIf(status === 'published')`, so it intentionally does
+    // NOT render on a create page (null record) — see spec 06 / 04 history.
+    await expect(page.locator('[data-arqel-field="status"] select')).toBeVisible();
+    await expect(page.locator('[data-arqel-field="author_id"] select')).toBeVisible();
   });
 });

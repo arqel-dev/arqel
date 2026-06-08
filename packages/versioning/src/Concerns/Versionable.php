@@ -103,7 +103,7 @@ trait Versionable
     }
 
     /**
-     * @param  array<string, array{0: mixed, 1: mixed}>|null  $diff
+     * @param array<string, array{0: mixed, 1: mixed}>|null $diff
      */
     private static function writeVersion(Model $model, ?array $diff): void
     {

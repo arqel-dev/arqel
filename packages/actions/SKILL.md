@@ -54,7 +54,7 @@ Oracles públicos:
 - `hasRecordDependentUrl(): bool` / `hasRecordDependentDisabled(): bool` — `true` quando `url`/`disabled` é uma `Closure` (precisa resolver por linha, #140)
 - `canBeExecutedBy(?Authenticatable, ?$record): bool` — `authorize` closure (default true)
 - `execute(?$record, array $data): mixed` — invoca callback (returna `null` sem callback)
-- `toArray(?Authenticatable, ?$record, ?object $resource): array<string, mixed>` — payload Inertia (chaves null filtradas). Quando o action não declarou `->url()` nem `->action()` e um `$resource` (com `::$slug`) é passado, `resolveStockUrl()` emite a URL convencional: row `view/edit/delete/restore` em `/admin/{slug}/{id}[/...]`, e **qualquer** action `type==='bulk'` (não só `delete`) em `POST /admin/{slug}/bulk/{name}` — assim bulk actions sem callback (ex.: `ExportAction`) sempre carregam uma `url` e o frontend nunca recai num route inexistente (#48)
+- `toArray(?Authenticatable, ?$record, ?object $resource): array<string, mixed>` — payload Inertia (chaves null filtradas). Quando o action não declarou `->url()` nem `->action()` e um `$resource` (com `::$slug`) é passado, `resolveStockUrl()` emite a URL convencional: row `view/edit/delete/restore` em `/admin/{slug}/{id}[/...]`, e **qualquer** action `type==='bulk'` (não só `delete`) em `POST /admin/{slug}/bulk/{name}` — assim bulk actions sem callback (ex.: `ExportAction`) sempre carregam uma `url` e o frontend nunca recai num route inexistente (#48). Quando o action tem form, o payload também carrega `formFields` — a FieldSchema completa de cada field via `FieldSchemaSerializer($user)` — ao lado do schema de layout `form` (#213)
 
 ### Tipos concretos
 
@@ -95,6 +95,8 @@ RowAction::make('transfer')
 ```
 
 O controller (ACTIONS-006) valida o request com `getFormValidationRules()` antes de chamar `execute()`. Entries não-Field passados a `form([...])` são descartados graciosamente.
+
+`Action::toArray()` envia o form em **duas** chaves complementares (#213): `form` é o schema de **layout** (`[{name,type}]`, a ordem de render), e `formFields` é a **FieldSchema completa** de cada field — a mesma produzida pelo `FieldSchemaSerializer` (CORE-010) para o form normal de um Resource, com options resolvidas, label, placeholder, validação e props por-tipo. O React (`<ActionFormModal>`) junta as duas por `name`, então o select renderiza suas opções e os fields suas labels (sem isto o modal abriria vazio). Action forms não têm record/resource owner, logo options/rotas de relacionamento que dependem de owner ficam a cargo dos props estáticos do field.
 
 ### `Actions` factory (built-ins)
 

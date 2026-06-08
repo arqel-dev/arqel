@@ -23,6 +23,11 @@ import { Button } from './Button.js';
 
 export interface ActionMenuProps {
   actions: ActionSchema[];
+  /**
+   * Optional per-action override map keyed by action name. When an action
+   * is absent here, `<ActionButton>` falls back to the action's own
+   * `formFields` payload shipped by `Action::toArray()` (#213).
+   */
   formFieldsByAction?: Record<string, FieldSchema[]>;
   onInvoke: (action: ActionSchema, formValues?: Record<string, unknown>) => void;
   inlineThreshold?: number;
@@ -49,7 +54,7 @@ export function ActionMenu({
           <ActionButton
             key={action.name}
             action={action}
-            formFields={formFieldsByAction[action.name] ?? []}
+            formFields={formFieldsByAction[action.name]}
             onInvoke={(values) => onInvoke(action, values)}
             processing={processing}
             size="sm"

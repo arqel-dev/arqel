@@ -27,7 +27,7 @@ it('attaches form fields and rejects non-Field entries', function (): void {
         ->and($action->getFormFields())->toHaveCount(2);
 });
 
-it('serialises the form schema in toArray', function (): void {
+it('serialises the form layout schema in toArray', function (): void {
     $action = RowAction::make('transfer')
         ->form([new TextField('reason'), new TextField('note')])
         ->modalSize(Action::MODAL_SIZE_LG);
@@ -39,6 +39,40 @@ it('serialises the form schema in toArray', function (): void {
             ['name' => 'reason', 'type' => 'text'],
             ['name' => 'note', 'type' => 'text'],
         ]);
+});
+
+it('serialises the full FieldSchema for form fields in toArray (#213)', function (): void {
+    $action = RowAction::make('transfer')->form([
+        (new SelectField('reason'))
+            ->options(['a' => 'Alpha', 'b' => 'Beta'])
+            ->required(),
+        (new TextField('note'))->label('Note'),
+    ]);
+
+    $payload = $action->toArray();
+
+    expect($payload)->toHaveKey('formFields')
+        ->and($payload['formFields'])->toHaveCount(2);
+
+    [$reason, $note] = $payload['formFields'];
+
+    // SelectField options survive — the empty-modal bug was the select
+    // arriving with no options to render.
+    expect($reason['name'])->toBe('reason')
+        ->and($reason['type'])->toBe('select')
+        ->and($reason['required'])->toBeTrue()
+        ->and($reason['props']['options'])->toBe(['a' => 'Alpha', 'b' => 'Beta'])
+        ->and($reason['validation']['rules'])->toContain('required');
+
+    // Labels survive too.
+    expect($note['name'])->toBe('note')
+        ->and($note['label'])->toBe('Note');
+});
+
+it('omits formFields when the action has no form (#213)', function (): void {
+    $payload = RowAction::make('publish')->toArray();
+
+    expect($payload)->not->toHaveKey('formFields');
 });
 
 it('aggregates validation rules per field name', function (): void {

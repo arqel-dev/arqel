@@ -103,10 +103,12 @@ trait HasForm
     }
 
     /**
-     * Serialise the form schema for the action payload. Each
-     * field is reduced to `{name, type}` plus its type-specific
-     * props — controllers materialise the full payload via
-     * `FieldSchemaSerializer` (CORE-010) once it lands.
+     * Serialise the modal *layout* for the action payload: each field
+     * reduced to `{name, type}`, preserving declaration order. The rich
+     * per-field payload (options, label, validation, props) is produced
+     * separately by `Action::toArray()` via `FieldSchemaSerializer`
+     * (CORE-010) under the `formFields` key, and the React renderer joins
+     * the two by `name` (#213).
      *
      * @return array<int, array<string, mixed>>
      */

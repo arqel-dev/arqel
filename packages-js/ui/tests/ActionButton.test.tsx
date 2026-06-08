@@ -1,4 +1,5 @@
 import type { ActionSchema } from '@arqel-dev/types/actions';
+import type { FieldSchema } from '@arqel-dev/types/fields';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -11,6 +12,21 @@ const baseAction: ActionSchema = {
   color: 'destructive',
   variant: 'destructive',
   method: 'DELETE',
+};
+
+const baseField = {
+  required: false,
+  readonly: false,
+  disabled: false,
+  placeholder: null,
+  helperText: null,
+  defaultValue: null,
+  columnSpan: 1,
+  live: false,
+  liveDebounce: null,
+  validation: { rules: [], messages: {}, attribute: null },
+  visibility: { create: true, edit: true, detail: true, table: true, canSee: true },
+  dependsOn: [],
 };
 
 describe('ActionButton', () => {
@@ -63,6 +79,50 @@ describe('ActionButton', () => {
 
     await user.click(submit);
     expect(onInvoke).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders form-field labels and select options from action.formFields (#213)', async () => {
+    const user = userEvent.setup();
+    const onInvoke = vi.fn();
+    // Rich payload serialised server-side from Action::form() (#213).
+    const reasonField: FieldSchema = {
+      ...baseField,
+      type: 'select',
+      name: 'reason',
+      label: 'Reason',
+      component: 'SelectInput',
+      required: true,
+      props: { options: { a: 'Alpha', b: 'Beta' } },
+    };
+    const noteField: FieldSchema = {
+      ...baseField,
+      type: 'text',
+      name: 'note',
+      label: 'Note',
+      component: 'TextInput',
+      props: {},
+    };
+    const formAction: ActionSchema = {
+      ...baseAction,
+      name: 'transfer',
+      label: 'Transfer',
+      method: 'POST',
+      form: [
+        { name: 'reason', type: 'select' },
+        { name: 'note', type: 'text' },
+      ],
+      formFields: [reasonField, noteField],
+    };
+
+    render(<ActionButton action={formAction} onInvoke={onInvoke} />);
+    await user.click(screen.getByRole('button', { name: 'Transfer' }));
+
+    // The modal must render real inputs — labels + the select's options,
+    // not an empty modal (the pre-#213 bug).
+    expect(await screen.findByText('Reason')).toBeInTheDocument();
+    expect(screen.getByText('Note')).toBeInTheDocument();
+    expect(screen.getByText('Alpha')).toBeInTheDocument();
+    expect(screen.getByText('Beta')).toBeInTheDocument();
   });
 
   it('respects schema-level disabled state', async () => {

@@ -4,16 +4,17 @@
 
 **Audiência:** maintainer principal (Diogo). Inclui passos com cobrança financeira — todos sinalizados com 💰.
 
-**Estado atual do repo (2026-05-04):**
+**Estado atual do repo (atualizado 2026-06-08):**
 
-- Distribuição: Composer (`arqel-dev/*` no Packagist), npm (`@arqel-dev/*`), site `arqel.dev`.
-- Versão alvo da primeira publicação: **`0.8.0`** (tag `v0.8.0`).
-- Rename `arqel/*` → `arqel-dev/*` **completo** em todos os manifests (Composer + npm + URLs GitHub). Namespace PHP `Arqel\` mantido.
-- Workflow `release.yml` agora é **real** — split via splitsh/lite + `pnpm publish -r --access public` + GitHub release notes a partir do CHANGELOG.
-- Org `github.com/arqel-dev` criada. Repositório principal **ainda em `github.com/arqel/arqel`** — transferência manual pendente.
-- Contas Packagist + npm `arqel-dev` ainda não criadas/confirmadas. Secrets `ARQEL_BOT_TOKEN` e `NPM_TOKEN` ainda não configurados em GitHub Actions.
-- DCO bot ainda não instalado (GOV-003 ficou marcado pendente "App instalação pendente").
-- Nenhum package publicado ainda.
+- Distribuição: Composer (`arqel-dev/*` no Packagist), npm (`@arqel-dev/*`), site `arqel.dev`. **AO VIVO.**
+- **Última release publicada: `v0.13.0`** (npm + Packagist + GitHub Release, todos a 0.13.0). Histórico de tags: v0.8.0 … v0.13.0.
+- Rename `arqel/*` → `arqel-dev/*` completo. Namespace PHP `Arqel\` mantido.
+- Workflow `release.yml` real e em produção — split via splitsh/lite (`--force` push aos sub-repos) + gate de verificação de versão + `pnpm publish -r --access public` + GitHub release notes a partir do CHANGELOG.
+- Repo principal em `github.com/arqel-dev/arqel`. Secrets `ARQEL_BOT_TOKEN` (split) e `NPM_TOKEN` configurados.
+- **`NPM_TOKEN` tem de ser um _Granular Access Token_** (não Classic Automation) — ver §4.3 + as armadilhas em §11. O token foi rodado em 2026-06-08 (o anterior expirou, causando falhas npm em v0.12.0/v0.13.0).
+- **Runbook de release recorrente + armadilhas conhecidas: §11.** Lê-o antes de cada release.
+
+> **Nota:** as secções §1-§10 abaixo descrevem o setup INICIAL (já concluído). Para uma release nova, vai direto à **§11 — Manutenção contínua / Runbook**.
 
 ### Checklist pré-tag `v0.8.0`
 
@@ -479,6 +480,30 @@ Checklist sequencial. Não saltar steps.
    git push origin vX.Y.Z
    ```
 3. CI faz o resto.
+
+### Runbook de release — ordem CORRETA (não saltar)
+
+> **Aprendido à força na v0.13.0.** O `release.yml` é disparado pela tag e tem um gate `Verify package versions match release tag` que aborta o publish npm se um `package.json`/`composer.json` divergir da tag. **Por isso os bumps de versão TÊM de estar em `main` ANTES de cortar a tag.**
+
+1. **Bump das versões num PR de release** (`chore(release): prepare vX.Y.Z`): consolidar `CHANGELOG.md` `[Unreleased]` → `[X.Y.Z] - <data>` + bump dos 38 manifests (`packages/*/composer.json` + `packages-js/*/package.json`) `"version"` para `X.Y.Z`. (O `scripts/release-prep.sh` faz o preflight.)
+2. **Merge desse PR para `main`** com CI verde. Confirmar: `git show origin/main:packages-js/types/package.json | jq -r .version` == `X.Y.Z` e `git show origin/main:packages/core/composer.json | jq -r .version` == `X.Y.Z`.
+3. **SÓ ENTÃO cortar a tag** no commit já-com-bumps:
+   ```bash
+   git checkout main && git pull
+   git tag -a vX.Y.Z -m "Release vX.Y.Z" && git push origin vX.Y.Z
+   ```
+4. Acompanhar o run em `arqel-dev/arqel/actions` (workflow `release.yml`).
+5. Verificar: Packagist (`arqel-dev/core` a X.Y.Z), npm (`npm view @arqel-dev/ui version`), GitHub Release publicada.
+
+### ⚠️ Armadilhas conhecidas (v0.12.0 + v0.13.0 falharam por estas)
+
+- **Tag cortada antes do merge dos bumps** → gate `version 0.12.0 != tag 0.13.0` aborta o npm (o split PHP **passa na mesma**, publicando o estado de `main` — pode ficar inconsistente). **Recuperação:** mergear o PR de bumps para `main`, depois `git push origin :vX.Y.Z` (apagar tag remota) + `git tag -f vX.Y.Z <novo-sha-main>` + `git push origin vX.Y.Z`. O split usa `git push --force`, por isso **sobrepõe** as tags desatualizadas nos sub-repos sem falhar.
+- **`NPM_TOKEN` expirado** → `npm ERR! 404 Not Found - PUT .../@arqel-dev%2f<pkg>` num package que **já existe** (o npm devolve 404, não 401, a tokens sem write). **Rodar o token.**
+- **Token errado: `code EOTP` / "requires a one-time password"** → o token é um **Classic "Automation"** (respeita o 2FA da conta) ou um Classic "Publish". CI não consegue introduzir OTP. **Solução: usar um _Granular Access Token_** (npmjs.com → Access Tokens → Granular) com Read+Write nos packages `@arqel-dev` — estes **dispensam OTP por design**. Ver §4.3.
+- **Re-disparar só o npm** (sem repetir o split PHP) após rodar o token: `gh run rerun <run-id> --failed` re-executa apenas o job `Publish npm packages` falhado; quando passa, `Create GitHub release` deixa de estar skipped. Em alternativa, `gh workflow run release.yml -f tag=vX.Y.Z` (mas isso repete o split — idempotente, `--force`).
+- **`pnpm publish -r` é idempotente o suficiente:** se uma corrida publicou alguns pacotes e falhou a meio, re-correr salta os já-publicados (`cannot publish over existing version` é skip, não erro fatal) e publica os restantes.
+
+> **Histórico:** v0.11.0 foi o último npm bem-sucedido; v0.12.0 falhou o npm (token expirado, não detetado) → npm ficou em 0.11.0 enquanto Packagist avançou. v0.13.0 realinhou ambos em 0.13.0 (Granular token + recuperação de tag acima).
 
 ### SemVer policy
 

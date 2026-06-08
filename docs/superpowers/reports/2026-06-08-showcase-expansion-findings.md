@@ -74,3 +74,18 @@ Because the contexts are different objects, `@arqel-dev/theme`'s `ThemeToggle`/`
 **Suggested framework fix:** collapse to ONE theme system. Either (a) have `@arqel-dev/react/providers` re-export / delegate to `@arqel-dev/theme` (single `ThemeContext`), and make the shell `Topbar` import `useTheme` from `@arqel-dev/theme`; or (b) drop the standalone `@arqel-dev/theme` provider/toggle and keep only `react/providers`, moving the richer `storageKey`/`attribute` options + the `preventFlashScript` helper onto it. Until then, document loudly that `@arqel-dev/theme`'s ThemeProvider/ThemeToggle are NOT what `@arqel-dev/ui/shell` uses.
 
 **Distinct-from:** unrelated to #1–#4 (morph-map, action-closure-null, workflow-no-HTTP-endpoint, Field::make factory). This is a frontend provider-duplication issue in the JS packages, not a PHP serialization/factory issue.
+
+## CANDIDATE #6 — no trashed/soft-delete filter primitive in the table package; every soft-deleted Resource hand-rolls its own (MEDIUM)
+
+**Surfaced:** Task 5.0 (OrderResource trashed filter, Phase-5 soft-delete E2E prerequisite).
+**Severity (suspected):** MEDIUM — not a crash, but a recurring boilerplate gap: any Resource backed by a `SoftDeletes` model that wants to surface/toggle trashed rows in its index must hand-write a filter, because the framework ships none.
+
+**The gap:** `packages/table/src/Filters/` ships SelectFilter, MultiSelectFilter, TernaryFilter, TextFilter, DateRangeFilter, ScopeFilter, QueryBuilderFilter — but NO TrashedFilter/SoftDeleteFilter. `grep -rn "withTrashed\|onlyTrashed\|SoftDelete" packages/table/src packages/core/src` → ZERO matches. So nothing in the framework knows how to relax the `SoftDeletes` global scope for a table query. The `Resource` base / `InertiaDataBuilder` index query also never calls `withTrashed()`, so trashed rows are simply invisible with no built-in way to reveal them.
+
+**Reproduction:** OrderResource uses `App\Models\Order` (SoftDeletes). The seeder creates 20 active + 5 soft-deleted orders. With only the framework primitives there is no declarative way to let the admin view those 5 trashed rows — the SoftDeletes default scope hides them and no shipped filter overrides it.
+
+**App-side workaround (taken):** a plain `SelectFilter::make('trashed')` whose `->apply(Closure)` calls `$query->onlyTrashed()` (value `'only'`) or `$query->withTrashed()` (value `'with'`); unset leaves the scope intact. This works because `Filter::apply()` hands the raw Eloquent `Builder` (with the SoftDeletes scope still attached) to the closure, and `with/onlyTrashed()` are scope macros that remove/replace it. It's ~20 lines of per-Resource boilerplate that every soft-deleted Resource would have to repeat verbatim.
+
+**Suggested framework fix:** ship a first-class `TrashedFilter` (Filament-style: a select/ternary with `with-trashed` / `only-trashed` / `without-trashed` states) in `packages/table/src/Filters/`, that detects the model uses `SoftDeletes` and applies `withTrashed()`/`onlyTrashed()` itself. Bonus: a `Resource`/`Table` opt-in (e.g. `->softDeletes()`) that auto-registers it + the restore/force-delete row actions.
+
+**Classification note for Round 22:** distinct from #1–#5. This is a genuine missing-primitive gap in the table package (a feature the framework plausibly should ship for any SoftDeletes resource), not app-misuse — the app could not express "show trashed" with any shipped filter and had to drop to a raw closure. A strict verifier may still weigh it as a deferred-enhancement rather than a defect; either way the absence is real and forces per-Resource boilerplate.

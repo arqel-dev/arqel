@@ -702,6 +702,24 @@
       "pr": 196,
       "round": 13,
       "note": "LOW/latent (needs non-users guard, fails-closed): Forgot/ResetPassword called Password::broker() no-arg (always 'users'); Panel::passwordResetExpirationMinutes + RegisterRequest also hardcoded users. Added resolvePasswordBroker() (guard->provider->broker, fallback users) in ResolvesPanelGuard + mirrored in Panel; all 3 touch-points now panel-guard-aware. Default web/users is a no-op."
+    },
+    {
+      "signature": "core::extractrules-ignores-layout-visibility",
+      "package": "core",
+      "status": "fixed",
+      "issue": 198,
+      "pr": 201,
+      "round": 14,
+      "note": "next layer of #115: extractRules() called effectiveFields() with NO record, so validation rules evaluated layout visibleIf/canSee against null -> a required field hidden by a record-dependent Section for THIS record was still validated required (422, unsubmittable update). Now validated()/extractRules() thread the record (update=record, create=null) -> effectiveFields($record). Render + write-prune were already record-aware."
+    },
+    {
+      "signature": "widgets::withfilters-nonscalar-serialization",
+      "package": "widgets",
+      "status": "fixed",
+      "issue": 199,
+      "pr": 200,
+      "round": 14,
+      "note": "exposed by #189: WidgetRenderer.withFilters() did String(value) on object/array filter values on deferred/poll refetch -> {from,to}='[object Object]', ['a','b']='a,b'. Now recursive appendFilterValue: arrays -> filters[k][], objects -> filters[k][subKey], scalars unchanged, empties skipped. Matches the SSR qs bracket notation."
     }
   ]
 }

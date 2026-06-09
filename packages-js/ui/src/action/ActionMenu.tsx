@@ -10,7 +10,7 @@
 
 import type { ActionSchema } from '@arqel-dev/types/actions';
 import type { FieldSchema } from '@arqel-dev/types/fields';
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,14 @@ import {
 } from '../shadcn/ui/dropdown-menu.js';
 import { cn } from '../utils/cn.js';
 import { ActionButton } from './ActionButton.js';
+import { ActionFormModal } from './ActionFormModal.js';
 import { Button } from './Button.js';
+import { ConfirmDialog } from './ConfirmDialog.js';
+
+/** Does this action need a gate (confirm/form) before invoking? */
+function actionHasForm(action: ActionSchema): boolean {
+  return Array.isArray(action.form) && action.form.length > 0;
+}
 
 export interface ActionMenuProps {
   actions: ActionSchema[];
@@ -45,6 +52,12 @@ export function ActionMenu({
   trigger,
   className,
 }: ActionMenuProps) {
+  // Which dropdown action (if any) is currently driving a confirm dialog /
+  // form modal. The modals are mounted as siblings of the menu so they
+  // survive the menu closing on `onSelect`.
+  const [confirmAction, setConfirmAction] = useState<ActionSchema | null>(null);
+  const [formAction, setFormAction] = useState<ActionSchema | null>(null);
+
   if (actions.length === 0) return null;
 
   if (actions.length <= inlineThreshold) {
@@ -64,34 +77,82 @@ export function ActionMenu({
     );
   }
 
+  const handleSelect = (action: ActionSchema) => {
+    if (action.disabled) return;
+    // Mirror ActionButton's gating: confirmation first, then form, else
+    // invoke directly. The modals open as siblings of the (now closing)
+    // menu so destructive/form actions never fire without a gate (#229,
+    // #231).
+    if (action.requiresConfirmation) {
+      setConfirmAction(action);
+    } else if (actionHasForm(action)) {
+      setFormAction(action);
+    } else {
+      onInvoke(action);
+    }
+  };
+
+  const handleConfirm = () => {
+    const action = confirmAction;
+    setConfirmAction(null);
+    if (!action) return;
+    if (actionHasForm(action)) {
+      setFormAction(action);
+    } else {
+      onInvoke(action);
+    }
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {trigger ?? (
-          <Button variant="ghost" size="icon" aria-label="Actions">
-            ⋯
-          </Button>
-        )}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={6} className={cn('min-w-[12rem]', className)}>
-        {actions.map((action) => (
-          <DropdownMenuItem
-            key={action.name}
-            disabled={action.disabled === true}
-            variant={action.color === 'destructive' ? 'destructive' : 'default'}
-            onSelect={() => {
-              // Delegate to ActionButton-style handling by routing
-              // through onInvoke. Confirmation/form modals are still
-              // available via direct ActionButton usage; the menu
-              // is intended for plain links / direct invocations.
-              if (action.disabled) return;
-              onInvoke(action);
-            }}
-          >
-            {action.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          {trigger ?? (
+            <Button variant="ghost" size="icon" aria-label="Actions">
+              ⋯
+            </Button>
+          )}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" sideOffset={6} className={cn('min-w-[12rem]', className)}>
+          {actions.map((action) => (
+            <DropdownMenuItem
+              key={action.name}
+              disabled={action.disabled === true}
+              variant={action.color === 'destructive' ? 'destructive' : 'default'}
+              onSelect={() => handleSelect(action)}
+            >
+              {action.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {confirmAction && (
+        <ConfirmDialog
+          open
+          onOpenChange={(next) => {
+            if (!next) setConfirmAction(null);
+          }}
+          config={confirmAction.confirmation}
+          onConfirm={handleConfirm}
+          processing={processing}
+        />
+      )}
+      {formAction && (
+        <ActionFormModal
+          open
+          onOpenChange={(next) => {
+            if (!next) setFormAction(null);
+          }}
+          action={formAction}
+          fields={formFieldsByAction[formAction.name] ?? formAction.formFields ?? []}
+          onSubmit={(values) => {
+            const action = formAction;
+            setFormAction(null);
+            onInvoke(action, values);
+          }}
+          processing={processing}
+        />
+      )}
+    </>
   );
 }

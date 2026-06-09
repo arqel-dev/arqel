@@ -167,3 +167,28 @@ it('BulkAction: deselectRecordsAfterCompletion default true', function (): void 
     expect($action->shouldDeselectAfterCompletion())->toBeTrue()
         ->and($action->deselectRecordsAfterCompletion(false)->shouldDeselectAfterCompletion())->toBeFalse();
 });
+
+it('isDisabledFor: short-circuits to the static default on a null template record (#232)', function (): void {
+    // A record-dependent disabled predicate that dereferences the record.
+    $action = RowAction::make('edit')->disabled(fn ($record) => $record->status === 'x');
+
+    // At template serialisation the row record is null; the predicate must NOT
+    // be invoked (it would dereference null → 500). The template default is
+    // "not disabled".
+    expect($action->isDisabledFor(null))->toBeFalse();
+});
+
+it('isVisibleFor: short-circuits to the static default on a null template record (#232)', function (): void {
+    $action = RowAction::make('edit')->visible(fn ($record) => $record->status === 'x');
+
+    expect($action->isVisibleFor(null))->toBeTrue();
+});
+
+it('toArray: serialises the row-action template with a null record without throwing (#232)', function (): void {
+    $action = RowAction::make('edit')->disabled(fn ($record) => $record->status === 'x');
+
+    $payload = $action->toArray(null, null, null);
+
+    expect($payload)->toBeArray()
+        ->and($payload)->not->toHaveKey('disabled');
+});

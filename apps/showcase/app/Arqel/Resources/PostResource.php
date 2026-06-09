@@ -21,7 +21,6 @@ use Arqel\Fields\Types\TextField;
 use Arqel\Form\Form;
 use Arqel\Realtime\Concerns\BroadcastsResourceUpdates;
 use Arqel\Form\Layout\Grid;
-use Arqel\Form\Layout\Group;
 use Arqel\Form\Layout\Tab;
 use Arqel\Form\Layout\Tabs;
 use Arqel\Table\Columns\BadgeColumn;
@@ -136,15 +135,13 @@ final class PostResource extends Resource
                                             ->inline(),
                                         (new DateTimeField('published_at')),
                                     ]),
-                                Group::make()
-                                    // visibleIf is invoked with a null record at
-                                    // serialization (Component::isVisibleFor(null)),
-                                    // so the predicate MUST be null-safe.
-                                    ->visibleIf(fn ($record) => $record?->status === 'published')
-                                    ->schema([
-                                        Field::keyValue('meta')
-                                            ->columnSpan('full'),
-                                    ]),
+                                // The `meta` KeyValue is kept UNCONDITIONALLY
+                                // visible so it renders on the create form (null
+                                // record) too — a visibleIf Group would hide it on
+                                // create and leave no spec exercising a rendered
+                                // KeyValue. See 06-form-layouts.spec.ts.
+                                Field::keyValue('meta')
+                                    ->columnSpan('full'),
                             ]),
                     ]),
             ]);

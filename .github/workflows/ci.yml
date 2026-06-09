@@ -327,10 +327,13 @@ jobs:
         run: docker compose -p arqel-dogfood -f compose.dogfood.yml exec -T app sh -c "php artisan migrate:fresh --seed --force && php artisan storage:link --force"
 
       - name: Run E2E tests (apps/showcase, against the dogfood stack)
-        working-directory: apps/showcase
         env:
           APP_BASE_URL: http://localhost:8090
-        run: pnpm exec playwright test
+        # Resolve the playwright bin via the workspace filter (matches
+        # dogfood.sh e2e). A bare `pnpm exec playwright` from apps/showcase
+        # fails with ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL "Command playwright not
+        # found" because @playwright/test is not hoisted into that dir's bin.
+        run: pnpm --filter @arqel-dev/showcase exec playwright test
 
       - name: Upload Playwright report (showcase) on failure
         if: failure()

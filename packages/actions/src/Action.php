@@ -318,7 +318,16 @@ abstract class Action
         $url = $this->resolveUrl($record);
         $method = $this->method;
 
-        if ($url === null && ! $this->hasCallback() && $resource !== null) {
+        // No explicit `->url()`: derive a conventional URL so the frontend
+        // never falls back to a dead route. This covers BOTH
+        //   - the stock verbs (view/edit/delete/restore) and bulk actions
+        //     that carry no callback, and
+        //   - a custom action with a server-side `->action(Closure)`, which
+        //     dispatches through core's authorised action endpoint
+        //     (`POST /admin/{slug}/actions/{name}[/{id}]`, #231) — without
+        //     this it shipped no url and the client POSTed to the removed
+        //     `/arqel-dev/actions/{name}` route (#174) → 404.
+        if ($url === null && $resource !== null) {
             $stock = $this->resolveStockUrl($resource, $record);
             if ($stock !== null) {
                 [$url, $method] = $stock;
@@ -396,16 +405,22 @@ abstract class Action
 
         $idSegment = is_scalar($id) ? (string) $id : '{id}';
 
-        $resolved = match ([$this->type, $this->name]) {
-            ['row', 'view'] => ["/admin/{$slug}/{$idSegment}", 'GET'],
-            ['row', 'edit'] => ["/admin/{$slug}/{$idSegment}/edit", 'GET'],
-            ['row', 'delete'] => ["/admin/{$slug}/{$idSegment}", 'DELETE'],
-            ['row', 'restore'] => ["/admin/{$slug}/{$idSegment}/restore", 'POST'],
-            default => null,
-        };
+        // Stock verbs (no user callback) map onto the conventional resource
+        // CRUD routes. A custom action that happens to be named after a stock
+        // verb is NOT hijacked here — it carries a callback and is routed to
+        // the action-dispatch endpoint below.
+        if (! $this->hasCallback()) {
+            $resolved = match ([$this->type, $this->name]) {
+                ['row', 'view'] => ["/admin/{$slug}/{$idSegment}", 'GET'],
+                ['row', 'edit'] => ["/admin/{$slug}/{$idSegment}/edit", 'GET'],
+                ['row', 'delete'] => ["/admin/{$slug}/{$idSegment}", 'DELETE'],
+                ['row', 'restore'] => ["/admin/{$slug}/{$idSegment}/restore", 'POST'],
+                default => null,
+            };
 
-        if ($resolved !== null) {
-            return $resolved;
+            if ($resolved !== null) {
+                return $resolved;
+            }
         }
 
         // Any bulk action (delete included) targets core's stock
@@ -415,6 +430,23 @@ abstract class Action
         // an unregistered route → 404 (#48).
         if ($this->type === 'bulk') {
             return ["/admin/{$slug}/bulk/{$this->name}", self::METHOD_POST];
+        }
+
+        // A custom row/header/toolbar action with a server-side callback
+        // dispatches through core's authorised action endpoint (#231):
+        //   - row/header carry the record id segment,
+        //   - toolbar (no record) omits it.
+        // Core's `ResourceController::rowAction` resolves the action by name
+        // on the matching collection, authorises it (resource Gate + the
+        // action's own `canBeExecutedBy`), validates the form payload and
+        // runs `execute()`. Without this URL the client fell back to the
+        // dead `/arqel-dev/actions/{name}` route removed in #174 → 404.
+        if ($this->hasCallback() && in_array($this->type, ['row', 'header', 'toolbar'], true)) {
+            if ($this->type === 'toolbar') {
+                return ["/admin/{$slug}/actions/{$this->name}", self::METHOD_POST];
+            }
+
+            return ["/admin/{$slug}/actions/{$this->name}/{$idSegment}", self::METHOD_POST];
         }
 
         return null;

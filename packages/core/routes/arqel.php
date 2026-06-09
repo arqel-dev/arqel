@@ -67,4 +67,21 @@ Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
         ->name('bulk')
         ->where('resource', $reservedSlugs)
         ->where('action', '[a-z][a-z0-9_-]*');
+
+    // Custom row/header/toolbar action dispatch (#231). A custom action
+    // with a server-side `->action(Closure)` (and no explicit `->url()`)
+    // funnels through this authorised endpoint instead of the dead
+    // standalone `arqel.actions.*` routes removed in #174. The optional
+    // `{id}` segment carries the target record for row/header actions;
+    // toolbar actions omit it. `ResourceController::rowAction` resolves
+    // the action by name on the resource's `actions`/`headerActions`/
+    // `toolbarActions` collection (duck-typed), authorises it (resource
+    // Gate + the action's `canBeExecutedBy`), validates the form payload
+    // and runs `execute()`. It rides the same panel/config middleware
+    // stack (web + auth + tenant) as every other resource route.
+    Route::post('{resource}/actions/{action}/{id?}', [ResourceController::class, 'rowAction'])
+        ->name('action')
+        ->where('resource', $reservedSlugs)
+        ->where('action', '[a-z][a-z0-9_-]*')
+        ->where('id', '[0-9a-zA-Z\-_]+');
 });

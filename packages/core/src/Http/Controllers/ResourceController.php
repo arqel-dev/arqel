@@ -20,6 +20,7 @@ use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Throwable;
 
 /**
  * Generic Resource controller. Polymorphic over the slug supplied
@@ -224,6 +225,139 @@ final class ResourceController
         }
 
         return $redirect;
+    }
+
+    /**
+     * Dispatch a custom row/header/toolbar action (#231). A custom action
+     * declares a server-side `->action(Closure)` and no explicit
+     * `->url()`; before this it had no working HTTP path (the standalone
+     * `arqel.actions.*` routes were removed in #174, and `resolveStockUrl()`
+     * only covered the stock CRUD verbs + bulk), so the frontend fell back
+     * to the dead `/arqel-dev/actions/{name}` route → 404.
+     *
+     * This mirrors `bulkAction()` (#48): it rides the panel/config
+     * middleware stack (web + auth + tenant) and authorises BEFORE running.
+     * The `{id}` segment is present for row/header actions (resolved to a
+     * record) and absent for toolbar actions.
+     *
+     * Authorisation is two-layer, matching `ActionController::execute`:
+     *   1. the resource-level Gate — `update` when a record is targeted
+     *      (the action mutates that row), `viewAny` for record-less
+     *      toolbar actions — so a user who cannot touch the resource is
+     *      rejected even if the action declared no own gate; and
+     *   2. the action's own `canBeExecutedBy($user, $record)` predicate
+     *      (ACTIONS-005) when it exposes one.
+     *
+     * The action is duck-typed (no hard dep on `arqel-dev/actions`),
+     * exactly like `findBulkAction()`.
+     */
+    public function rowAction(
+        Request $request,
+        string $resource,
+        string $action,
+        ?string $id = null,
+    ): RedirectResponse {
+        $instance = $this->resolveOrFail($resource);
+
+        $record = null;
+        if ($id !== null) {
+            $record = $this->findOrFail($instance, $id);
+        }
+
+        $actionInstance = $this->findResourceAction($instance, $action);
+        if ($actionInstance === null) {
+            abort(HttpResponse::HTTP_NOT_FOUND);
+        }
+
+        // Resource-level gate: a record-bound action mutates that row
+        // (`update`); a record-less toolbar action gates on `viewAny`.
+        $this->authorize(
+            $record !== null ? 'update' : 'viewAny',
+            $record ?? $instance::getModel(),
+        );
+
+        // Action-level gate (ACTIONS-005). Duck-typed: only consulted when
+        // the action exposes the predicate, and a denial aborts 403.
+        $user = $this->resolveUser($request);
+        if (
+            method_exists($actionInstance, 'canBeExecutedBy')
+            && $actionInstance->canBeExecutedBy($user, $record) !== true
+        ) {
+            abort(HttpResponse::HTTP_FORBIDDEN);
+        }
+
+        // Validate the action's form-modal payload when it carries one.
+        $data = [];
+        if (
+            method_exists($actionInstance, 'hasForm')
+            && $actionInstance->hasForm() === true
+            && method_exists($actionInstance, 'getFormValidationRules')
+        ) {
+            $rules = $actionInstance->getFormValidationRules();
+            if (is_array($rules)) {
+                $validated = $request->validate($rules);
+                foreach ($validated as $key => $value) {
+                    $data[(string) $key] = $value;
+                }
+            }
+        }
+
+        $failureNotification = method_exists($actionInstance, 'getFailureNotification')
+            ? $actionInstance->getFailureNotification()
+            : null;
+
+        try {
+            if (method_exists($actionInstance, 'execute')) {
+                $actionInstance->execute($record, $data);
+            }
+        } catch (Throwable $e) {
+            $message = is_string($failureNotification) ? $failureNotification : $e->getMessage();
+
+            return back()->with('error', $message);
+        }
+
+        $success = method_exists($actionInstance, 'getSuccessNotification')
+            ? $actionInstance->getSuccessNotification()
+            : null;
+
+        $redirect = back();
+
+        return is_string($success)
+            ? $redirect->with('success', $success)
+            : $redirect;
+    }
+
+    /**
+     * Walk the resource's row/header/toolbar action collections
+     * (`actions`/`headerActions`/`toolbarActions`) and return the action
+     * matching `$name`. Duck-typed so core keeps no hard dep on
+     * `arqel-dev/actions`. Returns null when no collection method exists or
+     * no action matches.
+     */
+    private function findResourceAction(Resource $instance, string $name): ?object
+    {
+        foreach (['actions', 'headerActions', 'toolbarActions'] as $collectionMethod) {
+            if (! method_exists($instance, $collectionMethod)) {
+                continue;
+            }
+
+            $collection = $instance->{$collectionMethod}();
+            if (! is_array($collection)) {
+                continue;
+            }
+
+            foreach ($collection as $candidate) {
+                if (! is_object($candidate) || ! method_exists($candidate, 'getName')) {
+                    continue;
+                }
+
+                if ($candidate->getName() === $name) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

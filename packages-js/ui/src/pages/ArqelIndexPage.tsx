@@ -56,9 +56,20 @@ function invokeAction(
   formValues?: Record<string, unknown>,
 ): void {
   const recordId = record?.id;
-  const url = action.url
-    ? action.url.replace('{id}', String(recordId ?? ''))
-    : `/arqel-dev/actions/${action.name}`;
+  // Every dispatchable action ships a server-emitted `url` (stock verbs,
+  // bulk, and custom callback actions all resolve through core's authorised
+  // routes — see `Action::resolveStockUrl()`, #48/#231). An absent `url`
+  // signals a misconfiguration; we must NOT fall back to the dead
+  // `/arqel-dev/actions/{name}` route removed in #174. Surface it clearly
+  // instead of masking it as a 404.
+  if (!action.url) {
+    throw new Error(
+      `Arqel: action "${action.name}" has no url to dispatch to. Declare it on ` +
+        `the Resource's actions()/headerActions()/toolbarActions() so the server ` +
+        `emits its endpoint URL, or give it an explicit ->url().`,
+    );
+  }
+  const url = action.url.replace('{id}', String(recordId ?? ''));
   const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
   const data: Record<string, unknown> = { ...(formValues ?? {}) };
   if (recordId !== undefined) data['record_id'] = recordId;

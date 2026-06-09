@@ -22,13 +22,17 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Arqel's core provider registers a greedy `admin/{resource}` route
-        // during its boot() (earlier than this app provider's boot()), so it
-        // would shadow any single-segment `/admin/*` route declared in
-        // routes/web.php or this provider's boot() — resolving e.g.
-        // `/admin/versions-demo` as resource="versions-demo" → 404. Registering
-        // the static route here in register() (which runs before ALL boot()
-        // methods) guarantees it is inserted first and wins the match.
-        // See the Phase-5 findings ledger (CANDIDATE #7).
+        // directly in ArqelServiceProvider::packageBooted() (its boot phase,
+        // earlier than this app provider's boot()), so it would shadow any
+        // single-segment `/admin/*` route declared in routes/web.php or this
+        // provider's boot() — resolving e.g. `/admin/versions-demo` as
+        // resource="versions-demo" → 404. The core's `{resource}` route IS
+        // constrained (->where('resource', ...)), but its allowlist only
+        // excludes auth slugs (login|logout|register|...), not app routes, so
+        // `versions-demo` still matches. Registering the static route here in
+        // register() (which runs before ALL boot() methods) guarantees it is
+        // inserted first and wins the match.
+        // See the Phase-5 findings ledger (CANDIDATE #7C).
         Route::get('/admin/versions-demo', static fn () => Inertia::render('VersionsDemo'))
             ->middleware(['web', 'auth'])
             ->name('showcase.versions-demo');

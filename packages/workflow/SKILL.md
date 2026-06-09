@@ -48,12 +48,9 @@ config()->set('arqel-realtime.workflow.broadcast_state_transitions', false);
 
 A direção da dep é `realtime → workflow`: este pacote nunca importa nada de `arqel-dev/realtime`. A wiring é por listener Laravel padrão, então user-land pode adicionar listeners adicionais (audit, notify) sem conflito.
 
-### Entregue (WF-001 → WF-010)
-
-- **WF-010** — `Http\Controllers\TransitionController` endpoint `POST /admin/{resource}/{record}/transition/{transition}` valida + dispara transições.
-
 ### Pendente
 
+- **HTTP transition endpoint (WF-003+)** — **NÃO shipado**. O pacote **não** registra rotas nem inclui um `Http\Controllers\TransitionController` (não há `Route::` em `packages/workflow/src`; o `WorkflowServiceProvider` confirma que ele "land in WF-003+"). O que **está** entregue server-side é `HasWorkflow::transitionTo($newState, $context)` (com enforcement de eligibility/autorização WF-006 no fallback) + o `StateTransitionField` React-bound. Apps consumidoras devem, por enquanto, **prover sua própria rota + controller** (validando o input e chamando `transitionTo()`); ver o padrão em `apps/docs/examples/workflows/`. Um endpoint canônico `POST /admin/{resource}/{record}/transition/{transition}` é trabalho futuro.
 - **WorkflowVisualizer React component** — diagrama interativo do workflow (states + transitions) consumindo `WorkflowDefinition::toArray()`.
 - **Integração canônica com `spatie/laravel-model-states`** — guard helpers + casts + transition events; o suggest entra em `require` quando o usuário opta in.
 

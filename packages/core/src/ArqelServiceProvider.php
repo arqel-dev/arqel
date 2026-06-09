@@ -95,13 +95,18 @@ final class ArqelServiceProvider extends PackageServiceProvider
         // runs before ours by registration order. Defer the panel→registry
         // sync to `app->booted` so we always see the final list of panels
         // and resources, regardless of provider order.
+        //
+        // Route registration is chained *after* the sync inside the same
+        // `booted` callback: the polymorphic `{resource}` wildcard is
+        // constrained to the actually-registered slugs (#234), so the
+        // registry must already be populated when routes are mounted.
         $this->app->booted(function (): void {
             $this->discoverResourcesIfEnabled();
             $this->syncPanelResourcesIntoRegistry();
             $this->electDefaultCurrentPanel();
+            $this->registerResourceRoutes();
         });
 
-        $this->registerResourceRoutes();
         $this->registerBuiltInCommandProviders();
 
         $this->app->booted(function (): void {
@@ -296,6 +301,13 @@ final class ArqelServiceProvider extends PackageServiceProvider
     {
         $registry = $this->app->make(PanelRegistry::class);
 
+        // The polymorphic `{resource}` wildcard is constrained to the
+        // currently-registered resource slugs (#234). Exposing them on the
+        // container lets the route file build an anchored alternation regex
+        // so an unknown single segment (e.g. an app's own `/admin/foo`
+        // route) falls through instead of being captured + 404-ed.
+        $this->app->instance('arqel.resource-route-slugs', $this->registeredResourceSlugs());
+
         $panel = $registry->getCurrent();
         $configPath = config('arqel.path', 'admin');
         $path = $panel?->getPath() ?? (is_string($configPath) ? $configPath : 'admin');
@@ -322,6 +334,30 @@ final class ArqelServiceProvider extends PackageServiceProvider
         Route::prefix($path)
             ->middleware($middleware)
             ->group(__DIR__.'/../routes/arqel.php');
+    }
+
+    /**
+     * Collect the slugs of every registered Resource.
+     *
+     * Used to constrain the polymorphic `{resource}` wildcard so it only
+     * matches known resources (#234). Slugs are regex-quoted at the route
+     * level; here we just gather them, de-duplicated and ordered.
+     *
+     * @return array<int, string>
+     */
+    protected function registeredResourceSlugs(): array
+    {
+        $registry = $this->app->make(ResourceRegistry::class);
+
+        $slugs = [];
+        foreach ($registry->all() as $resourceClass) {
+            $slug = $resourceClass::getSlug();
+            if ($slug !== '') {
+                $slugs[$slug] = $slug;
+            }
+        }
+
+        return array_values($slugs);
     }
 
     /**

@@ -303,6 +303,25 @@ jobs:
           done
           test "$code" = "200" || { echo "showcase did not boot"; docker compose -p arqel-dogfood -f compose.dogfood.yml logs --no-color | tail -200; exit 1; }
 
+      - name: Wait for postgres to be reachable from the app container
+        working-directory: apps/showcase
+        run: |
+          # The HTTP 200 health-check above only proves the web stack booted —
+          # the /admin/login page does not touch the database, so postgres may
+          # not yet be DNS-resolvable/accepting connections from inside the app
+          # container. Probe `db:5432` from the app container before migrating
+          # (mirrors dogfood.sh wait_for_db) to avoid a flaky "could not
+          # translate host name db" QueryException on a cold CI runner.
+          ready=0
+          for i in $(seq 1 40); do
+            if docker compose -p arqel-dogfood -f compose.dogfood.yml exec -T app \
+                 php -r 'exit(@fsockopen("db", 5432) ? 0 : 1);' >/dev/null 2>&1; then
+              echo "postgres reachable from app (attempt $i)"; ready=1; break
+            fi
+            echo "attempt $i: postgres not reachable yet"; sleep 3
+          done
+          test "$ready" = "1" || { echo "postgres never became reachable"; docker compose -p arqel-dogfood -f compose.dogfood.yml logs --no-color db app | tail -120; exit 1; }
+
       - name: Migrate + seed (postgres, inside the container)
         working-directory: apps/showcase
         run: docker compose -p arqel-dogfood -f compose.dogfood.yml exec -T app sh -c "php artisan migrate:fresh --seed --force && php artisan storage:link --force"

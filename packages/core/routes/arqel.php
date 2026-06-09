@@ -14,50 +14,63 @@ use Illuminate\Support\Facades\Route;
  * avoid `Route::resource()` because the controller is generic.
  */
 
-// Reserved sub-paths that Arqel itself owns under the panel prefix
-// (e.g. /admin/login, /admin/logout from arqel-dev/auth) must not be
-// captured by the polymorphic `{resource}` slug.
+// Constrain the polymorphic `{resource}` wildcard to the actually-
+// registered Resource slugs (#234). Anything else under the panel prefix
+// — auth sub-paths (`/admin/login`, `/admin/reset-password/{token}` from
+// arqel-dev/auth, which are *separate* routes), app-defined routes such as
+// `/admin/versions-demo`, etc. — then falls through to its own route
+// instead of being captured by this wildcard and 404-ed.
 //
-// Use lookahead with `(?:/|$)` so the exclusion fires even when the
-// reserved slug appears as the first segment of a multi-segment route
-// (e.g. `/admin/reset-password/{token}` or `/admin/email/verify/{id}/{hash}`).
-// Anchoring with `$` alone only catches single-segment URLs because the
-// captured `{resource}` value never includes a slash; multi-segment URLs
-// end the captured group before the `$` anchor would trigger.
-$reservedSlugs = '(?!(?:login|logout|register|forgot-password|reset-password|email|dashboards)(?:/|$))[^/]+';
+// The slug list is published on the container by
+// `ArqelServiceProvider::registerResourceRoutes()` right before this file
+// is loaded, so it always reflects the post-sync registry.
+$registeredSlugs = app()->bound('arqel.resource-route-slugs')
+    ? app('arqel.resource-route-slugs')
+    : [];
+$registeredSlugs = is_array($registeredSlugs) ? array_values(array_filter($registeredSlugs, 'is_string')) : [];
 
-Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
+// When no resources are registered the wildcard must match *nothing* so it
+// never shadows app routes. `(*FAIL)` is a PCRE control verb that always
+// fails the match; otherwise build an anchored alternation of quoted slugs.
+$resourceSlugPattern = $registeredSlugs === []
+    ? '(*FAIL)'
+    : '(?:'.implode('|', array_map(
+        static fn (string $slug): string => preg_quote($slug, '/'),
+        $registeredSlugs,
+    )).')';
+
+Route::name('arqel.resources.')->group(function () use ($resourceSlugPattern): void {
     Route::get('{resource}', [ResourceController::class, 'index'])
         ->name('index')
-        ->where('resource', $reservedSlugs);
+        ->where('resource', $resourceSlugPattern);
     Route::get('{resource}/create', [ResourceController::class, 'create'])
         ->name('create')
-        ->where('resource', $reservedSlugs);
+        ->where('resource', $resourceSlugPattern);
 
     // Precognition support (RF-FM-10) — Laravel runs validation only,
     // returning 204 No Content for `Precognition: true` requests.
     Route::middleware('precognitive')->post('{resource}', [ResourceController::class, 'store'])
         ->name('store')
-        ->where('resource', $reservedSlugs);
+        ->where('resource', $resourceSlugPattern);
 
     Route::get('{resource}/{id}', [ResourceController::class, 'show'])
         ->name('show')
-        ->where('resource', $reservedSlugs)
+        ->where('resource', $resourceSlugPattern)
         ->where('id', '[0-9a-zA-Z\-_]+');
     Route::get('{resource}/{id}/edit', [ResourceController::class, 'edit'])
         ->name('edit')
-        ->where('resource', $reservedSlugs)
+        ->where('resource', $resourceSlugPattern)
         ->where('id', '[0-9a-zA-Z\-_]+');
     Route::middleware('precognitive')->put('{resource}/{id}', [ResourceController::class, 'update'])
         ->name('update')
-        ->where('resource', $reservedSlugs)
+        ->where('resource', $resourceSlugPattern)
         ->where('id', '[0-9a-zA-Z\-_]+');
     Route::middleware('precognitive')->patch('{resource}/{id}', [ResourceController::class, 'update'])
-        ->where('resource', $reservedSlugs)
+        ->where('resource', $resourceSlugPattern)
         ->where('id', '[0-9a-zA-Z\-_]+');
     Route::delete('{resource}/{id}', [ResourceController::class, 'destroy'])
         ->name('destroy')
-        ->where('resource', $reservedSlugs)
+        ->where('resource', $resourceSlugPattern)
         ->where('id', '[0-9a-zA-Z\-_]+');
 
     // Bulk action dispatch (BUG-VAL-010). The React side POSTs the
@@ -65,7 +78,7 @@ Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
     // the BulkAction by name on the resource's table and executes it.
     Route::post('{resource}/bulk/{action}', [ResourceController::class, 'bulkAction'])
         ->name('bulk')
-        ->where('resource', $reservedSlugs)
+        ->where('resource', $resourceSlugPattern)
         ->where('action', '[a-z][a-z0-9_-]*');
 
     // Custom row/header/toolbar action dispatch (#231). A custom action
@@ -81,7 +94,7 @@ Route::name('arqel.resources.')->group(function () use ($reservedSlugs): void {
     // stack (web + auth + tenant) as every other resource route.
     Route::post('{resource}/actions/{action}/{id?}', [ResourceController::class, 'rowAction'])
         ->name('action')
-        ->where('resource', $reservedSlugs)
+        ->where('resource', $resourceSlugPattern)
         ->where('action', '[a-z][a-z0-9_-]*')
         ->where('id', '[0-9a-zA-Z\-_]+');
 });

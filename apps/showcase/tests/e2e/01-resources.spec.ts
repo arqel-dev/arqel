@@ -86,10 +86,14 @@ test.describe('Post resource', () => {
     await page.goto('/admin/posts/create');
     await expect(page.getByRole('heading', { name: 'Create Post' })).toBeVisible();
 
-    // The Title input is present and flagged required (native + schema).
+    // The Title input lives in the default Content tab and is flagged required
+    // (native + schema).
     const title = page.locator('[data-arqel-field="title"] input');
     await expect(title).toBeVisible();
-    // The Author belongsTo select is present and required.
+    // The form() is organised into Tabs (Content default + Meta); the Author
+    // belongsTo select lives in the Meta tab and is not in the DOM until the tab
+    // is activated. Switch to it before asserting the select renders.
+    await page.getByRole('tab', { name: 'Meta' }).click();
     await expect(page.locator('[data-arqel-field="author_id"] select')).toBeVisible();
     // Save / Cancel actions render.
     await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
@@ -102,23 +106,28 @@ test.describe('Post resource', () => {
 
     const firstTitle = await page.locator('table tbody tr td:nth-child(2)').first().innerText();
 
-    await page.locator('table tbody tr').first().getByRole('button', { name: 'Edit' }).click();
+    // The built-in Edit/Delete row actions now live in the per-row "Actions"
+    // dropdown (role="menuitem"), mirroring spec 05. Open it, then click Edit.
+    await page.locator('table tbody tr').first().getByRole('button', { name: 'Actions' }).click();
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
     await page.waitForURL(/\/admin\/posts\/\d+\/edit/);
 
+    // The title field is in the default Content tab, so it is prefilled and
+    // visible without switching tabs.
     await expect(page.locator('[data-arqel-field="title"] input')).toHaveValue(firstTitle.trim());
   });
 
-  test('row delete removes a row via the confirm dialog', async ({ loggedInPage }) => {
+  test('row delete removes a row', async ({ loggedInPage }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts');
     await expect(page.locator('table tbody tr').first()).toBeVisible();
     const before = await page.locator('table tbody tr').count();
 
-    // The row Delete action opens a ConfirmDialog with a Delete button.
-    await page.locator('table tbody tr').first().getByRole('button', { name: 'Delete' }).click();
-    const dialog = page.locator('[role="dialog"], [role="alertdialog"]');
-    await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: 'Delete' }).click();
+    // The built-in Delete row action now lives in the per-row "Actions"
+    // dropdown (role="menuitem"). Selecting it dispatches the Inertia
+    // `DELETE /admin/posts/{id}` directly (no ConfirmDialog), removing the row.
+    await page.locator('table tbody tr').first().getByRole('button', { name: 'Actions' }).click();
+    await page.getByRole('menuitem', { name: 'Delete' }).click();
 
     // The list re-renders with one fewer row.
     await expect(async () => {
@@ -144,12 +153,9 @@ test.describe('Post resource', () => {
     await page.locator('table thead input[type="checkbox"][aria-label="Select all rows"]').check();
 
     // The bulk-action bar appears once rows are selected; deleteBulk() renders a
-    // "Delete selected" button that opens a ConfirmDialog before dispatching via
-    // Inertia, mirroring the per-row delete action. Confirm to commit the delete.
+    // "Delete selected" button that dispatches `POST /admin/posts/bulk/delete`
+    // directly via Inertia (no ConfirmDialog), mirroring the per-row delete.
     await page.getByRole('button', { name: 'Delete selected' }).click();
-    const dialog = page.locator('[role="dialog"], [role="alertdialog"]');
-    await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: 'Delete' }).click();
 
     // After deleting every selected row the table is empty: no row checkboxes
     // remain and the empty-state placeholder is shown instead.

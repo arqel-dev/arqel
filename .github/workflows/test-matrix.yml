@@ -124,7 +124,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: matrix.php == '8.4' && matrix.laravel == '13.*' && matrix.db == 'mysql'
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false

@@ -1,18 +1,7 @@
-import { useContext } from 'react';
-
-import { ThemeContext } from './ThemeProvider';
-import type { ThemeContextValue } from './types';
-
 /**
- * Hook para acessar o tema atual e atualizá-lo.
- *
- * Lança erro se chamado fora de `<ThemeProvider>` (fail-fast — evita
- * componentes silenciosamente mostrando defaults errados).
+ * Re-export of the single source of truth (issue #236). This is the
+ * SAME hook the `@arqel-dev/ui` shell uses, so both operate on one
+ * context. The returned value exposes both `resolved` and the
+ * `resolvedTheme` alias for backward-compat.
  */
-export function useTheme(): ThemeContextValue {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) {
-    throw new Error('[arqel-dev/theme] useTheme() deve ser usado dentro de <ThemeProvider>.');
-  }
-  return ctx;
-}
+export { useTheme } from '@arqel-dev/react/providers';

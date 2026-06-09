@@ -41,6 +41,9 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "dependencies": {
+    "@arqel-dev/react": "workspace:*"
+  },
   "peerDependencies": {
     "react": "^19.2.0"
   },

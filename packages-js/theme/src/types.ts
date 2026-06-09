@@ -1,22 +1,17 @@
 /**
- * Theme preference armazenada em localStorage / Context.
+ * Theme types — re-exported from the single source of truth
+ * (`@arqel-dev/react/providers`, issue #236).
  *
  * - `light` — força modo claro
  * - `dark` — força modo escuro
  * - `system` — segue `prefers-color-scheme` do SO
+ *
+ * `ThemeContextValue` carries both `resolved` (react/providers shape)
+ * and `resolvedTheme` (the historical `@arqel-dev/theme` alias) so
+ * existing consumers of either shape keep working.
  */
-export type Theme = 'light' | 'dark' | 'system';
-
-/**
- * Tema efetivamente aplicado ao DOM (já resolvido a partir de `Theme`).
- */
-export type ResolvedTheme = 'light' | 'dark';
-
-export interface ThemeContextValue {
-  /** Preferência do utilizador (incluindo `system`). */
-  theme: Theme;
-  /** Tema concreto aplicado no `<html>` (sempre `light` ou `dark`). */
-  resolvedTheme: ResolvedTheme;
-  /** Atualiza preferência (persiste em localStorage). */
-  setTheme: (theme: Theme) => void;
-}
+export type {
+  ResolvedTheme,
+  Theme,
+  ThemeContextValue,
+} from '@arqel-dev/react/providers';

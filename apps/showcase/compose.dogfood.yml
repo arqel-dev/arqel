@@ -23,7 +23,14 @@ services:
     # LARAVEL_BYPASS_ENV_CHECK=1 lets the laravel-vite-plugin run the HMR dev server
     # despite CI=true (it otherwise refuses to start in CI environments).
     environment: { CI: "true", LARAVEL_BYPASS_ENV_CHECK: "1" }
-    command: sh -c "corepack enable && pnpm install --frozen-lockfile=false --config.confirm-modules-purge=false && pnpm --filter @arqel-dev/showcase exec vite --host 0.0.0.0 --port 5180"
+    # Stale-dist trap: the vite dev-server resolves @arqel-dev/* from each
+    # package's built dist/, NOT its src/. If the dist is stale (older than src),
+    # the dogfood E2E silently tests OLD code. So we MUST rebuild every workspace
+    # JS package (tsup -> fresh dist/, host-mounted) before vite serves. This adds
+    # ~1-2 min to startup but guarantees the dogfood suite exercises fresh source.
+    # Scoped to packages-js/* (matches pnpm-workspace.yaml) so we don't rebuild the
+    # showcase app itself here — vite serves it from src.
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile=false --config.confirm-modules-purge=false && pnpm -r --filter './packages-js/*' build && pnpm --filter @arqel-dev/showcase exec vite --host 0.0.0.0 --port 5180"
     ports: ["5180:5180"]
     volumes: ["../../:/app"]
     networks: [arqel-dogfood-net]

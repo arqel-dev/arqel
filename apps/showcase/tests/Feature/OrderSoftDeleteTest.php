@@ -30,7 +30,7 @@ final class OrderSoftDeleteTest extends TestCase
     }
 
     /**
-     * @param  array<string, string>  $filter
+     * @param array<string, string> $filter
      */
     private function buildCount(array $filter): int
     {

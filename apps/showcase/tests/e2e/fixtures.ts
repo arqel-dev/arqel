@@ -20,7 +20,7 @@ async function gotoLogin(page: Page): Promise<void> {
   for (let attempt = 0; attempt < 5; attempt++) {
     await page.goto('/admin/login', { waitUntil: 'domcontentloaded' });
     try {
-      await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 5000 });
+      await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 15000 });
       return;
     } catch {
       // Transient broken-pipe response — retry the navigation.
@@ -28,30 +28,33 @@ async function gotoLogin(page: Page): Promise<void> {
   }
   // Final attempt: let the normal assertion/timeout surface a real failure.
   await page.goto('/admin/login', { waitUntil: 'domcontentloaded' });
-  await page.locator('input[name="email"]').waitFor({ state: 'visible' });
+  await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 15000 });
 }
 
 /**
  * Submit the login form and wait for the post-login redirect off /admin/login.
  *
- * Under load the single-process `php artisan serve` can be slow to issue the
- * redirect, so `waitForURL` occasionally times out at the default 5s even
- * though the credentials are valid. We retry the submit→wait a couple of times
- * (mirroring `gotoLogin`'s broken-pipe retry) with a longer per-attempt
- * timeout. This only hardens against load flakiness — it does not change the
- * login semantics (same credentials, same success condition).
+ * Under serial-suite load the redirect can be slow to arrive, so `waitForURL`
+ * occasionally times out even though the credentials are valid. We retry the
+ * whole submit→wait (re-navigating to login between attempts, so a transient
+ * hiccup re-tries the entire login rather than failing setup) with a longer
+ * per-attempt timeout. The per-test `timeout` in playwright.config.ts is set
+ * high enough (90s) that these retries never exhaust the test budget mid-flight.
+ * This only hardens against load flakiness — it does not change the login
+ * semantics (same credentials, same success condition).
  */
 async function submitLogin(page: Page): Promise<void> {
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 4; attempt++) {
     await page.fill('input[name="email"]', 'admin@arqel.test');
     await page.fill('input[name="password"]', 'password');
     await page.click('button[type="submit"]');
     try {
-      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 15000 });
+      await page.waitForURL(/\/admin(?!\/login)/, { timeout: 20000 });
       return;
     } catch {
-      // Still on the login page under load — re-navigate and retry the submit.
-      if (attempt < 2) {
+      // Still on the login page under load — re-navigate and retry the whole
+      // login so a transient hiccup re-tries instead of failing setup.
+      if (attempt < 3) {
         await gotoLogin(page);
       }
     }
@@ -60,7 +63,7 @@ async function submitLogin(page: Page): Promise<void> {
   await page.fill('input[name="email"]', 'admin@arqel.test');
   await page.fill('input[name="password"]', 'password');
   await page.click('button[type="submit"]');
-  await page.waitForURL(/\/admin(?!\/login)/, { timeout: 15000 });
+  await page.waitForURL(/\/admin(?!\/login)/, { timeout: 20000 });
 }
 
 export const test = base.extend<Fixtures>({

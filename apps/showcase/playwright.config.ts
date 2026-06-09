@@ -10,6 +10,13 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false,
   workers: 1,
+  // The serial suite shares one worker, so each test also pays for the
+  // `loggedInPage` fixture setup (navigate + submit + redirect). Under serial
+  // load that login can retry a couple of times, which alone can approach the
+  // 30s default. Give every test a 90s budget so a slow-but-valid login never
+  // exhausts the per-test timeout mid-retry (which would close the page and
+  // surface a spurious "browser has been closed" during setup).
+  timeout: 90_000,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {

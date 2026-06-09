@@ -42,7 +42,12 @@ services:
       POSTGRES_DB: arqel_dogfood
       POSTGRES_USER: arqel
       POSTGRES_PASSWORD: arqel
-    volumes: ["arqel-dogfood-db-data:/var/lib/postgresql/data"]
+    # postgres:18+ stores data under a version subdir and expects the volume at
+    # /var/lib/postgresql (NOT the legacy /var/lib/postgresql/data). Mounting the
+    # old path makes pg 18 abort on a fresh volume ("PostgreSQL data in
+    # /var/lib/postgresql/data (unused mount/volume)") — which is why the DB never
+    # became reachable on a clean CI runner. Use the 18+ mount point.
+    volumes: ["arqel-dogfood-db-data:/var/lib/postgresql"]
     networks: [arqel-dogfood-net]
   redis:
     image: redis:7-alpine

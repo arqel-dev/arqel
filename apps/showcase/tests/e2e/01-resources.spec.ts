@@ -117,19 +117,45 @@ test.describe('Post resource', () => {
     await expect(page.locator('[data-arqel-field="title"] input')).toHaveValue(firstTitle.trim());
   });
 
-  test('row delete removes a row', async ({ loggedInPage }) => {
+  test('row delete fires DELETE directly with no confirm dialog (CANDIDATE #8)', async ({
+    loggedInPage,
+  }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts');
     await expect(page.locator('table tbody tr').first()).toBeVisible();
     const before = await page.locator('table tbody tr').count();
 
-    // The built-in Delete row action now lives in the per-row "Actions"
-    // dropdown (role="menuitem"). Selecting it dispatches the Inertia
-    // `DELETE /admin/posts/{id}` directly (no ConfirmDialog), removing the row.
+    // HONEST ENCODING of CANDIDATE #8: the dropdown Delete bypasses the required
+    // ConfirmDialog and fires DELETE directly. When Round 22 routes dropdown
+    // actions through ConfirmDialog, this test must be updated to click the
+    // confirm button.
+    //
+    // The built-in Delete row action lives in the per-row "Actions" dropdown
+    // (role="menuitem") because PostResource exposes 4 row actions (>3), so they
+    // collapse into the ActionMenu. Selecting Delete dispatches the Inertia
+    // `DELETE /admin/posts/{id}` IMMEDIATELY — even though the server-side action
+    // declares requiresConfirmation(), the dropdown path never renders a
+    // ConfirmDialog. This is a one-click irreversible delete.
+
+    // Arm the network listener BEFORE clicking so we capture the dispatch.
+    const deletePromise = page.waitForResponse(
+      (r) => /\/admin\/posts\/\d+$/.test(r.url()) && r.request().method() === 'DELETE',
+    );
+
     await page.locator('table tbody tr').first().getByRole('button', { name: 'Actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
 
-    // The list re-renders with one fewer row.
+    // The DELETE fired with no dialog interaction. Inertia visits respond with a
+    // redirect (303/302) back to the list.
+    const deleteResponse = await deletePromise;
+    expect([302, 303]).toContain(deleteResponse.status());
+
+    // CRUCIAL: no ConfirmDialog gated the delete. There is no lingering confirm
+    // alertdialog because none was ever rendered — the delete bypassed it.
+    await expect(page.getByRole('alertdialog')).toHaveCount(0);
+
+    // The list re-renders with one fewer row, confirming the bypassed delete
+    // actually mutated state without any user confirmation step.
     await expect(async () => {
       const after = await page.locator('table tbody tr').count();
       expect(after).toBe(before - 1);
@@ -153,9 +179,16 @@ test.describe('Post resource', () => {
     await page.locator('table thead input[type="checkbox"][aria-label="Select all rows"]').check();
 
     // The bulk-action bar appears once rows are selected; deleteBulk() renders a
-    // "Delete selected" button that dispatches `POST /admin/posts/bulk/delete`
-    // directly via Inertia (no ConfirmDialog), mirroring the per-row delete.
+    // "Delete selected" button. Unlike the per-row dropdown delete (CANDIDATE
+    // #8), the bulk delete DOES gate behind a ConfirmDialog ("Delete selected
+    // records?") — fresh dist renders it correctly. Trigger it, then confirm.
     await page.getByRole('button', { name: 'Delete selected' }).click();
+
+    // Confirm the dialog: click its "Delete" button to actually dispatch
+    // `POST /admin/posts/bulk/delete` via Inertia.
+    const confirmDialog = page.getByRole('dialog', { name: /Delete selected records\?/i });
+    await expect(confirmDialog).toBeVisible();
+    await confirmDialog.getByRole('button', { name: 'Delete' }).click();
 
     // After deleting every selected row the table is empty: no row checkboxes
     // remain and the empty-state placeholder is shown instead.

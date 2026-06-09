@@ -1,3 +1,4 @@
+import { SkipLink } from '@arqel-dev/a11y';
 import {
   ForgotPasswordPage,
   LoginPage,
@@ -5,7 +6,6 @@ import {
   ResetPasswordPage,
   VerifyEmailNoticePage,
 } from '@arqel-dev/auth';
-import { SkipLink } from '@arqel-dev/a11y';
 import { I18nProvider, LocaleSwitcher } from '@arqel-dev/i18n';
 import { createArqelApp } from '@arqel-dev/react/inertia';
 import { ConnectionStatusBanner, setupEcho } from '@arqel-dev/realtime';

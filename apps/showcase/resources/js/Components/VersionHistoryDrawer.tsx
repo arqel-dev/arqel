@@ -1,4 +1,4 @@
-import { VersionDiff, VersionTimeline, type Version } from '@arqel-dev/versioning';
+import { type Version, VersionDiff, VersionTimeline } from '@arqel-dev/versioning';
 import { router } from '@inertiajs/react';
 import { type JSX, useState } from 'react';
 

@@ -1,5 +1,5 @@
-import { type Version } from '@arqel-dev/versioning';
-import { type JSX } from 'react';
+import type { Version } from '@arqel-dev/versioning';
+import type { JSX } from 'react';
 import { VersionHistoryDrawer } from '../Components/VersionHistoryDrawer';
 
 /**

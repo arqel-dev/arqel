@@ -17,9 +17,7 @@ import { expect, test } from './fixtures';
  * shadow it and 404. See the findings ledger CANDIDATE #7.
  */
 test.describe('Versioning UI (VersionHistoryDrawer)', () => {
-  test('the versions-demo page mounts the drawer with a timeline', async ({
-    loggedInPage,
-  }) => {
+  test('the versions-demo page mounts the drawer with a timeline', async ({ loggedInPage }) => {
     const page = loggedInPage;
     const resp = await page.goto('/admin/versions-demo');
     expect(resp?.status()).toBe(200);

@@ -23,34 +23,22 @@ test.describe('Advanced table columns', () => {
     await expect(table).toBeVisible();
 
     // Column headers are rendered in the table head.
-    await expect(
-      table.locator('thead').getByText('Words', { exact: true }),
-    ).toBeVisible();
-    await expect(
-      table.locator('thead').getByText('Author', { exact: true }),
-    ).toBeVisible();
+    await expect(table.locator('thead').getByText('Words', { exact: true })).toBeVisible();
+    await expect(table.locator('thead').getByText('Author', { exact: true })).toBeVisible();
   });
 
-  test('the Words computed column produces a numeric value per row', async ({
-    loggedInPage,
-  }) => {
+  test('the Words computed column produces a numeric value per row', async ({ loggedInPage }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts');
     await page.waitForLoadState('networkidle');
 
     // Resolve the Words column index from the header order, then assert the
     // first data row's cell at that index is a number (word count).
-    const headers = await page
-      .locator('table thead th')
-      .allInnerTexts();
+    const headers = await page.locator('table thead th').allInnerTexts();
     const wordsIdx = headers.findIndex((h) => /^words$/i.test(h.trim()));
     expect(wordsIdx).toBeGreaterThanOrEqual(0);
 
-    const cell = page
-      .locator('table tbody tr')
-      .first()
-      .locator('td')
-      .nth(wordsIdx);
+    const cell = page.locator('table tbody tr').first().locator('td').nth(wordsIdx);
     await expect(cell).toBeVisible();
     expect((await cell.innerText()).trim()).toMatch(/^\d+$/);
   });

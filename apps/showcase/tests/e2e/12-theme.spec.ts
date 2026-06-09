@@ -7,9 +7,7 @@ import { expect, test } from './fixtures';
  * <html> element (the standalone @arqel-dev/theme ThemeToggle does not).
  */
 test.describe('Theme toggle', () => {
-  test('the topbar theme toggle flips the dark class on <html>', async ({
-    loggedInPage,
-  }) => {
+  test('the topbar theme toggle flips the dark class on <html>', async ({ loggedInPage }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts');
     await page.waitForLoadState('networkidle');

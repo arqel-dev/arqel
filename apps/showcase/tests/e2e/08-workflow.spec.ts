@@ -30,11 +30,7 @@ test.describe('Workflow resource (Tickets)', () => {
     await page.goto('/admin/tickets');
     await page.waitForLoadState('networkidle');
 
-    await page
-      .locator('table tbody tr')
-      .first()
-      .getByRole('button', { name: 'Edit' })
-      .click();
+    await page.locator('table tbody tr').first().getByRole('button', { name: 'Edit' }).click();
 
     // The editable form mounts inline (slideover) on the same URL.
     const subject = page.locator('[data-arqel-field="subject"]');
@@ -51,11 +47,7 @@ test.describe('Workflow resource (Tickets)', () => {
     await page.goto('/admin/tickets');
     await page.waitForLoadState('networkidle');
 
-    await page
-      .locator('table tbody tr')
-      .first()
-      .getByRole('button', { name: 'Edit' })
-      .click();
+    await page.locator('table tbody tr').first().getByRole('button', { name: 'Edit' }).click();
 
     await expect(page.locator('[data-arqel-field="subject"]')).toBeVisible();
 

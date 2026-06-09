@@ -24,9 +24,7 @@ test.describe('Soft-delete resource (Orders)', () => {
     await expect(page.locator('table tbody tr')).toHaveCount(20);
   });
 
-  test('the trashed SelectFilter is present with its scope options', async ({
-    loggedInPage,
-  }) => {
+  test('the trashed SelectFilter is present with its scope options', async ({ loggedInPage }) => {
     const page = loggedInPage;
     await page.goto('/admin/orders');
     await page.waitForLoadState('networkidle');
@@ -39,9 +37,7 @@ test.describe('Soft-delete resource (Orders)', () => {
     expect(opts.join('|')).toContain('Only trashed');
   });
 
-  test('selecting "Only trashed" surfaces the soft-deleted orders', async ({
-    loggedInPage,
-  }) => {
+  test('selecting "Only trashed" surfaces the soft-deleted orders', async ({ loggedInPage }) => {
     const page = loggedInPage;
     await page.goto('/admin/orders');
     await page.waitForLoadState('networkidle');

@@ -29,9 +29,7 @@ test.describe('Realtime (Echo / Reverb)', () => {
     await expect(page.locator('table').first()).toBeVisible();
 
     // No realtime-related console errors leaked from setupEcho.
-    const realtimeErrors = consoleErrors.filter((e) =>
-      /echo|reverb|websocket/i.test(e),
-    );
+    const realtimeErrors = consoleErrors.filter((e) => /echo|reverb|websocket/i.test(e));
     expect(realtimeErrors).toEqual([]);
   });
 });

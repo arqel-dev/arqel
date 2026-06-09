@@ -159,6 +159,78 @@ describe('FormRenderer', () => {
     expect(screen.getByLabelText(/^Name/)).toBeInTheDocument();
   });
 
+  it('renders both controls when two fields share the same name', () => {
+    // Two distinct fields both named 'status' (#233 defect 1): the
+    // name-keyed Map used to collapse them, dropping the first control.
+    const statusText: FieldSchema = {
+      ...baseField,
+      type: 'text',
+      name: 'status',
+      label: 'Status text',
+      component: null,
+      props: {},
+    };
+    const statusSelect: FieldSchema = {
+      ...baseField,
+      type: 'select',
+      name: 'status',
+      label: 'Status select',
+      component: null,
+      props: { options: [{ value: 'a', label: 'A' }] },
+    };
+
+    const schema: FormSchema = {
+      ...flatSchema,
+      schema: [
+        { kind: 'field', name: 'status', type: 'text' },
+        { kind: 'field', name: 'status', type: 'select' },
+      ],
+    };
+
+    render(
+      <FormRenderer
+        schema={schema}
+        fields={[statusText, statusSelect]}
+        values={{}}
+        onChange={() => {}}
+      />,
+    );
+
+    // Both labels render…
+    expect(screen.getByText('Status text')).toBeInTheDocument();
+    expect(screen.getByText('Status select')).toBeInTheDocument();
+    // …and each has its OWN control (textbox + combobox), not a bare label.
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+  });
+
+  it('surfaces a visible notice when a field uses an unregistered component', () => {
+    // #233 defect 2: a field declaring a custom component that was never
+    // registered, whose type has no native case, used to render nothing.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const customField: FieldSchema = {
+      ...baseField,
+      type: 'stateTransition',
+      name: 'transition',
+      label: 'Transition',
+      component: 'arqel-dev/workflow/StateTransition',
+      props: {},
+    };
+    const schema: FormSchema = {
+      ...flatSchema,
+      schema: [{ kind: 'field', name: 'transition', type: 'stateTransition' }],
+    };
+
+    render(<FormRenderer schema={schema} fields={[customField]} values={{}} onChange={() => {}} />);
+
+    expect(screen.getByTestId('arqel-unregistered-field')).toBeInTheDocument();
+    expect(screen.getByText(/arqel-dev\/workflow\/StateTransition/)).toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('arqel-dev/workflow/StateTransition'),
+    );
+    warn.mockRestore();
+  });
+
   it('renders Tabs and switches via Arrow keys', async () => {
     const user = userEvent.setup();
     const schema: FormSchema = {

@@ -22,7 +22,21 @@ export function useAction(action: ActionSchema): UseActionResult {
 
   const invoke = useCallback(
     (record: { id: string | number } | null, payload: Record<string, unknown> = {}) => {
-      const url = action.url ?? `/arqel-dev/actions/${action.name}`;
+      // The server emits a `url` for every dispatchable action — stock
+      // verbs + bulk + custom callback actions all resolve through core's
+      // authorised routes (see `Action::resolveStockUrl()`, #48/#231). A
+      // missing `url` means the action is a misconfiguration (e.g. a custom
+      // action serialised without a resource context); we must NOT silently
+      // POST to the dead `/arqel-dev/actions/{name}` route removed in #174.
+      // Surface it clearly instead of masking it as a 404.
+      if (!action.url) {
+        throw new Error(
+          `Arqel: action "${action.name}" has no url to dispatch to. A custom ` +
+            `action with ->action() must be declared on the Resource's actions() ` +
+            `so the server can emit its endpoint URL; otherwise give it ->url().`,
+        );
+      }
+      const url = action.url;
       const method = action.method.toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete';
       const data = record ? { record_id: record.id, ...payload } : payload;
 

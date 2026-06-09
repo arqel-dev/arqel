@@ -32,7 +32,14 @@ case "${1:-help}" in
     # APP_KEY comes from .env.dogfood (the Docker env_file); no key:generate needed.
     $DC exec -T app sh -c "php artisan migrate:fresh --seed --force && php artisan storage:link --force"
     ;;
-  test)  $DC exec -T app php artisan test ;;
+  # PHPUnit feature tests run on the HOST (SQLite :memory:, APP_ENV=testing via
+  # phpunit.xml), NOT inside the container. The dogfood container injects
+  # APP_ENV=local + SESSION_DRIVER=redis as real process env vars (from the
+  # compose env_file), which take precedence over phpunit.xml's <env> block —
+  # that flips on CSRF + a redis session and makes every POST test return 419.
+  # These tests are isolated (RefreshDatabase) and don't need the stack; the
+  # stack exists for the E2E suite, which DOES need a real browser/pg/redis/reverb.
+  test)  vendor/bin/phpunit ;;
   e2e)   APP_BASE_URL=http://localhost:8090 pnpm --filter @arqel-dev/showcase exec playwright test ;;
   logs)  $DC logs -f "${2:-}" ;;
   sh)    $DC exec app sh ;;

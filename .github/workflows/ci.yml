@@ -268,52 +268,48 @@ jobs:
           retention-days: 14
 
       # --- apps/showcase (comprehensive dogfooding app — all 20 packages) ---
-      # Reuses the Node deps, built packages, and cached Playwright
-      # browser from the apps/demo run above.
+      # Two layers of coverage:
+      #   1. PHPUnit feature tests on the HOST (SQLite :memory:, APP_ENV=testing
+      #      forced by phpunit.xml).
+      #   2. E2E against the arqel-dogfood Docker stack (nginx+php-fpm, postgres,
+      #      redis, reverb, vite dev-server). Reuses the Node deps, built
+      #      packages, and cached Playwright/Chromium from the apps/demo run.
 
       - name: Install Composer deps in apps/showcase
         run: composer install --working-dir=apps/showcase --no-interaction --prefer-dist
 
-      - name: Setup showcase .env + SQLite + key
+      - name: PHPUnit feature tests (apps/showcase, host SQLite)
         working-directory: apps/showcase
         run: |
           cp .env.example .env || true
           php artisan key:generate
-          touch database/database.sqlite
+          vendor/bin/phpunit
 
-      - name: Migrate + seed showcase DB
-        working-directory: apps/showcase
-        run: php artisan migrate:fresh --seed --force
-
-      - name: Smoke-check showcase server boots (surfaces boot errors)
+      - name: Boot the arqel-dogfood stack (pg + redis + reverb + fresh JS build)
         working-directory: apps/showcase
         run: |
-          echo "manifest present: $(ls -la public/build/manifest.json 2>&1)"
-          php artisan serve --host=127.0.0.1 --port=8002 > /tmp/showcase-serve.log 2>&1 &
-          server_pid=$!
-          ok=0
-          last_code=000
-          for i in $(seq 1 40); do
-            last_code=$(curl -s -o /tmp/showcase-login-body.html -w '%{http_code}' http://127.0.0.1:8002/admin/login || echo 000)
-            echo "attempt $i: HTTP $last_code (serve pid alive: $(kill -0 "$server_pid" 2>/dev/null && echo yes || echo no))"
-            if [ "$last_code" = "200" ]; then echo "showcase up (200)"; ok=1; break; fi
-            sleep 1
+          cp .env.dogfood .env
+          docker compose -p arqel-dogfood -f compose.dogfood.yml up -d --build
+          # Wait for the app to serve a 200. The vite service rebuilds every
+          # JS package on startup before serving, so first boot takes a couple
+          # of minutes (90 * 3s = up to 4.5 min budget).
+          code=000
+          for i in $(seq 1 90); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8090/admin/login || echo 000)
+            echo "attempt $i: HTTP $code"
+            [ "$code" = "200" ] && break
+            sleep 3
           done
-          if [ "$ok" != "1" ]; then
-            echo "=== showcase failed (last HTTP $last_code). Server log: ==="
-            cat /tmp/showcase-serve.log || true
-            echo "=== Response body (first 4KB): ==="
-            head -c 4096 /tmp/showcase-login-body.html 2>/dev/null || true
-            echo ""
-            echo "=== Laravel log tail: ==="
-            tail -n 40 storage/logs/laravel.log 2>/dev/null || echo "(no laravel.log)"
-            kill "$server_pid" 2>/dev/null || true
-            exit 1
-          fi
-          kill "$server_pid" 2>/dev/null || true
+          test "$code" = "200" || { echo "showcase did not boot"; docker compose -p arqel-dogfood -f compose.dogfood.yml logs --no-color | tail -200; exit 1; }
 
-      - name: Run E2E tests (apps/showcase)
+      - name: Migrate + seed (postgres, inside the container)
         working-directory: apps/showcase
+        run: docker compose -p arqel-dogfood -f compose.dogfood.yml exec -T app sh -c "php artisan migrate:fresh --seed --force && php artisan storage:link --force"
+
+      - name: Run E2E tests (apps/showcase, against the dogfood stack)
+        working-directory: apps/showcase
+        env:
+          APP_BASE_URL: http://localhost:8090
         run: pnpm exec playwright test
 
       - name: Upload Playwright report (showcase) on failure
@@ -323,3 +319,13 @@ jobs:
           name: playwright-report-showcase
           path: apps/showcase/playwright-report/
           retention-days: 14
+
+      - name: Dogfood stack logs on failure
+        if: failure()
+        working-directory: apps/showcase
+        run: docker compose -p arqel-dogfood -f compose.dogfood.yml logs --no-color | tail -300
+
+      - name: Tear down the dogfood stack
+        if: always()
+        working-directory: apps/showcase
+        run: docker compose -p arqel-dogfood -f compose.dogfood.yml down -v

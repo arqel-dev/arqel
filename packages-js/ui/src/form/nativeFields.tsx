@@ -77,8 +77,38 @@ export function NativeFieldInput(props: NativeProps) {
     case 'image':
       return <FileInput {...props} />;
     default:
-      return null;
+      return <UnregisteredField field={field} />;
   }
+}
+
+/**
+ * Visible fallback when a field's `type` has no native input. This usually
+ * means the field declared a custom `component` whose `/register` module was
+ * never imported, so `getFieldComponent` returned undefined and we fell
+ * through here. Instead of rendering nothing (a bare label, no control, no
+ * diagnostic — #233), surface an inline notice and warn in the console.
+ */
+function UnregisteredField({ field }: { field: FieldSchema }) {
+  if (field.component) {
+    console.warn(
+      `[arqel] field "${field.name}" uses unregistered component "${field.component}" — ` +
+        'did you import its /register module?',
+    );
+  } else {
+    console.warn(`[arqel] field "${field.name}" has no native input for type "${field.type}".`);
+  }
+  const detail = field.component
+    ? `unregistered component "${field.component}"`
+    : `unsupported type "${field.type}"`;
+  return (
+    <p
+      data-testid="arqel-unregistered-field"
+      role="alert"
+      className="rounded-sm border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive"
+    >
+      Field "{field.name}" could not render: {detail}.
+    </p>
+  );
 }
 
 /* ─── primitives ─────────────────────────────────────────────────── */

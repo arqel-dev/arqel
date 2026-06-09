@@ -49,7 +49,20 @@ export function FormRenderer({
   disabled = false,
   className,
 }: FormRendererProps) {
-  const fieldsByName = new Map(fields.map((f) => [f.name, f]));
+  // Resolve each schema entry to its OWN field object. A name-keyed Map
+  // would silently collapse two fields sharing a `name` (e.g. a `status`
+  // text + a `status` select) onto the last one, dropping a control. We
+  // instead consume matching fields positionally — preferring an exact
+  // (name, type) match and never reusing an already-claimed field — so
+  // duplicate-named entries each render their distinct schema (#233).
+  const remaining = [...fields];
+
+  const claimField = (entry: FieldEntry): FieldSchema | undefined => {
+    let idx = remaining.findIndex((f) => f.name === entry.name && f.type === entry.type);
+    if (idx === -1) idx = remaining.findIndex((f) => f.name === entry.name);
+    if (idx === -1) return undefined;
+    return remaining.splice(idx, 1)[0];
+  };
 
   const renderEntry = (entry: SchemaEntry, key: string): ReactNode => {
     if (isFieldEntry(entry)) {
@@ -62,7 +75,7 @@ export function FormRenderer({
   };
 
   const renderFieldEntry = (entry: FieldEntry, key: string): ReactNode => {
-    const field = fieldsByName.get(entry.name);
+    const field = claimField(entry);
     if (!field) return null;
     return (
       <FieldRenderer

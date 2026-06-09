@@ -329,10 +329,11 @@ jobs:
       - name: Run E2E tests (apps/showcase, against the dogfood stack)
         env:
           APP_BASE_URL: http://localhost:8090
-        # Resolve the playwright bin via the workspace filter (matches
-        # dogfood.sh e2e). A bare `pnpm exec playwright` from apps/showcase
-        # fails with ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL "Command playwright not
-        # found" because @playwright/test is not hoisted into that dir's bin.
+        # Use the workspace filter to resolve the showcase playwright bin
+        # (matches dogfood.sh e2e). The vite container no longer touches the
+        # runner's node_modules (it owns isolated anonymous-volume
+        # node_modules in compose.dogfood.yml), so the runner's playwright bin
+        # survives the stack boot.
         run: pnpm --filter @arqel-dev/showcase exec playwright test
 
       - name: Upload Playwright report (showcase) on failure

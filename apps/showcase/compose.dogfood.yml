@@ -32,7 +32,17 @@ services:
     # showcase app itself here — vite serves it from src.
     command: sh -c "corepack enable && pnpm install --frozen-lockfile=false --config.confirm-modules-purge=false && pnpm -r --filter './packages-js/*' build && pnpm --filter @arqel-dev/showcase exec vite --host 0.0.0.0 --port 5180"
     ports: ["5180:5180"]
-    volumes: ["../../:/app"]
+    # Mount the repo for HMR + to write fresh package dist/ back to the host,
+    # BUT keep the container's node_modules in isolated anonymous volumes so the
+    # container's `pnpm install` (root, different store layout) never rewrites the
+    # host/runner node_modules. Without this, the install strips the runner's
+    # .bin shims and the CI E2E step fails with "Command playwright not found".
+    # The workspace node_modules (apps/*, packages-js/*) symlink into the root
+    # .pnpm store, so isolating the root node_modules is what protects them.
+    volumes:
+      - "../../:/app"
+      - "/app/node_modules"
+      - "/app/apps/showcase/node_modules"
     networks: [arqel-dogfood-net]
   db:
     image: postgres:18-alpine

@@ -53,4 +53,31 @@ test.describe('Form layout tabs', () => {
     await expect(page.locator('[data-arqel-field="status"] select')).toBeVisible();
     await expect(page.locator('[data-arqel-field="body"]')).toHaveCount(0);
   });
+
+  test('the Meta tab renders the KeyValue meta field and "Add row" appends a key/value pair', async ({
+    loggedInPage,
+  }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts/create');
+    await expect(page.getByRole('heading', { name: 'Create Post' })).toBeVisible();
+
+    // The `meta` KeyValue is kept unconditionally visible in PostResource's
+    // Meta tab (no longer behind a visibleIf(status==='published') Group), so
+    // it renders on the create form (null record) — this is the only spec that
+    // exercises a rendered fields-advanced KeyValue.
+    await page.getByRole('tab', { name: 'Meta' }).click();
+
+    const meta = page.locator('[data-arqel-field="meta"]');
+    await expect(meta).toBeVisible();
+
+    // No rows yet on a fresh create form; the "+ Add row" affordance is there.
+    const addRow = meta.getByRole('button', { name: /Add .* row/i });
+    await expect(addRow).toBeVisible();
+    await expect(meta.getByLabel('Key 1')).toHaveCount(0);
+
+    // Clicking it appends an editable key/value input pair.
+    await addRow.click();
+    await expect(meta.getByLabel('Key 1')).toBeVisible();
+    await expect(meta.getByLabel('Value 1')).toBeVisible();
+  });
 });

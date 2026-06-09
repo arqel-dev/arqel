@@ -7,17 +7,30 @@ import { expect, test } from './fixtures';
  * an `archive` BulkAction.
  *
  * Real-DOM notes (verified against the dogfood stack):
- *  - Row actions render inside a per-row dropdown whose trigger is a button
- *    with aria-label="Actions" (text "⋯"). The menu items are role="menuitem"
- *    labelled Edit / Delete / Publish / Change Status.
+ *  - The row has FOUR actions (Edit / Delete / Publish / Change Status),
+ *    which exceeds <ActionMenu>'s inlineThreshold of 3, so they collapse
+ *    into a per-row dropdown whose trigger is a button with
+ *    aria-label="Actions" (text "⋯"). The menu items are role="menuitem".
  *  - Bulk actions surface in a bulk-action bar after selecting rows; the
  *    custom `archive` action is a plain button labelled "Archive".
  *
- * KNOWN GAP (see findings ledger CANDIDATE #7): activating a custom RowAction
- * (publish/change_status) opens a dialog whose body is an empty <iframe>
- * (404), so the confirmation copy / the change_status form schema does not
- * render. These tests therefore assert the action *surfaces* (menu items +
- * bulk bar) which is what reliably works, not the broken modal contents.
+ * KNOWN FRAMEWORK BUG — Round-22 CANDIDATE #7(A):
+ *   Row actions rendered in the dropdown ActionMenu (when a row exceeds the
+ *   inline threshold) bypass ConfirmDialog/ActionFormModal entirely — the
+ *   dropdown item's onSelect calls onInvoke(action) directly. invokeAction()
+ *   then POSTs to `/arqel-dev/actions/{name}` (no action.url), an endpoint
+ *   that DOES NOT EXIST in the framework → 404 (which Inertia renders into a
+ *   native dialog/iframe error overlay). So `publish`/`change_status` NEVER
+ *   reach their requiresConfirmation() / form([...]) UI.
+ *
+ *   The tests below therefore HONESTLY encode the broken state: they assert
+ *   the dropdown surfaces the menuitems (true) and that activating a custom
+ *   action POSTs to the missing `/arqel-dev/actions/*` endpoint and gets a
+ *   404 (the real, broken behavior). When the framework is fixed in Round 22
+ *   (e.g. the dropdown routes through ConfirmDialog/ActionFormModal, or the
+ *   action-execution endpoint is added), THESE TESTS WILL FAIL — that is the
+ *   intended regression signal forcing this spec to be updated to assert the
+ *   working confirmation/form modal.
  */
 test.describe('Custom table actions', () => {
   test('row actions dropdown exposes the custom Publish + Change Status actions', async ({
@@ -37,7 +50,7 @@ test.describe('Custom table actions', () => {
     await expect(page.getByRole('menuitem', { name: 'Change Status' })).toBeVisible();
   });
 
-  test('activating the Publish row action opens a confirmation dialog', async ({
+  test('the Publish row action POSTs to the (currently missing) /arqel-dev/actions execution endpoint — 404, see Round-22 #7A', async ({
     loggedInPage,
   }) => {
     const page = loggedInPage;
@@ -58,13 +71,23 @@ test.describe('Custom table actions', () => {
     await target.getByRole('button', { name: 'Actions' }).click();
     const publishItem = page.getByRole('menuitem', { name: 'Publish' });
     await expect(publishItem).toBeVisible();
-    await publishItem.click();
 
-    // requiresConfirmation() mounts a dialog (accessible role "dialog").
-    await expect(page.getByRole('dialog')).toBeVisible();
+    // The dropdown item bypasses requiresConfirmation()'s ConfirmDialog and
+    // POSTs straight to the framework's non-existent action-execution endpoint
+    // → 404. Capturing it asserts the *real* (broken) behavior (#7A).
+    const responsePromise = page.waitForResponse(
+      (r) => r.url().includes('/arqel-dev/actions/') && r.request().method() === 'POST',
+    );
+    await publishItem.click();
+    const response = await responsePromise;
+
+    expect(response.url()).toContain('/arqel-dev/actions/publish');
+    expect(response.status()).toBe(404);
   });
 
-  test('change-status row action opens a dialog', async ({ loggedInPage }) => {
+  test('the Change Status row action POSTs to the (currently missing) /arqel-dev/actions execution endpoint — 404, see Round-22 #7A', async ({
+    loggedInPage,
+  }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts');
     await page.waitForLoadState('networkidle');
@@ -72,11 +95,17 @@ test.describe('Custom table actions', () => {
     await page.locator('table tbody tr').first().getByRole('button', { name: 'Actions' }).click();
     const changeItem = page.getByRole('menuitem', { name: 'Change Status' });
     await expect(changeItem).toBeVisible();
-    await changeItem.click();
 
-    // The form-backed action opens a dialog. (Its inner schema does not
-    // render — CANDIDATE #7 — so we only assert the dialog surfaces.)
-    await expect(page.getByRole('dialog')).toBeVisible();
+    // Same #7A path: the form-backed action never opens its ActionFormModal —
+    // the dropdown item POSTs directly to the missing endpoint → 404.
+    const responsePromise = page.waitForResponse(
+      (r) => r.url().includes('/arqel-dev/actions/') && r.request().method() === 'POST',
+    );
+    await changeItem.click();
+    const response = await responsePromise;
+
+    expect(response.url()).toContain('/arqel-dev/actions/change_status');
+    expect(response.status()).toBe(404);
   });
 
   test('selecting rows reveals the bulk-action bar with the custom Archive action', async ({

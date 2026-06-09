@@ -208,17 +208,28 @@ describe('FormRenderer', () => {
     // #233 defect 2: a field declaring a custom component that was never
     // registered, whose type has no native case, used to render nothing.
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const customField: FieldSchema = {
+    // A custom field whose `type` is outside the native FieldType union (it
+    // comes from an external package serialized over the wire, e.g.
+    // @arqel-dev/workflow's StateTransition) and whose `component` was never
+    // registered. We cast the whole payload because it deliberately steps
+    // outside the discriminated FieldSchema union to mirror that real
+    // cross-package wire shape.
+    const customField = {
       ...baseField,
       type: 'stateTransition',
       name: 'transition',
       label: 'Transition',
       component: 'arqel-dev/workflow/StateTransition',
       props: {},
-    };
+    } as unknown as FieldSchema;
+    const customEntry = {
+      kind: 'field',
+      name: 'transition',
+      type: 'stateTransition',
+    } as unknown as FormSchema['schema'][number];
     const schema: FormSchema = {
       ...flatSchema,
-      schema: [{ kind: 'field', name: 'transition', type: 'stateTransition' }],
+      schema: [customEntry],
     };
 
     render(<FormRenderer schema={schema} fields={[customField]} values={{}} onChange={() => {}} />);

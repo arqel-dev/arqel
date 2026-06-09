@@ -290,11 +290,12 @@ jobs:
         run: |
           cp .env.dogfood .env
           docker compose -p arqel-dogfood -f compose.dogfood.yml up -d --build
-          # Wait for the app to serve a 200. The vite service rebuilds every
-          # JS package on startup before serving, so first boot takes a couple
-          # of minutes (90 * 3s = up to 4.5 min budget).
+          # Wait for the app to serve a 200. The vite service runs pnpm install
+          # + rebuilds every JS package (~20 tsup builds) on startup before
+          # serving, so the first cold boot can take several minutes
+          # (120 * 3s = up to 6 min budget — margin for a cold CI runner).
           code=000
-          for i in $(seq 1 90); do
+          for i in $(seq 1 120); do
             code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8090/admin/login || echo 000)
             echo "attempt $i: HTTP $code"
             [ "$code" = "200" ] && break

@@ -260,12 +260,26 @@ abstract class Action
             return true;
         }
 
+        // A null record means template serialisation (no row bound yet, #232).
+        // Don't invoke the record-dependent predicate — it would dereference
+        // null → 500. Fall back to the static visible default (true).
+        if ($record === null) {
+            return true;
+        }
+
         return (bool) ($this->visible)($record);
     }
 
     public function isDisabledFor(mixed $record = null): bool
     {
         if ($this->disabled === null) {
+            return false;
+        }
+
+        // A null record means template serialisation (no row bound yet, #232).
+        // Don't invoke the record-dependent predicate — it would dereference
+        // null → 500. Fall back to the static disabled default (false).
+        if ($record === null) {
             return false;
         }
 

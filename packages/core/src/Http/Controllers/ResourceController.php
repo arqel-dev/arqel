@@ -523,7 +523,7 @@ final class ResourceController
             abort(HttpResponse::HTTP_NOT_FOUND);
         }
 
-        /** @var resource $instance */
+        /** @var \Arqel\Core\Resources\Resource $instance */
         $instance = app($class);
 
         return $instance;

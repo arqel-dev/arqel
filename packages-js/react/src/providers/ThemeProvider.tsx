@@ -14,7 +14,14 @@ export type ResolvedTheme = 'light' | 'dark';
 
 export interface ThemeContextValue {
   theme: Theme;
+  /** Concrete theme applied to `<html>` (always `light` or `dark`). */
   resolved: ResolvedTheme;
+  /**
+   * Alias of {@link resolved}. Kept for backward-compat with the
+   * `@arqel-dev/theme` value shape (`resolvedTheme`), which now shares
+   * this single context (issue #236).
+   */
+  resolvedTheme: ResolvedTheme;
   setTheme: (theme: Theme) => void;
   toggle: () => void;
 }
@@ -25,9 +32,15 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 ThemeContext.displayName = 'ThemeContext';
 
+export { ThemeContext };
+
 interface ThemeProviderProps {
   defaultTheme?: Theme;
   storageKey?: string;
+  /** Class applied to `<html>` when dark. Default: `dark`. */
+  darkClass?: string;
+  /** Use a `data-theme` attribute instead of a class. Default: `class`. */
+  attribute?: 'class' | 'data-theme';
   children: ReactNode;
 }
 
@@ -42,6 +55,8 @@ interface ThemeProviderProps {
 export function ThemeProvider({
   defaultTheme = 'system',
   storageKey = STORAGE_KEY,
+  darkClass = 'dark',
+  attribute = 'class',
   children,
 }: ThemeProviderProps): ReactNode {
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
@@ -64,8 +79,13 @@ export function ThemeProvider({
     const apply = (next: ResolvedTheme): void => {
       setResolved(next);
       const root = window.document.documentElement;
-      root.classList.remove('light', 'dark');
-      root.classList.add(next);
+      if (attribute === 'data-theme') {
+        root.setAttribute('data-theme', next);
+      } else {
+        root.classList.remove(darkClass);
+        if (next === 'dark') root.classList.add(darkClass);
+      }
+      root.style.colorScheme = next;
     };
 
     if (theme !== 'system') {
@@ -76,13 +96,15 @@ export function ThemeProvider({
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     apply(media.matches ? 'dark' : 'light');
 
-    const listener = (event: MediaQueryListEvent): void => {
-      apply(event.matches ? 'dark' : 'light');
+    // Re-read from the media query (not the event arg) so the handler is
+    // robust to dispatchers that fire listeners without a MediaQueryListEvent.
+    const listener = (): void => {
+      apply(media.matches ? 'dark' : 'light');
     };
 
     media.addEventListener('change', listener);
     return () => media.removeEventListener('change', listener);
-  }, [theme]);
+  }, [theme, darkClass, attribute]);
 
   const setTheme = useCallback(
     (next: Theme) => {
@@ -99,7 +121,7 @@ export function ThemeProvider({
   }, [resolved, setTheme]);
 
   const value = useMemo<ThemeContextValue>(
-    () => ({ theme, resolved, setTheme, toggle }),
+    () => ({ theme, resolved, resolvedTheme: resolved, setTheme, toggle }),
     [theme, resolved, setTheme, toggle],
   );
 

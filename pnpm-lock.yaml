@@ -874,6 +874,10 @@ importers:
         version: 4.1.8(@types/node@25.6.0)(@vitest/coverage-v8@4.1.8)(jsdom@25.0.1)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
 
   packages-js/theme:
+    dependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
     devDependencies:
       '@testing-library/react':
         specifier: ^16.1.0

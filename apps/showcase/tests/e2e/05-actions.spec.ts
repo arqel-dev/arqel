@@ -101,8 +101,7 @@ test.describe('Custom table actions', () => {
     // `/arqel-dev/actions/*` route that produced the original 404.
     const responsePromise = page.waitForResponse(
       (r) =>
-        /\/admin\/posts\/actions\/publish\/\d+$/.test(r.url()) &&
-        r.request().method() === 'POST',
+        /\/admin\/posts\/actions\/publish\/\d+$/.test(r.url()) && r.request().method() === 'POST',
     );
     await confirmDialog.getByRole('button', { name: 'Confirm' }).click();
     const response = await responsePromise;

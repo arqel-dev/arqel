@@ -73,6 +73,16 @@ Route::name('arqel.resources.')->group(function () use ($resourceSlugPattern): v
         ->where('resource', $resourceSlugPattern)
         ->where('id', '[0-9a-zA-Z\-_]+');
 
+    // Restore a soft-deleted record (#244). `Actions::restore()` serialises
+    // `POST {slug}/{id}/restore` (Action::resolveStockUrl) but no route backed
+    // it → 404, so restore via any resource route was impossible. Mirrors the
+    // destroy route's constraints/middleware; the controller loads the record
+    // WITH trashed (the SoftDeletes scope otherwise hides it).
+    Route::post('{resource}/{id}/restore', [ResourceController::class, 'restore'])
+        ->name('restore')
+        ->where('resource', $resourceSlugPattern)
+        ->where('id', '[0-9a-zA-Z\-_]+');
+
     // Bulk action dispatch (BUG-VAL-010). The React side POSTs the
     // selected `record_ids` to this endpoint; the controller resolves
     // the BulkAction by name on the resource's table and executes it.

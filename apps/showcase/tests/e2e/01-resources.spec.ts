@@ -117,7 +117,7 @@ test.describe('Post resource', () => {
     await expect(page.locator('[data-arqel-field="title"] input')).toHaveValue(firstTitle.trim());
   });
 
-  test('row delete fires DELETE directly with no confirm dialog (CANDIDATE #8)', async ({
+  test('row delete shows a confirm dialog before deleting (CANDIDATE #8 fixed)', async ({
     loggedInPage,
   }) => {
     const page = loggedInPage;
@@ -125,37 +125,55 @@ test.describe('Post resource', () => {
     await expect(page.locator('table tbody tr').first()).toBeVisible();
     const before = await page.locator('table tbody tr').count();
 
-    // HONEST ENCODING of CANDIDATE #8: the dropdown Delete bypasses the required
-    // ConfirmDialog and fires DELETE directly. When Round 22 routes dropdown
-    // actions through ConfirmDialog, this test must be updated to click the
-    // confirm button.
+    // Round-22 FIX (#229): the dropdown Delete now gates behind a ConfirmDialog
+    // before firing, restoring the requiresConfirmation() safety step that the
+    // dropdown path previously bypassed (one-click irreversible delete).
     //
     // The built-in Delete row action lives in the per-row "Actions" dropdown
     // (role="menuitem") because PostResource exposes 4 row actions (>3), so they
-    // collapse into the ActionMenu. Selecting Delete dispatches the Inertia
-    // `DELETE /admin/posts/{id}` IMMEDIATELY — even though the server-side action
-    // declares requiresConfirmation(), the dropdown path never renders a
-    // ConfirmDialog. This is a one-click irreversible delete.
-
-    // Arm the network listener BEFORE clicking so we capture the dispatch.
-    const deletePromise = page.waitForResponse(
-      (r) => /\/admin\/posts\/\d+$/.test(r.url()) && r.request().method() === 'DELETE',
-    );
+    // collapse into the ActionMenu.
+    //
+    // SAFETY ASSERTION: track every DELETE request from the moment we open the
+    // dropdown, so we can prove none fires until the user confirms.
+    const deleteRequests: string[] = [];
+    page.on('request', (r) => {
+      if (r.method() === 'DELETE' && /\/admin\/posts\/\d+$/.test(r.url())) {
+        deleteRequests.push(r.url());
+      }
+    });
 
     await page.locator('table tbody tr').first().getByRole('button', { name: 'Actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
 
-    // The DELETE fired with no dialog interaction. Inertia visits respond with a
-    // redirect (303/302) back to the list.
+    // The ConfirmDialog appears (role="dialog", "Delete record?" with a warning)
+    // and offers Cancel/Delete — the delete is NOT yet dispatched.
+    const confirmDialog = page.getByRole('dialog');
+    await expect(confirmDialog).toBeVisible();
+    await expect(confirmDialog).toContainText(/delete record\?/i);
+    await expect(confirmDialog.getByRole('button', { name: 'Delete' })).toBeVisible();
+
+    // CRUCIAL: no DELETE has been dispatched before confirming. The dialog is a
+    // real gate, not cosmetic.
+    expect(deleteRequests).toHaveLength(0);
+    // Give any (incorrect) eager dispatch a window to show up, then re-assert.
+    await page.waitForTimeout(300);
+    expect(deleteRequests).toHaveLength(0);
+    expect(before).toBe(await page.locator('table tbody tr').count());
+
+    // Confirm: only NOW does the Inertia `DELETE /admin/posts/{id}` fire, which
+    // responds with a redirect (303/302) back to the list.
+    const deletePromise = page.waitForResponse(
+      (r) => /\/admin\/posts\/\d+$/.test(r.url()) && r.request().method() === 'DELETE',
+    );
+    await confirmDialog.getByRole('button', { name: 'Delete' }).click();
     const deleteResponse = await deletePromise;
     expect([302, 303]).toContain(deleteResponse.status());
 
-    // CRUCIAL: no ConfirmDialog gated the delete. There is no lingering confirm
-    // alertdialog because none was ever rendered — the delete bypassed it.
-    await expect(page.getByRole('alertdialog')).toHaveCount(0);
+    // The DELETE happened exactly once, after confirmation.
+    expect(deleteRequests).toHaveLength(1);
 
-    // The list re-renders with one fewer row, confirming the bypassed delete
-    // actually mutated state without any user confirmation step.
+    // The list re-renders with one fewer row, confirming the confirmed delete
+    // mutated state.
     await expect(async () => {
       const after = await page.locator('table tbody tr').count();
       expect(after).toBe(before - 1);

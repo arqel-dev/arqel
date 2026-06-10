@@ -328,11 +328,13 @@ final class ResourceController
     }
 
     /**
-     * Walk the resource's row/header/toolbar action collections
-     * (`actions`/`headerActions`/`toolbarActions`) and return the action
-     * matching `$name`. Duck-typed so core keeps no hard dep on
-     * `arqel-dev/actions`. Returns null when no collection method exists or
-     * no action matches.
+     * Walk the resource's action collections and return the action matching
+     * `$name`. Covers the resource-level `actions`/`headerActions`/
+     * `toolbarActions` methods AND the row actions declared on the resource's
+     * `table()` (the common place row actions live — `table()->actions([...])`,
+     * exposed via `Table::getActions()`). Duck-typed so core keeps no hard dep
+     * on `arqel-dev/actions`/`arqel-dev/table`. Returns null when no action
+     * matches.
      */
     private function findResourceAction(Resource $instance, string $name): ?object
     {
@@ -341,19 +343,43 @@ final class ResourceController
                 continue;
             }
 
-            $collection = $instance->{$collectionMethod}();
-            if (! is_array($collection)) {
+            $match = $this->matchActionInCollection($instance->{$collectionMethod}(), $name);
+            if ($match !== null) {
+                return $match;
+            }
+        }
+
+        // Row actions are most commonly declared on the resource's table
+        // (`table()->actions([...])`), surfaced via `Table::getActions()`.
+        $table = $instance->table();
+        if (is_object($table) && method_exists($table, 'getActions')) {
+            $match = $this->matchActionInCollection($table->getActions(), $name);
+            if ($match !== null) {
+                return $match;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the first action in `$collection` whose `getName()` matches
+     * `$name`, or null. Duck-typed: skips non-objects / objects without a
+     * `getName()`.
+     */
+    private function matchActionInCollection(mixed $collection, string $name): ?object
+    {
+        if (! is_array($collection)) {
+            return null;
+        }
+
+        foreach ($collection as $candidate) {
+            if (! is_object($candidate) || ! method_exists($candidate, 'getName')) {
                 continue;
             }
 
-            foreach ($collection as $candidate) {
-                if (! is_object($candidate) || ! method_exists($candidate, 'getName')) {
-                    continue;
-                }
-
-                if ($candidate->getName() === $name) {
-                    return $candidate;
-                }
+            if ($candidate->getName() === $name) {
+                return $candidate;
             }
         }
 

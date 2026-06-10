@@ -33,7 +33,7 @@ final class {{ class }} extends FormRequest
         $resource = app({{ resourceClassShort }}::class);
         $extractor = new FieldRulesExtractor;
 
-        return $extractor->extract($resource->fields());
+        return $extractor->extract($resource->effectiveFields());
     }
 
     /**
@@ -43,7 +43,7 @@ final class {{ class }} extends FormRequest
     {
         $resource = app({{ resourceClassShort }}::class);
 
-        return (new FieldRulesExtractor)->extractMessages($resource->fields());
+        return (new FieldRulesExtractor)->extractMessages($resource->effectiveFields());
     }
 
     /**
@@ -53,6 +53,6 @@ final class {{ class }} extends FormRequest
     {
         $resource = app({{ resourceClassShort }}::class);
 
-        return (new FieldRulesExtractor)->extractAttributes($resource->fields());
+        return (new FieldRulesExtractor)->extractAttributes($resource->effectiveFields());
     }
 }

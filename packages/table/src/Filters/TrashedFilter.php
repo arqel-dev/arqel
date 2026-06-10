@@ -33,7 +33,15 @@ final class TrashedFilter extends Filter
 
     public const string STATE_ONLY = 'only';
 
-    protected string $type = 'trashed';
+    /**
+     * Serialised as `select` (not `trashed`) on purpose: the React
+     * `FilterControl` switch (packages-js/ui TableFilters.tsx) renders
+     * by discriminator and only has a `case 'select'`. Our `props` are
+     * already select-shaped (`options:[{value,label}]`), so the existing
+     * select control renders the 3 trashed states with no React change.
+     * The soft-delete `apply()` logic below is unaffected by the type.
+     */
+    protected string $type = 'select';
 
     protected ?string $withoutLabel = null;
 

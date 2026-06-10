@@ -60,15 +60,20 @@ it('TrashedFilter: with shows every row including trashed', function (): void {
     expect($names)->toEqualCanonicalizing(['active-1', 'active-2', 'deleted-1']);
 });
 
-it('TrashedFilter: serialises the 3 options like a select', function (): void {
+it('TrashedFilter: serialises as a select so the React control renders it', function (): void {
     $filter = TrashedFilter::make();
 
     $payload = $filter->toArray();
 
-    expect($payload['type'])->toBe('trashed')
+    // The React `FilterControl` switch (packages-js/ui TableFilters.tsx)
+    // has a `case 'select'` but no `case 'trashed'` and no default, so the
+    // discriminator must be `select` for the filter to render at all.
+    expect($payload['type'])->toBe('select')
         ->and($payload['name'])->toBe('trashed')
         ->and($payload['label'])->toBe('Trashed')
         ->and($payload['default'])->toBe(TrashedFilter::STATE_WITHOUT)
+        // Same `[{value,label}]` shape the `case 'select'` control consumes
+        // (filter.props.options), with the 3 trashed states preserved.
         ->and($payload['props']['options'])->toBe([
             ['value' => TrashedFilter::STATE_WITHOUT, 'label' => 'Without deleted'],
             ['value' => TrashedFilter::STATE_WITH, 'label' => 'With deleted'],

@@ -55,9 +55,35 @@ final readonly class TransitionAuthorizer
         $from = self::resolveFrom($transitionClass);
         $to = self::resolveTo($transitionClass);
 
+        return self::authorizeAbility($from ?? '*', $to, $user, $record);
+    }
+
+    /**
+     * Autoriza diretamente um par `(from, to)` de states — sem uma transition
+     * class intermediária.
+     *
+     * Usado pelo caminho spatie de `HasWorkflow::transitionTo()` (#242) quando a
+     * `WorkflowDefinition` não enumera uma transition para o par solicitado (o
+     * grafo vive só dentro do spatie). Aplica a mesma precedência Gate →
+     * deny-by-default de {@see authorize()}, garantindo que a autorização
+     * server-side roda também no caminho spatie.
+     */
+    public static function authorizeStates(string $from, string $to, ?Authenticatable $user, mixed $record): bool
+    {
+        return self::authorizeAbility($from === '' ? '*' : $from, $to, $user, $record);
+    }
+
+    /**
+     * Resolve a ability `transition-{from}-to-{to}` e aplica a precedência
+     * Gate → deny-by-default. Compartilhado por {@see authorize()} (a partir de
+     * uma transition class) e por {@see authorizeStates()} (a partir de um par
+     * de states cru).
+     */
+    private static function authorizeAbility(string $from, string $to, ?Authenticatable $user, mixed $record): bool
+    {
         $ability = sprintf(
             'transition-%s-to-%s',
-            self::slugifyState($from ?? '*'),
+            self::slugifyState($from),
             self::slugifyState($to),
         );
 

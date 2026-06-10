@@ -125,7 +125,16 @@ trait HasWorkflow
         assert($this instanceof Model);
 
         if (is_object($currentValue) && method_exists($currentValue, 'transitionTo')) {
-            // Spatie path: keep its own guards/casts intact — unchanged.
+            // Spatie path: spatie owns graph validity (its `allowedTransitions`),
+            // but it knows nothing about the Arqel `TransitionAuthorizer` / the
+            // `transition-*-to-*` gate. Without this call an unauthorized user
+            // could drive a state change straight through spatie, bypassing the
+            // deny-by-default authorization the package advertises (#242). We run
+            // ONLY the authorization portion here — never the Arqel graph check —
+            // so a transition spatie considers valid is not rejected merely
+            // because the Arqel definition does not enumerate it.
+            $this->assertTransitionAuthorized($definition, $fromKey, $newState);
+
             $currentValue->transitionTo($newState);
         } else {
             // Fallback path (raw string / enum / slug). Enforce the
@@ -300,6 +309,88 @@ trait HasWorkflow
             throw IllegalTransitionException::for($fromKey, $newState);
         }
 
+        $this->authorizeAmongMatching($matching, $newState);
+    }
+
+    /**
+     * Enforce the central authorizer on the *spatie* path (#242).
+     *
+     * Spatie's own `transitionTo()` validates the graph, but it never consults
+     * the Arqel {@see TransitionAuthorizer} / the `transition-*-to-*` gate, so
+     * the deny-by-default authorization the package advertises was silently
+     * skipped. This method runs the authorization portion only — it never
+     * imposes the Arqel graph (no {@see IllegalTransitionException}), leaving
+     * spatie as the sole owner of reachability.
+     *
+     * Resolution:
+     * - When the model declares **no** transitions the workflow is free-form:
+     *   no authorization is imposed (mirrors the fallback contract).
+     * - Otherwise, gather the declared transitions whose `from()` includes the
+     *   current state (or which are open) and whose target resolves to
+     *   `$newState`. If at least one such transition is declared, require one of
+     *   them to be authorized (deny-by-default among them).
+     * - If the Arqel definition declares **no** transition matching this
+     *   `(from, to)` pair — common when spatie owns a graph the Arqel metadata
+     *   does not mirror — authorize directly against the canonical
+     *   `transition-{from}-to-{to}` gate using {@see TransitionAuthorizer},
+     *   which honours the `deny_when_undefined` flag.
+     *
+     * @throws UnauthorizedTransitionException when the user is not allowed
+     */
+    private function assertTransitionAuthorized(WorkflowDefinition $definition, string $fromKey, string $newState): void
+    {
+        $transitions = $definition->getTransitions();
+
+        // No declared transitions => free-form workflow, no enforcement.
+        if ($transitions === []) {
+            return;
+        }
+
+        $currentKey = $fromKey === '' ? null : $fromKey;
+
+        /** @var list<class-string> $matching */
+        $matching = [];
+
+        foreach ($transitions as $transition) {
+            if (! self::transitionApplies($transition, $currentKey)) {
+                continue;
+            }
+
+            if (! self::transitionTargets($transition, $newState)) {
+                continue;
+            }
+
+            $matching[] = $transition;
+        }
+
+        // The Arqel definition does not enumerate this spatie transition: do not
+        // reject it as illegal (spatie owns the graph), but still enforce the
+        // canonical `transition-{from}-to-{to}` ability so the deny-by-default
+        // gate applies to states that exist only in spatie's graph.
+        if ($matching === []) {
+            $user = self::resolveCurrentUser();
+
+            if (! TransitionAuthorizer::authorizeStates($fromKey, $newState, $user, $this)) {
+                throw UnauthorizedTransitionException::for($newState);
+            }
+
+            return;
+        }
+
+        $this->authorizeAmongMatching($matching, $newState);
+    }
+
+    /**
+     * Authorize a transition against a list of candidate transition classes.
+     * At least one must be allowed by {@see TransitionAuthorizer} for the
+     * current user + record; otherwise the transition is unauthorized.
+     *
+     * @param list<class-string> $matching
+     *
+     * @throws UnauthorizedTransitionException when none of the candidates allow it
+     */
+    private function authorizeAmongMatching(array $matching, string $newState): void
+    {
         $user = self::resolveCurrentUser();
 
         foreach ($matching as $transition) {

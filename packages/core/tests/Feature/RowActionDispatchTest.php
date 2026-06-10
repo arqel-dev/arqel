@@ -187,3 +187,60 @@ it('aborts 403 when the action canBeExecutedBy denies the user (authorization en
     expect($call)->toThrow(HttpException::class)
         ->and(SideEffectRowAction::$executions)->toBe(0);
 });
+
+/**
+ * A duck-typed table stub exposing `getActions()` — mirrors the shape of
+ * `Arqel\Table\Table` without a hard dep on `arqel-dev/table` (core stays
+ * duck-typed). This is exactly the contract `findResourceAction` probes.
+ */
+final class StubTableWithActions
+{
+    /** @param array<int, object> $actions */
+    public function __construct(private readonly array $actions) {}
+
+    /** @return array<int, object> */
+    public function getActions(): array
+    {
+        return $this->actions;
+    }
+}
+
+/**
+ * Row actions are most commonly declared on the resource's table
+ * (`table()->actions([...])` → `Table::getActions()`), NOT via a top-level
+ * `actions()` method. The dispatch endpoint must resolve those too —
+ * otherwise the common case 404s even though the URL + modal are correct
+ * (the residual gap found while updating the Round-22 E2E specs).
+ */
+final class TableActionResource extends Resource
+{
+    public static string $model = Stub::class;
+
+    public static ?string $slug = 'table-dispatch';
+
+    public function fields(): array
+    {
+        return [];
+    }
+
+    public function table(): mixed
+    {
+        return new StubTableWithActions([new SideEffectRowAction('publish')]);
+    }
+}
+
+it('resolves a row action declared on the resource table (not a top-level actions() method)', function (): void {
+    $this->registry->clear();
+    $this->registry->register(TableActionResource::class);
+
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $request = Request::create('/admin/table-dispatch/actions/publish/2', 'POST');
+
+    $response = $controller->rowAction($request, 'table-dispatch', 'publish', '2');
+
+    expect(SideEffectRowAction::$executions)->toBe(1)
+        ->and(SideEffectRowAction::$ranAgainst)->toBeInstanceOf(Stub::class)
+        ->and(SideEffectRowAction::$ranAgainst->getKey())->toBe(2)
+        ->and($response->getSession()->get('success'))->toBe('Published.');
+});

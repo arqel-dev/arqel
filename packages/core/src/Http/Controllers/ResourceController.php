@@ -9,6 +9,7 @@ use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Core\Support\InertiaDataBuilder;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -134,6 +135,45 @@ final class ResourceController
         return redirect()
             ->route('arqel.resources.index', ['resource' => $instance::getSlug()])
             ->with('success', __('arqel::messages.flash.deleted'));
+    }
+
+    /**
+     * Restore a soft-deleted record (#244). Two gaps closed together:
+     *
+     *  1. The SoftDeletes global scope hides trashed rows, so loading a
+     *     deleted record via the normal `findOrFail()` returns null → 404,
+     *     making restore impossible. We load WITH trashed here.
+     *  2. `Actions::restore()` serialised `POST {slug}/{id}/restore` but no
+     *     such route existed → 404. The route is now registered (mirroring
+     *     destroy) and points here.
+     *
+     * Mirrors `destroy()`'s shape: resolve the resource, load the record
+     * (withTrashed), authorise (`restore` ability — the Laravel convention),
+     * perform the mutation, redirect back with a success flash.
+     *
+     * SCOPE NOTE: this covers the stock `restore` route + controller method.
+     * The "custom action declared as a restore/forceDelete on a trashed
+     * record dispatched through `rowAction`" case is intentionally left as a
+     * follow-up — `rowAction` still loads non-trashed records, so a custom
+     * action targeting a trashed row would 404 there. Expanding `rowAction`
+     * to detect restore-shaped custom actions and load withTrashed is a
+     * larger change (it would need to thread the action's intent into record
+     * loading) and is out of scope for #244.
+     */
+    public function restore(Request $request, string $resource, string $id): RedirectResponse
+    {
+        $instance = $this->resolveOrFail($resource);
+        $record = $this->findWithTrashedOrFail($instance, $id);
+
+        $this->authorize('restore', $record);
+
+        if (method_exists($record, 'restore')) {
+            $record->restore();
+        }
+
+        return redirect()
+            ->route('arqel.resources.index', ['resource' => $instance::getSlug()])
+            ->with('success', __('arqel::messages.flash.restored'));
     }
 
     /**
@@ -582,6 +622,39 @@ final class ResourceController
         $modelClass = $resource::getModel();
 
         $record = $modelClass::query()->find($id);
+
+        if (! $record instanceof Model) {
+            abort(HttpResponse::HTTP_NOT_FOUND);
+        }
+
+        return $record;
+    }
+
+    /**
+     * Load a record INCLUDING soft-deleted rows (#244). The SoftDeletes
+     * global scope hides trashed rows from the default query, so restore
+     * (which by definition targets a deleted row) must bypass it via
+     * `withTrashed()`.
+     *
+     * The model may or may not use SoftDeletes: we apply `withTrashed()`
+     * only when the trait's query macro is available (detected duck-typed
+     * via `class_uses_recursive`), so a non-soft-delete model still loads
+     * normally instead of erroring on an unknown scope. Used exclusively by
+     * `restore()`; the normal `findOrFail()` (non-trashed) keeps backing
+     * show/edit/update/destroy unchanged.
+     */
+    private function findWithTrashedOrFail(Resource $resource, string $id): Model
+    {
+        $modelClass = $resource::getModel();
+
+        $query = $modelClass::query();
+
+        if (in_array(SoftDeletes::class, class_uses_recursive($modelClass), true)) {
+            /** @var \Illuminate\Database\Eloquent\Builder<Model> $query */
+            $query = $query->withTrashed();
+        }
+
+        $record = $query->find($id);
 
         if (! $record instanceof Model) {
             abort(HttpResponse::HTTP_NOT_FOUND);

@@ -49,7 +49,15 @@ final class SideEffectRowAction
 
     public static bool $disabled = false;
 
-    public function __construct(private readonly string $name) {}
+    public function __construct(
+        private readonly string $name,
+        private readonly string $type = 'row',
+    ) {}
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
 
     public function isVisibleFor(mixed $record = null): bool
     {
@@ -291,4 +299,78 @@ it('resolves a row action declared on the resource table (not a top-level action
         ->and(SideEffectRowAction::$ranAgainst)->toBeInstanceOf(Stub::class)
         ->and(SideEffectRowAction::$ranAgainst->getKey())->toBe(2)
         ->and($response->getSession()->get('success'))->toBe('Published.');
+});
+
+/**
+ * #246: the dispatch endpoint chose the gate ability + record binding by
+ * id-presence, never by the action's declared TYPE. So a TOOLBAR action could
+ * be POSTed WITH an `{id}` (loading + mutating a record it should never touch
+ * under the `update` gate), and a ROW action POSTed WITHOUT an id ran with a
+ * null record under the weaker `viewAny` gate. The controller now derives the
+ * binding from `getType()` and rejects the cross-forms.
+ *
+ * A resource exposing a toolbar-type action — invoked WITHOUT an id in the
+ * legitimate case (toolbar actions operate on no specific record).
+ */
+final class ToolbarActionResource extends Resource
+{
+    public static string $model = Stub::class;
+
+    public static ?string $slug = 'toolbar-dispatch';
+
+    public function fields(): array
+    {
+        return [];
+    }
+
+    /** @return array<int, object> */
+    public function toolbarActions(): array
+    {
+        return [new SideEffectRowAction('bulkpublish', 'toolbar')];
+    }
+}
+
+it('runs a toolbar action with no id (legitimate record-less invocation)', function (): void {
+    $this->registry->clear();
+    $this->registry->register(ToolbarActionResource::class);
+
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $request = Request::create('/admin/toolbar-dispatch/actions/bulkpublish', 'POST');
+    $response = $controller->rowAction($request, 'toolbar-dispatch', 'bulkpublish', null);
+
+    expect(SideEffectRowAction::$executions)->toBe(1)
+        ->and(SideEffectRowAction::$ranAgainst)->toBeNull()
+        ->and($response->getSession()->get('success'))->toBe('Published.');
+});
+
+it('rejects a toolbar action invoked WITH an id (cross-form blocked, record never touched)', function (): void {
+    $this->registry->clear();
+    $this->registry->register(ToolbarActionResource::class);
+
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $call = fn () => $controller->rowAction(
+        Request::create('/admin/toolbar-dispatch/actions/bulkpublish/1', 'POST'),
+        'toolbar-dispatch',
+        'bulkpublish',
+        '1',
+    );
+
+    expect($call)->toThrow(HttpException::class)
+        ->and(SideEffectRowAction::$executions)->toBe(0);
+});
+
+it('rejects a row action invoked WITHOUT an id (cross-form blocked)', function (): void {
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $call = fn () => $controller->rowAction(
+        Request::create('/admin/row-dispatch/actions/publish', 'POST'),
+        'row-dispatch',
+        'publish',
+        null,
+    );
+
+    expect($call)->toThrow(HttpException::class)
+        ->and(SideEffectRowAction::$executions)->toBe(0);
 });

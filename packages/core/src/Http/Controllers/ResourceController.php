@@ -309,11 +309,51 @@ final class ResourceController
             abort(HttpResponse::HTTP_NOT_FOUND);
         }
 
+        // Type vs id-presence enforcement (#246). Previously the gate ability
+        // and record binding were chosen purely by id-presence, never by the
+        // action's declared TYPE. That let a TOOLBAR action be POSTed WITH an
+        // `{id}` — loading + mutating a record it should never touch — under
+        // the `update` gate, and a ROW action be POSTed WITHOUT an id, running
+        // with a null record under the weaker `viewAny` gate.
+        //
+        // We resolve the type duck-typed (`getType()` → row|toolbar|header;
+        // core keeps no hard dep on `arqel-dev/actions`). The contract is:
+        //   - toolbar: operates on NO record → MUST be invoked without an id;
+        //     an id present is a cross-form invocation → reject (404).
+        //   - row/header: operate on a record → MUST be invoked with an id;
+        //     no id present is a cross-form invocation → reject (404).
+        // The gate ability is then derived from the type, not id-presence, so
+        // the weaker `viewAny` gate can never be reached by a record-bound
+        // action and vice versa.
+        //
+        // When the action does not expose `getType()` we cannot prove the
+        // type, so we fall back to the legacy id-presence mapping rather than
+        // hard-failing a contract we cannot read — the type check above is the
+        // hardening; this keeps non-typed third-party actions working.
+        $actionType = method_exists($actionInstance, 'getType') ? $actionInstance->getType() : null;
+
+        if ($actionType === 'toolbar') {
+            if ($id !== null) {
+                abort(HttpResponse::HTTP_NOT_FOUND);
+            }
+        } elseif ($actionType === 'row' || $actionType === 'header') {
+            if ($id === null) {
+                abort(HttpResponse::HTTP_NOT_FOUND);
+            }
+        }
+
         // Resource-level gate: a record-bound action mutates that row
-        // (`update`); a record-less toolbar action gates on `viewAny`.
+        // (`update`); a record-less toolbar action gates on `viewAny`. The
+        // ability is keyed off the declared type when known (#246) so it
+        // tracks the action's true target, falling back to id-presence only
+        // for type-less third-party actions.
+        $gatesOnRecord = $actionType !== null
+            ? ($actionType === 'row' || $actionType === 'header')
+            : $record !== null;
+
         $this->authorize(
-            $record !== null ? 'update' : 'viewAny',
-            $record ?? $instance::getModel(),
+            $gatesOnRecord ? 'update' : 'viewAny',
+            $gatesOnRecord ? $record : $instance::getModel(),
         );
 
         // Action-level gate (ACTIONS-005). Duck-typed: only consulted when

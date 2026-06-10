@@ -45,7 +45,21 @@ final class SideEffectRowAction
 
     public static bool $allowExecution = true;
 
+    public static bool $visible = true;
+
+    public static bool $disabled = false;
+
     public function __construct(private readonly string $name) {}
+
+    public function isVisibleFor(mixed $record = null): bool
+    {
+        return self::$visible;
+    }
+
+    public function isDisabledFor(mixed $record = null): bool
+    {
+        return self::$disabled;
+    }
 
     public function getName(): string
     {
@@ -113,6 +127,8 @@ beforeEach(function (): void {
     SideEffectRowAction::$ranAgainst = null;
     SideEffectRowAction::$ranWithData = [];
     SideEffectRowAction::$allowExecution = true;
+    SideEffectRowAction::$visible = true;
+    SideEffectRowAction::$disabled = false;
 
     $this->registry = app(ResourceRegistry::class);
     $this->registry->clear();
@@ -174,6 +190,38 @@ it('aborts 404 when the record id does not exist', function (): void {
 
 it('aborts 403 when the action canBeExecutedBy denies the user (authorization enforced)', function (): void {
     SideEffectRowAction::$allowExecution = false;
+
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $call = fn () => $controller->rowAction(
+        Request::create('/admin/row-dispatch/actions/publish/1', 'POST'),
+        'row-dispatch',
+        'publish',
+        '1',
+    );
+
+    expect($call)->toThrow(HttpException::class)
+        ->and(SideEffectRowAction::$executions)->toBe(0);
+});
+
+it('aborts 403 when the action is disabled for the record (state gate enforced)', function (): void {
+    SideEffectRowAction::$disabled = true;
+
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $call = fn () => $controller->rowAction(
+        Request::create('/admin/row-dispatch/actions/publish/1', 'POST'),
+        'row-dispatch',
+        'publish',
+        '1',
+    );
+
+    expect($call)->toThrow(HttpException::class)
+        ->and(SideEffectRowAction::$executions)->toBe(0);
+});
+
+it('aborts 403 when the action is not visible/hidden for the record (state gate enforced)', function (): void {
+    SideEffectRowAction::$visible = false;
 
     $controller = new ResourceController($this->registry, $this->dataBuilder);
 

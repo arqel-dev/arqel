@@ -77,15 +77,7 @@ final readonly class ResourceChannelAuthorizer
         int|string $recordId,
     ): bool {
         try {
-            $resourceClass = self::resolveResourceClass($resourceSlug);
-
-            if ($resourceClass === null) {
-                return false;
-            }
-
-            /** @var class-string<Model> $modelClass */
-            $modelClass = $resourceClass::getModel();
-            $record = $modelClass::find($recordId);
+            $record = self::resolveRecord($resourceSlug, $recordId);
 
             if ($record === null) {
                 return false;
@@ -102,6 +94,76 @@ final readonly class ResourceChannelAuthorizer
 
             return false;
         }
+    }
+
+    /**
+     * Resolve a Resource slug + id to an Eloquent record, or `null` quando
+     * o registry não está bound, o slug não bate com nenhuma Resource, ou o
+     * record não existe. Defensivo: qualquer falha (registry unbound, slug
+     * desconhecido, query throw) devolve `null` sem propagar exceptions.
+     *
+     * Centraliza a resolução slug→Model para que `authorizeRecord` e o
+     * presence channel callback (routes/channels.php) partilhem exatamente
+     * o mesmo caminho de resolução (DRY).
+     */
+    public static function resolveRecord(string $resourceSlug, int|string $recordId): ?Model
+    {
+        try {
+            $resourceClass = self::resolveResourceClass($resourceSlug);
+
+            if ($resourceClass === null) {
+                return null;
+            }
+
+            /** @var class-string<Model> $modelClass */
+            $modelClass = $resourceClass::getModel();
+
+            return $modelClass::query()->find($recordId);
+        } catch (Throwable $e) {
+            Log::warning('Arqel realtime: failed to resolve record', [
+                'resource' => $resourceSlug,
+                'recordId' => $recordId,
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Whether the core `ResourceRegistry` is bound in the container. Distingue
+     * "app Arqel real (registry bound) mas slug/record não resolveu" — onde
+     * negar é o correto — de "realtime standalone (registry unbound)" — onde
+     * não existe Policy/core possível e o presence channel pode abrir
+     * (scaffold mode).
+     */
+    public static function registryBound(): bool
+    {
+        return app()->bound(self::RESOURCE_REGISTRY_CLASS);
+    }
+
+    /**
+     * Member-info payload published to the presence roster for `$user`.
+     * Extraído do callback inline em routes/channels.php para que a shape
+     * `{id, name, avatar}` seja testável e o route file fique fino.
+     *
+     * @return array{id: int|string|null, name: string|null, avatar: string|null}
+     */
+    public static function presenceMemberInfo(Authenticatable $user): array
+    {
+        /** @var mixed $id */
+        $id = $user->getAuthIdentifier();
+        /** @var mixed $name */
+        $name = $user->name ?? null; // @phpstan-ignore-line property.notFound
+        /** @var mixed $avatar */
+        $avatar = $user->avatar_url ?? null; // @phpstan-ignore-line property.notFound
+
+        return [
+            'id' => is_int($id) || is_string($id) ? $id : null,
+            'name' => is_string($name) ? $name : null,
+            'avatar' => is_string($avatar) ? $avatar : null,
+        ];
     }
 
     /**

@@ -66,18 +66,15 @@ final class FieldUploadController
             abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, 'Missing uploaded file.');
         }
 
-        $directory = $fieldInstance->getDirectory() ?? '';
         $disk = $fieldInstance->getDisk();
 
-        // Pass the field's configured visibility so the stored object gets the
-        // right ACL. Without it Laravel falls back to the disk's default, which
-        // silently breaks url() for a public field on a private-default disk
-        // (e.g. s3) — see #142.
-        $stored = $upload->store($directory, [
-            'disk' => $disk,
-            'visibility' => $fieldInstance->getVisibility(),
-        ]);
-        if (! is_string($stored) || $stored === '') {
+        // Reuse the field's single store implementation (#245) so the direct-
+        // upload endpoint and the main-form write pipeline persist files the
+        // exact same way — same disk, directory, hashName, and visibility ACL
+        // (visibility matters on a private-default disk, see #142).
+        try {
+            $stored = $fieldInstance->storeUploadedFile($upload);
+        } catch (Throwable) {
             abort(HttpResponse::HTTP_INTERNAL_SERVER_ERROR, 'Could not persist uploaded file.');
         }
 

@@ -8,6 +8,7 @@ use Arqel\Core\Contracts\HasActions;
 use Arqel\Core\Contracts\HasFields;
 use Arqel\Core\Contracts\HasResource;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use LogicException;
 
@@ -262,6 +263,7 @@ abstract class Resource implements HasActions, HasFields, HasResource
         /** @var Model $record */
         $record = app($modelClass);
 
+        $data = $this->storeUploadedFiles($data, $record);
         $data = $this->beforeSave($record, $data);
         $data = $this->beforeCreate($data);
 
@@ -282,6 +284,7 @@ abstract class Resource implements HasActions, HasFields, HasResource
      */
     public function runUpdate(Model $record, array $data): Model
     {
+        $data = $this->storeUploadedFiles($data, $record);
         $data = $this->beforeSave($record, $data);
         $data = $this->beforeUpdate($record, $data);
 
@@ -291,6 +294,48 @@ abstract class Resource implements HasActions, HasFields, HasResource
         $this->afterSave($record);
 
         return $record;
+    }
+
+    /**
+     * Persist any uploaded files submitted through the main form's
+     * multipart body before `fill()` (#245). The stock ImageInput/
+     * FileInput submit the raw `File`, so a file/image field's value
+     * reaches the write pipeline as an `UploadedFile`; without this step
+     * the column would be filled with the upload object (cast to its temp
+     * path, which vanishes) and nothing would ever reach disk.
+     *
+     * Upload-capable fields are detected by duck-typing the
+     * `storeUploadedFile()` marker, so `arqel-dev/core` stays decoupled
+     * from `arqel-dev/fields` — the FileField owns the single store
+     * implementation (disk/directory/hashName/visibility), shared with the
+     * direct-upload `FieldUploadController`.
+     *
+     * Only an actual `UploadedFile` value is stored: a string (the
+     * unchanged stored path re-submitted on edit) or null is left
+     * untouched, so editing a record without re-uploading never wipes the
+     * existing file.
+     *
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    protected function storeUploadedFiles(array $data, Model $record): array
+    {
+        foreach ($this->effectiveFields($record->exists ? $record : null) as $field) {
+            if (! is_object($field) || ! method_exists($field, 'storeUploadedFile') || ! method_exists($field, 'getName')) {
+                continue;
+            }
+
+            $name = $field->getName();
+
+            if (! array_key_exists($name, $data) || ! $data[$name] instanceof UploadedFile) {
+                continue;
+            }
+
+            $data[$name] = $field->storeUploadedFile($data[$name]);
+        }
+
+        return $data;
     }
 
     /**

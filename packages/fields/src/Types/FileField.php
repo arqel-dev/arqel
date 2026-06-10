@@ -8,6 +8,7 @@ use Arqel\Fields\Field;
 use Closure;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
+use RuntimeException;
 
 /**
  * File upload input.
@@ -156,6 +157,33 @@ class FileField extends Field
     public function getStrategy(): string
     {
         return $this->strategy;
+    }
+
+    /**
+     * Store an uploaded file to the field's configured disk/directory and
+     * return the relative path. This is the single store implementation
+     * shared by both upload entry points: the direct-upload HTTP endpoint
+     * (`FieldUploadController`) and the main-form write pipeline
+     * (`Resource::runCreate`/`runUpdate`, #245), so the two stay in
+     * lockstep — same disk, directory, hashName, and visibility ACL.
+     *
+     * The field's configured visibility is passed through so the stored
+     * object gets the right ACL; without it Laravel falls back to the
+     * disk's default, which silently breaks `url()` for a public field on
+     * a private-default disk (e.g. s3) — see #142.
+     */
+    public function storeUploadedFile(UploadedFile $file): string
+    {
+        $stored = $file->store($this->directory ?? '', [
+            'disk' => $this->disk,
+            'visibility' => $this->visibility,
+        ]);
+
+        if (! is_string($stored) || $stored === '') {
+            throw new RuntimeException('Could not persist uploaded file.');
+        }
+
+        return $stored;
     }
 
     /**

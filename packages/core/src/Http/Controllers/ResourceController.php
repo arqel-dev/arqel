@@ -286,6 +286,28 @@ final class ResourceController
             abort(HttpResponse::HTTP_FORBIDDEN);
         }
 
+        // State gate (#240): mirror the render path (InertiaDataBuilder's
+        // resolveVisibleActionNames / resolveActionOverrides). A row/header/toolbar
+        // action that the UI would hide (`->hidden()`/`->visible(false)`) or grey out
+        // (`->disabled(fn ($r) => ...)`) for THIS record must not be dispatchable —
+        // otherwise a greyed/hidden action is still POSTable directly. `isVisibleFor`
+        // already folds in the `hidden` flag; both predicates are null-safe (#232) so a
+        // record-less toolbar action is handled too. Duck-typed: only consulted when
+        // the action exposes the methods (core keeps no hard dep on arqel-dev/actions).
+        if (
+            method_exists($actionInstance, 'isVisibleFor')
+            && $actionInstance->isVisibleFor($record) !== true
+        ) {
+            abort(HttpResponse::HTTP_FORBIDDEN);
+        }
+
+        if (
+            method_exists($actionInstance, 'isDisabledFor')
+            && $actionInstance->isDisabledFor($record) === true
+        ) {
+            abort(HttpResponse::HTTP_FORBIDDEN);
+        }
+
         // Validate the action's form-modal payload when it carries one.
         $data = [];
         if (

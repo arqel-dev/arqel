@@ -28,6 +28,69 @@ export interface ThemeContextValue {
 
 const STORAGE_KEY = 'arqel-theme';
 
+interface ResolveInitOptions {
+  storageKey: string;
+  darkClass: string;
+  attribute: 'class' | 'data-theme';
+  defaultTheme: Theme;
+}
+
+/**
+ * Computes the initial `resolved` value so the first paint matches what
+ * the FOUC guard ({@link preventFlashScript}) already applied to `<html>`.
+ *
+ * On the client it reads the truth already on the page — the `darkClass`
+ * on `<html>` (or the `data-theme` attribute) — falling back to
+ * `localStorage` + `prefers-color-scheme` (mirroring the FOUC snippet).
+ * On the server (`document` undefined) it resolves `defaultTheme`.
+ */
+/**
+ * Exported for direct unit testing of the first-paint resolution (issue
+ * #247) in isolation from the post-mount effect. Not re-exported from the
+ * package barrel — internal to the provider.
+ */
+export function computeInitialResolved({
+  storageKey,
+  darkClass,
+  attribute,
+  defaultTheme,
+}: ResolveInitOptions): ResolvedTheme {
+  if (typeof document === 'undefined') {
+    // SSR: no DOM/storage to read; resolve the default (system → light).
+    return defaultTheme === 'dark' ? 'dark' : 'light';
+  }
+
+  // Prefer the state the FOUC script already applied to <html>.
+  const root = document.documentElement;
+  if (attribute === 'data-theme') {
+    const applied = root.getAttribute('data-theme');
+    if (applied === 'dark' || applied === 'light') return applied;
+  } else if (root.classList.contains(darkClass)) {
+    return 'dark';
+  }
+
+  // Fall back to the FOUC snippet's own logic: stored pref + system query.
+  let stored: string | null = null;
+  try {
+    stored = window.localStorage.getItem(storageKey);
+  } catch {
+    stored = null;
+  }
+
+  if (stored === 'dark' || stored === 'light') return stored;
+
+  // `system` (or no stored pref) → resolve via prefers-color-scheme, like
+  // the FOUC snippet. A non-`system` defaultTheme wins when nothing is stored.
+  const pref = stored === 'system' ? 'system' : defaultTheme;
+  if (pref === 'dark') return 'dark';
+  if (pref === 'light') return 'light';
+
+  const prefersDark =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return prefersDark ? 'dark' : 'light';
+}
+
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 ThemeContext.displayName = 'ThemeContext';
@@ -60,7 +123,12 @@ export function ThemeProvider({
   children,
 }: ThemeProviderProps): ReactNode {
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
-  const [resolved, setResolved] = useState<ResolvedTheme>('light');
+  // Lazy-init `resolved` from the state the FOUC guard already applied to
+  // `<html>` so the first paint (and SSR) toggle icon/aria-label are correct
+  // instead of a hardcoded 'light' (issue #247).
+  const [resolved, setResolved] = useState<ResolvedTheme>(() =>
+    computeInitialResolved({ storageKey, darkClass, attribute, defaultTheme }),
+  );
 
   // Hydrate from localStorage after mount.
   useEffect(() => {
@@ -90,6 +158,14 @@ export function ThemeProvider({
 
     if (theme !== 'system') {
       apply(theme);
+      return;
+    }
+
+    // `matchMedia` is absent in some environments (older jsdom/happy-dom, a
+    // non-browser host). Without it, resolve `system` once to light and skip
+    // the listener instead of throwing.
+    if (typeof window.matchMedia !== 'function') {
+      apply('light');
       return;
     }
 

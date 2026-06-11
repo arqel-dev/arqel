@@ -14,7 +14,7 @@
 - `Arqel\Form\Layout\Component` — abstract base partilhada
 - `Section`, `Fieldset`, `Grid`, `Columns`, `Group`, `Tabs`, `Tab`
 - `Arqel\Form\FieldRulesExtractor` — agrega `extract`/`extractMessages`/`extractAttributes` a partir de uma lista de Fields
-- `Arqel\Form\FormRequestGenerator` — gera `Store{Model}Request`/`Update{Model}Request` com stub que delega rules ao `FieldRulesExtractor`
+- `Arqel\Form\FormRequestGenerator` — gera `Store{Model}Request`/`Update{Model}Request` (via `arqel:resource --with-requests`) com stub que delega `rules()`/`messages()`/`attributes()` ao `FieldRulesExtractor`. **As regras derivam de `Resource::effectiveFields()` (v0.14.0)** — a fonte unificada de fields (validação + render), espelhando a validação em runtime do `ResourceController` — **não** só de `fields()`. **Regenere FormRequests antigos** que ainda extraíam de `fields()`, senão divergem da validação efetiva
 - `FormServiceProvider` auto-discovery
 - **Integração com `ResourceController` via `Resource::form()` hook (FORM-006)** — `Resource` ganha `form(): mixed` (default `null`); `Arqel\Core\Support\InertiaDataBuilder::resolveFormFields` é duck-typed contra `arqel-dev/form` e detecta presença de `getFields()` + `toArray()`. Quando declarado, os payloads `buildCreateData`/`buildEditData`/`buildShowData` ganham chave `form` (= `Form::toArray()`) e o `fields` payload é sourced de `Form::getFields()` (flatten); sem `form()`, fallback para `Resource::fields()` flat (zero breaking-change). Retornos não-objeto também caem no fallback graciosamente
 - Inertia useForm flow consumido transparentemente: `ResourceController::validated()` lança `ValidationException` → Laravel converte em `back()->withErrors()->withInput()` (FORM-008)
@@ -157,6 +157,8 @@ Group::make()
 - ❌ **Dependências circulares em `visibleIf`** — A depende de B que depende de A. O resolver não detecta loops; resultado é UI inconsistente.
 - ❌ **Layout component sem `$type`/`$component`** — `Component::toArray()` espera ambos (PHP error em runtime se não declarado pelo subclasse).
 - ❌ **Misturar `Tab` fora de `Tabs`** — `Form::getFields()` ainda flattens correctamente, mas o `defaultTab` lookup só faz sentido dentro de um `Tabs`.
+- ❌ **Dois fields com o mesmo `name`** — o `<FormRenderer>` agora resolve cada entry para o seu próprio field posicionalmente (match exato `(name,type)` primeiro, sem reusar um field já reclamado), então ambos renderizam em vez de um colapsar no último (#233, v0.14.0). Mas continua um **smell**: o `useForm` keya valores/erros por `name`, então dois fields homónimos partilham valor e mensagem de erro. Use nomes distintos.
+- ❌ **Field com `component` custom não registado** — um `field.component` cujo componente nunca foi registado (`registerField(...)` no `@arqel-dev/fields`) agora renderiza um **aviso inline visível** (`<UnregisteredField>`, `data-testid="arqel-unregistered-field"`) + `console.warn`, em vez de não renderizar nada silenciosamente (#233, v0.14.0). Registe o componente — o aviso é diagnóstico, não um placeholder aceitável.
 
 ## Related
 

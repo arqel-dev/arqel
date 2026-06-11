@@ -26,7 +26,14 @@ A integração foca em três blocos:
 
 **Trait de auto-dispatch (RT-002).** `Concerns\BroadcastsResourceUpdates` é o entry point único — sobrescreve o `protected afterUpdate(Model $record): void` do core `Resource` e dispara `ResourceUpdated::dispatch(static::class, $record, $userId)`. Honra `arqel-realtime.auto_dispatch.resource_updated` (kill switch). Resolve user id via `auth()->id()` defensivamente (só passa adiante se for `int` — UUIDs/string ids viram `null`). **Decisão arquitetural**: trait em vez de patching no `Resource` base — `arqel-dev/core` e `arqel-dev/realtime` são pacotes independentes; mutação cross-package empurraria todos os consumidores de `arqel-dev/core` para a stack de broadcasting. Trait é opt-in explícito por Resource. Subclasses que precisam de lógica adicional em `afterUpdate` chamam `parent::afterUpdate($record)` para não silenciar o broadcast.
 
-**Presence channels (RT-004).** `routes/channels.php` registra o presence channel via `Broadcast::channel(PresenceChannelResolver::pattern(), ...)` — o pattern vem da MESMA config `arqel-realtime.presence.channel_pattern` que o resolver lê, então registro e assinatura ficam em sincronia mesmo com pattern custom (#130). O callback retorna `{id, name, avatar}` para o user autenticado, ou `false` quando o Gate opcional `view-resource-presence` é registrado pela app e nega. `Presence\PresenceChannelResolver` (final readonly) expõe `pattern(): string` (fonte única do pattern, lida da config, com fallback ao default `arqel.presence.{resource}.{recordId}` quando não-string/vazio) e `forResource(string $slug, int|string $recordId): string` (resolve o canal concreto). Um pattern custom DEVE preservar os tokens `{resource}` + `{recordId}` (binding posicional por nome do Laravel); placeholders extras (`{tenant}`, etc.) ficam literais em ambos os lados. Levanta `Exceptions\RealtimeException` quando `presence.enabled === false` (programmer error). `Exceptions\RealtimeException` (final, extends `RuntimeException`) é a base runtime exception do pacote.
+**Presence channels (RT-004).** `routes/channels.php` registra o presence channel via `Broadcast::channel(PresenceChannelResolver::pattern(), ...)` — o pattern vem da MESMA config `arqel-realtime.presence.channel_pattern` que o resolver lê, então registro e assinatura ficam em sincronia mesmo com pattern custom (#130). O callback retorna `{id, name, avatar}` para o user autorizado, ou `false` quando nega.
+
+**Presence channel authz endurecida (#239 — SECURITY, v0.14.0).** O callback de presence é **Policy-protected por default**, não mais fail-open. Modelo de autorização (mesma escada de `AwarenessChannelAuthorizer`):
+1. Gate nomeada `view-resource-presence` definida pela app → preserva o comportamento atual exatamente (`Gate::allows('view-resource-presence', [$resource, $recordId])`).
+2. **Sem** a Gate nomeada → endurece via a Policy `view` do record: com Gate `view` **OU** Policy registada para o model, decide por `Gate::check('view', $record)`.
+3. Só abre em **scaffold genuíno**: `ResourceRegistry` unbound (realtime standalone, sem core/Policy possível) **OU** record resolvido sem Gate `view` nem Policy. Se o registry **está** bound (app Arqel real) mas o record não resolveu (slug/id suspeito) → **nega**.
+
+Antes, sem a Gate nomeada (o default), o `&&` curto-circuitava e o callback devolvia o roster (id/name/avatar) a qualquer user autenticado → vazamento cross-user/tenant. O authorizer expõe os helpers reutilizados pelo callback: `presenceMemberInfo($user)`, `resolveRecord($resource, $recordId)`, `registryBound()`. `Presence\PresenceChannelResolver` (final readonly) expõe `pattern(): string` (fonte única do pattern, lida da config, com fallback ao default `arqel.presence.{resource}.{recordId}` quando não-string/vazio) e `forResource(string $slug, int|string $recordId): string` (resolve o canal concreto). Um pattern custom DEVE preservar os tokens `{resource}` + `{recordId}` (binding posicional por nome do Laravel); placeholders extras (`{tenant}`, etc.) ficam literais em ambos os lados. Levanta `Exceptions\RealtimeException` quando `presence.enabled === false` (programmer error). `Exceptions\RealtimeException` (final, extends `RuntimeException`) é a base runtime exception do pacote.
 
 **Channel authorization (RT-009).** `routes/channels.php` registra os 4 patterns canónicos (list, per-record, action progress, presence). `Channels\ResourceChannelAuthorizer` (final readonly) concentra a lógica de Gate-checking em 3 métodos estáticos:
 
@@ -35,7 +42,7 @@ A integração foca em três blocos:
 | `arqel.{resource}` | `authorizeResource` | `viewAny` no model class |
 | `arqel.{resource}.{recordId}` | `authorizeRecord` | `view` no model record |
 | `arqel.action.{jobId}` | `authorizeActionJob` | `Cache::get("arqel.action.{jobId}.user") === $user->getAuthIdentifier()` (comparação estrita) |
-| `arqel.presence.{resource}.{recordId}` | callback inline (RT-004) | Gate opcional `view-resource-presence` |
+| `arqel.presence.{resource}.{recordId}` | callback inline (RT-004, endurecido #239) | Gate nomeada `view-resource-presence` se definida; **senão** Policy `view` do record |
 
 Cada método encapsula a lógica em `try/catch \Throwable` e regista via `Log::warning()` em caso de falha — **defensive by default**. Sem `arqel-dev/core` no container (`app()->bound('Arqel\\Core\\Resources\\ResourceRegistry')` retorna `false`), o authorizer denega por defeito ao invés de explodir, preservando o desacoplamento opcional com o core. Registry sem método `findBySlug` ou retorno `null` também denega.
 
@@ -225,7 +232,9 @@ Gate::define('view', fn ($user, $record) => $user->id === $record->owner_id);
 // Action progress: o job grava o owner antes de dispatch.
 Cache::put("arqel.action.{$jobId}.user", auth()->id(), now()->addMinutes(30));
 
-// Presence opcional (somente quando definido — undefined = allow):
+// Presence: a Gate nomeada é OPCIONAL (#239). Sem ela, o presence channel
+// cai na Policy `view` do record (Policy-protected por default — não fail-open).
+// Defina-a só para sobrescrever essa escada com lógica custom:
 Gate::define('view-resource-presence', fn ($user, string $resource, string|int $id) =>
     $user->can('view', app(\App\Models\Post::class)->find($id))
 );

@@ -12,7 +12,7 @@
 
 - `Arqel\Actions\Action` abstract base com fluent API completo, oracles, XOR action↔url
 - `Concerns\Confirmable` — modal de confirmação (cores destructive/warning/info, type-to-confirm, auto-active flags)
-- `Concerns\HasAuthorization` — gates per-action via Closure `(?Authenticatable, mixed) => bool`
+- `Concerns\HasAuthorization` — gates per-action: `authorize()` aceita **Closure** `(?Authenticatable, mixed) => bool` **ou** uma **string Gate-ability** (`->authorize('refund')`, v0.14.0). A string checa `Gate::forUser($user)->allows($ability, $record)` contra o record bound (`null` para actions record-less). Closure e string **compõem em AND** (ambas têm de passar); declarar nenhuma mantém o default permissivo (sempre autorizado) — o gate de resource (`update`/`viewAny`) segue como guarda externa. **Não** vira deny-by-default — só **adiciona** um mecanismo explícito de Policy per-action
 - `Concerns\HasForm` — form modal com fields + size + validation
 - `Types\RowAction`, `Types\ToolbarAction`, `Types\HeaderAction`, `Types\BulkAction` (chunking automático via `chunkSize`)
 - `Actions` factory para verbos comuns (view/edit/delete/restore/create/deleteBulk)
@@ -52,7 +52,8 @@ Oracles públicos:
 - `isDisabledFor(?$record): bool` — `disabled` closure
 - `resolveUrl(?$record): ?string` — string literal ou closure resolvida
 - `hasRecordDependentUrl(): bool` / `hasRecordDependentDisabled(): bool` — `true` quando `url`/`disabled` é uma `Closure` (precisa resolver por linha, #140)
-- `canBeExecutedBy(?Authenticatable, ?$record): bool` — `authorize` closure (default true)
+- `canBeExecutedBy(?Authenticatable, ?$record): bool` — avalia o `authorize` (Closure e/ou Gate-ability string compõem em AND; default true)
+- `authorize(Closure|string): static` — Closure custom **ou** uma string de Gate-ability (`->authorize('refund')`, v0.14.0). Os dois caminhos coexistem e compõem em AND
 - `execute(?$record, array $data): mixed` — invoca callback (returna `null` sem callback)
 - `toArray(?Authenticatable, ?$record, ?object $resource): array<string, mixed>` — payload Inertia (chaves null filtradas). Quando o action não declarou `->url()` e um `$resource` (com `::$slug`) é passado, `resolveStockUrl()` emite a URL convencional: (a) sem callback — row `view/edit/delete/restore` em `/admin/{slug}/{id}[/...]` e **qualquer** action `type==='bulk'` (não só `delete`) em `POST /admin/{slug}/bulk/{name}` (#48); (b) **com `->action(Closure)`** — custom row/header em `POST /admin/{slug}/actions/{name}/{id}` e custom toolbar (sem record) em `POST /admin/{slug}/actions/{name}` (#231), apontando para `ResourceController::rowAction`. Assim toda action despachável carrega uma `url` e o frontend nunca recai num route inexistente (a `/arqel-dev/actions/{name}` morta removida no #174). Sem `$resource` (serialização de tabela sem slug) nenhuma url stock é emitida — compatível com o contrato anterior. Quando o action tem form, o payload também carrega `formFields` — a FieldSchema completa de cada field via `FieldSchemaSerializer($user)` — ao lado do schema de layout `form` (#213)
 
@@ -163,6 +164,28 @@ RowAction::make('change_status')
     ->action(fn ($post, $data) => $post->update($data));
 ```
 
+### Authorization per-action (Policy ou Closure)
+
+```php
+// Gate-ability string → Gate::allows('refund', $record) (Policy per-action):
+RowAction::make('refund')
+    ->authorize('refund')
+    ->action(fn ($order) => $order->refund());
+
+// Closure custom (predicado livre):
+RowAction::make('archive')
+    ->authorize(fn ($user, $record) => $user?->isAdmin() && ! $record->archived)
+    ->action(fn ($record) => $record->archive());
+
+// Ambos compõem em AND — as duas têm de passar:
+RowAction::make('escalate')
+    ->authorize('escalate')                       // Gate-ability
+    ->authorize(fn ($user) => $user?->isManager()) // + predicado
+    ->action(fn ($r) => $r->escalate());
+```
+
+`canBeExecutedBy()` é o gate **adicional** ao Resource Policy (`update`/`viewAny`), invocado pelo `ResourceController::rowAction` (#231) — uma negação devolve 403.
+
 ### Action como link externo
 
 ```php
@@ -176,7 +199,7 @@ RowAction::make('view_on_site')
 - `declare(strict_types=1)` obrigatório
 - `Action::__construct` é `final`; subclasses só declaram `$type`. Para extensibilidade usa **traits/concerns** ou mais um Type final
 - Form fields dentro de actions usam `arqel-dev/fields` directamente (sem layout components — modais são intencionalmente simples)
-- Authorization é gate **adicional** ao Resource Policy — não substitui. `authorize()` é para regras especificas ao action; o Resource Policy continua a ser invocado via Laravel Gate
+- Authorization é gate **adicional** ao Resource Policy — não substitui. `authorize()` aceita uma **Closure** ou uma **string de Gate-ability** (`->authorize('refund')` → `Gate::allows('refund', $record)`); ambas compõem em AND. É para regras específicas ao action; o Resource Policy continua a ser invocado via Laravel Gate
 - Notificações usam `successNotification`/`failureNotification` para texto literal — i18n é responsabilidade do consumer (passa string já traduzida)
 
 ## Anti-patterns

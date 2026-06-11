@@ -107,20 +107,36 @@ final readonly class TranslationLoader
     /**
      * Resolve um locale para a sua versão em disco. Retorna o
      * `defaultLocale()` se o directório não existir.
+     *
+     * O locale é normalizado (`-` → `_`) antes do lookup em disco — espelha a
+     * normalização do `SetLocaleMiddleware` para o header `Accept-Language` —
+     * de modo que a variante hifenizada `pt-BR` (aceite pelo allowlist e pelos
+     * `DEFAULT_LABELS` do `LocaleSwitcher`) resolva para o mesmo directório
+     * `pt_BR` em vez de cair silenciosamente no default (#250).
      */
     private function resolveLocale(string $locale): string
     {
         $base = $this->langPath();
-        if ($locale !== '' && is_dir($base.'/'.$locale)) {
-            return $locale;
+        $normalized = self::normalize($locale);
+        if ($normalized !== '' && is_dir($base.'/'.$normalized)) {
+            return $normalized;
         }
 
-        $default = $this->defaultLocale();
+        $default = self::normalize($this->defaultLocale());
         if (is_dir($base.'/'.$default)) {
             return $default;
         }
 
         return 'en';
+    }
+
+    /**
+     * Normaliza um locale para a convenção em disco do Laravel, trocando o
+     * separador BCP-47 (`-`) pelo underscore (`pt-BR` → `pt_BR`).
+     */
+    private static function normalize(string $locale): string
+    {
+        return str_replace('-', '_', $locale);
     }
 
     private function langPath(): string

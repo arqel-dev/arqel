@@ -10,6 +10,10 @@ export function isTheme(value: unknown): value is Theme {
 
 /**
  * Lê preferência do localStorage. SSR-safe: retorna `null` no servidor.
+ *
+ * @deprecated Após a unificação de contexto (issue #236), o `ThemeProvider`
+ * passou a gerenciar a leitura do `localStorage` internamente. Ler a chave
+ * por fora não reflete o estado do provider. Prefira `useTheme().theme`.
  */
 export function readStoredTheme(key: string = DEFAULT_STORAGE_KEY): Theme | null {
   if (typeof window === 'undefined') return null;
@@ -24,6 +28,10 @@ export function readStoredTheme(key: string = DEFAULT_STORAGE_KEY): Theme | null
 
 /**
  * Persiste preferência em localStorage. Silencioso em erro.
+ *
+ * @deprecated Após a unificação de contexto (issue #236), o `ThemeProvider`
+ * é a única fonte de escrita do `localStorage`. Chamar isto em runtime grava
+ * a chave mas NÃO atualiza o estado do provider. Prefira `useTheme().setTheme`.
  */
 export function writeStoredTheme(theme: Theme, key: string = DEFAULT_STORAGE_KEY): void {
   if (typeof window === 'undefined') return;

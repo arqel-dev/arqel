@@ -147,6 +147,15 @@ trait HasWorkflow
             $this->save();
         }
 
+        // Re-read the field and resolve its canonical key so the emitted `to`
+        // (and the persisted history `to_state`) matches the state actually
+        // persisted on the model. On the spatie path spatie may normalize the
+        // value (FQCN vs slug) or leave it unchanged, in which case the raw
+        // `$newState` argument would diverge from the model's real column
+        // (#250). Falls back to `$newState` only when the field cannot be
+        // resolved (e.g. spatie hydrated something without a string identity).
+        $toKey = self::resolveStateKey($this->{$field} ?? null) ?? $newState;
+
         if (config('arqel-workflow.audit.enabled', true) === false) {
             return;
         }
@@ -160,7 +169,7 @@ trait HasWorkflow
         event(new StateTransitioned(
             record: $this,
             from: $fromKey,
-            to: $newState,
+            to: $toKey,
             userId: is_int($userId) ? $userId : null,
             context: $context,
         ));

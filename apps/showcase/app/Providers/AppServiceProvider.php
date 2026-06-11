@@ -36,6 +36,13 @@ class AppServiceProvider extends ServiceProvider
         Route::get('/admin/versions-demo', static fn () => Inertia::render('VersionsDemo'))
             ->middleware(['web', 'auth'])
             ->name('showcase.versions-demo');
+
+        // Same greedy-route rationale as versions-demo above: register the
+        // tabs-free Grid form fixture here in register() so it is inserted
+        // before the core `admin/{resource}` route and wins the match.
+        Route::get('/admin/grid-form-demo', static fn () => Inertia::render('GridFormDemo'))
+            ->middleware(['web', 'auth'])
+            ->name('showcase.grid-form-demo');
     }
 
     /**

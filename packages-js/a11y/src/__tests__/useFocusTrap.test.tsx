@@ -51,6 +51,16 @@ describe('useFocusTrap', () => {
     expect(screen.getByText('last')).toHaveFocus();
   });
 
+  it('pulls focus back into the trap on forward Tab from outside the container', async () => {
+    const user = userEvent.setup();
+    render(<TrapFixture active={true} />);
+    // foco escapa para um elemento fora do container
+    screen.getByText('outside-after').focus();
+    expect(screen.getByText('outside-after')).toHaveFocus();
+    await user.tab();
+    expect(screen.getByText('first')).toHaveFocus();
+  });
+
   it('invokes onEscape when Escape pressed', async () => {
     const user = userEvent.setup();
     const onEscape = vi.fn();

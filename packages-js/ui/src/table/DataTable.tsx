@@ -166,7 +166,15 @@ export function DataTable<TRecord extends DataTableRecord>({
                     {sortable ? (
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1 hover:text-foreground"
+                        className={cn(
+                          // -mx-3 px-3 stretches the button across the cell's
+                          // horizontal padding; min-h-11 + w-full give a ≥44px
+                          // touch target on mobile (WCAG 2.5.5) without changing
+                          // the header's visual density.
+                          '-mx-3 inline-flex min-h-11 w-full items-center gap-1 px-3 hover:text-foreground',
+                          col?.align === 'center' && 'justify-center',
+                          col?.align === 'end' && 'justify-end',
+                        )}
                         onClick={() =>
                           onSortChange(header.column.id, direction === 'asc' ? 'desc' : 'asc')
                         }

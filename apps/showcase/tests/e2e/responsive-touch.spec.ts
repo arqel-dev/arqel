@@ -27,4 +27,14 @@ test.describe('responsive — touch targets (≥44px)', () => {
       });
     }
   });
+
+  test('row-action dropdown trigger is ≥44px on mobile', async ({ loggedInPage: page }) => {
+    await page.goto('/admin/posts');
+    for (const w of [360, 640] as const) {
+      await atViewport(page, w, async () => {
+        // the ⋯ Actions trigger button in each table row (ActionMenu).
+        await assertTouchTargets(page, 'table button[aria-label="Actions"]', 44);
+      });
+    }
+  });
 });

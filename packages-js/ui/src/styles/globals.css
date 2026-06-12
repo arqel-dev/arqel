@@ -13,6 +13,13 @@
 
 @import 'tailwindcss';
 
+/* Safelist the responsive grid-column utilities that FormGrid/DashboardGrid
+ * generate at runtime (e.g. `lg:grid-cols-3`). Because those class strings are
+ * built by concatenation, Tailwind's content scanner never sees the literals,
+ * so without this they'd be purged. The 1–12 range matches gridColsClass()'s
+ * Math.min(12, n) clamp. */
+@source inline("{,sm:,md:,lg:,xl:,2xl:}grid-cols-{1,2,3,4,5,6,7,8,9,10,11,12}");
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

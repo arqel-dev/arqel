@@ -108,7 +108,7 @@ export function ActionMenu({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           {trigger ?? (
-            <Button variant="ghost" size="icon" aria-label="Actions">
+            <Button variant="ghost" size="icon-touch" aria-label="Actions">
               ⋯
             </Button>
           )}

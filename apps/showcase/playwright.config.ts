@@ -8,6 +8,12 @@ const baseURL = process.env.APP_BASE_URL ?? 'http://127.0.0.1:8002';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  // The responsive baseline spec is a defect-map recorder, not a gate: it
+  // asserts the *current* (still-failing) per-surface gaps and is slow. It
+  // carries the `@baseline` tag; exclude it by default so the CI run only
+  // executes the real gates. Refresh the map on demand with
+  // `playwright test --grep @baseline` (an explicit --grep overrides this).
+  grepInvert: /@baseline/,
   fullyParallel: false,
   workers: 1,
   // The serial suite shares one worker, so each test also pays for the

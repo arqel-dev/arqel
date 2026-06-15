@@ -99,7 +99,10 @@ export function ResourceIndex<TRecord extends RecordType = RecordType>({
 
   return (
     <section
-      className={cn('flex flex-col rounded-md border border-border bg-background', className)}
+      className={cn(
+        'flex min-w-0 flex-col rounded-md border border-border bg-background',
+        className,
+      )}
       aria-label={resource.pluralLabel}
     >
       <header className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3">

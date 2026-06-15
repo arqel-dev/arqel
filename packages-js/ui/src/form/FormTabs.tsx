@@ -83,7 +83,7 @@ export function FormTabs({ config, tabs, className }: FormTabsProps): ReactEleme
               onClick={() => setActive(tab.id)}
               onKeyDown={onKeyDown}
               className={cn(
-                '-mb-px border-b-2 px-3 py-2 text-sm transition-colors',
+                '-mb-px inline-flex min-h-11 items-center border-b-2 px-3 py-2 text-sm transition-colors',
                 selected
                   ? 'border-primary font-medium text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-foreground',

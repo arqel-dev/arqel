@@ -36,14 +36,20 @@ export function Topbar({
     <header
       data-arqel-topbar=""
       className={cn(
-        'flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-4',
+        // `min-w-0 overflow-hidden` keep the topbar from ever pushing the body
+        // wide: as a flex child it must be allowed to shrink below its content
+        // (min-w-0), and any control cluster that still can't fit is clipped
+        // here instead of overflowing the viewport. Radix popovers (tenant /
+        // locale / user menus) render in a portal, so clipping the bar never
+        // hides their open content.
+        'flex h-14 min-w-0 shrink-0 items-center gap-2 overflow-hidden border-b border-border bg-background px-4',
         className,
       )}
     >
       <SidebarTrigger className="-ml-1" />
-      {brand && <div className="flex items-center">{brand}</div>}
-      <div className="hidden flex-1 md:block">{search}</div>
-      <div className="ml-auto flex items-center gap-2 md:ml-0">
+      {brand && <div className="flex min-w-0 items-center">{brand}</div>}
+      <div className="hidden min-w-0 flex-1 md:block">{search}</div>
+      <div className="ml-auto flex min-w-0 items-center gap-2 md:ml-0">
         {tenantSwitcher}
         <Button
           variant="ghost"

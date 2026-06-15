@@ -154,6 +154,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                       'px-3 py-2 text-left font-medium text-muted-foreground',
                       col?.align === 'center' && 'text-center',
                       col?.align === 'end' && 'text-right',
+                      col?.hiddenOnMobile && 'hidden md:table-cell',
                     )}
                     aria-sort={
                       direction === 'asc'

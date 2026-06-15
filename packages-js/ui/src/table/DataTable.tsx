@@ -100,6 +100,11 @@ export function DataTable<TRecord extends DataTableRecord>({
   const toggleRow = useCallback(
     (id: RowId, index: number, shiftKey: boolean) => {
       if (!onSelectionChange) return;
+      // `index` is the row's position in the core row-model, which today equals the
+      // `records` prop order (only getCoreRowModel is wired — no client sort/filter
+      // row model). The shift-range loop resolves ids from `records[i]`, so this
+      // holds only while that ordering parity is true; revisit if a client-side
+      // sorted/filtered row model is added.
       const set = new Set<RowId>(selectedIds);
       const lastIndex = lastClickedIndexRef.current;
 
@@ -338,16 +343,18 @@ function DataCards<TRecord extends DataTableRecord>({
             {(enableSelection || rowActions) && (
               <div className="mb-3 flex items-center justify-between gap-2">
                 {enableSelection ? (
-                  <input
-                    type="checkbox"
-                    aria-label={`Select row ${record.id}`}
-                    className="size-5"
-                    checked={checked}
-                    onChange={(event) => {
-                      const native = event.nativeEvent as MouseEvent;
-                      onToggleRow(record.id, index, native.shiftKey === true);
-                    }}
-                  />
+                  <label className="-m-2.5 inline-flex size-11 cursor-pointer items-center justify-center p-2.5">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select row ${record.id}`}
+                      className="size-5"
+                      checked={checked}
+                      onChange={(event) => {
+                        const native = event.nativeEvent as MouseEvent;
+                        onToggleRow(record.id, index, native.shiftKey === true);
+                      }}
+                    />
+                  </label>
                 ) : (
                   <span />
                 )}

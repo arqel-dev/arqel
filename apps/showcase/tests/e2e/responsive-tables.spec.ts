@@ -80,4 +80,61 @@ test.describe('responsive — tables', () => {
     expect(desktop.tableVisible, 'table must be visible on desktop').toBe(true);
     expect(desktop.cardCount, 'cards must be hidden on desktop').toBe(0);
   });
+
+  test('the card surface has no overflow, touchable controls, and drops hiddenOnMobile columns', async ({
+    loggedInPage: page,
+  }) => {
+    await page.goto('/admin/posts', { waitUntil: 'networkidle' });
+    for (const w of [360, 640] as const) {
+      await page.setViewportSize({ width: w, height: 900 });
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => r(null))));
+
+      // 1. No horizontal overflow on the body at this mobile width.
+      const body = await page.evaluate(() => ({
+        sw: document.body.scrollWidth,
+        cw: document.body.clientWidth,
+      }));
+      expect(body.sw, `body overflow at ${w}: ${body.sw} > ${body.cw}`).toBeLessThanOrEqual(
+        body.cw + 1,
+      );
+
+      // 2. The first card's row-action trigger is a >=44px touch target.
+      const trigger = page.locator('[data-arqel-data-card] button[aria-label="Actions"]').first();
+      if (await trigger.count()) {
+        const box = await trigger.boundingBox();
+        expect(box, 'action trigger has a box').not.toBeNull();
+        if (box) {
+          expect(
+            Math.min(box.width, box.height),
+            `action trigger ${box.width}x${box.height} < 44`,
+          ).toBeGreaterThanOrEqual(44);
+        }
+      }
+
+      // 3. The first card's selection checkbox has a >=44px touch target (the
+      //    44px <label> wrapper, not the 20px visual input).
+      const selectLabel = page
+        .locator('[data-arqel-data-card] label:has(input[type="checkbox"])')
+        .first();
+      if (await selectLabel.count()) {
+        const box = await selectLabel.boundingBox();
+        if (box) {
+          expect(
+            Math.min(box.width, box.height),
+            `select target ${box.width}x${box.height} < 44`,
+          ).toBeGreaterThanOrEqual(44);
+        }
+      }
+
+      // 4. hiddenOnMobile columns are dropped from the card body: the 'Words'
+      //    (word_count) label must NOT appear inside any card.
+      const wordsInCard = await page.evaluate(() => {
+        const cards = Array.from(document.querySelectorAll('[data-arqel-data-card]'));
+        return cards.some((card) =>
+          Array.from(card.querySelectorAll('dt')).some((dt) => /words/i.test(dt.textContent ?? '')),
+        );
+      });
+      expect(wordsInCard, "'Words' (hiddenOnMobile) must not appear in a card").toBe(false);
+    }
+  });
 });

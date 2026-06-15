@@ -124,7 +124,7 @@ export function DataTable<TRecord extends DataTableRecord>({
   };
 
   return (
-    <div className={cn('w-full overflow-x-auto', className)}>
+    <div className={cn('w-full min-w-0 overflow-x-auto', className)}>
       <table className="w-full border-collapse text-sm">
         <thead className="sticky top-0 bg-background">
           {table.getHeaderGroups().map((group) => (

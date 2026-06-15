@@ -160,7 +160,7 @@ final class PostResource extends Resource
                 BooleanColumn::make('featured'),
                 DateColumn::make('published_at')->sortable()->dateTime('d/m/Y H:i'),
                 RelationshipColumn::make('author')->display('name')->label('Author'),
-                ComputedColumn::make('word_count')->label('Words')
+                ComputedColumn::make('word_count')->label('Words')->hiddenOnMobile()
                     // getStateUsing is invoked with a null record at
                     // serialization (Column::getState(null)), so the
                     // closure MUST be null-safe.

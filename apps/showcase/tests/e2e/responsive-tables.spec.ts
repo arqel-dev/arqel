@@ -1,26 +1,49 @@
 import { expect, test } from './fixtures';
 
 test.describe('responsive — tables', () => {
-  // Guards the latent bug: a hiddenOnMobile column hid its <td> but not its
-  // <th>, so the header had one more cell than each body row at < md. Assert
-  // the header cell count equals the first body row's cell count.
-  test('the table header has no orphan hiddenOnMobile column at mobile width', async ({
+  // PostResource marks the 'Words' (word_count) column hiddenOnMobile, so it
+  // must be hidden on BOTH the <th> and <td> below md — exercising the header
+  // fix (the <th> previously stayed visible, orphaning a header cell). At md+
+  // the column reappears.
+  test('a hiddenOnMobile column hides its header AND body cell in lockstep', async ({
     loggedInPage: page,
   }) => {
-    await page.setViewportSize({ width: 360, height: 900 });
     await page.goto('/admin/posts', { waitUntil: 'networkidle' });
-    const counts = await page.evaluate(() => {
-      const table = document.querySelector('table');
-      if (!table) return { ths: -1, tds: -1 };
-      const ths = table.querySelectorAll('thead tr th').length;
-      const firstRow = table.querySelector('tbody tr');
-      const tds = firstRow ? firstRow.querySelectorAll('td').length : -1;
-      return { ths, tds };
+
+    // Mobile: the 'Words' header is hidden; header/body cell counts still match.
+    await page.setViewportSize({ width: 360, height: 900 });
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => r(null))));
+    const mobile = await page.evaluate(() => {
+      const headers = Array.from(document.querySelectorAll('thead tr th'));
+      const wordsTh = headers.find((th) => /words/i.test(th.textContent ?? ''));
+      const visibleThs = headers.filter((th) => (th as HTMLElement).offsetParent !== null);
+      const firstRow = document.querySelector('tbody tr');
+      const visibleTds = firstRow
+        ? Array.from(firstRow.querySelectorAll('td')).filter(
+            (td) => (td as HTMLElement).offsetParent !== null,
+          )
+        : [];
+      return {
+        wordsHidden: !!wordsTh && (wordsTh as HTMLElement).offsetParent === null,
+        visibleThCount: visibleThs.length,
+        visibleTdCount: visibleTds.length,
+      };
     });
-    expect(counts.tds, 'no body row found').toBeGreaterThan(0);
+    expect(mobile.wordsHidden, "'Words' header must be hidden on mobile").toBe(true);
     expect(
-      counts.ths,
-      `header cells (${counts.ths}) must equal body cells (${counts.tds})`,
-    ).toBe(counts.tds);
+      mobile.visibleThCount,
+      `visible header cells (${mobile.visibleThCount}) must equal visible body cells (${mobile.visibleTdCount})`,
+    ).toBe(mobile.visibleTdCount);
+
+    // Desktop: the 'Words' header is visible again.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => r(null))));
+    const desktopWordsVisible = await page.evaluate(() => {
+      const wordsTh = Array.from(document.querySelectorAll('thead tr th')).find((th) =>
+        /words/i.test(th.textContent ?? ''),
+      );
+      return !!wordsTh && (wordsTh as HTMLElement).offsetParent !== null;
+    });
+    expect(desktopWordsVisible, "'Words' header must be visible on desktop").toBe(true);
   });
 });

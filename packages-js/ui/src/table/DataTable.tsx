@@ -13,7 +13,13 @@
  */
 
 import type { ColumnSchema, SortDirection, TableSort } from '@arqel-dev/types/tables';
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  type Row,
+  useReactTable,
+} from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo, useRef } from 'react';
 import { cn } from '../utils/cn.js';
@@ -94,6 +100,11 @@ export function DataTable<TRecord extends DataTableRecord>({
   const toggleRow = useCallback(
     (id: RowId, index: number, shiftKey: boolean) => {
       if (!onSelectionChange) return;
+      // `index` is the row's position in the core row-model, which today equals the
+      // `records` prop order (only getCoreRowModel is wired — no client sort/filter
+      // row model). The shift-range loop resolves ids from `records[i]`, so this
+      // holds only while that ordering parity is true; revisit if a client-side
+      // sorted/filtered row model is added.
       const set = new Set<RowId>(selectedIds);
       const lastIndex = lastClickedIndexRef.current;
 
@@ -124,146 +135,251 @@ export function DataTable<TRecord extends DataTableRecord>({
   };
 
   return (
-    <div className={cn('w-full min-w-0 overflow-x-auto', className)}>
-      <table className="w-full border-collapse text-sm">
-        <thead className="sticky top-0 bg-background">
-          {table.getHeaderGroups().map((group) => (
-            <tr key={group.id} className="border-b border-border">
-              {enableSelection && (
-                <th scope="col" className="w-10 px-3 py-2 text-left">
-                  <input
-                    type="checkbox"
-                    aria-label="Select all rows"
-                    checked={allSelected}
-                    ref={(el) => {
-                      if (el) el.indeterminate = someSelected;
-                    }}
-                    onChange={toggleAll}
-                  />
-                </th>
-              )}
-              {group.headers.map((header) => {
-                const col = visibleColumns.find((c) => c.name === header.column.id);
-                const sortable = col?.sortable && onSortChange;
-                const direction = headerSortDirection(header.column.id);
-                return (
-                  <th
-                    key={header.id}
-                    scope="col"
-                    className={cn(
-                      'px-3 py-2 text-left font-medium text-muted-foreground',
-                      col?.align === 'center' && 'text-center',
-                      col?.align === 'end' && 'text-right',
-                    )}
-                    aria-sort={
-                      direction === 'asc'
-                        ? 'ascending'
-                        : direction === 'desc'
-                          ? 'descending'
-                          : 'none'
-                    }
-                  >
-                    {sortable ? (
-                      <button
-                        type="button"
-                        className={cn(
-                          // -mx-3 px-3 stretches the button across the cell's
-                          // horizontal padding; min-h-11 + w-full give a ≥44px
-                          // touch target on mobile (WCAG 2.5.5) without changing
-                          // the header's visual density.
-                          '-mx-3 inline-flex min-h-11 w-full items-center gap-1 px-3 hover:text-foreground',
-                          col?.align === 'center' && 'justify-center',
-                          col?.align === 'end' && 'justify-end',
-                        )}
-                        onClick={() =>
-                          onSortChange(header.column.id, direction === 'asc' ? 'desc' : 'asc')
-                        }
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        <span aria-hidden="true">
-                          {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
-                        </span>
-                      </button>
-                    ) : (
-                      flexRender(header.column.columnDef.header, header.getContext())
-                    )}
+    <>
+      <div className={cn('hidden w-full min-w-0 overflow-x-auto md:block', className)}>
+        <table className="w-full border-collapse text-sm">
+          <thead className="sticky top-0 bg-background">
+            {table.getHeaderGroups().map((group) => (
+              <tr key={group.id} className="border-b border-border">
+                {enableSelection && (
+                  <th scope="col" className="w-10 px-3 py-2 text-left">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all rows"
+                      checked={allSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someSelected;
+                      }}
+                      onChange={toggleAll}
+                    />
                   </th>
+                )}
+                {group.headers.map((header) => {
+                  const col = visibleColumns.find((c) => c.name === header.column.id);
+                  const sortable = col?.sortable && onSortChange;
+                  const direction = headerSortDirection(header.column.id);
+                  return (
+                    <th
+                      key={header.id}
+                      scope="col"
+                      className={cn(
+                        'px-3 py-2 text-left font-medium text-muted-foreground',
+                        col?.align === 'center' && 'text-center',
+                        col?.align === 'end' && 'text-right',
+                        col?.hiddenOnMobile && 'hidden md:table-cell',
+                      )}
+                      aria-sort={
+                        direction === 'asc'
+                          ? 'ascending'
+                          : direction === 'desc'
+                            ? 'descending'
+                            : 'none'
+                      }
+                    >
+                      {sortable ? (
+                        <button
+                          type="button"
+                          className={cn(
+                            // -mx-3 px-3 stretches the button across the cell's
+                            // horizontal padding; min-h-11 + w-full give a ≥44px
+                            // touch target on mobile (WCAG 2.5.5) without changing
+                            // the header's visual density.
+                            '-mx-3 inline-flex min-h-11 w-full items-center gap-1 px-3 hover:text-foreground',
+                            col?.align === 'center' && 'justify-center',
+                            col?.align === 'end' && 'justify-end',
+                          )}
+                          onClick={() =>
+                            onSortChange(header.column.id, direction === 'asc' ? 'desc' : 'asc')
+                          }
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <span aria-hidden="true">
+                            {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
+                          </span>
+                        </button>
+                      ) : (
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      )}
+                    </th>
+                  );
+                })}
+                {rowActions && (
+                  <th scope="col" className="w-24 px-3 py-2 text-right" aria-label="Actions" />
+                )}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {loading && (
+              <tr>
+                <td
+                  colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
+                  className="px-3 py-4 text-center text-muted-foreground"
+                >
+                  Loading…
+                </td>
+              </tr>
+            )}
+            {!loading && records.length === 0 && (
+              <tr>
+                <td
+                  colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
+                  className="px-3 py-8 text-center text-muted-foreground"
+                >
+                  {emptyState ?? 'No records found.'}
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              table.getRowModel().rows.map((row, index) => {
+                const record = row.original;
+                const checked = selectedIds.includes(record.id);
+                return (
+                  <tr
+                    key={row.id}
+                    data-selected={checked || undefined}
+                    className={cn('border-b border-border', checked && 'bg-muted')}
+                  >
+                    {enableSelection && (
+                      <td className="w-10 px-3 py-2">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select row ${record.id}`}
+                          checked={checked}
+                          onChange={(event) => {
+                            const native = event.nativeEvent as MouseEvent;
+                            toggleRow(record.id, index, native.shiftKey === true);
+                          }}
+                        />
+                      </td>
+                    )}
+                    {row.getVisibleCells().map((cell) => {
+                      const col = visibleColumns.find((c) => c.name === cell.column.id);
+                      return (
+                        <td
+                          key={cell.id}
+                          className={cn(
+                            'px-3 py-2',
+                            col?.align === 'center' && 'text-center',
+                            col?.align === 'end' && 'text-right',
+                            col?.hiddenOnMobile && 'hidden md:table-cell',
+                          )}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      );
+                    })}
+                    {rowActions && (
+                      <td className="w-24 px-3 py-2 text-right">{rowActions(record)}</td>
+                    )}
+                  </tr>
                 );
               })}
-              {rowActions && (
-                <th scope="col" className="w-24 px-3 py-2 text-right" aria-label="Actions" />
-              )}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {loading && (
-            <tr>
-              <td
-                colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
-                className="px-3 py-4 text-center text-muted-foreground"
-              >
-                Loading…
-              </td>
-            </tr>
-          )}
-          {!loading && records.length === 0 && (
-            <tr>
-              <td
-                colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
-                className="px-3 py-8 text-center text-muted-foreground"
-              >
-                {emptyState ?? 'No records found.'}
-              </td>
-            </tr>
-          )}
-          {!loading &&
-            table.getRowModel().rows.map((row, index) => {
-              const record = row.original;
-              const checked = selectedIds.includes(record.id);
-              return (
-                <tr
-                  key={row.id}
-                  data-selected={checked || undefined}
-                  className={cn('border-b border-border', checked && 'bg-muted')}
-                >
-                  {enableSelection && (
-                    <td className="w-10 px-3 py-2">
-                      <input
-                        type="checkbox"
-                        aria-label={`Select row ${record.id}`}
-                        checked={checked}
-                        onChange={(event) => {
-                          const native = event.nativeEvent as MouseEvent;
-                          toggleRow(record.id, index, native.shiftKey === true);
-                        }}
-                      />
-                    </td>
-                  )}
-                  {row.getVisibleCells().map((cell) => {
-                    const col = visibleColumns.find((c) => c.name === cell.column.id);
-                    return (
-                      <td
-                        key={cell.id}
-                        className={cn(
-                          'px-3 py-2',
-                          col?.align === 'center' && 'text-center',
-                          col?.align === 'end' && 'text-right',
-                          col?.hiddenOnMobile && 'hidden md:table-cell',
-                        )}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    );
-                  })}
-                  {rowActions && (
-                    <td className="w-24 px-3 py-2 text-right">{rowActions(record)}</td>
-                  )}
-                </tr>
-              );
-            })}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
+      <DataCards
+        columns={visibleColumns}
+        rows={table.getRowModel().rows}
+        enableSelection={enableSelection}
+        selectedIds={selectedIds}
+        onToggleRow={toggleRow}
+        rowActions={rowActions}
+        loading={loading}
+        emptyState={emptyState}
+      />
+    </>
+  );
+}
+
+interface DataCardsProps<TRecord extends DataTableRecord> {
+  columns: ColumnSchema[];
+  rows: Row<TRecord>[];
+  enableSelection: boolean;
+  selectedIds: ReadonlyArray<RowId>;
+  onToggleRow: (id: RowId, index: number, shiftKey: boolean) => void;
+  rowActions?: ((record: TRecord) => ReactNode) | undefined;
+  loading: boolean;
+  emptyState?: ReactNode;
+}
+
+function DataCards<TRecord extends DataTableRecord>({
+  columns,
+  rows,
+  enableSelection,
+  selectedIds,
+  onToggleRow,
+  rowActions,
+  loading,
+  emptyState,
+}: DataCardsProps<TRecord>) {
+  // hiddenOnMobile columns are dropped from the card body (same intent as the
+  // table hiding them at < md).
+  const cardColumns = columns.filter((col) => !col.hiddenOnMobile);
+
+  if (loading) {
+    return <div className="px-3 py-4 text-center text-muted-foreground md:hidden">Loading…</div>;
+  }
+  if (rows.length === 0) {
+    return (
+      <div className="px-3 py-8 text-center text-muted-foreground md:hidden">
+        {emptyState ?? 'No records found.'}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3 md:hidden">
+      {rows.map((row, index) => {
+        const record = row.original;
+        const checked = selectedIds.includes(record.id);
+        return (
+          <article
+            key={row.id}
+            data-arqel-data-card=""
+            data-selected={checked || undefined}
+            className={cn('rounded-lg border border-border p-4 text-sm', checked && 'bg-muted')}
+          >
+            {(enableSelection || rowActions) && (
+              <div className="mb-3 flex items-center justify-between gap-2">
+                {enableSelection ? (
+                  <label className="-m-2.5 inline-flex size-11 cursor-pointer items-center justify-center p-2.5">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select row ${record.id}`}
+                      className="size-5"
+                      checked={checked}
+                      onChange={(event) => {
+                        const native = event.nativeEvent as MouseEvent;
+                        onToggleRow(record.id, index, native.shiftKey === true);
+                      }}
+                    />
+                  </label>
+                ) : (
+                  <span />
+                )}
+                {rowActions ? <div className="ml-auto">{rowActions(record)}</div> : null}
+              </div>
+            )}
+            <dl className="grid grid-cols-[minmax(0,auto)_1fr] gap-x-3 gap-y-2">
+              {cardColumns.map((col) => (
+                <div key={col.name} className="contents">
+                  <dt className="font-medium text-muted-foreground">{col.label ?? col.name}</dt>
+                  <dd
+                    className={cn(
+                      'min-w-0 break-words',
+                      col.align === 'end' && 'text-right',
+                      col.align === 'center' && 'text-center',
+                    )}
+                  >
+                    <TableCell column={col} value={(record as Record<string, unknown>)[col.name]} />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        );
+      })}
     </div>
   );
 }

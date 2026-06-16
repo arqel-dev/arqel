@@ -1,5 +1,5 @@
 import type { ColumnSchema } from '@arqel-dev/types/tables';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { DataTable } from '../src/table/DataTable.js';
@@ -44,19 +44,22 @@ const records = [
 describe('DataTable', () => {
   it('renders columns and rows', () => {
     render(<DataTable columns={columns} records={records} />);
-    expect(screen.getByText('Name')).toBeInTheDocument();
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-    expect(screen.getAllByText('Active')).toHaveLength(3);
+    const table = within(screen.getByRole('table'));
+    expect(table.getByText('Name')).toBeInTheDocument();
+    expect(table.getByText('Alice')).toBeInTheDocument();
+    expect(table.getAllByText('Active')).toHaveLength(3);
   });
 
   it('shows empty state when no records', () => {
     render(<DataTable columns={columns} records={[]} emptyState="Nada por aqui" />);
-    expect(screen.getByText('Nada por aqui')).toBeInTheDocument();
+    const table = within(screen.getByRole('table'));
+    expect(table.getByText('Nada por aqui')).toBeInTheDocument();
   });
 
   it('shows loading row', () => {
     render(<DataTable columns={columns} records={[]} loading />);
-    expect(screen.getByText('Loading…')).toBeInTheDocument();
+    const table = within(screen.getByRole('table'));
+    expect(table.getByText('Loading…')).toBeInTheDocument();
   });
 
   it('emits sort change on header click for sortable columns', async () => {
@@ -79,7 +82,8 @@ describe('DataTable', () => {
         onSelectionChange={onSelectionChange}
       />,
     );
-    await user.click(screen.getByLabelText('Select row 1'));
+    const table = within(screen.getByRole('table'));
+    await user.click(table.getByLabelText('Select row 1'));
     expect(onSelectionChange).toHaveBeenCalledWith([1]);
   });
 
@@ -95,7 +99,7 @@ describe('DataTable', () => {
       />,
     );
     // First click: select row 1 (index 0)
-    fireEvent.click(screen.getByLabelText('Select row 1'));
+    fireEvent.click(within(screen.getByRole('table')).getByLabelText('Select row 1'));
     expect(onSelectionChange).toHaveBeenLastCalledWith([1]);
 
     rerender(
@@ -109,7 +113,9 @@ describe('DataTable', () => {
     );
 
     // Shift+click on row 3 (index 2) should select 1..3
-    fireEvent.click(screen.getByLabelText('Select row 3'), { shiftKey: true });
+    fireEvent.click(within(screen.getByRole('table')).getByLabelText('Select row 3'), {
+      shiftKey: true,
+    });
     expect(onSelectionChange).toHaveBeenLastCalledWith(expect.arrayContaining([1, 2, 3]));
   });
 
@@ -121,6 +127,7 @@ describe('DataTable', () => {
         rowActions={(record) => <button type="button">edit-{record.id}</button>}
       />,
     );
-    expect(screen.getByRole('button', { name: 'edit-1' })).toBeInTheDocument();
+    const table = within(screen.getByRole('table'));
+    expect(table.getByRole('button', { name: 'edit-1' })).toBeInTheDocument();
   });
 });

@@ -12,7 +12,7 @@ import type {
   ResourceMeta,
 } from '@arqel-dev/types/resources';
 import type { ColumnSchema, FilterSchema, TableSort } from '@arqel-dev/types/tables';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ArqelIndexPage from '../../src/pages/ArqelIndexPage.js';
@@ -263,7 +263,8 @@ describe('ArqelIndexPage — closure-URL row actions resolve per record (#140)',
     const user = userEvent.setup();
     render(<ArqelIndexPage />);
 
-    const viewButtons = screen.getAllByRole('button', { name: /view/i });
+    const table = within(screen.getByRole('table'));
+    const viewButtons = table.getAllByRole('button', { name: /view/i });
     expect(viewButtons.length).toBe(2);
 
     const firstButton = viewButtons[0];
@@ -300,7 +301,8 @@ describe('ArqelIndexPage — closure-URL row actions resolve per record (#140)',
     const user = userEvent.setup();
     render(<ArqelIndexPage />);
 
-    const editButtons = screen.getAllByRole('button', { name: /edit/i }) as HTMLButtonElement[];
+    const table = within(screen.getByRole('table'));
+    const editButtons = table.getAllByRole('button', { name: /edit/i }) as HTMLButtonElement[];
     expect(editButtons.length).toBe(2);
 
     // Row 1 disabled, row 2 enabled.

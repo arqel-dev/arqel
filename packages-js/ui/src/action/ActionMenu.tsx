@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../shadcn/ui/dropdown-menu.js';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../shadcn/ui/sheet.js';
 import { cn } from '../utils/cn.js';
 import { ActionButton } from './ActionButton.js';
 import { ActionFormModal } from './ActionFormModal.js';
@@ -57,6 +58,9 @@ export function ActionMenu({
   // survive the menu closing on `onSelect`.
   const [confirmAction, setConfirmAction] = useState<ActionSchema | null>(null);
   const [formAction, setFormAction] = useState<ActionSchema | null>(null);
+  // The mobile bottom-sheet is controlled so selecting an item can close it
+  // (mirroring the Dropdown's onSelect auto-close).
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   if (actions.length === 0) return null;
 
@@ -103,29 +107,81 @@ export function ActionMenu({
     }
   };
 
+  // One visual trigger shared by both presentation surfaces. The Dropdown
+  // wraps it via DropdownMenuTrigger (asChild); the Sheet opens it on click.
+  const triggerNode = trigger ?? (
+    <Button variant="ghost" size="icon-touch" aria-label="Actions">
+      ⋯
+    </Button>
+  );
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          {trigger ?? (
-            <Button variant="ghost" size="icon-touch" aria-label="Actions">
-              ⋯
-            </Button>
-          )}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" sideOffset={6} className={cn('min-w-[12rem]', className)}>
-          {actions.map((action) => (
-            <DropdownMenuItem
-              key={action.name}
-              disabled={action.disabled === true}
-              variant={action.color === 'destructive' ? 'destructive' : 'default'}
-              onSelect={() => handleSelect(action)}
-            >
-              {action.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Desktop (>=md): the Radix dropdown popper, unchanged. */}
+      <div data-arqel-action-dropdown="" className="hidden md:contents">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>{triggerNode}</DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={6}
+            className={cn('min-w-[12rem]', className)}
+          >
+            {actions.map((action) => (
+              <DropdownMenuItem
+                key={action.name}
+                disabled={action.disabled === true}
+                variant={action.color === 'destructive' ? 'destructive' : 'default'}
+                onSelect={() => handleSelect(action)}
+              >
+                {action.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Mobile (<md): a full-width bottom sheet with >=44px items. */}
+      <div className="md:hidden">
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <button
+            type="button"
+            aria-label="Actions"
+            className="inline-flex size-11 items-center justify-center rounded-md text-lg hover:bg-accent"
+            onClick={() => setSheetOpen(true)}
+          >
+            ⋯
+          </button>
+          <SheetContent
+            side="bottom"
+            className="max-h-[80vh] gap-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]"
+          >
+            <SheetHeader className="px-4 pt-4 pb-2">
+              <SheetTitle>Actions</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col px-2 pb-2">
+              {actions.map((action) => (
+                <button
+                  key={action.name}
+                  type="button"
+                  data-arqel-sheet-action=""
+                  disabled={action.disabled === true}
+                  className={cn(
+                    'flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm hover:bg-accent disabled:pointer-events-none disabled:opacity-50',
+                    action.color === 'destructive' && 'text-destructive',
+                  )}
+                  onClick={() => {
+                    setSheetOpen(false);
+                    handleSelect(action);
+                  }}
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
       {confirmAction && (
         <ConfirmDialog
           open

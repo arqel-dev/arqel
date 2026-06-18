@@ -63,4 +63,16 @@ describe('TableFilters', () => {
     );
     expect(screen.getByRole('button', { name: /clear filters \(1\)/i })).toBeInTheDocument();
   });
+
+  // ── Responsive touch targets (Phase 5): 44px on mobile, dense on >=md ──
+
+  it('filter controls carry the h-11 md:h-9 responsive touch sizing', () => {
+    render(<TableFilters filters={filters} values={{}} onChange={() => {}} />);
+    const select = screen.getByLabelText('Role');
+    expect(select.className).toContain('h-11');
+    expect(select.className).toContain('md:h-9');
+    const text = screen.getByLabelText('Query');
+    expect(text.className).toContain('h-11');
+    expect(text.className).toContain('md:h-9');
+  });
 });

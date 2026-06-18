@@ -86,7 +86,8 @@ function FilterControl({
 
 function controlClasses() {
   return cn(
-    'h-9 rounded-sm border border-[var(--input)]',
+    // 44px touch target on mobile (WCAG 2.5.5); dense 36px on >=md.
+    'h-11 rounded-sm border border-[var(--input)] md:h-9',
     'bg-background px-3 text-sm',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   );
@@ -135,7 +136,7 @@ function MultiSelectFilter({
       {filter.label ?? filter.name}
       <select
         multiple
-        className={cn(controlClasses(), 'h-auto min-h-[2.25rem] py-1')}
+        className={cn(controlClasses(), 'h-auto min-h-11 py-1 md:min-h-[2.25rem]')}
         value={arr.map(String)}
         onChange={(e) => {
           const next = Array.from(e.target.selectedOptions, (o) => o.value);

@@ -82,7 +82,8 @@ export function ResourceIndex<TRecord extends RecordType = RecordType>({
         <input
           type="search"
           placeholder={`Search ${resource.pluralLabel.toLowerCase()}…`}
-          className="h-9 w-64 rounded-sm border border-[var(--input)] bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          // 44px touch target on mobile (WCAG 2.5.5); dense 36px on >=md.
+          className="h-11 w-64 rounded-sm border border-[var(--input)] bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:h-9"
           value={search ?? ''}
           onChange={(e) => onSearchChange(e.target.value)}
         />

@@ -44,8 +44,9 @@ export function TablePagination({
         {onPerPageChange && (
           <label className="flex items-center gap-1 text-xs text-muted-foreground">
             Per page
+            {/* 44px touch target on mobile (WCAG 2.5.5); dense 32px on >=md. */}
             <select
-              className="h-8 rounded-sm border border-[var(--input)] bg-background px-2"
+              className="h-11 rounded-sm border border-[var(--input)] bg-background px-2 md:h-8"
               value={meta.perPage}
               onChange={(e) => onPerPageChange(Number(e.target.value))}
             >
@@ -57,9 +58,12 @@ export function TablePagination({
             </select>
           </label>
         )}
+        {/* Buttons use size="sm" (h-8) for the dense desktop bar; the responsive
+            h-11 override lifts them to a 44px touch target below md. */}
         <Button
           variant="outline"
           size="sm"
+          className="h-11 md:h-8"
           disabled={isFirst}
           onClick={() => onPageChange(meta.currentPage - 1)}
           aria-label="Previous page"
@@ -72,6 +76,7 @@ export function TablePagination({
         <Button
           variant="outline"
           size="sm"
+          className="h-11 md:h-8"
           disabled={isLast}
           onClick={() => onPageChange(meta.currentPage + 1)}
           aria-label="Next page"

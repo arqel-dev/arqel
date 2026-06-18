@@ -56,4 +56,24 @@ describe('TablePagination', () => {
     );
     expect(screen.getByText('No results')).toBeInTheDocument();
   });
+
+  // ── Responsive touch targets (Phase 4): 44px on mobile, dense on >=md ──
+
+  it('Prev/Next/per-page carry the h-11 md:h-8 responsive touch sizing', () => {
+    render(
+      <TablePagination
+        meta={{ currentPage: 2, lastPage: 5, perPage: 10, total: 47 }}
+        onPageChange={() => {}}
+        onPerPageChange={() => {}}
+      />,
+    );
+    for (const name of [/previous/i, /next/i] as const) {
+      const btn = screen.getByRole('button', { name });
+      expect(btn.className).toContain('h-11');
+      expect(btn.className).toContain('md:h-8');
+    }
+    const select = screen.getByRole('combobox');
+    expect(select.className).toContain('h-11');
+    expect(select.className).toContain('md:h-8');
+  });
 });

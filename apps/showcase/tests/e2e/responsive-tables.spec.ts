@@ -99,7 +99,12 @@ test.describe('responsive — tables', () => {
       );
 
       // 2. The first card's row-action trigger is a >=44px touch target.
-      const trigger = page.locator('[data-arqel-data-card] button[aria-label="Actions"]').first();
+      //    Since Phase 3 the collapsed menu dual-renders two triggers (desktop
+      //    dropdown in `hidden md:contents` + mobile sheet in `md:hidden`);
+      //    scope to the VISIBLE one — the desktop trigger has no box on mobile.
+      const trigger = page
+        .locator('[data-arqel-data-card] button[aria-label="Actions"]:visible')
+        .first();
       if (await trigger.count()) {
         const box = await trigger.boundingBox();
         expect(box, 'action trigger has a box').not.toBeNull();

@@ -263,6 +263,8 @@ export default function ArqelIndexPage<TRecord extends RecordType = RecordType>(
             action={action}
             onInvoke={() => dispatchBulkAction(action)}
             size="sm"
+            // 44px touch target on mobile (WCAG 2.5.5); dense 32px on >=md.
+            className="h-11 md:h-8"
           />
         ))}
       </div>

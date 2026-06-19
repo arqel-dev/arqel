@@ -5,6 +5,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ActionMenu } from '../src/action/ActionMenu.js';
 
+// ConfirmDialog/ActionFormModal translate their chrome via useArqelTranslations,
+// which reads usePage(). Mock it so these tests render outside an Inertia app;
+// an empty props bag exercises the English fallback.
+vi.mock('@inertiajs/react', () => ({ usePage: () => ({ props: {} }) }));
+
 function makeAction(name: string, label: string): ActionSchema {
   return {
     name,

@@ -13,7 +13,7 @@ import { useI18nContext } from './I18nProvider';
 type LocaleSwitcherProps = {
   /** Endpoint POST que persiste o locale na sessão (default `/admin/locale`). */
   endpoint?: string;
-  /** Label visível acima do select (default usa `t('locale.switcher.label')`). */
+  /** Label visível acima do select (default usa `t('arqel.locale.switch')`). */
   label?: string;
   /** Override do mapa locale → display name. */
   labels?: Readonly<Record<string, string>>;
@@ -41,7 +41,7 @@ export function LocaleSwitcher({
 }: LocaleSwitcherProps): ReactElement {
   const { locale, available, t } = useI18nContext();
   const selectId = useId();
-  const fieldLabel = label ?? t('locale.switcher.label');
+  const fieldLabel = label ?? t('arqel.locale.switch');
   const map = { ...DEFAULT_LABELS, ...(labels ?? {}) };
 
   const handleValueChange = (next: string): void => {

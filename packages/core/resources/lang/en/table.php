@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 return [
     'empty' => 'No records found.',
+    'per_page' => 'Per page',
     'search' => [
+        'label' => 'Search',
         'placeholder' => 'Search...',
     ],
     'pagination' => [
@@ -20,6 +22,7 @@ return [
         'apply' => 'Apply',
         'reset' => 'Reset',
         'all' => 'All',
+        'clear' => 'Clear filters (:count)',
     ],
     'bulk' => [
         'selected' => ':count selected',

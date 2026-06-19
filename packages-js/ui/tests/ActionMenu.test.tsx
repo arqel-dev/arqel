@@ -45,6 +45,20 @@ describe('ActionMenu', () => {
     expect(screen.queryByLabelText('Actions')).toBeNull();
   });
 
+  it('inline action buttons carry the h-11 md:h-8 responsive touch sizing', () => {
+    render(
+      <ActionMenu
+        actions={[makeAction('a', 'Edit'), makeAction('b', 'Delete')]}
+        onInvoke={vi.fn()}
+      />,
+    );
+    for (const name of ['Edit', 'Delete'] as const) {
+      const btn = screen.getByRole('button', { name });
+      expect(btn.className).toContain('h-11');
+      expect(btn.className).toContain('md:h-8');
+    }
+  });
+
   it('collapses into a dropdown trigger when count > threshold', () => {
     const onInvoke = vi.fn();
     render(

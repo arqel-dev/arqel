@@ -9,11 +9,11 @@
     "packages-dev": [
         {
             "name": "arqel-dev/actions",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/actions",
-                "reference": "0bab0b8fdc84f6e84cace25e852360c673d55dc3"
+                "reference": "51fcf14033cbc7b884f3e939698e8157776c166e"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -85,11 +85,11 @@
         },
         {
             "name": "arqel-dev/ai",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/ai",
-                "reference": "4c16e8f1633ba194b08e92a7c85cfccf5b41d24f"
+                "reference": "0257ddebb4227d0de56f5ac4677ab2f42840db14"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -168,11 +168,11 @@
         },
         {
             "name": "arqel-dev/audit",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/audit",
-                "reference": "9c9e6530f0492e3e170b889cee56f9f9102121e1"
+                "reference": "c84597797688fc07ccbc9df24878029d573f224d"
             },
             "require": {
                 "illuminate/support": "^12.0|^13.0",
@@ -246,11 +246,11 @@
         },
         {
             "name": "arqel-dev/auth",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/auth",
-                "reference": "a4a1cd2b00a209d052f06651b726041f5fabd328"
+                "reference": "41e42543c31033a0e378743c92f101f75648c66b"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -325,11 +325,11 @@
         },
         {
             "name": "arqel-dev/cli",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "4e0c92bc31db1b1d31bc2a345208b4b34fdcd326"
+                "reference": "35ff433a5722e999030c93282d5c56a376a06ac6"
             },
             "require": {
                 "laravel/prompts": "^0.3",
@@ -392,11 +392,11 @@
         },
         {
             "name": "arqel-dev/core",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
-                "reference": "9c2d27d08cab4dd4d04e57c872ed2b087578de10"
+                "reference": "4549d48b4f411056d64c3568721a9bec929438f9"
             },
             "require": {
                 "inertiajs/inertia-laravel": "^3.0",
@@ -471,11 +471,11 @@
         },
         {
             "name": "arqel-dev/export",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/export",
-                "reference": "1121487fc646d500191c863c3a29b9804feedfff"
+                "reference": "fcb073b127b575e57ba9e9bd4e5dd2b3226c8c78"
             },
             "require": {
                 "arqel-dev/actions": "@dev",
@@ -553,11 +553,11 @@
         },
         {
             "name": "arqel-dev/fields",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/fields",
-                "reference": "48f486e84d26f820818fe8bc278030d78904ac45"
+                "reference": "5b19243c9813220598b95c3fa2669fca6431f28a"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -628,11 +628,11 @@
         },
         {
             "name": "arqel-dev/fields-advanced",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/fields-advanced",
-                "reference": "702343eae4a5a0607275690be8550ca2f0bfd8f3"
+                "reference": "6ec819982e672ffc8d43dfa2d5d5d26ac653694b"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -705,11 +705,11 @@
         },
         {
             "name": "arqel-dev/form",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/form",
-                "reference": "a05b71d6973e8b114582fad87b93d1e5e47b0a58"
+                "reference": "17f7caa21241413ab6c1ed73447b3611ad851d75"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -780,11 +780,11 @@
         },
         {
             "name": "arqel-dev/marketplace",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/marketplace",
-                "reference": "75f7ad0623a817b1f8f6dc7ddf7c396fc0d686bf"
+                "reference": "0d19f1467e99f2a64af766945cc3e6a7bf4a855c"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -862,11 +862,11 @@
         },
         {
             "name": "arqel-dev/mcp",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
-                "reference": "bab8e43c0a01abb45705ba47a38fa8d401f0b5d5"
+                "reference": "33f8b2d65ed2ed183805d569cf9bd4d4a1d22b2d"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -938,11 +938,11 @@
         },
         {
             "name": "arqel-dev/nav",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/nav",
-                "reference": "57588fa2f9b914c062c67a4cbdb597a82b1826a2"
+                "reference": "6fcc72f154e677a5f0768228a4577f2ca79e0fe7"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1014,11 +1014,11 @@
         },
         {
             "name": "arqel-dev/realtime",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/realtime",
-                "reference": "41cddc67704e38e5a1db8ba3e1314b8923fe93d6"
+                "reference": "28dee37e220e470098871deefce977a982bb2adc"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1103,11 +1103,11 @@
         },
         {
             "name": "arqel-dev/table",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/table",
-                "reference": "39ba584acf1bf4e3df66776482a0220fe95d24f0"
+                "reference": "6f98fba1bc283d49790292adb3bdf41cbb8e827a"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1178,11 +1178,11 @@
         },
         {
             "name": "arqel-dev/tenant",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/tenant",
-                "reference": "f46e86f2e8c655770b26679cd3f2335874dfacab"
+                "reference": "3561deae4b8fb24a5db454400dcf8439a308d73c"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1257,11 +1257,11 @@
         },
         {
             "name": "arqel-dev/versioning",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/versioning",
-                "reference": "50aeca8584eb5f8a638eca2c1b3a435b413197a0"
+                "reference": "dce62d4babd70e8c16438d10a0272a936edc18d4"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1338,11 +1338,11 @@
         },
         {
             "name": "arqel-dev/widgets",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/widgets",
-                "reference": "3185bcf5fdcc7e263b9e93fcaa39c873174d72c0"
+                "reference": "780544934d93d053c5d2d76dc0ebb00ce68af9e6"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1414,11 +1414,11 @@
         },
         {
             "name": "arqel-dev/workflow",
-            "version": "0.12.0",
+            "version": "0.14.0",
             "dist": {
                 "type": "path",
                 "url": "packages/workflow",
-                "reference": "71e631bb98f5e60190623dcc7939e87102a6abcd"
+                "reference": "e168906a1048ceebc8268135c04cf268f58ae9c3"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -2286,22 +2286,22 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.11.0",
+            "version": "7.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "c987f8ce84b8434fa430795eca0f3430663da72b"
+                "reference": "d34627490fbc03bf5c5d7cfed81f2faa19519425"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/c987f8ce84b8434fa430795eca0f3430663da72b",
-                "reference": "c987f8ce84b8434fa430795eca0f3430663da72b",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/d34627490fbc03bf5c5d7cfed81f2faa19519425",
+                "reference": "d34627490fbc03bf5c5d7cfed81f2faa19519425",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/promises": "^2.5",
-                "guzzlehttp/psr7": "^2.11",
+                "guzzlehttp/psr7": "^2.12.1",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.5 || ^3.0",
@@ -2314,7 +2314,7 @@
                 "bamarni/composer-bin-plugin": "^1.8.2",
                 "ext-curl": "*",
                 "guzzle/client-integration-tests": "3.0.2",
-                "guzzlehttp/test-server": "^0.4",
+                "guzzlehttp/test-server": "^0.5.1",
                 "php-http/message-factory": "^1.1",
                 "phpunit/phpunit": "^8.5.52 || ^9.6.34",
                 "psr/log": "^1.1 || ^2.0 || ^3.0"
@@ -2394,7 +2394,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.11.0"
+                "source": "https://github.com/guzzle/guzzle/tree/7.12.1"
             },
             "funding": [
                 {
@@ -2410,7 +2410,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-02T12:40:51+00:00"
+            "time": "2026-06-18T14:12:49+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -2498,16 +2498,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.11.0",
+            "version": "2.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "bbb5e61349fa5cb822b3e87842b951088b76b81f"
+                "reference": "172ef2f4e9824c1e058b7f30be8ae25a02c0f2b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/bbb5e61349fa5cb822b3e87842b951088b76b81f",
-                "reference": "bbb5e61349fa5cb822b3e87842b951088b76b81f",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/172ef2f4e9824c1e058b7f30be8ae25a02c0f2b7",
+                "reference": "172ef2f4e9824c1e058b7f30be8ae25a02c0f2b7",
                 "shasum": ""
             },
             "require": {
@@ -2597,7 +2597,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.11.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.12.1"
             },
             "funding": [
                 {
@@ -2613,7 +2613,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-02T12:30:48+00:00"
+            "time": "2026-06-18T09:49:37+00:00"
         },
         {
             "name": "guzzlehttp/uri-template",

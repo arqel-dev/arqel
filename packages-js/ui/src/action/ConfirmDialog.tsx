@@ -12,6 +12,7 @@
  * type-to-confirm input fires confirm when the value matches.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ConfirmationConfig } from '@arqel-dev/types/actions';
 import { useEffect, useState } from 'react';
 import {
@@ -46,6 +47,7 @@ export function ConfirmDialog({
   onConfirm,
   processing = false,
 }: ConfirmDialogProps) {
+  const t = useArqelTranslations();
   const [typed, setTyped] = useState('');
 
   useEffect(() => {
@@ -55,14 +57,21 @@ export function ConfirmDialog({
   const requiresText = config?.requiresText;
   const submitDisabled = processing || (requiresText !== undefined && typed !== requiresText);
   const variant = COLOR_VARIANT[config?.color ?? 'destructive'];
-  const submitLabel = config?.submitLabel ?? (config?.color === 'info' ? 'Confirm' : 'Delete');
-  const cancelLabel = config?.cancelLabel ?? 'Cancel';
+  // Precedence: explicit config > shared translation > English fallback.
+  const submitLabel =
+    config?.submitLabel ??
+    (config?.color === 'info'
+      ? t('arqel.actions.confirm', 'Confirm')
+      : t('arqel.actions.delete', 'Delete'));
+  const cancelLabel = config?.cancelLabel ?? t('arqel.actions.cancel', 'Cancel');
 
   return (
     <Dialog open={open} onOpenChange={(next) => onOpenChange(next)}>
       <DialogContent className="sm:max-w-[28rem]" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>{config?.heading ?? 'Are you sure?'}</DialogTitle>
+          <DialogTitle>
+            {config?.heading ?? t('arqel.messages.delete_confirm', 'Are you sure?')}
+          </DialogTitle>
           {config?.description && <DialogDescription>{config.description}</DialogDescription>}
         </DialogHeader>
         {requiresText !== undefined && (
@@ -92,7 +101,7 @@ export function ConfirmDialog({
             </Button>
           </DialogClose>
           <Button type="button" variant={variant} disabled={submitDisabled} onClick={onConfirm}>
-            {processing ? 'Working…' : submitLabel}
+            {processing ? t('form.saving', 'Working…') : submitLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

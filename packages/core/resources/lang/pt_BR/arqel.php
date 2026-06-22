@@ -15,6 +15,7 @@ return [
         'restore' => 'Restaurar',
         'submit' => 'Enviar',
         'reset' => 'Limpar',
+        'retry' => 'Tentar novamente',
     ],
     'nav' => [
         'dashboard' => 'Painel',

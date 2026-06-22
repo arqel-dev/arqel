@@ -15,6 +15,7 @@ return [
         'restore' => 'Restore',
         'submit' => 'Submit',
         'reset' => 'Reset',
+        'retry' => 'Retry',
     ],
     'nav' => [
         'dashboard' => 'Dashboard',

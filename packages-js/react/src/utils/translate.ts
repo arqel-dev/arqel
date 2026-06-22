@@ -25,10 +25,13 @@ function applyReplacements(value: string, replacements?: Record<string, string |
     return value;
   }
 
-  return Object.entries(replacements).reduce(
-    (acc, [key, replacement]) => acc.replaceAll(`:${key}`, String(replacement)),
-    value,
-  );
+  // Match whole `:token` placeholders in one pass so a short key never
+  // clobbers a longer one (`:to` must not eat the start of `:total`), and a
+  // substituted value can't be re-substituted by a later key.
+  return value.replace(/:([a-zA-Z0-9_]+)/g, (match, name: string) => {
+    const replacement = replacements[name];
+    return replacement === undefined ? match : String(replacement);
+  });
 }
 
 /**

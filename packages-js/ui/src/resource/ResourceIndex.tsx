@@ -12,6 +12,7 @@
  * (Inertia-driven) and dashboard widgets (memory-driven).
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { RecordType, ResourceIndexProps as ServerProps } from '@arqel-dev/types/resources';
 import type { SortDirection, TableSort } from '@arqel-dev/types/tables';
 import type { ReactNode } from 'react';
@@ -71,6 +72,7 @@ export function ResourceIndex<TRecord extends RecordType = RecordType>({
   loading = false,
   className,
 }: ResourceIndexUIProps<TRecord>) {
+  const t = useArqelTranslations();
   const enableSelection = Boolean(onSelectionChange);
 
   const renderSearch = (): ReactNode => {
@@ -78,7 +80,7 @@ export function ResourceIndex<TRecord extends RecordType = RecordType>({
     if (!onSearchChange) return null;
     return (
       <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-        Search
+        {t('table.search.label', 'Search')}
         <input
           type="search"
           placeholder={`Search ${resource.pluralLabel.toLowerCase()}…`}

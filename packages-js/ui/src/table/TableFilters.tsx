@@ -8,6 +8,7 @@
  * UI-004, where the date primitives ship.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type {
   FilterSchema,
   MultiSelectFilterSchema,
@@ -33,6 +34,7 @@ export function TableFilters({
   onClearAll,
   className,
 }: TableFiltersProps) {
+  const t = useArqelTranslations();
   if (filters.length === 0) return null;
 
   const activeCount = filters.reduce((acc, f) => {
@@ -53,7 +55,7 @@ export function TableFilters({
       ))}
       {activeCount > 0 && onClearAll && (
         <Button variant="ghost" size="sm" onClick={onClearAll}>
-          Clear filters ({activeCount})
+          {t('table.filters.clear', `Clear filters (${activeCount})`, { count: activeCount })}
         </Button>
       )}
     </fieldset>
@@ -102,6 +104,7 @@ function SelectFilter({
   value: unknown;
   onChange: (value: unknown) => void;
 }) {
+  const t = useArqelTranslations();
   return (
     <label className="flex flex-col gap-1 text-xs text-muted-foreground">
       {filter.label ?? filter.name}
@@ -110,7 +113,7 @@ function SelectFilter({
         value={value === undefined || value === null ? '' : String(value)}
         onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
       >
-        <option value="">All</option>
+        <option value="">{t('table.filters.all', 'All')}</option>
         {filter.props.options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -184,6 +187,7 @@ function TernaryFilter({
   value: unknown;
   onChange: (value: unknown) => void;
 }) {
+  const t = useArqelTranslations();
   const current = value === undefined || value === null ? 'all' : String(value);
   return (
     <label className="flex flex-col gap-1 text-xs text-muted-foreground">
@@ -196,7 +200,7 @@ function TernaryFilter({
           onChange(v === 'all' ? null : v);
         }}
       >
-        <option value="all">{filter.props.allLabel ?? 'All'}</option>
+        <option value="all">{filter.props.allLabel ?? t('table.filters.all', 'All')}</option>
         <option value="true">{filter.props.trueLabel ?? 'Yes'}</option>
         <option value="false">{filter.props.falseLabel ?? 'No'}</option>
       </select>

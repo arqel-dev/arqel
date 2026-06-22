@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 return [
     'submit' => 'Submit',
+    'save' => 'Save',
+    'saving' => 'Saving…',
+    'cancel' => 'Cancel',
     'reset' => 'Reset',
     'required' => 'Required',
     'optional' => 'Optional',

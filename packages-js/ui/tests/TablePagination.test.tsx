@@ -96,7 +96,15 @@ describe('TablePagination', () => {
           translations: {
             table: {
               empty: 'Nenhum registro encontrado.',
-              pagination: { previous: 'Anterior', next: 'Próximo' },
+              // Short visible labels and descriptive aria-labels are separate
+              // keys: the button text reads "Anterior" while its accessible
+              // name reads the fuller "Página anterior".
+              pagination: {
+                previous: 'Anterior',
+                next: 'Próximo',
+                previous_page: 'Página anterior',
+                next_page: 'Próxima página',
+              },
             },
           },
         },
@@ -108,8 +116,12 @@ describe('TablePagination', () => {
         onPageChange={() => {}}
       />,
     );
-    expect(screen.getByRole('button', { name: 'Anterior' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Próximo' })).toBeInTheDocument();
+    // The accessible name comes from aria-label (the descriptive key); the
+    // visible short label is asserted separately via text content.
+    expect(screen.getByRole('button', { name: 'Página anterior' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Próxima página' })).toBeInTheDocument();
+    expect(screen.getByText('Anterior')).toBeInTheDocument();
+    expect(screen.getByText('Próximo')).toBeInTheDocument();
 
     rerender(
       <TablePagination

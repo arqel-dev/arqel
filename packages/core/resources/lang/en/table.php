@@ -10,8 +10,13 @@ return [
         'placeholder' => 'Search...',
     ],
     'pagination' => [
+        // Short button labels (visible text).
         'previous' => 'Previous',
         'next' => 'Next',
+        // Descriptive accessible names (aria-label) — kept distinct from the
+        // short labels so screen-reader users hear the full action.
+        'previous_page' => 'Previous page',
+        'next_page' => 'Next page',
         'showing' => 'Showing :from to :to of :total results',
     ],
     'sort' => [

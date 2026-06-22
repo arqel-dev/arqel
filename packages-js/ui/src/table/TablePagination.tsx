@@ -68,7 +68,7 @@ export function TablePagination({
           className="h-11 md:h-8"
           disabled={isFirst}
           onClick={() => onPageChange(meta.currentPage - 1)}
-          aria-label={t('table.pagination.previous', 'Previous page')}
+          aria-label={t('table.pagination.previous_page', 'Previous page')}
         >
           {t('table.pagination.previous', 'Prev')}
         </Button>
@@ -81,7 +81,7 @@ export function TablePagination({
           className="h-11 md:h-8"
           disabled={isLast}
           onClick={() => onPageChange(meta.currentPage + 1)}
-          aria-label={t('table.pagination.next', 'Next page')}
+          aria-label={t('table.pagination.next_page', 'Next page')}
         >
           {t('table.pagination.next', 'Next')}
         </Button>

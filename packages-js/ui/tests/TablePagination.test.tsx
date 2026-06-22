@@ -1,7 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TablePagination } from '../src/table/TablePagination.js';
+
+const { pageMock } = vi.hoisted(() => ({ pageMock: vi.fn(() => ({ props: {} })) }));
+vi.mock('@inertiajs/react', () => ({ usePage: pageMock }));
+
+afterEach(() => {
+  pageMock.mockReset();
+  pageMock.mockReturnValue({ props: {} });
+});
 
 describe('TablePagination', () => {
   it('renders range and total', () => {
@@ -75,5 +83,63 @@ describe('TablePagination', () => {
     const select = screen.getByRole('combobox');
     expect(select.className).toContain('h-11');
     expect(select.className).toContain('md:h-8');
+  });
+
+  // ── i18n: chrome translates from the shared dictionary ──
+
+  it('translates Prev/Next/No-results from props.i18n when present', () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          available: ['pt_BR'],
+          translations: {
+            table: {
+              empty: 'Nenhum registro encontrado.',
+              // Short visible labels and descriptive aria-labels are separate
+              // keys: the button text reads "Anterior" while its accessible
+              // name reads the fuller "Página anterior".
+              pagination: {
+                previous: 'Anterior',
+                next: 'Próximo',
+                previous_page: 'Página anterior',
+                next_page: 'Próxima página',
+              },
+            },
+          },
+        },
+      },
+    });
+    const { rerender } = render(
+      <TablePagination
+        meta={{ currentPage: 2, lastPage: 5, perPage: 10, total: 47 }}
+        onPageChange={() => {}}
+      />,
+    );
+    // The accessible name comes from aria-label (the descriptive key); the
+    // visible short label is asserted separately via text content.
+    expect(screen.getByRole('button', { name: 'Página anterior' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Próxima página' })).toBeInTheDocument();
+    expect(screen.getByText('Anterior')).toBeInTheDocument();
+    expect(screen.getByText('Próximo')).toBeInTheDocument();
+
+    rerender(
+      <TablePagination
+        meta={{ currentPage: 1, lastPage: 1, perPage: 10, total: 0 }}
+        onPageChange={() => {}}
+      />,
+    );
+    expect(screen.getByText('Nenhum registro encontrado.')).toBeInTheDocument();
+  });
+
+  it('falls back to the English literals when no i18n prop is present', () => {
+    render(
+      <TablePagination
+        meta={{ currentPage: 2, lastPage: 5, perPage: 10, total: 47 }}
+        onPageChange={() => {}}
+      />,
+    );
+    expect(screen.getByRole('button', { name: /prev/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 });

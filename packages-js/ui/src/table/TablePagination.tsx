@@ -5,6 +5,7 @@
  * (typically via Inertia `router.get` with `preserveState: true`).
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { PaginationMeta } from '@arqel-dev/types/resources';
 import { Button } from '../action/Button.js';
 import { cn } from '../utils/cn.js';
@@ -24,6 +25,7 @@ export function TablePagination({
   perPageOptions = [10, 25, 50, 100],
   className,
 }: TablePaginationProps) {
+  const t = useArqelTranslations();
   const from = (meta.currentPage - 1) * meta.perPage + 1;
   const to = Math.min(meta.currentPage * meta.perPage, meta.total);
   const isFirst = meta.currentPage <= 1;
@@ -38,12 +40,12 @@ export function TablePagination({
       aria-label="Pagination"
     >
       <span className="text-muted-foreground">
-        {meta.total === 0 ? 'No results' : `${from}–${to} of ${meta.total}`}
+        {meta.total === 0 ? t('table.empty', 'No results') : `${from}–${to} of ${meta.total}`}
       </span>
       <div className="flex items-center gap-2">
         {onPerPageChange && (
           <label className="flex items-center gap-1 text-xs text-muted-foreground">
-            Per page
+            {t('table.per_page', 'Per page')}
             {/* 44px touch target on mobile (WCAG 2.5.5); dense 32px on >=md. */}
             <select
               className="h-11 rounded-sm border border-[var(--input)] bg-background px-2 md:h-8"
@@ -66,9 +68,9 @@ export function TablePagination({
           className="h-11 md:h-8"
           disabled={isFirst}
           onClick={() => onPageChange(meta.currentPage - 1)}
-          aria-label="Previous page"
+          aria-label={t('table.pagination.previous_page', 'Previous page')}
         >
-          Prev
+          {t('table.pagination.previous', 'Prev')}
         </Button>
         <span className="text-xs text-muted-foreground">
           {meta.currentPage} / {meta.lastPage}
@@ -79,9 +81,9 @@ export function TablePagination({
           className="h-11 md:h-8"
           disabled={isLast}
           onClick={() => onPageChange(meta.currentPage + 1)}
-          aria-label="Next page"
+          aria-label={t('table.pagination.next_page', 'Next page')}
         >
-          Next
+          {t('table.pagination.next', 'Next')}
         </Button>
       </div>
     </nav>

@@ -5,6 +5,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ActionButton } from '../src/action/ActionButton.js';
 
+// ConfirmDialog/ActionFormModal translate their chrome via useArqelTranslations,
+// which reads usePage(). Mock it so these tests render outside an Inertia app;
+// an empty props bag exercises the English fallback.
+vi.mock('@inertiajs/react', () => ({ usePage: () => ({ props: {} }) }));
+
 const baseAction: ActionSchema = {
   name: 'delete',
   type: 'row',

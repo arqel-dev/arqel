@@ -7,6 +7,33 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-06-22
+
+### Summary
+
+Esta release entrega o **loop responsivo** (mobile-first em todo o chrome do painel) e fecha três bugs de UX/i18n descobertos no dogfooding da `apps/showcase`, além de endurecer a árvore de dependências contra advisories de segurança recém-publicados. O trabalho responsivo cobre forms, DataTable (card-view no mobile), action menus (bottom-sheet), pagination, toolbar e action buttons — todos com alvos de toque de 44px (WCAG 2.5.5) abaixo de `md` e densos no desktop. Os três bugs do dogfood: o menu de navegação sumia na dashboard, o seletor de idiomas divergia entre páginas, e trocar de idioma não traduzia o chrome do framework.
+
+### Security
+
+- **deps:** `hono` atualizado para `>=4.12.25` (override pnpm → 4.12.26), fechando GHSA-88fw-hqm2-52qc (reflexão de Origin no CORS middleware, HIGH) e três advisories moderate (serve-static path traversal, merge de `Set-Cookie` no adapter Lambda, bypass do body-limit). `guzzlehttp/guzzle` → `7.12.1` (CVE-2026-55767, CVE-2026-55568) e `guzzlehttp/psr7` → `2.12.1` (CVE-2026-55766, CRLF injection). `composer audit` e `pnpm audit --prod` limpos após o bump (#266).
+
+### Added
+
+- **ui (responsive):** chrome do painel mobile-first ponta a ponta — reflow do grid de forms, card-view do DataTable no mobile, action menu como bottom-sheet, e alvos de toque de 44px (WCAG 2.5.5) abaixo de `md` (densos no desktop) em pagination, toolbar e action buttons inline (#259, #260, #261, #262 + fases 0-2).
+- **react:** hook compartilhado `useArqelTranslations()` em `@arqel-dev/react/utils` — lê o dicionário `props.i18n.translations` do Inertia e expõe `t(key, fallback?, replacements?)` com lookup por dot-path e paridade com o `__()` do Laravel (retorna a key quando ausente). É o ponto único de tradução do chrome do framework, posicionado abaixo de `@arqel-dev/ui` na hierarquia de pacotes para evitar o ciclo `ui→i18n→ui`.
+
+### Fixed
+
+- **widgets:** o menu de navegação e o seletor de idiomas completo deixam de sumir na dashboard — as rotas de dashboard passam a aplicar o middleware `HandleArqelInertiaRequests`, que injeta os props compartilhados do Inertia (`panel.navigation` = a sidebar; `i18n` = `{locale, available, translations}`) dos quais o shell do admin depende. Antes, só as rotas de resource montavam o middleware, então a dashboard renderizava sem sidebar e com a lista de locales degradada a um único idioma (#263).
+- **ui:** trocar de idioma no `LocaleSwitcher` passa a de fato traduzir o chrome do framework. Os componentes de chrome (`TablePagination`, `FormActions`, `ConfirmDialog`, `ResourceIndex`, `TableFilters`, `TableToolbar`, `WidgetWrapper`, `LocaleSwitcher`) passam a resolver seus rótulos via `useArqelTranslations()`, com literais em inglês como fallback; props/config explícitos continuam ganhando. Antes, os rótulos eram strings hardcoded e o switch de idioma era um no-op visual (#264).
+- **react:** `applyReplacements` deixa de deixar um placeholder curto clobberar um mais longo — `:to` não engole mais o início de `:total`. A substituição passa a casar tokens `:nome` inteiros numa única passada de regex, em vez de `replaceAll` ingênuo por token (#264).
+- **ui:** os aria-labels de Prev/Next da pagination passam a usar chaves de tradução dedicadas (`table.pagination.previous_page`/`next_page` → "Previous page"/"Next page", "Página anterior"/"Próxima página"), distintas dos rótulos curtos visíveis (`previous`/`next` → "Prev"/"Next"). Antes, reusar a mesma chave colapsava o nome acessível ao rótulo curto quando o backend enviava a tradução, degradando a a11y para leitores de tela (#264).
+
+### Changed
+
+- **infra:** `@biomejs/biome` pinado em `2.4.12` (era `^2.4.12`) e a regra `useLiteralKeys` desabilitada — incompatível com `noPropertyAccessFromIndexSignature` do tsconfig. Estabiliza o lint JS/TS no CI (#265).
+
+
 ## [0.14.0] - 2026-06-11
 
 ### Summary
@@ -531,7 +558,8 @@ Primeiro release pós-MVP. Bump coordenado de todos os pacotes (`packages-js/*` 
 
 - _Sem entradas — primeira release tagueada._
 
-[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/arqel-dev/arqel/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/arqel-dev/arqel/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/arqel-dev/arqel/compare/v0.12.0...v0.13.0
 [0.8.1]: https://github.com/arqel-dev/arqel/compare/v0.8.0...v0.8.1

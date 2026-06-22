@@ -11,6 +11,7 @@
  * outer card chrome is consistent across widget types.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn.js';
 
@@ -42,6 +43,7 @@ export function WidgetWrapper({
   className,
   children,
 }: WidgetWrapperProps) {
+  const t = useArqelTranslations();
   const baseClass = cn(
     'rounded border bg-background p-4',
     resolveColumnSpan(columnSpan),
@@ -72,7 +74,7 @@ export function WidgetWrapper({
               onClick={onRetry}
               className="self-start rounded border px-2 py-1 text-xs text-foreground hover:bg-muted"
             >
-              Retry
+              {t('arqel.actions.retry', 'Retry')}
             </button>
           )}
         </div>

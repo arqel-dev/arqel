@@ -10,3 +10,4 @@ export {
   translate,
   useTranslator,
 } from './translate.js';
+export { useArqelTranslations } from './useArqelTranslations.js';

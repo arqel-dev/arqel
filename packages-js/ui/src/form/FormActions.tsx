@@ -6,6 +6,7 @@
  * triggers the form's onSubmit naturally.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ReactNode } from 'react';
 import { Button } from '../action/Button.js';
 import { cn } from '../utils/cn.js';
@@ -21,14 +22,18 @@ export interface FormActionsProps {
 }
 
 export function FormActions({
-  submitLabel = 'Save',
-  cancelLabel = 'Cancel',
+  submitLabel,
+  cancelLabel,
   onCancel,
   processing = false,
   disabled = false,
   extra,
   className,
 }: FormActionsProps) {
+  const t = useArqelTranslations();
+  // Precedence: explicit prop > shared translation > English fallback.
+  const submit = submitLabel ?? t('form.save', 'Save');
+  const cancel = cancelLabel ?? t('form.cancel', 'Cancel');
   return (
     <div
       className={cn(
@@ -39,11 +44,11 @@ export function FormActions({
       {extra && <div className="mr-auto">{extra}</div>}
       {onCancel && (
         <Button type="button" variant="ghost" onClick={onCancel} disabled={processing}>
-          {cancelLabel}
+          {cancel}
         </Button>
       )}
       <Button type="submit" disabled={processing || disabled}>
-        {processing ? 'Saving…' : submitLabel}
+        {processing ? t('form.saving', 'Saving…') : submit}
       </Button>
     </div>
   );

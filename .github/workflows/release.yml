@@ -248,3 +248,65 @@ jobs:
             --title "$TAG" \
             --notes-file release-notes.md \
             --verify-tag
+
+  # Toda tag de release republica o site de documentação unificado (apps/docs —
+  # guide/reference/advanced + i18n) na versão recém-publicada, para que
+  # arqel.dev nunca fique atrás dos pacotes. Espelha o docs-deploy.yml (que só
+  # cobre pushes de conteúdo em main); aqui o gatilho é o corte da tag.
+  # Pulado em dry-run, e corre só depois que npm + split-php + github-release
+  # confirmaram a publicação.
+  deploy-docs:
+    name: Deploy docs site (apps/docs)
+    needs: [resolve, split-php, publish-npm, github-release]
+    if: needs.resolve.outputs.dry_run != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.9.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build VitePress
+        run: pnpm --filter @arqel-dev/docs build
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy via rsync
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          DEPLOY_PATH: ${{ secrets.HOSTINGER_DEPLOY_PATH || format('/home/{0}/domains/arqel.dev/public_html', secrets.HOSTINGER_SSH_USER) }}
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=no" \
+            apps/docs/.vitepress/dist/ \
+            "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+
+      - name: Verify deploy
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          DEPLOY_PATH: ${{ secrets.HOSTINGER_DEPLOY_PATH || format('/home/{0}/domains/arqel.dev/public_html', secrets.HOSTINGER_SSH_USER) }}
+        run: |
+          ssh -i "$HOME/.ssh/deploy_key" -p "$SSH_PORT" -o StrictHostKeyChecking=no \
+            "$SSH_USER@$SSH_HOST" \
+            "ls -la \"$DEPLOY_PATH/index.html\" && du -sh \"$DEPLOY_PATH\""

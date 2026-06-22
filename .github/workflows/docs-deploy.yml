@@ -3,6 +3,10 @@ name: Docs — Deploy
 # Builds the VitePress site in apps/docs and rsyncs it to Hostinger
 # Business hosting (~/domains/arqel.dev/public_html) over SSH (port 65002).
 #
+# Trigger here = content pushes to main. Release tags also redeploy the docs
+# via the `deploy-docs` job in release.yml (so arqel.dev tracks every publish);
+# both share these same build + rsync steps.
+#
 # Required secrets in arqel-dev/arqel:
 #   HOSTINGER_SSH_HOST  e.g. 123.45.67.89 or arqel.dev
 #   HOSTINGER_SSH_USER  e.g. u123456789

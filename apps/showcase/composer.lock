@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1608be599fe68022cfd9017ee27063f1",
+    "content-hash": "bd3e25d8d827a9e67dbeab78d9691c31",
     "packages": [
         {
             "name": "arqel-dev/actions",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/actions",
-                "reference": "0cd59f699198160bcc77a7fa7c4f47e217cbe489"
+                "reference": "e6d9129cdbd75fd702c68fa5877210259096d995"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -84,11 +84,11 @@
         },
         {
             "name": "arqel-dev/ai",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/ai",
-                "reference": "a42715a65c0ca0405f717fb449923e8b26e0e95e"
+                "reference": "10d2491c9897ff70a2fc926f10b087e6eb2787b8"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -167,11 +167,11 @@
         },
         {
             "name": "arqel-dev/audit",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/audit",
-                "reference": "eb9a057beec564698b12e4904b3195fbc46b2b5f"
+                "reference": "8801d9f29a4d6aa9dc260b45a64866f631e02846"
             },
             "require": {
                 "illuminate/support": "^12.0|^13.0",
@@ -245,11 +245,11 @@
         },
         {
             "name": "arqel-dev/auth",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/auth",
-                "reference": "846f7159aaa49ed9e9b3325c74f23c78e4d3247a"
+                "reference": "d4ddf6dddd92c8085f276c190580652dce543b6a"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -324,11 +324,11 @@
         },
         {
             "name": "arqel-dev/core",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/core",
-                "reference": "df2d23dbff229262975d95a7b63d6860cbb2da6f"
+                "reference": "cdf8abf46137d9c8f215ee52a704d3ed71f1e0b6"
             },
             "require": {
                 "inertiajs/inertia-laravel": "^3.0",
@@ -403,11 +403,11 @@
         },
         {
             "name": "arqel-dev/export",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/export",
-                "reference": "b2bd4e8fb2dd676a77074ffa59678718e7ccd25f"
+                "reference": "27080d510cfe0deb261eb16caf62e3d0ccba9fca"
             },
             "require": {
                 "arqel-dev/actions": "@dev",
@@ -485,11 +485,11 @@
         },
         {
             "name": "arqel-dev/fields",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/fields",
-                "reference": "e9a0ab58074fa4f68f72ec107ab6cea61c4c655d"
+                "reference": "a2af20b8e8d7aca22debfa79580a603321292cd1"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -560,11 +560,11 @@
         },
         {
             "name": "arqel-dev/fields-advanced",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/fields-advanced",
-                "reference": "6a2a4bda00b22e9b3595da2340aeb1c136b0e51a"
+                "reference": "ee98f1e775c37c26eb906078d0f639029912a96a"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -637,11 +637,11 @@
         },
         {
             "name": "arqel-dev/form",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/form",
-                "reference": "8c84c63026fee3343c03ef848cc1105c62ffe5da"
+                "reference": "e8e468b0799ec885268fec5da2d5c9352f7ba89c"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -712,11 +712,11 @@
         },
         {
             "name": "arqel-dev/framework",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/arqel",
-                "reference": "82ede73226b1cfaa02837ad7e6543b86b4f139f7"
+                "reference": "85737e69ac7f4b8bee6049a7be160e3bcd5b2ab8"
             },
             "require": {
                 "arqel-dev/actions": "self.version",
@@ -764,11 +764,11 @@
         },
         {
             "name": "arqel-dev/mcp",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/mcp",
-                "reference": "424070382d49938fd5788594765fa1f3012e6263"
+                "reference": "b915f79c10dbf1d31ed810accb82dc9c82fde10c"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -840,11 +840,11 @@
         },
         {
             "name": "arqel-dev/nav",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/nav",
-                "reference": "501f356e87519c1b96cd632889f62cd91ce6dddf"
+                "reference": "38b9b6fc7b2baf5b2b343cab8dc5a482f38dec08"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -916,11 +916,11 @@
         },
         {
             "name": "arqel-dev/realtime",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/realtime",
-                "reference": "dc23e8612e47351c476e4579cddec10cf053a157"
+                "reference": "a52d87acf1ce026adb9c1eedcaac83556e9d0d8b"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1005,11 +1005,11 @@
         },
         {
             "name": "arqel-dev/table",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/table",
-                "reference": "b85da77f4b455af6126c14e48a40172f634b405c"
+                "reference": "36b292908826bbe9f2b2e786972e6d6406fd6e35"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1080,11 +1080,11 @@
         },
         {
             "name": "arqel-dev/tenant",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/tenant",
-                "reference": "2f3e037fca35b19c70c90a28c9def2b3c7589abf"
+                "reference": "17101c8cb182696362c76c45215142e4d85e9d5c"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1159,11 +1159,11 @@
         },
         {
             "name": "arqel-dev/versioning",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/versioning",
-                "reference": "ffabe9943d272f92cd1ceb97dc9053ec8351b5cb"
+                "reference": "c4dda5a33742523642dfc7c781369076c551a153"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1240,11 +1240,11 @@
         },
         {
             "name": "arqel-dev/widgets",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/widgets",
-                "reference": "e375aa24dbc31612dbbd78fd4d3755b6385a3127"
+                "reference": "7bb77529684ec9bcf7c7724cac8ee377583bcc06"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1316,11 +1316,11 @@
         },
         {
             "name": "arqel-dev/workflow",
-            "version": "0.13.0",
+            "version": "0.15.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/workflow",
-                "reference": "66cbe77d0ee35be044ec7fe0ff2881fec17c2d72"
+                "reference": "da6561c915a654d36dcf298936a2dbc09bb5714f"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -1398,23 +1398,22 @@
         },
         {
             "name": "brick/math",
-            "version": "0.14.8",
+            "version": "0.17.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "63422359a44b7f06cae63c3b429b59e8efcc0629"
+                "reference": "8189e751995f9e15729c1aa2f89fa8f166ffe818"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/63422359a44b7f06cae63c3b429b59e8efcc0629",
-                "reference": "63422359a44b7f06cae63c3b429b59e8efcc0629",
+                "url": "https://api.github.com/repos/brick/math/zipball/8189e751995f9e15729c1aa2f89fa8f166ffe818",
+                "reference": "8189e751995f9e15729c1aa2f89fa8f166ffe818",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.2"
             },
             "require-dev": {
-                "php-coveralls/php-coveralls": "^2.2",
                 "phpstan/phpstan": "2.1.22",
                 "phpunit/phpunit": "^11.5"
             },
@@ -1446,7 +1445,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.14.8"
+                "source": "https://github.com/brick/math/tree/0.17.2"
             },
             "funding": [
                 {
@@ -1454,7 +1453,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-10T14:33:43+00:00"
+            "time": "2026-05-25T20:34:43+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -2365,22 +2364,22 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.11.1",
+            "version": "7.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "5af96f374e0ab4ebd747b8310888c99d3adb0a8c"
+                "reference": "d34627490fbc03bf5c5d7cfed81f2faa19519425"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/5af96f374e0ab4ebd747b8310888c99d3adb0a8c",
-                "reference": "5af96f374e0ab4ebd747b8310888c99d3adb0a8c",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/d34627490fbc03bf5c5d7cfed81f2faa19519425",
+                "reference": "d34627490fbc03bf5c5d7cfed81f2faa19519425",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/promises": "^2.5",
-                "guzzlehttp/psr7": "^2.11",
+                "guzzlehttp/psr7": "^2.12.1",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.5 || ^3.0",
@@ -2393,7 +2392,7 @@
                 "bamarni/composer-bin-plugin": "^1.8.2",
                 "ext-curl": "*",
                 "guzzle/client-integration-tests": "3.0.2",
-                "guzzlehttp/test-server": "^0.5",
+                "guzzlehttp/test-server": "^0.5.1",
                 "php-http/message-factory": "^1.1",
                 "phpunit/phpunit": "^8.5.52 || ^9.6.34",
                 "psr/log": "^1.1 || ^2.0 || ^3.0"
@@ -2473,7 +2472,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.11.1"
+                "source": "https://github.com/guzzle/guzzle/tree/7.12.1"
             },
             "funding": [
                 {
@@ -2489,7 +2488,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-07T22:54:06+00:00"
+            "time": "2026-06-18T14:12:49+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -2577,16 +2576,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.11.0",
+            "version": "2.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "bbb5e61349fa5cb822b3e87842b951088b76b81f"
+                "reference": "172ef2f4e9824c1e058b7f30be8ae25a02c0f2b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/bbb5e61349fa5cb822b3e87842b951088b76b81f",
-                "reference": "bbb5e61349fa5cb822b3e87842b951088b76b81f",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/172ef2f4e9824c1e058b7f30be8ae25a02c0f2b7",
+                "reference": "172ef2f4e9824c1e058b7f30be8ae25a02c0f2b7",
                 "shasum": ""
             },
             "require": {
@@ -2676,7 +2675,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.11.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.12.1"
             },
             "funding": [
                 {
@@ -2692,20 +2691,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-02T12:30:48+00:00"
+            "time": "2026-06-18T09:49:37+00:00"
         },
         {
             "name": "guzzlehttp/uri-template",
-            "version": "v1.0.6",
+            "version": "v1.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/uri-template.git",
-                "reference": "eef7f87bab6f204eba3c39224d8075c70c637946"
+                "reference": "7fe811c23a9e3cd712b4389eaeb50b5456d8c529"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/uri-template/zipball/eef7f87bab6f204eba3c39224d8075c70c637946",
-                "reference": "eef7f87bab6f204eba3c39224d8075c70c637946",
+                "url": "https://api.github.com/repos/guzzle/uri-template/zipball/7fe811c23a9e3cd712b4389eaeb50b5456d8c529",
+                "reference": "7fe811c23a9e3cd712b4389eaeb50b5456d8c529",
                 "shasum": ""
             },
             "require": {
@@ -2762,7 +2761,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/uri-template/issues",
-                "source": "https://github.com/guzzle/uri-template/tree/v1.0.6"
+                "source": "https://github.com/guzzle/uri-template/tree/v1.0.7"
             },
             "funding": [
                 {
@@ -2778,7 +2777,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-23T22:00:21+00:00"
+            "time": "2026-06-12T21:33:43+00:00"
         },
         {
             "name": "inertiajs/inertia-laravel",
@@ -2855,16 +2854,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v13.14.0",
+            "version": "v13.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "e60b1c817a9ef7da319e4007de6cfda5301a58c0"
+                "reference": "6135650d69bd9442e470bb1b343422081b076f1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/e60b1c817a9ef7da319e4007de6cfda5301a58c0",
-                "reference": "e60b1c817a9ef7da319e4007de6cfda5301a58c0",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/6135650d69bd9442e470bb1b343422081b076f1e",
+                "reference": "6135650d69bd9442e470bb1b343422081b076f1e",
                 "shasum": ""
             },
             "require": {
@@ -3075,7 +3074,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2026-06-04T18:46:35+00:00"
+            "time": "2026-06-16T16:07:50+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -4076,16 +4075,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "3.11.4",
+            "version": "3.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CarbonPHP/carbon.git",
-                "reference": "e890471a3494740f7d9326d72ce6a8c559ffee60"
+                "reference": "40f6618f052df16b545f626fbf9a878e6497d16a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/e890471a3494740f7d9326d72ce6a8c559ffee60",
-                "reference": "e890471a3494740f7d9326d72ce6a8c559ffee60",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/40f6618f052df16b545f626fbf9a878e6497d16a",
+                "reference": "40f6618f052df16b545f626fbf9a878e6497d16a",
                 "shasum": ""
             },
             "require": {
@@ -4177,7 +4176,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-07T09:57:54+00:00"
+            "time": "2026-06-18T13:49:15+00:00"
         },
         {
             "name": "nette/schema",
@@ -5323,20 +5322,20 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "4.9.2",
+            "version": "4.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "8429c78ca35a09f27565311b98101e2826affde0"
+                "reference": "1df15849d00943a67d677dc9cfd80795f038c9f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/8429c78ca35a09f27565311b98101e2826affde0",
-                "reference": "8429c78ca35a09f27565311b98101e2826affde0",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/1df15849d00943a67d677dc9cfd80795f038c9f8",
+                "reference": "1df15849d00943a67d677dc9cfd80795f038c9f8",
                 "shasum": ""
             },
             "require": {
-                "brick/math": "^0.8.16 || ^0.9 || ^0.10 || ^0.11 || ^0.12 || ^0.13 || ^0.14",
+                "brick/math": ">=0.8.16 <=0.18",
                 "php": "^8.0",
                 "ramsey/collection": "^1.2 || ^2.0"
             },
@@ -5395,9 +5394,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ramsey/uuid/issues",
-                "source": "https://github.com/ramsey/uuid/tree/4.9.2"
+                "source": "https://github.com/ramsey/uuid/tree/4.9.3"
             },
-            "time": "2025-12-14T04:43:48+00:00"
+            "time": "2026-06-18T03:57:49+00:00"
         },
         {
             "name": "ratchet/rfc6455",
@@ -5990,16 +5989,16 @@
         },
         {
             "name": "sabberworm/php-css-parser",
-            "version": "v9.3.0",
+            "version": "v9.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MyIntervals/PHP-CSS-Parser.git",
-                "reference": "88dbd0f7f91abbfe4402d0a3071e9ff4d81ed949"
+                "reference": "fd3bf9fb173e0df649bc4e3e0d088a1b2417c08f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/88dbd0f7f91abbfe4402d0a3071e9ff4d81ed949",
-                "reference": "88dbd0f7f91abbfe4402d0a3071e9ff4d81ed949",
+                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/fd3bf9fb173e0df649bc4e3e0d088a1b2417c08f",
+                "reference": "fd3bf9fb173e0df649bc4e3e0d088a1b2417c08f",
                 "shasum": ""
             },
             "require": {
@@ -6010,15 +6009,15 @@
             "require-dev": {
                 "php-parallel-lint/php-parallel-lint": "1.4.0",
                 "phpstan/extension-installer": "1.4.3",
-                "phpstan/phpstan": "1.12.32 || 2.1.32",
-                "phpstan/phpstan-phpunit": "1.4.2 || 2.0.8",
-                "phpstan/phpstan-strict-rules": "1.6.2 || 2.0.7",
+                "phpstan/phpstan": "1.12.33 || 2.2.2",
+                "phpstan/phpstan-phpunit": "1.4.2 || 2.0.16",
+                "phpstan/phpstan-strict-rules": "1.6.2 || 2.0.11",
                 "phpunit/phpunit": "8.5.52",
                 "rawr/phpunit-data-provider": "3.3.1",
-                "rector/rector": "1.2.10 || 2.2.8",
-                "rector/type-perfect": "1.0.0 || 2.1.0",
+                "rector/rector": "1.2.10 || 2.4.6",
+                "rector/type-perfect": "1.0.0 || 2.1.3",
                 "squizlabs/php_codesniffer": "4.0.1",
-                "thecodingmachine/phpstan-safe-rule": "1.2.0 || 1.4.1"
+                "thecodingmachine/phpstan-safe-rule": "1.2.0 || 1.4.3"
             },
             "suggest": {
                 "ext-mbstring": "for parsing UTF-8 CSS"
@@ -6026,7 +6025,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "9.4.x-dev"
+                    "dev-main": "9.5.x-dev"
                 }
             },
             "autoload": {
@@ -6064,9 +6063,9 @@
             ],
             "support": {
                 "issues": "https://github.com/MyIntervals/PHP-CSS-Parser/issues",
-                "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v9.3.0"
+                "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v9.4.0"
             },
-            "time": "2026-03-03T17:31:43+00:00"
+            "time": "2026-06-18T15:10:53+00:00"
         },
         {
             "name": "spatie/laravel-activitylog",
@@ -6222,16 +6221,16 @@
         },
         {
             "name": "spatie/simple-excel",
-            "version": "3.9.0",
+            "version": "3.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/simple-excel.git",
-                "reference": "67095053ff6037284fd213abd84259ea4faca7aa"
+                "reference": "2aa4cd9da6f29a23e4f7b6f4c6944dce204ea47a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/simple-excel/zipball/67095053ff6037284fd213abd84259ea4faca7aa",
-                "reference": "67095053ff6037284fd213abd84259ea4faca7aa",
+                "url": "https://api.github.com/repos/spatie/simple-excel/zipball/2aa4cd9da6f29a23e4f7b6f4c6944dce204ea47a",
+                "reference": "2aa4cd9da6f29a23e4f7b6f4c6944dce204ea47a",
                 "shasum": ""
             },
             "require": {
@@ -6270,7 +6269,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/simple-excel/tree/3.9.0"
+                "source": "https://github.com/spatie/simple-excel/tree/3.10.0"
             },
             "funding": [
                 {
@@ -6278,7 +6277,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-22T08:49:24+00:00"
+            "time": "2026-06-15T06:21:16+00:00"
         },
         {
             "name": "symfony/clock",
@@ -7607,16 +7606,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.38.1",
+            "version": "v1.38.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92"
+                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/14c5439eec4ccff081ac14eca2dc57feb2a66d92",
-                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
+                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
                 "shasum": ""
             },
             "require": {
@@ -7668,7 +7667,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.2"
             },
             "funding": [
                 {
@@ -7688,7 +7687,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-26T12:51:13+00:00"
+            "time": "2026-05-27T06:59:30+00:00"
         },
         {
             "name": "symfony/polyfill-php80",

@@ -53,11 +53,12 @@ test.describe('Dashboard', () => {
   test('renders the shared shell: sidebar menu + full locale switcher (parity with resources)', async ({
     loggedInPage: page,
   }) => {
-    const navCount = async () =>
-      page.locator('nav a, aside a, [data-slot="sidebar"] a').count();
+    const navCount = async () => page.locator('nav a, aside a, [data-slot="sidebar"] a').count();
     const localeOptions = async () => {
       const trigger = page
-        .locator('[data-arqel-locale-switcher] [role="combobox"], [data-arqel-locale-switcher] button')
+        .locator(
+          '[data-arqel-locale-switcher] [role="combobox"], [data-arqel-locale-switcher] button',
+        )
         .first();
       await trigger.click();
       await page.waitForTimeout(250);

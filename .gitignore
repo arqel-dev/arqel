@@ -78,3 +78,6 @@ apps/*/public/storage
 
 # Phase-2 transient backup of pre-recreate apps/demo
 /apps/demo-old/
+
+# Superpowers tooling scratch (local only)
+/.superpowers/

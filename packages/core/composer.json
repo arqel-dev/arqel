@@ -1,66 +1,66 @@
 {
-    "name": "arqel-dev/core",
-    "version": "0.14.0",
-    "description": "Core contracts, service provider, and primitives for Arqel.",
-    "type": "library",
-    "license": "MIT",
-    "keywords": [
-        "laravel",
-        "admin",
-        "inertia",
-        "arqel"
-    ],
-    "homepage": "https://arqel.dev",
-    "support": {
-        "issues": "https://github.com/arqel-dev/arqel/issues",
-        "source": "https://github.com/arqel-dev/arqel",
-        "docs": "https://arqel.dev/docs"
+  "name": "arqel-dev/core",
+  "version": "0.15.0",
+  "description": "Core contracts, service provider, and primitives for Arqel.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "laravel",
+    "admin",
+    "inertia",
+    "arqel"
+  ],
+  "homepage": "https://arqel.dev",
+  "support": {
+    "issues": "https://github.com/arqel-dev/arqel/issues",
+    "source": "https://github.com/arqel-dev/arqel",
+    "docs": "https://arqel.dev/docs"
+  },
+  "require": {
+    "php": "^8.3",
+    "laravel/framework": "^12.0|^13.0",
+    "inertiajs/inertia-laravel": "^3.0",
+    "spatie/laravel-package-tools": "^1.16"
+  },
+  "require-dev": {
+    "larastan/larastan": "^3.0",
+    "orchestra/testbench": "^10.0",
+    "pestphp/pest": "^3.0",
+    "pestphp/pest-plugin-laravel": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Arqel\\Core\\": "src/"
     },
-    "require": {
-        "php": "^8.3",
-        "laravel/framework": "^12.0|^13.0",
-        "inertiajs/inertia-laravel": "^3.0",
-        "spatie/laravel-package-tools": "^1.16"
-    },
-    "require-dev": {
-        "larastan/larastan": "^3.0",
-        "orchestra/testbench": "^10.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Arqel\\Core\\": "src/"
-        },
-        "files": [
-            "src/Pulse/stubs.php"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Arqel\\Core\\Tests\\": "tests/"
-        }
-    },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Arqel\\Core\\ArqelServiceProvider"
-            ]
-        }
-    },
-    "scripts": {
-        "test": "vendor/bin/pest",
-        "test:coverage": "vendor/bin/pest --coverage --min=90",
-        "analyse": "phpstan analyse",
-        "lint": "pint --test",
-        "format": "pint"
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
+    "files": [
+      "src/Pulse/stubs.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Arqel\\Core\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Arqel\\Core\\ArqelServiceProvider"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest",
+    "test:coverage": "vendor/bin/pest --coverage --min=90",
+    "analyse": "phpstan analyse",
+    "lint": "pint --test",
+    "format": "pint"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }

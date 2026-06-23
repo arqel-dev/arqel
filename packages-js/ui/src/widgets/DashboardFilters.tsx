@@ -8,6 +8,7 @@
  * Controlled component: callers own `values` and react to `onChange`.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { cn } from '../utils/cn.js';
 
 export interface SelectFilterPayload {
@@ -106,6 +107,7 @@ function SelectControl({
   value: unknown;
   onChange: (value: unknown) => void;
 }) {
+  const t = useArqelTranslations();
   const options = normaliseOptions(filter.options);
   const label = filter.label ?? filter.name;
 
@@ -143,7 +145,7 @@ function SelectControl({
         value={value === undefined || value === null ? '' : String(value)}
         onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
       >
-        <option value="">All</option>
+        <option value="">{t('table.filters.all', 'All')}</option>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}

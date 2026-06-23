@@ -16,6 +16,7 @@ return [
         'submit' => 'Enviar',
         'reset' => 'Limpar',
         'retry' => 'Tentar novamente',
+        'menu' => 'Ações',
     ],
     'nav' => [
         'dashboard' => 'Painel',
@@ -40,6 +41,8 @@ return [
         'unsaved_changes' => 'Você tem alterações não salvas.',
         'delete_confirm' => 'Tem certeza que deseja excluir?',
         'cannot_undo' => 'Esta ação não pode ser desfeita.',
+        // Prompt de confirmação por digitação; :value é exibido como <code> inline.
+        'type_to_confirm' => 'Digite :value para confirmar',
         'created' => 'Registro criado.',
         'updated' => 'Registro atualizado.',
         'deleted' => 'Registro excluído.',

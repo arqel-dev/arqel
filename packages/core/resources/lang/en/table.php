@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 return [
     'empty' => 'No records found.',
+    'loading' => 'Loading…',
     'per_page' => 'Per page',
     'search' => [
         'label' => 'Search',
         'placeholder' => 'Search...',
+        // Resource-aware placeholder, e.g. "Search posts…".
+        'placeholder_for' => 'Search :resource…',
     ],
     'pagination' => [
         // Short button labels (visible text).
@@ -18,6 +21,8 @@ return [
         'previous_page' => 'Previous page',
         'next_page' => 'Next page',
         'showing' => 'Showing :from to :to of :total results',
+        // Compact range summary (visible + announced).
+        'range' => ':from–:to of :total',
     ],
     'sort' => [
         'asc' => 'Ascending',
@@ -27,6 +32,8 @@ return [
         'apply' => 'Apply',
         'reset' => 'Reset',
         'all' => 'All',
+        'yes' => 'Yes',
+        'no' => 'No',
         'clear' => 'Clear filters (:count)',
     ],
     'bulk' => [

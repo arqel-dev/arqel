@@ -40,7 +40,16 @@ export function TablePagination({
       aria-label="Pagination"
     >
       <span className="text-muted-foreground">
-        {meta.total === 0 ? t('table.empty', 'No results') : `${from}–${to} of ${meta.total}`}
+        {meta.total === 0
+          ? t('table.empty', 'No records found.')
+          : t(
+              'table.pagination.showing',
+              // Fallback is rendered verbatim when the key is missing, so it must
+              // already carry the interpolated values (the replacements map only
+              // applies to a resolved dictionary string).
+              `Showing ${from} to ${to} of ${meta.total} results`,
+              { from, to, total: meta.total },
+            )}
       </span>
       <div className="flex items-center gap-2">
         {onPerPageChange && (

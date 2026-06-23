@@ -37,6 +37,20 @@ it('merges the validation lang file so its strings reach the JS dictionary', fun
         ->toBe('Os dados enviados são inválidos. Revise os campos destacados.');
 });
 
+it('loads the widgets and palette chrome namespaces', function (): void {
+    $loader = app(TranslationLoader::class);
+
+    $en = $loader->loadForLocale('en');
+    $ptBr = $loader->loadForLocale('pt_BR');
+
+    expect($en)->toHaveKey('widgets')
+        ->and($en['widgets']['table']['see_all'])->toBe('See all →')
+        ->and($en['widgets']['unknown_type'])->toBe('Widget type :type not registered')
+        ->and($en['palette']['placeholder'])->toBe('Type a command…')
+        ->and($ptBr['widgets']['table']['see_all'])->toBe('Ver todos →')
+        ->and($ptBr['palette']['placeholder'])->toBe('Digite um comando…');
+});
+
 it('falls back to the default locale when target locale is missing', function (): void {
     config()->set('arqel.i18n.default', 'en');
     $loader = app(TranslationLoader::class);

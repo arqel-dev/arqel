@@ -201,8 +201,8 @@ function TernaryFilter({
         }}
       >
         <option value="all">{filter.props.allLabel ?? t('table.filters.all', 'All')}</option>
-        <option value="true">{filter.props.trueLabel ?? 'Yes'}</option>
-        <option value="false">{filter.props.falseLabel ?? 'No'}</option>
+        <option value="true">{filter.props.trueLabel ?? t('table.filters.yes', 'Yes')}</option>
+        <option value="false">{filter.props.falseLabel ?? t('table.filters.no', 'No')}</option>
       </select>
     </label>
   );

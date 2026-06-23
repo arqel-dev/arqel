@@ -8,6 +8,7 @@
  * (typically `useAction`) handles invocation + loading.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ActionSchema, ModalSize } from '@arqel-dev/types/actions';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FormSchema } from '@arqel-dev/types/forms';
@@ -53,6 +54,7 @@ export function ActionFormModal({
   errors = {},
   initialValues = {},
 }: ActionFormModalProps) {
+  const t = useArqelTranslations();
   const [values, setValues] = useState<Record<string, unknown>>(initialValues);
   const size = action.modalSize ?? 'md';
 
@@ -98,7 +100,7 @@ export function ActionFormModal({
             extra={
               <DialogClose asChild>
                 <Button type="button" variant="ghost" disabled={processing}>
-                  Cancel
+                  {t('form.cancel', 'Cancel')}
                 </Button>
               </DialogClose>
             }

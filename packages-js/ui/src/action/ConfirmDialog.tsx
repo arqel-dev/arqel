@@ -77,7 +77,22 @@ export function ConfirmDialog({
         {requiresText !== undefined && (
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
             <span>
-              Type <code className="font-mono text-foreground">{requiresText}</code> to confirm
+              {(() => {
+                // Render the required value as inline <code> while keeping the
+                // surrounding prompt translatable: split the localized string on
+                // its :value placeholder and splice the <code> element in.
+                const [before, after] = t(
+                  'arqel.messages.type_to_confirm',
+                  'Type :value to confirm',
+                ).split(':value');
+                return (
+                  <>
+                    {before}
+                    <code className="font-mono text-foreground">{requiresText}</code>
+                    {after}
+                  </>
+                );
+              })()}
             </span>
             <input
               type="text"

@@ -12,6 +12,7 @@
  * matching the canonical Filament/Linear UX.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ColumnSchema, SortDirection, TableSort } from '@arqel-dev/types/tables';
 import {
   type ColumnDef,
@@ -64,6 +65,7 @@ export function DataTable<TRecord extends DataTableRecord>({
   emptyState,
   className,
 }: DataTableProps<TRecord>) {
+  const t = useArqelTranslations();
   const lastClickedIndexRef = useRef<number | null>(null);
 
   const visibleColumns = useMemo(() => columns.filter((col) => !col.hidden), [columns]);
@@ -216,7 +218,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                   colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
                   className="px-3 py-4 text-center text-muted-foreground"
                 >
-                  Loading…
+                  {t('table.loading', 'Loading…')}
                 </td>
               </tr>
             )}
@@ -226,7 +228,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                   colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
                   className="px-3 py-8 text-center text-muted-foreground"
                 >
-                  {emptyState ?? 'No records found.'}
+                  {emptyState ?? t('table.empty', 'No records found.')}
                 </td>
               </tr>
             )}
@@ -313,17 +315,22 @@ function DataCards<TRecord extends DataTableRecord>({
   loading,
   emptyState,
 }: DataCardsProps<TRecord>) {
+  const t = useArqelTranslations();
   // hiddenOnMobile columns are dropped from the card body (same intent as the
   // table hiding them at < md).
   const cardColumns = columns.filter((col) => !col.hiddenOnMobile);
 
   if (loading) {
-    return <div className="px-3 py-4 text-center text-muted-foreground md:hidden">Loading…</div>;
+    return (
+      <div className="px-3 py-4 text-center text-muted-foreground md:hidden">
+        {t('table.loading', 'Loading…')}
+      </div>
+    );
   }
   if (rows.length === 0) {
     return (
       <div className="px-3 py-8 text-center text-muted-foreground md:hidden">
-        {emptyState ?? 'No records found.'}
+        {emptyState ?? t('table.empty', 'No records found.')}
       </div>
     );
   }

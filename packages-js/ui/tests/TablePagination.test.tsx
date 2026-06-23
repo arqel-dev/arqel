@@ -19,7 +19,9 @@ describe('TablePagination', () => {
         onPageChange={() => {}}
       />,
     );
-    expect(screen.getByText(/11–20 of 47/)).toBeInTheDocument();
+    // Range summary now flows through the `table.pagination.showing` key
+    // (English fallback) instead of a hand-built ' of ' literal.
+    expect(screen.getByText('Showing 11 to 20 of 47 results')).toBeInTheDocument();
     expect(screen.getByText('2 / 5')).toBeInTheDocument();
   });
 
@@ -55,14 +57,37 @@ describe('TablePagination', () => {
     expect(onPageChange).toHaveBeenCalledWith(3);
   });
 
-  it('shows "No results" when total=0', () => {
+  it('shows the empty fallback when total=0', () => {
     render(
       <TablePagination
         meta={{ currentPage: 1, lastPage: 1, perPage: 10, total: 0 }}
         onPageChange={() => {}}
       />,
     );
-    expect(screen.getByText('No results')).toBeInTheDocument();
+    expect(screen.getByText('No records found.')).toBeInTheDocument();
+  });
+
+  it('translates the range summary via table.pagination.showing', () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          available: ['pt_BR'],
+          translations: {
+            table: {
+              pagination: { showing: 'Exibindo :from a :to de :total resultados' },
+            },
+          },
+        },
+      },
+    });
+    render(
+      <TablePagination
+        meta={{ currentPage: 2, lastPage: 5, perPage: 10, total: 47 }}
+        onPageChange={() => {}}
+      />,
+    );
+    expect(screen.getByText('Exibindo 11 a 20 de 47 resultados')).toBeInTheDocument();
   });
 
   // ── Responsive touch targets (Phase 4): 44px on mobile, dense on >=md ──

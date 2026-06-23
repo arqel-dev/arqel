@@ -16,6 +16,7 @@ return [
         'submit' => 'Submit',
         'reset' => 'Reset',
         'retry' => 'Retry',
+        'menu' => 'Actions',
     ],
     'nav' => [
         'dashboard' => 'Dashboard',
@@ -40,6 +41,8 @@ return [
         'unsaved_changes' => 'You have unsaved changes.',
         'delete_confirm' => 'Are you sure you want to delete this?',
         'cannot_undo' => 'This action cannot be undone.',
+        // Type-to-confirm prompt; :value is rendered as inline <code>.
+        'type_to_confirm' => 'Type :value to confirm',
         'created' => 'Record created.',
         'updated' => 'Record updated.',
         'deleted' => 'Record deleted.',

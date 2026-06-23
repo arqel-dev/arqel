@@ -1,13 +1,12 @@
 import type { FieldSchema } from '@arqel-dev/types/fields';
+import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-
 import { route } from '../src/utils/route.js';
 import {
   buildInitialFormState,
   fieldsVisibleIn,
   indexFieldsByName,
 } from '../src/utils/serializeFields.js';
-import { renderHook } from '@testing-library/react';
 import { selectPluralForm, translate, useTranslator } from '../src/utils/translate.js';
 
 describe('route()', () => {

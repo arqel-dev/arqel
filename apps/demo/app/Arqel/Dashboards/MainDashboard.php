@@ -73,7 +73,7 @@ final class MainDashboard
 
         for ($i = 6; $i >= 0; $i--) {
             $day = Carbon::now()->subDays($i)->startOfDay();
-            $labels[] = $day->format('M j');
+            $labels[] = $day->translatedFormat('M j');
             $data[] = (int) Post::query()
                 ->whereBetween('created_at', [$day, $day->copy()->endOfDay()])
                 ->count();

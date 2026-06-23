@@ -152,7 +152,12 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
   const handleGenerate = useCallback(async (): Promise<void> => {
     const url = buildGenerateUrl(generateUrl, resource, field);
     if (url === null) {
-      setError('Missing generate URL: provide `generateUrl` or both `resource` and `field`.');
+      setError(
+        t(
+          'arqel.ai.missing_generate_url',
+          'Missing generate URL: provide `generateUrl` or both `resource` and `field`.',
+        ),
+      );
       return;
     }
 

@@ -227,7 +227,12 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
     }
     const url = buildAnalyzeUrl(analyzeUrl, resource, field);
     if (url === null) {
-      setError('Missing analyze URL: provide `analyzeUrl` or both `resource` and `field`.');
+      setError(
+        t(
+          'arqel.ai.missing_analyze_url',
+          'Missing analyze URL: provide `analyzeUrl` or both `resource` and `field`.',
+        ),
+      );
       return;
     }
 
@@ -347,7 +352,7 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
           <CardContent className="p-2 flex items-center justify-center">
             <img
               src={previewUrl}
-              alt="Selected preview"
+              alt={t('arqel.ai.selected_preview_alt', 'Selected preview')}
               data-testid="image-preview"
               className="max-h-64 max-w-full rounded-sm"
             />

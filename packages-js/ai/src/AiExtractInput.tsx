@@ -186,7 +186,12 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
   const handleExtract = useCallback(async (): Promise<void> => {
     const url = buildExtractUrl(extractUrl, resource, field);
     if (url === null) {
-      setError('Missing extract URL: provide `extractUrl` or both `resource` and `field`.');
+      setError(
+        t(
+          'arqel.ai.missing_extract_url',
+          'Missing extract URL: provide `extractUrl` or both `resource` and `field`.',
+        ),
+      );
       return;
     }
 

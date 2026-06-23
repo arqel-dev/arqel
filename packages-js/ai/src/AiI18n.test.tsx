@@ -50,6 +50,13 @@ const aiDict = {
         'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
       missing_classify_url:
         'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+      missing_generate_url:
+        'URL de geração ausente: forneça `generateUrl` ou ambos `resource` e `field`.',
+      missing_extract_url:
+        'URL de extração ausente: forneça `extractUrl` ou ambos `resource` e `field`.',
+      missing_analyze_url:
+        'URL de análise ausente: forneça `analyzeUrl` ou ambos `resource` e `field`.',
+      selected_preview_alt: 'Pré-visualização selecionada',
       status_generating: 'Gerando',
       status_classifying: 'Classificando',
       status_extracting: 'Extraindo',
@@ -253,6 +260,78 @@ describe('@arqel-dev/ai i18n', () => {
     const alert = screen.getByRole('alert');
     expect(alert.textContent).toBe(
       'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+    );
+  });
+
+  it('AiTextInput localizes the missing-generate-url config error', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiTextInput
+        name="bio"
+        value=""
+        onChange={vi.fn()}
+        props={{ provider: null, buttonLabel: '', maxLength: null, hasContextFields: false }}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Gerar com IA' }));
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe(
+      'URL de geração ausente: forneça `generateUrl` ou ambos `resource` e `field`.',
+    );
+  });
+
+  it('AiExtractInput localizes the missing-extract-url config error', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiExtractInput
+        name="ex"
+        value={{ title: 'Hello' }}
+        props={{
+          sourceField: 'raw',
+          targetFields: ['title'],
+          buttonLabel: '',
+          usingJsonMode: false,
+          provider: null,
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Extrair com IA' }));
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe(
+      'URL de extração ausente: forneça `extractUrl` ou ambos `resource` e `field`.',
+    );
+  });
+
+  it('AiImageInput localizes the missing-analyze-url config error and preview alt', () => {
+    setMockTranslations(aiDict);
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn(() => 'blob:fake-preview'),
+      revokeObjectURL: vi.fn(),
+    });
+    render(
+      <AiImageInput
+        name="img"
+        value={null}
+        props={{
+          analyses: [],
+          populateFields: {},
+          provider: null,
+          acceptedMimes: ['image/png'],
+          maxFileSize: 0,
+          buttonLabel: '',
+        }}
+      />,
+    );
+    const input = screen.getByLabelText('Arquivo de imagem') as HTMLInputElement;
+    const file = new File(['x'], 'pic.png', { type: 'image/png' });
+    fireEvent.change(input, { target: { files: [file] } });
+    // Preview <img> alt is localized.
+    expect(screen.getByAltText('Pré-visualização selecionada')).toBeInTheDocument();
+    // Analyze without a resolvable URL surfaces the localized config error.
+    fireEvent.click(screen.getByRole('button', { name: 'Analisar com IA' }));
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe(
+      'URL de análise ausente: forneça `analyzeUrl` ou ambos `resource` e `field`.',
     );
   });
 

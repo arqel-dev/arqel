@@ -183,6 +183,10 @@ return [
         'file_too_large' => 'File too large: :size (max :max).',
         'missing_translate_url' => 'Missing translate URL: provide `translateUrl` or both `resource` and `field`.',
         'missing_classify_url' => 'Missing classify URL: provide `classifyUrl` or both `resource` and `field`.',
+        'missing_generate_url' => 'Missing generate URL: provide `generateUrl` or both `resource` and `field`.',
+        'missing_extract_url' => 'Missing extract URL: provide `extractUrl` or both `resource` and `field`.',
+        'missing_analyze_url' => 'Missing analyze URL: provide `analyzeUrl` or both `resource` and `field`.',
+        'selected_preview_alt' => 'Selected preview',
         // sr-only / aria live-region status announcements.
         'status_generating' => 'Generating',
         'status_classifying' => 'Classifying',

@@ -182,6 +182,10 @@ return [
         'file_too_large' => 'Arquivo muito grande: :size (máx. :max).',
         'missing_translate_url' => 'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
         'missing_classify_url' => 'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+        'missing_generate_url' => 'URL de geração ausente: forneça `generateUrl` ou ambos `resource` e `field`.',
+        'missing_extract_url' => 'URL de extração ausente: forneça `extractUrl` ou ambos `resource` e `field`.',
+        'missing_analyze_url' => 'URL de análise ausente: forneça `analyzeUrl` ou ambos `resource` e `field`.',
+        'selected_preview_alt' => 'Pré-visualização selecionada',
         // Anúncios de status das regiões aria/sr-only.
         'status_generating' => 'Gerando',
         'status_classifying' => 'Classificando',

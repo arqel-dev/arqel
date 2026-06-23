@@ -48,20 +48,20 @@ final class SetLocaleMiddleware
     private function resolveLocale(Request $request, array $available): string
     {
         $session = $request->hasSession() ? $request->session()->get('locale') : null;
-        if (is_string($session) && in_array($session, $available, true)) {
-            return $session;
+        if (is_string($session) && ($matched = $this->loader->matchAvailable($session, $available)) !== null) {
+            return $matched;
         }
 
         $cookie = $request->cookie('arqel_locale');
-        if (is_string($cookie) && in_array($cookie, $available, true)) {
-            return $cookie;
+        if (is_string($cookie) && ($matched = $this->loader->matchAvailable($cookie, $available)) !== null) {
+            return $matched;
         }
 
         $header = $request->header('Accept-Language');
         if (is_string($header) && $header !== '') {
             foreach ($this->parseAcceptLanguage($header) as $candidate) {
-                if (in_array($candidate, $available, true)) {
-                    return $candidate;
+                if (($matched = $this->loader->matchAvailable($candidate, $available)) !== null) {
+                    return $matched;
                 }
             }
         }

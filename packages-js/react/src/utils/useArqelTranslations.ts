@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { type TranslationDictionary, translate } from './translate.js';
 
 /**
@@ -24,10 +24,17 @@ export function useArqelTranslations(): (
 ) => string {
   const page = usePage();
   const i18n = (page?.props as Record<string, unknown> | undefined)?.['i18n'];
-  const dict: TranslationDictionary =
-    i18n !== null && typeof i18n === 'object' && 'translations' in i18n
-      ? (((i18n as { translations?: unknown }).translations as TranslationDictionary) ?? {})
-      : {};
+  // Memoize the dictionary on the `i18n` prop identity. Recomputing it inline
+  // on every render produced a fresh object reference each time, which made the
+  // `useCallback([dict])` below return a new `t` on every render and defeated
+  // memoization for consumers that list `t` in their effect/memo dep arrays.
+  const dict = useMemo<TranslationDictionary>(
+    () =>
+      i18n !== null && typeof i18n === 'object' && 'translations' in i18n
+        ? (((i18n as { translations?: unknown }).translations as TranslationDictionary) ?? {})
+        : {},
+    [i18n],
+  );
 
   return useCallback(
     (key: string, fallback?: string, replacements?: Record<string, string | number>): string => {

@@ -420,10 +420,18 @@ final class HandleArqelInertiaRequests extends Middleware
         }
 
         $locale = app()->getLocale();
+        $available = $loader->availableLocales();
+
+        // O locale activo pode estar hifenizado (e.g. `App::setLocale('pt-BR')`
+        // ou `config('app.locale')='pt-BR'`) enquanto o allowlist usa underscore
+        // (`pt_BR`). Emitimos a forma exacta do allowlist para que o `<Select>`
+        // do `LocaleSwitcher` case `value` com um `<SelectItem>` em vez de cair
+        // no placeholder vazio.
+        $emittedLocale = $loader->matchAvailable($locale, $available) ?? $locale;
 
         return [
-            'locale' => $locale,
-            'available' => $loader->availableLocales(),
+            'locale' => $emittedLocale,
+            'available' => $available,
             'translations' => $loader->loadForLocale($locale),
         ];
     }

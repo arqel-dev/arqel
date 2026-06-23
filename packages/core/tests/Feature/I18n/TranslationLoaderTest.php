@@ -39,11 +39,13 @@ it('returns the default available locales', function (): void {
     expect($loader->availableLocales())->toBe(['en', 'pt_BR']);
 });
 
-it('honours configured available locales', function (): void {
+it('honours configured available locales that resolve on disk', function (): void {
+    // 'fr' has no resources/lang/fr directory, so it is dropped: the switcher
+    // must only offer locales that actually load translations.
     config()->set('arqel.i18n.locales', ['en', 'fr']);
     $loader = app(TranslationLoader::class);
 
-    expect($loader->availableLocales())->toBe(['en', 'fr']);
+    expect($loader->availableLocales())->toBe(['en']);
 });
 
 it('reads default locale from config or app fallback', function (): void {

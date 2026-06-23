@@ -35,14 +35,18 @@ final class LocaleController
 
         $available = $this->loader->availableLocales();
 
-        if (! in_array($locale, $available, true)) {
+        // Compara hífen/underscore como o mesmo locale: `pt-BR` casa com a
+        // entrada `pt_BR` (e vice-versa). Persistimos a forma canónica do
+        // allowlist para que o middleware a reconheça em requests futuros.
+        $matched = $this->loader->matchAvailable($locale, $available);
+        if ($matched === null) {
             abort(422, 'Invalid locale.');
         }
 
         if ($request->hasSession()) {
-            $request->session()->put('locale', $locale);
+            $request->session()->put('locale', $matched);
         }
 
-        return back()->withCookie(Cookie::forever('arqel_locale', $locale));
+        return back()->withCookie(Cookie::forever('arqel_locale', $matched));
     }
 }

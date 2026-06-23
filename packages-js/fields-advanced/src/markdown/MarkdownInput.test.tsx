@@ -8,9 +8,10 @@
  */
 
 import type { FieldSchema } from '@arqel-dev/types/fields';
+import { usePage } from '@inertiajs/react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownInput } from './MarkdownInput.js';
 
 // MarkdownInput now localizes its control aria-labels via
@@ -197,5 +198,65 @@ describe('<MarkdownInput>', () => {
 
     const textarea = screen.getByLabelText('Body') as HTMLTextAreaElement;
     expect(textarea.rows).toBe(3);
+  });
+
+  // --- i18n: preview button + fullscreen toggle visible text & aria-label ---
+
+  it('falls back to English literals for the preview/fullscreen controls', () => {
+    const onChange = vi.fn();
+    render(
+      <MarkdownInput
+        field={buildField({ previewMode: 'popup', fullscreen: true })}
+        value=""
+        onChange={onChange}
+      />,
+    );
+    // Visible preview button text (was a hardcoded literal before the fix).
+    expect(screen.getByRole('button', { name: 'Open preview' })).toHaveTextContent('Preview');
+    // Fullscreen toggle: English aria-label + visible "Full" short text.
+    const fullscreen = screen.getByRole('button', { name: 'Enter fullscreen' });
+    expect(fullscreen).toHaveTextContent('Full');
+  });
+});
+
+describe('<MarkdownInput> localization', () => {
+  afterEach(() => {
+    vi.mocked(usePage).mockReturnValue({ props: {} } as unknown as ReturnType<typeof usePage>);
+  });
+
+  it('routes the preview button + fullscreen toggle through t()', () => {
+    vi.mocked(usePage).mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: {
+              fields_advanced: {
+                markdown_preview_open: 'Abrir pré-visualização',
+                markdown_preview_label: 'Pré-visualização',
+                markdown_enter_fullscreen: 'Entrar em tela cheia',
+                markdown_fullscreen_short: 'Tela cheia',
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ReturnType<typeof usePage>);
+
+    const onChange = vi.fn();
+    render(
+      <MarkdownInput
+        field={buildField({ previewMode: 'popup', fullscreen: true })}
+        value=""
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Abrir pré-visualização' })).toHaveTextContent(
+      'Pré-visualização',
+    );
+    expect(screen.getByRole('button', { name: 'Entrar em tela cheia' })).toHaveTextContent(
+      'Tela cheia',
+    );
   });
 });

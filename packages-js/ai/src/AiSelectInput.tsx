@@ -71,7 +71,7 @@ interface AiClassifyResponseBody {
 type SuggestionKind = 'ai' | 'fallback';
 
 const DEFAULT_BUTTON_LABEL = 'Classify with AI';
-const NO_CONTEXT_TOOLTIP =
+const NO_CONTEXT_TOOLTIP_FALLBACK =
   'No context fields configured. Add `classifyFromFields` to enable AI classification.';
 
 function buildClassifyUrl(
@@ -221,7 +221,9 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
   }, [applyValue, classifyUrl, csrfToken, fallbackOption, field, formData, resource, t]);
 
   const buttonDisabled = isLoading || !hasContextFields;
-  const buttonTitle = !hasContextFields ? NO_CONTEXT_TOOLTIP : undefined;
+  const buttonTitle = !hasContextFields
+    ? t('arqel.ai.classify_no_context_tooltip', NO_CONTEXT_TOOLTIP_FALLBACK)
+    : undefined;
 
   return (
     <div className="flex flex-col gap-2" data-arqel-field="aiSelect" data-field-name={name}>

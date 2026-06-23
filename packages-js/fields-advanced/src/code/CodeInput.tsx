@@ -77,6 +77,13 @@ function readProps(raw: unknown): CodeProps {
 /* Language label mapping                                                     */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Language codes whose human label is a generic English phrase (not a proper
+ * noun) and must therefore be localized via t(). Proper nouns like
+ * "JavaScript" / "PHP" stay verbatim across locales.
+ */
+const PLAINTEXT_LANGUAGES = new Set<string>(['plaintext', 'text']);
+
 const LANGUAGE_LABELS: Record<string, string> = {
   plaintext: 'Plain text',
   text: 'Plain text',
@@ -579,7 +586,9 @@ export function CodeInput({
           aria-hidden="true"
         >
           <span data-testid="code-language-badge" className={badgeClasses}>
-            {languageLabel(props.language)}
+            {PLAINTEXT_LANGUAGES.has(props.language.toLowerCase())
+              ? t('arqel.fields_advanced.code_language_plaintext', 'Plain text')
+              : languageLabel(props.language)}
           </span>
         </div>
 

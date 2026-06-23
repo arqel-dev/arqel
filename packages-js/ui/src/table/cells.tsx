@@ -7,6 +7,7 @@
  * from props serialised server-side.
  */
 
+import { useArqelLocale } from '@arqel-dev/react/utils';
 import type {
   BadgeColumnSchema,
   BooleanColumnSchema,
@@ -19,7 +20,6 @@ import type {
   RelationshipColumnSchema,
   TextColumnSchema,
 } from '@arqel-dev/types/tables';
-import { useArqelLocale } from '@arqel-dev/react/utils';
 import { cn } from '../utils/cn.js';
 import { resolveLucideIcon } from '../utils/icon.js';
 
@@ -213,7 +213,10 @@ function NumberCell({ column, value }: { column: NumberColumnSchema; value: unkn
         style: 'currency',
         currency: column.props.currency,
         ...(column.props.decimals !== undefined
-          ? { minimumFractionDigits: column.props.decimals, maximumFractionDigits: column.props.decimals }
+          ? {
+              minimumFractionDigits: column.props.decimals,
+              maximumFractionDigits: column.props.decimals,
+            }
           : {}),
       }).format(num);
       return (

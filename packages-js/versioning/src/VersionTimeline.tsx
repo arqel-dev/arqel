@@ -45,11 +45,7 @@ const RTF_SUPPORTED = typeof Intl !== 'undefined' && 'RelativeTimeFormat' in Int
  * Falls back to the raw string when `Intl.RelativeTimeFormat` is unavailable
  * (very old runtimes / SSR snapshots without polyfill).
  */
-export function formatRelativeTime(
-  iso: string,
-  now: Date = new Date(),
-  locale = 'en',
-): string {
+export function formatRelativeTime(iso: string, now: Date = new Date(), locale = 'en'): string {
   const then = new Date(iso);
   if (Number.isNaN(then.getTime())) {
     return iso;

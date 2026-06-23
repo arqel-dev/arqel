@@ -10,5 +10,5 @@ export {
   translate,
   useTranslator,
 } from './translate.js';
-export { useArqelTranslations } from './useArqelTranslations.js';
 export { toBcp47, useArqelLocale } from './useArqelLocale.js';
+export { useArqelTranslations } from './useArqelTranslations.js';

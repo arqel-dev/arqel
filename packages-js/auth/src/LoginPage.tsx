@@ -9,6 +9,7 @@ import {
   FieldLabel,
   Input,
 } from '@arqel-dev/ui';
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useForm } from '@inertiajs/react';
 import type { FormEvent, ReactElement } from 'react';
 
@@ -52,11 +53,12 @@ export function LoginPage({
   loginUrl = '/admin/login',
   registerUrl = '/register',
   forgotPasswordUrl = '/forgot-password',
-  title = 'Welcome back',
-  description = 'Login to your account',
+  title,
+  description,
   heroImageSrc = '/login-hero.svg',
-  heroImageAlt = 'Login illustration',
+  heroImageAlt,
 }: LoginPageProps): ReactElement {
+  const t = useArqelTranslations();
   const { data, setData, post, processing, errors, reset } = useForm<LoginFormData>({
     email: '',
     password: '',
@@ -78,12 +80,16 @@ export function LoginPage({
             <form onSubmit={handleSubmit} className="p-6 md:p-8" noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <h1 className="text-2xl font-bold">{title}</h1>
-                  <p className="text-balance text-muted-foreground">{description}</p>
+                  <h1 className="text-2xl font-bold">
+                    {title ?? t('arqel.auth.login_title', 'Welcome back')}
+                  </h1>
+                  <p className="text-balance text-muted-foreground">
+                    {description ?? t('arqel.auth.login_description', 'Login to your account')}
+                  </p>
                 </div>
 
                 <Field>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <FieldLabel htmlFor="email">{t('arqel.auth.email', 'Email')}</FieldLabel>
                   <Input
                     id="email"
                     type="email"
@@ -99,13 +105,15 @@ export function LoginPage({
 
                 <Field>
                   <div className="flex items-center">
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <FieldLabel htmlFor="password">
+                      {t('arqel.auth.password', 'Password')}
+                    </FieldLabel>
                     {canResetPassword ? (
                       <a
                         href={forgotPasswordUrl}
                         className="ml-auto text-sm underline-offset-2 hover:underline"
                       >
-                        Forgot your password?
+                        {t('arqel.auth.forgot_password', 'Forgot your password?')}
                       </a>
                     ) : null}
                   </div>
@@ -124,15 +132,17 @@ export function LoginPage({
 
                 <Field>
                   <Button type="submit" disabled={processing}>
-                    {processing ? 'Signing in…' : 'Login'}
+                    {processing
+                      ? t('arqel.auth.login_submitting', 'Signing in…')
+                      : t('arqel.auth.login_submit', 'Login')}
                   </Button>
                 </Field>
 
                 {canRegister ? (
                   <FieldDescription className="text-center">
-                    Don't have an account?{' '}
+                    {t('arqel.auth.no_account', "Don't have an account?")}{' '}
                     <a href={registerUrl} className="underline underline-offset-4">
-                      Sign up
+                      {t('arqel.auth.sign_up', 'Sign up')}
                     </a>
                   </FieldDescription>
                 ) : null}
@@ -142,7 +152,7 @@ export function LoginPage({
             <div className="bg-primary/10 relative hidden md:block">
               <img
                 src={heroImageSrc}
-                alt={heroImageAlt}
+                alt={heroImageAlt ?? t('arqel.auth.login_hero_alt', 'Login illustration')}
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>

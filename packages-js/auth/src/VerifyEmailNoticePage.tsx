@@ -1,4 +1,5 @@
 import { Button, Card, CardContent, Field, FieldDescription, FieldGroup } from '@arqel-dev/ui';
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useForm } from '@inertiajs/react';
 import type { FormEvent, ReactElement } from 'react';
 
@@ -27,10 +28,11 @@ export function VerifyEmailNoticePage({
   email = null,
   status = null,
   resendUrl = '/admin/email/verify/resend',
-  title = 'Verifique seu e-mail',
+  title,
   heroImageSrc = '/login-hero.svg',
-  heroImageAlt = 'Verify email illustration',
+  heroImageAlt,
 }: VerifyEmailNoticePageProps): ReactElement {
+  const t = useArqelTranslations();
   const { post, processing } = useForm({});
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
@@ -39,8 +41,13 @@ export function VerifyEmailNoticePage({
   };
 
   const intro = email
-    ? `Enviamos um link de verificação para ${email}. Confira sua caixa de entrada.`
-    : 'Enviamos um link de verificação para o seu e-mail. Confira sua caixa de entrada.';
+    ? t('arqel.auth.verify_intro', 'We sent a verification link to :email. Check your inbox.', {
+        email,
+      })
+    : t(
+        'arqel.auth.verify_intro_generic',
+        'We sent a verification link to your email. Check your inbox.',
+      );
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center bg-muted p-6 md:p-10">
@@ -50,23 +57,27 @@ export function VerifyEmailNoticePage({
             <form onSubmit={handleSubmit} className="p-6 md:p-8">
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <h1 className="text-2xl font-bold">{title}</h1>
+                  <h1 className="text-2xl font-bold">
+                    {title ?? t('arqel.auth.verify_title', 'Verify your email')}
+                  </h1>
                   <p className="text-balance text-muted-foreground">{intro}</p>
                 </div>
 
                 {status === 'verification-link-sent' ? (
                   <FieldDescription className="text-center text-green-600 dark:text-green-400">
-                    Um novo link de verificação foi enviado.
+                    {t('arqel.auth.verify_resent', 'A new verification link has been sent.')}
                   </FieldDescription>
                 ) : null}
 
                 <FieldDescription className="text-center">
-                  Não recebeu? Clique abaixo para reenviar.
+                  {t('arqel.auth.verify_not_received', "Didn't receive it? Click below to resend.")}
                 </FieldDescription>
 
                 <Field>
                   <Button type="submit" disabled={processing} variant="outline">
-                    {processing ? 'Enviando…' : 'Reenviar link'}
+                    {processing
+                      ? t('arqel.auth.verify_resending', 'Sending…')
+                      : t('arqel.auth.verify_resend', 'Resend link')}
                   </Button>
                 </Field>
               </FieldGroup>
@@ -75,7 +86,7 @@ export function VerifyEmailNoticePage({
             <div className="bg-primary/10 relative hidden md:block">
               <img
                 src={heroImageSrc}
-                alt={heroImageAlt}
+                alt={heroImageAlt ?? t('arqel.auth.verify_hero_alt', 'Verify email illustration')}
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>

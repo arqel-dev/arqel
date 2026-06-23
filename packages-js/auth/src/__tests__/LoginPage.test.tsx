@@ -1,24 +1,22 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { LoginPage } from '../LoginPage';
-import { postSpy, setMockErrors } from './setup';
+import { postSpy, setMockErrors, setMockTranslations } from './setup';
 
-// FIXME(post-shadcn-migration): LoginPage rebuilt on shadcn block login-04;
-// existing assertions reference labels/roles from the previous implementation.
-// Skipped to unblock v0.9.0; rewrite suite against the new markup in a follow-up.
-describe.skip('LoginPage', () => {
-  it('renders email, password fields and submit button', () => {
+describe('LoginPage', () => {
+  it('renders email, password fields and submit button (English default)', () => {
     render(<LoginPage />);
 
-    expect(screen.getByLabelText(/e-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^senha$/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
   });
 
   it('calls post on form submit with the configured loginUrl', () => {
     render(<LoginPage loginUrl="/admin/login" />);
 
-    const form = screen.getByRole('button', { name: /entrar/i }).closest('form');
+    const form = screen.getByRole('button', { name: 'Login' }).closest('form');
     expect(form).not.toBeNull();
     if (form) fireEvent.submit(form);
 
@@ -26,18 +24,18 @@ describe.skip('LoginPage', () => {
     expect(postSpy.mock.calls[0]?.[0]).toBe('/admin/login');
   });
 
-  it('renders the "Criar conta" link when canRegister is true', () => {
+  it('renders the sign-up link when canRegister is true', () => {
     render(<LoginPage canRegister registerUrl="/register" />);
 
-    const link = screen.getByRole('link', { name: /criar conta/i });
+    const link = screen.getByRole('link', { name: 'Sign up' });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', '/register');
   });
 
-  it('renders the "Esqueci minha senha" link when canResetPassword is true', () => {
+  it('renders the forgot-password link when canResetPassword is true', () => {
     render(<LoginPage canResetPassword forgotPasswordUrl="/forgot-password" />);
 
-    const link = screen.getByRole('link', { name: /esqueci/i });
+    const link = screen.getByRole('link', { name: /forgot your password/i });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', '/forgot-password');
   });
@@ -45,8 +43,8 @@ describe.skip('LoginPage', () => {
   it('does not render conditional links when flags are false', () => {
     render(<LoginPage />);
 
-    expect(screen.queryByRole('link', { name: /criar conta/i })).toBeNull();
-    expect(screen.queryByRole('link', { name: /esqueci/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Sign up' })).toBeNull();
+    expect(screen.queryByRole('link', { name: /forgot your password/i })).toBeNull();
   });
 
   it('displays validation errors from useForm.errors', () => {
@@ -55,5 +53,29 @@ describe.skip('LoginPage', () => {
     render(<LoginPage />);
 
     expect(screen.getByText('Credenciais inválidas.')).toBeInTheDocument();
+  });
+
+  it('localizes title, labels and buttons from the i18n dictionary (pt_BR)', () => {
+    setMockTranslations({
+      arqel: {
+        auth: {
+          login_title: 'Bem-vindo de volta',
+          email: 'E-mail',
+          password: 'Senha',
+          login_submit: 'Entrar',
+          forgot_password: 'Esqueceu sua senha?',
+          sign_up: 'Criar conta',
+        },
+      },
+    });
+
+    render(<LoginPage canRegister canResetPassword />);
+
+    expect(screen.getByRole('heading', { name: 'Bem-vindo de volta' })).toBeInTheDocument();
+    expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
+    expect(screen.getByLabelText('Senha')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Entrar' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Esqueceu sua senha?' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Criar conta' })).toBeInTheDocument();
   });
 });

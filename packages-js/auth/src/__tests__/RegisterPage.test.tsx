@@ -1,26 +1,23 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { RegisterPage } from '../RegisterPage';
-import { postSpy, setMockErrors } from './setup';
+import { postSpy, setMockErrors, setMockTranslations } from './setup';
 
-// FIXME(post-shadcn-migration): RegisterPage rebuilt on shadcn block signup-04;
-// existing assertions reference labels/roles from the previous implementation.
-// Skipped to unblock v0.9.0; rewrite suite against the new markup in a follow-up.
-describe.skip('RegisterPage', () => {
+describe('RegisterPage', () => {
   it('renders name, email, password and confirmation fields and submit button', () => {
     render(<RegisterPage />);
 
-    expect(screen.getByLabelText(/nome/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/e-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^senha$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/confirmar senha/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /criar conta/i })).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    expect(screen.getByLabelText('Confirm password')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Create account' })).toBeInTheDocument();
   });
 
   it('calls post on form submit with the configured registerUrl', () => {
     render(<RegisterPage registerUrl="/admin/register" />);
 
-    const form = screen.getByRole('button', { name: /criar conta/i }).closest('form');
+    const form = screen.getByRole('button', { name: 'Create account' }).closest('form');
     expect(form).not.toBeNull();
     if (form) fireEvent.submit(form);
 
@@ -31,7 +28,7 @@ describe.skip('RegisterPage', () => {
   it('renders the login link when canLogin is true', () => {
     render(<RegisterPage canLogin loginUrl="/admin/login" />);
 
-    const link = screen.getByRole('link', { name: /já tem conta/i });
+    const link = screen.getByRole('link', { name: 'Sign in' });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', '/admin/login');
   });
@@ -39,7 +36,7 @@ describe.skip('RegisterPage', () => {
   it('does not render login link when canLogin is false', () => {
     render(<RegisterPage canLogin={false} />);
 
-    expect(screen.queryByRole('link', { name: /já tem conta/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Sign in' })).toBeNull();
   });
 
   it('displays validation errors from useForm.errors', () => {
@@ -48,5 +45,30 @@ describe.skip('RegisterPage', () => {
     render(<RegisterPage />);
 
     expect(screen.getByText('O e-mail já está em uso.')).toBeInTheDocument();
+  });
+
+  it('localizes title, labels and buttons from the i18n dictionary (pt_BR)', () => {
+    setMockTranslations({
+      arqel: {
+        auth: {
+          register_title: 'Criar uma conta',
+          name: 'Nome',
+          email: 'E-mail',
+          password: 'Senha',
+          confirm_password: 'Confirmar senha',
+          register_submit: 'Criar conta',
+          have_account: 'Já tem uma conta?',
+          sign_in: 'Entrar',
+        },
+      },
+    });
+
+    render(<RegisterPage canLogin />);
+
+    expect(screen.getByRole('heading', { name: 'Criar uma conta' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Nome')).toBeInTheDocument();
+    expect(screen.getByLabelText('Confirmar senha')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Criar conta' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Entrar' })).toBeInTheDocument();
   });
 });

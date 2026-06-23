@@ -205,12 +205,16 @@ abstract class Field
 
     public function getPlaceholder(): ?string
     {
-        return $this->placeholder;
+        return $this->placeholder === null
+            ? null
+            : self::localizeLabel($this->placeholder);
     }
 
     public function getHelperText(): ?string
     {
-        return $this->helperText;
+        return $this->helperText === null
+            ? null
+            : self::localizeLabel($this->helperText);
     }
 
     public function getDefault(): mixed

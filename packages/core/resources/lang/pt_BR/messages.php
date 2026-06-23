@@ -40,5 +40,17 @@ return [
     ],
     'tenant' => [
         'feature_unavailable' => "O recurso ':feature' não está disponível no seu plano atual.",
+        'no_current_tenant' => 'Nenhum tenant atual.',
+    ],
+    'action' => [
+        'missing_selection' => 'Nenhuma seleção informada.',
+    ],
+    'upload' => [
+        'not_file_field' => 'O campo não é de upload de arquivo.',
+        'missing_file' => 'Arquivo enviado ausente.',
+        'persist_failed' => 'Não foi possível salvar o arquivo enviado.',
+        'missing_path' => 'Caminho do arquivo ausente.',
+        'invalid_path' => 'Caminho de arquivo inválido.',
+        'path_outside_directory' => 'O caminho do arquivo está fora do diretório permitido.',
     ],
 ];

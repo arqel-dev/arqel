@@ -87,7 +87,7 @@ final class ActionController
 
         $ids = $request->input('ids');
         if (! is_array($ids) || $ids === []) {
-            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, 'Missing selection.');
+            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, (string) __('arqel::messages.action.missing_selection'));
         }
 
         $modelClass = $instance::getModel();

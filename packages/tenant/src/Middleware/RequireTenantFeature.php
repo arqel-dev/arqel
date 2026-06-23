@@ -43,7 +43,7 @@ final class RequireTenantFeature
         $tenant = $this->manager->current();
 
         if ($tenant === null) {
-            abort(Response::HTTP_NOT_FOUND, 'No current tenant.');
+            abort(Response::HTTP_NOT_FOUND, (string) __('arqel::messages.tenant.no_current_tenant'));
         }
 
         if (! method_exists($tenant, 'hasFeature')) {

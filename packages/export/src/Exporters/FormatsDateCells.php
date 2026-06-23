@@ -50,7 +50,13 @@ trait FormatsDateCells
 
         $format = is_array($props) ? ($props['format'] ?? 'Y-m-d') : 'Y-m-d';
 
-        return $value->format(is_string($format) ? $format : 'Y-m-d');
+        // Bind to the active request locale and use translatedFormat() so textual
+        // tokens (F/M/l/D) localize their month/day names, matching the on-screen
+        // Intl-formatted cell instead of always emitting English. Numeric tokens
+        // (Y/m/d/H/i/s) are unaffected, so a plain `Y-m-d` column is unchanged.
+        return Carbon::instance($value)
+            ->locale($this->activeLocale())
+            ->translatedFormat(is_string($format) ? $format : 'Y-m-d');
     }
 
     /**

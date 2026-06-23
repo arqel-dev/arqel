@@ -36,7 +36,7 @@
  * em handlers de evento.
  */
 
-import { useArqelTranslations } from '@arqel-dev/react/utils';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
 import { Alert, AlertDescription, Badge, Button, Card, CardContent } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
 
@@ -111,14 +111,23 @@ function readFileAsDataUrl(file: File): Promise<string> {
   });
 }
 
-function formatBytes(bytes: number): string {
+/**
+ * Format a byte count for display, using the active panel locale for the
+ * number portion so comma-decimal locales (e.g. `pt-BR` → `1,5 MB`) render
+ * correctly instead of always emitting an en-US `.` decimal. The unit suffix
+ * stays the conventional symbol (`MB`/`KB`/`B`), which is locale-neutral.
+ */
+function formatBytes(bytes: number, locale?: string): string {
+  const round1 = (value: number): string =>
+    new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value);
+
   if (bytes >= 1_048_576) {
-    return `${(bytes / 1_048_576).toFixed(1)} MB`;
+    return `${round1(bytes / 1_048_576)} MB`;
   }
   if (bytes >= 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${round1(bytes / 1024)} KB`;
   }
-  return `${String(bytes)} B`;
+  return `${round1(bytes)} B`;
 }
 
 function Spinner(): ReactElement {
@@ -161,6 +170,7 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
   const acceptedMimes = fieldProps?.acceptedMimes ?? [];
   const maxFileSize = fieldProps?.maxFileSize ?? 0;
   const t = useArqelTranslations();
+  const locale = useArqelLocale();
   const serverLabel = fieldProps?.buttonLabel;
   const buttonLabel =
     serverLabel !== undefined && serverLabel !== ''
@@ -192,8 +202,8 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
       if (maxFileSize > 0 && next.size > maxFileSize) {
         setError(
           t('arqel.ai.file_too_large', 'File too large: :size (max :max).', {
-            size: formatBytes(next.size),
-            max: formatBytes(maxFileSize),
+            size: formatBytes(next.size, locale),
+            max: formatBytes(maxFileSize, locale),
           }),
         );
         setFile(null);
@@ -208,7 +218,7 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
         setPreviewUrl(null);
       }
     },
-    [maxFileSize, t],
+    [locale, maxFileSize, t],
   );
 
   const handleAnalyze = useCallback(async (): Promise<void> => {

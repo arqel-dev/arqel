@@ -1079,6 +1079,9 @@ importers:
         specifier: workspace:*
         version: link:../types
     devDependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
       '@arqel-dev/ui':
         specifier: workspace:*
         version: link:../ui

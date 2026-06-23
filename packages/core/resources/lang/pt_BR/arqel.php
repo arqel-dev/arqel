@@ -240,5 +240,17 @@ return [
         'loading' => 'Carregando versões',
         'history' => 'Histórico de versões',
         'item_label' => 'Versão :id por :user, :relative: :summary',
+        // Chrome visível + nomes acessíveis do <VersionDiff>.
+        'modified' => 'Modificado',
+        'no_changes' => 'Nenhuma alteração a exibir.',
+        'field_comparison' => 'Comparação de campos',
+        'no_previous_value' => 'sem valor anterior',
+        'no_new_value' => 'sem novo valor',
+    ],
+    // Chrome de estado vazio visível do <StateTransition> de
+    // @arqel-dev/workflow.
+    'workflow' => [
+        'no_state_assigned' => 'Nenhum estado atribuído.',
+        'no_transitions' => 'Nenhuma transição disponível.',
     ],
 ];

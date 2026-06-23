@@ -103,6 +103,52 @@ trait HasForm
     }
 
     /**
+     * Per-field custom validation messages keyed `field.rule => message`
+     * for Laravel's validator, so a `validationMessage()` declared on an
+     * action form field actually applies on a failed action-form submit
+     * (the controller drops them otherwise). Returns an empty array when
+     * no field declares custom messages.
+     *
+     * @return array<string, string>
+     */
+    public function getFormValidationMessages(): array
+    {
+        $messages = [];
+        foreach ($this->form as $field) {
+            foreach ($field->getValidationMessages() as $rule => $message) {
+                $messages[$field->getName().'.'.$rule] = $message;
+            }
+        }
+
+        return $messages;
+    }
+
+    /**
+     * Humanised / localized attribute names keyed `field => attribute`, so
+     * a failed action-form validation renders `:attribute` as the field's
+     * (already `__()`-localized) label rather than the raw snake_case key.
+     * An explicit `validationAttribute()` wins over the label.
+     *
+     * @return array<string, string>
+     */
+    public function getFormValidationAttributes(): array
+    {
+        $attributes = [];
+        foreach ($this->form as $field) {
+            $attribute = $field->getValidationAttribute();
+            if ($attribute === null || $attribute === '') {
+                $attribute = $field->getLabel();
+            }
+
+            if ($attribute !== '') {
+                $attributes[$field->getName()] = $attribute;
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
      * Serialise the modal *layout* for the action payload: each field
      * reduced to `{name, type}`, preserving declaration order. The rich
      * per-field payload (options, label, validation, props) is produced

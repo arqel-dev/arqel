@@ -23,6 +23,7 @@
  * coupling lives in higher layers.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Badge, Button, type badgeVariants } from '@arqel-dev/ui';
 import type { VariantProps } from 'class-variance-authority';
 import { type ReactElement, useCallback } from 'react';
@@ -122,6 +123,7 @@ export function StateTransition({
   onTransition,
 }: StateTransitionProps): ReactElement {
   const { currentState, transitions, history, showDescription, showHistory } = props;
+  const t = useArqelTranslations();
 
   const handleClick = useCallback(
     (from: string, to: string) => {
@@ -160,7 +162,7 @@ export function StateTransition({
             className="text-sm text-muted-foreground"
             data-testid="state-transition-empty-state"
           >
-            No state assigned.
+            {t('arqel.workflow.no_state_assigned', 'No state assigned.')}
           </span>
         ) : (
           <Badge
@@ -181,7 +183,7 @@ export function StateTransition({
             className="text-sm text-muted-foreground"
             data-testid="state-transition-empty-transitions"
           >
-            No transitions available.
+            {t('arqel.workflow.no_transitions', 'No transitions available.')}
           </span>
         ) : (
           visibleTransitions.map((t) => (

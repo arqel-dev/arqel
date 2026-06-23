@@ -75,6 +75,13 @@ final class SetLocaleMiddleware
      * `pt`, `en-US;q=0.9` — a normalização troca `-` por `_` para
      * casar com o padrão do Laravel.
      *
+     * Para cada segmento regional (`pt-BR`) acrescenta também a língua
+     * base (`pt`) logo a seguir, como candidato de fallback. Assim um
+     * header `Accept-Language: pt-BR;q=0.9` continua a resolver para um
+     * allowlist que só ofereça o português genérico (`['en', 'pt']`),
+     * em vez de cair silenciosamente no default. A ordem preserva a
+     * preferência: a variante completa é tentada antes da base.
+     *
      * @return array<int, string>
      */
     private function parseAcceptLanguage(string $header): array
@@ -88,9 +95,15 @@ final class SetLocaleMiddleware
                 continue;
             }
 
-            $candidates[] = str_replace('-', '_', $segment);
+            $normalized = str_replace('-', '_', $segment);
+            $candidates[] = $normalized;
+
+            $base = explode('_', $normalized)[0];
+            if ($base !== '' && $base !== $normalized) {
+                $candidates[] = $base;
+            }
         }
 
-        return $candidates;
+        return array_values(array_unique($candidates));
     }
 }

@@ -141,13 +141,29 @@ export function translate(
  * Hook that returns a memoised `t(key, replacements)` bound to the
  * supplied dictionary. Apps build the dictionary from
  * `usePage<SharedProps>().props.translations`.
+ *
+ * Like {@link useArqelTranslations}, when `replacements.count` is a number the
+ * resolved value is treated as a pluralizable string and the matching form is
+ * selected via `Intl.PluralRules` in `locale` (BCP-47) before `:placeholder`
+ * tokens are substituted. Pass `locale` so pluralization and number-aware
+ * forms honor the active panel locale instead of defaulting to `'en'`.
  */
 export function useTranslator(
   dict: TranslationDictionary,
+  locale?: string,
 ): (key: string, replacements?: Record<string, string | number>) => string {
   return useCallback(
-    (key: string, replacements?: Record<string, string | number>): string =>
-      translate(dict, key, replacements ? { replacements } : undefined),
-    [dict],
+    (key: string, replacements?: Record<string, string | number>): string => {
+      if (replacements === undefined) {
+        return translate(dict, key, locale !== undefined ? { locale } : undefined);
+      }
+      const count = typeof replacements['count'] === 'number' ? replacements['count'] : undefined;
+      return translate(dict, key, {
+        replacements,
+        ...(locale !== undefined ? { locale } : {}),
+        ...(count !== undefined ? { count } : {}),
+      });
+    },
+    [dict, locale],
   );
 }

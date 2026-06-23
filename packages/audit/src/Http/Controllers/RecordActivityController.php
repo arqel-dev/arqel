@@ -50,14 +50,14 @@ final class RecordActivityController extends Controller
         if ($modelClass === null) {
             return new JsonResponse([
                 'error' => 'invalid_subject_type',
-                'message' => 'subjectType must be a fully-qualified Eloquent model class or a registered morph alias.',
+                'message' => (string) __('arqel-audit::messages.invalid_subject_type'),
             ], 400);
         }
 
         $subject = $this->resolveSubject($modelClass, $subjectId);
 
         if ($this->deniesView($subject)) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => (string) __('arqel-audit::messages.forbidden')], 403);
         }
 
         // Query on the value Spatie actually persists: `getMorphClass()` —

@@ -242,5 +242,19 @@ return [
         'loading' => 'Loading versions',
         'history' => 'Version history',
         'item_label' => 'Version :id by :user, :relative: :summary',
+        // Visible chrome + accessible names for <VersionDiff>. Values must
+        // equal the original English literals so accessible names stay stable.
+        'modified' => 'Modified',
+        'no_changes' => 'No changes to display.',
+        'field_comparison' => 'Field comparison',
+        'no_previous_value' => 'no previous value',
+        'no_new_value' => 'no new value',
+    ],
+    // Visible empty-state chrome for @arqel-dev/workflow's <StateTransition>.
+    // Values must equal the original English literals so consumer tests and
+    // accessible names stay stable.
+    'workflow' => [
+        'no_state_assigned' => 'No state assigned.',
+        'no_transitions' => 'No transitions available.',
     ],
 ];

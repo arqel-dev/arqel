@@ -71,5 +71,17 @@ return [
         'review_not_found' => 'Avaliação não encontrada',
         'refund_failed' => 'Falha no reembolso pelo gateway',
         'payment_verification_failed' => 'Falha na verificação do pagamento',
+    'field_search' => [
+        'not_searchable' => 'O campo não permite busca.',
+        'disabled' => 'A busca está desabilitada para este campo.',
+    ],
+    'versioning' => [
+        'not_versionable' => 'O model não usa a trait Versionable.',
+        'restore_failed' => 'Falha ao restaurar.',
+        'registry_not_bound' => 'ResourceRegistry não está registrado',
+        'forbidden' => 'Acesso negado',
+    ],
+    'workflow' => [
+        'state_filter_label' => 'Estado',
     ],
 ];

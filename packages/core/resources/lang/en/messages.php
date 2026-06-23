@@ -71,5 +71,17 @@ return [
         'review_not_found' => 'Review not found',
         'refund_failed' => 'Refund failed at gateway',
         'payment_verification_failed' => 'Payment verification failed',
+    'field_search' => [
+        'not_searchable' => 'Field is not searchable.',
+        'disabled' => 'Field has search disabled.',
+    ],
+    'versioning' => [
+        'not_versionable' => 'Model does not use the Versionable trait.',
+        'restore_failed' => 'Restore failed.',
+        'registry_not_bound' => 'ResourceRegistry not bound',
+        'forbidden' => 'Forbidden',
+    ],
+    'workflow' => [
+        'state_filter_label' => 'State',
     ],
 ];

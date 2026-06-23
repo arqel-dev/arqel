@@ -51,7 +51,10 @@ final class VersionRestoreController
 
             if (! $usesVersionable) {
                 return new JsonResponse([
-                    'message' => 'Model does not use the Versionable trait.',
+                    'message' => $this->message(
+                        'arqel::messages.versioning.not_versionable',
+                        'Model does not use the Versionable trait.',
+                    ),
                 ], 422);
             }
 
@@ -101,9 +104,25 @@ final class VersionRestoreController
 
             return new JsonResponse([
                 'restored' => false,
-                'message' => 'Restore failed.',
+                'message' => $this->message('arqel::messages.versioning.restore_failed', 'Restore failed.'),
             ], 500);
         }
+    }
+
+    /**
+     * Localize a user-facing JSON message lazily so the request locale
+     * applies. Falls back to the English literal when no translator is bound
+     * or the key is untranslated, keeping the response text stable.
+     */
+    private function message(string $key, string $fallback): string
+    {
+        if (! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans($key);
+
+        return is_string($translated) && $translated !== $key ? $translated : $fallback;
     }
 
     /**

@@ -73,9 +73,29 @@ final readonly class StateFilter
         return [
             'field' => $this->field,
             'type' => 'state',
-            'label' => 'State',
+            'label' => $this->label(),
             'options' => array_values($this->optionsArray()),
         ];
+    }
+
+    /**
+     * Localize the filter label lazily so the request locale applies. Falls
+     * back to the English literal when no translator is bound or the key is
+     * untranslated, keeping the visible label stable.
+     */
+    private function label(): string
+    {
+        $fallback = 'State';
+
+        if (! function_exists('app') || ! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans('arqel::messages.workflow.state_filter_label');
+
+        return is_string($translated) && $translated !== 'arqel::messages.workflow.state_filter_label'
+            ? $translated
+            : $fallback;
     }
 
     /**

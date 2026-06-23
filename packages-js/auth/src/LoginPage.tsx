@@ -1,3 +1,4 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   Button,
   Card,
@@ -9,7 +10,6 @@ import {
   FieldLabel,
   Input,
 } from '@arqel-dev/ui';
-import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useForm } from '@inertiajs/react';
 import type { FormEvent, ReactElement } from 'react';
 

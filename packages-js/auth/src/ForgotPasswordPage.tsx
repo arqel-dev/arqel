@@ -1,3 +1,4 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   Button,
   Card,
@@ -9,7 +10,6 @@ import {
   FieldLabel,
   Input,
 } from '@arqel-dev/ui';
-import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useForm, usePage } from '@inertiajs/react';
 import type { FormEvent, ReactElement } from 'react';
 
@@ -78,10 +78,7 @@ export function ForgotPasswordPage({
                   </h1>
                   <p className="text-balance text-muted-foreground">
                     {description ??
-                      t(
-                        'arqel.auth.forgot_description',
-                        'We will send a reset link to your email',
-                      )}
+                      t('arqel.auth.forgot_description', 'We will send a reset link to your email')}
                   </p>
                 </div>
 
@@ -125,7 +122,9 @@ export function ForgotPasswordPage({
             <div className="bg-primary/10 relative hidden md:block">
               <img
                 src={heroImageSrc}
-                alt={heroImageAlt ?? t('arqel.auth.forgot_hero_alt', 'Forgot password illustration')}
+                alt={
+                  heroImageAlt ?? t('arqel.auth.forgot_hero_alt', 'Forgot password illustration')
+                }
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>

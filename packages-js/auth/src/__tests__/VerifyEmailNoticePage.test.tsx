@@ -39,7 +39,8 @@ describe('VerifyEmailNoticePage', () => {
       arqel: {
         auth: {
           verify_title: 'Verifique seu e-mail',
-          verify_intro: 'Enviamos um link de verificação para :email. Confira sua caixa de entrada.',
+          verify_intro:
+            'Enviamos um link de verificação para :email. Confira sua caixa de entrada.',
           verify_resent: 'Um novo link de verificação foi enviado.',
           verify_not_received: 'Não recebeu? Clique abaixo para reenviar.',
           verify_resend: 'Reenviar link',

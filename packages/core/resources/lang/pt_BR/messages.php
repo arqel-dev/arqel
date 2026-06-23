@@ -30,4 +30,12 @@ return [
         'forbidden' => 'Você não tem permissão para executar esta ação.',
         'not_found' => 'Registro não encontrado.',
     ],
+    'export' => [
+        'invalid_id' => 'ID de exportação inválido.',
+        'not_found' => 'Exportação não encontrada.',
+        'ambiguous' => 'Exportação ambígua.',
+    ],
+    'locale' => [
+        'invalid' => 'Idioma inválido.',
+    ],
 ];

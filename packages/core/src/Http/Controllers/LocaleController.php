@@ -41,7 +41,8 @@ final class LocaleController
         // allowlist para que o middleware a reconheça em requests futuros.
         $matched = $this->loader->matchAvailable($locale, $available);
         if ($matched === null) {
-            abort(422, 'Invalid locale.');
+            $message = trans('arqel::messages.locale.invalid');
+            abort(422, is_string($message) && $message !== 'arqel::messages.locale.invalid' ? $message : 'Invalid locale.');
         }
 
         if ($request->hasSession()) {

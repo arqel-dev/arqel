@@ -38,18 +38,18 @@ final class ExportDownloadController
     public function download(string $exportId, Request $request): BinaryFileResponse
     {
         if (preg_match(self::UUID_PATTERN, $exportId) !== 1) {
-            abort(400, 'Invalid export id.');
+            abort(400, $this->message('arqel::messages.export.invalid_id', 'Invalid export id.'));
         }
 
         $dir = $this->resolveDirectory();
         $matches = glob(rtrim($dir, '/').'/export-'.$exportId.'.*');
 
         if ($matches === false || count($matches) === 0) {
-            abort(404, 'Export not found.');
+            abort(404, $this->message('arqel::messages.export.not_found', 'Export not found.'));
         }
 
         if (count($matches) > 1) {
-            abort(404, 'Export ambiguous.');
+            abort(404, $this->message('arqel::messages.export.ambiguous', 'Export ambiguous.'));
         }
 
         $filePath = $matches[0];
@@ -62,6 +62,22 @@ final class ExportDownloadController
         }
 
         return response()->download($filePath, basename($filePath), $headers);
+    }
+
+    /**
+     * Localize an abort message lazily so the request locale applies. Falls
+     * back to the English literal when no translator is bound or the key is
+     * untranslated, keeping the user-facing error text stable.
+     */
+    private function message(string $key, string $fallback): string
+    {
+        if (! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans($key);
+
+        return is_string($translated) && $translated !== $key ? $translated : $fallback;
     }
 
     private function resolveDirectory(): string

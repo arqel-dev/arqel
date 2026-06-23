@@ -43,3 +43,29 @@ it('falls back to the slug ucfirst when the resource is not registered', functio
 
     expect($crumbs[0]['label'])->toBe('Posts');
 });
+
+it('localizes the Create crumb label to the active locale', function (): void {
+    app()->setLocale('pt_BR');
+
+    $crumbs = $this->builder->buildFor('arqel.admin.users.create');
+
+    expect($crumbs[1])->toBe(['label' => 'Criar', 'url' => null]);
+});
+
+it('localizes the Edit crumb label to the active locale', function (): void {
+    app()->setLocale('pt_BR');
+
+    $crumbs = $this->builder->buildFor('arqel.admin.users.edit', ['id' => 42]);
+
+    expect($crumbs[2])->toBe(['label' => 'Editar', 'url' => null]);
+});
+
+it('keeps the English Create/Edit labels under the en locale', function (): void {
+    app()->setLocale('en');
+
+    $create = $this->builder->buildFor('arqel.admin.users.create');
+    $edit = $this->builder->buildFor('arqel.admin.users.edit', ['id' => 42]);
+
+    expect($create[1]['label'])->toBe('Create')
+        ->and($edit[2]['label'])->toBe('Edit');
+});

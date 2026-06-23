@@ -116,3 +116,23 @@ it('toArray includes filters and heading/description', function (): void {
         ->and($payload['description'])->toBe('30-day rolling')
         ->and($payload['filters'])->toBe(['range' => '30d']);
 });
+
+it('toArray localizes heading/description that are translation keys', function (): void {
+    app()->setLocale('pt_BR');
+
+    $payload = (new CounterWidget('x'))
+        ->heading('arqel::arqel.actions.create')
+        ->description('arqel::arqel.actions.edit')
+        ->toArray();
+
+    expect($payload['heading'])->toBe('Criar')
+        ->and($payload['description'])->toBe('Editar');
+});
+
+it('toArray passes a plain-literal heading through unchanged', function (): void {
+    app()->setLocale('pt_BR');
+
+    $payload = (new CounterWidget('x'))->heading('Sales')->toArray();
+
+    expect($payload['heading'])->toBe('Sales');
+});

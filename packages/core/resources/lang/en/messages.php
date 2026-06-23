@@ -30,4 +30,12 @@ return [
         'forbidden' => 'You are not authorized to perform this action.',
         'not_found' => 'Record not found.',
     ],
+    'export' => [
+        'invalid_id' => 'Invalid export id.',
+        'not_found' => 'Export not found.',
+        'ambiguous' => 'Export ambiguous.',
+    ],
+    'locale' => [
+        'invalid' => 'Invalid locale.',
+    ],
 ];

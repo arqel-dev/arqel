@@ -235,8 +235,8 @@ abstract class Widget
             'name' => $this->name,
             'type' => $this->type,
             'component' => $this->component,
-            'heading' => $this->heading,
-            'description' => $this->description,
+            'heading' => self::localize($this->heading),
+            'description' => self::localize($this->description),
             'sort' => $this->sort,
             'columnSpan' => $this->columnSpan,
             // Emitted as `poll` (not `pollingInterval`) to match the key the
@@ -246,5 +246,23 @@ abstract class Widget
             'filters' => $this->filters,
             'data' => $this->deferred ? null : $this->data(),
         ];
+    }
+
+    /**
+     * Resolve a heading/description through Laravel translation lazily so the
+     * active request locale applies at serialization time. A value that is a
+     * translation key renders in the current locale; a plain literal passes
+     * through unchanged (trans() returns the key when no translation exists).
+     * Falls back to the raw value when no translator is bound (unit context).
+     */
+    private static function localize(?string $value): ?string
+    {
+        if ($value === null || ! app()->bound('translator')) {
+            return $value;
+        }
+
+        $translated = trans($value);
+
+        return is_string($translated) ? $translated : $value;
     }
 }

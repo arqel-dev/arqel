@@ -109,6 +109,51 @@ return [
         // Visible + announced fallback name for a tenant with no `name`.
         'unnamed' => 'Tenant :id',
     ],
+    // Strings for the @arqel-dev/ai field renderers (AiTextInput,
+    // AiSelectInput, AiExtractInput, AiImageInput, AiTranslateInput):
+    // default action button labels, visible action controls, user-facing
+    // error banners and the sr-only/aria status live regions. Resolved
+    // client-side via useArqelTranslations() with the English literal as
+    // fallback, so a translation gap never regresses the UI.
+    'ai' => [
+        // Default action button labels (used when the server omits buttonLabel).
+        'generate' => 'Generate with AI',
+        'regenerate' => 'Regenerate',
+        'classify' => 'Classify with AI',
+        'extract' => 'Extract with AI',
+        'analyze' => 'Analyze with AI',
+        // Visible action controls.
+        'apply' => 'Apply',
+        'apply_field' => 'Apply :field',
+        'apply_all' => 'Apply all',
+        'translate_all_missing' => 'Translate all missing',
+        'translate_from' => 'Translate from :language',
+        'missing_translation' => 'Missing translation',
+        'source' => 'Source: :field',
+        'select_placeholder' => 'Select...',
+        'image_file' => 'Image file',
+        // User-facing error banners (HTTP failure + network error).
+        'error_http' => 'Generation failed (HTTP :status).',
+        'error_network' => 'Generation failed: network error.',
+        'classify_error_http' => 'Classification failed (HTTP :status).',
+        'classify_error_none' => 'Could not classify.',
+        'classify_error_network' => 'Classification failed: network error.',
+        'extract_error_http' => 'Extraction failed (HTTP :status).',
+        'extract_error_invalid' => 'Extraction failed: invalid response body.',
+        'extract_error_network' => 'Extraction failed: network error.',
+        'analyze_error_http' => 'Analysis failed (HTTP :status).',
+        'analyze_error_invalid' => 'Analysis failed: invalid response body.',
+        'analyze_error_network' => 'Analysis failed: network error.',
+        'translate_error_http' => 'Translation failed (HTTP :status).',
+        'translate_error_invalid' => 'Translation failed: invalid response body.',
+        'translate_error_network' => 'Translation failed: network error.',
+        // sr-only / aria live-region status announcements.
+        'status_generating' => 'Generating',
+        'status_classifying' => 'Classifying',
+        'status_extracting' => 'Extracting',
+        'status_analyzing' => 'Analyzing',
+        'status_translating' => 'Translating',
+    ],
     // Accessible names (aria-label / sr-only) for framework UI chrome. Kept
     // distinct from short visible labels so screen-reader users hear a full,
     // descriptive accessible name.

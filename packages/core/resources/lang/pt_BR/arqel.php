@@ -110,6 +110,51 @@ return [
         // Nome de fallback (visível + anunciado) para um tenant sem `name`.
         'unnamed' => 'Tenant :id',
     ],
+    // Strings dos renderizadores de campo do @arqel-dev/ai (AiTextInput,
+    // AiSelectInput, AiExtractInput, AiImageInput, AiTranslateInput):
+    // rótulos padrão dos botões de ação, controles de ação visíveis,
+    // banners de erro voltados ao usuário e as regiões sr-only/aria de
+    // status. Resolvidos no cliente via useArqelTranslations() com o
+    // literal em inglês como fallback.
+    'ai' => [
+        // Rótulos padrão dos botões de ação (quando o servidor omite buttonLabel).
+        'generate' => 'Gerar com IA',
+        'regenerate' => 'Gerar novamente',
+        'classify' => 'Classificar com IA',
+        'extract' => 'Extrair com IA',
+        'analyze' => 'Analisar com IA',
+        // Controles de ação visíveis.
+        'apply' => 'Aplicar',
+        'apply_field' => 'Aplicar :field',
+        'apply_all' => 'Aplicar tudo',
+        'translate_all_missing' => 'Traduzir tudo que falta',
+        'translate_from' => 'Traduzir de :language',
+        'missing_translation' => 'Tradução ausente',
+        'source' => 'Fonte: :field',
+        'select_placeholder' => 'Selecionar...',
+        'image_file' => 'Arquivo de imagem',
+        // Banners de erro voltados ao usuário (falha HTTP + erro de rede).
+        'error_http' => 'Falha na geração (HTTP :status).',
+        'error_network' => 'Falha na geração: erro de rede.',
+        'classify_error_http' => 'Falha na classificação (HTTP :status).',
+        'classify_error_none' => 'Não foi possível classificar.',
+        'classify_error_network' => 'Falha na classificação: erro de rede.',
+        'extract_error_http' => 'Falha na extração (HTTP :status).',
+        'extract_error_invalid' => 'Falha na extração: corpo de resposta inválido.',
+        'extract_error_network' => 'Falha na extração: erro de rede.',
+        'analyze_error_http' => 'Falha na análise (HTTP :status).',
+        'analyze_error_invalid' => 'Falha na análise: corpo de resposta inválido.',
+        'analyze_error_network' => 'Falha na análise: erro de rede.',
+        'translate_error_http' => 'Falha na tradução (HTTP :status).',
+        'translate_error_invalid' => 'Falha na tradução: corpo de resposta inválido.',
+        'translate_error_network' => 'Falha na tradução: erro de rede.',
+        // Anúncios de status das regiões aria/sr-only.
+        'status_generating' => 'Gerando',
+        'status_classifying' => 'Classificando',
+        'status_extracting' => 'Extraindo',
+        'status_analyzing' => 'Analisando',
+        'status_translating' => 'Traduzindo',
+    ],
     // Nomes acessíveis (aria-label / sr-only) da interface do framework.
     // Mantidos distintos dos rótulos visíveis curtos para que leitores de
     // tela anunciem um nome acessível completo e descritivo.

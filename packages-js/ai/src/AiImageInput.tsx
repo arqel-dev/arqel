@@ -36,6 +36,7 @@
  * em handlers de evento.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Alert, AlertDescription, Badge, Button, Card, CardContent } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
 
@@ -159,7 +160,12 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
   const populateFields = fieldProps?.populateFields ?? {};
   const acceptedMimes = fieldProps?.acceptedMimes ?? [];
   const maxFileSize = fieldProps?.maxFileSize ?? 0;
-  const buttonLabel = fieldProps?.buttonLabel ?? 'Analyze with AI';
+  const t = useArqelTranslations();
+  const serverLabel = fieldProps?.buttonLabel;
+  const buttonLabel =
+    serverLabel !== undefined && serverLabel !== ''
+      ? serverLabel
+      : t('arqel.ai.analyze', 'Analyze with AI');
 
   const reactId = useId();
   const inputId = `arqel-ai-image-${reactId}`;
@@ -236,13 +242,18 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
         } catch {
           message = null;
         }
-        setError(message ?? `Analysis failed (HTTP ${String(response.status)}).`);
+        setError(
+          message ??
+            t('arqel.ai.analyze_error_http', 'Analysis failed (HTTP :status).', {
+              status: String(response.status),
+            }),
+        );
         return;
       }
 
       const body = (await response.json()) as AiImageResponseBody;
       if (!isStringRecord(body.analyses)) {
-        setError('Analysis failed: invalid response body.');
+        setError(t('arqel.ai.analyze_error_invalid', 'Analysis failed: invalid response body.'));
         return;
       }
 
@@ -257,11 +268,11 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
         onChange(imageBase64);
       }
     } catch {
-      setError('Analysis failed: network error.');
+      setError(t('arqel.ai.analyze_error_network', 'Analysis failed: network error.'));
     } finally {
       setIsLoading(false);
     }
-  }, [analyzeUrl, csrfToken, field, file, onChange, resource]);
+  }, [analyzeUrl, csrfToken, field, file, onChange, resource, t]);
 
   const applyOne = useCallback(
     (analysisKey: string, val: string) => {
@@ -312,7 +323,7 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
           accept={accept}
           onChange={handleFileChange}
           className="sr-only"
-          aria-label="Image file"
+          aria-label={t('arqel.ai.image_file', 'Image file')}
         />
       </label>
 
@@ -340,7 +351,7 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
           aria-label={buttonLabel}
         >
           {isLoading ? (
-            <span role="status" aria-label="Analyzing">
+            <span role="status" aria-label={t('arqel.ai.status_analyzing', 'Analyzing')}>
               <Spinner />
             </span>
           ) : null}
@@ -355,7 +366,7 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
               applyAll(results);
             }}
           >
-            Apply all
+            {t('arqel.ai.apply_all', 'Apply all')}
           </Button>
         ) : null}
       </div>
@@ -393,9 +404,9 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
                           onClick={() => {
                             applyOne(key, val);
                           }}
-                          aria-label={`Apply ${key}`}
+                          aria-label={t('arqel.ai.apply_field', 'Apply :field', { field: key })}
                         >
-                          Apply
+                          {t('arqel.ai.apply', 'Apply')}
                         </Button>
                       ) : null}
                     </dd>

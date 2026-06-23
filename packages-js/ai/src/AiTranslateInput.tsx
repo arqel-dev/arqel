@@ -34,6 +34,7 @@
  * só dispara dentro do click handler (post-mount).
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Alert, AlertDescription, Badge, Button, Textarea } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useMemo, useState } from 'react';
 
@@ -126,6 +127,7 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
     csrfToken,
   } = props;
 
+  const t = useArqelTranslations();
   const languages = useMemo<string[]>(() => fieldProps?.languages ?? [], [fieldProps?.languages]);
   const defaultLanguage = fieldProps?.defaultLanguage ?? languages[0] ?? '';
 
@@ -208,21 +210,27 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
         });
 
         if (!response.ok) {
-          setError(`Translation failed (HTTP ${String(response.status)}).`);
+          setError(
+            t('arqel.ai.translate_error_http', 'Translation failed (HTTP :status).', {
+              status: String(response.status),
+            }),
+          );
           return;
         }
 
         const body = (await response.json()) as AiTranslateResponseBody;
         const incoming = body.translations;
         if (!isStringRecord(incoming)) {
-          setError('Translation failed: invalid response body.');
+          setError(
+            t('arqel.ai.translate_error_invalid', 'Translation failed: invalid response body.'),
+          );
           return;
         }
 
         const merged: AiTranslateValue = { ...currentValue, ...incoming };
         applyValue(merged);
       } catch {
-        setError('Translation failed: network error.');
+        setError(t('arqel.ai.translate_error_network', 'Translation failed: network error.'));
       } finally {
         setLoadingFor(targetLanguages, false);
       }
@@ -235,6 +243,7 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
       field,
       resource,
       setLoadingFor,
+      t,
       translateUrl,
     ],
   );
@@ -269,7 +278,7 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
           onClick={handleTranslateAllMissing}
           disabled={missingCount === 0 || loadingLangs.size > 0}
         >
-          Translate all missing
+          {t('arqel.ai.translate_all_missing', 'Translate all missing')}
         </Button>
       </div>
 
@@ -298,7 +307,7 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
                 <Badge
                   variant="secondary"
                   role="img"
-                  aria-label="Missing translation"
+                  aria-label={t('arqel.ai.missing_translation', 'Missing translation')}
                   data-testid={`missing-dot-${lang}`}
                   className="px-1 py-0"
                 >
@@ -328,11 +337,15 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
               disabled={activeIsLoading}
             >
               {activeIsLoading ? (
-                <span role="status" aria-label="Translating">
+                <span role="status" aria-label={t('arqel.ai.status_translating', 'Translating')}>
                   <Spinner />
                 </span>
               ) : null}
-              <span>Translate from {defaultLanguage}</span>
+              <span>
+                {t('arqel.ai.translate_from', 'Translate from :language', {
+                  language: defaultLanguage,
+                })}
+              </span>
             </Button>
           </div>
         ) : null}

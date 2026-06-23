@@ -1300,5 +1300,77 @@
     "line": 82,
     "title": "DevTools TimeTravel snapshot timestamp uses toLocaleTimeString() with no locale arg",
     "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 498,
+    "title": "MarkdownInput fullscreen toggle aria-label hardcoded English (sibling fixed in CodeInput but missed here)",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 501,
+    "title": "MarkdownInput fullscreen toggle visible button text hardcoded English ('Exit'/'Full')",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 491,
+    "title": "MarkdownInput preview button visible text 'Preview' hardcoded (aria-label translated, visible label is not)",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiSelectInput.tsx",
+    "line": 224,
+    "title": "AiSelectInput NO_CONTEXT_TOOLTIP title tooltip hardcoded English",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/code/CodeInput.tsx",
+    "line": 81,
+    "title": "CodeInput language badge 'Plain text' label hardcoded English",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/workflow/src/WorkflowDefinition.php",
+    "line": 84,
+    "title": "Workflow state labels serialized verbatim to frontend \u2014 never passed through __()",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/workflow/src/Fields/StateTransitionField.php",
+    "line": 162,
+    "title": "Workflow transition labels serialized verbatim \u2014 StateTransitionField never localizes",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+    "line": 71,
+    "title": "VersionRestoreController throws raw English NotFoundHttpException messages while siblings localize",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+    "line": 156,
+    "title": "VersionRestoreController::resolveRecord throws raw English 'Resource registry unavailable.' (x2)",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+    "line": 169,
+    "title": "VersionRestoreController throws raw English resource-not-found messages",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/VersionPresenter.php",
+    "line": 82,
+    "title": "VersionPresenter.summarize() bakes hardcoded English + naive '(s)' pluralization into changes_summary rendered verbatim by the localized VersionTimeline",
+    "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+    "line": 145,
+    "title": "DevTools InertiaInspector navigation timestamp uses toLocaleTimeString() with no locale arg \u2014 the exact pattern fixed in sibling TimeTravel",
+    "round": 10
   }
 ]

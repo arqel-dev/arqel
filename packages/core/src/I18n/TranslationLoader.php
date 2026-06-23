@@ -12,9 +12,10 @@ use Illuminate\Contracts\Foundation\Application;
  *
  * Combina cada ficheiro de lang publicado em `resources/lang/{locale}/`
  * (`arqel`, `messages`, `actions`, `table`, `form`, `validation`)
- * num único array nested. Quando o locale alvo não existe em disco,
- * usa silenciosamente o `defaultLocale()` como fallback para evitar
- * payloads vazios na UI.
+ * num único array nested. O `defaultLocale()` é sempre carregado como
+ * base e o locale alvo é deep-merged por cima, de modo que um locale
+ * parcialmente traduzido herda os valores default per-key em vez de
+ * deixar a chave dotted crua vazar para a UI.
  */
 final readonly class TranslationLoader
 {
@@ -32,19 +33,43 @@ final readonly class TranslationLoader
     ) {}
 
     /**
-     * Carrega traduções para um locale específico. Faz fallback
-     * para `defaultLocale()` se o directório não existir.
+     * Carrega traduções para um locale específico.
+     *
+     * O directório default (fallback_locale) é carregado como base e o locale
+     * alvo é deep-merged por cima, chave a chave. Assim, um locale parcialmente
+     * traduzido (directório existe mas omite chaves) herda o valor default em vez
+     * de deixar a chave dotted crua vazar para a UI (o lado React devolve a chave
+     * quando ela falta). Quando o locale resolvido É o default, ou está completo,
+     * o resultado é idêntico ao comportamento anterior.
      *
      * @return array<string, mixed>
      */
     public function loadForLocale(string $locale): array
     {
         $resolved = $this->resolveLocale($locale);
+        $default = self::normalize($this->defaultLocale());
+
+        $merged = $this->loadDir($default);
+
+        if ($resolved !== $default) {
+            $merged = self::deepMerge($merged, $this->loadDir($resolved));
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Carrega e agrega os ficheiros de lang de um único directório de locale.
+     *
+     * @return array<string, mixed>
+     */
+    private function loadDir(string $locale): array
+    {
         $base = $this->langPath();
 
         $merged = [];
         foreach (self::LANG_FILES as $file) {
-            $path = $base.'/'.$resolved.'/'.$file.'.php';
+            $path = $base.'/'.$locale.'/'.$file.'.php';
             if (! is_file($path)) {
                 continue;
             }
@@ -60,6 +85,35 @@ final readonly class TranslationLoader
         }
 
         return $merged;
+    }
+
+    /**
+     * Deep-merge recursivo: `$override` vence `$base` chave a chave. Sub-arrays
+     * associativos são fundidos recursivamente; valores escalares (e a folha do
+     * override) substituem o base. Chaves presentes só no base sobrevivem — é
+     * isto que dá o fallback per-key para locales parciais.
+     *
+     * @param array<string, mixed> $base
+     * @param array<string, mixed> $override
+     *
+     * @return array<string, mixed>
+     */
+    private static function deepMerge(array $base, array $override): array
+    {
+        foreach ($override as $key => $value) {
+            $existing = $base[$key] ?? null;
+            if (is_array($existing) && is_array($value)) {
+                /** @var array<string, mixed> $existing */
+                /** @var array<string, mixed> $value */
+                $base[$key] = self::deepMerge($existing, $value);
+
+                continue;
+            }
+
+            $base[$key] = $value;
+        }
+
+        return $base;
     }
 
     /**

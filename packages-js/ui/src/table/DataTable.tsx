@@ -147,7 +147,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                   <th scope="col" className="w-10 px-3 py-2 text-left">
                     <input
                       type="checkbox"
-                      aria-label={t('table.bulk.select_all', 'Select all')}
+                      aria-label={t('table.bulk.select_all_rows', 'Select all rows')}
                       checked={allSelected}
                       ref={(el) => {
                         if (el) el.indeterminate = someSelected;

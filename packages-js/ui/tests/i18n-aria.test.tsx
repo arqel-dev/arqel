@@ -37,6 +37,7 @@ const PT_BR = {
   table: {
     bulk: {
       select_all: 'Selecionar todos',
+      select_all_rows: 'Selecionar todas as linhas',
       select_row: 'Selecionar linha :id',
       label: 'Ações em massa',
       selected: ':count selecionado(s)',
@@ -111,7 +112,7 @@ describe('DataTable aria a11y i18n', () => {
       />,
     );
     // Two surfaces (table + mobile cards) each render the same accessible names.
-    expect(screen.getAllByLabelText('Selecionar todos').length).toBeGreaterThan(0);
+    expect(screen.getAllByLabelText('Selecionar todas as linhas').length).toBeGreaterThan(0);
     expect(screen.getAllByLabelText('Selecionar linha 7').length).toBeGreaterThan(0);
     expect(screen.getAllByLabelText('Ações').length).toBeGreaterThan(0);
   });
@@ -126,7 +127,7 @@ describe('DataTable aria a11y i18n', () => {
         onSelectionChange={() => {}}
       />,
     );
-    expect(screen.getAllByLabelText('Select all').length).toBeGreaterThan(0);
+    expect(screen.getAllByLabelText('Select all rows').length).toBeGreaterThan(0);
     expect(screen.getAllByLabelText('Select row 7').length).toBeGreaterThan(0);
   });
 });

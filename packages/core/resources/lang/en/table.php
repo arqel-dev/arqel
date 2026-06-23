@@ -47,6 +47,8 @@ return [
     'bulk' => [
         'selected' => ':count selected',
         'select_all' => 'Select all',
+        // Accessible name for the header select-all checkbox (vs the short menu label above).
+        'select_all_rows' => 'Select all rows',
         'clear' => 'Clear',
         // Accessible name for the bulk-actions <section> landmark.
         'label' => 'Bulk actions',

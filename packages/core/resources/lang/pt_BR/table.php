@@ -47,6 +47,8 @@ return [
     'bulk' => [
         'selected' => ':count selecionado(s)',
         'select_all' => 'Selecionar todos',
+        // Nome acessível do checkbox de selecionar-tudo no cabeçalho (vs o rótulo curto do menu).
+        'select_all_rows' => 'Selecionar todas as linhas',
         'clear' => 'Limpar',
         // Nome acessível do landmark <section> de ações em massa.
         'label' => 'Ações em massa',

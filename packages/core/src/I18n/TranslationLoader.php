@@ -25,7 +25,7 @@ final readonly class TranslationLoader
      *
      * @var array<int, string>
      */
-    private const array LANG_FILES = ['arqel', 'messages', 'actions', 'table', 'form'];
+    private const array LANG_FILES = ['arqel', 'messages', 'actions', 'table', 'form', 'validation'];
 
     public function __construct(
         private Application $app,

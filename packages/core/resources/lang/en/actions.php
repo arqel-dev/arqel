@@ -10,4 +10,9 @@ return [
     'force_delete' => 'Force delete',
     'duplicate' => 'Duplicate',
     'export' => 'Export',
+
+    'confirm' => [
+        'submit' => 'Confirm',
+        'cancel' => 'Cancel',
+    ],
 ];

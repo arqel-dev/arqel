@@ -24,6 +24,19 @@ it('loads translations for the pt_BR locale', function (): void {
         ->and($payload['arqel']['nav']['logout'])->toBe('Sair');
 });
 
+it('merges the validation lang file so its strings reach the JS dictionary', function (): void {
+    $loader = app(TranslationLoader::class);
+
+    $en = $loader->loadForLocale('en');
+    expect($en)->toHaveKey('validation')
+        ->and($en['validation']['failed'])
+        ->toBe('The submitted data is invalid. Please review the highlighted fields.');
+
+    $pt = $loader->loadForLocale('pt_BR');
+    expect($pt['validation']['failed'])
+        ->toBe('Os dados enviados são inválidos. Revise os campos destacados.');
+});
+
 it('falls back to the default locale when target locale is missing', function (): void {
     config()->set('arqel.i18n.default', 'en');
     $loader = app(TranslationLoader::class);

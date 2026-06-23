@@ -7,7 +7,8 @@ import {
   fieldsVisibleIn,
   indexFieldsByName,
 } from '../src/utils/serializeFields.js';
-import { selectPluralForm, translate } from '../src/utils/translate.js';
+import { renderHook } from '@testing-library/react';
+import { selectPluralForm, translate, useTranslator } from '../src/utils/translate.js';
 
 describe('route()', () => {
   afterEach(() => {
@@ -93,6 +94,34 @@ describe('translate()', () => {
         replacements: { count: 3 },
       }),
     ).toBe('3 selecionados');
+  });
+});
+
+describe('useTranslator()', () => {
+  const dict = {
+    arqel: { actions: { create: 'Create' }, hello: 'Hello :name!' },
+    table: { bulk: { selected: '{one} :count item|{other} :count items' } },
+  };
+
+  it('resolves keys and applies replacements', () => {
+    const { result } = renderHook(() => useTranslator(dict));
+    expect(result.current('arqel.actions.create')).toBe('Create');
+    expect(result.current('arqel.hello', { name: 'World' })).toBe('Hello World!');
+  });
+
+  it('selects the plural form from replacements.count instead of emitting the pipe-string', () => {
+    const { result } = renderHook(() => useTranslator(dict));
+    expect(result.current('table.bulk.selected', { count: 1 })).toBe('1 item');
+    expect(result.current('table.bulk.selected', { count: 2 })).toBe('2 items');
+  });
+
+  it('threads the active locale into pluralization', () => {
+    const ptDict = {
+      table: { bulk: { selected: '{one} :count selecionado|{other} :count selecionados' } },
+    };
+    const { result } = renderHook(() => useTranslator(ptDict, 'pt-BR'));
+    expect(result.current('table.bulk.selected', { count: 1 })).toBe('1 selecionado');
+    expect(result.current('table.bulk.selected', { count: 3 })).toBe('3 selecionados');
   });
 });
 

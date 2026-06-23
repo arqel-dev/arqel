@@ -41,7 +41,7 @@ final class ForgotPasswordController
 
         Password::broker($this->resolvePasswordBroker())->sendResetLink(['email' => $data['email']]);
 
-        return back()->with('status', __('A reset link has been sent if the email exists.'));
+        return back()->with('status', __('arqel::arqel.auth.reset_link_sent'));
     }
 
     /**

@@ -67,6 +67,7 @@ return [
         'verify_not_received' => "Didn't receive it? Click below to resend.",
         'verify_resend' => 'Resend link',
         'verify_resending' => 'Sending…',
+        'reset_link_sent' => 'A reset link has been sent if the email exists.',
     ],
     'messages' => [
         'unsaved_changes' => 'You have unsaved changes.',

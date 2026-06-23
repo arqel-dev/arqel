@@ -135,6 +135,38 @@ it('rate-limits after 3 successful attempts from same IP', function (): void {
     expect(RegisterUser::where('email', 'carol@example.com')->exists())->toBeFalse();
 });
 
+it('uses the translatable auth.throttle key for the rate-limit message', function (): void {
+    // Reset the route-level `throttle:6,1` limiter so prior tests in the run
+    // don't trip the 429 before the FormRequest throttle (our subject) fires.
+    app('cache')->store()->flush();
+
+    for ($i = 0; $i < 3; $i++) {
+        RateLimiter::hit('arqel-register|127.0.0.1', 3600);
+    }
+
+    $response = $this->from('/admin/register')->post('/admin/register', [
+        'name' => 'Carol',
+        'email' => 'carol@example.com',
+        'password' => 'secret-pass-123',
+        'password_confirmation' => 'secret-pass-123',
+    ]);
+
+    $errors = session('errors');
+    $message = (string) ($errors?->get('email')[0] ?? '');
+
+    // Must resolve the canonical, translatable auth.throttle key — never the
+    // raw English sentence previously passed as its own lookup key.
+    expect($message)->not->toBe('');
+    expect($message)->not->toContain('Too many registration attempts');
+    expect($message)->not->toContain('registration attempts');
+
+    // The message must match the auth.throttle template (minus its :seconds
+    // placeholder value), proving the canonical key was resolved.
+    $template = __('auth.throttle', ['seconds' => '__S__', 'minutes' => '__M__']);
+    [$prefix] = explode('__S__', $template, 2);
+    expect($message)->toStartWith($prefix);
+});
+
 it('resolves user model from auth.providers.users.model config', function (): void {
     expect((string) config('auth.providers.users.model'))->toBe(RegisterUser::class);
 

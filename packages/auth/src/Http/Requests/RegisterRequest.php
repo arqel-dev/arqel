@@ -50,8 +50,9 @@ final class RegisterRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => __('Too many registration attempts. Please try again in :seconds seconds.', [
+            'email' => __('auth.throttle', [
                 'seconds' => $seconds,
+                'minutes' => (int) ceil($seconds / 60),
             ]),
         ]);
     }

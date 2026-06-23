@@ -68,6 +68,7 @@ return [
         'verify_not_received' => 'Não recebeu? Clique abaixo para reenviar.',
         'verify_resend' => 'Reenviar link',
         'verify_resending' => 'Enviando…',
+        'reset_link_sent' => 'Um link de redefinição foi enviado, caso o e-mail exista.',
     ],
     'messages' => [
         'unsaved_changes' => 'Você tem alterações não salvas.',

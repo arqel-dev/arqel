@@ -105,7 +105,7 @@ final readonly class TranslationLoader
      * mais um header `Accept-Language: pt-BR` (normalizado para `pt_BR`) deixa
      * de falhar o `in_array` estrito; ambas resolvem para a mesma entrada.
      *
-     * @param  array<int, string>  $available
+     * @param array<int, string> $available
      */
     public function matchAvailable(string $candidate, array $available): ?string
     {

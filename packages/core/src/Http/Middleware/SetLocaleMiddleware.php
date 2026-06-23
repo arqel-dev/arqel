@@ -43,7 +43,7 @@ final class SetLocaleMiddleware
     }
 
     /**
-     * @param  array<int, string>  $available
+     * @param array<int, string> $available
      */
     private function resolveLocale(Request $request, array $available): string
     {

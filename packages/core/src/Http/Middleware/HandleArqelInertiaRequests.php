@@ -262,7 +262,7 @@ final class HandleArqelInertiaRequests extends Middleware
      * ({@see NavigationCommandProvider})
      * so both navigation surfaces stay symmetric (issues #118 and #129).
      *
-     * @param  class-string<\Arqel\Core\Resources\Resource>  $resourceClass
+     * @param class-string<\Arqel\Core\Resources\Resource> $resourceClass
      */
     private function resourceViewAnyDenied(string $resourceClass, ?Authenticatable $user): bool
     {
@@ -275,8 +275,9 @@ final class HandleArqelInertiaRequests extends Middleware
      * ungrouped bucket) following — ordered by their minimum item sort —
      * and items within each group ordered by their per-item sort.
      *
-     * @param  array<int, array<string, mixed>>  $items
-     * @param  array<int, string>  $explicitGroups
+     * @param array<int, array<string, mixed>> $items
+     * @param array<int, string> $explicitGroups
+     *
      * @return array<int, array<string, mixed>>
      */
     private function orderNavigationItems(array $items, array $explicitGroups): array

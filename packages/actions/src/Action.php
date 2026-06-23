@@ -351,22 +351,40 @@ abstract class Action
         return array_filter([
             'name' => $this->name,
             'type' => $this->type,
-            'label' => $this->label,
+            'label' => self::localizeAction($this->label),
             'icon' => $this->icon,
             'color' => $this->color,
             'variant' => $this->variant,
             'method' => $method,
             'url' => $url,
-            'tooltip' => $this->tooltip,
+            'tooltip' => self::localizeAction($this->tooltip),
             'disabled' => $this->isDisabledFor($record) ?: null,
             'requiresConfirmation' => $this->isRequiringConfirmation() ?: null,
             'confirmation' => $this->getConfirmationConfig(),
             'form' => $this->hasForm() ? $this->getFormSchemaArray() : null,
             'formFields' => $this->hasForm() ? $this->serializeFormFields($user) : null,
             'modalSize' => $this->hasForm() ? $this->getModalSize() : null,
-            'successNotification' => $this->successNotification,
-            'failureNotification' => $this->failureNotification,
+            'successNotification' => self::localizeAction($this->successNotification),
+            'failureNotification' => self::localizeAction($this->failureNotification),
         ], fn ($v) => $v !== null);
+    }
+
+    /**
+     * Resolve a stored string against the translator when it is a
+     * registered key, otherwise return it verbatim. Applied lazily at
+     * serialization so the active request locale governs button captions,
+     * tooltips and success/failure toasts — mirroring the resource flash
+     * messages that already route through `__('arqel::messages...')`.
+     */
+    private static function localizeAction(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return $value;
+        }
+
+        $translated = __($value);
+
+        return is_string($translated) ? $translated : $value;
     }
 
     /**

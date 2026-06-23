@@ -13,8 +13,11 @@ return [
     'placeholder' => [
         'select' => 'Select an option',
         'search' => 'Search...',
+        'search_relation' => 'Search :resource…',
     ],
     'helper' => [
         'unsaved_changes' => 'You have unsaved changes.',
     ],
+    // Inline notice when a field type/component has no renderer.
+    'unregistered_field' => 'Field ":name" could not render: :detail.',
 ];

@@ -66,6 +66,26 @@ describe('useArqelTranslations', () => {
     expect(result.current('anything.at.all')).toBe('anything.at.all');
   });
 
+  it('returns a stable t reference across re-renders with the same i18n prop', () => {
+    const props = {
+      i18n: {
+        locale: 'pt_BR',
+        available: ['en', 'pt_BR'],
+        translations: { table: { pagination: { previous: 'Anterior' } } },
+      },
+    };
+    // usePage returns the same prop object identity each render (Inertia shares
+    // a stable reference until a navigation), so the memoized dict — and thus t —
+    // must keep the same identity instead of being rebuilt every render.
+    pageMock.mockReturnValue({ props });
+
+    const { result, rerender } = renderHook(() => useArqelTranslations());
+    const first = result.current;
+    rerender();
+    rerender();
+    expect(result.current).toBe(first);
+  });
+
   it('applies :placeholder replacements', () => {
     pageMock.mockReturnValue({
       props: {

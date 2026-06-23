@@ -3,6 +3,7 @@
  * richer impls. One renderer per FieldSchema discriminant.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type {
   BelongsToFieldSchema,
   BooleanFieldSchema,
@@ -89,6 +90,7 @@ export function NativeFieldInput(props: NativeProps) {
  * diagnostic — #233), surface an inline notice and warn in the console.
  */
 function UnregisteredField({ field }: { field: FieldSchema }) {
+  const t = useArqelTranslations();
   if (field.component) {
     console.warn(
       `[arqel] field "${field.name}" uses unregistered component "${field.component}" — ` +
@@ -106,7 +108,10 @@ function UnregisteredField({ field }: { field: FieldSchema }) {
       role="alert"
       className="rounded-sm border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive"
     >
-      Field "{field.name}" could not render: {detail}.
+      {t('form.unregistered_field', `Field "${field.name}" could not render: ${detail}.`, {
+        name: field.name,
+        detail,
+      })}
     </p>
   );
 }
@@ -339,6 +344,7 @@ function BelongsToInput({
   inputId,
   describedBy,
 }: NativeProps & { field: BelongsToFieldSchema }) {
+  const t = useArqelTranslations();
   // Phase 1 fallback: native text input. The full async-search picker
   // ships in `@arqel-dev/fields/BelongsToField` and registers via FieldRegistry.
   return (
@@ -347,7 +353,12 @@ function BelongsToInput({
       type="text"
       className={inputClasses}
       value={value === null || value === undefined ? '' : String(value)}
-      placeholder={field.placeholder ?? `Search ${field.props.relatedResource}…`}
+      placeholder={
+        field.placeholder ??
+        t('form.placeholder.search_relation', `Search ${field.props.relatedResource}…`, {
+          resource: field.props.relatedResource,
+        })
+      }
       disabled={disabled || field.disabled || field.readonly}
       readOnly={field.readonly === true}
       aria-describedby={describedBy}

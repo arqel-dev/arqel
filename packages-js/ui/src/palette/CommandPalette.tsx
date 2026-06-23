@@ -10,6 +10,7 @@
  * Ctrl+K listener is mounted on `window` while the component is alive.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { type CSSProperties, useCallback, useEffect, useId, useRef, useState } from 'react';
 
 export interface PaletteCommand {
@@ -132,6 +133,7 @@ const dialogStyle: CSSProperties = {
 };
 
 export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteProps) {
+  const t = useArqelTranslations();
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -272,7 +274,7 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this wrapper only delegates ArrowUp/Down/Enter/Escape from the combobox input below */}
       <div onKeyDown={onKeyDown} className="flex flex-col">
         <h2 id={titleId} className="sr-only">
-          Command palette
+          {t('arqel.aria.palette_title', 'Command palette')}
         </h2>
         <input
           ref={inputRef}
@@ -282,19 +284,19 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
           aria-controls={listId}
           aria-autocomplete="list"
           {...(activeOptionId ? { 'aria-activedescendant': activeOptionId } : {})}
-          placeholder="Type a command…"
+          placeholder={t('palette.placeholder', 'Type a command…')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full border-b border-[var(--border,#e5e7eb)] bg-transparent px-4 py-3 text-base outline-none"
         />
         <div role="status" aria-live="polite" className="sr-only">
-          {flat.length} commands
+          {t('arqel.aria.palette_results', `${flat.length} commands`, { count: flat.length })}
         </div>
         <ul
           id={listId}
           // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: WAI-ARIA combobox/listbox pattern requires <ul role="listbox">
           role="listbox"
-          aria-label="Commands"
+          aria-label={t('arqel.aria.palette_list', 'Commands')}
           className="max-h-[50vh] overflow-y-auto py-2"
         >
           {groups.length === 0 && (

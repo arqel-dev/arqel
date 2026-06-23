@@ -9,6 +9,7 @@
  * draw an empty table.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { cn } from '../utils/cn.js';
 import { WidgetWrapper } from './WidgetWrapper.js';
 
@@ -39,6 +40,7 @@ export interface TableCardProps {
 }
 
 export function TableCard({ widget, className }: TableCardProps) {
+  const t = useArqelTranslations();
   return (
     <WidgetWrapper
       heading={widget.heading ?? undefined}
@@ -86,7 +88,7 @@ export function TableCard({ widget, className }: TableCardProps) {
           {widget.seeAllUrl && (
             <div className="mt-3 text-right">
               <a href={widget.seeAllUrl} className="text-sm text-primary">
-                See all →
+                {t('widgets.table.see_all', 'See all →')}
               </a>
             </div>
           )}

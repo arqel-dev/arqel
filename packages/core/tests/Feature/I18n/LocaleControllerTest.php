@@ -38,3 +38,15 @@ it('rejects empty locale input', function (): void {
 
     $response->assertStatus(422);
 });
+
+it('accepts a hyphenated input against an underscored allowlist and persists the canonical form', function (): void {
+    config()->set('arqel.i18n.locales', ['en', 'pt_BR']);
+
+    $response = $this->from('/admin')->post('/admin/locale', ['locale' => 'pt-BR']);
+
+    $response->assertRedirect('/admin');
+    // The hyphenated input is matched against pt_BR and the canonical allowlist
+    // form is persisted, so the SetLocaleMiddleware recognizes it next request.
+    expect(session('locale'))->toBe('pt_BR');
+    $response->assertCookie('arqel_locale', 'pt_BR');
+});

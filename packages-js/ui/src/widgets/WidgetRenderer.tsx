@@ -19,6 +19,7 @@
  * query params so deferred / poll refetches stay segmented.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useEffect, useRef, useState } from 'react';
 import { ChartCard } from './ChartCard.js';
 import { StatCard } from './StatCard.js';
@@ -44,6 +45,7 @@ export interface WidgetRendererProps {
 }
 
 export function WidgetRenderer({ widget, filterValues, fetcher }: WidgetRendererProps) {
+  const t = useArqelTranslations();
   const [data, setData] = useState<unknown>(widget.data ?? null);
   const filterRef = useRef(filterValues);
   filterRef.current = filterValues;
@@ -115,7 +117,9 @@ export function WidgetRenderer({ widget, filterValues, fetcher }: WidgetRenderer
     default:
       return (
         <div role="alert" className="text-sm text-red-600">
-          Widget type {widget.type} not registered
+          {t('widgets.unknown_type', `Widget type ${widget.type} not registered`, {
+            type: widget.type,
+          })}
         </div>
       );
   }

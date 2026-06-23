@@ -16,6 +16,7 @@ return [
         'submit' => 'Submit',
         'reset' => 'Reset',
         'retry' => 'Retry',
+        'menu' => 'Actions',
     ],
     'nav' => [
         'dashboard' => 'Dashboard',
@@ -40,6 +41,8 @@ return [
         'unsaved_changes' => 'You have unsaved changes.',
         'delete_confirm' => 'Are you sure you want to delete this?',
         'cannot_undo' => 'This action cannot be undone.',
+        // Type-to-confirm prompt; :value is rendered as inline <code>.
+        'type_to_confirm' => 'Type :value to confirm',
         'created' => 'Record created.',
         'updated' => 'Record updated.',
         'deleted' => 'Record deleted.',
@@ -60,5 +63,20 @@ return [
         'previous' => 'Previous',
         'next' => 'Next',
         'showing' => 'Showing :from to :to of :total results',
+    ],
+    // Accessible names (aria-label / sr-only) for framework UI chrome. Kept
+    // distinct from short visible labels so screen-reader users hear a full,
+    // descriptive accessible name.
+    'aria' => [
+        'flash_dismiss' => 'Dismiss',
+        'chart_loading' => 'Loading chart',
+        'stat_sparkline' => 'Trend sparkline',
+        'palette_title' => 'Command palette',
+        'palette_results' => ':count commands',
+        'palette_list' => 'Commands',
+        'breadcrumb' => 'Breadcrumb',
+        'theme_toggle_light' => 'Switch to light theme',
+        'theme_toggle_dark' => 'Switch to dark theme',
+        'tenant_switch' => 'Switch tenant (current: :tenant)',
     ],
 ];

@@ -44,7 +44,7 @@ export function TableFilters({
 
   return (
     <fieldset className={cn('flex flex-wrap items-end gap-2 border-0 p-0', className)}>
-      <legend className="sr-only">Filters</legend>
+      <legend className="sr-only">{t('table.filters.legend', 'Filters')}</legend>
       {filters.map((filter) => (
         <FilterControl
           key={filter.name}
@@ -201,8 +201,8 @@ function TernaryFilter({
         }}
       >
         <option value="all">{filter.props.allLabel ?? t('table.filters.all', 'All')}</option>
-        <option value="true">{filter.props.trueLabel ?? 'Yes'}</option>
-        <option value="false">{filter.props.falseLabel ?? 'No'}</option>
+        <option value="true">{filter.props.trueLabel ?? t('table.filters.yes', 'Yes')}</option>
+        <option value="false">{filter.props.falseLabel ?? t('table.filters.no', 'No')}</option>
       </select>
     </label>
   );

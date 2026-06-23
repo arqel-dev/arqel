@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Http\Controllers;
 
+use Arqel\Core\Http\Middleware\SetLocaleMiddleware;
 use Arqel\Core\I18n\TranslationLoader;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Cookie;
  * Endpoint POST que persiste a escolha de locale do usuário.
  *
  * Grava em duas camadas para casar com a resolução do
- * {@see \Arqel\Core\Http\Middleware\SetLocaleMiddleware}:
+ * {@see SetLocaleMiddleware}:
  *
  *  1. `session('locale')` — fonte tier-1 dentro da sessão;
  *  2. cookie `arqel_locale` — fonte tier-2 cross-session, lida
@@ -35,14 +36,18 @@ final class LocaleController
 
         $available = $this->loader->availableLocales();
 
-        if (! in_array($locale, $available, true)) {
+        // Compara hífen/underscore como o mesmo locale: `pt-BR` casa com a
+        // entrada `pt_BR` (e vice-versa). Persistimos a forma canónica do
+        // allowlist para que o middleware a reconheça em requests futuros.
+        $matched = $this->loader->matchAvailable($locale, $available);
+        if ($matched === null) {
             abort(422, 'Invalid locale.');
         }
 
         if ($request->hasSession()) {
-            $request->session()->put('locale', $locale);
+            $request->session()->put('locale', $matched);
         }
 
-        return back()->withCookie(Cookie::forever('arqel_locale', $locale));
+        return back()->withCookie(Cookie::forever('arqel_locale', $matched));
     }
 }

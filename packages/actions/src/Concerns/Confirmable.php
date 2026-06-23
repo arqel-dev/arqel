@@ -29,9 +29,19 @@ trait Confirmable
 
     protected ?string $modalConfirmationRequiresText = null;
 
-    protected string $modalSubmitButtonLabel = 'Confirm';
+    /**
+     * Custom submit-button label. When null the localized default
+     * (`arqel::actions.confirm.submit`) is resolved lazily at
+     * serialization so the active request locale applies.
+     */
+    protected ?string $modalSubmitButtonLabel = null;
 
-    protected string $modalCancelButtonLabel = 'Cancel';
+    /**
+     * Custom cancel-button label. When null the localized default
+     * (`arqel::actions.confirm.cancel`) is resolved lazily at
+     * serialization so the active request locale applies.
+     */
+    protected ?string $modalCancelButtonLabel = null;
 
     public function requiresConfirmation(bool $required = true): static
     {
@@ -113,13 +123,33 @@ trait Confirmable
         }
 
         return array_filter([
-            'heading' => $this->modalHeading,
-            'description' => $this->modalDescription,
+            'heading' => self::localizeConfirmable($this->modalHeading),
+            'description' => self::localizeConfirmable($this->modalDescription),
             'icon' => $this->modalIcon,
             'color' => $this->modalColor,
-            'requiresText' => $this->modalConfirmationRequiresText,
-            'submitLabel' => $this->modalSubmitButtonLabel,
-            'cancelLabel' => $this->modalCancelButtonLabel,
+            'requiresText' => self::localizeConfirmable($this->modalConfirmationRequiresText),
+            'submitLabel' => $this->modalSubmitButtonLabel !== null
+                ? self::localizeConfirmable($this->modalSubmitButtonLabel)
+                : (string) __('arqel::actions.confirm.submit'),
+            'cancelLabel' => $this->modalCancelButtonLabel !== null
+                ? self::localizeConfirmable($this->modalCancelButtonLabel)
+                : (string) __('arqel::actions.confirm.cancel'),
         ], fn ($v) => $v !== null);
+    }
+
+    /**
+     * Resolve a stored string against the translator when it is a
+     * registered key, otherwise return it verbatim. Resolved lazily at
+     * serialization so the active request locale applies (#i18n).
+     */
+    private static function localizeConfirmable(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return $value;
+        }
+
+        $translated = __($value);
+
+        return is_string($translated) ? $translated : $value;
     }
 }

@@ -12,6 +12,7 @@
  * matching the canonical Filament/Linear UX.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ColumnSchema, SortDirection, TableSort } from '@arqel-dev/types/tables';
 import {
   type ColumnDef,
@@ -64,6 +65,7 @@ export function DataTable<TRecord extends DataTableRecord>({
   emptyState,
   className,
 }: DataTableProps<TRecord>) {
+  const t = useArqelTranslations();
   const lastClickedIndexRef = useRef<number | null>(null);
 
   const visibleColumns = useMemo(() => columns.filter((col) => !col.hidden), [columns]);
@@ -145,7 +147,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                   <th scope="col" className="w-10 px-3 py-2 text-left">
                     <input
                       type="checkbox"
-                      aria-label="Select all rows"
+                      aria-label={t('table.bulk.select_all_rows', 'Select all rows')}
                       checked={allSelected}
                       ref={(el) => {
                         if (el) el.indeterminate = someSelected;
@@ -204,7 +206,11 @@ export function DataTable<TRecord extends DataTableRecord>({
                   );
                 })}
                 {rowActions && (
-                  <th scope="col" className="w-24 px-3 py-2 text-right" aria-label="Actions" />
+                  <th
+                    scope="col"
+                    className="w-24 px-3 py-2 text-right"
+                    aria-label={t('table.column.actions', 'Actions')}
+                  />
                 )}
               </tr>
             ))}
@@ -216,7 +222,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                   colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
                   className="px-3 py-4 text-center text-muted-foreground"
                 >
-                  Loading…
+                  {t('table.loading', 'Loading…')}
                 </td>
               </tr>
             )}
@@ -226,7 +232,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                   colSpan={visibleColumns.length + (enableSelection ? 1 : 0) + (rowActions ? 1 : 0)}
                   className="px-3 py-8 text-center text-muted-foreground"
                 >
-                  {emptyState ?? 'No records found.'}
+                  {emptyState ?? t('table.empty', 'No records found.')}
                 </td>
               </tr>
             )}
@@ -244,7 +250,9 @@ export function DataTable<TRecord extends DataTableRecord>({
                       <td className="w-10 px-3 py-2">
                         <input
                           type="checkbox"
-                          aria-label={`Select row ${record.id}`}
+                          aria-label={t('table.bulk.select_row', `Select row ${record.id}`, {
+                            id: String(record.id),
+                          })}
                           checked={checked}
                           onChange={(event) => {
                             const native = event.nativeEvent as MouseEvent;
@@ -313,17 +321,22 @@ function DataCards<TRecord extends DataTableRecord>({
   loading,
   emptyState,
 }: DataCardsProps<TRecord>) {
+  const t = useArqelTranslations();
   // hiddenOnMobile columns are dropped from the card body (same intent as the
   // table hiding them at < md).
   const cardColumns = columns.filter((col) => !col.hiddenOnMobile);
 
   if (loading) {
-    return <div className="px-3 py-4 text-center text-muted-foreground md:hidden">Loading…</div>;
+    return (
+      <div className="px-3 py-4 text-center text-muted-foreground md:hidden">
+        {t('table.loading', 'Loading…')}
+      </div>
+    );
   }
   if (rows.length === 0) {
     return (
       <div className="px-3 py-8 text-center text-muted-foreground md:hidden">
-        {emptyState ?? 'No records found.'}
+        {emptyState ?? t('table.empty', 'No records found.')}
       </div>
     );
   }
@@ -346,7 +359,9 @@ function DataCards<TRecord extends DataTableRecord>({
                   <label className="-m-2.5 inline-flex size-11 cursor-pointer items-center justify-center p-2.5">
                     <input
                       type="checkbox"
-                      aria-label={`Select row ${record.id}`}
+                      aria-label={t('table.bulk.select_row', `Select row ${record.id}`, {
+                        id: String(record.id),
+                      })}
                       className="size-5"
                       checked={checked}
                       onChange={(event) => {

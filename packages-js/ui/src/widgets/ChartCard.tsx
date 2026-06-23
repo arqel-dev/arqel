@@ -1,3 +1,4 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { type ComponentType, lazy, Suspense } from 'react';
 import type { ChartSubProps, ChartType, ChartWidgetProps } from './types';
 import { WidgetWrapper } from './WidgetWrapper';
@@ -29,6 +30,7 @@ const REGISTRY: Record<ChartType, ComponentType<ChartSubProps>> = {
 };
 
 export function ChartCard({ widget }: ChartWidgetProps) {
+  const t = useArqelTranslations();
   const Chart = REGISTRY[widget.chartType] ?? LineChart;
 
   return (
@@ -37,7 +39,7 @@ export function ChartCard({ widget }: ChartWidgetProps) {
         fallback={
           <div
             role="status"
-            aria-label="Loading chart"
+            aria-label={t('arqel.aria.chart_loading', 'Loading chart')}
             data-testid="chart-fallback"
             className="animate-pulse rounded bg-muted"
             style={{ height: widget.height }}

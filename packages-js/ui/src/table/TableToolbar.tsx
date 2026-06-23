@@ -37,7 +37,7 @@ export function TableToolbar({
       {selectedCount > 0 && (
         <section
           className="flex flex-wrap items-center gap-2 rounded-sm border border-border bg-muted px-3 py-2"
-          aria-label="Bulk actions"
+          aria-label={t('table.bulk.label', 'Bulk actions')}
         >
           <span className="text-sm font-medium">
             {t('table.bulk.selected', `${selectedCount} selected`, { count: selectedCount })}

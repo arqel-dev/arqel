@@ -16,6 +16,7 @@ return [
         'submit' => 'Enviar',
         'reset' => 'Limpar',
         'retry' => 'Tentar novamente',
+        'menu' => 'Ações',
     ],
     'nav' => [
         'dashboard' => 'Painel',
@@ -40,6 +41,8 @@ return [
         'unsaved_changes' => 'Você tem alterações não salvas.',
         'delete_confirm' => 'Tem certeza que deseja excluir?',
         'cannot_undo' => 'Esta ação não pode ser desfeita.',
+        // Prompt de confirmação por digitação; :value é exibido como <code> inline.
+        'type_to_confirm' => 'Digite :value para confirmar',
         'created' => 'Registro criado.',
         'updated' => 'Registro atualizado.',
         'deleted' => 'Registro excluído.',
@@ -60,5 +63,20 @@ return [
         'previous' => 'Anterior',
         'next' => 'Próximo',
         'showing' => 'Exibindo :from a :to de :total resultados',
+    ],
+    // Nomes acessíveis (aria-label / sr-only) da interface do framework.
+    // Mantidos distintos dos rótulos visíveis curtos para que leitores de
+    // tela anunciem um nome acessível completo e descritivo.
+    'aria' => [
+        'flash_dismiss' => 'Dispensar',
+        'chart_loading' => 'Carregando gráfico',
+        'stat_sparkline' => 'Minigráfico de tendência',
+        'palette_title' => 'Paleta de comandos',
+        'palette_results' => ':count comandos',
+        'palette_list' => 'Comandos',
+        'breadcrumb' => 'Trilha de navegação',
+        'theme_toggle_light' => 'Mudar para o tema claro',
+        'theme_toggle_dark' => 'Mudar para o tema escuro',
+        'tenant_switch' => 'Trocar de tenant (atual: :tenant)',
     ],
 ];

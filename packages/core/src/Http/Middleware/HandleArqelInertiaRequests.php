@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Http\Middleware;
 
+use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\I18n\TranslationLoader;
+use Arqel\Core\Panel\Panel;
 use Arqel\Core\Panel\PanelRegistry;
+use Arqel\Core\Resources\Resource;
 use Arqel\Core\Support\ResourceAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -214,7 +218,7 @@ final class HandleArqelInertiaRequests extends Middleware
      *
      * @return array<int, array<string, mixed>>
      */
-    private function buildNavigation(\Arqel\Core\Panel\Panel $panel, ?Authenticatable $user = null): array
+    private function buildNavigation(Panel $panel, ?Authenticatable $user = null): array
     {
         $items = [];
         $request = request();
@@ -255,7 +259,7 @@ final class HandleArqelInertiaRequests extends Middleware
      *
      * Delegates to {@see ResourceAuthorization::viewAnyDenied()} — the
      * single source of truth shared with the command palette
-     * ({@see \Arqel\Core\CommandPalette\Providers\NavigationCommandProvider})
+     * ({@see NavigationCommandProvider})
      * so both navigation surfaces stay symmetric (issues #118 and #129).
      *
      * @param class-string<\Arqel\Core\Resources\Resource> $resourceClass
@@ -381,7 +385,7 @@ final class HandleArqelInertiaRequests extends Middleware
      */
     private function serialiseTenant(mixed $tenant): ?array
     {
-        if (! $tenant instanceof \Illuminate\Database\Eloquent\Model) {
+        if (! $tenant instanceof Model) {
             return null;
         }
 
@@ -420,10 +424,18 @@ final class HandleArqelInertiaRequests extends Middleware
         }
 
         $locale = app()->getLocale();
+        $available = $loader->availableLocales();
+
+        // O locale activo pode estar hifenizado (e.g. `App::setLocale('pt-BR')`
+        // ou `config('app.locale')='pt-BR'`) enquanto o allowlist usa underscore
+        // (`pt_BR`). Emitimos a forma exacta do allowlist para que o `<Select>`
+        // do `LocaleSwitcher` case `value` com um `<SelectItem>` em vez de cair
+        // no placeholder vazio.
+        $emittedLocale = $loader->matchAvailable($locale, $available) ?? $locale;
 
         return [
-            'locale' => $locale,
-            'available' => $loader->availableLocales(),
+            'locale' => $emittedLocale,
+            'available' => $available,
             'translations' => $loader->loadForLocale($locale),
         ];
     }

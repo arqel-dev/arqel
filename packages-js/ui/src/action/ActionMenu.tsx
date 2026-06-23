@@ -8,6 +8,7 @@
  * supply a custom `trigger` slot.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ActionSchema } from '@arqel-dev/types/actions';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import { type ReactNode, useState } from 'react';
@@ -53,6 +54,7 @@ export function ActionMenu({
   trigger,
   className,
 }: ActionMenuProps) {
+  const t = useArqelTranslations();
   // Which dropdown action (if any) is currently driving a confirm dialog /
   // form modal. The modals are mounted as siblings of the menu so they
   // survive the menu closing on `onSelect`.
@@ -112,7 +114,7 @@ export function ActionMenu({
   // One visual trigger shared by both presentation surfaces. The Dropdown
   // wraps it via DropdownMenuTrigger (asChild); the Sheet opens it on click.
   const triggerNode = trigger ?? (
-    <Button variant="ghost" size="icon-touch" aria-label="Actions">
+    <Button variant="ghost" size="icon-touch" aria-label={t('arqel.actions.menu', 'Actions')}>
       ⋯
     </Button>
   );
@@ -147,7 +149,7 @@ export function ActionMenu({
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <button
             type="button"
-            aria-label="Actions"
+            aria-label={t('arqel.actions.menu', 'Actions')}
             className="inline-flex size-11 items-center justify-center rounded-md text-lg hover:bg-accent"
             onClick={() => setSheetOpen(true)}
           >
@@ -158,7 +160,7 @@ export function ActionMenu({
             className="max-h-[80vh] gap-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]"
           >
             <SheetHeader className="px-4 pt-4 pb-2">
-              <SheetTitle>Actions</SheetTitle>
+              <SheetTitle>{t('arqel.actions.menu', 'Actions')}</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col px-2 pb-2">
               {actions.map((action) => (

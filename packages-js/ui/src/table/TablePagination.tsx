@@ -37,10 +37,19 @@ export function TablePagination({
         'flex flex-wrap items-center justify-between gap-2 border-t border-border px-3 py-2 text-sm',
         className,
       )}
-      aria-label="Pagination"
+      aria-label={t('table.pagination.label', 'Pagination')}
     >
       <span className="text-muted-foreground">
-        {meta.total === 0 ? t('table.empty', 'No results') : `${from}–${to} of ${meta.total}`}
+        {meta.total === 0
+          ? t('table.empty', 'No records found.')
+          : t(
+              'table.pagination.showing',
+              // Fallback is rendered verbatim when the key is missing, so it must
+              // already carry the interpolated values (the replacements map only
+              // applies to a resolved dictionary string).
+              `Showing ${from} to ${to} of ${meta.total} results`,
+              { from, to, total: meta.total },
+            )}
       </span>
       <div className="flex items-center gap-2">
         {onPerPageChange && (

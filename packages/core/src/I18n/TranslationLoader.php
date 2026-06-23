@@ -25,7 +25,7 @@ final readonly class TranslationLoader
      *
      * @var array<int, string>
      */
-    private const array LANG_FILES = ['arqel', 'messages', 'actions', 'table', 'form'];
+    private const array LANG_FILES = ['arqel', 'messages', 'actions', 'table', 'form', 'validation', 'widgets', 'palette'];
 
     public function __construct(
         private Application $app,
@@ -66,6 +66,13 @@ final readonly class TranslationLoader
      * Locales suportados pelo painel. Configurável via
      * `arqel.i18n.locales`; default `['en', 'pt_BR']`.
      *
+     * Cada entrada é validada contra um directório de lang em disco
+     * (na sua forma normalizada `pt-BR` → `pt_BR`), para que o switcher
+     * só ofereça locales que realmente resolvem em traduções — caso
+     * contrário o utilizador "muda" para um locale sem ficheiros e vê o
+     * fallback default sem qualquer aviso. Se nenhuma entrada configurada
+     * existir em disco, o default seguro `['en', 'pt_BR']` é devolvido.
+     *
      * @return array<int, string>
      */
     public function availableLocales(): array
@@ -76,14 +83,53 @@ final readonly class TranslationLoader
             return ['en', 'pt_BR'];
         }
 
+        $base = $this->langPath();
+
         $clean = [];
         foreach ($configured as $value) {
-            if (is_string($value) && $value !== '') {
+            if (is_string($value) && $value !== '' && is_dir($base.'/'.self::normalize($value))) {
                 $clean[] = $value;
             }
         }
 
         return $clean === [] ? ['en', 'pt_BR'] : $clean;
+    }
+
+    /**
+     * Resolve um locale candidato (sessão, cookie, header, input do switcher)
+     * para a entrada equivalente no allowlist, comparando ambas as formas em
+     * versão normalizada (`-` ↔ `_`). Devolve a forma exacta tal como aparece
+     * em `availableLocales()` — ou `null` se nenhuma variante casar.
+     *
+     * Isto fecha a divergência hífen/underscore: configurar `['en', 'pt-BR']`
+     * mais um header `Accept-Language: pt-BR` (normalizado para `pt_BR`) deixa
+     * de falhar o `in_array` estrito; ambas resolvem para a mesma entrada.
+     *
+     * @param array<int, string> $available
+     */
+    public function matchAvailable(string $candidate, array $available): ?string
+    {
+        $normalizedCandidate = self::normalize($candidate);
+        if ($normalizedCandidate === '') {
+            return null;
+        }
+
+        foreach ($available as $entry) {
+            if (self::normalize($entry) === $normalizedCandidate) {
+                return $entry;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Normaliza um locale para a convenção em disco do Laravel, trocando o
+     * separador BCP-47 (`-`) pelo underscore (`pt-BR` → `pt_BR`).
+     */
+    public static function normalize(string $locale): string
+    {
+        return str_replace('-', '_', $locale);
     }
 
     /**
@@ -128,15 +174,6 @@ final readonly class TranslationLoader
         }
 
         return 'en';
-    }
-
-    /**
-     * Normaliza um locale para a convenção em disco do Laravel, trocando o
-     * separador BCP-47 (`-`) pelo underscore (`pt-BR` → `pt_BR`).
-     */
-    private static function normalize(string $locale): string
-    {
-        return str_replace('-', '_', $locale);
     }
 
     private function langPath(): string

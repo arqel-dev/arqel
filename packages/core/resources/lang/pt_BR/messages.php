@@ -53,4 +53,14 @@ return [
         'invalid_path' => 'Caminho de arquivo inválido.',
         'path_outside_directory' => 'O caminho do arquivo está fora do diretório permitido.',
     ],
+    'ai' => [
+        'forbidden' => 'Acesso negado',
+        'registry_unbound' => 'A IA está temporariamente indisponível.',
+        'registry_contract_mismatch' => 'A IA está temporariamente indisponível.',
+        'resource_not_registered' => 'Recurso [:resource] não registrado',
+        'field_resolution_failed' => 'Não foi possível resolver os campos do recurso.',
+        'field_not_found' => ':type [:field] não encontrado no recurso [:resource]',
+        'provider_failed' => 'A requisição ao provedor de IA falhou',
+        'image_source_required' => 'É necessário fornecer imageUrl ou imageBase64',
+    ],
 ];

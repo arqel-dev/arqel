@@ -53,4 +53,14 @@ return [
         'invalid_path' => 'Invalid file path.',
         'path_outside_directory' => 'File path is outside the allowed directory.',
     ],
+    'ai' => [
+        'forbidden' => 'Forbidden',
+        'registry_unbound' => 'AI is temporarily unavailable.',
+        'registry_contract_mismatch' => 'AI is temporarily unavailable.',
+        'resource_not_registered' => 'Resource [:resource] not registered',
+        'field_resolution_failed' => 'Could not resolve resource fields.',
+        'field_not_found' => ':type [:field] not found on resource [:resource]',
+        'provider_failed' => 'AI provider request failed',
+        'image_source_required' => 'Either imageUrl or imageBase64 must be provided',
+    ],
 ];

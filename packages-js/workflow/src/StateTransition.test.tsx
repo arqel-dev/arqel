@@ -1,5 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+
+// `<StateTransition>` now resolves its empty-state chrome via
+// `useArqelTranslations()` (which reads `usePage().props.i18n`). Outside an
+// Inertia tree that hook would throw, so stub it to echo the English fallback
+// — the literals these tests assert on are exactly those fallbacks.
+vi.mock('@arqel-dev/react/utils', () => ({
+  useArqelTranslations: () => (key: string, fallback?: string) => fallback ?? key,
+}));
+
 import {
   STATE_TRANSITION_EVENT,
   StateTransition,

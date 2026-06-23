@@ -14,8 +14,15 @@
  * linha-a-linha; senão render block-level com badge "Modified".
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Badge, Card, CardContent } from '@arqel-dev/ui';
 import { type JSX, useMemo } from 'react';
+
+type TranslateFn = (
+  key: string,
+  fallback?: string,
+  replacements?: Record<string, string>,
+) => string;
 
 export type DiffStatus = 'added' | 'removed' | 'changed' | 'unchanged';
 
@@ -104,6 +111,7 @@ interface ValueCellProps {
   value: unknown;
   side: 'before' | 'after';
   status: DiffStatus;
+  t: TranslateFn;
   /** When true, the counterpart value is the same length string and we can do line-by-line. */
   lineDiffWith?: string;
 }
@@ -115,13 +123,17 @@ const STATUS_ROW_BG: Record<DiffStatus, string> = {
   unchanged: '',
 };
 
-function renderValueCell({ value, side, status, lineDiffWith }: ValueCellProps): JSX.Element {
+function renderValueCell({ value, side, status, t, lineDiffWith }: ValueCellProps): JSX.Element {
   if (value === undefined && (status === 'added' || status === 'removed')) {
     return (
       <span
         className="text-muted-foreground italic"
         role="note"
-        aria-label={side === 'before' ? 'no previous value' : 'no new value'}
+        aria-label={
+          side === 'before'
+            ? t('arqel.versioning.no_previous_value', 'no previous value')
+            : t('arqel.versioning.no_new_value', 'no new value')
+        }
       >
         —
       </span>
@@ -176,7 +188,7 @@ function renderValueCell({ value, side, status, lineDiffWith }: ValueCellProps):
     }
     return (
       <div className="flex flex-col gap-2" data-testid={`version-diff-block-${side}`}>
-        <Badge variant="default">Modified</Badge>
+        <Badge variant="default">{t('arqel.versioning.modified', 'Modified')}</Badge>
         <pre className="text-xs whitespace-pre-wrap break-words rounded-sm bg-muted p-2 text-foreground">
           {text}
         </pre>
@@ -193,6 +205,8 @@ export function VersionDiff({
   fieldLabels,
   showUnchanged = false,
 }: VersionDiffProps): JSX.Element {
+  const t = useArqelTranslations();
+  const fieldComparison = t('arqel.versioning.field_comparison', 'Field comparison');
   const entries = useMemo(() => getDiffEntries(before, after), [before, after]);
   const visible = useMemo(
     () => (showUnchanged ? entries : entries.filter((e) => e.status !== 'unchanged')),
@@ -201,16 +215,16 @@ export function VersionDiff({
 
   if (visible.length === 0) {
     return (
-      <Card aria-label="Field comparison" data-testid="version-diff-empty">
+      <Card aria-label={fieldComparison} data-testid="version-diff-empty">
         <CardContent className="py-8 text-center text-muted-foreground">
-          <p>No changes to display.</p>
+          <p>{t('arqel.versioning.no_changes', 'No changes to display.')}</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card aria-label="Field comparison" data-testid="version-diff">
+    <Card aria-label={fieldComparison} data-testid="version-diff">
       <CardContent className="p-0">
         <dl className="flex flex-col divide-y divide-[var(--border)]">
           {visible.map((entry) => {
@@ -238,6 +252,7 @@ export function VersionDiff({
                     value: entry.oldValue,
                     side: 'before',
                     status: entry.status,
+                    t,
                     ...(lineDiffOld !== undefined ? { lineDiffWith: lineDiffOld } : {}),
                   })}
                 </dd>
@@ -246,6 +261,7 @@ export function VersionDiff({
                     value: entry.newValue,
                     side: 'after',
                     status: entry.status,
+                    t,
                     ...(lineDiffNew !== undefined ? { lineDiffWith: lineDiffNew } : {}),
                   })}
                 </dd>

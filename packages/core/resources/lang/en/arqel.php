@@ -117,7 +117,8 @@ return [
         'chart_loading' => 'Loading chart',
         'stat_sparkline' => 'Trend sparkline',
         'palette_title' => 'Command palette',
-        'palette_results' => ':count commands',
+        // Pluralizable sr-only live region: "1 command" / "N commands".
+        'palette_results' => '{one} :count command|{other} :count commands',
         'palette_list' => 'Commands',
         'breadcrumb' => 'Breadcrumb',
         'theme_toggle_light' => 'Switch to light theme',

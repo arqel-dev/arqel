@@ -49,7 +49,9 @@ return [
         'date_to' => ':label até',
     ],
     'bulk' => [
-        'selected' => ':count selecionado(s)',
+        // Pluralizável: o tradutor JS escolhe a forma via Intl.PluralRules
+        // ({one}/{other}), então "1 selecionado" nunca vira "1 selecionado(s)".
+        'selected' => '{one} :count selecionado|{other} :count selecionados',
         'select_all' => 'Selecionar todos',
         // Nome acessível do checkbox de selecionar-tudo no cabeçalho (vs o rótulo curto do menu).
         'select_all_rows' => 'Selecionar todas as linhas',

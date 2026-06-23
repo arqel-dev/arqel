@@ -118,7 +118,8 @@ return [
         'chart_loading' => 'Carregando gráfico',
         'stat_sparkline' => 'Minigráfico de tendência',
         'palette_title' => 'Paleta de comandos',
-        'palette_results' => ':count comandos',
+        // Região sr-only pluralizável: "1 comando" / "N comandos".
+        'palette_results' => '{one} :count comando|{other} :count comandos',
         'palette_list' => 'Comandos',
         'breadcrumb' => 'Trilha de navegação',
         'theme_toggle_light' => 'Mudar para o tema claro',

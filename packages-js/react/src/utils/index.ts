@@ -5,6 +5,7 @@ export {
   indexFieldsByName,
 } from './serializeFields.js';
 export {
+  selectPluralForm,
   type TranslateOptions,
   type TranslationDictionary,
   translate,

@@ -40,7 +40,9 @@ export function TableToolbar({
           aria-label={t('table.bulk.label', 'Bulk actions')}
         >
           <span className="text-sm font-medium">
-            {t('table.bulk.selected', `${selectedCount} selected`, { count: selectedCount })}
+            {t('table.bulk.selected', '{one} :count selected|{other} :count selected', {
+              count: selectedCount,
+            })}
           </span>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {bulkActions}

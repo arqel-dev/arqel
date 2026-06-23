@@ -290,7 +290,9 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
           className="w-full border-b border-[var(--border,#e5e7eb)] bg-transparent px-4 py-3 text-base outline-none"
         />
         <div role="status" aria-live="polite" className="sr-only">
-          {t('arqel.aria.palette_results', `${flat.length} commands`, { count: flat.length })}
+          {t('arqel.aria.palette_results', '{one} :count command|{other} :count commands', {
+            count: flat.length,
+          })}
         </div>
         <ul
           id={listId}

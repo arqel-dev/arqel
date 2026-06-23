@@ -131,9 +131,9 @@ final class TrashedFilter extends Filter
     {
         return [
             'options' => [
-                ['value' => self::STATE_WITHOUT, 'label' => $this->withoutLabel ?? 'Without deleted'],
-                ['value' => self::STATE_WITH, 'label' => $this->withLabel ?? 'With deleted'],
-                ['value' => self::STATE_ONLY, 'label' => $this->onlyLabel ?? 'Only deleted'],
+                ['value' => self::STATE_WITHOUT, 'label' => self::localizeLabel($this->withoutLabel ?? 'Without deleted')],
+                ['value' => self::STATE_WITH, 'label' => self::localizeLabel($this->withLabel ?? 'With deleted')],
+                ['value' => self::STATE_ONLY, 'label' => self::localizeLabel($this->onlyLabel ?? 'Only deleted')],
             ],
         ];
     }

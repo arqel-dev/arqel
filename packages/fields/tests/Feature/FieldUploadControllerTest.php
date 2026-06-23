@@ -278,3 +278,45 @@ it('store + destroy: no-policy scaffold still works (baseline regression guard)'
     expect($response->getData(true))->toBe(['deleted' => true]);
     Storage::disk('local')->assertMissing($path);
 });
+
+it('store: localizes the not-a-file-upload abort message via arqel:: namespace', function (): void {
+    app()->setLocale('pt_BR');
+
+    try {
+        // `name` is a TextField, not a FileField → the 400 branch fires.
+        $this->controller->store(uploadRequestAs('POST'), 'uploading-resources', 'name');
+        $this->fail('Expected a 400 HttpException for the non-file field.');
+    } catch (HttpException $e) {
+        expect($e->getStatusCode())->toBe(400)
+            ->and($e->getMessage())->toBe('O campo não é de upload de arquivo.')
+            ->and($e->getMessage())->not->toBe('arqel::messages.upload.not_file_field');
+    }
+});
+
+it('store: emits the English not-a-file-upload abort message under en locale', function (): void {
+    app()->setLocale('en');
+
+    try {
+        $this->controller->store(uploadRequestAs('POST'), 'uploading-resources', 'name');
+        $this->fail('Expected a 400 HttpException for the non-file field.');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('Field is not a file upload.');
+    }
+});
+
+it('destroy: localizes the path-outside-directory abort message via arqel:: namespace', function (): void {
+    Gate::define('update', fn () => true);
+    Gate::define('delete', fn () => true);
+    app()->setLocale('pt_BR');
+
+    try {
+        $this->controller->destroy(
+            uploadRequestAs('DELETE', ['path' => '/etc/passwd']),
+            'uploading-resources',
+            'avatar',
+        );
+        $this->fail('Expected the absolute path to be rejected.');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('O caminho do arquivo está fora do diretório permitido.');
+    }
+});

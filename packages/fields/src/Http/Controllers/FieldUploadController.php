@@ -52,7 +52,7 @@ final class FieldUploadController
         $fieldInstance = $this->resolveFieldOrFail($instance, $field);
 
         if (! $fieldInstance instanceof FileField) {
-            abort(HttpResponse::HTTP_BAD_REQUEST, 'Field is not a file upload.');
+            abort(HttpResponse::HTTP_BAD_REQUEST, (string) __('arqel::messages.upload.not_file_field'));
         }
 
         $this->authorize($instance, 'create', $request);
@@ -63,7 +63,7 @@ final class FieldUploadController
 
         $upload = $request->file('file');
         if (! $upload instanceof UploadedFile) {
-            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, 'Missing uploaded file.');
+            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, (string) __('arqel::messages.upload.missing_file'));
         }
 
         $disk = $fieldInstance->getDisk();
@@ -75,7 +75,7 @@ final class FieldUploadController
         try {
             $stored = $fieldInstance->storeUploadedFile($upload);
         } catch (Throwable) {
-            abort(HttpResponse::HTTP_INTERNAL_SERVER_ERROR, 'Could not persist uploaded file.');
+            abort(HttpResponse::HTTP_INTERNAL_SERVER_ERROR, (string) __('arqel::messages.upload.persist_failed'));
         }
 
         $url = null;
@@ -102,7 +102,7 @@ final class FieldUploadController
         $fieldInstance = $this->resolveFieldOrFail($instance, $field);
 
         if (! $fieldInstance instanceof FileField) {
-            abort(HttpResponse::HTTP_BAD_REQUEST, 'Field is not a file upload.');
+            abort(HttpResponse::HTTP_BAD_REQUEST, (string) __('arqel::messages.upload.not_file_field'));
         }
 
         $this->authorize($instance, 'delete', $request);
@@ -110,7 +110,7 @@ final class FieldUploadController
 
         $path = $request->input('path');
         if (! is_string($path) || $path === '') {
-            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, 'Missing file path.');
+            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, (string) __('arqel::messages.upload.missing_path'));
         }
 
         $path = $this->containedPathOrFail($fieldInstance, $path);
@@ -167,12 +167,12 @@ final class FieldUploadController
     private function containedPathOrFail(FileField $field, string $path): string
     {
         if (str_contains($path, "\0")) {
-            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, 'Invalid file path.');
+            abort(HttpResponse::HTTP_UNPROCESSABLE_ENTITY, (string) __('arqel::messages.upload.invalid_path'));
         }
 
         // Reject absolute paths (POSIX `/...` and Windows `C:\...`).
         if (str_starts_with($path, '/') || str_starts_with($path, '\\') || preg_match('#^[A-Za-z]:#', $path) === 1) {
-            abort(HttpResponse::HTTP_FORBIDDEN, 'File path is outside the allowed directory.');
+            abort(HttpResponse::HTTP_FORBIDDEN, (string) __('arqel::messages.upload.path_outside_directory'));
         }
 
         $normalised = str_replace('\\', '/', $path);
@@ -183,7 +183,7 @@ final class FieldUploadController
             }
 
             if ($segment === '..') {
-                abort(HttpResponse::HTTP_FORBIDDEN, 'File path is outside the allowed directory.');
+                abort(HttpResponse::HTTP_FORBIDDEN, (string) __('arqel::messages.upload.path_outside_directory'));
             }
 
             $segments[] = $segment;
@@ -195,7 +195,7 @@ final class FieldUploadController
         if ($directory !== '') {
             $prefix = $directory.'/';
             if ($clean !== $directory && ! str_starts_with($clean, $prefix)) {
-                abort(HttpResponse::HTTP_FORBIDDEN, 'File path is outside the allowed directory.');
+                abort(HttpResponse::HTTP_FORBIDDEN, (string) __('arqel::messages.upload.path_outside_directory'));
             }
         }
 

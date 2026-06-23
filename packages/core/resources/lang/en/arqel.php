@@ -104,6 +104,7 @@ return [
             'upload' => 'File upload',
             'browse' => 'Browse',
             'choose_another' => 'Choose another file',
+            'drop_hint' => 'Drag a file here or click to browse',
         ],
         'image' => [
             'preview_alt' => 'Preview',
@@ -238,6 +239,15 @@ return [
         'theme_toggle_light' => 'Switch to light theme',
         'theme_toggle_dark' => 'Switch to dark theme',
         'tenant_switch' => 'Switch tenant (current: :tenant)',
+    ],
+    // Visible keyboard-hint labels in the <CommandPalette> footer. The glyph
+    // (↑↓ / ↵ / esc) is rendered by the component; only the verb is localized.
+    // Resolved client-side via useArqelTranslations() with the English literal
+    // as fallback.
+    'palette' => [
+        'hint_navigate' => '↑↓ navigate',
+        'hint_select' => '↵ select',
+        'hint_close' => 'esc close',
     ],
     // Accessible names + visible chrome for the rich-content editing surface
     // shipped by @arqel-dev/fields-advanced (Markdown / Repeater / Wizard /

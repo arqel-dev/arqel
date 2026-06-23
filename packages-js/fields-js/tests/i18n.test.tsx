@@ -148,6 +148,21 @@ describe('FileInput visible browse label (i18n)', () => {
     rerender(<FileInput field={file} value="avatar.png" onChange={vi.fn()} />);
     expect(screen.getByText('Escolher outro arquivo')).toBeInTheDocument();
   });
+
+  it('falls back to the English drop-zone instruction', () => {
+    render(<FileInput field={file} value={null} onChange={vi.fn()} />);
+    expect(screen.getByText('Drag a file here or click to browse')).toBeInTheDocument();
+  });
+
+  it('localizes the drop-zone instruction', () => {
+    setMockTranslations({
+      arqel: {
+        fields: { file: { drop_hint: 'Arraste um arquivo aqui ou clique para procurar' } },
+      },
+    });
+    render(<FileInput field={file} value={null} onChange={vi.fn()} />);
+    expect(screen.getByText('Arraste um arquivo aqui ou clique para procurar')).toBeInTheDocument();
+  });
 });
 
 describe('ImageInput alt + visible label (i18n)', () => {

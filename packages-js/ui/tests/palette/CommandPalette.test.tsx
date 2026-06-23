@@ -72,6 +72,11 @@ function usePtBr() {
               palette_results: '{one} :count comando|{other} :count comandos',
               palette_list: 'Comandos',
             },
+            palette: {
+              hint_navigate: '↑↓ navegar',
+              hint_select: '↵ selecionar',
+              hint_close: 'esc fechar',
+            },
           },
         },
       },
@@ -235,6 +240,27 @@ describe('CommandPalette', () => {
     await flushMicrotasks();
     await flushMicrotasks();
     expect(screen.getByRole('status').textContent).toMatch(/2 comandos/);
+  });
+
+  it('renders the footer keyboard hints with English fallback verbs', async () => {
+    globalThis.fetch = mockFetch([]) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    expect(screen.getByText('↑↓ navigate')).toBeInTheDocument();
+    expect(screen.getByText('↵ select')).toBeInTheDocument();
+    expect(screen.getByText('esc close')).toBeInTheDocument();
+  });
+
+  it('localizes the footer keyboard hints, keeping the glyphs (pt_BR)', async () => {
+    usePtBr();
+    globalThis.fetch = mockFetch([]) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    expect(screen.getByText('↑↓ navegar')).toBeInTheDocument();
+    expect(screen.getByText('↵ selecionar')).toBeInTheDocument();
+    expect(screen.getByText('esc fechar')).toBeInTheDocument();
   });
 
   it('singularizes the live-region count for exactly one result (pt_BR)', async () => {

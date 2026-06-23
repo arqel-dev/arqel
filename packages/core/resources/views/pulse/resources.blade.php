@@ -12,10 +12,10 @@
 
     <x-pulse::scroll :expand="false">
         <div class="text-3xl font-bold tabular-nums text-gray-900 dark:text-gray-100 p-4">
-            {{ number_format($count) }}
+            {{ \Illuminate\Support\Number::format($count, locale: app()->getLocale()) }}
         </div>
         <div class="px-4 pb-4 text-xs text-gray-500 dark:text-gray-400">
-            Resource{{ $count === 1 ? '' : 's' }} registered
+            {{ trans_choice('arqel::pulse.resources.registered', $count) }}
         </div>
     </x-pulse::scroll>
 </x-pulse::card>

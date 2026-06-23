@@ -40,5 +40,17 @@ return [
     ],
     'tenant' => [
         'feature_unavailable' => "The ':feature' feature is not available on your current plan.",
+        'no_current_tenant' => 'No current tenant.',
+    ],
+    'action' => [
+        'missing_selection' => 'Missing selection.',
+    ],
+    'upload' => [
+        'not_file_field' => 'Field is not a file upload.',
+        'missing_file' => 'Missing uploaded file.',
+        'persist_failed' => 'Could not persist uploaded file.',
+        'missing_path' => 'Missing file path.',
+        'invalid_path' => 'Invalid file path.',
+        'path_outside_directory' => 'File path is outside the allowed directory.',
     ],
 ];

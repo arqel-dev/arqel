@@ -9,13 +9,13 @@
             <div>
                 <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Tokens (today)</div>
                 <div class="text-2xl font-bold tabular-nums text-gray-900 dark:text-gray-100">
-                    {{ number_format($tokens) }}
+                    {{ \Illuminate\Support\Number::format($tokens, locale: app()->getLocale()) }}
                 </div>
             </div>
             <div>
                 <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Cost (USD)</div>
                 <div class="text-2xl font-bold tabular-nums text-gray-900 dark:text-gray-100">
-                    ${{ number_format($cost, 4) }}
+                    {{ \Illuminate\Support\Number::currency($cost, 'USD', app()->getLocale(), 4) }}
                 </div>
             </div>
         </div>

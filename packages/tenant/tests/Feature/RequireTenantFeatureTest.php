@@ -36,6 +36,37 @@ it('aborts with 404 when there is no current tenant', function (): void {
     }
 });
 
+it('localizes the no-current-tenant abort message via the arqel translation namespace', function (): void {
+    $middleware = buildFeatureMiddleware(null);
+
+    app()->setLocale('en');
+
+    try {
+        $middleware->handle(
+            Request::create('https://x.test/'),
+            fn () => new Response('next'),
+            'analytics',
+        );
+        $this->fail('expected HttpException');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('No current tenant.');
+    }
+
+    app()->setLocale('pt_BR');
+
+    try {
+        $middleware->handle(
+            Request::create('https://x.test/'),
+            fn () => new Response('next'),
+            'analytics',
+        );
+        $this->fail('expected HttpException');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('Nenhum tenant atual.')
+            ->and($e->getMessage())->not->toBe('arqel::messages.tenant.no_current_tenant');
+    }
+});
+
 it('aborts with 500 when the tenant model does not implement hasFeature', function (): void {
     $middleware = buildFeatureMiddleware(new PlainTenant(['id' => 1]));
 

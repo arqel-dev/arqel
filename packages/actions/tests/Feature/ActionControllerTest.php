@@ -161,6 +161,34 @@ it('rejects bulk requests with no ids before any DB lookup (422)', function (): 
         ->and($code ?? null)->toBe(422);
 });
 
+it('localizes the missing-selection bulk abort message via the arqel:: namespace', function (): void {
+    StubResourceWithToolbarAction::$bulk = [
+        BulkAction::make('archive')->action(fn () => null),
+    ];
+
+    /** @var ActionController $controller */
+    $controller = $this->app->make(ActionController::class);
+
+    app()->setLocale('pt_BR');
+
+    try {
+        $controller->invokeBulk(new Request, 'controller-stub', 'archive');
+        $this->fail('Expected a 422 HttpException for the empty selection.');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('Nenhuma seleção informada.')
+            ->and($e->getMessage())->not->toBe('arqel::messages.action.missing_selection');
+    }
+
+    app()->setLocale('en');
+
+    try {
+        $controller->invokeBulk(new Request, 'controller-stub', 'archive');
+        $this->fail('Expected a 422 HttpException for the empty selection.');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('Missing selection.');
+    }
+});
+
 it('validates the action form using the field label as :attribute and custom messages', function (): void {
     StubResourceWithToolbarAction::$toolbar = [
         ToolbarAction::make('transfer')

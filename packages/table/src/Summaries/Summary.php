@@ -118,7 +118,25 @@ abstract class Summary
         return [
             'type' => $this->type,
             'field' => $this->field,
-            'label' => $this->label,
+            'label' => $this->label === null ? null : self::localizeLabel($this->label),
         ];
+    }
+
+    /**
+     * Resolve a label through Laravel translation lazily so the active request
+     * locale applies at serialization time. A label that is a translation key
+     * renders in the current locale; a plain literal passes through unchanged
+     * (Laravel __() returns the key when no translation exists). Falls back to
+     * the raw literal when no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

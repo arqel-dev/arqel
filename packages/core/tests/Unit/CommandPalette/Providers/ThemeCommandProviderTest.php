@@ -45,3 +45,17 @@ it('emits the expected ids, urls and icons for the three theme variants', functi
         ->and($byId['theme:system']->url)->toBe('?theme=system')
         ->and($byId['theme:system']->icon)->toBe('monitor');
 });
+
+it('localises theme labels and category to the active locale (pt_BR)', function (): void {
+    app()->setLocale('pt_BR');
+
+    $byId = [];
+    foreach ($this->provider->provide(null, '') as $command) {
+        $byId[$command->id] = $command;
+    }
+
+    expect($byId['theme:light']->label)->toBe('Mudar para tema claro')
+        ->and($byId['theme:dark']->label)->toBe('Mudar para tema escuro')
+        ->and($byId['theme:system']->label)->toBe('Usar tema do sistema')
+        ->and($byId['theme:light']->category)->toBe('Configurações');
+});

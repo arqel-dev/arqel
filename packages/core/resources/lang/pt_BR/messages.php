@@ -86,6 +86,15 @@ return [
         'registry_unavailable' => 'Registro de recursos indisponível.',
         'resource_not_found' => "Recurso ':resource' não encontrado.",
         'resource_no_model' => "O recurso ':resource' não tem um model vinculado.",
+        'resource_not_registered' => 'Recurso [:resource] não está registrado',
+        'resource_invalid' => 'Recurso [:resource] é inválido',
+    ],
+    'realtime' => [
+        'collab' => [
+            'invalid_state' => 'state deve ser uma string base64 não vazia',
+            'invalid_base64' => 'state não é um base64 válido',
+            'version_conflict' => 'conflito de versão',
+        ],
     ],
     'workflow' => [
         'state_filter_label' => 'Estado',

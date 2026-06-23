@@ -57,11 +57,19 @@ final class VersionHistoryController
         $resourceClass = $registry->findBySlug($resource);
 
         if ($resourceClass === null) {
-            return new JsonResponse(['message' => "Resource [{$resource}] not registered"], 404);
+            return new JsonResponse(['message' => $this->message(
+                'arqel::messages.versioning.resource_not_registered',
+                "Resource [{$resource}] not registered",
+                ['resource' => $resource],
+            )], 404);
         }
 
         if (! method_exists($resourceClass, 'getModel')) {
-            return new JsonResponse(['message' => "Resource [{$resource}] is invalid"], 404);
+            return new JsonResponse(['message' => $this->message(
+                'arqel::messages.versioning.resource_invalid',
+                "Resource [{$resource}] is invalid",
+                ['resource' => $resource],
+            )], 404);
         }
 
         /** @var class-string<Model> $modelClass */
@@ -150,14 +158,16 @@ final class VersionHistoryController
      * Localize a user-facing JSON message lazily so the request locale
      * applies. Falls back to the English literal when no translator is bound
      * or the key is untranslated, keeping the response text stable.
+     *
+     * @param array<string, string> $replace
      */
-    private function message(string $key, string $fallback): string
+    private function message(string $key, string $fallback, array $replace = []): string
     {
         if (! app()->bound('translator')) {
             return $fallback;
         }
 
-        $translated = trans($key);
+        $translated = trans($key, $replace);
 
         return is_string($translated) && $translated !== $key ? $translated : $fallback;
     }

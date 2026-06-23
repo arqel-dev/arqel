@@ -130,6 +130,40 @@ it('localizes the version-not-found 404 message (restore)', function (): void {
         ->assertJsonPath('message', 'Versão não encontrada para o registro.');
 });
 
+it('localizes the resource-not-registered 404 message with the slug (history)', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(ArticleResource::class);
+
+    /** @var TestCase $this */
+    $response = $this->actingAs(authedUserForVersioningLocale())
+        ->getJson('/admin/unknown-slug/1/versions');
+
+    $response->assertStatus(404)
+        ->assertJsonPath('message', 'Recurso [unknown-slug] não está registrado');
+});
+
+it('localizes the resource-invalid 404 message with the slug (history)', function (): void {
+    // A registry whose findBySlug resolves to a class that lacks getModel()
+    // — exercises the defensive resource_invalid branch the real registry
+    // can't reach (every Resource extends the abstract base with getModel()).
+    $fakeRegistry = new class
+    {
+        public function findBySlug(string $slug): string
+        {
+            return stdClass::class;
+        }
+    };
+    app()->instance(ResourceRegistry::class, $fakeRegistry);
+
+    /** @var TestCase $this */
+    $response = $this->actingAs(authedUserForVersioningLocale())
+        ->getJson('/admin/broken/1/versions');
+
+    $response->assertStatus(404)
+        ->assertJsonPath('message', 'Recurso [broken] é inválido');
+});
+
 it('localizes the resource-not-found 404 message with the slug (restore)', function (): void {
     Route::post(
         '/admin/{resource}/{id}/versions/{versionId}/restore',

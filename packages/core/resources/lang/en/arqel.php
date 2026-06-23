@@ -115,6 +115,14 @@ return [
         'en' => 'English',
         'pt_BR' => 'Português (Brasil)',
     ],
+    // Visible copy for @arqel-dev/realtime's <ConnectionStatusBanner>
+    // (role=status, aria-live=polite). Shown on every WebSocket
+    // disconnect/failed state; keep wording matching the React fallbacks.
+    'realtime' => [
+        'connecting' => 'Connecting...',
+        'disconnected' => 'Connection lost. Reconnecting...',
+        'failed' => 'Connection failed. Refresh page.',
+    ],
     'pagination' => [
         'previous' => 'Previous',
         'next' => 'Next',

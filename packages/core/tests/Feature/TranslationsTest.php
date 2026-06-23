@@ -45,3 +45,20 @@ it('substitutes placeholders in pagination strings', function (): void {
     expect(__('arqel::table.pagination.showing', ['from' => 1, 'to' => 10, 'total' => 42]))
         ->toBe('Showing 1 to 10 of 42 results');
 });
+
+it('exposes the realtime connection-banner copy in both locales', function (): void {
+    // These keys back @arqel-dev/realtime's <ConnectionStatusBanner>; the
+    // English values must match the React fallbacks so the accessible name is
+    // stable when no translation prop is present.
+    app()->setLocale('en');
+
+    expect(__('arqel::arqel.realtime.connecting'))->toBe('Connecting...')
+        ->and(__('arqel::arqel.realtime.disconnected'))->toBe('Connection lost. Reconnecting...')
+        ->and(__('arqel::arqel.realtime.failed'))->toBe('Connection failed. Refresh page.');
+
+    app()->setLocale('pt_BR');
+
+    expect(__('arqel::arqel.realtime.connecting'))->toBe('Conectando...')
+        ->and(__('arqel::arqel.realtime.disconnected'))->toBe('Conexão perdida. Reconectando...')
+        ->and(__('arqel::arqel.realtime.failed'))->toBe('Falha na conexão. Atualize a página.');
+});

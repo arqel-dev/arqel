@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from '@arqel-dev/ui';
 import { router } from '@inertiajs/react';
-import { type ReactElement, useId } from 'react';
+import { type ReactElement, useEffect, useId } from 'react';
 import { useI18nContext } from './I18nProvider';
 
 type LocaleSwitcherProps = {
@@ -43,6 +43,18 @@ export function LocaleSwitcher({
   const selectId = useId();
   const fieldLabel = label ?? t('arqel.locale.switch');
   const map = { ...DEFAULT_LABELS, ...(labels ?? {}) };
+
+  // After a client-side locale change the Inertia visit swaps the page
+  // component without re-rendering the Blade shell that set `<html lang>`,
+  // leaving the attribute stale (screen readers keep the old pronunciation).
+  // Sync it from the active locale, normalizing the underscore Laravel tag
+  // (`pt_BR`) to BCP-47 (`pt-BR`) so `lang` is a valid language tag.
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    document.documentElement.lang = locale.replace(/_/g, '-');
+  }, [locale]);
 
   const handleValueChange = (next: string): void => {
     if (next === locale) {

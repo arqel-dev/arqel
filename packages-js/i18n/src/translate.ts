@@ -1,41 +1,36 @@
+import { translate as coreTranslate } from '@arqel-dev/react/utils';
 import type { TranslateFn, TranslationDictionary } from './types';
 
 /**
- * Walks the dotted-path `key` through `dict`, returning the leaf string
- * or — when missing — the original key. This mirrors Laravel's `__()`
- * fallback behaviour, keeping missing keys visible during development
- * without throwing in production.
+ * Builds a translator bound to `dict`, delegating to the SAME pluralization-
+ * and locale-aware `translate()` core that `@arqel-dev/react`'s
+ * `useArqelTranslations()` uses. This keeps the provider's `t()` and the hook
+ * in lock-step: one page, one dictionary, one resolution semantics.
+ *
+ * Behaviour mirrors Laravel's `__()`:
+ * - dotted-path lookup (`actions.create` → `dict.actions.create`);
+ * - missing keys return the key itself (visible during development);
+ * - `:placeholder` tokens are substituted from `params`;
+ * - when `params.count` is a number the value is treated as a pluralizable
+ *   string (`{one} :count item|{other} :count items`) and the matching form is
+ *   selected via `Intl.PluralRules` in `locale` before substitution.
+ *
+ * `locale` should be a BCP-47 tag (`pt-BR`); pass the active panel locale so
+ * pluralization matches the rendered language.
  */
-function lookup(dict: TranslationDictionary, key: string): string | undefined {
-  const segments = key.split('.');
-  let cursor: string | TranslationDictionary | undefined = dict;
-  for (const segment of segments) {
-    if (cursor === undefined || typeof cursor === 'string') {
-      return undefined;
-    }
-    cursor = cursor[segment];
-  }
-  return typeof cursor === 'string' ? cursor : undefined;
-}
-
-/**
- * Replaces `:placeholder` tokens with values from `params`. Numeric
- * values are coerced to strings — keep the API symmetric with Laravel
- * `__('greeting', ['name' => $name])`.
- */
-function interpolate(template: string, params?: Readonly<Record<string, string | number>>): string {
-  if (params === undefined) {
-    return template;
-  }
-  return template.replace(/:([a-zA-Z0-9_]+)/g, (match, name: string) => {
-    const value = params[name];
-    return value === undefined ? match : String(value);
-  });
-}
-
-export function buildTranslator(dict: TranslationDictionary): TranslateFn {
+export function buildTranslator(dict: TranslationDictionary, locale?: string): TranslateFn {
   return (key, params) => {
-    const found = lookup(dict, key);
-    return found === undefined ? key : interpolate(found, params);
+    const count = typeof params?.['count'] === 'number' ? params['count'] : undefined;
+    return coreTranslate(
+      dict as Record<string, unknown>,
+      key,
+      params
+        ? {
+            replacements: params,
+            ...(locale !== undefined ? { locale } : {}),
+            ...(count !== undefined ? { count } : {}),
+          }
+        : undefined,
+    );
   };
 }

@@ -114,6 +114,14 @@ return [
         'en' => 'English',
         'pt_BR' => 'Português (Brasil)',
     ],
+    // Texto visível do <ConnectionStatusBanner> do @arqel-dev/realtime
+    // (role=status, aria-live=polite). Exibido a cada desconexão/falha
+    // do WebSocket.
+    'realtime' => [
+        'connecting' => 'Conectando...',
+        'disconnected' => 'Conexão perdida. Reconectando...',
+        'failed' => 'Falha na conexão. Atualize a página.',
+    ],
     'pagination' => [
         'previous' => 'Anterior',
         'next' => 'Próximo',

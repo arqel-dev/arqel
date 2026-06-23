@@ -6,6 +6,7 @@
  * collections require their own change-set tracking.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { HasManyFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 
@@ -17,12 +18,15 @@ interface RelatedRecord {
 
 export function HasManyReadonly({ field, value, inputId, describedBy }: FieldRendererProps) {
   const f = field as HasManyFieldSchema;
+  const t = useArqelTranslations();
   const items: RelatedRecord[] = Array.isArray(value) ? (value as RelatedRecord[]) : [];
 
   if (items.length === 0) {
     return (
       <p id={inputId} aria-describedby={describedBy} className="text-sm text-muted-foreground">
-        No {f.props.relatedResource} linked.
+        {t('arqel.fields.has_many_empty', 'No :resource linked.', {
+          resource: f.props.relatedResource,
+        })}
       </p>
     );
   }

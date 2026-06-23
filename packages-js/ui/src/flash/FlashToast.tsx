@@ -6,6 +6,7 @@
  * a richer library is preferred.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useEffect } from 'react';
 import { cn } from '../utils/cn.js';
 
@@ -40,6 +41,7 @@ export function FlashToast({
   durationMs = 5000,
   className,
 }: FlashToastProps) {
+  const t = useArqelTranslations();
   useEffect(() => {
     if (durationMs <= 0) return undefined;
     const id = window.setTimeout(onDismiss, durationMs);
@@ -63,7 +65,7 @@ export function FlashToast({
       <span className="flex-1">{message}</span>
       <button
         type="button"
-        aria-label="Dismiss"
+        aria-label={t('arqel.aria.flash_dismiss', 'Dismiss')}
         onClick={onDismiss}
         className="text-muted-foreground hover:text-foreground"
       >

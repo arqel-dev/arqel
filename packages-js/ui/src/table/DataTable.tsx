@@ -147,7 +147,7 @@ export function DataTable<TRecord extends DataTableRecord>({
                   <th scope="col" className="w-10 px-3 py-2 text-left">
                     <input
                       type="checkbox"
-                      aria-label="Select all rows"
+                      aria-label={t('table.bulk.select_all', 'Select all')}
                       checked={allSelected}
                       ref={(el) => {
                         if (el) el.indeterminate = someSelected;
@@ -206,7 +206,11 @@ export function DataTable<TRecord extends DataTableRecord>({
                   );
                 })}
                 {rowActions && (
-                  <th scope="col" className="w-24 px-3 py-2 text-right" aria-label="Actions" />
+                  <th
+                    scope="col"
+                    className="w-24 px-3 py-2 text-right"
+                    aria-label={t('table.column.actions', 'Actions')}
+                  />
                 )}
               </tr>
             ))}
@@ -246,7 +250,9 @@ export function DataTable<TRecord extends DataTableRecord>({
                       <td className="w-10 px-3 py-2">
                         <input
                           type="checkbox"
-                          aria-label={`Select row ${record.id}`}
+                          aria-label={t('table.bulk.select_row', `Select row ${record.id}`, {
+                            id: String(record.id),
+                          })}
                           checked={checked}
                           onChange={(event) => {
                             const native = event.nativeEvent as MouseEvent;
@@ -353,7 +359,9 @@ function DataCards<TRecord extends DataTableRecord>({
                   <label className="-m-2.5 inline-flex size-11 cursor-pointer items-center justify-center p-2.5">
                     <input
                       type="checkbox"
-                      aria-label={`Select row ${record.id}`}
+                      aria-label={t('table.bulk.select_row', `Select row ${record.id}`, {
+                        id: String(record.id),
+                      })}
                       className="size-5"
                       checked={checked}
                       onChange={(event) => {

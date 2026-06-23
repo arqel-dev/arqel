@@ -8,6 +8,7 @@
  */
 
 import { useTheme } from '@arqel-dev/react/providers';
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ReactNode } from 'react';
 import { Button } from '../action/Button.js';
 import { SidebarTrigger } from '../shadcn/ui/sidebar.js';
@@ -31,6 +32,7 @@ export function Topbar({
   className,
 }: TopbarProps) {
   const { resolved, toggle } = useTheme();
+  const t = useArqelTranslations();
 
   return (
     <header
@@ -54,7 +56,11 @@ export function Topbar({
         <Button
           variant="ghost"
           size="icon"
-          aria-label={`Switch to ${resolved === 'dark' ? 'light' : 'dark'} theme`}
+          aria-label={
+            resolved === 'dark'
+              ? t('arqel.aria.theme_toggle_light', 'Switch to light theme')
+              : t('arqel.aria.theme_toggle_dark', 'Switch to dark theme')
+          }
           onClick={toggle}
         >
           <span aria-hidden="true">{resolved === 'dark' ? '☀' : '☾'}</span>

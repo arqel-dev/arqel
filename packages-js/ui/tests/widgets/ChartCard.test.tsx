@@ -3,6 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { ChartCard } from '../../src/widgets/ChartCard';
 import type { ChartWidgetProps } from '../../src/widgets/types';
 
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} as Record<string, unknown> })),
+}));
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: pageMock };
+});
+
 // Mock chart sub-modules so jsdom doesn't try to render Recharts SVG output.
 // Each mock returns a tiny stub component that asserts its testid presence;
 // this validates ChartCard's lazy-dispatch logic, not Recharts internals.
@@ -53,6 +61,28 @@ describe('ChartCard', () => {
     const { container } = render(<ChartCard widget={makeWidget()} />);
     const fallback = container.querySelector('[data-testid="chart-fallback"]');
     expect(fallback).not.toBeNull();
+  });
+
+  it('localizes the loading-fallback accessible name from the shared dictionary', () => {
+    // This is the FIRST test that renders ChartCard with a pt_BR dictionary, so
+    // the lazy chart chunk has not resolved yet on the first synchronous render
+    // and Suspense shows the skeleton fallback — whose accessible name must be
+    // routed through t(). (Later tests resolve the lazy chunk from cache and no
+    // longer suspend, so the fallback assertion has to run before them.)
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          available: ['pt_BR'],
+          translations: { arqel: { aria: { chart_loading: 'Carregando gráfico' } } },
+        },
+      },
+    });
+    const { container } = render(<ChartCard widget={makeWidget({ chartType: 'radar' })} />);
+    const fallback = container.querySelector('[data-testid="chart-fallback"]');
+    expect(fallback).not.toBeNull();
+    expect(fallback).toHaveAttribute('aria-label', 'Carregando gráfico');
+    pageMock.mockReturnValue({ props: {} });
   });
 
   it('dispatches LineChart for chartType="line"', async () => {

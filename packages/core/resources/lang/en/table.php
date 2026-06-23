@@ -23,6 +23,12 @@ return [
         'showing' => 'Showing :from to :to of :total results',
         // Compact range summary (visible + announced).
         'range' => ':from–:to of :total',
+        // Accessible name for the pagination <nav> landmark.
+        'label' => 'Pagination',
+    ],
+    'column' => [
+        // Accessible name for the otherwise-empty row-actions column header.
+        'actions' => 'Actions',
     ],
     'sort' => [
         'asc' => 'Ascending',
@@ -35,10 +41,16 @@ return [
         'yes' => 'Yes',
         'no' => 'No',
         'clear' => 'Clear filters (:count)',
+        // Accessible name for the filters <fieldset> legend (sr-only).
+        'legend' => 'Filters',
     ],
     'bulk' => [
         'selected' => ':count selected',
         'select_all' => 'Select all',
         'clear' => 'Clear',
+        // Accessible name for the bulk-actions <section> landmark.
+        'label' => 'Bulk actions',
+        // Per-row selection checkbox accessible name (:id is the record key).
+        'select_row' => 'Select row :id',
     ],
 ];

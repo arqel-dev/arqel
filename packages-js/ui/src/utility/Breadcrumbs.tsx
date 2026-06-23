@@ -11,6 +11,7 @@
  * usage works outside Inertia (e.g. dashboard widgets, tests).
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn.js';
@@ -48,10 +49,11 @@ function BreadcrumbsList({
   separator = <span aria-hidden="true">/</span>,
   className,
 }: BreadcrumbsProps & { items: BreadcrumbItem[] }) {
+  const t = useArqelTranslations();
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Breadcrumb" className={cn('text-sm', className)}>
+    <nav aria-label={t('arqel.aria.breadcrumb', 'Breadcrumb')} className={cn('text-sm', className)}>
       <ol className="flex flex-wrap items-center gap-2 text-muted-foreground">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

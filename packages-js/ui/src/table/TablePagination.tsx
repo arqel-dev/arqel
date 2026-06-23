@@ -37,7 +37,7 @@ export function TablePagination({
         'flex flex-wrap items-center justify-between gap-2 border-t border-border px-3 py-2 text-sm',
         className,
       )}
-      aria-label="Pagination"
+      aria-label={t('table.pagination.label', 'Pagination')}
     >
       <span className="text-muted-foreground">
         {meta.total === 0

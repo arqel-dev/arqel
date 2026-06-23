@@ -2,6 +2,14 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CommandPalette, type PaletteCommand } from '../../src/palette/CommandPalette.js';
 
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} as Record<string, unknown> })),
+}));
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: pageMock };
+});
+
 const RECENT_KEY = 'arqel:cmdpal:recent';
 
 const sample: PaletteCommand[] = [
@@ -47,7 +55,29 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
+  pageMock.mockReset();
+  pageMock.mockReturnValue({ props: {} });
 });
+
+function usePtBr() {
+  pageMock.mockReturnValue({
+    props: {
+      i18n: {
+        locale: 'pt_BR',
+        available: ['pt_BR'],
+        translations: {
+          arqel: {
+            aria: {
+              palette_title: 'Paleta de comandos',
+              palette_results: ':count comandos',
+              palette_list: 'Comandos',
+            },
+          },
+        },
+      },
+    },
+  });
+}
 
 function pressCmdK() {
   fireEvent.keyDown(window, { key: 'k', metaKey: true });
@@ -186,5 +216,24 @@ describe('CommandPalette', () => {
     await flushMicrotasks();
     const status = screen.getByRole('status');
     expect(status.textContent).toMatch(/2 commands/);
+  });
+
+  it('translates dialog title, listbox name and the live-region count (pt_BR)', async () => {
+    usePtBr();
+    globalThis.fetch = mockFetch(sample) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    // sr-only <h2> drives the dialog's accessible name via aria-labelledby.
+    expect(screen.getByRole('heading', { name: 'Paleta de comandos' })).toBeInTheDocument();
+    expect(screen.getByRole('listbox', { name: 'Comandos' })).toBeInTheDocument();
+    const input = screen.getByRole('combobox') as HTMLInputElement;
+    act(() => fireEvent.change(input, { target: { value: 'x' } }));
+    await act(async () => {
+      vi.advanceTimersByTime(160);
+    });
+    await flushMicrotasks();
+    await flushMicrotasks();
+    expect(screen.getByRole('status').textContent).toMatch(/2 comandos/);
   });
 });

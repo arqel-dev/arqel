@@ -15,6 +15,7 @@
  * common "big number" case stays bundle-cheap.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn.js';
 import { WidgetWrapper } from './WidgetWrapper.js';
@@ -65,6 +66,7 @@ interface SparklineProps {
 }
 
 function Sparkline({ points, color }: SparklineProps) {
+  const t = useArqelTranslations();
   if (points.length < 2) return null;
 
   const min = Math.min(...points);
@@ -87,7 +89,7 @@ function Sparkline({ points, color }: SparklineProps) {
       preserveAspectRatio="none"
       className={cn('mt-3 h-8 w-full', COLOR_STROKE[color])}
       role="img"
-      aria-label="Trend sparkline"
+      aria-label={t('arqel.aria.stat_sparkline', 'Trend sparkline')}
       data-testid="stat-card-sparkline"
     >
       <polyline

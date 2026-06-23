@@ -23,6 +23,12 @@ return [
         'showing' => 'Exibindo :from a :to de :total resultados',
         // Resumo compacto do intervalo (visível + anunciado).
         'range' => ':from–:to de :total',
+        // Nome acessível do landmark <nav> de paginação.
+        'label' => 'Paginação',
+    ],
+    'column' => [
+        // Nome acessível do cabeçalho (vazio) da coluna de ações da linha.
+        'actions' => 'Ações',
     ],
     'sort' => [
         'asc' => 'Crescente',
@@ -35,10 +41,16 @@ return [
         'yes' => 'Sim',
         'no' => 'Não',
         'clear' => 'Limpar filtros (:count)',
+        // Nome acessível da legenda (sr-only) do <fieldset> de filtros.
+        'legend' => 'Filtros',
     ],
     'bulk' => [
         'selected' => ':count selecionado(s)',
         'select_all' => 'Selecionar todos',
         'clear' => 'Limpar',
+        // Nome acessível do landmark <section> de ações em massa.
+        'label' => 'Ações em massa',
+        // Nome acessível do checkbox de seleção de cada linha (:id é a chave).
+        'select_row' => 'Selecionar linha :id',
     ],
 ];

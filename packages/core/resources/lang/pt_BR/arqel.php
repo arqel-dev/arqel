@@ -64,4 +64,20 @@ return [
         'next' => 'Próximo',
         'showing' => 'Exibindo :from a :to de :total resultados',
     ],
+    // Nomes acessíveis (aria-label / sr-only) da interface do framework.
+    // Mantidos distintos dos rótulos visíveis curtos para que leitores de
+    // tela anunciem um nome acessível completo e descritivo.
+    'aria' => [
+        'actions_menu' => 'Ações',
+        'flash_dismiss' => 'Dispensar',
+        'chart_loading' => 'Carregando gráfico',
+        'stat_sparkline' => 'Minigráfico de tendência',
+        'palette_title' => 'Paleta de comandos',
+        'palette_results' => ':count comandos',
+        'palette_list' => 'Comandos',
+        'breadcrumb' => 'Trilha de navegação',
+        'theme_toggle_light' => 'Mudar para o tema claro',
+        'theme_toggle_dark' => 'Mudar para o tema escuro',
+        'tenant_switch' => 'Trocar de tenant (atual: :tenant)',
+    ],
 ];

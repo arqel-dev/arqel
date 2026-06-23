@@ -10,6 +10,7 @@
  * come from the same payload.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { TenantSummary } from '@arqel-dev/types/tenant';
 import { router } from '@inertiajs/react';
 import type { JSX } from 'react';
@@ -38,6 +39,7 @@ export function TenantSwitcher({
   available,
   switchUrl,
 }: TenantSwitcherProps): JSX.Element | null {
+  const t = useArqelTranslations();
   if (!current || available.length <= 1) return null;
 
   const buildUrl = switchUrl ?? DEFAULT_SWITCH_URL;
@@ -52,7 +54,9 @@ export function TenantSwitcher({
           variant="ghost"
           size="sm"
           data-testid="tenant-switcher-trigger"
-          aria-label={`Switch tenant (current: ${currentLabel})`}
+          aria-label={t('arqel.aria.tenant_switch', `Switch tenant (current: ${currentLabel})`, {
+            tenant: currentLabel,
+          })}
         >
           {currentLabel}
         </Button>

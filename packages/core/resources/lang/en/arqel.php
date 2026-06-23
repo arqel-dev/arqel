@@ -64,4 +64,20 @@ return [
         'next' => 'Next',
         'showing' => 'Showing :from to :to of :total results',
     ],
+    // Accessible names (aria-label / sr-only) for framework UI chrome. Kept
+    // distinct from short visible labels so screen-reader users hear a full,
+    // descriptive accessible name.
+    'aria' => [
+        'actions_menu' => 'Actions',
+        'flash_dismiss' => 'Dismiss',
+        'chart_loading' => 'Loading chart',
+        'stat_sparkline' => 'Trend sparkline',
+        'palette_title' => 'Command palette',
+        'palette_results' => ':count commands',
+        'palette_list' => 'Commands',
+        'breadcrumb' => 'Breadcrumb',
+        'theme_toggle_light' => 'Switch to light theme',
+        'theme_toggle_dark' => 'Switch to dark theme',
+        'tenant_switch' => 'Switch tenant (current: :tenant)',
+    ],
 ];

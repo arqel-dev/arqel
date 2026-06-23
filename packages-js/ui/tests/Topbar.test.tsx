@@ -6,6 +6,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SidebarProvider } from '../src/shadcn/ui/sidebar.js';
 import { Topbar } from '../src/shell/Topbar.js';
 
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} as Record<string, unknown> })),
+}));
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: pageMock };
+});
+
 function withTheme(node: ReactNode) {
   return <ThemeProvider defaultTheme="light">{node}</ThemeProvider>;
 }
@@ -83,5 +91,34 @@ describe('Topbar theme toggle (#236)', () => {
     });
 
     expect(root.classList.contains('dark')).toBe(true);
+  });
+
+  it('translates the theme-toggle accessible name (pt_BR)', () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          available: ['pt_BR'],
+          translations: {
+            arqel: {
+              aria: {
+                theme_toggle_dark: 'Mudar para o tema escuro',
+                theme_toggle_light: 'Mudar para o tema claro',
+              },
+            },
+          },
+        },
+      },
+    });
+    render(
+      <ThemeProvider defaultTheme="light">
+        <SidebarProvider>
+          <Topbar />
+        </SidebarProvider>
+      </ThemeProvider>,
+    );
+    // In light mode the toggle switches to dark; its accessible name is localized.
+    expect(screen.getByRole('button', { name: 'Mudar para o tema escuro' })).toBeInTheDocument();
+    pageMock.mockReturnValue({ props: {} });
   });
 });

@@ -760,10 +760,98 @@ final class ResourceController
             return $clean;
         }
 
-        $validated = $request->validate($rules);
+        // Feed the Resource's per-field custom messages and humanised /
+        // localized attribute names into the validator so the default
+        // Inertia CRUD path matches what a hand-rolled FormRequest would
+        // produce. Without these, Laravel falls back to the raw snake_case
+        // field key for `:attribute` and silently drops any
+        // `validationMessage()` the app declared (#i18n-r2). Both are
+        // derived from the same `effectiveFields($record)` set as the
+        // rules, so layout-hidden fields stay consistent across all three.
+        $fields = $resource->effectiveFields($record);
+
+        $validated = $request->validate(
+            $rules,
+            $this->extractMessages($fields),
+            $this->extractAttributes($fields),
+        );
         $clean = [];
         foreach ($validated as $key => $value) {
             $clean[(string) $key] = $value;
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Pull per-field custom validation messages from the rule extractor,
+     * keyed `field.rule => message` for Laravel's validator. Returns an
+     * empty array when the extractor is absent or lacks the method, so
+     * the validator simply uses its translated defaults.
+     *
+     * @param array<int, mixed> $fields
+     *
+     * @return array<string, string>
+     */
+    private function extractMessages(array $fields): array
+    {
+        return $this->extractStringMap($fields, 'extractMessages');
+    }
+
+    /**
+     * Pull humanised / localized attribute names from the rule extractor,
+     * keyed `field => attribute`, so `:attribute` renders the field's
+     * label rather than the raw snake_case key.
+     *
+     * @param array<int, mixed> $fields
+     *
+     * @return array<string, string>
+     */
+    private function extractAttributes(array $fields): array
+    {
+        return $this->extractStringMap($fields, 'extractAttributes');
+    }
+
+    /**
+     * Shared, fail-OPEN helper for the secondary validator inputs
+     * (messages + attributes). Unlike rules, a missing/broken extraction
+     * here must NOT block the request: these only improve the error copy,
+     * never the security posture, so we degrade to the validator's
+     * translated defaults rather than throwing.
+     *
+     * @param array<int, mixed> $fields
+     *
+     * @return array<string, string>
+     */
+    private function extractStringMap(array $fields, string $method): array
+    {
+        $extractorClass = 'Arqel\\Form\\FieldRulesExtractor';
+
+        if (! class_exists($extractorClass)) {
+            return [];
+        }
+
+        try {
+            $extractor = (new ReflectionClass($extractorClass))->newInstance();
+
+            if (! method_exists($extractor, $method)) {
+                return [];
+            }
+
+            $result = $extractor->{$method}($fields);
+        } catch (ReflectionException) {
+            return [];
+        }
+
+        if (! is_array($result)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach ($result as $key => $value) {
+            if (is_string($key) && is_string($value)) {
+                $clean[$key] = $value;
+            }
         }
 
         return $clean;

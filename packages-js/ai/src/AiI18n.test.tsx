@@ -45,6 +45,9 @@ const aiDict = {
       translate_error_http: 'Falha na tradução (HTTP :status).',
       translate_error_invalid: 'Falha na tradução: corpo de resposta inválido.',
       translate_error_network: 'Falha na tradução: erro de rede.',
+      file_too_large: 'Arquivo muito grande: :size (máx. :max).',
+      missing_translate_url: 'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
+      missing_classify_url: 'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
       status_generating: 'Gerando',
       status_classifying: 'Classificando',
       status_extracting: 'Extraindo',
@@ -181,6 +184,74 @@ describe('@arqel-dev/ai i18n', () => {
     // Switch to the non-default tab to reveal the per-language translate button.
     fireEvent.click(screen.getByRole('tab', { name: /pt/ }));
     expect(screen.getByRole('button', { name: 'Traduzir de en' })).toBeInTheDocument();
+  });
+
+  it('AiImageInput localizes the file-too-large validation error with :size/:max', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiImageInput
+        name="img"
+        value={null}
+        props={{
+          analyses: [],
+          populateFields: {},
+          provider: null,
+          acceptedMimes: ['image/png'],
+          maxFileSize: 10,
+          buttonLabel: '',
+        }}
+        resource="media"
+        field="img"
+      />,
+    );
+    const input = screen.getByLabelText('Arquivo de imagem') as HTMLInputElement;
+    const big = new File(['x'.repeat(100)], 'big.png', { type: 'image/png' });
+    fireEvent.change(input, { target: { files: [big] } });
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe('Arquivo muito grande: 100 B (máx. 10 B).');
+  });
+
+  it('AiTranslateInput localizes the missing-translate-url config error', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiTranslateInput
+        name="tr"
+        value={{ en: 'Hi' }}
+        props={{
+          languages: ['en', 'pt'],
+          defaultLanguage: 'en',
+          autoTranslate: false,
+          provider: null,
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Traduzir tudo que falta' }));
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe(
+      'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
+    );
+  });
+
+  it('AiSelectInput localizes the missing-classify-url config error', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiSelectInput
+        name="cat"
+        value={null}
+        props={{
+          options: { a: 'A' },
+          classifyFromFields: ['body'],
+          provider: null,
+          fallbackOption: null,
+          hasContextFields: true,
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Classificar com IA' }));
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe(
+      'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+    );
   });
 
   it('falls back to English literals when the dictionary lacks the ai keys', () => {

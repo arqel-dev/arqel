@@ -179,6 +179,10 @@ return [
         'translate_error_http' => 'Translation failed (HTTP :status).',
         'translate_error_invalid' => 'Translation failed: invalid response body.',
         'translate_error_network' => 'Translation failed: network error.',
+        // Client-side validation + configuration error banners.
+        'file_too_large' => 'File too large: :size (max :max).',
+        'missing_translate_url' => 'Missing translate URL: provide `translateUrl` or both `resource` and `field`.',
+        'missing_classify_url' => 'Missing classify URL: provide `classifyUrl` or both `resource` and `field`.',
         // sr-only / aria live-region status announcements.
         'status_generating' => 'Generating',
         'status_classifying' => 'Classifying',

@@ -178,6 +178,10 @@ return [
         'translate_error_http' => 'Falha na tradução (HTTP :status).',
         'translate_error_invalid' => 'Falha na tradução: corpo de resposta inválido.',
         'translate_error_network' => 'Falha na tradução: erro de rede.',
+        // Banners de validação no cliente + erros de configuração.
+        'file_too_large' => 'Arquivo muito grande: :size (máx. :max).',
+        'missing_translate_url' => 'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
+        'missing_classify_url' => 'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
         // Anúncios de status das regiões aria/sr-only.
         'status_generating' => 'Gerando',
         'status_classifying' => 'Classificando',

@@ -186,7 +186,12 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
       }
       const url = buildTranslateUrl(translateUrl, resource, field);
       if (url === null) {
-        setError('Missing translate URL: provide `translateUrl` or both `resource` and `field`.');
+        setError(
+          t(
+            'arqel.ai.missing_translate_url',
+            'Missing translate URL: provide `translateUrl` or both `resource` and `field`.',
+          ),
+        );
         return;
       }
 

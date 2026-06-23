@@ -22,7 +22,7 @@ final class PluginDownloadController
         $user = $request->user();
 
         if ($user === null) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         $plugin = Plugin::query()->where('slug', $slug)->first();
@@ -42,7 +42,7 @@ final class PluginDownloadController
                 ->exists();
 
             if (! $hasPurchase) {
-                return new JsonResponse(['message' => 'License required'], 403);
+                return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.license_required')], 403);
             }
         }
 

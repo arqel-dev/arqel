@@ -25,7 +25,7 @@ final class PluginReviewController
         $userId = $this->resolveUserId($request);
 
         if ($userId === null) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         try {
@@ -36,7 +36,7 @@ final class PluginReviewController
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => $e->errors(),
             ], 422);
         }

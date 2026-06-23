@@ -20,7 +20,7 @@ final class PublisherPayoutsController
         $user = $request->user();
 
         if ($user === null) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         $key = $user->getAuthIdentifier();

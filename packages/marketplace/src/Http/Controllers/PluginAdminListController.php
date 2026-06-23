@@ -20,7 +20,7 @@ final class PluginAdminListController
     public function __invoke(Request $request): JsonResponse
     {
         if (! Gate::allows('marketplace.review')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.forbidden')], 403);
         }
 
         /** @var mixed $statusInput */

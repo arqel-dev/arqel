@@ -62,5 +62,14 @@ return [
         'field_not_found' => ':type [:field] not found on resource [:resource]',
         'provider_failed' => 'AI provider request failed',
         'image_source_required' => 'Either imageUrl or imageBase64 must be provided',
+    'marketplace' => [
+        'forbidden' => 'Forbidden',
+        'unauthenticated' => 'Unauthenticated',
+        'validation_failed' => 'Validation failed',
+        'license_required' => 'License required',
+        'purchase_not_found' => 'Purchase not found',
+        'review_not_found' => 'Review not found',
+        'refund_failed' => 'Refund failed at gateway',
+        'payment_verification_failed' => 'Payment verification failed',
     ],
 ];

@@ -62,5 +62,14 @@ return [
         'field_not_found' => ':type [:field] não encontrado no recurso [:resource]',
         'provider_failed' => 'A requisição ao provedor de IA falhou',
         'image_source_required' => 'É necessário fornecer imageUrl ou imageBase64',
+    'marketplace' => [
+        'forbidden' => 'Acesso negado',
+        'unauthenticated' => 'Não autenticado',
+        'validation_failed' => 'Falha na validação',
+        'license_required' => 'Licença obrigatória',
+        'purchase_not_found' => 'Compra não encontrada',
+        'review_not_found' => 'Avaliação não encontrada',
+        'refund_failed' => 'Falha no reembolso pelo gateway',
+        'payment_verification_failed' => 'Falha na verificação do pagamento',
     ],
 ];

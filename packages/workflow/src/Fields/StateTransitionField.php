@@ -151,7 +151,7 @@ final class StateTransitionField extends Field
         if ($meta === null) {
             return [
                 'name' => $key,
-                'label' => $key,
+                'label' => self::localizeLabel($key),
                 'color' => null,
                 'icon' => null,
             ];
@@ -368,7 +368,26 @@ final class StateTransitionField extends Field
 
         $spaced = (string) preg_replace('/(?<!^)(?=[A-Z])/', ' ', $short);
 
-        return trim($spaced);
+        return self::localizeLabel(trim($spaced));
+    }
+
+    /**
+     * Resolve a workflow label through Laravel translation lazily so the
+     * active request locale applies at serialization time. A label that is a
+     * translation key (e.g. `arqel::workflow.transitions.approve`) renders in
+     * the current locale; a plain literal passes through unchanged (Laravel
+     * `trans()` returns the key when no translation exists). Falls back to the
+     * raw literal when no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 
     private static function shortName(string $value): string

@@ -126,7 +126,17 @@ final class WorkflowDefinition
      */
     public function getStates(): array
     {
-        return $this->states;
+        $localized = [];
+
+        foreach ($this->states as $key => $meta) {
+            $localized[$key] = [
+                'label' => self::localizeLabel($meta['label']),
+                'color' => $meta['color'],
+                'icon' => $meta['icon'],
+            ];
+        }
+
+        return $localized;
     }
 
     /**
@@ -144,7 +154,17 @@ final class WorkflowDefinition
      */
     public function getStateMetadata(string $stateClass): ?array
     {
-        return $this->states[$stateClass] ?? null;
+        $meta = $this->states[$stateClass] ?? null;
+
+        if ($meta === null) {
+            return null;
+        }
+
+        return [
+            'label' => self::localizeLabel($meta['label']),
+            'color' => $meta['color'],
+            'icon' => $meta['icon'],
+        ];
     }
 
     /**
@@ -160,7 +180,7 @@ final class WorkflowDefinition
     {
         return [
             'field' => $this->field,
-            'states' => $this->states,
+            'states' => $this->getStates(),
             'transitions' => $this->transitions,
         ];
     }
@@ -179,5 +199,24 @@ final class WorkflowDefinition
         $spaced = (string) preg_replace('/(?<!^)(?=[A-Z])/', ' ', $basename);
 
         return trim($spaced);
+    }
+
+    /**
+     * Resolve a state label through Laravel translation lazily so the active
+     * request locale applies at serialization time. A label that is a
+     * translation key (e.g. `arqel::workflow.states.pending`) renders in the
+     * current locale; a plain literal passes through unchanged (Laravel
+     * `trans()` returns the key when no translation exists). Falls back to the
+     * raw literal when no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

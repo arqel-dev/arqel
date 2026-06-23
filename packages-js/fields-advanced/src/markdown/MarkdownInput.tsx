@@ -487,7 +487,7 @@ export function MarkdownInput({
                 onClick={() => setIsPopupOpen(true)}
                 aria-label={t('arqel.fields_advanced.markdown_preview_open', 'Open preview')}
               >
-                Preview
+                {t('arqel.fields_advanced.markdown_preview_label', 'Preview')}
               </button>
             ) : null}
             {props.fullscreen ? (
@@ -495,10 +495,16 @@ export function MarkdownInput({
                 type="button"
                 className={buttonClasses}
                 onClick={() => setIsFullscreen((prev) => !prev)}
-                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                aria-label={
+                  isFullscreen
+                    ? t('arqel.fields_advanced.markdown_exit_fullscreen', 'Exit fullscreen')
+                    : t('arqel.fields_advanced.markdown_enter_fullscreen', 'Enter fullscreen')
+                }
                 aria-pressed={isFullscreen}
               >
-                {isFullscreen ? 'Exit' : 'Full'}
+                {isFullscreen
+                  ? t('arqel.fields_advanced.markdown_exit_short', 'Exit')
+                  : t('arqel.fields_advanced.markdown_fullscreen_short', 'Full')}
               </button>
             ) : null}
           </span>

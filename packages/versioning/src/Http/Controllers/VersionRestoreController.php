@@ -68,7 +68,10 @@ final class VersionRestoreController
                 ->first();
 
             if ($version === null) {
-                throw new NotFoundHttpException('Version not found for record.');
+                throw new NotFoundHttpException($this->message(
+                    'arqel::messages.versioning.version_not_found',
+                    'Version not found for record.',
+                ));
             }
 
             /** @var callable(Version): bool $restore */
@@ -113,16 +116,40 @@ final class VersionRestoreController
      * Localize a user-facing JSON message lazily so the request locale
      * applies. Falls back to the English literal when no translator is bound
      * or the key is untranslated, keeping the response text stable.
+     *
+     * @param array<string, string> $replace placeholder substitutions applied
+     *                                       to both the translation and the
+     *                                       English fallback (e.g. :resource)
      */
-    private function message(string $key, string $fallback): string
+    private function message(string $key, string $fallback, array $replace = []): string
     {
         if (! app()->bound('translator')) {
-            return $fallback;
+            return $this->interpolate($fallback, $replace);
         }
 
-        $translated = trans($key);
+        $translated = trans($key, $replace);
 
-        return is_string($translated) && $translated !== $key ? $translated : $fallback;
+        if (is_string($translated) && $translated !== $key) {
+            return $translated;
+        }
+
+        return $this->interpolate($fallback, $replace);
+    }
+
+    /**
+     * Apply `:placeholder` substitutions to the English fallback literal so
+     * the response stays coherent when the translator is unavailable or the
+     * key is untranslated.
+     *
+     * @param array<string, string> $replace
+     */
+    private function interpolate(string $text, array $replace): string
+    {
+        foreach ($replace as $placeholder => $value) {
+            $text = str_replace(':'.$placeholder, $value, $text);
+        }
+
+        return $text;
     }
 
     /**
@@ -153,27 +180,41 @@ final class VersionRestoreController
         $registryFqcn = 'Arqel\\Core\\Resources\\ResourceRegistry';
 
         if (! class_exists($registryFqcn)) {
-            throw new NotFoundHttpException('Resource registry unavailable.');
+            throw new NotFoundHttpException($this->message(
+                'arqel::messages.versioning.registry_unavailable',
+                'Resource registry unavailable.',
+            ));
         }
 
         $registry = app($registryFqcn);
 
         if (! is_object($registry) || ! method_exists($registry, 'findBySlug')) {
-            throw new NotFoundHttpException('Resource registry unavailable.');
+            throw new NotFoundHttpException($this->message(
+                'arqel::messages.versioning.registry_unavailable',
+                'Resource registry unavailable.',
+            ));
         }
 
         /** @var mixed $resourceClass */
         $resourceClass = $registry->findBySlug($resource);
 
         if (! is_string($resourceClass) || ! class_exists($resourceClass)) {
-            throw new NotFoundHttpException("Resource '{$resource}' not found.");
+            throw new NotFoundHttpException($this->message(
+                'arqel::messages.versioning.resource_not_found',
+                "Resource ':resource' not found.",
+                ['resource' => $resource],
+            ));
         }
 
         /** @var mixed $modelClass */
         $modelClass = $resourceClass::$model ?? null;
 
         if (! is_string($modelClass) || ! class_exists($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
-            throw new NotFoundHttpException("Resource '{$resource}' has no model bound.");
+            throw new NotFoundHttpException($this->message(
+                'arqel::messages.versioning.resource_no_model',
+                "Resource ':resource' has no model bound.",
+                ['resource' => $resource],
+            ));
         }
 
         /** @var class-string<Model> $modelClass */

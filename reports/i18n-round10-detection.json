@@ -1,0 +1,152 @@
+{
+  "total": 12,
+  "confirmed_count": 12,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "MarkdownInput fullscreen toggle aria-label hardcoded English (sibling fixed in CodeInput but missed here)",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+      "line": 498,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.fields_advanced.markdown_fullscreen_enter / arqel.fields_advanced.markdown_fullscreen_exit",
+      "detail": "aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'} is a raw English ternary. Every OTHER toolbar button in this same component (bold/italic/heading/code/link/list at lines 432-481, and the preview-open button) is wrapped in t(). The Round-2 ledger entry (line 430, 'every aria-label hardcoded') only covered those earlier buttons; the fullscreen toggle that appears later in the JSX was missed. The equivalent CodeInput fullscreen toggle WAS fixed (ledger CodeInput line 589), so this is the one remaining un-translated fullscreen control. NOT in ledger.",
+      "confidence": "high",
+      "why_real": "Confirmed real and novel. At /home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx:498 the fullscreen toggle uses a raw English ternary aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}, while every sibling toolbar button in the same component (lines 432/441/450/459/468/477/488) is wrapped in t('arqel.fields_advanced.markdown_*', ...). The t() helper is in scope (used 26x), so this single control is a genuine miss. Not vendored (path is fields-advanced/src/markdown, not ui/src/shadcn). Ledger check: the only MarkdownInput entry is Round 4 line 430 ('every aria-label hardcoded ... Markdown/RichText'), but the current file proves that sweep translated the earlier buttons and left line 498 raw. The equivalent CodeInput fullscreen toggle required its OWN separate Round 7 entry (line 589), confirming fullscreen toggles were a blind spot of the Round-4 sweep and the MarkdownInput one was never separately ledgered. User-facing a11y defect: aria-label is announced by screen readers, so non-English locales get hardcoded English."
+    },
+    {
+      "title": "MarkdownInput fullscreen toggle visible button text hardcoded English ('Exit'/'Full')",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+      "line": 501,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.fields_advanced.markdown_fullscreen_short_exit / arqel.fields_advanced.markdown_fullscreen_short_enter",
+      "detail": "Visible button label {isFullscreen ? 'Exit' : 'Full'} is raw English (visible, not aria-only). Same fullscreen toggle button as the aria-label finding above. Sibling CodeInput fullscreen visible text was already fixed; this Markdown one was not. NOT in ledger.",
+      "confidence": "high",
+      "why_real": "Confirmed at /home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx:501: `{isFullscreen ? 'Exit' : 'Full'}` is raw hardcoded English visible button text, NOT wrapped in t(). This is user-facing (visible label, not aria-only) and not vendored (fields-advanced package, not ui/src/shadcn/*).\n\nLedger check: The only MarkdownInput ledger entry is line 430, round 4, titled \"fields-advanced editor controls: every aria-LABEL hardcoded English.\" That entry is scoped to aria-labels, not visible button text. The visible-text ternary at line 501 is a distinct defect. (Indeed even line 498's aria-label `isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'` remains hardcoded, but that aria concern is at least nominally in-scope of the r4 entry; the visible text at 501 is not.)\n\nSibling claim verified: CodeInput.tsx:598-600 keys the equivalent visible fullscreen text via t('...code_exit_short','Exit') / t('...code_fullscreen_short','Full'), and was filed in round 7 (\"CodeInput fullscreen toggle aria-label + visible text\"). The parallel MarkdownInput visible-text was never given matching keys — a genuine asymmetry/gap. Novel, real, user-facing, not a duplicate, not vendored."
+    },
+    {
+      "title": "MarkdownInput preview button visible text 'Preview' hardcoded (aria-label translated, visible label is not)",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+      "line": 491,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.fields_advanced.markdown_preview_label",
+      "detail": "The popup-preview button has a translated aria-label (t('arqel.fields_advanced.markdown_preview_open', 'Open preview') at line 489) but its visible text content on line 491 is the raw literal 'Preview'. A sighted user in a non-English locale sees English 'Preview' while the accessible name is localized — visible/aria mismatch. NOT in ledger (ledger MarkdownInput entry at line 430 covered aria-labels only).",
+      "confidence": "high",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx. The popup-preview button at lines 484-491 has a translated aria-label (t('arqel.fields_advanced.markdown_preview_open','Open preview') at line 488) but its visible text content is the raw English literal 'Preview' (actual line 490; finding cited 491, off-by-one but unambiguously the same code). This is a genuine visible/aria mismatch: a sighted non-English user sees English 'Preview' while the accessible name is localized. The same defect pattern spans the whole toolbar (Bold/Italic/Heading/Code/Link/List/Preview/Exit/Full visible literals at lines 470,479,490,501,530 etc.) while every aria-label uses t().\n\nNot a duplicate: the only ledger entry for this file (round 4, line 430) is titled explicitly 'every aria-label hardcoded English' — that round fixed the aria-labels (hence every aria-label now wraps t()), but the visible button text content was out of scope and remains hardcoded. Visible-text i18n is a distinct, novel defect class from the previously-fixed aria-labels. The other ledger preview entry (round 7, line 350) is AiImageInput, a different file.\n\nNot vendored: fields-advanced is a first-party authored package, not packages-js/ui/src/shadcn/*. User-facing and reproduces in any non-English locale."
+    },
+    {
+      "title": "AiSelectInput NO_CONTEXT_TOOLTIP title tooltip hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiSelectInput.tsx",
+      "line": 224,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.ai.classify_no_context_tooltip",
+      "detail": "const NO_CONTEXT_TOOLTIP (defined lines 74-75: 'No context fields configured. Add `classifyFromFields` to enable AI classification.') is assigned to buttonTitle at line 224 and rendered as the button's title= attribute at line 250. This is a user-visible hover tooltip (not a dev-only throw) and is NOT wrapped in t(), whereas the sibling button label, placeholder, and status aria-label in the same component ARE translated. The ledger covers AiSelectInput error strings (183), config-error throws (165) and provenance badges (271) but NOT this tooltip. NOT in ledger.",
+      "confidence": "high",
+      "why_real": "Confirmed in code: /home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiSelectInput.tsx defines NO_CONTEXT_TOOLTIP (lines 74-75) as hardcoded English ('No context fields configured. Add `classifyFromFields` to enable AI classification.'), assigns it to buttonTitle at line 224, and renders it as the button's title= attribute at line 250 when !hasContextFields. This is a user-visible hover tooltip on the disabled Classify button, not a dev-only throw. Every sibling user-facing string in the same component IS translated via t(): button label (line 130), select placeholder (line 231), classifying status aria-label (line 253), and all error strings (lines 166, 192, 215, 217), so this is a genuine i18n omission, not by-design. Not vendored: it lives in the first-party packages-js/ai package, not packages-js/ui/src/shadcn/*. Not a duplicate: the ledger's 3 AiSelectInput entries cover line 183 (error strings, R4), line 165 (Missing classify URL config error, R5), and line 271 (provenance badges, R9) — none cover the NO_CONTEXT_TOOLTIP title attribute. The only ledger 'tooltip' hit is an unrelated R1 action-serialization entry in a different file. No line-224 or NO_CONTEXT entry exists in rounds 1-9."
+    },
+    {
+      "title": "CodeInput language badge 'Plain text' label hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/code/CodeInput.tsx",
+      "line": 81,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.fields_advanced.code_language_plaintext",
+      "detail": "LANGUAGE_LABELS maps 'plaintext'/'text' -> 'Plain text' (lines 81-82), surfaced via languageLabel() into the visible code-language badge span at line 582. Most other entries are proper nouns (JavaScript, PHP, etc.) that don't need translation, but 'Plain text' (and arguably 'Shell') are generic English phrases shown to the user. The badge container is aria-hidden=\"true\" so this is sighted-only and low severity, but it is a genuine hardcoded user-facing string not passed through t(). NOT in ledger.",
+      "confidence": "high",
+      "why_real": "Verified in /home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/code/CodeInput.tsx. LANGUAGE_LABELS at lines 81-82 maps plaintext/text -> 'Plain text' (a generic English phrase, unlike the proper-noun entries JavaScript/PHP/Python which legitimately don't translate). languageLabel() (line 119) surfaces this into the visible code-language badge span at line 582 (data-testid=\"code-language-badge\"). The badge is shown to sighted users; the container is aria-hidden=\"true\" so it is sighted-only and low severity, but it is a genuine hardcoded user-facing string not passed through t(). t() is demonstrably available and already used in this same component (lines 593-599 for the fullscreen labels), so wiring it through is feasible. NOT vendored: file lives in packages-js/fields-advanced/src/code/, not packages-js/ui/src/shadcn/*. NOT a duplicate: the only ledger entry touching this file is round 7 at line 589 ('fullscreen toggle aria-label + visible text'), which is a different string at a different location; the LANGUAGE_LABELS 'Plain text' badge string at lines 81-82/582 is not in the ledger. 'Shell' (lines 107-108) is arguably the same class of generic phrase. Confidence high on real+novel; severity is genuinely low given aria-hidden."
+    },
+    {
+      "title": "Workflow state labels serialized verbatim to frontend — never passed through __()",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/workflow/src/WorkflowDefinition.php",
+      "line": 84,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::workflow.states.<state_key>",
+      "detail": "WorkflowDefinition::states() normalises each state's metadata and serializes the human-readable 'label' verbatim ($normalised[$key] = ['label' => $label, ...]). The label originates from app config (commonly prose like 'Pending Review', 'Awaiting Approval') OR from guessLabel() (line 173), which de-camelCases the state key producing English-ish text. Unlike Field::$label / Column::$label / Action::$label / NavigationItem::$label — all of which the framework now routes through __()/localizeLabel() per rounds 1-7 — workflow state labels bypass localization entirely. This label feeds StateTransition.tsx badges/buttons on the frontend. Framework-hardcoded plumbing gap: the framework should localizeLabel() the state label like every other label surface; app-supplied keys can then be translatable. NOT in ledger (round 9 only caught StateFilter's hardcoded 'State' string).",
+      "confidence": "high",
+      "why_real": "Verified real and novel. At WorkflowDefinition.php:71-87, each state's human-readable `label` (either app-supplied prose like 'Pending Review' or `guessLabel()`-derived de-camelCased English at line 173) is normalized and stored verbatim, then serialized via `toArray()` (line 159-166) and `getStates()` (line 127) WITHOUT any `__()`/`trans()`/`localizeLabel()` pass. grep confirms zero localization calls anywhere in packages/workflow/src/ for state labels. This text is genuinely user-facing: it reaches the frontend as `currentState.label` (StateTransition.tsx:175, the badge) and `t.label` (line 202, transition buttons), and also feeds StateFilter option labels (`'label' => $meta['label']` at Filters/StateFilter.php:114) verbatim. Contrast with every comparable label surface in the framework — Field::getLabel (Field.php:185), Column, NavigationItem, Block, Step, Tab, Section, and even StateFilter's own column-header label — all of which route through localizeLabel()/trans() per rounds 1-7. NOT a duplicate: the i18n ledger's only workflow/state PHP entry is 'Workflow StateFilter serializes hardcoded label State' (the filter's column-header literal `arqel::messages.workflow.state_filter_label`), a distinct surface from the per-state metadata labels. The StateTransition.tsx ledger entries cover only the empty-state strings ('No state assigned.', 'No transitions available.'), not the dynamic state labels. Not a vendored shadcn primitive — it is framework PHP plumbing in packages/workflow/src/WorkflowDefinition.php."
+    },
+    {
+      "title": "Workflow transition labels serialized verbatim — StateTransitionField never localizes",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/workflow/src/Fields/StateTransitionField.php",
+      "line": 162,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::workflow.transitions.<transition_key>",
+      "detail": "StateTransitionField serializes the state 'label' (line 162: 'label' => $meta['label']; and the bare-key fallback at line 154: 'label' => $key) and the transition 'label' (line 210, sourced from transitionLabel() at line 365 which de-camelCases the transition class short-name) verbatim into the payload consumed by StateTransition.tsx. None of these pass through __(). Same systemic 'documented-but-unwired label localization' family as the resolved Field/Column/Action findings: the framework localizes those labels but not workflow transition/state labels, so a panel running in pt_BR still shows English transition buttons ('Approve', 'Reject', 'Send Back'). Framework-hardcoded plumbing gap. NOT in ledger.",
+      "confidence": "med",
+      "why_real": "Confirmed real and novel. StateTransitionField.php serializes labels verbatim with no localization: line 162 emits $meta['label'] raw, line 154 fallback emits the bare state $key, and line 210 emits the transition $label produced by transitionLabel() (line 365), which de-camelCases the transition class short-name into hardcoded English (e.g. \"Send Back\"). grep for __()/localize in StateTransitionField.php returns zero matches (exit=1). The systemic-family premise verifies: Action::toArray() (line 354) wraps every serialized label in localizeAction(), and core Resource uses __() for labels, so the framework demonstrably owns localizing serialized labels for the sibling Field/Action/Column findings — workflow transition/state labels are the unwired exception. User-facing: a pt_BR panel renders English transition buttons. Not vendored (packages/workflow/src/Fields/, not packages-js/ui/src/shadcn/*). Ledger check: the only nearby entries are StateTransition.tsx empty-state strings (round 6) and StateFilter.php's hardcoded 'State' filter label (round 9) — both distinct from the state/transition label serialization in StateTransitionField, so not a duplicate. Confidence med rather than high because $meta['label'] state metadata may be author-supplied (developer could inject __() themselves), but the line-365 transition label is unambiguously framework-generated English with no localization hook."
+    },
+    {
+      "title": "VersionRestoreController throws raw English NotFoundHttpException messages while siblings localize",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+      "line": 71,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.versioning.version_not_found",
+      "detail": "throw new NotFoundHttpException('Version not found for record.') — the message is rendered into the HTTP 404 response body by Laravel's handler and reaches the end user. The SAME controller localizes other user-facing responses via $this->message('arqel::messages.versioning.not_versionable', ...) (line ~55) and round 9 already keyed lines 54/104, so this is an inconsistency gap: this 'Version not found' branch was missed. Framework-hardcoded. Should use $this->message('arqel::messages.versioning.version_not_found', 'Version not found for record.'). NOT in ledger.",
+      "confidence": "high",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php:71 — `throw new NotFoundHttpException('Version not found for record.')` is a raw English literal. This exception is caught by the `catch (HttpException|ModelNotFoundException|AuthorizationException $e)` clause at line 95 and rethrown, so Laravel's handler renders the message into the HTTP 404 response body, reaching the end user. The same controller localizes sibling responses via $this->message('arqel::messages.versioning.not_versionable', ...) at lines 54-57 and 'restore_failed' at line 107, confirming a genuine consistency gap. The ledger shows round 9 keyed lines 54 and 104 of THIS exact controller but did NOT cover line 71 — so it is novel and not a duplicate. It is a PHP controller, not a vendored shadcn primitive (packages-js/ui/src/shadcn/*). Note: the resolveRecord() helper (lines 156/162/169/176) also throws raw-English NotFoundHttpException messages, part of the same un-keyed family, but the specific line-71 finding is correct as reported."
+    },
+    {
+      "title": "VersionRestoreController::resolveRecord throws raw English 'Resource registry unavailable.' (x2)",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+      "line": 156,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.versioning.registry_unavailable",
+      "detail": "throw new NotFoundHttpException('Resource registry unavailable.') appears at lines 156 and 162 inside resolveRecord(). These propagate to the end user as the 404 response body. Same controller otherwise uses $this->message() localization. Framework-hardcoded English leaking to the client. NOT in ledger (round 9 covered VersionHistoryController's 'ResourceRegistry not bound' but not these two in VersionRestoreController).",
+      "confidence": "high",
+      "why_real": "Confirmed at /home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php lines 156 and 162: both throw new NotFoundHttpException('Resource registry unavailable.') inside resolveRecord(). The NotFoundHttpException message propagates to the client as the 404 response body, so this is genuinely user-facing framework-hardcoded English. The same controller localizes other strings via $this->message() (helper at lines 120-126), confirming the inconsistency. Not vendored (it is a PHP controller, not packages-js/ui/src/shadcn/*). Not a duplicate: round 9 covered this file only at line 54 ('Model does not use the Versionable trait.') and line 104 ('Restore failed.'), and the 'ResourceRegistry not bound' coverage was for the DIFFERENT controller VersionHistoryController.php line 49. Lines 156/162 of VersionRestoreController are novel and absent from the R1-R9 ledger."
+    },
+    {
+      "title": "VersionRestoreController throws raw English resource-not-found messages",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+      "line": 169,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.versioning.resource_not_found",
+      "detail": "Lines 169 and 176 throw new NotFoundHttpException(\"Resource '{$resource}' not found.\") and \"Resource '{$resource}' has no model bound.\" — interpolated English strings rendered into the 404 response body for the end user, while sibling responses in the same controller are localized via $this->message(). Framework-hardcoded. Should route through $this->message('arqel::messages.versioning.resource_not_found', ...). NOT in ledger.",
+      "confidence": "med",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php. Line 169 throws new NotFoundHttpException(\"Resource '{$resource}' not found.\") and line 176 throws \"Resource '{$resource}' has no model bound.\" — both hardcoded interpolated English. The same controller defines a message() helper (line 117) that routes strings through arqel::messages.versioning.* with English fallback, and sibling response paths (lines 54-55 not_versionable, line 107 restore_failed) correctly use it, so the localization plumbing exists and these two throws bypass it. This is a genuine, reproducible inconsistency in framework-shipped code.\n\nNot a duplicate: the ledger has R9 entries for this exact controller but only at line 54 ('Model does not use the Versionable trait.') and line 104 ('Restore failed.'). Lines 169 and 176 and their distinct messages are NOT in the ledger. Not a vendored shadcn primitive (it is PHP under packages/versioning, not packages-js/ui/src/shadcn/*).\n\nCaveat: these are NotFoundHttpException messages, which under APP_DEBUG=false are typically hidden behind a generic 404 page and only surfaced in debug mode or JSON/API error responses. However the ledger consistently treats abort/exception messages as user-facing (including the prior R9 entries on this very controller and the many marketplace/audit/AI controller 'Forbidden'/'not found' exception entries), so by the established standard this qualifies. Confidence med rather than high purely due to that production-visibility nuance, not the substance."
+    },
+    {
+      "title": "VersionPresenter.summarize() bakes hardcoded English + naive '(s)' pluralization into changes_summary rendered verbatim by the localized VersionTimeline",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/VersionPresenter.php",
+      "line": 82,
+      "kind": "php-label-gap",
+      "severity": "high",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "arqel.versioning.summary.changed",
+      "detail": "summarize() builds the human-readable version summary entirely in English and ships it in the Inertia payload as `changes_summary`: line 72 returns literal 'Created', line 76 returns literal 'No changes', and line 82 does `sprintf('Changed %d field%s: %s', $count, $count === 1 ? '' : 's', ...)` — none pass through trans(), and the '%s'/'field%s' suffix is English plural morphology that is wrong for every other locale (e.g. pt_BR would need 'campo'/'campos', and many locales have >2 plural categories). This string is consumed verbatim by the React VersionTimeline at packages-js/versioning/src/VersionTimeline.tsx:198 (`{version.changes_summary}`) and interpolated into the localized :summary slot at line 171 — so the surrounding chrome was localized in earlier rounds but the data source was not, leaving English 'Changed 3 fields: ...' inside an otherwise pt_BR timeline. Repro: set app locale to pt_BR, edit a versioned model changing 2 fields, open the version timeline — the entry reads 'Changed 2 fields: title, body' in English with English pluralization while every other label is Portuguese. Fix: route the three branches through trans()/trans_choice() with a :count-aware key (e.g. arqel.versioning.summary.changed) so plural selection follows the locale's plural rules.",
+      "confidence": "high",
+      "why_real": "Verified against source and ledger. VersionPresenter.php:69-83 summarize() builds changes_summary entirely in English: line 72 returns literal 'Created', line 76 'No changes', and line 82 sprintf('Changed %d field%s: %s', ...) with naive English '(s)' pluralization (count===1?'':'s') — none routed through trans()/trans_choice(). This string is shipped in the Inertia payload (toArray, line 51) and rendered verbatim by VersionTimeline.tsx:199 (<p>{version.changes_summary}</p>) and interpolated into the otherwise-localized :summary slot of the t()-translated aria-label at line 171. So the React chrome was localized but the PHP data source feeding it was not — a real, user-facing leak of English text and incorrect plural morphology into a pt_BR timeline (e.g. 'Changed 2 fields: title, body' inside Portuguese UI; pt_BR needs campo/campos, and many locales have >2 plural categories). Reproduces as described. Ledger check: i18n-fixed-ledger covers VersionTimeline.tsx (relative-time locale, English UI strings, list aria-labels), VersionDiff.tsx, and two versioning controllers (VersionRestoreController, VersionHistoryController) — but NOT VersionPresenter.php nor the summarize()/changes_summary data source. Novel. Not a vendored shadcn primitive (it's packages/versioning PHP). Genuinely new, user-facing, not duplicated."
+    },
+    {
+      "title": "DevTools InertiaInspector navigation timestamp uses toLocaleTimeString() with no locale arg — the exact pattern fixed in sibling TimeTravel",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+      "line": 145,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "",
+      "detail": "`{new Date(entry.timestamp).toLocaleTimeString()}` formats the navigation-event timestamp with no explicit locale, so it follows the host runtime locale rather than the panel/app locale. This is the identical no-locale-arg toLocaleTimeString() pattern that was already fixed in the sibling panel TimeTravel.tsx:82 (round 1+, in the fixed ledger), so this is a missed instance of an already-acknowledged class within the same package. Repro: open the DevTools extension Inertia panel 'navigation' tab; entry timestamps render in the browser's runtime locale instead of the configured app locale, inconsistent with TimeTravel's now-locale-aware timestamps. Severity low because it is developer-facing tooling, but it is an unledgered occurrence of a pattern the project chose to fix.",
+      "confidence": "high",
+      "why_real": "Confirmed at /home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx:145: `{new Date(entry.timestamp).toLocaleTimeString()}` renders the navigation-event timestamp with no explicit locale argument, so it follows the host browser runtime locale rather than the configured panel/app locale. This is the same locale-insensitive toLocaleTimeString() class the project chose to fix in the sibling panel TimeTravel.tsx:82, which IS in the ledger (round 9, last entry: \"DevTools TimeTravel snapshot timestamp uses toLocaleTimeString() with no locale arg\"). I scanned the full i18n-fixed-ledger.json (rounds 1-9): there is NO entry for InertiaInspector.tsx, so this specific occurrence is unledgered/novel. The file is at packages-js/devtools-extension/src/panel/, NOT under packages-js/ui/src/shadcn/*, so it is not a vendored shadcn primitive. The defect genuinely reproduces (navigation tab timestamps render in the runtime locale, inconsistent with the now-locale-aware TimeTravel) and is user-facing in the rendered-output sense. Low severity (developer-facing tooling), but a real, novel, non-vendored instance of an acknowledged class."
+    }
+  ]
+}

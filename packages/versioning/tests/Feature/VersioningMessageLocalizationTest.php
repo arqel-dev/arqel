@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Versioning\Http\Controllers\VersionRestoreController;
+use Arqel\Versioning\Models\Version;
 use Arqel\Versioning\Tests\Fixtures\Article;
 use Arqel\Versioning\Tests\Fixtures\ArticleResource;
 use Arqel\Versioning\Tests\Fixtures\DenyViewPolicy;
@@ -99,4 +100,59 @@ it('localizes the not-versionable 422 message (restore)', function (): void {
 
     $response->assertStatus(422)
         ->assertJsonPath('message', 'O model não usa a trait Versionable.');
+});
+
+it('localizes the version-not-found 404 message (restore)', function (): void {
+    Route::post(
+        '/admin/{resource}/{id}/versions/{versionId}/restore',
+        VersionRestoreController::class,
+    )->name('arqel.versioning.restore.notfound');
+
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(ArticleResource::class);
+
+    $a = Article::create(['title' => 'A', 'body' => 'b', 'status' => 'draft']);
+    $b = Article::create(['title' => 'B', 'body' => 'b', 'status' => 'draft']);
+
+    /** @var Version $bVersion */
+    $bVersion = $b->versions()->first();
+
+    /** @var TestCase $this */
+    $response = $this->actingAs(authedUserForVersioningLocale())
+        ->postJson(route('arqel.versioning.restore.notfound', [
+            'resource' => 'articles',
+            'id' => $a->getKey(),
+            'versionId' => $bVersion->id,
+        ]));
+
+    $response->assertStatus(404)
+        ->assertJsonPath('message', 'Versão não encontrada para o registro.');
+});
+
+it('localizes the resource-not-found 404 message with the slug (restore)', function (): void {
+    Route::post(
+        '/admin/{resource}/{id}/versions/{versionId}/restore',
+        VersionRestoreController::class,
+    )->name('arqel.versioning.restore.unknownslug');
+
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(ArticleResource::class);
+
+    $article = Article::create(['title' => 'A', 'body' => 'b', 'status' => 'draft']);
+
+    /** @var Version $version */
+    $version = $article->versions()->first();
+
+    /** @var TestCase $this */
+    $response = $this->actingAs(authedUserForVersioningLocale())
+        ->postJson(route('arqel.versioning.restore.unknownslug', [
+            'resource' => 'unknown-slug',
+            'id' => $article->getKey(),
+            'versionId' => $version->id,
+        ]));
+
+    $response->assertStatus(404)
+        ->assertJsonPath('message', "Recurso 'unknown-slug' não encontrado.");
 });

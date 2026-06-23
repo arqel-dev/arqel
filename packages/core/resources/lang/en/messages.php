@@ -82,6 +82,10 @@ return [
         'restore_failed' => 'Restore failed.',
         'registry_not_bound' => 'ResourceRegistry not bound',
         'forbidden' => 'Forbidden',
+        'version_not_found' => 'Version not found for record.',
+        'registry_unavailable' => 'Resource registry unavailable.',
+        'resource_not_found' => "Resource ':resource' not found.",
+        'resource_no_model' => "Resource ':resource' has no model bound.",
     ],
     'workflow' => [
         'state_filter_label' => 'State',

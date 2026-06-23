@@ -213,6 +213,7 @@ return [
         'file_too_large' => 'File too large: :size (max :max).',
         'missing_translate_url' => 'Missing translate URL: provide `translateUrl` or both `resource` and `field`.',
         'missing_classify_url' => 'Missing classify URL: provide `classifyUrl` or both `resource` and `field`.',
+        'classify_no_context_tooltip' => 'No context fields configured. Add `classifyFromFields` to enable AI classification.',
         'missing_generate_url' => 'Missing generate URL: provide `generateUrl` or both `resource` and `field`.',
         'missing_extract_url' => 'Missing extract URL: provide `extractUrl` or both `resource` and `field`.',
         'missing_analyze_url' => 'Missing analyze URL: provide `analyzeUrl` or both `resource` and `field`.',
@@ -273,6 +274,11 @@ return [
         'markdown_link' => 'Link',
         'markdown_list' => 'List',
         'markdown_preview_open' => 'Open preview',
+        'markdown_preview_label' => 'Preview',
+        'markdown_enter_fullscreen' => 'Enter fullscreen',
+        'markdown_exit_fullscreen' => 'Exit fullscreen',
+        'markdown_fullscreen_short' => 'Full',
+        'markdown_exit_short' => 'Exit',
         'markdown_editor_mode' => 'Editor mode',
         'markdown_preview' => 'Markdown preview',
         'repeater_move_up' => 'Move up',
@@ -305,6 +311,7 @@ return [
         'code_exit_fullscreen' => 'Exit fullscreen',
         'code_fullscreen_short' => 'Full',
         'code_exit_short' => 'Exit',
+        'code_language_plaintext' => 'Plain text',
         'richtext_toolbar' => 'Formatting toolbar',
         'richtext_over_limit' => 'Content exceeds the maximum length of :max characters.',
         'richtext_bold' => 'Bold',
@@ -341,6 +348,15 @@ return [
         'field_comparison' => 'Field comparison',
         'no_previous_value' => 'no previous value',
         'no_new_value' => 'no new value',
+        // Localized changes_summary built by VersionPresenter::summarize().
+        // `changed` is plural-aware (trans_choice): :count = field count,
+        // :fields = comma-joined field names. Values must equal the original
+        // English literals so existing payload consumers stay stable.
+        'summary' => [
+            'created' => 'Created',
+            'no_changes' => 'No changes',
+            'changed' => '{1}Changed :count field: :fields|[2,*]Changed :count fields: :fields',
+        ],
     ],
     // Visible empty-state chrome for @arqel-dev/workflow's <StateTransition>.
     // Values must equal the original English literals so consumer tests and

@@ -29,6 +29,7 @@ vi.mock('@inertiajs/react', async (importOriginal) => {
   return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
 });
 
+import { usePage } from '@inertiajs/react';
 import { CodeInput } from './CodeInput.js';
 
 interface CodeProps {
@@ -168,6 +169,33 @@ describe('<CodeInput>', () => {
 
     const badge = screen.getByTestId('code-language-badge');
     expect(badge.textContent).toBe('PHP');
+  });
+
+  it('falls back to the English "Plain text" badge for plaintext languages', () => {
+    const onChange = vi.fn();
+    render(
+      <CodeInput field={buildField({ language: 'plaintext' })} value="" onChange={onChange} />,
+    );
+
+    expect(screen.getByTestId('code-language-badge').textContent).toBe('Plain text');
+  });
+
+  it('localizes the plaintext language badge via t()', () => {
+    vi.mocked(usePage).mockReturnValueOnce({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: { fields_advanced: { code_language_plaintext: 'Texto simples' } },
+          },
+        },
+      },
+    } as unknown as ReturnType<typeof usePage>);
+
+    const onChange = vi.fn();
+    render(<CodeInput field={buildField({ language: 'text' })} value="" onChange={onChange} />);
+
+    expect(screen.getByTestId('code-language-badge').textContent).toBe('Texto simples');
   });
 
   it('marks the textarea aria-invalid when errors are present', () => {

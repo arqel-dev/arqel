@@ -212,6 +212,7 @@ return [
         'file_too_large' => 'Arquivo muito grande: :size (máx. :max).',
         'missing_translate_url' => 'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
         'missing_classify_url' => 'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+        'classify_no_context_tooltip' => 'Nenhum campo de contexto configurado. Adicione `classifyFromFields` para habilitar a classificação por IA.',
         'missing_generate_url' => 'URL de geração ausente: forneça `generateUrl` ou ambos `resource` e `field`.',
         'missing_extract_url' => 'URL de extração ausente: forneça `extractUrl` ou ambos `resource` e `field`.',
         'missing_analyze_url' => 'URL de análise ausente: forneça `analyzeUrl` ou ambos `resource` e `field`.',
@@ -270,6 +271,11 @@ return [
         'markdown_link' => 'Link',
         'markdown_list' => 'Lista',
         'markdown_preview_open' => 'Abrir pré-visualização',
+        'markdown_preview_label' => 'Pré-visualização',
+        'markdown_enter_fullscreen' => 'Entrar em tela cheia',
+        'markdown_exit_fullscreen' => 'Sair da tela cheia',
+        'markdown_fullscreen_short' => 'Tela cheia',
+        'markdown_exit_short' => 'Sair',
         'markdown_editor_mode' => 'Modo do editor',
         'markdown_preview' => 'Pré-visualização Markdown',
         'repeater_move_up' => 'Mover para cima',
@@ -302,6 +308,7 @@ return [
         'code_exit_fullscreen' => 'Sair da tela cheia',
         'code_fullscreen_short' => 'Tela cheia',
         'code_exit_short' => 'Sair',
+        'code_language_plaintext' => 'Texto simples',
         'richtext_toolbar' => 'Barra de formatação',
         'richtext_over_limit' => 'O conteúdo excede o comprimento máximo de :max caracteres.',
         'richtext_bold' => 'Negrito',
@@ -337,6 +344,14 @@ return [
         'field_comparison' => 'Comparação de campos',
         'no_previous_value' => 'sem valor anterior',
         'no_new_value' => 'sem novo valor',
+        // changes_summary localizado gerado por VersionPresenter::summarize().
+        // `changed` respeita plural (trans_choice): :count = número de campos,
+        // :fields = nomes dos campos separados por vírgula.
+        'summary' => [
+            'created' => 'Criado',
+            'no_changes' => 'Sem alterações',
+            'changed' => '{1}Alterado :count campo: :fields|[2,*]Alterados :count campos: :fields',
+        ],
     ],
     // Chrome de estado vazio visível do <StateTransition> de
     // @arqel-dev/workflow.

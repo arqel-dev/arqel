@@ -50,6 +50,8 @@ const aiDict = {
         'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
       missing_classify_url:
         'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+      classify_no_context_tooltip:
+        'Nenhum campo de contexto configurado. Adicione `classifyFromFields` para habilitar a classificação por IA.',
       missing_generate_url:
         'URL de geração ausente: forneça `generateUrl` ou ambos `resource` e `field`.',
       missing_extract_url:
@@ -127,6 +129,29 @@ describe('@arqel-dev/ai i18n', () => {
     );
     expect(screen.getByRole('button', { name: 'Classificar com IA' })).toBeInTheDocument();
     expect(screen.getByText('Selecionar...')).toBeInTheDocument();
+  });
+
+  it('AiSelectInput localizes the no-context-fields hover tooltip (title attr)', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiSelectInput
+        name="cat"
+        value={null}
+        props={{
+          options: { a: 'A' },
+          classifyFromFields: [],
+          provider: null,
+          fallbackOption: null,
+          hasContextFields: false,
+        }}
+        resource="posts"
+        field="cat"
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Classificar com IA' })).toHaveAttribute(
+      'title',
+      'Nenhum campo de contexto configurado. Adicione `classifyFromFields` para habilitar a classificação por IA.',
+    );
   });
 
   it('AiExtractInput localizes the source label, extract button and apply-all', () => {

@@ -86,6 +86,35 @@ it('emits user.id when created_by_user_id is set even without resolvable model',
     expect($user['id'])->toBe(42);
 });
 
+it('localizes the changes_summary under pt_BR with locale-correct pluralization', function (): void {
+    app()->setLocale('pt_BR');
+
+    try {
+        $article = Article::create(['title' => 'A', 'body' => 'b', 'status' => 'draft']);
+        $article->update(['title' => 'B', 'body' => 'c']);
+
+        $latest = latestVersionOrFail($article);
+        $payload = VersionPresenter::toArray($latest);
+
+        // Two fields changed → plural branch in pt_BR.
+        expect($payload['changes_summary'])->toContain('Alterados 2 campos');
+        expect($payload['changes_summary'])->toContain('title');
+        expect($payload['changes_summary'])->toContain('body');
+
+        // Initial insert → "Criado".
+        $articleB = Article::create(['title' => 'X', 'body' => 'y', 'status' => 'draft']);
+        $firstB = latestVersionOrFail($articleB);
+        expect(VersionPresenter::toArray($firstB)['changes_summary'])->toBe('Criado');
+
+        // Single field → singular branch in pt_BR.
+        $articleB->update(['title' => 'Z']);
+        $latestB = latestVersionOrFail($articleB);
+        expect(VersionPresenter::toArray($latestB)['changes_summary'])->toContain('Alterado 1 campo');
+    } finally {
+        app()->setLocale('en');
+    }
+});
+
 it('omits payload by default and includes it when requested', function (): void {
     $article = Article::create(['title' => 'Secret', 'body' => 'b', 'status' => 'draft']);
 

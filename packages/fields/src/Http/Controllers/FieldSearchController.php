@@ -51,11 +51,17 @@ final class FieldSearchController
         $fieldInstance = $this->resolveFieldOrFail($instance, $field);
 
         if (! $fieldInstance instanceof BelongsToField) {
-            abort(HttpResponse::HTTP_BAD_REQUEST, 'Field is not searchable.');
+            abort(
+                HttpResponse::HTTP_BAD_REQUEST,
+                $this->message('arqel::messages.field_search.not_searchable', 'Field is not searchable.'),
+            );
         }
 
         if (! $fieldInstance->isSearchable()) {
-            abort(HttpResponse::HTTP_FORBIDDEN, 'Field has search disabled.');
+            abort(
+                HttpResponse::HTTP_FORBIDDEN,
+                $this->message('arqel::messages.field_search.disabled', 'Field has search disabled.'),
+            );
         }
 
         $rawQuery = $request->input('q', '');
@@ -137,6 +143,22 @@ final class FieldSearchController
         if (Gate::forUser($request->user())->denies($ability, $modelClass)) {
             abort(HttpResponse::HTTP_FORBIDDEN);
         }
+    }
+
+    /**
+     * Localize an abort message lazily so the request locale applies. Falls
+     * back to the English literal when no translator is bound or the key is
+     * untranslated, keeping the user-facing error text stable.
+     */
+    private function message(string $key, string $fallback): string
+    {
+        if (! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans($key);
+
+        return is_string($translated) && $translated !== $key ? $translated : $fallback;
     }
 
     private function resolveResourceOrFail(string $slug): Resource

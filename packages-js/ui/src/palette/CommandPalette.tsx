@@ -100,15 +100,22 @@ function topRecents(): PaletteCommand[] {
 }
 
 interface Group {
+  /** Stable bucket identity (React key). For uncategorized commands this is
+   *  the sentinel `__general` so the visible heading can be localized at
+   *  render without colliding with a real category literally named "General". */
   category: string;
   commands: PaletteCommand[];
 }
+
+/** Sentinel bucket ids whose visible heading is resolved via i18n at render. */
+const GENERAL_CATEGORY = '__general';
+const RECENT_CATEGORY = '__recent';
 
 function groupByCategory(commands: PaletteCommand[]): Group[] {
   const order: string[] = [];
   const buckets = new Map<string, PaletteCommand[]>();
   for (const cmd of commands) {
-    const key = cmd.category ?? 'General';
+    const key = cmd.category ?? GENERAL_CATEGORY;
     if (!buckets.has(key)) {
       buckets.set(key, []);
       order.push(key);
@@ -151,8 +158,20 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
   const visibleCommands = query.trim().length === 0 ? recents : results;
   const groups =
     query.trim().length === 0 && recents.length > 0
-      ? [{ category: 'Recent', commands: recents }]
+      ? [{ category: RECENT_CATEGORY, commands: recents }]
       : groupByCategory(visibleCommands);
+
+  // Resolve the visible heading for a group, localizing the synthetic
+  // "General"/"Recent" buckets while passing real categories through verbatim.
+  const categoryLabel = (category: string): string => {
+    if (category === GENERAL_CATEGORY) {
+      return t('arqel.command_palette.category_general', 'General');
+    }
+    if (category === RECENT_CATEGORY) {
+      return t('arqel.command_palette.category_recent', 'Recent');
+    }
+    return category;
+  };
   const flat = flattenGroups(groups);
 
   // Cmd+K / Ctrl+K global toggle.
@@ -314,7 +333,7 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
                   role="presentation"
                   className="px-4 pt-2 pb-1 text-xs font-semibold uppercase tracking-wide opacity-60"
                 >
-                  {group.category}
+                  {categoryLabel(group.category)}
                 </div>
                 <ul role="presentation" className="m-0 list-none p-0">
                   {group.commands.map((cmd, j) => {

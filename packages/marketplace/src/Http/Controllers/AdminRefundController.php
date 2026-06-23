@@ -22,7 +22,7 @@ final class AdminRefundController
     public function __invoke(Request $request, PaymentGateway $gateway, string $slug, int $purchaseId): JsonResponse
     {
         if (! Gate::allows('marketplace.refund')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.forbidden')], 403);
         }
 
         $plugin = Plugin::query()->where('slug', $slug)->first();
@@ -38,19 +38,19 @@ final class AdminRefundController
             ->first();
 
         if (! $purchase instanceof PluginPurchase) {
-            return new JsonResponse(['message' => 'Purchase not found'], 404);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.purchase_not_found')], 404);
         }
 
         if ($purchase->status === 'refunded') {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => ['purchase' => ['Purchase is already refunded.']],
             ], 422);
         }
 
         if ($purchase->status !== 'completed') {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => ['purchase' => ['Only completed purchases can be refunded.']],
             ], 422);
         }
@@ -59,7 +59,7 @@ final class AdminRefundController
 
         if (! $ok) {
             return new JsonResponse([
-                'message' => 'Refund failed at gateway',
+                'message' => (string) __('arqel::messages.marketplace.refund_failed'),
             ], 422);
         }
 

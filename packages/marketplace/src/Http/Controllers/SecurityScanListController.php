@@ -19,7 +19,7 @@ final class SecurityScanListController
     public function __invoke(Request $request): JsonResponse
     {
         if (! Gate::allows('marketplace.security-scans')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.forbidden')], 403);
         }
 
         $query = SecurityScan::query()

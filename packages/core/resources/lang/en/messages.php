@@ -53,4 +53,37 @@ return [
         'invalid_path' => 'Invalid file path.',
         'path_outside_directory' => 'File path is outside the allowed directory.',
     ],
+    'ai' => [
+        'forbidden' => 'Forbidden',
+        'registry_unbound' => 'AI is temporarily unavailable.',
+        'registry_contract_mismatch' => 'AI is temporarily unavailable.',
+        'resource_not_registered' => 'Resource [:resource] not registered',
+        'field_resolution_failed' => 'Could not resolve resource fields.',
+        'field_not_found' => ':type [:field] not found on resource [:resource]',
+        'provider_failed' => 'AI provider request failed',
+        'image_source_required' => 'Either imageUrl or imageBase64 must be provided',
+    ],
+    'marketplace' => [
+        'forbidden' => 'Forbidden',
+        'unauthenticated' => 'Unauthenticated',
+        'validation_failed' => 'Validation failed',
+        'license_required' => 'License required',
+        'purchase_not_found' => 'Purchase not found',
+        'review_not_found' => 'Review not found',
+        'refund_failed' => 'Refund failed at gateway',
+        'payment_verification_failed' => 'Payment verification failed',
+    ],
+    'field_search' => [
+        'not_searchable' => 'Field is not searchable.',
+        'disabled' => 'Field has search disabled.',
+    ],
+    'versioning' => [
+        'not_versionable' => 'Model does not use the Versionable trait.',
+        'restore_failed' => 'Restore failed.',
+        'registry_not_bound' => 'ResourceRegistry not bound',
+        'forbidden' => 'Forbidden',
+    ],
+    'workflow' => [
+        'state_filter_label' => 'State',
+    ],
 ];

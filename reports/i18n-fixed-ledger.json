@@ -1114,5 +1114,191 @@
     "line": 24,
     "title": "Pulse Top-actions card: number_format() en-US grouping on count column",
     "round": 8
+  },
+  {
+    "file": "packages-js/fields-advanced/src/rich-text/RichTextInput.tsx",
+    "line": 162,
+    "title": "RichTextInput toolbar BUTTON_SPECS labels hardcoded English (aria-label + title)",
+    "round": 9
+  },
+  {
+    "file": "packages-js/fields-advanced/src/rich-text/RichTextInput.tsx",
+    "line": 376,
+    "title": "RichTextInput 'Image upload not configured' button title hardcoded English",
+    "round": 9
+  },
+  {
+    "file": "packages-js/fields-advanced/src/rich-text/RichTextInput.tsx",
+    "line": 221,
+    "title": "RichTextInput editor placeholder defaults to hardcoded English 'Start writing...'",
+    "round": 9
+  },
+  {
+    "file": "packages-js/ui/src/palette/CommandPalette.tsx",
+    "line": 111,
+    "title": "CommandPalette 'General' fallback category heading hardcoded English",
+    "round": 9
+  },
+  {
+    "file": "packages-js/ui/src/palette/CommandPalette.tsx",
+    "line": 154,
+    "title": "CommandPalette 'Recent' category heading hardcoded English",
+    "round": 9
+  },
+  {
+    "file": "packages-js/ai/src/AiSelectInput.tsx",
+    "line": 271,
+    "title": "AiSelectInput provenance badge 'Suggested by AI' / 'Used fallback' hardcoded English",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/fields/src/Http/Controllers/FieldSearchController.php",
+    "line": 54,
+    "title": "FieldSearchController abort message 'Field is not searchable.' hardcoded",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/fields/src/Http/Controllers/FieldSearchController.php",
+    "line": 58,
+    "title": "FieldSearchController abort message 'Field has search disabled.' hardcoded",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiClassifyController.php",
+    "line": 32,
+    "title": "AI controllers return hardcoded English JSON 'message' (Forbidden) across all 5 AI field endpoints",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiClassifyController.php",
+    "line": 39,
+    "title": "AI controllers leak 'ResourceRegistry not bound: ' + raw exception to client JSON",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiGenerateController.php",
+    "line": 42,
+    "title": "AI controllers return hardcoded 'Resource [{resource}] not registered'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiGenerateController.php",
+    "line": 52,
+    "title": "AI controllers return hardcoded 'Failed to resolve resource fields: ' + raw exception",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiClassifyController.php",
+    "line": 77,
+    "title": "AI controllers return hardcoded '{FieldType} [{field}] not found on resource [{resource}]'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiClassifyController.php",
+    "line": 94,
+    "title": "AI controllers return hardcoded 'AI provider request failed'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiAnalyzeImageController.php",
+    "line": 48,
+    "title": "AiAnalyzeImageController validation message 'Either imageUrl or imageBase64 must be provided' hardcoded",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Http/Controllers/AiClassifyController.php",
+    "line": 43,
+    "title": "AI controllers also leak 'ResourceRegistry contract mismatch' to client",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+    "line": 54,
+    "title": "Versioning VersionRestoreController returns hardcoded 'Model does not use the Versionable trait.'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionRestoreController.php",
+    "line": 104,
+    "title": "Versioning VersionRestoreController returns hardcoded 'Restore failed.'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionHistoryController.php",
+    "line": 49,
+    "title": "Versioning VersionHistoryController returns hardcoded 'ResourceRegistry not bound' / 'Forbidden'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/PluginFeatureController.php",
+    "line": 24,
+    "title": "Marketplace controllers return hardcoded 'Forbidden' JSON message (repeated, ~8 controllers)",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/PluginDownloadController.php",
+    "line": 25,
+    "title": "Marketplace controllers return hardcoded 'Unauthenticated' JSON message (repeated)",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/PluginPurchaseController.php",
+    "line": 41,
+    "title": "Marketplace controllers return hardcoded 'Validation failed' JSON message (repeated)",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/PluginDownloadController.php",
+    "line": 45,
+    "title": "Marketplace PluginDownloadController hardcoded 'License required'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/AdminRefundController.php",
+    "line": 41,
+    "title": "Marketplace controllers hardcoded 'Purchase not found' / 'Review not found'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/AdminRefundController.php",
+    "line": 62,
+    "title": "Marketplace AdminRefundController hardcoded 'Refund failed at gateway'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/PluginPurchaseController.php",
+    "line": 155,
+    "title": "Marketplace PluginPurchaseController hardcoded 'Payment verification failed'",
+    "round": 9
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/workflow/src/Filters/StateFilter.php",
+    "line": 76,
+    "title": "Workflow StateFilter serializes hardcoded label 'State' bypassing base Filter localization",
+    "round": 9
+  },
+  {
+    "file": "packages-js/ui/src/widgets/StatCard.tsx",
+    "line": 115,
+    "title": "StatCard numeric KPI value rendered raw without Intl.NumberFormat grouping",
+    "round": 9
+  },
+  {
+    "file": "packages-js/ui/src/widgets/TableCard.tsx",
+    "line": 104,
+    "title": "Dashboard TableCard formatCell uses String(value) for numbers \u2014 no locale grouping",
+    "round": 9
+  },
+  {
+    "file": "apps/demo/app/Arqel/Dashboards/MainDashboard.php",
+    "line": 76,
+    "title": "Demo dashboard chart labels use ->format('M j') \u2014 English month abbreviation hardcoded",
+    "round": 9
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+    "line": 82,
+    "title": "DevTools TimeTravel snapshot timestamp uses toLocaleTimeString() with no locale arg",
+    "round": 9
   }
 ]

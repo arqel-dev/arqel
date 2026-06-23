@@ -222,6 +222,16 @@ return [
         'status_extracting' => 'Extraindo',
         'status_analyzing' => 'Analisando',
         'status_translating' => 'Traduzindo',
+        // Selo de proveniência exibido após uma classificação (role="status").
+        'suggestion_ai' => 'Sugerido por IA',
+        'suggestion_fallback' => 'Usou alternativa',
+    ],
+    // Títulos de grupo visíveis na listbox do <CommandPalette> quando um comando
+    // não tem categoria explícita, além do grupo sintético "Recentes". Resolvido
+    // no cliente via useArqelTranslations() com o literal em inglês como fallback.
+    'command_palette' => [
+        'category_general' => 'Geral',
+        'category_recent' => 'Recentes',
     ],
     // Nomes acessíveis (aria-label / sr-only) da interface do framework.
     // Mantidos distintos dos rótulos visíveis curtos para que leitores de
@@ -294,6 +304,21 @@ return [
         'code_exit_short' => 'Sair',
         'richtext_toolbar' => 'Barra de formatação',
         'richtext_over_limit' => 'O conteúdo excede o comprimento máximo de :max caracteres.',
+        'richtext_bold' => 'Negrito',
+        'richtext_italic' => 'Itálico',
+        'richtext_underline' => 'Sublinhado',
+        'richtext_strike' => 'Tachado',
+        'richtext_h1' => 'Título 1',
+        'richtext_h2' => 'Título 2',
+        'richtext_h3' => 'Título 3',
+        'richtext_ul' => 'Lista com marcadores',
+        'richtext_ol' => 'Lista numerada',
+        'richtext_blockquote' => 'Citação',
+        'richtext_link' => 'Link',
+        'richtext_code' => 'Código em linha',
+        'richtext_image' => 'Imagem',
+        'richtext_image_disabled' => 'Upload de imagem não configurado',
+        'richtext_placeholder' => 'Comece a escrever...',
     ],
     // Chrome visível + nomes acessíveis do <VersionTimeline> de
     // @arqel-dev/versioning. :id / :user / :relative / :summary alimentam o

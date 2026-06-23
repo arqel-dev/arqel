@@ -21,7 +21,7 @@ final class PluginFeatureController
     public function __invoke(Request $request, string $slug): JsonResponse
     {
         if (! Gate::allows('marketplace.feature')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.forbidden')], 403);
         }
 
         try {
@@ -31,7 +31,7 @@ final class PluginFeatureController
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => $e->errors(),
             ], 422);
         }

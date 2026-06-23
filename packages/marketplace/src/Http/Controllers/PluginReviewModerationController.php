@@ -24,7 +24,7 @@ final class PluginReviewModerationController
     public function index(Request $request): JsonResponse
     {
         if (! Gate::allows('marketplace.moderate-reviews')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.forbidden')], 403);
         }
 
         /** @var mixed $statusInput */
@@ -70,7 +70,7 @@ final class PluginReviewModerationController
     public function moderate(Request $request, int $reviewId): JsonResponse
     {
         if (! Gate::allows('marketplace.moderate-reviews')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.forbidden')], 403);
         }
 
         try {
@@ -81,7 +81,7 @@ final class PluginReviewModerationController
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => $e->errors(),
             ], 422);
         }
@@ -89,7 +89,7 @@ final class PluginReviewModerationController
         $review = PluginReview::query()->find($reviewId);
 
         if (! $review instanceof PluginReview) {
-            return new JsonResponse(['message' => 'Review not found'], 404);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.review_not_found')], 404);
         }
 
         if ($data['action'] === 'publish') {

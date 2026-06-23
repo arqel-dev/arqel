@@ -223,6 +223,17 @@ return [
         'status_extracting' => 'Extracting',
         'status_analyzing' => 'Analyzing',
         'status_translating' => 'Translating',
+        // Provenance badge shown after a classification (role="status").
+        'suggestion_ai' => 'Suggested by AI',
+        'suggestion_fallback' => 'Used fallback',
+    ],
+    // Visible group headings rendered in the <CommandPalette> listbox when a
+    // command has no explicit category, plus the synthetic "Recent" bucket.
+    // Resolved client-side via useArqelTranslations() with the English literal
+    // as fallback.
+    'command_palette' => [
+        'category_general' => 'General',
+        'category_recent' => 'Recent',
     ],
     // Accessible names (aria-label / sr-only) for framework UI chrome. Kept
     // distinct from short visible labels so screen-reader users hear a full,
@@ -296,6 +307,21 @@ return [
         'code_exit_short' => 'Exit',
         'richtext_toolbar' => 'Formatting toolbar',
         'richtext_over_limit' => 'Content exceeds the maximum length of :max characters.',
+        'richtext_bold' => 'Bold',
+        'richtext_italic' => 'Italic',
+        'richtext_underline' => 'Underline',
+        'richtext_strike' => 'Strikethrough',
+        'richtext_h1' => 'Heading 1',
+        'richtext_h2' => 'Heading 2',
+        'richtext_h3' => 'Heading 3',
+        'richtext_ul' => 'Bullet list',
+        'richtext_ol' => 'Numbered list',
+        'richtext_blockquote' => 'Blockquote',
+        'richtext_link' => 'Link',
+        'richtext_code' => 'Inline code',
+        'richtext_image' => 'Image',
+        'richtext_image_disabled' => 'Image upload not configured',
+        'richtext_placeholder' => 'Start writing...',
     ],
     // Visible chrome + accessible names for @arqel-dev/versioning's
     // <VersionTimeline>. :id / :user / :relative / :summary feed the per-item

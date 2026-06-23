@@ -27,7 +27,7 @@ final class PluginPurchaseController
         $user = $request->user();
 
         if ($user === null) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         $plugin = Plugin::query()->where('slug', $slug)->first();
@@ -38,7 +38,7 @@ final class PluginPurchaseController
 
         if (! $plugin->isPremium()) {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => ['plugin' => ['Plugin is free.']],
             ], 422);
         }
@@ -47,7 +47,7 @@ final class PluginPurchaseController
         $userId = is_numeric($key) ? (int) $key : 0;
 
         if ($userId === 0) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         /** @var PluginPurchase|null $existingCompleted */
@@ -104,20 +104,20 @@ final class PluginPurchaseController
         $user = $request->user();
 
         if ($user === null) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         $key = $user->getAuthIdentifier();
         $userId = is_numeric($key) ? (int) $key : 0;
 
         if ($userId === 0) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         $rawPaymentId = $request->input('paymentId');
         if (! is_string($rawPaymentId) || $rawPaymentId === '') {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => ['paymentId' => ['paymentId is required.']],
             ], 422);
         }
@@ -136,7 +136,7 @@ final class PluginPurchaseController
             ->first();
 
         if (! $purchase instanceof PluginPurchase) {
-            return new JsonResponse(['message' => 'Purchase not found'], 404);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.purchase_not_found')], 404);
         }
 
         if ($purchase->status === 'completed') {
@@ -152,7 +152,7 @@ final class PluginPurchaseController
             $purchase->update(['status' => 'failed']);
 
             return new JsonResponse([
-                'message' => 'Payment verification failed',
+                'message' => (string) __('arqel::messages.marketplace.payment_verification_failed'),
                 'purchase' => $this->serialize($purchase),
             ], 422);
         }

@@ -35,25 +35,27 @@ final class AiTranslateController
     public function __invoke(Request $request, string $resource, string $field): JsonResponse
     {
         if (Gate::has('use-ai') && ! Gate::allows('use-ai')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => __('arqel::messages.ai.forbidden')], 403);
         }
 
         try {
             /** @var object $registry */
             $registry = app(self::RESOURCE_REGISTRY);
         } catch (BindingResolutionException $e) {
-            return new JsonResponse(['message' => 'ResourceRegistry not bound: '.$e->getMessage()], 404);
+            report($e);
+
+            return new JsonResponse(['message' => __('arqel::messages.ai.registry_unbound')], 404);
         }
 
         if (! method_exists($registry, 'findBySlug')) {
-            return new JsonResponse(['message' => 'ResourceRegistry contract mismatch'], 404);
+            return new JsonResponse(['message' => __('arqel::messages.ai.registry_contract_mismatch')], 404);
         }
 
         /** @var class-string|null $resourceClass */
         $resourceClass = $registry->findBySlug($resource);
 
         if ($resourceClass === null || ! is_string($resourceClass) || ! class_exists($resourceClass)) {
-            return new JsonResponse(['message' => "Resource [{$resource}] not registered"], 404);
+            return new JsonResponse(['message' => __('arqel::messages.ai.resource_not_registered', ['resource' => $resource])], 404);
         }
 
         try {
@@ -63,7 +65,9 @@ final class AiTranslateController
                 ? $instance->effectiveFields()
                 : (method_exists($instance, 'fields') ? $instance->fields() : []);
         } catch (Throwable $e) {
-            return new JsonResponse(['message' => 'Failed to resolve resource fields: '.$e->getMessage()], 500);
+            report($e);
+
+            return new JsonResponse(['message' => __('arqel::messages.ai.field_resolution_failed')], 500);
         }
 
         $translateField = null;
@@ -80,7 +84,7 @@ final class AiTranslateController
         }
 
         if ($translateField === null) {
-            return new JsonResponse(['message' => "AiTranslateField [{$field}] not found on resource [{$resource}]"], 422);
+            return new JsonResponse(['message' => __('arqel::messages.ai.field_not_found', ['type' => 'AiTranslateField', 'field' => $field, 'resource' => $resource])], 422);
         }
 
         $rawSourceLanguage = $request->input('sourceLanguage', '');
@@ -112,7 +116,7 @@ final class AiTranslateController
             // client; log it server-side and return a fixed generic message.
             report($e);
 
-            return new JsonResponse(['message' => 'AI provider request failed'], 422);
+            return new JsonResponse(['message' => __('arqel::messages.ai.provider_failed')], 422);
         }
 
         return new JsonResponse(['translations' => $translations]);

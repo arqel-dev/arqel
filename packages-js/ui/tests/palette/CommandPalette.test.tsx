@@ -77,6 +77,10 @@ function usePtBr() {
               hint_select: '↵ selecionar',
               hint_close: 'esc fechar',
             },
+            command_palette: {
+              category_general: 'Geral',
+              category_recent: 'Recentes',
+            },
           },
         },
       },
@@ -278,5 +282,50 @@ describe('CommandPalette', () => {
     await flushMicrotasks();
     // 1 result -> "1 comando", never "1 comandos" / the old ":count comandos".
     expect(screen.getByRole('status').textContent).toMatch(/^1 comando$/);
+  });
+
+  it('buckets uncategorized commands under the English "General" heading by default', async () => {
+    const uncategorized: PaletteCommand[] = [{ id: 'ping', label: 'Ping', url: '/admin/ping' }];
+    globalThis.fetch = mockFetch(uncategorized) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    const input = screen.getByRole('combobox') as HTMLInputElement;
+    act(() => fireEvent.change(input, { target: { value: 'pi' } }));
+    await act(async () => {
+      vi.advanceTimersByTime(160);
+    });
+    await flushMicrotasks();
+    await flushMicrotasks();
+    expect(screen.getByText('General')).toBeInTheDocument();
+  });
+
+  it('localizes the synthetic "General" + "Recent" category headings (pt_BR)', async () => {
+    usePtBr();
+    localStorage.setItem(
+      RECENT_KEY,
+      JSON.stringify([{ id: 'goto-users', count: 3, lastUsed: Date.now(), command: sample[0] }]),
+    );
+    globalThis.fetch = mockFetch([]) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    // Recents bucket heading is translated, never the literal "Recent".
+    expect(screen.getByText('Recentes')).toBeInTheDocument();
+    expect(screen.queryByText('Recent')).toBeNull();
+
+    // Now switch to an uncategorized search result to assert the "General" bucket.
+    globalThis.fetch = mockFetch([
+      { id: 'ping', label: 'Ping', url: '/admin/ping' },
+    ]) as unknown as typeof fetch;
+    const input = screen.getByRole('combobox') as HTMLInputElement;
+    act(() => fireEvent.change(input, { target: { value: 'pi' } }));
+    await act(async () => {
+      vi.advanceTimersByTime(160);
+    });
+    await flushMicrotasks();
+    await flushMicrotasks();
+    expect(screen.getByText('Geral')).toBeInTheDocument();
+    expect(screen.queryByText('General')).toBeNull();
   });
 });

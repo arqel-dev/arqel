@@ -9,7 +9,8 @@
  * draw an empty table.
  */
 
-import { useArqelTranslations } from '@arqel-dev/react/utils';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
+import { useMemo } from 'react';
 import { cn } from '../utils/cn.js';
 import { WidgetWrapper } from './WidgetWrapper.js';
 
@@ -41,6 +42,8 @@ export interface TableCardProps {
 
 export function TableCard({ widget, className }: TableCardProps) {
   const t = useArqelTranslations();
+  const locale = useArqelLocale();
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   return (
     <WidgetWrapper
       heading={widget.heading ?? undefined}
@@ -77,7 +80,7 @@ export function TableCard({ widget, className }: TableCardProps) {
                   >
                     {widget.columns.map((column) => (
                       <td key={column.name} className="px-2 py-1.5">
-                        {formatCell(record[column.name])}
+                        {formatCell(record[column.name], numberFormatter)}
                       </td>
                     ))}
                   </tr>
@@ -98,9 +101,14 @@ export function TableCard({ widget, className }: TableCardProps) {
   );
 }
 
-function formatCell(value: unknown): string {
+function formatCell(value: unknown, numberFormatter: Intl.NumberFormat): string {
   if (value === null || value === undefined) return '';
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+  // Numbers are grouped/decimal-formatted for the active locale so a cell of
+  // `1500000` reads `1.500.000` under pt-BR instead of the raw en-US digits.
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? numberFormatter.format(value) : String(value);
+  }
+  if (typeof value === 'string' || typeof value === 'boolean') {
     return String(value);
   }
   try {

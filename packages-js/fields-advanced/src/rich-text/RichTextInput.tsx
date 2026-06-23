@@ -155,24 +155,62 @@ const counterStyle: CSSProperties = {
 
 interface ButtonSpec {
   id: string;
-  label: string;
+  /** i18n key under `arqel.fields_advanced.*` for the aria-label / title. */
+  labelKey: string;
+  /** English literal — fallback so the accessible name stays stable. */
+  labelFallback: string;
   render: () => ReactNode;
 }
 
 const BUTTON_SPECS: Record<string, ButtonSpec> = {
-  bold: { id: 'bold', label: 'Bold', render: () => <strong>B</strong> },
-  italic: { id: 'italic', label: 'Italic', render: () => <em>I</em> },
-  underline: { id: 'underline', label: 'Underline', render: () => <u>U</u> },
-  strike: { id: 'strike', label: 'Strikethrough', render: () => <s>S</s> },
-  h1: { id: 'h1', label: 'Heading 1', render: () => <>H1</> },
-  h2: { id: 'h2', label: 'Heading 2', render: () => <>H2</> },
-  h3: { id: 'h3', label: 'Heading 3', render: () => <>H3</> },
-  ul: { id: 'ul', label: 'Bullet list', render: () => <>•</> },
-  ol: { id: 'ol', label: 'Numbered list', render: () => <>1.</> },
-  blockquote: { id: 'blockquote', label: 'Blockquote', render: () => <>&ldquo;</> },
-  link: { id: 'link', label: 'Link', render: () => <>Link</> },
-  code: { id: 'code', label: 'Inline code', render: () => <>{'<>'}</> },
-  image: { id: 'image', label: 'Image', render: () => <>Img</> },
+  bold: {
+    id: 'bold',
+    labelKey: 'richtext_bold',
+    labelFallback: 'Bold',
+    render: () => <strong>B</strong>,
+  },
+  italic: {
+    id: 'italic',
+    labelKey: 'richtext_italic',
+    labelFallback: 'Italic',
+    render: () => <em>I</em>,
+  },
+  underline: {
+    id: 'underline',
+    labelKey: 'richtext_underline',
+    labelFallback: 'Underline',
+    render: () => <u>U</u>,
+  },
+  strike: {
+    id: 'strike',
+    labelKey: 'richtext_strike',
+    labelFallback: 'Strikethrough',
+    render: () => <s>S</s>,
+  },
+  h1: { id: 'h1', labelKey: 'richtext_h1', labelFallback: 'Heading 1', render: () => <>H1</> },
+  h2: { id: 'h2', labelKey: 'richtext_h2', labelFallback: 'Heading 2', render: () => <>H2</> },
+  h3: { id: 'h3', labelKey: 'richtext_h3', labelFallback: 'Heading 3', render: () => <>H3</> },
+  ul: { id: 'ul', labelKey: 'richtext_ul', labelFallback: 'Bullet list', render: () => <>•</> },
+  ol: { id: 'ol', labelKey: 'richtext_ol', labelFallback: 'Numbered list', render: () => <>1.</> },
+  blockquote: {
+    id: 'blockquote',
+    labelKey: 'richtext_blockquote',
+    labelFallback: 'Blockquote',
+    render: () => <>&ldquo;</>,
+  },
+  link: { id: 'link', labelKey: 'richtext_link', labelFallback: 'Link', render: () => <>Link</> },
+  code: {
+    id: 'code',
+    labelKey: 'richtext_code',
+    labelFallback: 'Inline code',
+    render: () => <>{'<>'}</>,
+  },
+  image: {
+    id: 'image',
+    labelKey: 'richtext_image',
+    labelFallback: 'Image',
+    render: () => <>Img</>,
+  },
 };
 
 /* -------------------------------------------------------------------------- */
@@ -218,7 +256,8 @@ export function RichTextInput({
       }),
       Image.configure({ inline: false }),
       Placeholder.configure({
-        placeholder: props.placeholder ?? 'Start writing...',
+        placeholder:
+          props.placeholder ?? t('arqel.fields_advanced.richtext_placeholder', 'Start writing...'),
       }),
       CharacterCount.configure({ limit: props.maxLength }),
     ],
@@ -365,6 +404,7 @@ export function RichTextInput({
             if (!spec) return null;
             const isImage = button === 'image';
             const imageDisabled = isImage && props.imageUploadRoute === null;
+            const label = t(`arqel.fields_advanced.${spec.labelKey}`, spec.labelFallback);
             return (
               <button
                 key={spec.id}
@@ -372,8 +412,15 @@ export function RichTextInput({
                 className={buttonClasses}
                 onClick={() => applyButton(button)}
                 disabled={disabled || imageDisabled}
-                aria-label={spec.label}
-                title={imageDisabled ? 'Image upload not configured' : spec.label}
+                aria-label={label}
+                title={
+                  imageDisabled
+                    ? t(
+                        'arqel.fields_advanced.richtext_image_disabled',
+                        'Image upload not configured',
+                      )
+                    : label
+                }
               >
                 {spec.render()}
               </button>

@@ -33,13 +33,13 @@ final class AiGenerateController
     public function __invoke(Request $request, string $resource, string $field): JsonResponse
     {
         if (Gate::has('use-ai') && ! Gate::allows('use-ai')) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => __('arqel::messages.ai.forbidden')], 403);
         }
 
         $resourceClass = $this->registry->findBySlug($resource);
 
         if ($resourceClass === null) {
-            return new JsonResponse(['message' => "Resource [{$resource}] not registered"], 404);
+            return new JsonResponse(['message' => __('arqel::messages.ai.resource_not_registered', ['resource' => $resource])], 404);
         }
 
         try {
@@ -49,7 +49,9 @@ final class AiGenerateController
                 ? $instance->effectiveFields()
                 : (method_exists($instance, 'fields') ? $instance->fields() : []);
         } catch (Throwable $e) {
-            return new JsonResponse(['message' => 'Failed to resolve resource fields: '.$e->getMessage()], 500);
+            report($e);
+
+            return new JsonResponse(['message' => __('arqel::messages.ai.field_resolution_failed')], 500);
         }
 
         $aiField = null;
@@ -66,7 +68,7 @@ final class AiGenerateController
         }
 
         if ($aiField === null) {
-            return new JsonResponse(['message' => "AiTextField [{$field}] not found on resource [{$resource}]"], 422);
+            return new JsonResponse(['message' => __('arqel::messages.ai.field_not_found', ['type' => 'AiTextField', 'field' => $field, 'resource' => $resource])], 422);
         }
 
         /** @var array<string, mixed> $formData */
@@ -83,7 +85,7 @@ final class AiGenerateController
             // client; log it server-side and return a fixed generic message.
             report($e);
 
-            return new JsonResponse(['message' => 'AI provider request failed'], 422);
+            return new JsonResponse(['message' => __('arqel::messages.ai.provider_failed')], 422);
         }
 
         return new JsonResponse(['text' => $text]);

@@ -15,8 +15,8 @@
  * common "big number" case stays bundle-cheap.
  */
 
-import { useArqelTranslations } from '@arqel-dev/react/utils';
-import type { ReactNode } from 'react';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
+import { type ReactNode, useMemo } from 'react';
 import { cn } from '../utils/cn.js';
 import { WidgetWrapper } from './WidgetWrapper.js';
 
@@ -107,12 +107,22 @@ function Sparkline({ points, color }: SparklineProps) {
 export function StatCard({ widget, className, columnSpan }: StatCardProps) {
   const { heading, description, value, statDescription, descriptionIcon, color, chart, url } =
     widget;
+  const locale = useArqelLocale();
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+
+  // Numeric KPI values are grouped/decimal-formatted for the active locale
+  // (e.g. `1234567` → `1.234.567` under pt-BR). Strings pass through verbatim
+  // so server-formatted values (currency, percentages) stay intact.
+  const displayValue =
+    typeof value === 'number' && Number.isFinite(value)
+      ? numberFormatter.format(value)
+      : (value ?? '—');
 
   const hasChart = Array.isArray(chart) && chart.length >= 2;
 
   const body: ReactNode = (
     <>
-      <div className={cn('text-4xl font-bold tabular-nums', COLOR_TEXT[color])}>{value ?? '—'}</div>
+      <div className={cn('text-4xl font-bold tabular-nums', COLOR_TEXT[color])}>{displayValue}</div>
       {statDescription && (
         <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
           {descriptionIcon && (

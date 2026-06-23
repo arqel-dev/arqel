@@ -27,7 +27,7 @@ final class PluginReviewVoteController
         $userId = $this->resolveUserId($request);
 
         if ($userId === null) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         try {
@@ -37,7 +37,7 @@ final class PluginReviewVoteController
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
-                'message' => 'Validation failed',
+                'message' => (string) __('arqel::messages.marketplace.validation_failed'),
                 'errors' => $e->errors(),
             ], 422);
         }
@@ -45,7 +45,7 @@ final class PluginReviewVoteController
         $review = $this->findReview($slug, $reviewId);
 
         if (! $review instanceof PluginReview) {
-            return new JsonResponse(['message' => 'Review not found'], 404);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.review_not_found')], 404);
         }
 
         $newVote = $data['vote'];
@@ -104,13 +104,13 @@ final class PluginReviewVoteController
         $userId = $this->resolveUserId($request);
 
         if ($userId === null) {
-            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
         $review = $this->findReview($slug, $reviewId);
 
         if (! $review instanceof PluginReview) {
-            return new JsonResponse(['message' => 'Review not found'], 404);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.review_not_found')], 404);
         }
 
         DB::transaction(static function () use ($review, $userId): void {

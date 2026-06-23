@@ -46,11 +46,11 @@ final class VersionHistoryController
         $registry = $this->resolveRegistry();
 
         if ($registry === null) {
-            return new JsonResponse(['message' => 'ResourceRegistry not bound'], 404);
+            return new JsonResponse(['message' => $this->message('arqel::messages.versioning.registry_not_bound', 'ResourceRegistry not bound')], 404);
         }
 
         if (! method_exists($registry, 'findBySlug')) {
-            return new JsonResponse(['message' => 'ResourceRegistry not bound'], 404);
+            return new JsonResponse(['message' => $this->message('arqel::messages.versioning.registry_not_bound', 'ResourceRegistry not bound')], 404);
         }
 
         /** @var class-string|null $resourceClass */
@@ -77,7 +77,7 @@ final class VersionHistoryController
         }
 
         if ($this->deniesView($model)) {
-            return new JsonResponse(['message' => 'Forbidden'], 403);
+            return new JsonResponse(['message' => $this->message('arqel::messages.versioning.forbidden', 'Forbidden')], 403);
         }
 
         $perPage = $this->resolvePerPage($request);
@@ -144,6 +144,22 @@ final class VersionHistoryController
         }
 
         return Gate::denies('view', $model);
+    }
+
+    /**
+     * Localize a user-facing JSON message lazily so the request locale
+     * applies. Falls back to the English literal when no translator is bound
+     * or the key is untranslated, keeping the response text stable.
+     */
+    private function message(string $key, string $fallback): string
+    {
+        if (! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans($key);
+
+        return is_string($translated) && $translated !== $key ? $translated : $fallback;
     }
 
     private function resolveRegistry(): ?object

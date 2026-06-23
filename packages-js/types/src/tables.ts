@@ -81,6 +81,13 @@ export interface NumberColumnProps {
   decimalSeparator?: string;
   prefix?: string;
   suffix?: string;
+  /**
+   * ISO 4217 currency code emitted by `NumberColumn::money()` (e.g. `'EUR'`).
+   * When present the cell formats via `Intl.NumberFormat` in the active locale
+   * with `style: 'currency'`, so the symbol, grouping and decimals follow the
+   * viewer's panel locale instead of a raw en-US shape.
+   */
+  currency?: string;
 }
 
 export interface IconColumnProps {

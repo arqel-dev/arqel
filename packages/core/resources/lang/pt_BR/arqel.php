@@ -103,6 +103,7 @@ return [
             'upload' => 'Envio de arquivo',
             'browse' => 'Procurar',
             'choose_another' => 'Escolher outro arquivo',
+            'drop_hint' => 'Arraste um arquivo aqui ou clique para procurar',
         ],
         'image' => [
             'preview_alt' => 'Pré-visualização',
@@ -237,6 +238,15 @@ return [
         'theme_toggle_light' => 'Mudar para o tema claro',
         'theme_toggle_dark' => 'Mudar para o tema escuro',
         'tenant_switch' => 'Trocar de tenant (atual: :tenant)',
+    ],
+    // Rótulos visíveis das dicas de teclado no rodapé do <CommandPalette>. O
+    // glifo (↑↓ / ↵ / esc) é renderizado pelo componente; apenas o verbo é
+    // localizado. Resolvido no cliente via useArqelTranslations() com o literal
+    // em inglês como fallback.
+    'palette' => [
+        'hint_navigate' => '↑↓ navegar',
+        'hint_select' => '↵ selecionar',
+        'hint_close' => 'esc fechar',
     ],
     // Nomes acessíveis + chrome visível da superfície de edição de conteúdo
     // rico fornecida por @arqel-dev/fields-advanced (Markdown / Repeater /

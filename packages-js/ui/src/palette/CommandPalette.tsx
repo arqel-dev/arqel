@@ -353,9 +353,9 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
           id={hintId}
           className="flex items-center gap-3 border-t border-[var(--border,#e5e7eb)] px-4 py-2 text-xs opacity-70"
         >
-          <span>↑↓ navigate</span>
-          <span>↵ select</span>
-          <span>esc close</span>
+          <span>{t('arqel.palette.hint_navigate', '↑↓ navigate')}</span>
+          <span>{t('arqel.palette.hint_select', '↵ select')}</span>
+          <span>{t('arqel.palette.hint_close', 'esc close')}</span>
         </footer>
       </div>
     </dialog>

@@ -513,7 +513,11 @@ export function RepeaterInput({
                             <button
                               type="button"
                               className={dragHandleClasses}
-                              aria-label={`Drag to reorder item ${index + 1}`}
+                              aria-label={t(
+                                'arqel.fields_advanced.repeater_drag',
+                                `Drag to reorder item ${index + 1}`,
+                                { number: index + 1 },
+                              )}
                               data-testid={`repeater-drag-handle-${index}`}
                               {...attributes}
                               {...listeners}
@@ -532,8 +536,16 @@ export function RepeaterInput({
                               className={iconButtonClasses}
                               aria-label={
                                 isCollapsed
-                                  ? `Expand item ${index + 1}`
-                                  : `Collapse item ${index + 1}`
+                                  ? t(
+                                      'arqel.fields_advanced.repeater_expand',
+                                      `Expand item ${index + 1}`,
+                                      { number: index + 1 },
+                                    )
+                                  : t(
+                                      'arqel.fields_advanced.repeater_collapse',
+                                      `Collapse item ${index + 1}`,
+                                      { number: index + 1 },
+                                    )
                               }
                               aria-expanded={!isCollapsed}
                               onClick={() => toggleCollapsed(item.__id)}
@@ -570,7 +582,11 @@ export function RepeaterInput({
                             <button
                               type="button"
                               className={iconButtonClasses}
-                              aria-label={`Clone item ${index + 1}`}
+                              aria-label={t(
+                                'arqel.fields_advanced.repeater_clone',
+                                `Clone item ${index + 1}`,
+                                { number: index + 1 },
+                              )}
                               disabled={atMax}
                               onClick={() => cloneItem(item.__id)}
                             >
@@ -580,7 +596,11 @@ export function RepeaterInput({
                           <button
                             type="button"
                             className={iconButtonClasses}
-                            aria-label={`Remove item ${index + 1}`}
+                            aria-label={t(
+                              'arqel.fields_advanced.repeater_remove',
+                              `Remove item ${index + 1}`,
+                              { number: index + 1 },
+                            )}
                             disabled={atMin}
                             onClick={() => removeItem(item.__id)}
                           >
@@ -630,7 +650,7 @@ export function RepeaterInput({
         disabled={disabled || atMax}
         aria-label={t('arqel.fields_advanced.repeater_add_item', 'Add item')}
       >
-        + Add item
+        {t('arqel.fields_advanced.repeater_add_item_label', '+ Add item')}
       </button>
     </fieldset>
   );

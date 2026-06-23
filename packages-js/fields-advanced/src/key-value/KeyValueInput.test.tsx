@@ -12,6 +12,15 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { KeyValueInput } from './KeyValueInput.js';
 
+// KeyValueInput localizes its labels and add/remove controls via
+// `useArqelTranslations()`, which reads Inertia's `usePage()`. Stub an
+// empty-props page so the hook falls back to the English literals these
+// assertions expect.
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 interface KvProps {
   keyLabel?: string;
   valueLabel?: string;

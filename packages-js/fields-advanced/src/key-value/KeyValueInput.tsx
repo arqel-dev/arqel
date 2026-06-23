@@ -16,6 +16,7 @@
  * dnd-kit integration is deferred to a follow-up ticket.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -84,8 +85,10 @@ function readProps(field: FieldSchema): KeyValueProps {
   // discriminated-union boundary; defensively narrow each entry.
   const raw = (field.props ?? {}) as Partial<Record<keyof KeyValueProps, unknown>>;
   return {
-    keyLabel: typeof raw.keyLabel === 'string' ? raw.keyLabel : 'Key',
-    valueLabel: typeof raw.valueLabel === 'string' ? raw.valueLabel : 'Value',
+    // `keyLabel`/`valueLabel` default to empty so the component can swap in a
+    // locale-aware fallback ('Key'/'Value') via `t()` when PHP omits them.
+    keyLabel: typeof raw.keyLabel === 'string' ? raw.keyLabel : '',
+    valueLabel: typeof raw.valueLabel === 'string' ? raw.valueLabel : '',
     keyPlaceholder: typeof raw.keyPlaceholder === 'string' ? raw.keyPlaceholder : '',
     valuePlaceholder: typeof raw.valuePlaceholder === 'string' ? raw.valuePlaceholder : '',
     editableKeys: typeof raw.editableKeys === 'boolean' ? raw.editableKeys : true,
@@ -152,7 +155,10 @@ export function KeyValueInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const props = readProps(field);
+  const keyLabel = props.keyLabel || t('arqel.fields_advanced.keyvalue_key', 'Key');
+  const valueLabel = props.valueLabel || t('arqel.fields_advanced.keyvalue_value', 'Value');
   const hasError = errors !== undefined && errors.length > 0;
   const fallbackId = useId();
   const baseId = inputId ?? fallbackId;
@@ -236,8 +242,8 @@ export function KeyValueInput({
       ) : null}
 
       <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-        <div className="text-xs font-medium text-muted-foreground">{props.keyLabel}</div>
-        <div className="text-xs font-medium text-muted-foreground">{props.valueLabel}</div>
+        <div className="text-xs font-medium text-muted-foreground">{keyLabel}</div>
+        <div className="text-xs font-medium text-muted-foreground">{valueLabel}</div>
         <div aria-hidden="true" />
 
         {items.map((item, index) => {
@@ -252,7 +258,7 @@ export function KeyValueInput({
                 className={inputClasses}
                 value={item.key}
                 placeholder={props.keyPlaceholder || undefined}
-                aria-label={`${props.keyLabel} ${index + 1}`}
+                aria-label={`${keyLabel} ${index + 1}`}
                 aria-invalid={hasError || undefined}
                 readOnly={!keyEditable}
                 disabled={!keyEditable && !item.__justAdded}
@@ -264,7 +270,7 @@ export function KeyValueInput({
                 className={inputClasses}
                 value={item.value}
                 placeholder={props.valuePlaceholder || undefined}
-                aria-label={`${props.valueLabel} ${index + 1}`}
+                aria-label={`${valueLabel} ${index + 1}`}
                 aria-invalid={hasError || undefined}
                 onChange={(e) => updateRow(item.__id, { value: e.target.value })}
               />
@@ -272,7 +278,11 @@ export function KeyValueInput({
                 <button
                   type="button"
                   className={removeButtonClasses}
-                  aria-label={`Remove row ${index + 1}`}
+                  aria-label={t(
+                    'arqel.fields_advanced.keyvalue_remove_row',
+                    `Remove row ${index + 1}`,
+                    { number: index + 1 },
+                  )}
                   onClick={() => removeRow(item.__id)}
                 >
                   ×
@@ -290,9 +300,13 @@ export function KeyValueInput({
           type="button"
           className={buttonClasses}
           onClick={addRow}
-          aria-label={`Add ${props.keyLabel.toLowerCase()} / ${props.valueLabel.toLowerCase()} row`}
+          aria-label={t(
+            'arqel.fields_advanced.keyvalue_add_row',
+            `Add ${keyLabel.toLowerCase()} / ${valueLabel.toLowerCase()} row`,
+            { key: keyLabel.toLowerCase(), value: valueLabel.toLowerCase() },
+          )}
         >
-          + Add row
+          {t('arqel.fields_advanced.keyvalue_add_row_label', '+ Add row')}
         </button>
       ) : null}
     </fieldset>

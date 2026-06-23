@@ -27,7 +27,7 @@
  * `safeUrl` before being passed to the editor command.
  */
 
-import { useArqelTranslations } from '@arqel-dev/react/utils';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
 import CharacterCount from '@tiptap/extension-character-count';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
@@ -40,6 +40,7 @@ import {
   type ReactNode,
   useEffect,
   useId,
+  useMemo,
   useRef,
 } from 'react';
 import type { FieldRendererProps } from '../shared/types.js';
@@ -188,6 +189,8 @@ export function RichTextInput({
   describedBy,
 }: FieldRendererProps) {
   const t = useArqelTranslations();
+  const locale = useArqelLocale();
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const fieldRecord = field as { props?: unknown; placeholder?: unknown };
   const placeholder = typeof fieldRecord.placeholder === 'string' ? fieldRecord.placeholder : null;
   const props = readProps(fieldRecord.props, placeholder);
@@ -381,7 +384,11 @@ export function RichTextInput({
 
       {overLimit ? (
         <div role="alert" style={warningStyle}>
-          {`Content exceeds the maximum length of ${props.maxLength} characters.`}
+          {t(
+            'arqel.fields_advanced.richtext_over_limit',
+            `Content exceeds the maximum length of ${numberFormatter.format(props.maxLength)} characters.`,
+            { max: numberFormatter.format(props.maxLength) },
+          )}
         </div>
       ) : null}
 
@@ -390,7 +397,7 @@ export function RichTextInput({
       </div>
 
       <div style={counterStyle} aria-live="polite">
-        {characters} / {props.maxLength}
+        {numberFormatter.format(characters)} / {numberFormatter.format(props.maxLength)}
       </div>
 
       {props.imageUploadRoute !== null ? (

@@ -4,6 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { TagsInput } from './TagsInput.js';
 
+// TagsInput localizes its chip-remove aria-label via `useArqelTranslations()`,
+// which reads Inertia's `usePage()`. Stub an empty-props page so the hook falls
+// back to the English literals these assertions expect.
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 interface TagsTestProps {
   suggestions?: string[];
   creatable?: boolean;

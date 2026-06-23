@@ -698,7 +698,11 @@ export function BuilderInput({
                           <button
                             type="button"
                             className={iconButtonClasses}
-                            aria-label={`Remove block ${index + 1}`}
+                            aria-label={t(
+                              'arqel.fields_advanced.builder_remove_block',
+                              `Remove block ${index + 1}`,
+                              { number: index + 1 },
+                            )}
                             disabled={atMin}
                             onClick={() => removeItem(item.__id)}
                           >
@@ -751,7 +755,7 @@ export function BuilderInput({
           aria-expanded={pickerOpen}
           aria-label={t('arqel.fields_advanced.builder_add_block', 'Add block')}
         >
-          + Add block
+          {t('arqel.fields_advanced.builder_add_block_label', '+ Add block')}
         </button>
         {pickerOpen ? (
           <BlockPicker

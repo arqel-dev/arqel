@@ -11,6 +11,7 @@
  * Implemented with vanilla React only — no Headless UI / Combobox lib.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import {
   type KeyboardEvent as ReactKeyboardEvent,
@@ -56,6 +57,7 @@ export function TagsInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const props = readTagsProps((field as { props: unknown }).props);
   const hasError = errors !== undefined && errors.length > 0;
 
@@ -175,7 +177,9 @@ export function TagsInput({
             {!disabled && (
               <button
                 type="button"
-                aria-label={`Remove tag ${tag}`}
+                aria-label={t('arqel.fields_advanced.tags_remove', `Remove tag ${tag}`, {
+                  tag,
+                })}
                 onClick={() => removeAt(index)}
                 className="ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-black/10"
               >

@@ -699,6 +699,9 @@ importers:
 
   packages-js/i18n:
     devDependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
       '@arqel-dev/ui':
         specifier: workspace:*
         version: link:../ui
@@ -816,6 +819,9 @@ importers:
         specifier: ^8.4.0
         version: 8.5.0
     devDependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
       '@arqel-dev/ui':
         specifier: workspace:*
         version: link:../ui

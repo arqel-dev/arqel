@@ -5,6 +5,7 @@
  * sent as `null` so server-side validation rules see typed values.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { NumberFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { cn } from '@arqel-dev/ui/utils';
@@ -20,6 +21,7 @@ export function NumberInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as NumberFieldSchema;
+  const t = useArqelTranslations();
   const hasError = errors !== undefined && errors.length > 0;
   const isDisabled = disabled || f.disabled || f.readonly;
 
@@ -63,7 +65,7 @@ export function NumberInput({
       <div className="absolute inset-y-0 right-0 flex flex-col">
         <button
           type="button"
-          aria-label="Increment"
+          aria-label={t('arqel.fields.increment', 'Increment')}
           disabled={isDisabled}
           onClick={() => setValue((current ?? 0) + step)}
           className="flex h-1/2 w-8 items-center justify-center text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
@@ -72,7 +74,7 @@ export function NumberInput({
         </button>
         <button
           type="button"
-          aria-label="Decrement"
+          aria-label={t('arqel.fields.decrement', 'Decrement')}
           disabled={isDisabled}
           onClick={() => setValue((current ?? 0) - step)}
           className="flex h-1/2 w-8 items-center justify-center text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"

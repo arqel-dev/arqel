@@ -6,6 +6,7 @@
  * presentation-only and writes back through the same `onChange`.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { MultiSelectFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { cn } from '@arqel-dev/ui/utils';
@@ -22,6 +23,7 @@ export function MultiSelectInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as MultiSelectFieldSchema;
+  const t = useArqelTranslations();
   const hasError = errors !== undefined && errors.length > 0;
   const options = normaliseOptions(f.props.options);
   const arr = Array.isArray(value) ? (value as Array<string | number>) : [];
@@ -47,7 +49,9 @@ export function MultiSelectInput({
                 {!isDisabled && (
                   <button
                     type="button"
-                    aria-label={`Remove ${opt?.label ?? String(v)}`}
+                    aria-label={t('arqel.fields.multiselect.remove', 'Remove :label', {
+                      label: opt?.label ?? String(v),
+                    })}
                     onClick={() => remove(v)}
                     className="text-muted-foreground hover:text-foreground"
                   >

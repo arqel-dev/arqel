@@ -87,6 +87,22 @@ return [
         'not_found' => 'Registro não encontrado.',
         'server_error' => 'Ocorreu um erro inesperado.',
     ],
+    // Nomes acessíveis + placeholders visíveis dos inputs de campo do
+    // framework (renderers React do @arqel-dev/fields). :label / :resource
+    // são valores de runtime (já traduzidos) substituídos no cliente.
+    'fields' => [
+        'increment' => 'Incrementar',
+        'decrement' => 'Decrementar',
+        'file' => [
+            'upload' => 'Envio de arquivo',
+        ],
+        'belongsto' => [
+            'search' => 'Buscar :resource…',
+        ],
+        'multiselect' => [
+            'remove' => 'Remover :label',
+        ],
+    ],
     'locale' => [
         'switch' => 'Idioma',
         'en' => 'English',

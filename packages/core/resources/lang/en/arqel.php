@@ -86,6 +86,24 @@ return [
         'not_found' => 'Record not found.',
         'server_error' => 'An unexpected error occurred.',
     ],
+    // Accessible names + visible placeholders for the framework's field
+    // inputs (@arqel-dev/fields React renderers). :label / :resource are
+    // already-translated runtime values substituted client-side. Each value
+    // mirrors the component's original English literal so accessible names
+    // stay stable for non-Arqel pages and a11y consumer tests.
+    'fields' => [
+        'increment' => 'Increment',
+        'decrement' => 'Decrement',
+        'file' => [
+            'upload' => 'File upload',
+        ],
+        'belongsto' => [
+            'search' => 'Search :resource…',
+        ],
+        'multiselect' => [
+            'remove' => 'Remove :label',
+        ],
+    ],
     'locale' => [
         'switch' => 'Language',
         'en' => 'English',

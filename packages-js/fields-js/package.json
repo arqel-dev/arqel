@@ -89,11 +89,13 @@
     "@arqel-dev/types": "workspace:*"
   },
   "peerDependencies": {
+    "@arqel-dev/react": "workspace:*",
     "@arqel-dev/ui": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@arqel-dev/react": "workspace:*",
     "@arqel-dev/ui": "workspace:*",
     "@inertiajs/react": "^3.0.0",
     "@testing-library/jest-dom": "^6.6.3",

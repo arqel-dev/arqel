@@ -309,4 +309,27 @@ return [
         'no_state_assigned' => 'Nenhum estado atribuído.',
         'no_transitions' => 'Nenhuma transição disponível.',
     ],
+    // Chrome de validação localizado da submissão de plugin do
+    // @arqel-dev/marketplace (SubmitPluginRequest). `attributes` substitui os
+    // nomes de campo em snake_case nos placeholders :attribute; `messages`
+    // localiza falhas de regra independentemente das linhas de validação da
+    // aplicação hospedeira.
+    'marketplace' => [
+        'attributes' => [
+            'slug' => 'slug',
+            'composer_package' => 'pacote Composer',
+            'npm_package' => 'pacote npm',
+            'github_url' => 'URL do GitHub',
+            'type' => 'tipo',
+            'name' => 'nome',
+            'description' => 'descrição',
+            'screenshots' => 'capturas de tela',
+            'license' => 'licença',
+        ],
+        'messages' => [
+            'slug_regex' => 'O slug pode conter apenas letras minúsculas, números e hífens.',
+            'composer_package_regex' => 'O pacote Composer deve seguir o formato vendor/nome.',
+            'type_in' => 'O tipo selecionado é inválido.',
+        ],
+    ],
 ];

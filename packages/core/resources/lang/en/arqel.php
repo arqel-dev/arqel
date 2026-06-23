@@ -313,4 +313,26 @@ return [
         'no_state_assigned' => 'No state assigned.',
         'no_transitions' => 'No transitions available.',
     ],
+    // Localized validation chrome for @arqel-dev/marketplace plugin submission
+    // (SubmitPluginRequest). `attributes` replaces the raw snake_case field
+    // names in :attribute placeholders; `messages` localizes rule failures
+    // independent of the host application's validation lines.
+    'marketplace' => [
+        'attributes' => [
+            'slug' => 'slug',
+            'composer_package' => 'Composer package',
+            'npm_package' => 'npm package',
+            'github_url' => 'GitHub URL',
+            'type' => 'type',
+            'name' => 'name',
+            'description' => 'description',
+            'screenshots' => 'screenshots',
+            'license' => 'license',
+        ],
+        'messages' => [
+            'slug_regex' => 'The slug may only contain lowercase letters, numbers and hyphens.',
+            'composer_package_regex' => 'The Composer package must follow the vendor/name format.',
+            'type_in' => 'The selected type is invalid.',
+        ],
+    ],
 ];

@@ -52,4 +52,41 @@ final class SubmitPluginRequest extends FormRequest
             'license' => ['nullable', 'string', 'max:100'],
         ];
     }
+
+    /**
+     * Localized rule messages for the cases where Laravel's defaults are too
+     * generic (regex/in). Resolved lazily at validation time so the request
+     * locale applies.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'slug.regex' => __('arqel::arqel.marketplace.messages.slug_regex'),
+            'composer_package.regex' => __('arqel::arqel.marketplace.messages.composer_package_regex'),
+            'type.in' => __('arqel::arqel.marketplace.messages.type_in'),
+        ];
+    }
+
+    /**
+     * Human-readable, localized field names so :attribute placeholders no
+     * longer render raw snake_case identifiers in error messages.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'slug' => __('arqel::arqel.marketplace.attributes.slug'),
+            'composer_package' => __('arqel::arqel.marketplace.attributes.composer_package'),
+            'npm_package' => __('arqel::arqel.marketplace.attributes.npm_package'),
+            'github_url' => __('arqel::arqel.marketplace.attributes.github_url'),
+            'type' => __('arqel::arqel.marketplace.attributes.type'),
+            'name' => __('arqel::arqel.marketplace.attributes.name'),
+            'description' => __('arqel::arqel.marketplace.attributes.description'),
+            'screenshots' => __('arqel::arqel.marketplace.attributes.screenshots'),
+            'license' => __('arqel::arqel.marketplace.attributes.license'),
+        ];
+    }
 }

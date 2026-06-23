@@ -2,10 +2,11 @@ import type { FieldSchema } from '@arqel-dev/types/fields';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DateTimeInput } from '../src/date/index.js';
-import { FileInput } from '../src/file/index.js';
+import { FileInput, ImageInput } from '../src/file/index.js';
 import { NumberInput } from '../src/number/index.js';
 import { BelongsToInput } from '../src/relationship/index.js';
 import { MultiSelectInput } from '../src/select/index.js';
+import { PasswordInput } from '../src/text/index.js';
 import { setMockTranslations } from './setup.js';
 
 const baseField = {
@@ -39,6 +40,24 @@ const file: FieldSchema = {
   label: 'Avatar',
   component: 'FileInput',
   props: { disk: 'public' },
+};
+
+const image: FieldSchema = {
+  ...baseField,
+  type: 'image',
+  name: 'cover',
+  label: 'Cover',
+  component: 'ImageInput',
+  props: { disk: 'public' },
+};
+
+const password: FieldSchema = {
+  ...baseField,
+  type: 'password',
+  name: 'secret',
+  label: 'Secret',
+  component: 'PasswordInput',
+  props: { autocomplete: 'new-password' },
 };
 
 const multi: FieldSchema = {
@@ -109,6 +128,72 @@ describe('FileInput a11y (i18n)', () => {
     setMockTranslations({ arqel: { fields: { file: { upload: 'Envio de arquivo' } } } });
     render(<FileInput field={file} value={null} onChange={vi.fn()} />);
     expect(screen.getByRole('region', { name: 'Envio de arquivo' })).toBeInTheDocument();
+  });
+});
+
+describe('FileInput visible browse label (i18n)', () => {
+  it('falls back to the English visible labels', () => {
+    const { rerender } = render(<FileInput field={file} value={null} onChange={vi.fn()} />);
+    expect(screen.getByText('Browse')).toBeInTheDocument();
+    rerender(<FileInput field={file} value="avatar.png" onChange={vi.fn()} />);
+    expect(screen.getByText('Choose another file')).toBeInTheDocument();
+  });
+
+  it('localizes the visible browse / replace labels', () => {
+    setMockTranslations({
+      arqel: { fields: { file: { browse: 'Procurar', choose_another: 'Escolher outro arquivo' } } },
+    });
+    const { rerender } = render(<FileInput field={file} value={null} onChange={vi.fn()} />);
+    expect(screen.getByText('Procurar')).toBeInTheDocument();
+    rerender(<FileInput field={file} value="avatar.png" onChange={vi.fn()} />);
+    expect(screen.getByText('Escolher outro arquivo')).toBeInTheDocument();
+  });
+});
+
+describe('ImageInput alt + visible label (i18n)', () => {
+  it('falls back to English alt + choose label', () => {
+    render(<ImageInput field={image} value="https://example.com/a.png" onChange={vi.fn()} />);
+    expect(screen.getByAltText('Preview')).toBeInTheDocument();
+    expect(screen.getByText('Replace image')).toBeInTheDocument();
+  });
+
+  it('shows the choose label when there is no preview', () => {
+    render(<ImageInput field={image} value={null} onChange={vi.fn()} />);
+    expect(screen.getByText('Choose image')).toBeInTheDocument();
+  });
+
+  it('localizes the preview alt + replace label', () => {
+    setMockTranslations({
+      arqel: {
+        fields: {
+          image: {
+            preview_alt: 'Pré-visualização',
+            replace: 'Substituir imagem',
+            choose: 'Escolher imagem',
+          },
+        },
+      },
+    });
+    render(<ImageInput field={image} value="https://example.com/a.png" onChange={vi.fn()} />);
+    expect(screen.getByAltText('Pré-visualização')).toBeInTheDocument();
+    expect(screen.getByText('Substituir imagem')).toBeInTheDocument();
+  });
+});
+
+describe('PasswordInput reveal toggle a11y (i18n)', () => {
+  it('falls back to the English accessible name', () => {
+    render(<PasswordInput field={password} value="hunter2" onChange={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeInTheDocument();
+  });
+
+  it('localizes the show/hide accessible name and swaps on toggle', () => {
+    setMockTranslations({
+      arqel: { fields: { password: { show: 'Mostrar senha', hide: 'Ocultar senha' } } },
+    });
+    render(<PasswordInput field={password} value="hunter2" onChange={vi.fn()} />);
+    const button = screen.getByRole('button', { name: 'Mostrar senha' });
+    fireEvent.click(button);
+    expect(screen.getByRole('button', { name: 'Ocultar senha' })).toBeInTheDocument();
   });
 });
 

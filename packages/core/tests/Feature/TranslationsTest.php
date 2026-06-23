@@ -46,6 +46,53 @@ it('substitutes placeholders in pagination strings', function (): void {
         ->toBe('Showing 1 to 10 of 42 results');
 });
 
+it('exposes the theme-toggle aria/title copy in both locales', function (): void {
+    // Keys back @arqel-dev/theme's <ThemeToggle> aria-label/title; the English
+    // values are the React fallbacks so the accessible name stays stable when
+    // no translation prop is present.
+    app()->setLocale('en');
+
+    expect(__('arqel::arqel.theme.toggle.system'))->toBe('Theme: system (click for light)')
+        ->and(__('arqel::arqel.theme.toggle.light'))->toBe('Theme: light (click for dark)')
+        ->and(__('arqel::arqel.theme.toggle.dark'))->toBe('Theme: dark (click for system)');
+
+    app()->setLocale('pt_BR');
+
+    expect(__('arqel::arqel.theme.toggle.system'))->toBe('Tema: sistema (clique para claro)')
+        ->and(__('arqel::arqel.theme.toggle.light'))->toBe('Tema: claro (clique para escuro)')
+        ->and(__('arqel::arqel.theme.toggle.dark'))->toBe('Tema: escuro (clique para sistema)');
+});
+
+it('exposes the skip-link default label in both locales', function (): void {
+    app()->setLocale('en');
+    expect(__('arqel::arqel.a11y.skip_to_content'))->toBe('Skip to main content');
+
+    app()->setLocale('pt_BR');
+    expect(__('arqel::arqel.a11y.skip_to_content'))->toBe('Pular para o conteúdo principal');
+});
+
+it('exposes the image/file/password field labels in both locales', function (): void {
+    app()->setLocale('en');
+
+    expect(__('arqel::arqel.fields.image.preview_alt'))->toBe('Preview')
+        ->and(__('arqel::arqel.fields.image.choose'))->toBe('Choose image')
+        ->and(__('arqel::arqel.fields.image.replace'))->toBe('Replace image')
+        ->and(__('arqel::arqel.fields.file.browse'))->toBe('Browse')
+        ->and(__('arqel::arqel.fields.file.choose_another'))->toBe('Choose another file')
+        ->and(__('arqel::arqel.fields.password.show'))->toBe('Show password')
+        ->and(__('arqel::arqel.fields.password.hide'))->toBe('Hide password');
+
+    app()->setLocale('pt_BR');
+
+    expect(__('arqel::arqel.fields.image.preview_alt'))->toBe('Pré-visualização')
+        ->and(__('arqel::arqel.fields.image.choose'))->toBe('Escolher imagem')
+        ->and(__('arqel::arqel.fields.image.replace'))->toBe('Substituir imagem')
+        ->and(__('arqel::arqel.fields.file.browse'))->toBe('Procurar')
+        ->and(__('arqel::arqel.fields.file.choose_another'))->toBe('Escolher outro arquivo')
+        ->and(__('arqel::arqel.fields.password.show'))->toBe('Mostrar senha')
+        ->and(__('arqel::arqel.fields.password.hide'))->toBe('Ocultar senha');
+});
+
 it('exposes the realtime connection-banner copy in both locales', function (): void {
     // These keys back @arqel-dev/realtime's <ConnectionStatusBanner>; the
     // English values must match the React fallbacks so the accessible name is

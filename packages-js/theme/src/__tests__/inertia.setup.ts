@@ -1,6 +1,4 @@
-import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { vi } from 'vitest';
 
 type Dict = Record<string, unknown>;
 
@@ -22,29 +20,24 @@ function lookup(dict: Dict, key: string): string | undefined {
  * Install a translation dictionary the mocked `useArqelTranslations()` resolves
  * against (mirroring `props.i18n.translations`). With no dictionary installed
  * the translate helper returns the caller's English `fallback`, so accessible
- * names + visible labels stay stable.
+ * names stay stable.
  */
 export function setMockTranslations(translations: Dict): void {
   mockState.translations = translations;
 }
 
-export function resetMockTranslations(): void {
+export function resetMockPage(): void {
   mockState.translations = {};
 }
 
-// `<SkipLink>` calls `useArqelTranslations()` from `@arqel-dev/react/utils`,
+// `<ThemeToggle>` calls `useArqelTranslations()` from `@arqel-dev/react/utils`,
 // which internally reads Inertia's `usePage()` and throws outside an Inertia
-// app. Mock the hook directly so components resolve their own copy under jsdom
-// without a full Inertia shell, while still honouring an installed dictionary +
-// English fallback (the real hook's contract).
+// app. Mock the hook directly so the toggle resolves its aria-label/title under
+// jsdom without a full Inertia shell, while still honouring an installed
+// dictionary + English fallback (the real hook's contract).
 vi.mock('@arqel-dev/react/utils', () => ({
   useArqelTranslations:
     () =>
     (key: string, fallback?: string): string =>
       lookup(mockState.translations, key) ?? fallback ?? key,
 }));
-
-afterEach(() => {
-  cleanup();
-  resetMockTranslations();
-});

@@ -101,6 +101,17 @@ return [
         'decrement' => 'Decrementar',
         'file' => [
             'upload' => 'Envio de arquivo',
+            'browse' => 'Procurar',
+            'choose_another' => 'Escolher outro arquivo',
+        ],
+        'image' => [
+            'preview_alt' => 'Pré-visualização',
+            'choose' => 'Escolher imagem',
+            'replace' => 'Substituir imagem',
+        ],
+        'password' => [
+            'show' => 'Mostrar senha',
+            'hide' => 'Ocultar senha',
         ],
         'belongsto' => [
             'search' => 'Buscar :resource…',
@@ -139,6 +150,24 @@ return [
     'tenant' => [
         // Nome de fallback (visível + anunciado) para um tenant sem `name`.
         'unnamed' => 'Tenant :id',
+    ],
+    // aria-label + tooltip (title) do <ThemeToggle> de @arqel-dev/theme, que
+    // alterna sistema → claro → escuro. Cada valor descreve o tema ATUAL e o
+    // tema alcançado no próximo clique. Resolvido no cliente via
+    // useArqelTranslations() com o literal em inglês como fallback.
+    'theme' => [
+        'toggle' => [
+            'system' => 'Tema: sistema (clique para claro)',
+            'light' => 'Tema: claro (clique para escuro)',
+            'dark' => 'Tema: escuro (clique para sistema)',
+        ],
+    ],
+    // Rótulo visível + focável do <SkipLink> de @arqel-dev/a11y. Texto padrão
+    // do link de pular para o conteúdo; a prop `label` ainda o sobrescreve.
+    // Resolvido no cliente via useArqelTranslations() com o literal em inglês
+    // como fallback.
+    'a11y' => [
+        'skip_to_content' => 'Pular para o conteúdo principal',
     ],
     // Strings dos renderizadores de campo do @arqel-dev/ai (AiTextInput,
     // AiSelectInput, AiExtractInput, AiImageInput, AiTranslateInput):

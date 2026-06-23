@@ -62,7 +62,9 @@ export function FileInput({
         <span className="text-muted-foreground">Drag a file here or click to browse</span>
       )}
       <label className="cursor-pointer text-xs text-primary hover:underline">
-        {filename ? 'Choose another file' : 'Browse'}
+        {filename
+          ? t('arqel.fields.file.choose_another', 'Choose another file')
+          : t('arqel.fields.file.browse', 'Browse')}
         <input
           id={inputId}
           type="file"

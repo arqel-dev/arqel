@@ -5,6 +5,7 @@
  * is rendered inside the trailing edge of the input via wrapper.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { PasswordFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { cn } from '@arqel-dev/ui/utils';
@@ -21,6 +22,7 @@ export function PasswordInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as PasswordFieldSchema;
+  const t = useArqelTranslations();
   const [revealed, setRevealed] = useState(false);
   const hasError = errors !== undefined && errors.length > 0;
   const isDisabled = disabled || f.disabled || f.readonly;
@@ -43,7 +45,11 @@ export function PasswordInput({
       />
       <button
         type="button"
-        aria-label={revealed ? 'Hide password' : 'Show password'}
+        aria-label={
+          revealed
+            ? t('arqel.fields.password.hide', 'Hide password')
+            : t('arqel.fields.password.show', 'Show password')
+        }
         aria-pressed={revealed}
         disabled={isDisabled}
         onClick={() => setRevealed((v) => !v)}

@@ -5,6 +5,7 @@
  * Crop / aspect-ratio editor lands in Phase 2 with `react-image-crop`.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ImageFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { cn } from '@arqel-dev/ui/utils';
@@ -20,6 +21,7 @@ export function ImageInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as ImageFieldSchema;
+  const t = useArqelTranslations();
   const hasError = errors !== undefined && errors.length > 0;
   const isDisabled = disabled || f.disabled || f.readonly;
 
@@ -44,7 +46,7 @@ export function ImageInput({
       {previewUrl && (
         <img
           src={previewUrl}
-          alt="Preview"
+          alt={t('arqel.fields.image.preview_alt', 'Preview')}
           className={cn('max-h-40 w-auto rounded-sm border border-border')}
         />
       )}
@@ -55,7 +57,9 @@ export function ImageInput({
           isDisabled && 'cursor-not-allowed opacity-50',
         )}
       >
-        {previewUrl ? 'Replace image' : 'Choose image'}
+        {previewUrl
+          ? t('arqel.fields.image.replace', 'Replace image')
+          : t('arqel.fields.image.choose', 'Choose image')}
         <input
           id={inputId}
           type="file"

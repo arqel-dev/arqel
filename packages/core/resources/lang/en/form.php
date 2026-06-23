@@ -18,6 +18,11 @@ return [
     'helper' => [
         'unsaved_changes' => 'You have unsaved changes.',
     ],
+    // Collapsible-section toggle labels (visible button text).
+    'section' => [
+        'show' => 'Show',
+        'hide' => 'Hide',
+    ],
     // Inline notice when a field type/component has no renderer.
     'unregistered_field' => 'Field ":name" could not render: :detail.',
 ];

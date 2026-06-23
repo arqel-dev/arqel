@@ -7,6 +7,7 @@
  * "View" e "Restore". Não faz fetch nem decisões de autorização.
  */
 
+import { useArqelLocale } from '@arqel-dev/react/utils';
 import { Badge, Button, Card, CardContent, CardHeader, LoadingSkeleton } from '@arqel-dev/ui';
 import type { JSX } from 'react';
 
@@ -31,24 +32,28 @@ export interface VersionTimelineProps {
   canRestore?: (version: Version) => boolean;
 }
 
-const RTF =
-  typeof Intl !== 'undefined' && 'RelativeTimeFormat' in Intl
-    ? new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
-    : null;
+const RTF_SUPPORTED = typeof Intl !== 'undefined' && 'RelativeTimeFormat' in Intl;
 
 /**
- * Format an ISO date string as a relative time ("2 hours ago").
- * Falls back to the raw string when `Intl.RelativeTimeFormat` is
- * unavailable (very old runtimes / SSR snapshots without polyfill).
+ * Format an ISO date string as a relative time ("2 hours ago" / "há 2 horas").
+ *
+ * `locale` is a BCP-47 tag for the active panel locale; it defaults to `'en'`
+ * so the exported pure helper stays deterministic for callers/tests that do not
+ * supply one. The `<VersionTimeline>` component passes the active locale read
+ * from the Inertia `i18n` prop via `useArqelLocale()`.
+ *
+ * Falls back to the raw string when `Intl.RelativeTimeFormat` is unavailable
+ * (very old runtimes / SSR snapshots without polyfill).
  */
-export function formatRelativeTime(iso: string, now: Date = new Date()): string {
+export function formatRelativeTime(iso: string, now: Date = new Date(), locale = 'en'): string {
   const then = new Date(iso);
   if (Number.isNaN(then.getTime())) {
     return iso;
   }
-  if (RTF === null) {
+  if (!RTF_SUPPORTED) {
     return iso;
   }
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
   const diffSeconds = Math.round((then.getTime() - now.getTime()) / 1000);
   const absSeconds = Math.abs(diffSeconds);
   const units: Array<{ unit: Intl.RelativeTimeFormatUnit; seconds: number }> = [
@@ -61,10 +66,10 @@ export function formatRelativeTime(iso: string, now: Date = new Date()): string 
   ];
   for (const { unit, seconds } of units) {
     if (absSeconds >= seconds) {
-      return RTF.format(Math.round(diffSeconds / seconds), unit);
+      return rtf.format(Math.round(diffSeconds / seconds), unit);
     }
   }
-  return RTF.format(diffSeconds, 'second');
+  return rtf.format(diffSeconds, 'second');
 }
 
 function getInitials(name: string | undefined | null): string {
@@ -107,6 +112,9 @@ export function VersionTimeline({
   onRestore,
   canRestore,
 }: VersionTimelineProps): JSX.Element {
+  // Active panel locale (BCP-47) for relative timestamps, read from the Inertia
+  // `i18n` prop. Called unconditionally before any early return (rules of hooks).
+  const locale = useArqelLocale();
   if (loading === true) {
     return (
       <ol
@@ -145,7 +153,7 @@ export function VersionTimeline({
       {versions.map((version) => {
         const userName = version.user?.name ?? 'system';
         const initials = getInitials(version.user?.name);
-        const relative = formatRelativeTime(version.created_at);
+        const relative = formatRelativeTime(version.created_at, undefined, locale);
         const restoreVisible = canRestore === undefined ? true : canRestore(version) === true;
 
         return (

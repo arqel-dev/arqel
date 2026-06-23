@@ -165,6 +165,8 @@ function DateRangeControl({
   value: unknown;
   onChange: (value: unknown) => void;
 }) {
+  const t = useArqelTranslations();
+  const label = filter.label ?? filter.name;
   const range = (value && typeof value === 'object' ? (value as Record<string, unknown>) : {}) as {
     from?: unknown;
     to?: unknown;
@@ -174,11 +176,11 @@ function DateRangeControl({
 
   return (
     <fieldset className="flex flex-col gap-1 text-xs text-muted-foreground">
-      <legend>{filter.label ?? filter.name}</legend>
+      <legend>{label}</legend>
       <div className="flex items-center gap-1">
         <input
           type="date"
-          aria-label={`${filter.label ?? filter.name} from`}
+          aria-label={t('table.filters.date_from', `${label} from`, { label })}
           className={controlClasses()}
           value={fromValue}
           onChange={(e) => onChange({ from: e.target.value || null, to: range.to ?? null })}
@@ -186,7 +188,7 @@ function DateRangeControl({
         <span aria-hidden="true">–</span>
         <input
           type="date"
-          aria-label={`${filter.label ?? filter.name} to`}
+          aria-label={t('table.filters.date_to', `${label} to`, { label })}
           className={controlClasses()}
           value={toValue}
           onChange={(e) => onChange({ from: range.from ?? null, to: e.target.value || null })}

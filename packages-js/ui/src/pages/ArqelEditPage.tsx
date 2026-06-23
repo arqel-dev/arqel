@@ -6,6 +6,7 @@
  */
 
 import { useArqelForm } from '@arqel-dev/hooks';
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FormSchema } from '@arqel-dev/types/forms';
 import type { RecordType, ResourceEditProps } from '@arqel-dev/types/resources';
@@ -32,6 +33,7 @@ interface ArqelFormShape {
 
 export default function ArqelEditPage<TRecord extends RecordType = RecordType>(): JSX.Element {
   const page = usePage();
+  const t = useArqelTranslations();
   const props = page.props as unknown as ResourceEditProps<TRecord>;
   const fields = (props.fields ?? []) as FieldSchema[];
   const record = props.record;
@@ -49,12 +51,15 @@ export default function ArqelEditPage<TRecord extends RecordType = RecordType>()
     });
   };
 
+  // Pre-interpolate the label into the English fallback so the title stays
+  // correct even when the `arqel.pages.edit` key is absent from the shared
+  // dictionary (the hook does not re-interpolate a raw fallback).
+  const label = props.resource?.label ?? t('arqel.pages.fallback', 'record');
+  const editTitle = props.recordTitle ?? t('arqel.pages.edit', `Edit ${label}`, { label });
+
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={props.recordTitle ?? `Edit ${props.resource?.label ?? 'record'}`}
-        description={props.recordSubtitle ?? null}
-      />
+      <PageHeader title={editTitle} description={props.recordSubtitle ?? null} />
       <form onSubmit={submit} className="space-y-6">
         <FormRenderer
           schema={schema}

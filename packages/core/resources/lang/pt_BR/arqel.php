@@ -64,6 +64,19 @@ return [
         'next' => 'Próximo',
         'showing' => 'Exibindo :from a :to de :total resultados',
     ],
+    // Títulos H1 visíveis das páginas CRUD padrão. :label é o rótulo
+    // (já traduzido) singular do recurso; 'fallback' é usado quando não há
+    // rótulo nem título de registro disponível.
+    'pages' => [
+        'create' => 'Criar :label',
+        'edit' => 'Editar :label',
+        'record' => 'Registro',
+        'fallback' => 'registro',
+    ],
+    'tenant' => [
+        // Nome de fallback (visível + anunciado) para um tenant sem `name`.
+        'unnamed' => 'Tenant :id',
+    ],
     // Nomes acessíveis (aria-label / sr-only) da interface do framework.
     // Mantidos distintos dos rótulos visíveis curtos para que leitores de
     // tela anunciem um nome acessível completo e descritivo.

@@ -9,8 +9,18 @@ import type {
   TextColumnSchema,
 } from '@arqel-dev/types/tables';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TableCell } from '../src/table/cells.js';
+
+// Controllable `usePage` so locale-aware tests can set `props.i18n.locale`.
+// Overrides the empty-bag default from tests/setup.ts.
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} }) as { props: Record<string, unknown> }),
+}));
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: pageMock };
+});
 
 const baseColumn = {
   name: 'value',
@@ -152,5 +162,121 @@ describe('TableCell', () => {
     };
     render(<TableCell column={column} value={null} />);
     expect(screen.getByText('—')).toBeInTheDocument();
+  });
+});
+
+// The default setup mocks `usePage` to `{ props: {} }` (en fallback). These
+// tests stub it with an explicit `i18n.locale` to exercise locale-aware
+// date/number/relative-time formatting — pt-BR must differ from en-US.
+describe('TableCell — locale-aware formatting', () => {
+  function mockLocale(locale: string | undefined) {
+    pageMock.mockReturnValue(
+      locale === undefined ? { props: {} } : { props: { i18n: { locale } } },
+    );
+  }
+
+  afterEach(() => {
+    pageMock.mockReturnValue({ props: {} });
+  });
+
+  it('date cell formats the visible date in the active locale (pt_BR ≠ en)', () => {
+    const column: DateColumnSchema = {
+      ...baseColumn,
+      type: 'date',
+      props: { mode: 'date', format: 'Y-m-d', timezone: 'UTC' },
+    };
+    const value = '2026-01-15T00:00:00Z';
+
+    mockLocale('en');
+    const { unmount } = render(<TableCell column={column} value={value} />);
+    const enText = screen.getByRole('time').textContent ?? '';
+    unmount();
+
+    mockLocale('pt_BR');
+    render(<TableCell column={column} value={value} />);
+    const ptText = screen.getByRole('time').textContent ?? '';
+
+    // pt-BR renders the month name in Portuguese ("jan"), distinct from English.
+    expect(ptText).not.toEqual(enText);
+    expect(ptText.toLowerCase()).toContain('jan');
+  });
+
+  it('datetime cell honours the timezone prop and the active locale', () => {
+    const column: DateColumnSchema = {
+      ...baseColumn,
+      type: 'date',
+      props: { mode: 'datetime', format: 'Y-m-d H:i', timezone: 'America/Sao_Paulo' },
+    };
+    mockLocale('pt_BR');
+    render(<TableCell column={column} value="2026-01-15T12:00:00Z" />);
+    // 12:00 UTC → 09:00 in São Paulo (UTC-3); pt-BR uses 24h clock so "09".
+    expect(screen.getByRole('time').textContent ?? '').toContain('09');
+  });
+
+  it('since/relative mode is localized via Intl.RelativeTimeFormat (no hardcoded " ago")', () => {
+    const column: DateColumnSchema = {
+      ...baseColumn,
+      type: 'date',
+      props: { mode: 'since', format: '' },
+    };
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+
+    mockLocale('en');
+    const { unmount } = render(<TableCell column={column} value={threeDaysAgo} />);
+    const enText = screen.getByRole('time').textContent ?? '';
+    unmount();
+
+    mockLocale('pt_BR');
+    render(<TableCell column={column} value={threeDaysAgo} />);
+    const ptText = screen.getByRole('time').textContent ?? '';
+
+    expect(enText).toContain('ago');
+    // Old code emitted the hardcoded "3d ago"; now en says "3 days ago".
+    expect(enText).not.toContain('3d ago');
+    expect(ptText).not.toEqual(enText);
+    expect(ptText.toLowerCase()).toContain('dias');
+  });
+
+  it('money() currency prop renders via Intl.NumberFormat in the active locale', () => {
+    const column: NumberColumnSchema = {
+      ...baseColumn,
+      type: 'number',
+      props: { currency: 'EUR', decimals: 2 },
+    };
+
+    mockLocale('en');
+    const { unmount } = render(<TableCell column={column} value={1234.5} />);
+    const enText = screen.getByText(/1.*234/).textContent ?? '';
+    unmount();
+
+    mockLocale('pt_BR');
+    render(<TableCell column={column} value={1234.5} />);
+    const ptText = screen.getByText(/1.*234/).textContent ?? '';
+
+    // Currency symbol must appear (was silently dropped before).
+    expect(enText).toContain('€');
+    expect(ptText).toContain('€');
+    // Locale grouping differs: en-US "1,234.50" vs pt-BR "1.234,50".
+    expect(ptText).not.toEqual(enText);
+  });
+
+  it('plain number cell groups in the active locale when no separators are set', () => {
+    const column: NumberColumnSchema = {
+      ...baseColumn,
+      type: 'number',
+      props: { decimals: 2 },
+    };
+
+    mockLocale('en');
+    const { unmount } = render(<TableCell column={column} value={1234.5} />);
+    const enText = screen.getByText(/234/).textContent ?? '';
+    unmount();
+
+    mockLocale('pt_BR');
+    render(<TableCell column={column} value={1234.5} />);
+    const ptText = screen.getByText(/234/).textContent ?? '';
+
+    expect(enText).toEqual('1,234.50');
+    expect(ptText).toEqual('1.234,50');
   });
 });

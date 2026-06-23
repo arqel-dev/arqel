@@ -75,7 +75,7 @@ final class BreadcrumbsBuilder
         }
 
         if ($action === self::ACTION_CREATE) {
-            $crumbs[] = ['label' => 'Create', 'url' => null];
+            $crumbs[] = ['label' => self::localize('arqel::arqel.actions.create', 'Create'), 'url' => null];
 
             return $crumbs;
         }
@@ -92,11 +92,28 @@ final class BreadcrumbsBuilder
             }
 
             if ($action === self::ACTION_EDIT) {
-                $crumbs[] = ['label' => 'Edit', 'url' => null];
+                $crumbs[] = ['label' => self::localize('arqel::arqel.actions.edit', 'Edit'), 'url' => null];
             }
         }
 
         return $crumbs;
+    }
+
+    /**
+     * Resolve a translation key lazily so the active request locale applies at
+     * build time. Falls back to the English literal when no translator is bound
+     * (unit context) or the key is untranslated, keeping the visible/accessible
+     * breadcrumb label stable.
+     */
+    private static function localize(string $key, string $fallback): string
+    {
+        if (! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans($key);
+
+        return is_string($translated) && $translated !== $key ? $translated : $fallback;
     }
 
     /**

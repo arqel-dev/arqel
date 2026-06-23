@@ -6,6 +6,7 @@
  * for create/edit/show without a parallel "DetailRenderer" stack.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FormSchema } from '@arqel-dev/types/forms';
 import type { RecordType, ResourceDetailProps } from '@arqel-dev/types/resources';
@@ -24,6 +25,7 @@ const FALLBACK_SCHEMA: FormSchema = {
 
 export default function ArqelShowPage<TRecord extends RecordType = RecordType>(): JSX.Element {
   const page = usePage();
+  const t = useArqelTranslations();
   const props = page.props as unknown as ResourceDetailProps<TRecord>;
   const fields = (props.fields ?? []) as FieldSchema[];
 
@@ -43,7 +45,7 @@ export default function ArqelShowPage<TRecord extends RecordType = RecordType>()
   return (
     <div className="space-y-6">
       <PageHeader
-        title={props.recordTitle ?? props.resource?.label ?? 'Record'}
+        title={props.recordTitle ?? props.resource?.label ?? t('arqel.pages.record', 'Record')}
         description={props.recordSubtitle ?? null}
       />
       <FormRenderer

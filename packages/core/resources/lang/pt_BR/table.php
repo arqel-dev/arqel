@@ -43,6 +43,10 @@ return [
         'clear' => 'Limpar filtros (:count)',
         // Nome acessível da legenda (sr-only) do <fieldset> de filtros.
         'legend' => 'Filtros',
+        // Nomes acessíveis dos dois campos de intervalo de datas (:label é o
+        // rótulo do filtro).
+        'date_from' => ':label de',
+        'date_to' => ':label até',
     ],
     'bulk' => [
         'selected' => ':count selecionado(s)',

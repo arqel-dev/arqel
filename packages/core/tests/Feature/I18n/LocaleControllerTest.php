@@ -39,6 +39,24 @@ it('rejects empty locale input', function (): void {
     $response->assertStatus(422);
 });
 
+it('localizes the invalid-locale abort message to the active locale', function (): void {
+    app()->setLocale('pt_BR');
+
+    $response = $this->post('/admin/locale', ['locale' => 'xx_YY']);
+
+    $response->assertStatus(422);
+    expect($response->exception?->getMessage())->toBe('Idioma inválido.');
+});
+
+it('emits the English invalid-locale abort message under the en locale', function (): void {
+    app()->setLocale('en');
+
+    $response = $this->post('/admin/locale', ['locale' => 'xx_YY']);
+
+    $response->assertStatus(422);
+    expect($response->exception?->getMessage())->toBe('Invalid locale.');
+});
+
 it('accepts a hyphenated input against an underscored allowlist and persists the canonical form', function (): void {
     config()->set('arqel.i18n.locales', ['en', 'pt_BR']);
 

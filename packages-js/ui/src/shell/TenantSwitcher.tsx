@@ -44,7 +44,9 @@ export function TenantSwitcher({
 
   const buildUrl = switchUrl ?? DEFAULT_SWITCH_URL;
   const labelFor = (tenant: TenantSummary): string =>
-    tenant.name?.trim() ? tenant.name : `Tenant ${tenant.id}`;
+    tenant.name?.trim()
+      ? tenant.name
+      : t('arqel.tenant.unnamed', `Tenant ${tenant.id}`, { id: tenant.id });
   const currentLabel = labelFor(current);
 
   return (

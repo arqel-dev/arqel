@@ -64,6 +64,19 @@ return [
         'next' => 'Next',
         'showing' => 'Showing :from to :to of :total results',
     ],
+    // Visible H1 titles for the default CRUD pages. :label is the resource's
+    // (already-translated) singular label; 'fallback' is used when no label
+    // or record title is available.
+    'pages' => [
+        'create' => 'Create :label',
+        'edit' => 'Edit :label',
+        'record' => 'Record',
+        'fallback' => 'record',
+    ],
+    'tenant' => [
+        // Visible + announced fallback name for a tenant with no `name`.
+        'unnamed' => 'Tenant :id',
+    ],
     // Accessible names (aria-label / sr-only) for framework UI chrome. Kept
     // distinct from short visible labels so screen-reader users hear a full,
     // descriptive accessible name.

@@ -74,3 +74,34 @@ it('aborts with 404 when multiple files match the export id', function (): void 
         expect($e->getStatusCode())->toBe(404);
     }
 });
+
+it('localizes abort messages to the active locale', function (): void {
+    app()->setLocale('pt_BR');
+    $controller = new ExportDownloadController;
+
+    try {
+        $controller->download('NOT-A-VALID-ID!!', Request::create('/x'));
+        $this->fail('Expected HttpException');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('ID de exportação inválido.');
+    }
+
+    try {
+        $controller->download('11111111-1111-1111-1111-111111111111', Request::create('/x'));
+        $this->fail('Expected HttpException');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('Exportação não encontrada.');
+    }
+});
+
+it('emits English abort messages under the en locale', function (): void {
+    app()->setLocale('en');
+    $controller = new ExportDownloadController;
+
+    try {
+        $controller->download('NOT-A-VALID-ID!!', Request::create('/x'));
+        $this->fail('Expected HttpException');
+    } catch (HttpException $e) {
+        expect($e->getMessage())->toBe('Invalid export id.');
+    }
+});

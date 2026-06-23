@@ -7,6 +7,7 @@
  * from props serialised server-side.
  */
 
+import { useArqelLocale } from '@arqel-dev/react/utils';
 import type {
   BadgeColumnSchema,
   BooleanColumnSchema,
@@ -142,45 +143,116 @@ function BooleanCell({ column, value }: { column: BooleanColumnSchema; value: un
 }
 
 function DateCell({ column, value }: { column: DateColumnSchema; value: unknown }) {
+  // Active panel locale (BCP-47), so dates format in the viewer's locale rather
+  // than the runtime default (commonly en-US 'MM/DD/YYYY').
+  const locale = useArqelLocale();
   if (!value) return <span className="text-muted-foreground">—</span>;
   const raw = String(value);
   const date = new Date(raw);
   if (Number.isNaN(date.getTime())) return <span>{raw}</span>;
+  // `timezone` is honoured when the server emits it; an invalid zone would make
+  // `Intl` throw, so fall back to the runtime zone defensively.
+  const timeZone = column.props.timezone || undefined;
   if (column.props.mode === 'since') {
-    return <time dateTime={date.toISOString()}>{formatRelative(date)}</time>;
+    return <time dateTime={date.toISOString()}>{formatRelative(date, locale)}</time>;
   }
   if (column.props.mode === 'datetime') {
-    return <time dateTime={date.toISOString()}>{date.toLocaleString()}</time>;
+    return (
+      <time dateTime={date.toISOString()}>{formatDate(date, locale, 'datetime', timeZone)}</time>
+    );
   }
-  return <time dateTime={date.toISOString()}>{date.toLocaleDateString()}</time>;
+  return <time dateTime={date.toISOString()}>{formatDate(date, locale, 'date', timeZone)}</time>;
 }
 
-function formatRelative(date: Date): string {
+function formatDate(
+  date: Date,
+  locale: string,
+  mode: 'date' | 'datetime',
+  timeZone: string | undefined,
+): string {
+  const options: Intl.DateTimeFormatOptions =
+    mode === 'datetime' ? { dateStyle: 'medium', timeStyle: 'short' } : { dateStyle: 'medium' };
+  if (timeZone !== undefined) options.timeZone = timeZone;
+  try {
+    return new Intl.DateTimeFormat(locale, options).format(date);
+  } catch {
+    // Invalid timezone (or other Intl error) — retry without it.
+    if (timeZone !== undefined) {
+      const { timeZone: _drop, ...rest } = options;
+      return new Intl.DateTimeFormat(locale, rest).format(date);
+    }
+    return mode === 'datetime' ? date.toISOString() : date.toISOString().slice(0, 10);
+  }
+}
+
+function formatRelative(date: Date, locale: string): string {
   const seconds = Math.round((Date.now() - date.getTime()) / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  // Negative values render as "X ago"; the elapsed time is always in the past.
+  const absSeconds = Math.abs(seconds);
+  if (absSeconds < 60) return rtf.format(-seconds, 'second');
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');
   const days = Math.round(hours / 24);
-  return `${days}d ago`;
+  return rtf.format(-days, 'day');
 }
 
 function NumberCell({ column, value }: { column: NumberColumnSchema; value: unknown }) {
+  const locale = useArqelLocale();
   if (value === null || value === undefined) return <span>—</span>;
   const num = typeof value === 'number' ? value : Number(value);
   if (Number.isNaN(num)) return <span>{asString(value)}</span>;
-  const formatted = num.toFixed(column.props.decimals ?? 0);
-  const [whole, dec] = formatted.split('.');
-  const safeWhole = whole ?? '0';
+
+  // `money($currency)` → render through `Intl.NumberFormat` in the active locale
+  // so the currency symbol, grouping and decimals follow the viewer's panel.
+  if (column.props.currency) {
+    try {
+      const formatted = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: column.props.currency,
+        ...(column.props.decimals !== undefined
+          ? {
+              minimumFractionDigits: column.props.decimals,
+              maximumFractionDigits: column.props.decimals,
+            }
+          : {}),
+      }).format(num);
+      return (
+        <span>
+          {column.props.prefix ?? ''}
+          {formatted}
+          {column.props.suffix ?? ''}
+        </span>
+      );
+    } catch {
+      // Unknown currency code — fall through to the plain numeric path below.
+    }
+  }
+
+  const decimals = column.props.decimals ?? 0;
+  // Explicit separators win (developer override). Otherwise group/decimal in the
+  // active locale via Intl instead of the previous en-US-shaped raw output.
   const ts = column.props.thousandsSeparator;
-  const finalWhole = ts ? safeWhole.replace(/\B(?=(\d{3})+(?!\d))/g, ts) : safeWhole;
-  const ds = column.props.decimalSeparator ?? '.';
+  const ds = column.props.decimalSeparator;
+  let body: string;
+  if (ts === undefined && ds === undefined) {
+    body = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(num);
+  } else {
+    const formatted = num.toFixed(decimals);
+    const [whole, dec] = formatted.split('.');
+    const safeWhole = whole ?? '0';
+    const finalWhole = ts ? safeWhole.replace(/\B(?=(\d{3})+(?!\d))/g, ts) : safeWhole;
+    body = dec ? `${finalWhole}${ds ?? '.'}${dec}` : finalWhole;
+  }
   return (
     <span>
       {column.props.prefix ?? ''}
-      {finalWhole}
-      {dec ? `${ds}${dec}` : ''}
+      {body}
       {column.props.suffix ?? ''}
     </span>
   );

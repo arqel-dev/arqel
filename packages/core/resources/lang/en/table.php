@@ -43,6 +43,11 @@ return [
         'clear' => 'Clear filters (:count)',
         // Accessible name for the filters <fieldset> legend (sr-only).
         'legend' => 'Filters',
+        // Accessible names for the two date-range inputs (:label is the filter
+        // label). Values must equal the original "<label> from" / "<label> to"
+        // literals so the screen-reader accessible name stays stable.
+        'date_from' => ':label from',
+        'date_to' => ':label to',
     ],
     'bulk' => [
         'selected' => ':count selected',

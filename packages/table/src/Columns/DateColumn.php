@@ -24,6 +24,8 @@ final class DateColumn extends Column
 
     protected string $format = 'Y-m-d';
 
+    protected ?string $timezone = null;
+
     public function date(string $format = 'Y-m-d'): static
     {
         $this->mode = self::MODE_DATE;
@@ -48,13 +50,32 @@ final class DateColumn extends Column
     }
 
     /**
+     * Declare the display timezone for this column. The React `DateCell`
+     * passes this to `Intl.DateTimeFormat({ timeZone })` so a UTC-stored
+     * value renders in the intended zone instead of the viewer's browser
+     * zone. Mirrors `DateField::timezone()` in arqel/fields.
+     */
+    public function timezone(string $tz): static
+    {
+        $this->timezone = $tz;
+
+        return $this;
+    }
+
+    public function getTimezone(): ?string
+    {
+        return $this->timezone;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function getTypeSpecificProps(): array
     {
-        return [
+        return array_filter([
             'mode' => $this->mode,
             'format' => $this->format,
-        ];
+            'timezone' => $this->timezone,
+        ], fn ($value) => $value !== null);
     }
 }

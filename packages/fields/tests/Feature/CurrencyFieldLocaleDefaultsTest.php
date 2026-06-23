@@ -49,3 +49,21 @@ it('falls back to en-US shape for an unknown locale', function (): void {
     expect($props['thousandsSeparator'])->toBe(',')
         ->and($props['decimalSeparator'])->toBe('.');
 });
+
+it('derives comma-decimal separators for dot-grouping locales beyond the original table', function (string $locale): void {
+    App::setLocale($locale);
+
+    $props = (new CurrencyField('price'))->getTypeSpecificProps();
+
+    expect($props['thousandsSeparator'])->toBe('.')
+        ->and($props['decimalSeparator'])->toBe(',');
+})->with(['da', 'id', 'tr', 'vi', 'ro', 'bg']);
+
+it('derives space-grouping comma-decimal separators for slavic/nordic locales', function (string $locale): void {
+    App::setLocale($locale);
+
+    $props = (new CurrencyField('price'))->getTypeSpecificProps();
+
+    expect($props['thousandsSeparator'])->toBe(' ')
+        ->and($props['decimalSeparator'])->toBe(',');
+})->with(['ru', 'pl', 'sv', 'cs', 'sk', 'hu', 'uk', 'fi', 'nb', 'no', 'lt', 'lv', 'et']);

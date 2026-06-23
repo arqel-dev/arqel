@@ -157,15 +157,73 @@ describe('NumberInput', () => {
   });
 });
 
+const usdCurrency: FieldSchema = {
+  ...baseField,
+  type: 'currency',
+  name: 'amount',
+  label: 'Amount',
+  component: 'CurrencyInput',
+  props: {
+    prefix: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    decimals: 2,
+  },
+};
+
 describe('CurrencyInput', () => {
-  it('formats on blur and shows raw on focus', async () => {
+  it('formats on blur and shows the editable value in the field locale on focus', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<CurrencyInput field={currency} value={1234.5} onChange={onChange} />);
     const input = screen.getByDisplayValue('R$ 1.234,50') as HTMLInputElement;
 
     await user.click(input);
-    expect(input.value).toBe('1234.5');
+    // Comma-decimal locale: the editable value uses ',' not '.'.
+    expect(input.value).toBe('1234,5');
+  });
+
+  it('parses a comma-decimal entry without collapsing to null', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CurrencyInput field={currency} value={null} onChange={onChange} />);
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+
+    await user.click(input);
+    await user.type(input, '1234,56');
+
+    expect(onChange).toHaveBeenLastCalledWith(1234.56);
+  });
+
+  it('emits null when the field is cleared', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CurrencyInput field={currency} value={12.5} onChange={onChange} />);
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+
+    await user.click(input);
+    await user.clear(input);
+
+    expect(onChange).toHaveBeenLastCalledWith(null);
+  });
+
+  it('round-trips an en-US dot-decimal entry', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CurrencyInput field={usdCurrency} value={null} onChange={onChange} />);
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+
+    await user.click(input);
+    await user.type(input, '99.99');
+
+    expect(onChange).toHaveBeenLastCalledWith(99.99);
+  });
+
+  it('uses a text input (not number) so comma decimals are typeable', () => {
+    render(<CurrencyInput field={currency} value={null} onChange={() => {}} />);
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    expect(input.type).toBe('text');
+    expect(input).toHaveAttribute('inputmode', 'decimal');
   });
 });
 

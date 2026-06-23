@@ -121,6 +121,24 @@ it('DateColumn: switches between date / dateTime / since modes', function (): vo
         ->toBe(['mode' => 'since', 'format' => 'Y-m-d']);
 });
 
+it('DateColumn: omits timezone by default so the prop never appears unset', function (): void {
+    $column = DateColumn::make('created_at');
+
+    expect($column->getTimezone())->toBeNull()
+        ->and($column->getTypeSpecificProps())->not->toHaveKey('timezone');
+});
+
+it('DateColumn: emits the timezone prop so the React DateCell can honour it', function (): void {
+    $column = DateColumn::make('created_at')->dateTime()->timezone('America/Sao_Paulo');
+
+    expect($column->getTimezone())->toBe('America/Sao_Paulo')
+        ->and($column->getTypeSpecificProps())->toBe([
+            'mode' => 'datetime',
+            'format' => 'Y-m-d H:i:s',
+            'timezone' => 'America/Sao_Paulo',
+        ]);
+});
+
 it('NumberColumn: serialises currency, prefix, suffix, and decimals only when set', function (): void {
     $bare = NumberColumn::make('amount')->getTypeSpecificProps();
     $full = NumberColumn::make('amount')

@@ -10,6 +10,7 @@
  * also honours `disabled` / `readonly` / `required` from the schema.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import { type ChangeEvent, type ReactNode, useId } from 'react';
 import { cn } from '../utils/cn.js';
@@ -25,14 +26,17 @@ export interface FieldRendererProps {
   className?: string | undefined;
   inputId?: string | undefined;
   describedBy?: string | undefined;
+  /** Whether the field is in an error state (sets `aria-invalid` on the input). */
+  invalid?: boolean | undefined;
 }
 
 export function FieldRenderer(props: FieldRendererProps): ReactNode {
   const { field, errors, className } = props;
+  const t = useArqelTranslations();
   const id = useId();
   const errorId = `${id}-error`;
   const helperId = `${id}-helper`;
-  const hasError = errors && errors.length > 0;
+  const hasError = errors !== undefined && errors.length > 0;
 
   const Custom = field.component ? getFieldComponent(field.component) : undefined;
   const Input = Custom ?? (NativeFieldInput as typeof NativeFieldInput);
@@ -51,13 +55,21 @@ export function FieldRenderer(props: FieldRendererProps): ReactNode {
         <label htmlFor={id} className="text-sm font-medium">
           {field.label}
           {field.required && (
-            <span aria-hidden="true" className="ml-0.5 text-destructive">
-              *
-            </span>
+            <>
+              <span aria-hidden="true" className="ml-0.5 text-destructive">
+                *
+              </span>
+              <span className="sr-only">{` (${t('form.required', 'Required')})`}</span>
+            </>
           )}
         </label>
       )}
-      <Input {...props} inputId={id} describedBy={describedBy || undefined} />
+      <Input
+        {...props}
+        inputId={id}
+        describedBy={describedBy || undefined}
+        invalid={hasError || undefined}
+      />
       {field.helperText && !hasError && (
         <p id={helperId} className="text-xs text-muted-foreground">
           {field.helperText}

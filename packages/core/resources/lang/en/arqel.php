@@ -73,6 +73,10 @@ return [
         'record' => 'Record',
         'fallback' => 'record',
     ],
+    'tenant' => [
+        // Visible + announced fallback name for a tenant with no `name`.
+        'unnamed' => 'Tenant :id',
+    ],
     // Accessible names (aria-label / sr-only) for framework UI chrome. Kept
     // distinct from short visible labels so screen-reader users hear a full,
     // descriptive accessible name.

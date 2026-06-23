@@ -35,6 +35,8 @@ export interface NativeProps {
   className?: string | undefined;
   inputId?: string | undefined;
   describedBy?: string | undefined;
+  /** When true, the control is in an error state — sets `aria-invalid`. */
+  invalid?: boolean | undefined;
 }
 
 const inputClasses = cn(
@@ -132,6 +134,7 @@ function TextLike({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: TextLikeField }) {
   const htmlType =
     field.type === 'email'
@@ -153,6 +156,7 @@ function TextLike({
       readOnly={field.readonly === true}
       required={field.required === true}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => onChange(e.target.value)}
     />
   );
@@ -165,6 +169,7 @@ function Textarea({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: TextareaFieldSchema }) {
   return (
     <textarea
@@ -177,6 +182,7 @@ function Textarea({
       required={field.required === true}
       rows={4}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => onChange(e.target.value)}
     />
   );
@@ -189,6 +195,7 @@ function NumericInput({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: NumberFieldSchema | CurrencyFieldSchema }) {
   return (
     <input
@@ -201,6 +208,7 @@ function NumericInput({
       readOnly={field.readonly === true}
       required={field.required === true}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => {
         const raw = e.target.value;
         if (raw === '') {
@@ -221,6 +229,7 @@ function Checkbox({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: BooleanFieldSchema | ToggleFieldSchema }) {
   return (
     <input
@@ -230,6 +239,7 @@ function Checkbox({
       checked={value === true}
       disabled={disabled || field.disabled || field.readonly}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => onChange(e.target.checked)}
     />
   );
@@ -250,6 +260,7 @@ function SelectInput({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: SelectFieldSchema }) {
   const options = normaliseOptions(field.props.options);
   return (
@@ -260,6 +271,7 @@ function SelectInput({
       disabled={disabled || field.disabled || field.readonly}
       required={field.required === true}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
     >
       {field.placeholder && <option value="">{field.placeholder}</option>}
@@ -279,6 +291,7 @@ function MultiSelectInput({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: MultiSelectFieldSchema | HasManyFieldSchema }) {
   const arr = Array.isArray(value) ? (value as Array<string | number>) : [];
   const options = field.type === 'multiSelect' ? normaliseOptions(field.props.options) : [];
@@ -290,6 +303,7 @@ function MultiSelectInput({
       value={arr.map(String)}
       disabled={disabled || field.disabled || field.readonly}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => {
         const next = Array.from(e.target.selectedOptions, (o) => o.value);
         onChange(next);
@@ -311,12 +325,14 @@ function RadioGroup({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: RadioFieldSchema }) {
   return (
     <div
       id={inputId}
       className="flex flex-col gap-1"
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       role="radiogroup"
     >
       {(field.props.options ?? []).map((opt) => (
@@ -343,6 +359,7 @@ function BelongsToInput({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: BelongsToFieldSchema }) {
   const t = useArqelTranslations();
   // Phase 1 fallback: native text input. The full async-search picker
@@ -362,6 +379,7 @@ function BelongsToInput({
       disabled={disabled || field.disabled || field.readonly}
       readOnly={field.readonly === true}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
     />
   );
@@ -374,6 +392,7 @@ function DateInput({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: DateFieldSchema | DateTimeFieldSchema }) {
   return (
     <input
@@ -385,6 +404,7 @@ function DateInput({
       readOnly={field.readonly === true}
       required={field.required === true}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
     />
   );
@@ -396,6 +416,7 @@ function FileInput({
   disabled,
   inputId,
   describedBy,
+  invalid,
 }: NativeProps & { field: FieldSchema }) {
   return (
     <input
@@ -404,6 +425,7 @@ function FileInput({
       className="text-sm"
       disabled={disabled || field.disabled || field.readonly}
       aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
       onChange={(e) => onChange(e.target.files?.[0] ?? null)}
     />
   );

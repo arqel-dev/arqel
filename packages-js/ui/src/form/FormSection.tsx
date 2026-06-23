@@ -5,6 +5,7 @@
  * right) ships behind the `aside` prop so wide forms can read like docs.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { SectionProps } from '@arqel-dev/types/forms';
 import { type ReactNode, useState } from 'react';
 import { cn } from '../utils/cn.js';
@@ -16,6 +17,7 @@ export interface FormSectionProps {
 }
 
 export function FormSection({ config, children, className }: FormSectionProps) {
+  const t = useArqelTranslations();
   const [open, setOpen] = useState(!config.collapsed);
   const collapsible = config.collapsible === true;
 
@@ -34,7 +36,7 @@ export function FormSection({ config, children, className }: FormSectionProps) {
           onClick={() => setOpen((v) => !v)}
           className="text-sm text-muted-foreground hover:underline"
         >
-          {open ? 'Hide' : 'Show'}
+          {open ? t('form.section.hide', 'Hide') : t('form.section.show', 'Show')}
         </button>
       )}
     </div>

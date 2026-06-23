@@ -18,6 +18,11 @@ return [
     'helper' => [
         'unsaved_changes' => 'Você tem alterações não salvas.',
     ],
+    // Rótulos do botão de alternância da seção recolhível (texto visível).
+    'section' => [
+        'show' => 'Exibir',
+        'hide' => 'Ocultar',
+    ],
     // Aviso inline quando um tipo/componente de campo não tem renderizador.
     'unregistered_field' => 'O campo ":name" não pôde ser renderizado: :detail.',
 ];

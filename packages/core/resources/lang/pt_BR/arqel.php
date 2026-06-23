@@ -73,6 +73,10 @@ return [
         'record' => 'Registro',
         'fallback' => 'registro',
     ],
+    'tenant' => [
+        // Nome de fallback (visível + anunciado) para um tenant sem `name`.
+        'unnamed' => 'Tenant :id',
+    ],
     // Nomes acessíveis (aria-label / sr-only) da interface do framework.
     // Mantidos distintos dos rótulos visíveis curtos para que leitores de
     // tela anunciem um nome acessível completo e descritivo.

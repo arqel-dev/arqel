@@ -1,11 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+const localeRef = { current: 'en' };
+
 vi.mock('@inertiajs/react', () => ({
   Link: ({ children, ...rest }: { children: React.ReactNode } & Record<string, unknown>) => (
     <a {...rest}>{children}</a>
   ),
   Head: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  usePage: () => ({ props: { i18n: { locale: localeRef.current } } }),
 }));
 
 import PublisherProfile from '../Pages/Marketplace/PublisherProfile';
@@ -44,7 +47,7 @@ describe('<PublisherProfile />', () => {
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
     expect(screen.getByTestId('profile-bio')).toHaveTextContent('We build great plugins.');
     expect(screen.getByTestId('stat-plugins')).toHaveTextContent('1');
-    expect(screen.getByTestId('stat-downloads')).toHaveTextContent('1.2k');
+    expect(screen.getByTestId('stat-downloads')).toHaveTextContent('1.2K');
     expect(screen.getByTestId('stat-rating')).toHaveTextContent('4.5');
     expect(screen.getByText('Acme Widget')).toBeInTheDocument();
   });

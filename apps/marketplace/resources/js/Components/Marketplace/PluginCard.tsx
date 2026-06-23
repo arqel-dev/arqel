@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { useCompareSlugs } from '../../hooks/useCompareSlugs';
+import { formatCompact, useActiveLocale } from '../../lib/format';
 import type { Plugin } from '../../types';
 import { PublisherBadge } from './PublisherBadge';
 
@@ -7,13 +8,8 @@ type Props = {
   plugin: Plugin;
 };
 
-function formatInstallCount(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`;
-  return String(count);
-}
-
 export function PluginCard({ plugin }: Props): JSX.Element {
+  const locale = useActiveLocale();
   const { slugs, addSlug, removeSlug, isFull } = useCompareSlugs();
   const inCompare = slugs.includes(plugin.slug);
 
@@ -44,7 +40,7 @@ export function PluginCard({ plugin }: Props): JSX.Element {
         <p className="mt-2 line-clamp-2 text-sm text-neutral-600">{plugin.description}</p>
         <footer className="mt-3 flex items-center gap-3 text-xs text-neutral-500">
           <span data-testid="install-count">
-            {formatInstallCount(plugin.install_count ?? 0)} installs
+            {formatCompact(plugin.install_count ?? 0, locale)} installs
           </span>
           {typeof plugin.stars === 'number' && <span data-testid="stars">⭐ {plugin.stars}</span>}
         </footer>

@@ -1,8 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const localeRef = { current: 'en' };
 
 vi.mock('@inertiajs/react', () => ({
   Head: ({ title }: { title: string }) => <title>{title}</title>,
+  usePage: () => ({ props: { i18n: { locale: localeRef.current } } }),
 }));
 
 import Checkout from '../Pages/Marketplace/Checkout';
@@ -28,10 +31,31 @@ const summary = {
 };
 
 describe('<Checkout />', () => {
+  beforeEach(() => {
+    localeRef.current = 'en';
+  });
+
   it('renders summary card with plugin name and total', () => {
     render(<Checkout plugin={plugin} summary={summary} />);
     expect(screen.getByTestId('summary-card')).toHaveTextContent('Paid Plugin');
-    expect(screen.getByTestId('summary-total')).toHaveTextContent('USD 25.00');
+    expect(screen.getByTestId('summary-total')).toHaveTextContent('$25.00');
+  });
+
+  it('formats money in the active locale (pt_BR → R$ with comma decimal)', () => {
+    localeRef.current = 'pt_BR';
+    render(
+      <Checkout
+        plugin={{ ...plugin, currency: 'BRL' }}
+        summary={{
+          price_cents: 199900,
+          currency: 'BRL',
+          fee_estimate_cents: 0,
+          total_cents: 199900,
+        }}
+      />,
+    );
+    expect(screen.getByTestId('summary-total')).toHaveTextContent('R$');
+    expect(screen.getByTestId('summary-total')).toHaveTextContent('1.999,00');
   });
 
   it('submits a POST form to the initiate endpoint when proceed clicked', () => {
@@ -50,7 +74,7 @@ describe('<Checkout />', () => {
 
   it('renders fee estimate from summary', () => {
     render(<Checkout plugin={plugin} summary={summary} />);
-    expect(screen.getByTestId('summary-fee')).toHaveTextContent('USD 5.00');
-    expect(screen.getByTestId('summary-price')).toHaveTextContent('USD 25.00');
+    expect(screen.getByTestId('summary-fee')).toHaveTextContent('$5.00');
+    expect(screen.getByTestId('summary-price')).toHaveTextContent('$25.00');
   });
 });

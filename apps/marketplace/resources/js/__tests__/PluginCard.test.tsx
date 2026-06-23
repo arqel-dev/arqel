@@ -1,10 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+const localeRef = { current: 'en' };
+
 vi.mock('@inertiajs/react', () => ({
   Link: ({ children, ...rest }: { children: React.ReactNode } & Record<string, unknown>) => (
     <a {...rest}>{children}</a>
   ),
+  usePage: () => ({ props: { i18n: { locale: localeRef.current } } }),
 }));
 
 import { PluginCard } from '../Components/Marketplace/PluginCard';
@@ -34,8 +37,16 @@ describe('<PluginCard />', () => {
     expect(screen.getByTestId('type-badge')).toHaveTextContent('field');
   });
 
-  it('formats large install counts as Xk / XM', () => {
+  it('formats large install counts with locale-aware compact notation (en)', () => {
+    localeRef.current = 'en';
     render(<PluginCard plugin={{ ...basePlugin, install_count: 12345 }} />);
-    expect(screen.getByTestId('install-count')).toHaveTextContent('12.3k installs');
+    expect(screen.getByTestId('install-count')).toHaveTextContent('12K installs');
+  });
+
+  it('uses pt-BR compact notation when the active locale is pt_BR', () => {
+    localeRef.current = 'pt_BR';
+    render(<PluginCard plugin={{ ...basePlugin, install_count: 12345 }} />);
+    expect(screen.getByTestId('install-count')).toHaveTextContent('12 mil installs');
+    localeRef.current = 'en';
   });
 });

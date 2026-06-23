@@ -1,3 +1,4 @@
+import { formatCurrency, formatDate, useActiveLocale } from '../../lib/format';
 import type { Plugin } from '../../types';
 
 type Props = {
@@ -11,29 +12,38 @@ type Row = {
   value: (plugin: Plugin) => string;
 };
 
-function formatPrice(plugin: Plugin): string {
-  const cents = plugin.price_cents ?? 0;
-  if (cents === 0) return 'Free';
-  const currency = plugin.currency ?? 'USD';
-  return `${(cents / 100).toFixed(2)} ${currency}`;
-}
+function buildRows(locale: string): Row[] {
+  const formatPrice = (plugin: Plugin): string => {
+    const cents = plugin.price_cents ?? 0;
+    if (cents === 0) return 'Free';
+    const currency = plugin.currency ?? 'USD';
+    return formatCurrency(cents, currency, locale);
+  };
 
-const ROWS: Row[] = [
-  { key: 'price', label: 'Preço', value: formatPrice },
-  { key: 'installs', label: 'Downloads', value: (p) => String(p.install_count ?? 0) },
-  { key: 'stars', label: 'Estrelas', value: (p) => String(p.stars ?? 0) },
-  { key: 'type', label: 'Tipo', value: (p) => p.type },
-  { key: 'compat', label: 'Compat (versão)', value: (p) => p.latest_version ?? '—' },
-  { key: 'license', label: 'Licença', value: (p) => p.license ?? '—' },
-  { key: 'last_release', label: 'Último release', value: (p) => p.updated_at ?? '—' },
-  { key: 'reviews', label: 'Reviews', value: (p) => String(p.reviews_count ?? 0) },
-];
+  return [
+    { key: 'price', label: 'Preço', value: formatPrice },
+    { key: 'installs', label: 'Downloads', value: (p) => String(p.install_count ?? 0) },
+    { key: 'stars', label: 'Estrelas', value: (p) => String(p.stars ?? 0) },
+    { key: 'type', label: 'Tipo', value: (p) => p.type },
+    { key: 'compat', label: 'Compat (versão)', value: (p) => p.latest_version ?? '—' },
+    { key: 'license', label: 'Licença', value: (p) => p.license ?? '—' },
+    {
+      key: 'last_release',
+      label: 'Último release',
+      value: (p) => formatDate(p.updated_at, locale),
+    },
+    { key: 'reviews', label: 'Reviews', value: (p) => String(p.reviews_count ?? 0) },
+  ];
+}
 
 function isDifferent(values: string[]): boolean {
   return new Set(values).size > 1;
 }
 
 export function CompareTable({ plugins, onRemove }: Props): JSX.Element {
+  const locale = useActiveLocale();
+  const rows = buildRows(locale);
+
   return (
     <div className="overflow-x-auto" data-testid="compare-table">
       <table className="w-full min-w-[600px] border-collapse text-sm">
@@ -70,7 +80,7 @@ export function CompareTable({ plugins, onRemove }: Props): JSX.Element {
           </tr>
         </thead>
         <tbody>
-          {ROWS.map((row) => {
+          {rows.map((row) => {
             const values = plugins.map((p) => row.value(p));
             const differs = isDifferent(values);
             return (

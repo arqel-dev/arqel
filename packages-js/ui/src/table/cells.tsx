@@ -7,7 +7,7 @@
  * from props serialised server-side.
  */
 
-import { useArqelLocale } from '@arqel-dev/react/utils';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
 import type {
   BadgeColumnSchema,
   BooleanColumnSchema,
@@ -134,9 +134,15 @@ function BadgeCell({ column, value }: { column: BadgeColumnSchema; value: unknow
 }
 
 function BooleanCell({ column, value }: { column: BooleanColumnSchema; value: unknown }) {
+  const t = useArqelTranslations();
   const truthy = Boolean(value);
+  // The glyph stays language-neutral; only the screen-reader accessible name is
+  // localized so a pt-BR viewer hears "sim"/"não" instead of "true"/"false".
+  const ariaLabel = truthy
+    ? t('table.boolean.true_label', 'true')
+    : t('table.boolean.false_label', 'false');
   return (
-    <span role="img" aria-label={truthy ? 'true' : 'false'}>
+    <span role="img" aria-label={ariaLabel}>
       {truthy ? (column.props.trueIcon ?? '✓') : (column.props.falseIcon ?? '—')}
     </span>
   );

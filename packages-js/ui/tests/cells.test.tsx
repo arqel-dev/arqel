@@ -179,6 +179,34 @@ describe('TableCell — locale-aware formatting', () => {
     pageMock.mockReturnValue({ props: {} });
   });
 
+  it('boolean cell localizes the aria-label via the shared dictionary (pt-BR)', () => {
+    const column: BooleanColumnSchema = {
+      ...baseColumn,
+      type: 'boolean',
+      props: {},
+    };
+    // Stub usePage with both an active locale and the boolean labels so the
+    // shared translator resolves them instead of the English fallback.
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            table: { boolean: { true_label: 'sim', false_label: 'não' } },
+          },
+        },
+      },
+    });
+
+    const { rerender } = render(<TableCell column={column} value={true} />);
+    // Accessible name is now the Portuguese term, not the hardcoded 'true'.
+    expect(screen.getByLabelText('sim')).toHaveTextContent('✓');
+    expect(screen.queryByLabelText('true')).toBeNull();
+    rerender(<TableCell column={column} value={false} />);
+    expect(screen.getByLabelText('não')).toHaveTextContent('—');
+    expect(screen.queryByLabelText('false')).toBeNull();
+  });
+
   it('date cell formats the visible date in the active locale (pt_BR ≠ en)', () => {
     const column: DateColumnSchema = {
       ...baseColumn,

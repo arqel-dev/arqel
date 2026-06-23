@@ -34,6 +34,13 @@ return [
         'asc' => 'Ascending',
         'desc' => 'Descending',
     ],
+    'boolean' => [
+        // Accessible names (aria-label) for the boolean cell's language-neutral
+        // glyph (✓ / —). Values must equal the original 'true'/'false' literals
+        // so the accessible name stays stable for existing consumers.
+        'true_label' => 'true',
+        'false_label' => 'false',
+    ],
     'filters' => [
         'apply' => 'Apply',
         'reset' => 'Reset',

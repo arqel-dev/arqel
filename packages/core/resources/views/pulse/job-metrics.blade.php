@@ -9,13 +9,13 @@
             <div>
                 <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Pending</div>
                 <div class="text-2xl font-bold tabular-nums text-blue-600 dark:text-blue-400">
-                    {{ number_format($pending) }}
+                    {{ \Illuminate\Support\Number::format($pending, locale: app()->getLocale()) }}
                 </div>
             </div>
             <div>
                 <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Failed</div>
                 <div class="text-2xl font-bold tabular-nums {{ $failed > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100' }}">
-                    {{ number_format($failed) }}
+                    {{ \Illuminate\Support\Number::format($failed, locale: app()->getLocale()) }}
                 </div>
             </div>
         </div>

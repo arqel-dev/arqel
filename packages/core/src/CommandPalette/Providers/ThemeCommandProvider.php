@@ -29,29 +29,35 @@ final class ThemeCommandProvider implements CommandProvider
      */
     public function provide(?Authenticatable $user, string $query): array
     {
+        // Labels + category are localised lazily here (at provide() time) so
+        // the active request locale applies. Under the default `en` locale the
+        // key values equal the original English literals, so the palette's
+        // accessible names stay stable.
+        $category = (string) __('arqel::palette.category.settings');
+
         return [
             new Command(
                 id: 'theme:light',
-                label: 'Switch to light theme',
+                label: (string) __('arqel::palette.theme.light'),
                 url: '?theme=light',
                 description: null,
-                category: 'Settings',
+                category: $category,
                 icon: 'sun',
             ),
             new Command(
                 id: 'theme:dark',
-                label: 'Switch to dark theme',
+                label: (string) __('arqel::palette.theme.dark'),
                 url: '?theme=dark',
                 description: null,
-                category: 'Settings',
+                category: $category,
                 icon: 'moon',
             ),
             new Command(
                 id: 'theme:system',
-                label: 'Use system theme',
+                label: (string) __('arqel::palette.theme.system'),
                 url: '?theme=system',
                 description: null,
-                category: 'Settings',
+                category: $category,
                 icon: 'monitor',
             ),
         ];

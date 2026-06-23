@@ -40,6 +40,18 @@ it('emits a navigation command for every registered resource', function (): void
         ->and($postCommand->icon)->toBeNull();
 });
 
+it('localises the go-to label and category to the active locale (pt_BR)', function (): void {
+    app()->setLocale('pt_BR');
+
+    $this->registry->register(UserResource::class);
+
+    $commands = $this->provider->provide(null, '');
+
+    expect($commands)->toHaveCount(1)
+        ->and($commands[0]->label)->toBe('Ir para Users')
+        ->and($commands[0]->category)->toBe('Navegação');
+});
+
 it('resolves navigation urls against a non-default panel path from config', function (): void {
     config(['arqel.path' => 'manage']);
 

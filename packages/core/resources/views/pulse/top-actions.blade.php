@@ -21,7 +21,7 @@
                     @foreach ($rows as $row)
                         <tr class="border-t border-gray-100 dark:border-gray-800">
                             <td class="px-4 py-2 font-mono text-xs">{{ $row['action'] }}</td>
-                            <td class="px-4 py-2 text-right tabular-nums">{{ number_format($row['count']) }}</td>
+                            <td class="px-4 py-2 text-right tabular-nums">{{ \Illuminate\Support\Number::format($row['count'], locale: app()->getLocale()) }}</td>
                         </tr>
                     @endforeach
                 </tbody>

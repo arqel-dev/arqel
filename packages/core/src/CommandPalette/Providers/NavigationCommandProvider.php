@@ -113,12 +113,16 @@ final class NavigationCommandProvider implements CommandProvider
             $icon = null;
         }
 
+        // Label + category are localised lazily here so the active request
+        // locale applies. Under the default `en` locale `palette.go_to`
+        // resolves to "Go to :label" → "Go to {plural}", keeping the palette's
+        // accessible name identical to the previous hardcoded literal.
         return new Command(
             id: 'nav:'.$slug,
-            label: 'Go to '.$pluralLabel,
+            label: (string) __('arqel::palette.go_to', ['label' => $pluralLabel]),
             url: $panelPath.'/'.$slug,
             description: null,
-            category: 'Navigation',
+            category: (string) __('arqel::palette.category.navigation'),
             icon: $icon,
         );
     }

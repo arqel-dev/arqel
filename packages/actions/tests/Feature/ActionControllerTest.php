@@ -7,7 +7,9 @@ use Arqel\Actions\Types\BulkAction;
 use Arqel\Actions\Types\ToolbarAction;
 use Arqel\Core\Resources\Resource;
 use Arqel\Core\Resources\ResourceRegistry;
+use Arqel\Fields\Types\TextField;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -157,6 +159,39 @@ it('rejects bulk requests with no ids before any DB lookup (422)', function (): 
 
     expect($thrown)->toBeTrue()
         ->and($code ?? null)->toBe(422);
+});
+
+it('validates the action form using the field label as :attribute and custom messages', function (): void {
+    StubResourceWithToolbarAction::$toolbar = [
+        ToolbarAction::make('transfer')
+            ->form([
+                (new TextField('new_owner'))
+                    ->label('Recipient name')
+                    ->required(),
+                (new TextField('reason'))
+                    ->required()
+                    ->validationMessage('required', 'You must explain why.'),
+            ])
+            ->action(fn () => StubResourceWithToolbarAction::$callbackInvoked = true),
+    ];
+
+    /** @var ActionController $controller */
+    $controller = $this->app->make(ActionController::class);
+
+    try {
+        // Empty payload → both required fields fail.
+        $controller->invokeToolbar(new Request, 'controller-stub', 'transfer');
+        $errors = [];
+    } catch (ValidationException $e) {
+        $errors = $e->errors();
+    }
+
+    expect($errors)->toHaveKeys(['new_owner', 'reason'])
+        // :attribute renders the localized field label, not the raw key.
+        ->and($errors['new_owner'][0])->toContain('Recipient name')
+        // Per-field custom message applies instead of the default.
+        ->and($errors['reason'][0])->toBe('You must explain why.')
+        ->and(StubResourceWithToolbarAction::$callbackInvoked)->toBeFalse();
 });
 
 it('keeps the action collection resolution duck-typed (no method_exists hard fail)', function (): void {

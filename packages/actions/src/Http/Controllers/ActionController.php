@@ -111,8 +111,19 @@ final class ActionController
         /** @var array<string, mixed> $data */
         $data = [];
         if ($action->hasForm()) {
+            // Feed the action form's per-field custom messages and humanised /
+            // localized attribute names (from each field's __()-localized
+            // getLabel()) into the validator so a failed action-form submit
+            // renders `:attribute` as the field label and applies any
+            // validationMessage() the app declared — matching the main CRUD
+            // path (ResourceController). Without these, Laravel falls back to
+            // the raw snake_case field key and silently drops custom messages.
             $rules = $action->getFormValidationRules();
-            $validated = $request->validate($rules);
+            $validated = $request->validate(
+                $rules,
+                $action->getFormValidationMessages(),
+                $action->getFormValidationAttributes(),
+            );
             foreach ($validated as $key => $value) {
                 $data[(string) $key] = $value;
             }

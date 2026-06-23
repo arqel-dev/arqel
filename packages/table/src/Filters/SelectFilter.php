@@ -129,13 +129,32 @@ class SelectFilter extends Filter
     {
         $normalized = [];
         foreach ($options as $value => $label) {
+            $text = is_scalar($label) ? (string) $label : (string) $value;
             $normalized[] = [
                 'value' => $value,
-                'label' => is_scalar($label) ? (string) $label : (string) $value,
+                'label' => self::localizeOptionLabel($text),
             ];
         }
 
         return $normalized;
+    }
+
+    /**
+     * Pass an option label through Laravel translation lazily so the active
+     * request locale applies at serialization time. A label that is a
+     * translation key renders in the current locale; a plain literal passes
+     * through unchanged (Laravel __() returns the key when no translation
+     * exists). Falls back to the raw literal when no translator is bound.
+     */
+    private static function localizeOptionLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 
     /**

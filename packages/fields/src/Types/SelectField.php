@@ -175,16 +175,49 @@ class SelectField extends Field
     public function resolveOptions(): array
     {
         if ($this->staticOptions !== null) {
-            return $this->staticOptions;
+            return self::localizeOptionLabels($this->staticOptions);
         }
 
         if ($this->optionsCallback !== null) {
             $resolved = ($this->optionsCallback)();
 
-            return is_array($resolved) ? $resolved : [];
+            return is_array($resolved) ? self::localizeOptionLabels($resolved) : [];
         }
 
         return [];
+    }
+
+    /**
+     * Pass each option *label* (the map value) through Laravel translation
+     * lazily so the active request locale applies at serialization time.
+     * A label that is a translation key renders in the current locale; a
+     * plain literal passes through unchanged (Laravel __() returns the key
+     * when no translation exists). Keys are preserved untouched. Non-string
+     * labels (e.g. nested option groups) are left as-is.
+     *
+     * @param array<int|string, mixed> $options
+     *
+     * @return array<int|string, mixed>
+     */
+    private static function localizeOptionLabels(array $options): array
+    {
+        if (! app()->bound('translator')) {
+            return $options;
+        }
+
+        $localized = [];
+        foreach ($options as $key => $label) {
+            if (is_string($label)) {
+                $translated = trans($label);
+                $localized[$key] = is_string($translated) ? $translated : $label;
+
+                continue;
+            }
+
+            $localized[$key] = $label;
+        }
+
+        return $localized;
     }
 
     /**

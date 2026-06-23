@@ -57,3 +57,21 @@ it('translates every marketplace message key to pt_BR', function (): void {
         expect($value)->not->toBe($key);
     }
 });
+
+it('interpolates :slug in the plugin/category not-found messages (en)', function (): void {
+    App::setLocale('en');
+
+    expect(__('arqel::messages.marketplace.plugin_not_found', ['slug' => 'my-plugin']))
+        ->toBe('Plugin [my-plugin] not found');
+    expect(__('arqel::messages.marketplace.category_not_found', ['slug' => 'widgets']))
+        ->toBe('Category [widgets] not found');
+});
+
+it('interpolates :slug in the plugin/category not-found messages (pt_BR)', function (): void {
+    App::setLocale('pt_BR');
+
+    expect(__('arqel::messages.marketplace.plugin_not_found', ['slug' => 'my-plugin']))
+        ->toBe('Plugin [my-plugin] não encontrado');
+    expect(__('arqel::messages.marketplace.category_not_found', ['slug' => 'widgets']))
+        ->toBe('Categoria [widgets] não encontrada');
+});

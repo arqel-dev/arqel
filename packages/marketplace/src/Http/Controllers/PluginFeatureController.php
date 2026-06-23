@@ -39,7 +39,7 @@ final class PluginFeatureController
         $plugin = Plugin::query()->where('slug', $slug)->first();
 
         if (! $plugin instanceof Plugin) {
-            return new JsonResponse(['message' => "Plugin [{$slug}] not found"], 404);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.plugin_not_found', ['slug' => $slug])], 404);
         }
 
         $featured = (bool) $data['featured'];

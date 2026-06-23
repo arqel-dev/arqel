@@ -72,6 +72,9 @@ return [
         'review_not_found' => 'Review not found',
         'refund_failed' => 'Refund failed at gateway',
         'payment_verification_failed' => 'Payment verification failed',
+        'plugin_not_found' => 'Plugin [:slug] not found',
+        'category_not_found' => 'Category [:slug] not found',
+        'screenshots_count' => '{1}Provided :count screenshot.|[2,*]Provided :count screenshots.',
     ],
     'field_search' => [
         'not_searchable' => 'Field is not searchable.',

@@ -70,6 +70,48 @@ it('warns when no screenshots provided', function (): void {
     expect($check['status'])->toBe('warn');
 });
 
+it('localizes the screenshot count with a correct singular form (no "(s)" hack)', function (): void {
+    Illuminate\Support\Facades\App::setLocale('en');
+
+    $plugin = makeCheckerPlugin([
+        'screenshots' => ['https://example.com/a.png'],
+    ]);
+    $report = (new PluginAutoChecker)->check($plugin);
+
+    $check = findCheck($report['checks'], 'screenshots_count');
+    expect($check['status'])->toBe('ok');
+    expect($check['message'])->toBe('Provided 1 screenshot.');
+    expect($check['message'])->not->toContain('(s)');
+});
+
+it('localizes the screenshot count with a correct plural form', function (): void {
+    Illuminate\Support\Facades\App::setLocale('en');
+
+    $plugin = makeCheckerPlugin([
+        'screenshots' => ['https://example.com/a.png', 'https://example.com/b.png'],
+    ]);
+    $report = (new PluginAutoChecker)->check($plugin);
+
+    $check = findCheck($report['checks'], 'screenshots_count');
+    expect($check['message'])->toBe('Provided 2 screenshots.');
+});
+
+it('translates the screenshot count to pt_BR', function (): void {
+    Illuminate\Support\Facades\App::setLocale('pt_BR');
+
+    $singular = (new PluginAutoChecker)->check(makeCheckerPlugin([
+        'screenshots' => ['https://example.com/a.png'],
+    ]));
+    expect(findCheck($singular['checks'], 'screenshots_count')['message'])
+        ->toBe('1 captura de tela fornecida.');
+
+    $plural = (new PluginAutoChecker)->check(makeCheckerPlugin([
+        'screenshots' => ['https://example.com/a.png', 'https://example.com/b.png'],
+    ]));
+    expect(findCheck($plural['checks'], 'screenshots_count')['message'])
+        ->toBe('2 capturas de tela fornecidas.');
+});
+
 it('returns shape with checks list and passed flag for happy plugin', function (): void {
     $plugin = makeCheckerPlugin([
         'screenshots' => ['https://example.com/a.png'],

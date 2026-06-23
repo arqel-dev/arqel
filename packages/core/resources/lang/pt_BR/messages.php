@@ -72,6 +72,9 @@ return [
         'review_not_found' => 'Avaliação não encontrada',
         'refund_failed' => 'Falha no reembolso pelo gateway',
         'payment_verification_failed' => 'Falha na verificação do pagamento',
+        'plugin_not_found' => 'Plugin [:slug] não encontrado',
+        'category_not_found' => 'Categoria [:slug] não encontrada',
+        'screenshots_count' => '{1}:count captura de tela fornecida.|[2,*]:count capturas de tela fornecidas.',
     ],
     'field_search' => [
         'not_searchable' => 'O campo não permite busca.',

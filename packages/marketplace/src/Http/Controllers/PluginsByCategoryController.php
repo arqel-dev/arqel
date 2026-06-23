@@ -19,7 +19,7 @@ final class PluginsByCategoryController
         $category = PluginCategory::query()->where('slug', $slug)->first();
 
         if (! $category instanceof PluginCategory) {
-            return new JsonResponse(['message' => "Category [{$slug}] not found"], 404);
+            return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.category_not_found', ['slug' => $slug])], 404);
         }
 
         /** @var mixed $perPageInput */

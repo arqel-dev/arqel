@@ -130,7 +130,7 @@ final readonly class PluginAutoChecker
         return [
             'name' => 'screenshots_count',
             'status' => 'ok',
-            'message' => "Provided {$count} screenshot(s).",
+            'message' => (string) trans_choice('arqel::messages.marketplace.screenshots_count', $count, ['count' => $count]),
         ];
     }
 

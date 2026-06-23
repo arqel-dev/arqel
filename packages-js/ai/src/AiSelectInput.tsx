@@ -29,6 +29,7 @@
  * SSR-safe: nothing in the render path touches `window`/`document`.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   Alert,
   AlertDescription,
@@ -122,9 +123,11 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
     csrfToken,
   } = props;
 
+  const t = useArqelTranslations();
   const options = fieldProps?.options ?? {};
   const fallbackOption = fieldProps?.fallbackOption ?? null;
   const hasContextFields = fieldProps?.hasContextFields ?? false;
+  const buttonLabel = t('arqel.ai.classify', DEFAULT_BUTTON_LABEL);
 
   const reactId = useId();
   const selectId = `arqel-ai-select-${reactId}`;
@@ -180,7 +183,11 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
       });
 
       if (!response.ok) {
-        setError(`Classification failed (HTTP ${String(response.status)}).`);
+        setError(
+          t('arqel.ai.classify_error_http', 'Classification failed (HTTP :status).', {
+            status: String(response.status),
+          }),
+        );
         return;
       }
 
@@ -200,13 +207,13 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
         return;
       }
 
-      setError('Could not classify.');
+      setError(t('arqel.ai.classify_error_none', 'Could not classify.'));
     } catch {
-      setError('Classification failed: network error.');
+      setError(t('arqel.ai.classify_error_network', 'Classification failed: network error.'));
     } finally {
       setIsLoading(false);
     }
-  }, [applyValue, classifyUrl, csrfToken, fallbackOption, field, formData, resource]);
+  }, [applyValue, classifyUrl, csrfToken, fallbackOption, field, formData, resource, t]);
 
   const buttonDisabled = isLoading || !hasContextFields;
   const buttonTitle = !hasContextFields ? NO_CONTEXT_TOOLTIP : undefined;
@@ -216,7 +223,7 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
       <div className="flex items-center gap-2">
         <Select value={currentValue ?? ''} onValueChange={handleSelectChange} name={name}>
           <SelectTrigger id={selectId} className="flex-1">
-            <SelectValue placeholder="Select..." />
+            <SelectValue placeholder={t('arqel.ai.select_placeholder', 'Select...')} />
           </SelectTrigger>
           <SelectContent>
             {Object.entries(options).map(([key, label]) => (
@@ -234,15 +241,15 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
             void handleClassify();
           }}
           disabled={buttonDisabled}
-          aria-label={DEFAULT_BUTTON_LABEL}
+          aria-label={buttonLabel}
           {...(buttonTitle !== undefined ? { title: buttonTitle } : {})}
         >
           {isLoading ? (
-            <span role="status" aria-label="Classifying">
+            <span role="status" aria-label={t('arqel.ai.status_classifying', 'Classifying')}>
               <Spinner />
             </span>
           ) : null}
-          <span>{DEFAULT_BUTTON_LABEL}</span>
+          <span>{buttonLabel}</span>
         </Button>
       </div>
 

@@ -28,6 +28,7 @@
  * the network call only fires from the click handler (post-mount).
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Alert, AlertDescription, Button, Textarea } from '@arqel-dev/ui';
 import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
 
@@ -106,7 +107,12 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
     csrfToken,
   } = props;
 
-  const buttonLabel = fieldProps?.buttonLabel ?? DEFAULT_BUTTON_LABEL;
+  const t = useArqelTranslations();
+  const serverLabel = fieldProps?.buttonLabel;
+  const buttonLabel =
+    serverLabel !== undefined && serverLabel !== ''
+      ? serverLabel
+      : t('arqel.ai.generate', DEFAULT_BUTTON_LABEL);
   const maxLength = fieldProps?.maxLength ?? null;
 
   const reactId = useId();
@@ -166,7 +172,11 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
       });
 
       if (!response.ok) {
-        setError(`Generation failed (HTTP ${String(response.status)}).`);
+        setError(
+          t('arqel.ai.error_http', 'Generation failed (HTTP :status).', {
+            status: String(response.status),
+          }),
+        );
         return;
       }
 
@@ -175,13 +185,13 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
       applyGeneratedText(text);
       setHasGenerated(true);
     } catch {
-      setError('Generation failed: network error.');
+      setError(t('arqel.ai.error_network', 'Generation failed: network error.'));
     } finally {
       setIsLoading(false);
     }
-  }, [applyGeneratedText, csrfToken, field, formData, generateUrl, resource]);
+  }, [applyGeneratedText, csrfToken, field, formData, generateUrl, resource, t]);
 
-  const triggerLabel = hasGenerated ? REGENERATE_LABEL : buttonLabel;
+  const triggerLabel = hasGenerated ? t('arqel.ai.regenerate', REGENERATE_LABEL) : buttonLabel;
   const charCount = currentValue.length;
 
   return (
@@ -212,7 +222,7 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
           aria-label={triggerLabel}
         >
           {isLoading ? (
-            <span role="status" aria-label="Generating">
+            <span role="status" aria-label={t('arqel.ai.status_generating', 'Generating')}>
               <Spinner />
             </span>
           ) : null}

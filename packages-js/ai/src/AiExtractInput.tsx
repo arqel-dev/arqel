@@ -27,6 +27,7 @@
  * SSR-safe: nada no render path toca `window`/`document`.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Alert, AlertDescription, Badge, Button, Card, CardContent, Label } from '@arqel-dev/ui';
 import { type ReactElement, useCallback, useId, useState } from 'react';
 
@@ -142,9 +143,14 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
     onPopulateField,
   } = props;
 
+  const t = useArqelTranslations();
   const sourceField = fieldProps?.sourceField ?? '';
   const targetFields = fieldProps?.targetFields ?? [];
-  const buttonLabel = fieldProps?.buttonLabel ?? 'Extract with AI';
+  const serverLabel = fieldProps?.buttonLabel;
+  const buttonLabel =
+    serverLabel !== undefined && serverLabel !== ''
+      ? serverLabel
+      : t('arqel.ai.extract', 'Extract with AI');
 
   const reactId = useId();
   const previewId = `arqel-ai-extract-${reactId}`;
@@ -213,30 +219,37 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
         } catch {
           message = null;
         }
-        setError(message ?? `Extraction failed (HTTP ${String(response.status)}).`);
+        setError(
+          message ??
+            t('arqel.ai.extract_error_http', 'Extraction failed (HTTP :status).', {
+              status: String(response.status),
+            }),
+        );
         return;
       }
 
       const body = (await response.json()) as AiExtractResponseBody;
       if (!isPlainRecord(body.extracted)) {
-        setError('Extraction failed: invalid response body.');
+        setError(t('arqel.ai.extract_error_invalid', 'Extraction failed: invalid response body.'));
         return;
       }
 
       setExtracted(body.extracted);
     } catch {
-      setError('Extraction failed: network error.');
+      setError(t('arqel.ai.extract_error_network', 'Extraction failed: network error.'));
     } finally {
       setIsLoading(false);
     }
-  }, [csrfToken, extractUrl, field, formData, resource, sourceField]);
+  }, [csrfToken, extractUrl, field, formData, resource, sourceField, t]);
 
   const hasExtraction = extracted !== null && Object.keys(extracted).length > 0;
 
   return (
     <div className="flex flex-col gap-2" data-arqel-field="aiExtract" data-field-name={name}>
       <div>
-        <Label className="text-muted-foreground">Source: {sourceField}</Label>
+        <Label className="text-muted-foreground">
+          {t('arqel.ai.source', 'Source: :field', { field: sourceField })}
+        </Label>
       </div>
 
       <div className="flex items-center gap-2">
@@ -250,7 +263,7 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
           aria-label={buttonLabel}
         >
           {isLoading ? (
-            <span role="status" aria-label="Extracting">
+            <span role="status" aria-label={t('arqel.ai.status_extracting', 'Extracting')}>
               <Spinner />
             </span>
           ) : null}
@@ -265,7 +278,7 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
               applyAll(extracted);
             }}
           >
-            Apply all
+            {t('arqel.ai.apply_all', 'Apply all')}
           </Button>
         ) : null}
       </div>
@@ -297,9 +310,9 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
                         onClick={() => {
                           applyOne(target, val);
                         }}
-                        aria-label={`Apply ${target}`}
+                        aria-label={t('arqel.ai.apply_field', 'Apply :field', { field: target })}
                       >
-                        Apply
+                        {t('arqel.ai.apply', 'Apply')}
                       </Button>
                     </dd>
                   </div>

@@ -12,6 +12,15 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WizardInput } from './WizardInput.js';
 
+// WizardInput now localizes its Back/Next/Submit aria-labels via
+// `useArqelTranslations()`, which reads Inertia's `usePage()`. Stub an
+// empty-props page so the hook falls back to the English literals these
+// assertions expect.
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 type SubFieldOptions =
   | ReadonlyArray<{ value: string | number; label: string }>
   | Record<string, string>;

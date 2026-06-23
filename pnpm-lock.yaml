@@ -352,6 +352,9 @@ importers:
         specifier: ^3.0.0
         version: 3.0.3(axios@1.17.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
     devDependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
       '@arqel-dev/ui':
         specifier: workspace:*
         version: link:../ui
@@ -553,9 +556,15 @@ importers:
         specifier: ^3.0.0
         version: 3.23.0
     devDependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
       '@arqel-dev/ui':
         specifier: workspace:*
         version: link:../ui
+      '@inertiajs/react':
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.17.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
@@ -596,6 +605,9 @@ importers:
         specifier: workspace:*
         version: link:../types
     devDependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
       '@arqel-dev/ui':
         specifier: workspace:*
         version: link:../ui

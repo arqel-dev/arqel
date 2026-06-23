@@ -24,6 +24,7 @@
  * `value` + `onChange`; each step writes back as `{ ...value, [name]: v }`.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useEffect, useId, useMemo, useState } from 'react';
 import type { FieldRendererProps } from '../shared/types.js';
 
@@ -300,6 +301,7 @@ export function WizardInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const props = readProps((field as { props?: unknown }).props);
   const hasError = errors !== undefined && errors.length > 0;
   const fallbackId = useId();
@@ -565,7 +567,7 @@ export function WizardInput({
           className={buttonClasses}
           onClick={handleBack}
           disabled={disabled || isFirst}
-          aria-label="Back"
+          aria-label={t('arqel.fields_advanced.wizard_back', 'Back')}
         >
           Back
         </button>
@@ -575,7 +577,7 @@ export function WizardInput({
             className={primaryButtonClasses}
             onClick={handleSubmit}
             disabled={disabled}
-            aria-label="Submit"
+            aria-label={t('arqel.fields_advanced.wizard_submit', 'Submit')}
           >
             Submit
           </button>
@@ -585,7 +587,7 @@ export function WizardInput({
             className={primaryButtonClasses}
             onClick={handleNext}
             disabled={disabled}
-            aria-label="Next"
+            aria-label={t('arqel.fields_advanced.wizard_next', 'Next')}
           >
             Next
           </button>

@@ -7,7 +7,7 @@
  * "View" e "Restore". Não faz fetch nem decisões de autorização.
  */
 
-import { useArqelLocale } from '@arqel-dev/react/utils';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
 import { Badge, Button, Card, CardContent, CardHeader, LoadingSkeleton } from '@arqel-dev/ui';
 import type { JSX } from 'react';
 
@@ -115,13 +115,14 @@ export function VersionTimeline({
   // Active panel locale (BCP-47) for relative timestamps, read from the Inertia
   // `i18n` prop. Called unconditionally before any early return (rules of hooks).
   const locale = useArqelLocale();
+  const t = useArqelTranslations();
   if (loading === true) {
     return (
       <ol
         className="flex flex-col gap-4 border-l border-border pl-4"
         role="feed"
         aria-busy="true"
-        aria-label="Loading versions"
+        aria-label={t('arqel.versioning.loading', 'Loading versions')}
       >
         <SkeletonItem index={0} />
         <SkeletonItem index={1} />
@@ -138,7 +139,7 @@ export function VersionTimeline({
         data-testid="version-timeline-empty"
       >
         <CardContent className="py-8">
-          <p>No versions yet.</p>
+          <p>{t('arqel.versioning.empty', 'No versions yet.')}</p>
         </CardContent>
       </Card>
     );
@@ -148,7 +149,7 @@ export function VersionTimeline({
     <ol
       className="flex flex-col gap-4 border-l border-border pl-4"
       role="feed"
-      aria-label="Version history"
+      aria-label={t('arqel.versioning.history', 'Version history')}
     >
       {versions.map((version) => {
         const userName = version.user?.name ?? 'system';
@@ -160,7 +161,16 @@ export function VersionTimeline({
           <li
             key={version.id}
             className="relative"
-            aria-label={`Version ${version.id} by ${userName}, ${relative}: ${version.changes_summary}`}
+            aria-label={t(
+              'arqel.versioning.item_label',
+              'Version :id by :user, :relative: :summary',
+              {
+                id: String(version.id),
+                user: userName,
+                relative,
+                summary: version.changes_summary,
+              },
+            )}
           >
             <Card>
               <CardHeader className="flex flex-row items-center gap-3">
@@ -176,7 +186,7 @@ export function VersionTimeline({
                     <span className="text-sm font-medium text-foreground">{userName}</span>
                     <Badge variant="outline">#{version.id}</Badge>
                     {version.is_initial === true ? (
-                      <Badge variant="secondary">Initial</Badge>
+                      <Badge variant="secondary">{t('arqel.versioning.initial', 'Initial')}</Badge>
                     ) : null}
                   </div>
                   <time dateTime={version.created_at} className="text-xs text-muted-foreground">
@@ -196,7 +206,7 @@ export function VersionTimeline({
                           onViewDiff(version);
                         }}
                       >
-                        Compare
+                        {t('arqel.versioning.compare', 'Compare')}
                       </Button>
                     ) : null}
                     {onRestore !== undefined && restoreVisible ? (
@@ -207,7 +217,7 @@ export function VersionTimeline({
                           onRestore(version);
                         }}
                       >
-                        Restore
+                        {t('arqel.versioning.restore', 'Restore')}
                       </Button>
                     ) : null}
                   </div>

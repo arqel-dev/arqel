@@ -28,6 +28,7 @@
  * `@arqel-dev/ui` `FieldRegistry` and opt into a heavier renderer there.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import {
   type ChangeEvent,
@@ -304,6 +305,7 @@ export function MarkdownInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const props = readProps((field as { props?: unknown }).props);
   const hasError = errors !== undefined && errors.length > 0;
   const fallbackId = useId();
@@ -418,7 +420,7 @@ export function MarkdownInput({
       {props.toolbar ? (
         <div
           role="toolbar"
-          aria-label="Markdown formatting"
+          aria-label={t('arqel.fields_advanced.markdown_formatting', 'Markdown formatting')}
           aria-controls={id}
           className="flex flex-wrap items-center gap-1"
         >
@@ -427,7 +429,7 @@ export function MarkdownInput({
             className={buttonClasses}
             onClick={() => applyAction('bold')}
             disabled={disabled}
-            aria-label="Bold"
+            aria-label={t('arqel.fields_advanced.markdown_bold', 'Bold')}
           >
             <strong>B</strong>
           </button>
@@ -436,7 +438,7 @@ export function MarkdownInput({
             className={buttonClasses}
             onClick={() => applyAction('italic')}
             disabled={disabled}
-            aria-label="Italic"
+            aria-label={t('arqel.fields_advanced.markdown_italic', 'Italic')}
           >
             <em>I</em>
           </button>
@@ -445,7 +447,7 @@ export function MarkdownInput({
             className={buttonClasses}
             onClick={() => applyAction('heading')}
             disabled={disabled}
-            aria-label="Heading"
+            aria-label={t('arqel.fields_advanced.markdown_heading', 'Heading')}
           >
             H
           </button>
@@ -454,7 +456,7 @@ export function MarkdownInput({
             className={buttonClasses}
             onClick={() => applyAction('code')}
             disabled={disabled}
-            aria-label="Inline code"
+            aria-label={t('arqel.fields_advanced.markdown_code', 'Inline code')}
           >
             {'<>'}
           </button>
@@ -463,7 +465,7 @@ export function MarkdownInput({
             className={buttonClasses}
             onClick={() => applyAction('link')}
             disabled={disabled}
-            aria-label="Link"
+            aria-label={t('arqel.fields_advanced.markdown_link', 'Link')}
           >
             Link
           </button>
@@ -472,7 +474,7 @@ export function MarkdownInput({
             className={buttonClasses}
             onClick={() => applyAction('list')}
             disabled={disabled}
-            aria-label="List"
+            aria-label={t('arqel.fields_advanced.markdown_list', 'List')}
           >
             List
           </button>
@@ -483,7 +485,7 @@ export function MarkdownInput({
                 type="button"
                 className={buttonClasses}
                 onClick={() => setIsPopupOpen(true)}
-                aria-label="Open preview"
+                aria-label={t('arqel.fields_advanced.markdown_preview_open', 'Open preview')}
               >
                 Preview
               </button>
@@ -504,7 +506,11 @@ export function MarkdownInput({
       ) : null}
 
       {showTabbed ? (
-        <div role="tablist" aria-label="Editor mode" className="flex gap-1">
+        <div
+          role="tablist"
+          aria-label={t('arqel.fields_advanced.markdown_editor_mode', 'Editor mode')}
+          className="flex gap-1"
+        >
           <button
             type="button"
             role="tab"
@@ -546,7 +552,7 @@ export function MarkdownInput({
 
         {showSideBySide || previewTabVisible ? (
           <section
-            aria-label="Markdown preview"
+            aria-label={t('arqel.fields_advanced.markdown_preview', 'Markdown preview')}
             className={previewPaneClasses}
             // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped by markdownToHtml().
             dangerouslySetInnerHTML={{ __html: previewHtml }}
@@ -557,12 +563,12 @@ export function MarkdownInput({
       {showPopup ? (
         <dialog
           ref={dialogRef}
-          aria-label="Markdown preview"
+          aria-label={t('arqel.fields_advanced.markdown_preview', 'Markdown preview')}
           className="rounded-sm p-4"
           onClose={() => setIsPopupOpen(false)}
         >
           <section
-            aria-label="Markdown preview"
+            aria-label={t('arqel.fields_advanced.markdown_preview', 'Markdown preview')}
             className={previewPaneClasses}
             // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped by markdownToHtml().
             dangerouslySetInnerHTML={{ __html: previewHtml }}

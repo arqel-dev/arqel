@@ -77,21 +77,44 @@ abstract class Resource implements HasActions, HasFields, HasResource
 
     public static function getLabel(): string
     {
-        $label = static::$label ?? Str::of(class_basename(static::getModel()))
+        return static::localizeLabel(static::rawLabel());
+    }
+
+    /**
+     * Singular label before localization: the explicit `$label` (which may be
+     * a translation key or literal) or the model class name humanised.
+     */
+    private static function rawLabel(): string
+    {
+        return static::$label ?? Str::of(class_basename(static::getModel()))
             ->snake(' ')
             ->title()
             ->toString();
-
-        return static::localizeLabel($label);
     }
 
     public static function getPluralLabel(): string
     {
-        $label = static::$pluralLabel ?? Str::of(static::getLabel())
-            ->plural()
-            ->toString();
+        // Prefer an explicit plural key/literal. Otherwise derive the plural
+        // from the *un-localized* singular so Str::plural (the English
+        // inflector) only ever runs on the class-name-derived English noun —
+        // never on an already-translated label, which would corrupt non-English
+        // plurals (e.g. a pt_BR "Categoria" must not become "Categorias" via
+        // English morphology by accident). The derived plural is then localized
+        // so a matching translation key still resolves in the active locale.
+        if (static::$pluralLabel !== null) {
+            return static::localizeLabel(static::$pluralLabel);
+        }
 
-        return static::localizeLabel($label);
+        if (static::$label !== null) {
+            // The singular is an explicit (possibly translated) label: do not
+            // apply English inflection to it. Fall back to the localized
+            // singular as the plural.
+            return static::getLabel();
+        }
+
+        $plural = Str::of(static::rawLabel())->plural()->toString();
+
+        return static::localizeLabel($plural);
     }
 
     public static function getNavigationIcon(): ?string

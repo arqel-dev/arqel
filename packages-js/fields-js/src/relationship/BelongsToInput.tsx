@@ -9,6 +9,7 @@
  * + `<ul>`); Base UI Combobox lands in a follow-up.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { BelongsToFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { cn } from '@arqel-dev/ui/utils';
@@ -30,6 +31,7 @@ export function BelongsToInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as BelongsToFieldSchema;
+  const t = useArqelTranslations();
   const hasError = errors !== undefined && errors.length > 0;
   const isDisabled = disabled || f.disabled || f.readonly;
 
@@ -77,7 +79,12 @@ export function BelongsToInput({
             ? query
             : (selectedLabel ?? (value === null || value === undefined ? '' : String(value)))
         }
-        placeholder={f.placeholder ?? `Search ${f.props.relatedResource}…`}
+        placeholder={
+          f.placeholder ??
+          t('arqel.fields.belongsto.search', 'Search :resource…', {
+            resource: f.props.relatedResource,
+          })
+        }
         disabled={isDisabled}
         readOnly={!(f.readonly === true || f.readonly === undefined)}
         aria-invalid={hasError || undefined}

@@ -7,6 +7,7 @@
  * via `useArqelForm`'s `progress` field (Inertia native).
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FileFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { cn } from '@arqel-dev/ui/utils';
@@ -22,6 +23,7 @@ export function FileInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as FileFieldSchema;
+  const t = useArqelTranslations();
   const hasError = errors !== undefined && errors.length > 0;
   const isDisabled = disabled || f.disabled || f.readonly;
   const [dragOver, setDragOver] = useState(false);
@@ -36,7 +38,7 @@ export function FileInput({
 
   return (
     <section
-      aria-label="File upload"
+      aria-label={t('arqel.fields.file.upload', 'File upload')}
       onDragOver={(e) => {
         e.preventDefault();
         if (!isDisabled) setDragOver(true);

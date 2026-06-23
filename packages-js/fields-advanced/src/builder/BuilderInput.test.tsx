@@ -9,6 +9,15 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { BuilderInput } from './BuilderInput.js';
 
+// BuilderInput now localizes its add-block / close-picker aria-labels via
+// `useArqelTranslations()`, which reads Inertia's `usePage()`. Stub an
+// empty-props page so the hook falls back to the English literals these
+// assertions expect.
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 // See `RepeaterInput.test.tsx` for the rationale: capture the dnd-kit
 // callbacks so the test can drive a drag-end without relying on jsdom's
 // pointer/keyboard sensor support.

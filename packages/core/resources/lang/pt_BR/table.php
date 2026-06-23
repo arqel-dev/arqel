@@ -34,6 +34,12 @@ return [
         'asc' => 'Crescente',
         'desc' => 'Decrescente',
     ],
+    'boolean' => [
+        // Nomes acessíveis (aria-label) para o glifo neutro do boolean cell
+        // (✓ / —). Anunciados por leitores de tela no lugar de 'true'/'false'.
+        'true_label' => 'sim',
+        'false_label' => 'não',
+    ],
     'filters' => [
         'apply' => 'Aplicar',
         'reset' => 'Limpar',

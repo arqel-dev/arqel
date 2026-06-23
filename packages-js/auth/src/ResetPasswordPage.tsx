@@ -1,3 +1,4 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   Button,
   Card,
@@ -21,7 +22,7 @@ export interface ResetPasswordPageProps {
   resetPasswordUrl?: string;
   /** URL para voltar ao login (default `/admin/login`). */
   loginUrl?: string;
-  /** Texto do header (default "Definir nova senha"). */
+  /** Texto do header (default localizado via `arqel.auth.reset_title`). */
   title?: string;
   /** Subtítulo opcional. */
   description?: string;
@@ -43,18 +44,20 @@ type ResetPasswordFormData = {
  *
  * Layout split-screen consistente com `LoginPage` (Card com form à
  * esquerda e hero image à direita visível em md+). Usa `useForm()` do
- * Inertia para estado, submit e errors.
+ * Inertia para estado, submit e errors. Strings visíveis localizadas via
+ * `useArqelTranslations()` (chaves `arqel.auth.reset_*`).
  */
 export function ResetPasswordPage({
   token,
   email = '',
   resetPasswordUrl = '/admin/reset-password',
   loginUrl = '/admin/login',
-  title = 'Definir nova senha',
-  description = 'Escolha uma nova senha para sua conta',
+  title,
+  description,
   heroImageSrc = '/login-hero.svg',
-  heroImageAlt = 'Reset password illustration',
+  heroImageAlt,
 }: ResetPasswordPageProps): ReactElement {
+  const t = useArqelTranslations();
   const { data, setData, post, processing, errors } = useForm<ResetPasswordFormData>({
     token,
     email,
@@ -75,12 +78,17 @@ export function ResetPasswordPage({
             <form onSubmit={handleSubmit} className="p-6 md:p-8" noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <h1 className="text-2xl font-bold">{title}</h1>
-                  <p className="text-balance text-muted-foreground">{description}</p>
+                  <h1 className="text-2xl font-bold">
+                    {title ?? t('arqel.auth.reset_title', 'Set a new password')}
+                  </h1>
+                  <p className="text-balance text-muted-foreground">
+                    {description ??
+                      t('arqel.auth.reset_description', 'Choose a new password for your account')}
+                  </p>
                 </div>
 
                 <Field>
-                  <FieldLabel htmlFor="email">E-mail</FieldLabel>
+                  <FieldLabel htmlFor="email">{t('arqel.auth.email', 'Email')}</FieldLabel>
                   <Input
                     id="email"
                     type="email"
@@ -96,7 +104,9 @@ export function ResetPasswordPage({
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="password">Nova senha</FieldLabel>
+                  <FieldLabel htmlFor="password">
+                    {t('arqel.auth.reset_new_password', 'New password')}
+                  </FieldLabel>
                   <Input
                     id="password"
                     type="password"
@@ -111,7 +121,9 @@ export function ResetPasswordPage({
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="password_confirmation">Confirmar senha</FieldLabel>
+                  <FieldLabel htmlFor="password_confirmation">
+                    {t('arqel.auth.confirm_password', 'Confirm password')}
+                  </FieldLabel>
                   <Input
                     id="password_confirmation"
                     type="password"
@@ -129,13 +141,15 @@ export function ResetPasswordPage({
 
                 <Field>
                   <Button type="submit" disabled={processing}>
-                    {processing ? 'Salvando…' : 'Redefinir senha'}
+                    {processing
+                      ? t('arqel.auth.reset_submitting', 'Saving…')
+                      : t('arqel.auth.reset_submit', 'Reset password')}
                   </Button>
                 </Field>
 
                 <FieldDescription className="text-center">
                   <a href={loginUrl} className="underline underline-offset-4">
-                    Voltar ao login
+                    {t('arqel.auth.back_to_login', 'Back to login')}
                   </a>
                 </FieldDescription>
               </FieldGroup>
@@ -144,7 +158,7 @@ export function ResetPasswordPage({
             <div className="bg-primary/10 relative hidden md:block">
               <img
                 src={heroImageSrc}
-                alt={heroImageAlt}
+                alt={heroImageAlt ?? t('arqel.auth.reset_hero_alt', 'Reset password illustration')}
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>

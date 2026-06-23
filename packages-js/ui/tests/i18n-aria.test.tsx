@@ -53,8 +53,12 @@ const PT_BR = {
     },
   },
   arqel: {
+    // The ActionMenu trigger/title resolves through arqel.actions.menu
+    // (shared with the visible bottom-sheet title), not arqel.aria.*.
+    actions: {
+      menu: 'Ações',
+    },
     aria: {
-      actions_menu: 'Ações',
       flash_dismiss: 'Dispensar',
       stat_sparkline: 'Minigráfico de tendência',
       breadcrumb: 'Trilha de navegação',

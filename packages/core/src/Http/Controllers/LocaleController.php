@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Http\Controllers;
 
+use Arqel\Core\Http\Middleware\SetLocaleMiddleware;
 use Arqel\Core\I18n\TranslationLoader;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Cookie;
  * Endpoint POST que persiste a escolha de locale do usuário.
  *
  * Grava em duas camadas para casar com a resolução do
- * {@see \Arqel\Core\Http\Middleware\SetLocaleMiddleware}:
+ * {@see SetLocaleMiddleware}:
  *
  *  1. `session('locale')` — fonte tier-1 dentro da sessão;
  *  2. cookie `arqel_locale` — fonte tier-2 cross-session, lida

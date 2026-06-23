@@ -302,7 +302,7 @@ abstract class Action
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function execute(mixed $record = null, array $data = []): mixed
     {

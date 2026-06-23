@@ -68,7 +68,6 @@ return [
     // Mantidos distintos dos rótulos visíveis curtos para que leitores de
     // tela anunciem um nome acessível completo e descritivo.
     'aria' => [
-        'actions_menu' => 'Ações',
         'flash_dismiss' => 'Dispensar',
         'chart_loading' => 'Carregando gráfico',
         'stat_sparkline' => 'Minigráfico de tendência',

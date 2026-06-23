@@ -68,7 +68,6 @@ return [
     // distinct from short visible labels so screen-reader users hear a full,
     // descriptive accessible name.
     'aria' => [
-        'actions_menu' => 'Actions',
         'flash_dismiss' => 'Dismiss',
         'chart_loading' => 'Loading chart',
         'stat_sparkline' => 'Trend sparkline',

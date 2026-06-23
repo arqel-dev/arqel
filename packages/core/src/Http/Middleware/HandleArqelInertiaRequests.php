@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Http\Middleware;
 
+use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
 use Arqel\Core\DevTools\DevToolsPayloadBuilder;
 use Arqel\Core\I18n\TranslationLoader;
+use Arqel\Core\Panel\Panel;
 use Arqel\Core\Panel\PanelRegistry;
+use Arqel\Core\Resources\Resource;
 use Arqel\Core\Support\ResourceAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -214,7 +218,7 @@ final class HandleArqelInertiaRequests extends Middleware
      *
      * @return array<int, array<string, mixed>>
      */
-    private function buildNavigation(\Arqel\Core\Panel\Panel $panel, ?Authenticatable $user = null): array
+    private function buildNavigation(Panel $panel, ?Authenticatable $user = null): array
     {
         $items = [];
         $request = request();
@@ -255,10 +259,10 @@ final class HandleArqelInertiaRequests extends Middleware
      *
      * Delegates to {@see ResourceAuthorization::viewAnyDenied()} — the
      * single source of truth shared with the command palette
-     * ({@see \Arqel\Core\CommandPalette\Providers\NavigationCommandProvider})
+     * ({@see NavigationCommandProvider})
      * so both navigation surfaces stay symmetric (issues #118 and #129).
      *
-     * @param class-string<\Arqel\Core\Resources\Resource> $resourceClass
+     * @param  class-string<\Arqel\Core\Resources\Resource>  $resourceClass
      */
     private function resourceViewAnyDenied(string $resourceClass, ?Authenticatable $user): bool
     {
@@ -271,9 +275,8 @@ final class HandleArqelInertiaRequests extends Middleware
      * ungrouped bucket) following — ordered by their minimum item sort —
      * and items within each group ordered by their per-item sort.
      *
-     * @param array<int, array<string, mixed>> $items
-     * @param array<int, string> $explicitGroups
-     *
+     * @param  array<int, array<string, mixed>>  $items
+     * @param  array<int, string>  $explicitGroups
      * @return array<int, array<string, mixed>>
      */
     private function orderNavigationItems(array $items, array $explicitGroups): array
@@ -381,7 +384,7 @@ final class HandleArqelInertiaRequests extends Middleware
      */
     private function serialiseTenant(mixed $tenant): ?array
     {
-        if (! $tenant instanceof \Illuminate\Database\Eloquent\Model) {
+        if (! $tenant instanceof Model) {
             return null;
         }
 

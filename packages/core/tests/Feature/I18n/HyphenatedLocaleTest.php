@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\Http\Middleware\SetLocaleMiddleware;
 use Arqel\Core\I18n\TranslationLoader;
+use Illuminate\Http\Request;
 
 /*
  * #250 — footgun 1: locale allowlist-vs-disk mismatch.
@@ -65,8 +67,8 @@ it('keeps a hyphenated configured locale that resolves on disk', function (): vo
 it('reaches a hyphenated config locale through the SetLocale middleware Accept-Language path', function (): void {
     config()->set('arqel.i18n.locales', ['en', 'pt-BR']);
 
-    $middleware = app(\Arqel\Core\Http\Middleware\SetLocaleMiddleware::class);
-    $request = \Illuminate\Http\Request::create('/admin', 'GET', [], [], [], [
+    $middleware = app(SetLocaleMiddleware::class);
+    $request = Request::create('/admin', 'GET', [], [], [], [
         'HTTP_ACCEPT_LANGUAGE' => 'pt-BR,en;q=0.8',
     ]);
     $request->setLaravelSession(app('session.store'));

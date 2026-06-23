@@ -8,6 +8,7 @@
  */
 
 import { useArqelForm } from '@arqel-dev/hooks';
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FormSchema } from '@arqel-dev/types/forms';
 import type { ResourceCreateProps } from '@arqel-dev/types/resources';
@@ -34,6 +35,7 @@ interface ArqelFormShape {
 
 export default function ArqelCreatePage(): JSX.Element {
   const page = usePage();
+  const t = useArqelTranslations();
   const props = page.props as unknown as ResourceCreateProps;
   const fields = (props.fields ?? []) as FieldSchema[];
   const schema = (props as unknown as { form?: FormSchema }).form ?? FALLBACK_SCHEMA;
@@ -49,9 +51,15 @@ export default function ArqelCreatePage(): JSX.Element {
     });
   };
 
+  // Pre-interpolate the label into the English fallback so the title stays
+  // correct even when the `arqel.pages.create` key is absent from the shared
+  // dictionary (the hook does not re-interpolate a raw fallback).
+  const label = props.resource?.label ?? t('arqel.pages.fallback', 'record');
+  const createTitle = t('arqel.pages.create', `Create ${label}`, { label });
+
   return (
     <div className="space-y-6">
-      <PageHeader title={`Create ${props.resource?.label ?? 'record'}`} description={null} />
+      <PageHeader title={createTitle} description={null} />
       <form onSubmit={submit} className="space-y-6">
         <FormRenderer
           schema={schema}

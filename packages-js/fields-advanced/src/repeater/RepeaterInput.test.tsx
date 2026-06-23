@@ -12,6 +12,15 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { RepeaterInput } from './RepeaterInput.js';
 
+// RepeaterInput now localizes its control aria-labels via
+// `useArqelTranslations()`, which reads Inertia's `usePage()`. Stub an
+// empty-props page so the hook falls back to the English literals these
+// assertions expect.
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 // Capture the latest `onDragEnd` handler and `items[]` passed to
 // <DndContext> / <SortableContext> so the test can simulate a drag-drop
 // reorder without relying on jsdom's (incomplete) pointer/keyboard event

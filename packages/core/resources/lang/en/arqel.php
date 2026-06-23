@@ -188,4 +188,41 @@ return [
         'theme_toggle_dark' => 'Switch to dark theme',
         'tenant_switch' => 'Switch tenant (current: :tenant)',
     ],
+    // Accessible names + visible chrome for the rich-content editing surface
+    // shipped by @arqel-dev/fields-advanced (Markdown / Repeater / Wizard /
+    // Builder / RichText). Values must equal the original English literals so
+    // accessible names stay stable for screen readers and consumer tests.
+    'fields_advanced' => [
+        'markdown_formatting' => 'Markdown formatting',
+        'markdown_bold' => 'Bold',
+        'markdown_italic' => 'Italic',
+        'markdown_heading' => 'Heading',
+        'markdown_code' => 'Inline code',
+        'markdown_link' => 'Link',
+        'markdown_list' => 'List',
+        'markdown_preview_open' => 'Open preview',
+        'markdown_editor_mode' => 'Editor mode',
+        'markdown_preview' => 'Markdown preview',
+        'repeater_move_up' => 'Move up',
+        'repeater_move_down' => 'Move down',
+        'repeater_add_item' => 'Add item',
+        'wizard_back' => 'Back',
+        'wizard_submit' => 'Submit',
+        'wizard_next' => 'Next',
+        'builder_close_picker' => 'Close block picker',
+        'builder_add_block' => 'Add block',
+        'richtext_toolbar' => 'Formatting toolbar',
+    ],
+    // Visible chrome + accessible names for @arqel-dev/versioning's
+    // <VersionTimeline>. :id / :user / :relative / :summary feed the per-item
+    // accessible name; keep wording matching the original English literals.
+    'versioning' => [
+        'initial' => 'Initial',
+        'compare' => 'Compare',
+        'restore' => 'Restore',
+        'empty' => 'No versions yet.',
+        'loading' => 'Loading versions',
+        'history' => 'Version history',
+        'item_label' => 'Version :id by :user, :relative: :summary',
+    ],
 ];

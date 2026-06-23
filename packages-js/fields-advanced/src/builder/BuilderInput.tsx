@@ -27,6 +27,7 @@
  * migration is a separate follow-up).
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   closestCenter,
   DndContext,
@@ -383,6 +384,7 @@ interface BlockPickerProps {
 }
 
 function BlockPicker({ blocks, onSelect, onClose }: BlockPickerProps) {
+  const t = useArqelTranslations();
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -423,12 +425,12 @@ function BlockPicker({ blocks, onSelect, onClose }: BlockPickerProps) {
         className="fixed inset-0 z-40 cursor-default"
         onClick={onClose}
         tabIndex={-1}
-        aria-label="Close block picker"
+        aria-label={t('arqel.fields_advanced.builder_close_picker', 'Close block picker')}
       />
       <div
         ref={menuRef}
         role="menu"
-        aria-label="Add block"
+        aria-label={t('arqel.fields_advanced.builder_add_block', 'Add block')}
         onKeyDown={onKeyDown}
         className="relative z-50 mt-1 w-64 rounded-sm border border-[var(--input)] bg-background p-1 shadow-md"
       >
@@ -493,6 +495,7 @@ export function BuilderInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const props = readProps((field as { props?: unknown }).props);
   const hasError = errors !== undefined && errors.length > 0;
   const fallbackId = useId();
@@ -746,7 +749,7 @@ export function BuilderInput({
           disabled={disabled || atMax}
           aria-haspopup="menu"
           aria-expanded={pickerOpen}
-          aria-label="Add block"
+          aria-label={t('arqel.fields_advanced.builder_add_block', 'Add block')}
         >
           + Add block
         </button>

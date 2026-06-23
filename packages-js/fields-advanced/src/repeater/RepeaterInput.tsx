@@ -40,6 +40,7 @@
  * buttons are hidden / disabled.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   closestCenter,
   DndContext,
@@ -389,6 +390,7 @@ export function RepeaterInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const props = readProps((field as { props?: unknown }).props);
   const hasError = errors !== undefined && errors.length > 0;
   const fallbackId = useId();
@@ -544,7 +546,7 @@ export function RepeaterInput({
                               <button
                                 type="button"
                                 className={iconButtonClasses}
-                                aria-label="Move up"
+                                aria-label={t('arqel.fields_advanced.repeater_move_up', 'Move up')}
                                 disabled={index === 0}
                                 onClick={() => moveItem(index, -1)}
                               >
@@ -553,7 +555,10 @@ export function RepeaterInput({
                               <button
                                 type="button"
                                 className={iconButtonClasses}
-                                aria-label="Move down"
+                                aria-label={t(
+                                  'arqel.fields_advanced.repeater_move_down',
+                                  'Move down',
+                                )}
                                 disabled={index === items.length - 1}
                                 onClick={() => moveItem(index, 1)}
                               >
@@ -623,7 +628,7 @@ export function RepeaterInput({
         className={buttonClasses}
         onClick={addItem}
         disabled={disabled || atMax}
-        aria-label="Add item"
+        aria-label={t('arqel.fields_advanced.repeater_add_item', 'Add item')}
       >
         + Add item
       </button>

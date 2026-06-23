@@ -97,12 +97,16 @@
     "shiki": "^3.0.0"
   },
   "peerDependencies": {
+    "@arqel-dev/react": "workspace:*",
     "@arqel-dev/ui": "workspace:*",
+    "@inertiajs/react": "^3.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@arqel-dev/react": "workspace:*",
     "@arqel-dev/ui": "workspace:*",
+    "@inertiajs/react": "^3.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",

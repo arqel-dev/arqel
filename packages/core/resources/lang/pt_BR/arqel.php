@@ -187,4 +187,40 @@ return [
         'theme_toggle_dark' => 'Mudar para o tema escuro',
         'tenant_switch' => 'Trocar de tenant (atual: :tenant)',
     ],
+    // Nomes acessíveis + chrome visível da superfície de edição de conteúdo
+    // rico fornecida por @arqel-dev/fields-advanced (Markdown / Repeater /
+    // Wizard / Builder / RichText).
+    'fields_advanced' => [
+        'markdown_formatting' => 'Formatação Markdown',
+        'markdown_bold' => 'Negrito',
+        'markdown_italic' => 'Itálico',
+        'markdown_heading' => 'Título',
+        'markdown_code' => 'Código em linha',
+        'markdown_link' => 'Link',
+        'markdown_list' => 'Lista',
+        'markdown_preview_open' => 'Abrir pré-visualização',
+        'markdown_editor_mode' => 'Modo do editor',
+        'markdown_preview' => 'Pré-visualização Markdown',
+        'repeater_move_up' => 'Mover para cima',
+        'repeater_move_down' => 'Mover para baixo',
+        'repeater_add_item' => 'Adicionar item',
+        'wizard_back' => 'Voltar',
+        'wizard_submit' => 'Enviar',
+        'wizard_next' => 'Avançar',
+        'builder_close_picker' => 'Fechar seletor de blocos',
+        'builder_add_block' => 'Adicionar bloco',
+        'richtext_toolbar' => 'Barra de formatação',
+    ],
+    // Chrome visível + nomes acessíveis do <VersionTimeline> de
+    // @arqel-dev/versioning. :id / :user / :relative / :summary alimentam o
+    // nome acessível de cada item.
+    'versioning' => [
+        'initial' => 'Inicial',
+        'compare' => 'Comparar',
+        'restore' => 'Restaurar',
+        'empty' => 'Nenhuma versão ainda.',
+        'loading' => 'Carregando versões',
+        'history' => 'Histórico de versões',
+        'item_label' => 'Versão :id por :user, :relative: :summary',
+    ],
 ];

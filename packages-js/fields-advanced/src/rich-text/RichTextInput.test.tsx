@@ -21,6 +21,15 @@ import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { RichTextInput, safeUrl } from './RichTextInput.js';
 
+// RichTextInput now localizes its toolbar aria-label via
+// `useArqelTranslations()`, which reads Inertia's `usePage()`. Stub an
+// empty-props page so the hook falls back to the English literals these
+// assertions expect.
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 /**
  * jsdom does not implement `getClientRects` on Range nodes nor
  * `elementFromPoint` / `getSelection` coords helpers that ProseMirror

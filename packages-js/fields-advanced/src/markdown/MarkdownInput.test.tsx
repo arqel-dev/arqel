@@ -13,6 +13,15 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { MarkdownInput } from './MarkdownInput.js';
 
+// MarkdownInput now localizes its control aria-labels via
+// `useArqelTranslations()`, which reads Inertia's `usePage()`. Stub an
+// empty-props page so the hook falls back to the English literals these
+// assertions expect (no `i18n.translations` dictionary present).
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 interface MdProps {
   preview?: boolean;
   previewMode?: 'side-by-side' | 'tab' | 'popup';

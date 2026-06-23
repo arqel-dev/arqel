@@ -27,6 +27,7 @@
  * `safeUrl` before being passed to the editor command.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import CharacterCount from '@tiptap/extension-character-count';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
@@ -186,6 +187,7 @@ export function RichTextInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const fieldRecord = field as { props?: unknown; placeholder?: unknown };
   const placeholder = typeof fieldRecord.placeholder === 'string' ? fieldRecord.placeholder : null;
   const props = readProps(fieldRecord.props, placeholder);
@@ -351,7 +353,7 @@ export function RichTextInput({
       {renderedToolbar.length > 0 ? (
         <div
           role="toolbar"
-          aria-label="Formatting toolbar"
+          aria-label={t('arqel.fields_advanced.richtext_toolbar', 'Formatting toolbar')}
           aria-controls={id}
           className="flex flex-wrap items-center gap-1"
         >

@@ -52,6 +52,44 @@ it('binds Carbon diffForHumans to the pt_BR request locale for since cells', fun
         ->and($cell)->not->toContain('ago');
 });
 
+it('localizes textual month tokens of an absolute date cell under pt_BR', function (): void {
+    App::setLocale('pt_BR');
+
+    $formatter = makeDateCellFormatter();
+    $cell = $formatter->format(
+        new DateTime('2024-03-01'),
+        ['props' => ['mode' => 'date', 'format' => 'd F Y']],
+    );
+
+    // March localizes to "março" in pt-BR; the English "March" must not leak.
+    expect($cell)->toContain('março')
+        ->and($cell)->not->toContain('March');
+});
+
+it('keeps English textual month tokens under the en locale', function (): void {
+    App::setLocale('en');
+
+    $formatter = makeDateCellFormatter();
+    $cell = $formatter->format(
+        new DateTime('2024-03-01'),
+        ['props' => ['mode' => 'date', 'format' => 'd F Y']],
+    );
+
+    expect($cell)->toContain('March');
+});
+
+it('leaves numeric-only format tokens unchanged across locales', function (): void {
+    App::setLocale('pt_BR');
+
+    $formatter = makeDateCellFormatter();
+    $cell = $formatter->format(
+        new DateTime('2024-03-01'),
+        ['props' => ['mode' => 'date', 'format' => 'Y-m-d']],
+    );
+
+    expect($cell)->toBe('2024-03-01');
+});
+
 it('does not leak a previously set locale into a later en export', function (): void {
     App::setLocale('pt_BR');
     makeDateCellFormatter()->format(

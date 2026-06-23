@@ -74,7 +74,7 @@ final class GlobalActivityLogController extends Controller
             || ($hasActivityGate && Gate::allows('viewAny', Activity::class));
 
         if (! $allowed) {
-            throw new HttpException(403, 'Forbidden');
+            throw new HttpException(403, (string) __('arqel-audit::messages.forbidden'));
         }
     }
 

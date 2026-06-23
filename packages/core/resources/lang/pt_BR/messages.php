@@ -82,6 +82,10 @@ return [
         'restore_failed' => 'Falha ao restaurar.',
         'registry_not_bound' => 'ResourceRegistry não está registrado',
         'forbidden' => 'Acesso negado',
+        'version_not_found' => 'Versão não encontrada para o registro.',
+        'registry_unavailable' => 'Registro de recursos indisponível.',
+        'resource_not_found' => "Recurso ':resource' não encontrado.",
+        'resource_no_model' => "O recurso ':resource' não tem um model vinculado.",
     ],
     'workflow' => [
         'state_filter_label' => 'Estado',

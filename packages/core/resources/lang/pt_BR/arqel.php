@@ -344,6 +344,14 @@ return [
         'field_comparison' => 'Comparação de campos',
         'no_previous_value' => 'sem valor anterior',
         'no_new_value' => 'sem novo valor',
+        // changes_summary localizado gerado por VersionPresenter::summarize().
+        // `changed` respeita plural (trans_choice): :count = número de campos,
+        // :fields = nomes dos campos separados por vírgula.
+        'summary' => [
+            'created' => 'Criado',
+            'no_changes' => 'Sem alterações',
+            'changed' => '{1}Alterado :count campo: :fields|[2,*]Alterados :count campos: :fields',
+        ],
     ],
     // Chrome de estado vazio visível do <StateTransition> de
     // @arqel-dev/workflow.

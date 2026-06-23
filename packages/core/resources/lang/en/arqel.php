@@ -348,6 +348,15 @@ return [
         'field_comparison' => 'Field comparison',
         'no_previous_value' => 'no previous value',
         'no_new_value' => 'no new value',
+        // Localized changes_summary built by VersionPresenter::summarize().
+        // `changed` is plural-aware (trans_choice): :count = field count,
+        // :fields = comma-joined field names. Values must equal the original
+        // English literals so existing payload consumers stay stable.
+        'summary' => [
+            'created' => 'Created',
+            'no_changes' => 'No changes',
+            'changed' => '{1}Changed :count field: :fields|[2,*]Changed :count fields: :fields',
+        ],
     ],
     // Visible empty-state chrome for @arqel-dev/workflow's <StateTransition>.
     // Values must equal the original English literals so consumer tests and

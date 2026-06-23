@@ -64,22 +64,59 @@ final readonly class VersionPresenter
     }
 
     /**
+     * Build the human-readable `changes_summary` lazily through the
+     * translator so the request locale applies and plural selection follows
+     * the target locale's rules (trans_choice). Falls back to the English
+     * literals when no translator is bound or the key is untranslated,
+     * keeping the payload text stable for existing consumers.
+     *
      * @param array<string, array{0: mixed, 1: mixed}>|null $changes
      */
     private static function summarize(?array $changes): string
     {
         if ($changes === null) {
-            return 'Created';
+            return self::trans('arqel.versioning.summary.created', 'Created');
         }
 
         if ($changes === []) {
-            return 'No changes';
+            return self::trans('arqel.versioning.summary.no_changes', 'No changes');
         }
 
         $fields = array_keys($changes);
         $count = count($fields);
+        $joined = implode(', ', $fields);
 
-        return sprintf('Changed %d field%s: %s', $count, $count === 1 ? '' : 's', implode(', ', $fields));
+        $key = 'arqel::arqel.versioning.summary.changed';
+
+        if (app()->bound('translator')) {
+            $translated = trans_choice($key, $count, [
+                'count' => (string) $count,
+                'fields' => $joined,
+            ]);
+
+            if ($translated !== $key) {
+                return $translated;
+            }
+        }
+
+        return sprintf('Changed %d field%s: %s', $count, $count === 1 ? '' : 's', $joined);
+    }
+
+    /**
+     * Resolve a single localized summary literal, falling back to the
+     * English text when the translator is absent or the key is untranslated.
+     */
+    private static function trans(string $key, string $fallback): string
+    {
+        $namespaced = 'arqel::'.$key;
+
+        if (! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans($namespaced);
+
+        return is_string($translated) && $translated !== $namespaced ? $translated : $fallback;
     }
 
     /**

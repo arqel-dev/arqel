@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { setMockTranslations } from '../tests/setup.js';
 import { AiExtractInput } from './AiExtractInput.js';
@@ -167,7 +167,12 @@ describe('@arqel-dev/ai i18n', () => {
       <AiTranslateInput
         name="tr"
         value={{ en: 'Hi' }}
-        props={{ languages: ['en', 'pt'], defaultLanguage: 'en', autoTranslate: false, provider: null }}
+        props={{
+          languages: ['en', 'pt'],
+          defaultLanguage: 'en',
+          autoTranslate: false,
+          provider: null,
+        }}
         resource="posts"
         field="tr"
       />,

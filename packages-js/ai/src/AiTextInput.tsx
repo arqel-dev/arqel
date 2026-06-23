@@ -191,9 +191,7 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
     }
   }, [applyGeneratedText, csrfToken, field, formData, generateUrl, resource, t]);
 
-  const triggerLabel = hasGenerated
-    ? t('arqel.ai.regenerate', REGENERATE_LABEL)
-    : buttonLabel;
+  const triggerLabel = hasGenerated ? t('arqel.ai.regenerate', REGENERATE_LABEL) : buttonLabel;
   const charCount = currentValue.length;
 
   return (

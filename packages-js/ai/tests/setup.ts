@@ -16,10 +16,7 @@ const mockPage: MockPageState = {
  * `HandleArqelInertiaRequests` shares `props.i18n.translations`). Pass a
  * nested object (e.g. `{ arqel: { ai: { generate: 'Gerar com IA' } } }`).
  */
-export function setMockTranslations(
-  translations: Record<string, unknown>,
-  locale = 'pt_BR',
-): void {
+export function setMockTranslations(translations: Record<string, unknown>, locale = 'pt_BR'): void {
   mockPage.props = { i18n: { locale, translations } };
 }
 

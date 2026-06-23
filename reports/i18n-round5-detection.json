@@ -1,0 +1,116 @@
+{
+  "total": 19,
+  "confirmed_count": 9,
+  "dupe_count": 1,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "ConnectionStatusBanner status messages hardcoded English, no translation hook",
+      "file": "packages-js/realtime/src/ConnectionStatusBanner.tsx",
+      "line": 29,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.realtime.connecting / arqel.realtime.disconnected / arqel.realtime.failed",
+      "detail": "DEFAULT_MESSAGES maps connection states to hardcoded English literals ('Connecting...', 'Connection lost. Reconnecting...', 'Connection failed. Refresh page.') and AlertDescription renders them verbatim. The component imports no translation hook (no useArqelTranslations). This is a user-facing realtime status banner (role=status, aria-live=polite) shown on every disconnect/failed state, so non-English panels show English connectivity copy. The default banner has no t()-backed override; only the whole-banner renderBanner escape hatch exists. Not in the Rounds 1-4 ledger (which covered FlashToast chrome but not the realtime banner).",
+      "confidence": "high",
+      "why_real": "Verified at packages-js/realtime/src/ConnectionStatusBanner.tsx. DEFAULT_MESSAGES (lines 27-33) hardcodes English connection-state strings ('Connecting...', 'Connection lost. Reconnecting...', 'Connection failed. Refresh page.') and line 101 renders DEFAULT_MESSAGES[status] verbatim in AlertDescription. Imports (lines 1-3) include no translation hook (no useArqelTranslations/t()/__). The component is user-facing: role=status, aria-live=polite (lines 95-96), shown on every disconnect/failed/connecting state. The only override is the whole-banner renderBanner escape hatch (line 22); there is no t()-backed default for the per-status copy, so non-English panels show English connectivity messages. Ledger scan: i18n-fixed-ledger.json has no entry for any packages-js/realtime/ file across rounds 1-4 (it covers FlashToast and other ui/auth/ai/fields components, plus PHP serialization gaps, but not the realtime banner). Novel and reproduces. Consistent with the established defect class (rounds 3-4 flagged the same 'hardcoded English, no t()' pattern in auth pages and AI fields as real)."
+    },
+    {
+      "title": "AiImageInput 'File too large' validation error hardcoded English",
+      "file": "packages-js/ai/src/AiImageInput.tsx",
+      "line": 193,
+      "kind": "validation-i18n",
+      "severity": "med",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.ai.file_too_large",
+      "detail": "setError(`File too large: ${formatBytes(next.size)} (max ${formatBytes(maxFileSize)}).`) is hardcoded English with template interpolation and shown directly to the user on file selection. AiImageInput was NOT among the AI inputs swept in Round 4 (which covered AiTextInput/AiExtractInput/AiSelectInput). No useArqelTranslations t() is used for this path. End-user-facing client validation.",
+      "confidence": "high",
+      "why_real": "Confirmed reproducible and novel. At packages-js/ai/src/AiImageInput.tsx:193, the file-too-large client validation does setError(`File too large: ${formatBytes(next.size)} (max ${formatBytes(maxFileSize)}).`) with a hardcoded English template literal. This error is rendered directly to the user via <AlertDescription>{error}</AlertDescription> at line 421-423, so it is end-user-facing client validation. The component already imports/uses useArqelTranslations (t at line 163) and other setError calls in the same file ARE localized (lines 247/256/271 use t('arqel.ai.analyze_error_*')), proving the wiring exists but was missed for this path — a clear inconsistency, not a dev-only string. Ledger check: Round 4 AI sweep covered AiTextInput.tsx, AiExtractInput.tsx, and AiSelectInput.tsx only; AiImageInput.tsx appears nowhere in the rounds 1-4 ledger, so this is not a duplicate."
+    },
+    {
+      "title": "AiTranslateInput 'Missing translate URL' config error hardcoded English",
+      "file": "packages-js/ai/src/AiTranslateInput.tsx",
+      "line": 189,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.ai.missing_translate_url",
+      "detail": "setError('Missing translate URL: provide `translateUrl` or both `resource` and `field`.') is hardcoded English. The rest of AiTranslateInput correctly uses t() (e.g. arqel.ai.translate_error_http/_invalid/_network), so this literal is an inconsistency gap in an otherwise-localized file. Surfaces in the user-facing error region.",
+      "confidence": "med",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiTranslateInput.tsx:189. The literal setError('Missing translate URL: provide `translateUrl` or both `resource` and `field`.') is set into the `error` state, which is rendered user-facing at lines 354-356 inside an AlertDescription (role=\"alert\" banner per the file's own doc comment at line 21). Every sibling setError call in the same function uses t() with translation keys (arqel.ai.translate_error_http at L214, _invalid at L225, _network at L233), making this an inconsistency gap in an otherwise-localized file. It is not a dev-only string (not console/throw/comment) and not already wired through t(). Novelty: scanned the full ledger (rounds 1-4); there is NO AiTranslateInput.tsx entry anywhere. The round-4 AI-package entries cover only AiTextInput.tsx, AiExtractInput.tsx, and AiSelectInput.tsx. Caveat: the string only fires on a misconfiguration (no translateUrl and not both resource+field), but it still surfaces in the user-facing error region at runtime, so it qualifies as a real user-facing i18n defect. Confidence is med rather than high because the trigger is a configuration-error edge path rather than a normal-use flow."
+    },
+    {
+      "title": "AiSelectInput 'Missing classify URL' config error hardcoded English",
+      "file": "packages-js/ai/src/AiSelectInput.tsx",
+      "line": 165,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.ai.missing_classify_url",
+      "detail": "setError('Missing classify URL: provide `classifyUrl` or both `resource` and `field`.') is hardcoded English. Round 4 ledgered AiSelectInput line 183/186 ('user-facing error strings') but this earlier missing-URL branch at line 165 was not the same literal and remains hardcoded while siblings (classify_error_none/_network) use t().",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/ai/src/AiSelectInput.tsx:165: setError('Missing classify URL: provide `classifyUrl` or both `resource` and `field`.') is a hardcoded English string passed into the `error` state that is rendered user-facing in the UI. The sibling error branches in the same handleClassify callback all use t(): line 187 classify_error_http, line 210 classify_error_none, line 212 classify_error_network. The t function is in scope and already in the deps array, so wiring this literal is trivial and consistent with the established pattern. Ledger scan: the only AiSelectInput entry is Round 4 line 183 ('AI field user-facing error strings hardcoded English'), which maps to the classify_error_http region (now already wired to t() at 187). Line 165 is a DISTINCT literal ('Missing classify URL') in a different branch (the early-return guard when buildClassifyUrl returns null) — no ledger entry references line 165 or this string. Genuinely novel and reproducible. Minor caveat: this branch only fires on field misconfiguration, but it is still rendered to the user (not a throw/console), and the framework localizes its other errors, so it is a legitimate i18n gap, not a dev-only string."
+    },
+    {
+      "title": "RequireTenantFeature plan-restriction message hardcoded English",
+      "file": "packages/tenant/src/Middleware/RequireTenantFeature.php",
+      "line": 60,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel::messages.tenant.feature_unavailable",
+      "detail": "Middleware returns JSON 'message' => \"The '{$feature}' feature is not available on your current plan.\" as a hardcoded English sentence with no __() wrapping. This is a user-facing denial message returned when a tenant hits a gated feature. Should be a translation key with a :feature placeholder.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages/tenant/src/Middleware/RequireTenantFeature.php:60. The 402 JSON response sets 'message' => \"The '{$feature}' feature is not available on your current plan.\" as a hardcoded English sentence with no __() wrapping. The class docblock (lines 27-29) documents this payload is returned to the frontend for upsell flows, so it is genuinely user-facing, not a dev-only/log string. It reproduces unconditionally: any tenant lacking a gated feature receives English regardless of app locale. Not a duplicate: the ledger contains no packages/tenant/ entries across rounds 1-4 (the only tenant-related entry is the JS TenantSwitcher.tsx, a different file/package). It matches the same accepted defect class already in the ledger (round-2 ExportDownloadController.php:41 and LocaleController.php:44 hardcoded abort messages). High confidence."
+    },
+    {
+      "title": "GlobalActivityLogController hardcoded English query-validation JSON messages",
+      "file": "packages/audit/src/Http/Controllers/GlobalActivityLogController.php",
+      "line": 93,
+      "kind": "validation-i18n",
+      "severity": "low",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel::messages.audit.invalid_event / arqel::messages.audit.invalid_date",
+      "detail": "Two 400-response bodies hardcode English: 'event must be one of: ...' (line 93) and 'from/to must be ISO 8601 date strings.' (line 110). These are returned to the client (activity-log filter UI) verbatim with no __() / trans(). Should be translation keys with placeholders.",
+      "confidence": "high",
+      "why_real": "Verified at packages/audit/src/Http/Controllers/GlobalActivityLogController.php. Line 93 returns JSON `'message' => 'event must be one of: '.implode(...).'.'` and line 110 returns `'message' => 'from/to must be ISO 8601 date strings.'`, both inside 400 JsonResponse bodies with no __()/trans() wrapping. These are returned verbatim to the activity-log filter client, so they are genuinely user-facing strings, not dev-only/log strings. The finding is consistent with the same class of defect already accepted in the ledger (round-2 ExportDownloadController abort messages, round-2 LocaleController 'Invalid locale.'). Ledger scan: no entry references GlobalActivityLogController.php; the only audit-related entries are ExportDownloadController.php (export) and LocaleController.php (core, not audit). Therefore novel and not a duplicate. Confidence reduced slightly from full because the activity-log filter UI's actual rendering of these specific error bodies was not located, but they are nevertheless emitted as client-facing response messages."
+    },
+    {
+      "title": "TranslationLoader.loadForLocale does no per-key fallback merge with the default locale — partial locales leak raw keys",
+      "file": "packages/core/src/I18n/TranslationLoader.php",
+      "line": 40,
+      "kind": "plumbing-bug",
+      "severity": "high",
+      "dimension": "plumbing-edge",
+      "suggested_key": "",
+      "detail": "loadForLocale($locale) resolves a SINGLE on-disk locale dir and merges its files; it never merges the default-locale (fallback_locale) values underneath. resolveLocale() only falls back at the directory level (if the whole dir is missing). So a locale dir that exists but is partially translated (e.g. a third-party panel ships resources/lang/es/ with only some keys, or adds a new key to en but not pt_BR) yields a JS dictionary missing those keys, and the React side renders the raw dotted key (translate() returns the key). Laravel's translator honors config('app.fallback_locale') per-key; this custom JS-dictionary loader does not consult it at all (grep for fallback_locale in packages/core/src returns nothing). Repro: add 'foo' => 'Bar' to en/messages.php but not pt_BR/messages.php, switch panel to pt_BR, any UI using messages.foo shows 'messages.foo'.",
+      "confidence": "high",
+      "why_real": "Confirmed by reading packages/core/src/I18n/TranslationLoader.php. loadForLocale() (line 40) resolves a SINGLE on-disk locale dir via resolveLocale() (lines 163-177) and merges only the files inside that one directory (loop lines 46-60). resolveLocale only falls back at the directory level: if the whole normalized dir is missing it uses defaultLocale(), otherwise it uses the existing dir as-is. There is no second pass that merges the default-locale (fallback_locale) values underneath on a per-key basis. grep confirms the loader never consults config('app.fallback_locale') — only directory-level defaultLocale() fallback exists. Consequently a locale dir that exists on disk but is partially translated (third-party panel shipping a partial es/, or a key added to en/messages.php but not pt_BR/messages.php) yields a JS dictionary missing those keys, and the React translate() returns the raw dotted key. The repro is valid: framework ships both en and pt_BR dirs, so the leak manifests on any key-level divergence. This is a genuine user-facing plumbing gap, not a dev-only string. Novelty: the ledger has two TranslationLoader entries — line 71 (availableLocales not validated against on-disk dirs, round 1) and line 28 (validation.php excluded from LANG_FILES, round 1, now resolved). Neither addresses per-key fallback merge against the default locale, so this finding is not a duplicate of rounds 1-4."
+    },
+    {
+      "title": "<html lang> goes stale after a client-side LocaleSwitcher change (Inertia visit, not full reload)",
+      "file": "packages-js/i18n/src/LocaleSwitcher.tsx",
+      "line": 51,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "plumbing-edge",
+      "suggested_key": "",
+      "detail": "The <html lang> attribute is set ONLY by app.blade.php ({{ str_replace('_','-', app()->getLocale()) }}) on a full page load. LocaleSwitcher.handleValueChange uses router.post(endpoint, { locale }, { preserveScroll: true, preserveState: true }) — an Inertia visit that swaps the page component without re-rendering the Blade shell. No client code updates document.documentElement.lang (grep for documentElement.lang / setAttribute('lang') across packages-js returns nothing). Repro: load panel in en, switch to pt_BR via the switcher; the visible UI re-translates from the new i18n prop, but <html lang> stays 'en', so screen readers keep announcing content with the wrong language pronunciation/voice until a hard reload. A SetLocale-aware effect should sync documentElement.lang from props.i18n.locale.",
+      "confidence": "high",
+      "why_real": "Confirmed against source. app.blade.php (packages/core/resources/views/app.blade.php:2) sets <html lang=\"{{ str_replace('_','-', app()->getLocale()) }}\"> server-side only on full page loads. LocaleSwitcher.tsx:51 switches locale via router.post(endpoint, { locale: next }, { preserveScroll: true, preserveState: true }) — an Inertia partial visit that swaps the page component without re-rendering the Blade shell. Grep across packages-js for documentElement returns only ThemeProvider (classList/colorScheme for dark mode) and docs; grep for setAttribute('lang') / .lang= returns nothing; I18nProvider.tsx has no useEffect. So after a client-side locale change the visible UI re-translates from the fresh i18n prop while <html lang> stays stale until a hard reload — screen readers keep announcing content in the prior language. Real a11y/i18n defect, not a dev-only string, not already wired through t(). Novel vs the ledger: rounds 1-4 cover hardcoded strings, formatters, and LocaleController/middleware locale-normalization, but grep of the ledger for documentElement/html lang/lang attribute/pronunciation returns no hits. Fix would be a SetLocale-aware effect syncing document.documentElement.lang from the i18n.locale prop."
+    },
+    {
+      "title": "I18nProvider context translator diverges from useArqelTranslations — two inconsistent t() behaviors in one tree",
+      "file": "packages-js/i18n/src/I18nProvider.tsx",
+      "line": 45,
+      "kind": "plumbing-bug",
+      "severity": "med",
+      "dimension": "plumbing-edge",
+      "suggested_key": "",
+      "detail": "I18nProvider builds value.t via buildTranslator(resolved.translations) from @arqel-dev/i18n's translate.ts (no plural, no locale, no fallback), while @arqel-dev/ui chrome resolves the SAME dictionary through @arqel-dev/react's useArqelTranslations() (plural + Intl.PluralRules + fallback). Same page, same dict, two divergent resolution semantics depending on which hook a component happens to import. A pluralizable/`:count` string renders correctly in framework chrome but breaks in any app component using useI18nContext().t / useTranslation(). The provider should delegate to the same pluralization-aware translate() the react package exposes (and thread `locale` into it) so behavior is uniform.",
+      "confidence": "high",
+      "why_real": "Confirmed and novel. packages-js/i18n/src/I18nProvider.tsx:45 builds the context translator via buildTranslator(resolved.translations) from packages-js/i18n/src/translate.ts:36, which only does dotted-path lookup + :placeholder interpolation — no plural selection, no locale, no count concept (the TranslateFn type in types.ts:16 has no count/plural param at all). useTranslation()/useI18n() (the documented public app-author API, useTranslation.ts) delegate to useI18nContext().t, i.e. this same plural-blind translator. In contrast, @arqel-dev/react's useArqelTranslations.ts -> translate() (packages-js/react/src/utils/translate.ts) implements full Laravel-style plural handling via selectPluralForm + Intl.PluralRules + locale, reading the SAME props.i18n.translations dictionary. Result: a pluralizable key like \"{one} :count item|{other} :count items\" renders correctly in framework chrome (UI consumed via useArqelTranslations) but renders the raw pipe-delimited string verbatim in any app component calling useI18nContext().t / useTranslation() — a visible, user-facing broken-text defect, with two divergent resolution semantics over one dictionary in one tree. The fix is to delegate the provider's t to the same pluralization-aware translate() and thread resolved.locale through it. Novelty: ledger has no entry for I18nProvider.tsx or buildTranslator. Nearest entries are useArqelTranslations.ts:27 (a memoization-identity bug, different file/defect) and TableToolbar.tsx:43 (a \"(s)\" interpolation hack in a UI component, not the i18n provider/translator); neither covers this provider-vs-react-hook semantic divergence. Confidence high on the code facts; the only caveat is whether app authors in practice push pluralizable strings through the i18n-package hook, but since it is the documented public translation API and shares the dictionary that carries plural syntax, the defect genuinely reproduces."
+    }
+  ]
+}

@@ -442,5 +442,677 @@
     "line": 44,
     "title": "LocaleController 'Invalid locale.' abort hardcoded",
     "round": 2
+  },
+  {
+    "file": "packages/table/src/Columns/DateColumn.php",
+    "line": 53,
+    "title": "DateColumn PHP never emits a `timezone` prop (no builder, not in getTypeSpecificProps) \u2014 round-2 JS timezone honoring is dead for table date cells",
+    "round": 3
+  },
+  {
+    "file": "packages-js/fields-js/src/number/CurrencyInput.tsx",
+    "line": 64,
+    "title": "CurrencyInput input/parse path is hardcoded en-US (`Number(raw)` + `String(numeric)`) \u2014 comma-decimal locales cannot type a value",
+    "round": 3
+  },
+  {
+    "file": "packages/fields/src/Types/CurrencyField.php",
+    "line": 164,
+    "title": "CurrencyField separator table omits many comma-decimal locales \u2192 silent en-US fallback",
+    "round": 3
+  },
+  {
+    "file": "packages/export/src/Exporters/FormatsDateCells.php",
+    "line": 43,
+    "title": "Export `since` cell uses Carbon diffForHumans() unbound to the request/panel locale",
+    "round": 3
+  },
+  {
+    "file": "packages-js/auth/src/LoginPage.tsx",
+    "line": 55,
+    "title": "LoginPage: every label/button/link/title hardcoded, no translation hook (arqel.auth.* keys already exist but unused)",
+    "round": 3
+  },
+  {
+    "file": "packages-js/auth/src/RegisterPage.tsx",
+    "line": 49,
+    "title": "RegisterPage: all labels/buttons/links hardcoded English, no t()",
+    "round": 3
+  },
+  {
+    "file": "packages-js/auth/src/ForgotPasswordPage.tsx",
+    "line": 49,
+    "title": "ForgotPasswordPage: hardcoded text mixes PT-BR literals, no t()",
+    "round": 3
+  },
+  {
+    "file": "packages-js/auth/src/VerifyEmailNoticePage.tsx",
+    "line": 31,
+    "title": "VerifyEmailNoticePage: hardcoded PT-BR notice/buttons and English-template intro, no t()",
+    "round": 3
+  },
+  {
+    "file": "packages/auth/src/Http/Requests/RegisterRequest.php",
+    "line": 53,
+    "title": "RegisterRequest throttle message: English sentence passed as the translation key",
+    "round": 3
+  },
+  {
+    "file": "packages/auth/src/Http/Controllers/ForgotPasswordController.php",
+    "line": 44,
+    "title": "ForgotPasswordController status flash: English sentence passed as translation key",
+    "round": 3
+  },
+  {
+    "file": "packages/core/src/Support/InertiaDataBuilder.php",
+    "line": 363,
+    "title": "Resource::getLabel/getPluralLabel serialized verbatim \u2014 never passed through __()",
+    "round": 3
+  },
+  {
+    "file": "packages/nav/src/NavigationGroup.php",
+    "line": 141,
+    "title": "NavigationGroup label serialized verbatim in toArray()",
+    "round": 3
+  },
+  {
+    "file": "packages/nav/src/NavigationItem.php",
+    "line": 212,
+    "title": "NavigationItem label serialized verbatim in toArray()",
+    "round": 3
+  },
+  {
+    "file": "packages-js/ui/src/table/TableToolbar.tsx",
+    "line": 43,
+    "title": "Pluralized count strings use naive interpolation / '(s)' hack instead of plural rules",
+    "round": 3
+  },
+  {
+    "file": "packages-js/fields-js/src/date/DateTimeInput.tsx",
+    "line": 25,
+    "title": "DateTimeInput ignores displayFormat/format/timezone/seconds-display props from DateTimeField",
+    "round": 4
+  },
+  {
+    "file": "packages-js/ui/src/table/cells.tsx",
+    "line": 139,
+    "title": "BooleanCell aria-label hardcodes English 'true'/'false'",
+    "round": 4
+  },
+  {
+    "file": "packages-js/fields-js/src/number/NumberInput.tsx",
+    "line": 66,
+    "title": "NumberInput stepper buttons aria-label hardcoded English 'Increment'/'Decrement'",
+    "round": 4
+  },
+  {
+    "file": "packages-js/versioning/src/VersionTimeline.tsx",
+    "line": 179,
+    "title": "VersionTimeline hardcodes English UI strings ('Initial', 'Compare', 'Restore', 'No versions yet.', aria feed labels)",
+    "round": 4
+  },
+  {
+    "file": "packages-js/auth/src/ResetPasswordPage.tsx",
+    "line": 53,
+    "title": "ResetPasswordPage: every label/button/link/title hardcoded, no t()",
+    "round": 4
+  },
+  {
+    "file": "packages-js/ai/src/AiTextInput.tsx",
+    "line": 57,
+    "title": "AI field default button labels hardcoded English (Generate/Classify/Translate/Extract/Analyze with AI + Regenerate)",
+    "round": 4
+  },
+  {
+    "file": "packages-js/ai/src/AiExtractInput.tsx",
+    "line": 268,
+    "title": "AI field visible action text hardcoded ('Apply', 'Apply all', 'Translate all missing', 'Translate from {x}', 'Source: {x}')",
+    "round": 4
+  },
+  {
+    "file": "packages-js/ai/src/AiSelectInput.tsx",
+    "line": 183,
+    "title": "AI field user-facing error strings hardcoded English",
+    "round": 4
+  },
+  {
+    "file": "packages-js/ai/src/AiTextInput.tsx",
+    "line": 215,
+    "title": "AI status sr-only/aria labels hardcoded (Analyzing/Classifying/Extracting/Generating/Translating)",
+    "round": 4
+  },
+  {
+    "file": "packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 430,
+    "title": "fields-advanced editor controls: every aria-label hardcoded English (Repeater/Wizard/Builder/Markdown/RichText)",
+    "round": 4
+  },
+  {
+    "file": "packages-js/fields-js/src/number/NumberInput.tsx",
+    "line": 66,
+    "title": "fields-js NumberInput/FileInput aria-labels hardcoded English",
+    "round": 4
+  },
+  {
+    "file": "packages-js/versioning/src/VersionTimeline.tsx",
+    "line": 124,
+    "title": "VersionTimeline list aria-labels hardcoded ('Loading versions' / 'Version history')",
+    "round": 4
+  },
+  {
+    "file": "packages-js/ui/src/shadcn/ui/sidebar.tsx",
+    "line": 277,
+    "title": "Vendored shadcn Sidebar toggle a11y text hardcoded ('Toggle Sidebar' / 'Sidebar' / 'Displays the mobile sidebar.')",
+    "round": 4
+  },
+  {
+    "file": "packages/core/src/Resources/Resource.php",
+    "line": 90,
+    "title": "Resource::getPluralLabel pluralizes the ALREADY-translated label with English Str::plural()",
+    "round": 4
+  },
+  {
+    "file": "packages-js/fields-js/src/number/NumberInput.tsx",
+    "line": 66,
+    "title": "NumberInput stepper buttons: aria-label=\"Increment\"/\"Decrement\" hardcoded English",
+    "round": 4
+  },
+  {
+    "file": "packages-js/fields-js/src/file/FileInput.tsx",
+    "line": 39,
+    "title": "FileInput: aria-label=\"File upload\" hardcoded English",
+    "round": 4
+  },
+  {
+    "file": "packages-js/fields-js/src/select/MultiSelectInput.tsx",
+    "line": 50,
+    "title": "MultiSelectInput chip remove button: aria-label built from hardcoded English template `Remove ${label}`",
+    "round": 4
+  },
+  {
+    "file": "packages-js/fields-js/src/relationship/BelongsToInput.tsx",
+    "line": 80,
+    "title": "BelongsToInput: search placeholder built from hardcoded English template `Search ${relatedResource}\u2026`",
+    "round": 4
+  },
+  {
+    "file": "packages-js/realtime/src/ConnectionStatusBanner.tsx",
+    "line": 29,
+    "title": "ConnectionStatusBanner status messages hardcoded English, no translation hook",
+    "round": 5
+  },
+  {
+    "file": "packages-js/ai/src/AiImageInput.tsx",
+    "line": 193,
+    "title": "AiImageInput 'File too large' validation error hardcoded English",
+    "round": 5
+  },
+  {
+    "file": "packages-js/ai/src/AiTranslateInput.tsx",
+    "line": 189,
+    "title": "AiTranslateInput 'Missing translate URL' config error hardcoded English",
+    "round": 5
+  },
+  {
+    "file": "packages-js/ai/src/AiSelectInput.tsx",
+    "line": 165,
+    "title": "AiSelectInput 'Missing classify URL' config error hardcoded English",
+    "round": 5
+  },
+  {
+    "file": "packages/tenant/src/Middleware/RequireTenantFeature.php",
+    "line": 60,
+    "title": "RequireTenantFeature plan-restriction message hardcoded English",
+    "round": 5
+  },
+  {
+    "file": "packages/audit/src/Http/Controllers/GlobalActivityLogController.php",
+    "line": 93,
+    "title": "GlobalActivityLogController hardcoded English query-validation JSON messages",
+    "round": 5
+  },
+  {
+    "file": "packages/core/src/I18n/TranslationLoader.php",
+    "line": 40,
+    "title": "TranslationLoader.loadForLocale does no per-key fallback merge with the default locale \u2014 partial locales leak raw keys",
+    "round": 5
+  },
+  {
+    "file": "packages-js/i18n/src/LocaleSwitcher.tsx",
+    "line": 51,
+    "title": "<html lang> goes stale after a client-side LocaleSwitcher change (Inertia visit, not full reload)",
+    "round": 5
+  },
+  {
+    "file": "packages-js/i18n/src/I18nProvider.tsx",
+    "line": 45,
+    "title": "I18nProvider context translator diverges from useArqelTranslations \u2014 two inconsistent t() behaviors in one tree",
+    "round": 5
+  },
+  {
+    "file": "packages/actions/src/Http/Controllers/ActionController.php",
+    "line": 115,
+    "title": "Action-form validation ignores field labels (custom messages()/attributes()) \u2014 :attribute renders raw snake_case",
+    "round": 6
+  },
+  {
+    "file": "packages/fields/src/Types/SelectField.php",
+    "line": 177,
+    "title": "Select/MultiSelect static & closure option LABELS serialized verbatim \u2014 never passed through __()",
+    "round": 6
+  },
+  {
+    "file": "packages/export/src/Exporters/FormatsDateCells.php",
+    "line": 53,
+    "title": "Export absolute date/datetime cells use raw Carbon ->format() \u2014 textual month/day tokens (F/M/l/D) render in English",
+    "round": 6
+  },
+  {
+    "file": "packages-js/ai/src/AiImageInput.tsx",
+    "line": 114,
+    "title": "AiImageInput file-size display hardcodes en-US decimal and English unit labels (MB/KB/B)",
+    "round": 6
+  },
+  {
+    "file": "packages-js/versioning/src/VersionDiff.tsx",
+    "line": 206,
+    "title": "VersionDiff empty-state text 'No changes to display.' hardcoded English",
+    "round": 6
+  },
+  {
+    "file": "packages-js/versioning/src/VersionDiff.tsx",
+    "line": 179,
+    "title": "VersionDiff 'Modified' badge label hardcoded",
+    "round": 6
+  },
+  {
+    "file": "packages-js/versioning/src/VersionDiff.tsx",
+    "line": 204,
+    "title": "VersionDiff card aria-label 'Field comparison' hardcoded (two occurrences)",
+    "round": 6
+  },
+  {
+    "file": "packages-js/versioning/src/VersionDiff.tsx",
+    "line": 124,
+    "title": "VersionDiff value-cell aria-label 'no previous value'/'no new value' hardcoded",
+    "round": 6
+  },
+  {
+    "file": "packages-js/workflow/src/StateTransition.tsx",
+    "line": 163,
+    "title": "StateTransition empty-state 'No state assigned.' hardcoded English",
+    "round": 6
+  },
+  {
+    "file": "packages-js/workflow/src/StateTransition.tsx",
+    "line": 184,
+    "title": "StateTransition empty-state 'No transitions available.' hardcoded English",
+    "round": 6
+  },
+  {
+    "file": "packages/audit/src/Http/Controllers/RecordActivityController.php",
+    "line": 60,
+    "title": "Audit RecordActivityController 403 'Forbidden' JSON message hardcoded",
+    "round": 6
+  },
+  {
+    "file": "packages/audit/src/Http/Controllers/RecordActivityController.php",
+    "line": 53,
+    "title": "Audit RecordActivityController 400 invalid-subject message hardcoded English",
+    "round": 6
+  },
+  {
+    "file": "packages/audit/src/Http/Controllers/GlobalActivityLogController.php",
+    "line": 77,
+    "title": "Audit GlobalActivityLogController 403 'Forbidden' HttpException message hardcoded",
+    "round": 6
+  },
+  {
+    "file": "packages-js/ui/src/shadcn/ui/dialog.tsx",
+    "line": 74,
+    "title": "Vendored shadcn dialog Close sr-only text hardcoded English",
+    "round": 6
+  },
+  {
+    "file": "packages-js/ui/src/shadcn/ui/sheet.tsx",
+    "line": 78,
+    "title": "Vendored shadcn sheet Close sr-only text hardcoded English",
+    "round": 6
+  },
+  {
+    "file": "packages-js/react/src/utils/translate.ts",
+    "line": 145,
+    "title": "useTranslator() public hook ignores pluralization (count) and locale \u2014 naive output through the documented React translator API",
+    "round": 6
+  },
+  {
+    "file": "packages/core/src/Http/Middleware/SetLocaleMiddleware.php",
+    "line": 80,
+    "title": "Accept-Language parser does not append the language base as a fallback candidate (pt-BR header never matches a 'pt'-only allowlist)",
+    "round": 6
+  },
+  {
+    "file": "apps/marketplace/resources/views/app.blade.php",
+    "line": 14,
+    "title": "Marketplace root Inertia view hardcodes <html lang=\"pt-BR\"> instead of deriving from app()->getLocale() \u2014 SSR/first-paint locale mismatch",
+    "round": 6
+  },
+  {
+    "file": "packages-js/theme/src/ThemeToggle.tsx",
+    "line": 8,
+    "title": "theme-package ThemeToggle aria-label/title hardcoded (PT-BR literal, no translator)",
+    "round": 7
+  },
+  {
+    "file": "packages-js/a11y/src/SkipLink.tsx",
+    "line": 40,
+    "title": "a11y SkipLink default label hardcoded pt-BR",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-js/src/file/ImageInput.tsx",
+    "line": 47,
+    "title": "fields-js ImageInput: alt + visible button text hardcoded English, no translator",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-js/src/file/FileInput.tsx",
+    "line": 65,
+    "title": "fields-js FileInput visible button text 'Choose another file'/'Browse' hardcoded",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-js/src/text/PasswordInput.tsx",
+    "line": 46,
+    "title": "fields-js PasswordInput show/hide toggle aria-label hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/ai/src/AiTextInput.tsx",
+    "line": 155,
+    "title": "AI setError config-error 'Missing generate URL' hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/ai/src/AiExtractInput.tsx",
+    "line": 189,
+    "title": "AI setError config-error 'Missing extract URL' hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/ai/src/AiImageInput.tsx",
+    "line": 230,
+    "title": "AI setError config-error 'Missing analyze URL' hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/ai/src/AiImageInput.tsx",
+    "line": 350,
+    "title": "AiImageInput preview img alt hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/code/CodeInput.tsx",
+    "line": 589,
+    "title": "fields-advanced CodeInput fullscreen toggle aria-label + visible text hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/tags/TagsInput.tsx",
+    "line": 178,
+    "title": "fields-advanced TagsInput chip-remove aria-label hardcoded English template",
+    "round": 7
+  },
+  {
+    "file": "packages/fields-advanced/src/Types/KeyValueField.php",
+    "line": 38,
+    "title": "KeyValueField ships hardcoded English 'Key'/'Value' column labels verbatim",
+    "round": 7
+  },
+  {
+    "file": "packages/form/src/Layout/Tab.php",
+    "line": 76,
+    "title": "Form Tab::$label serialized verbatim \u2014 never passed through __()",
+    "round": 7
+  },
+  {
+    "file": "packages/form/src/Layout/Section.php",
+    "line": 106,
+    "title": "Form Section heading/description serialized verbatim \u2014 never through __()",
+    "round": 7
+  },
+  {
+    "file": "packages/fields-advanced/src/Blocks/Block.php",
+    "line": 78,
+    "title": "fields-advanced Block::label() serialized verbatim in toArray()",
+    "round": 7
+  },
+  {
+    "file": "packages/fields-advanced/src/Steps/Step.php",
+    "line": 138,
+    "title": "Wizard Step label (and English humanization fallback) serialized verbatim",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/key-value/KeyValueInput.tsx",
+    "line": 295,
+    "title": "KeyValueInput is fully un-i18n'd: hardcoded 'Key'/'Value' defaults, 'Add row' visible text, all aria-labels English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/repeater/RepeaterInput.tsx",
+    "line": 516,
+    "title": "RepeaterInput drag/clone/remove/expand-collapse aria-labels still hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/wizard/WizardInput.tsx",
+    "line": 513,
+    "title": "WizardInput step counter + empty-state hardcoded English (nav buttons are keyed, these are not)",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/tags/TagsInput.tsx",
+    "line": 178,
+    "title": "TagsInput is fully un-i18n'd: 'Remove tag' aria-label hardcoded, no translator import",
+    "round": 7
+  },
+  {
+    "file": "packages/marketplace/src/Http/Requests/SubmitPluginRequest.php",
+    "line": 43,
+    "title": "Marketplace SubmitPluginRequest has no messages()/attributes() \u2014 :attribute renders raw snake_case English",
+    "round": 7
+  },
+  {
+    "file": "packages/form/src/Layout/Section.php",
+    "line": 106,
+    "title": "FormSection heading & description serialized verbatim \u2014 never passed through __()",
+    "round": 7
+  },
+  {
+    "file": "packages/form/src/Layout/Tab.php",
+    "line": 76,
+    "title": "Form Tab label serialized verbatim \u2014 never passed through __()",
+    "round": 7
+  },
+  {
+    "file": "packages/fields-advanced/src/Steps/Step.php",
+    "line": 138,
+    "title": "Wizard Step label serialized verbatim \u2014 never passed through __()",
+    "round": 7
+  },
+  {
+    "file": "packages/fields-advanced/src/Blocks/Block.php",
+    "line": 78,
+    "title": "Builder Block label serialized verbatim \u2014 never passed through __()",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/wizard/WizardInput.tsx",
+    "line": 474,
+    "title": "WizardInput per-step aria-label 'Step N: {label}' hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/wizard/WizardInput.tsx",
+    "line": 513,
+    "title": "WizardInput sr-only progress 'Step N of M: {label}' hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/wizard/WizardInput.tsx",
+    "line": 436,
+    "title": "WizardInput empty-state 'No wizard steps configured.' hardcoded English",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/repeater/RepeaterInput.tsx",
+    "line": 633,
+    "title": "RepeaterInput visible '+ Add item' text and 'Remove item N' aria-label hardcoded",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+    "line": 754,
+    "title": "BuilderInput visible '+ Add block' text and 'Remove block N' aria-label hardcoded",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/key-value/KeyValueInput.tsx",
+    "line": 295,
+    "title": "KeyValueInput visible '+ Add row' text and 'Remove row N' aria-label hardcoded",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/rich-text/RichTextInput.tsx",
+    "line": 384,
+    "title": "RichTextInput max-length error message hardcoded English + un-grouped number",
+    "round": 7
+  },
+  {
+    "file": "packages-js/fields-advanced/src/rich-text/RichTextInput.tsx",
+    "line": 393,
+    "title": "RichTextInput character counter 'N / M' emits un-grouped numbers (locale-insensitive)",
+    "round": 7
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-js/src/file/FileInput.tsx",
+    "line": 62,
+    "title": "FileInput drop-zone instruction text hardcoded in English",
+    "round": 8
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ui/src/palette/CommandPalette.tsx",
+    "line": 356,
+    "title": "CommandPalette footer keyboard-hint labels hardcoded in English",
+    "round": 8
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ui/src/palette/CommandPalette.tsx",
+    "line": 357,
+    "title": "CommandPalette 'select' keyboard hint hardcoded",
+    "round": 8
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ui/src/palette/CommandPalette.tsx",
+    "line": 358,
+    "title": "CommandPalette 'esc close' keyboard hint hardcoded",
+    "round": 8
+  },
+  {
+    "file": "packages/table/src/Filters/TrashedFilter.php",
+    "line": 134,
+    "title": "TrashedFilter hardcodes English soft-delete option labels (framework default, never through __())",
+    "round": 8
+  },
+  {
+    "file": "packages/core/src/CommandPalette/Providers/ThemeCommandProvider.php",
+    "line": 35,
+    "title": "ThemeCommandProvider command-palette labels + category hardcoded English (framework)",
+    "round": 8
+  },
+  {
+    "file": "packages/core/src/CommandPalette/Providers/NavigationCommandProvider.php",
+    "line": 118,
+    "title": "NavigationCommandProvider builds 'Go to {label}' command + 'Navigation' category from hardcoded English",
+    "round": 8
+  },
+  {
+    "file": "packages/fields/src/Field.php",
+    "line": 206,
+    "title": "Field placeholder & helperText serialized verbatim \u2014 localizeLabel() applied to label but NOT to placeholder/helperText",
+    "round": 8
+  },
+  {
+    "file": "packages/table/src/Filter.php",
+    "line": 191,
+    "title": "Base table Filter::getLabel() serialized verbatim \u2014 never through __()",
+    "round": 8
+  },
+  {
+    "file": "packages/table/src/Summaries/Summary.php",
+    "line": 121,
+    "title": "QueryBuilder Summary::label serialized verbatim in toArray()",
+    "round": 8
+  },
+  {
+    "file": "packages/table/src/Filters/Constraints/Constraint.php",
+    "line": 105,
+    "title": "QueryBuilder Constraint::toArray serializes label verbatim and raw operator identifiers",
+    "round": 8
+  },
+  {
+    "file": "packages/actions/src/Http/Controllers/ActionController.php",
+    "line": 90,
+    "title": "ActionController bulk invoke aborts with hardcoded 'Missing selection.'",
+    "round": 8
+  },
+  {
+    "file": "packages/tenant/src/Middleware/RequireTenantFeature.php",
+    "line": 46,
+    "title": "RequireTenantFeature aborts with hardcoded 'No current tenant.'",
+    "round": 8
+  },
+  {
+    "file": "packages/fields/src/Http/Controllers/FieldUploadController.php",
+    "line": 66,
+    "title": "FieldUploadController user-facing 4xx upload errors hardcoded English",
+    "round": 8
+  },
+  {
+    "file": "packages/core/resources/views/pulse/ai-tokens.blade.php",
+    "line": 12,
+    "title": "Pulse AI-tokens card: number_format() emits en-US grouping",
+    "round": 8
+  },
+  {
+    "file": "packages/core/resources/views/pulse/ai-tokens.blade.php",
+    "line": 18,
+    "title": "Pulse AI-tokens card: hardcoded '$' USD currency symbol + en-US number_format on cost",
+    "round": 8
+  },
+  {
+    "file": "packages/core/resources/views/pulse/resources.blade.php",
+    "line": 15,
+    "title": "Pulse Resources card: number_format() en-US grouping",
+    "round": 8
+  },
+  {
+    "file": "packages/core/resources/views/pulse/resources.blade.php",
+    "line": 18,
+    "title": "Pulse Resources card: naive English pluralization \"Resource(s)\"",
+    "round": 8
+  },
+  {
+    "file": "packages/core/resources/views/pulse/job-metrics.blade.php",
+    "line": 12,
+    "title": "Pulse Job-metrics card: number_format() en-US grouping (pending/failed)",
+    "round": 8
+  },
+  {
+    "file": "packages/core/resources/views/pulse/top-actions.blade.php",
+    "line": 24,
+    "title": "Pulse Top-actions card: number_format() en-US grouping on count column",
+    "round": 8
   }
 ]

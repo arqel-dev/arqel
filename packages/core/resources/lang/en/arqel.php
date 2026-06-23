@@ -102,6 +102,17 @@ return [
         'decrement' => 'Decrement',
         'file' => [
             'upload' => 'File upload',
+            'browse' => 'Browse',
+            'choose_another' => 'Choose another file',
+        ],
+        'image' => [
+            'preview_alt' => 'Preview',
+            'choose' => 'Choose image',
+            'replace' => 'Replace image',
+        ],
+        'password' => [
+            'show' => 'Show password',
+            'hide' => 'Hide password',
         ],
         'belongsto' => [
             'search' => 'Search :resource…',
@@ -140,6 +151,24 @@ return [
     'tenant' => [
         // Visible + announced fallback name for a tenant with no `name`.
         'unnamed' => 'Tenant :id',
+    ],
+    // aria-label + title tooltip for @arqel-dev/theme's <ThemeToggle>, which
+    // cycles system → light → dark. Each value describes the CURRENT theme and
+    // the theme reached on the next click. Resolved client-side via
+    // useArqelTranslations() with the English literal as fallback.
+    'theme' => [
+        'toggle' => [
+            'system' => 'Theme: system (click for light)',
+            'light' => 'Theme: light (click for dark)',
+            'dark' => 'Theme: dark (click for system)',
+        ],
+    ],
+    // Visible + focusable label for @arqel-dev/a11y's <SkipLink>. The default
+    // skip-to-content link text; a `label` prop still overrides it. Resolved
+    // client-side via useArqelTranslations() with the English literal as
+    // fallback.
+    'a11y' => [
+        'skip_to_content' => 'Skip to main content',
     ],
     // Strings for the @arqel-dev/ai field renderers (AiTextInput,
     // AiSelectInput, AiExtractInput, AiImageInput, AiTranslateInput):
@@ -183,6 +212,10 @@ return [
         'file_too_large' => 'File too large: :size (max :max).',
         'missing_translate_url' => 'Missing translate URL: provide `translateUrl` or both `resource` and `field`.',
         'missing_classify_url' => 'Missing classify URL: provide `classifyUrl` or both `resource` and `field`.',
+        'missing_generate_url' => 'Missing generate URL: provide `generateUrl` or both `resource` and `field`.',
+        'missing_extract_url' => 'Missing extract URL: provide `extractUrl` or both `resource` and `field`.',
+        'missing_analyze_url' => 'Missing analyze URL: provide `analyzeUrl` or both `resource` and `field`.',
+        'selected_preview_alt' => 'Selected preview',
         // sr-only / aria live-region status announcements.
         'status_generating' => 'Generating',
         'status_classifying' => 'Classifying',
@@ -224,12 +257,35 @@ return [
         'repeater_move_up' => 'Move up',
         'repeater_move_down' => 'Move down',
         'repeater_add_item' => 'Add item',
+        'repeater_add_item_label' => '+ Add item',
+        'repeater_drag' => 'Drag to reorder item :number',
+        'repeater_expand' => 'Expand item :number',
+        'repeater_collapse' => 'Collapse item :number',
+        'repeater_clone' => 'Clone item :number',
+        'repeater_remove' => 'Remove item :number',
         'wizard_back' => 'Back',
         'wizard_submit' => 'Submit',
         'wizard_next' => 'Next',
+        'wizard_step_label' => 'Step :number: :label',
+        'wizard_progress' => 'Step :number of :total: :label',
+        'wizard_no_fields' => 'This step has no fields.',
+        'wizard_empty' => 'No wizard steps configured.',
         'builder_close_picker' => 'Close block picker',
         'builder_add_block' => 'Add block',
+        'builder_add_block_label' => '+ Add block',
+        'builder_remove_block' => 'Remove block :number',
+        'keyvalue_key' => 'Key',
+        'keyvalue_value' => 'Value',
+        'keyvalue_add_row' => 'Add :key / :value row',
+        'keyvalue_add_row_label' => '+ Add row',
+        'keyvalue_remove_row' => 'Remove row :number',
+        'tags_remove' => 'Remove tag :tag',
+        'code_enter_fullscreen' => 'Enter fullscreen',
+        'code_exit_fullscreen' => 'Exit fullscreen',
+        'code_fullscreen_short' => 'Full',
+        'code_exit_short' => 'Exit',
         'richtext_toolbar' => 'Formatting toolbar',
+        'richtext_over_limit' => 'Content exceeds the maximum length of :max characters.',
     ],
     // Visible chrome + accessible names for @arqel-dev/versioning's
     // <VersionTimeline>. :id / :user / :relative / :summary feed the per-item
@@ -256,5 +312,27 @@ return [
     'workflow' => [
         'no_state_assigned' => 'No state assigned.',
         'no_transitions' => 'No transitions available.',
+    ],
+    // Localized validation chrome for @arqel-dev/marketplace plugin submission
+    // (SubmitPluginRequest). `attributes` replaces the raw snake_case field
+    // names in :attribute placeholders; `messages` localizes rule failures
+    // independent of the host application's validation lines.
+    'marketplace' => [
+        'attributes' => [
+            'slug' => 'slug',
+            'composer_package' => 'Composer package',
+            'npm_package' => 'npm package',
+            'github_url' => 'GitHub URL',
+            'type' => 'type',
+            'name' => 'name',
+            'description' => 'description',
+            'screenshots' => 'screenshots',
+            'license' => 'license',
+        ],
+        'messages' => [
+            'slug_regex' => 'The slug may only contain lowercase letters, numbers and hyphens.',
+            'composer_package_regex' => 'The Composer package must follow the vendor/name format.',
+            'type_in' => 'The selected type is invalid.',
+        ],
     ],
 ];

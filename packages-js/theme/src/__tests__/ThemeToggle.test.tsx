@@ -3,13 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ThemeProvider } from '../ThemeProvider';
 import { ThemeToggle } from '../ThemeToggle';
-
+import { resetMockPage, setMockTranslations } from './inertia.setup';
 import { installMatchMedia } from './matchMedia.helper';
 
 describe('ThemeToggle', () => {
   beforeEach(() => {
     window.localStorage.clear();
     document.documentElement.classList.remove('dark');
+    resetMockPage();
   });
 
   afterEach(() => {
@@ -17,7 +18,7 @@ describe('ThemeToggle', () => {
     vi.restoreAllMocks();
   });
 
-  it('renderiza com aria-label do tema atual (system default)', () => {
+  it('renderiza com aria-label do tema atual em inglês (fallback, system default)', () => {
     installMatchMedia(false);
     render(
       <ThemeProvider>
@@ -25,8 +26,35 @@ describe('ThemeToggle', () => {
       </ThemeProvider>,
     );
     const button = screen.getByRole('button');
-    expect(button.getAttribute('aria-label')).toMatch(/sistema/);
+    expect(button.getAttribute('aria-label')).toBe('Theme: system (click for light)');
+    expect(button.getAttribute('title')).toBe('Theme: system (click for light)');
     expect(button.getAttribute('data-theme-current')).toBe('system');
+  });
+
+  it('localiza aria-label/title via chaves arqel.theme.toggle.*', () => {
+    installMatchMedia(false);
+    setMockTranslations({
+      arqel: {
+        theme: {
+          toggle: {
+            system: 'Tema: sistema (clique para claro)',
+            light: 'Tema: claro (clique para escuro)',
+            dark: 'Tema: escuro (clique para sistema)',
+          },
+        },
+      },
+    });
+    render(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>,
+    );
+    const button = screen.getByRole('button');
+    expect(button.getAttribute('aria-label')).toBe('Tema: sistema (clique para claro)');
+    expect(button.getAttribute('title')).toBe('Tema: sistema (clique para claro)');
+
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-label')).toBe('Tema: claro (clique para escuro)');
   });
 
   it('cicla system -> light -> dark -> system ao clicar', () => {

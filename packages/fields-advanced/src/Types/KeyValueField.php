@@ -35,9 +35,9 @@ final class KeyValueField extends Field
 
     protected string $component = 'KeyValueInput';
 
-    protected string $keyLabel = 'Key';
+    protected string $keyLabel = 'arqel::fields.keyvalue.key';
 
-    protected string $valueLabel = 'Value';
+    protected string $valueLabel = 'arqel::fields.keyvalue.value';
 
     protected string $keyPlaceholder = '';
 
@@ -174,8 +174,8 @@ final class KeyValueField extends Field
     public function getTypeSpecificProps(): array
     {
         return [
-            'keyLabel' => $this->keyLabel,
-            'valueLabel' => $this->valueLabel,
+            'keyLabel' => self::localizeLabel($this->keyLabel),
+            'valueLabel' => self::localizeLabel($this->valueLabel),
             'keyPlaceholder' => $this->keyPlaceholder,
             'valuePlaceholder' => $this->valuePlaceholder,
             'editableKeys' => $this->editableKeys,
@@ -184,5 +184,24 @@ final class KeyValueField extends Field
             'reorderable' => $this->reorderable,
             'asObject' => $this->asObject,
         ];
+    }
+
+    /**
+     * Resolve a column label through Laravel translation lazily so the active
+     * request locale applies at serialization time. A label that is a
+     * translation key (the framework defaults, or an app-supplied key) renders
+     * in the current locale; a plain literal passes through unchanged (Laravel
+     * trans() returns the key when no translation exists). Falls back to the
+     * raw literal when no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

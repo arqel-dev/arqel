@@ -1,9 +1,14 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { CSSProperties, MouseEvent, ReactElement } from 'react';
 
 export interface SkipLinkProps {
   /** ID do elemento de destino (sem `#`). */
   targetId: string;
-  /** Label visível e acessível. Default: "Pular para o conteúdo principal". */
+  /**
+   * Label visível e acessível. Quando omitido, usa a tradução
+   * `arqel.a11y.skip_to_content` (fallback em inglês "Skip to main content")
+   * resolvida no locale ativo do painel.
+   */
   label?: string;
   /** Classe extra opcional para integração com Tailwind/ShadCN. */
   className?: string;
@@ -35,11 +40,9 @@ const focusStyle: CSSProperties = {
  *
  * Deve ser o primeiro elemento focável do `<body>` (recomendado dentro do layout root).
  */
-export function SkipLink({
-  targetId,
-  label = 'Pular para o conteúdo principal',
-  className,
-}: SkipLinkProps): ReactElement {
+export function SkipLink({ targetId, label, className }: SkipLinkProps): ReactElement {
+  const t = useArqelTranslations();
+  const resolvedLabel = label ?? t('arqel.a11y.skip_to_content', 'Skip to main content');
   const handleClick = (event: MouseEvent<HTMLAnchorElement>): void => {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -71,7 +74,7 @@ export function SkipLink({
       className={className}
       data-arqel-skip-link=""
     >
-      {label}
+      {resolvedLabel}
     </a>
   );
 }

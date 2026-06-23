@@ -27,6 +27,7 @@
  * without a `CodeField` don't pay the ~80KB cost.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import {
   type ChangeEvent,
@@ -435,6 +436,7 @@ export function CodeInput({
   inputId,
   describedBy,
 }: FieldRendererProps) {
+  const t = useArqelTranslations();
   const props = readProps((field as { props?: unknown }).props);
   const hasError = errors !== undefined && errors.length > 0;
   const fallbackId = useId();
@@ -586,10 +588,16 @@ export function CodeInput({
             type="button"
             className={buttonClasses}
             onClick={() => setIsFullscreen((prev) => !prev)}
-            aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+            aria-label={
+              isFullscreen
+                ? t('arqel.fields_advanced.code_exit_fullscreen', 'Exit fullscreen')
+                : t('arqel.fields_advanced.code_enter_fullscreen', 'Enter fullscreen')
+            }
             aria-pressed={isFullscreen}
           >
-            {isFullscreen ? 'Exit' : 'Full'}
+            {isFullscreen
+              ? t('arqel.fields_advanced.code_exit_short', 'Exit')
+              : t('arqel.fields_advanced.code_fullscreen_short', 'Full')}
           </button>
         </div>
 

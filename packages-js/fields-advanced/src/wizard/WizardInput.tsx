@@ -433,7 +433,7 @@ export function WizardInput({
         className="rounded-sm border border-dashed border-[var(--input)] p-4 text-sm text-muted-foreground"
         aria-describedby={describedBy}
       >
-        No wizard steps configured.
+        {t('arqel.fields_advanced.wizard_empty', 'No wizard steps configured.')}
       </div>
     );
   }
@@ -471,7 +471,11 @@ export function WizardInput({
               ? 'border-[var(--input)] text-foreground'
               : 'border-[var(--input)] text-muted-foreground';
           const ariaCurrent: 'step' | undefined = isActive ? 'step' : undefined;
-          const accessibleLabel = `Step ${idx + 1}: ${step.label}`;
+          const accessibleLabel = t(
+            'arqel.fields_advanced.wizard_step_label',
+            `Step ${idx + 1}: ${step.label}`,
+            { number: idx + 1, label: step.label },
+          );
 
           return (
             <li key={step.name}>
@@ -510,14 +514,22 @@ export function WizardInput({
 
       {/* Live region announcing transitions */}
       <div id={statusId} role="status" aria-live="polite" className="sr-only">
-        {currentStep ? `Step ${safeIndex + 1} of ${total}: ${currentStep.label}` : ''}
+        {currentStep
+          ? t(
+              'arqel.fields_advanced.wizard_progress',
+              `Step ${safeIndex + 1} of ${total}: ${currentStep.label}`,
+              { number: safeIndex + 1, total, label: currentStep.label },
+            )
+          : ''}
       </div>
 
       {/* Step body */}
       {currentStep ? (
         <div className="grid grid-cols-1 gap-3 rounded-sm border border-[var(--input)] bg-background p-4">
           {currentStep.schema.length === 0 ? (
-            <p className="text-sm text-muted-foreground">This step has no fields.</p>
+            <p className="text-sm text-muted-foreground">
+              {t('arqel.fields_advanced.wizard_no_fields', 'This step has no fields.')}
+            </p>
           ) : (
             currentStep.schema.map((sub) => {
               const subId = `${baseId}-step-${safeIndex}-${sub.name}`;

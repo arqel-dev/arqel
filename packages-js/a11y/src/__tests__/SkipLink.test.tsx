@@ -1,13 +1,30 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { SkipLink } from '../SkipLink';
+import { setMockTranslations } from './setup';
 
 describe('SkipLink', () => {
-  it('renders an anchor pointing to target id', () => {
+  it('renders an anchor pointing to target id (English fallback default)', () => {
     render(<SkipLink targetId="main" />);
     const link = screen.getByRole('link');
     expect(link.getAttribute('href')).toBe('#main');
-    expect(link.textContent).toBe('Pular para o conteúdo principal');
+    expect(link.textContent).toBe('Skip to main content');
+  });
+
+  it('localizes the default label via arqel.a11y.skip_to_content', () => {
+    setMockTranslations({
+      arqel: { a11y: { skip_to_content: 'Pular para o conteúdo principal' } },
+    });
+    render(<SkipLink targetId="main" />);
+    expect(screen.getByText('Pular para o conteúdo principal')).toBeInTheDocument();
+  });
+
+  it('prefers an explicit label prop over the translated default', () => {
+    setMockTranslations({
+      arqel: { a11y: { skip_to_content: 'Pular para o conteúdo principal' } },
+    });
+    render(<SkipLink targetId="main" label="Custom skip" />);
+    expect(screen.getByText('Custom skip')).toBeInTheDocument();
   });
 
   it('applies focused style when focused', () => {

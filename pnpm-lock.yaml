@@ -299,7 +299,14 @@ importers:
         version: 7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3)
 
   packages-js/a11y:
+    dependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
     devDependencies:
+      '@inertiajs/react':
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.17.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
@@ -902,6 +909,9 @@ importers:
         specifier: workspace:*
         version: link:../react
     devDependencies:
+      '@inertiajs/react':
+        specifier: ^3.0.0
+        version: 3.0.3(axios@1.17.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@testing-library/react':
         specifier: ^16.1.0
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)

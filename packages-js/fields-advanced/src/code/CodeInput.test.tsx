@@ -21,6 +21,14 @@ vi.mock('shiki', () => {
   };
 });
 
+// CodeInput localizes its fullscreen toggle via `useArqelTranslations()`,
+// which reads Inertia's `usePage()`. Stub an empty-props page so the hook
+// falls back to the English literals these assertions expect.
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+});
+
 import { CodeInput } from './CodeInput.js';
 
 interface CodeProps {

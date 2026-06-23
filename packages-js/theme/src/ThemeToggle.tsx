@@ -1,13 +1,19 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ReactNode } from 'react';
 import type { Theme } from './types';
 import { useTheme } from './useTheme';
 
 const CYCLE: readonly Theme[] = ['system', 'light', 'dark'];
 
-const LABELS: Record<Theme, string> = {
-  system: 'Tema: sistema (clique para claro)',
-  light: 'Tema: claro (clique para escuro)',
-  dark: 'Tema: escuro (clique para sistema)',
+/**
+ * English fallbacks for each theme's aria-label/title. The localized values
+ * live in `arqel.theme.toggle.*` (resolved client-side); these literals are
+ * rendered when the dictionary is absent so the accessible name stays stable.
+ */
+const LABEL_FALLBACKS: Record<Theme, string> = {
+  system: 'Theme: system (click for light)',
+  light: 'Theme: light (click for dark)',
+  dark: 'Theme: dark (click for system)',
 };
 
 function nextTheme(current: Theme): Theme {
@@ -82,15 +88,17 @@ export interface ThemeToggleProps {
  */
 export function ThemeToggle({ className }: ThemeToggleProps = {}): ReactNode {
   const { theme, setTheme } = useTheme();
+  const t = useArqelTranslations();
 
   const icon = theme === 'light' ? <SunIcon /> : theme === 'dark' ? <MoonIcon /> : <MonitorIcon />;
+  const label = t(`arqel.theme.toggle.${theme}`, LABEL_FALLBACKS[theme]);
 
   return (
     <button
       type="button"
       onClick={() => setTheme(nextTheme(theme))}
-      aria-label={LABELS[theme]}
-      title={LABELS[theme]}
+      aria-label={label}
+      title={label}
       data-theme-current={theme}
       className={className}
     >

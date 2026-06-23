@@ -101,6 +101,17 @@ return [
         'decrement' => 'Decrementar',
         'file' => [
             'upload' => 'Envio de arquivo',
+            'browse' => 'Procurar',
+            'choose_another' => 'Escolher outro arquivo',
+        ],
+        'image' => [
+            'preview_alt' => 'Pré-visualização',
+            'choose' => 'Escolher imagem',
+            'replace' => 'Substituir imagem',
+        ],
+        'password' => [
+            'show' => 'Mostrar senha',
+            'hide' => 'Ocultar senha',
         ],
         'belongsto' => [
             'search' => 'Buscar :resource…',
@@ -139,6 +150,24 @@ return [
     'tenant' => [
         // Nome de fallback (visível + anunciado) para um tenant sem `name`.
         'unnamed' => 'Tenant :id',
+    ],
+    // aria-label + tooltip (title) do <ThemeToggle> de @arqel-dev/theme, que
+    // alterna sistema → claro → escuro. Cada valor descreve o tema ATUAL e o
+    // tema alcançado no próximo clique. Resolvido no cliente via
+    // useArqelTranslations() com o literal em inglês como fallback.
+    'theme' => [
+        'toggle' => [
+            'system' => 'Tema: sistema (clique para claro)',
+            'light' => 'Tema: claro (clique para escuro)',
+            'dark' => 'Tema: escuro (clique para sistema)',
+        ],
+    ],
+    // Rótulo visível + focável do <SkipLink> de @arqel-dev/a11y. Texto padrão
+    // do link de pular para o conteúdo; a prop `label` ainda o sobrescreve.
+    // Resolvido no cliente via useArqelTranslations() com o literal em inglês
+    // como fallback.
+    'a11y' => [
+        'skip_to_content' => 'Pular para o conteúdo principal',
     ],
     // Strings dos renderizadores de campo do @arqel-dev/ai (AiTextInput,
     // AiSelectInput, AiExtractInput, AiImageInput, AiTranslateInput):
@@ -182,6 +211,10 @@ return [
         'file_too_large' => 'Arquivo muito grande: :size (máx. :max).',
         'missing_translate_url' => 'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
         'missing_classify_url' => 'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+        'missing_generate_url' => 'URL de geração ausente: forneça `generateUrl` ou ambos `resource` e `field`.',
+        'missing_extract_url' => 'URL de extração ausente: forneça `extractUrl` ou ambos `resource` e `field`.',
+        'missing_analyze_url' => 'URL de análise ausente: forneça `analyzeUrl` ou ambos `resource` e `field`.',
+        'selected_preview_alt' => 'Pré-visualização selecionada',
         // Anúncios de status das regiões aria/sr-only.
         'status_generating' => 'Gerando',
         'status_classifying' => 'Classificando',
@@ -222,12 +255,35 @@ return [
         'repeater_move_up' => 'Mover para cima',
         'repeater_move_down' => 'Mover para baixo',
         'repeater_add_item' => 'Adicionar item',
+        'repeater_add_item_label' => '+ Adicionar item',
+        'repeater_drag' => 'Arraste para reordenar o item :number',
+        'repeater_expand' => 'Expandir item :number',
+        'repeater_collapse' => 'Recolher item :number',
+        'repeater_clone' => 'Clonar item :number',
+        'repeater_remove' => 'Remover item :number',
         'wizard_back' => 'Voltar',
         'wizard_submit' => 'Enviar',
         'wizard_next' => 'Avançar',
+        'wizard_step_label' => 'Etapa :number: :label',
+        'wizard_progress' => 'Etapa :number de :total: :label',
+        'wizard_no_fields' => 'Esta etapa não tem campos.',
+        'wizard_empty' => 'Nenhuma etapa do assistente configurada.',
         'builder_close_picker' => 'Fechar seletor de blocos',
         'builder_add_block' => 'Adicionar bloco',
+        'builder_add_block_label' => '+ Adicionar bloco',
+        'builder_remove_block' => 'Remover bloco :number',
+        'keyvalue_key' => 'Chave',
+        'keyvalue_value' => 'Valor',
+        'keyvalue_add_row' => 'Adicionar linha de :key / :value',
+        'keyvalue_add_row_label' => '+ Adicionar linha',
+        'keyvalue_remove_row' => 'Remover linha :number',
+        'tags_remove' => 'Remover tag :tag',
+        'code_enter_fullscreen' => 'Entrar em tela cheia',
+        'code_exit_fullscreen' => 'Sair da tela cheia',
+        'code_fullscreen_short' => 'Tela cheia',
+        'code_exit_short' => 'Sair',
         'richtext_toolbar' => 'Barra de formatação',
+        'richtext_over_limit' => 'O conteúdo excede o comprimento máximo de :max caracteres.',
     ],
     // Chrome visível + nomes acessíveis do <VersionTimeline> de
     // @arqel-dev/versioning. :id / :user / :relative / :summary alimentam o
@@ -252,5 +308,28 @@ return [
     'workflow' => [
         'no_state_assigned' => 'Nenhum estado atribuído.',
         'no_transitions' => 'Nenhuma transição disponível.',
+    ],
+    // Chrome de validação localizado da submissão de plugin do
+    // @arqel-dev/marketplace (SubmitPluginRequest). `attributes` substitui os
+    // nomes de campo em snake_case nos placeholders :attribute; `messages`
+    // localiza falhas de regra independentemente das linhas de validação da
+    // aplicação hospedeira.
+    'marketplace' => [
+        'attributes' => [
+            'slug' => 'slug',
+            'composer_package' => 'pacote Composer',
+            'npm_package' => 'pacote npm',
+            'github_url' => 'URL do GitHub',
+            'type' => 'tipo',
+            'name' => 'nome',
+            'description' => 'descrição',
+            'screenshots' => 'capturas de tela',
+            'license' => 'licença',
+        ],
+        'messages' => [
+            'slug_regex' => 'O slug pode conter apenas letras minúsculas, números e hífens.',
+            'composer_package_regex' => 'O pacote Composer deve seguir o formato vendor/nome.',
+            'type_in' => 'O tipo selecionado é inválido.',
+        ],
     ],
 ];

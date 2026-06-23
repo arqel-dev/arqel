@@ -115,6 +115,14 @@ return [
         'en' => 'English',
         'pt_BR' => 'Português (Brasil)',
     ],
+    // Visible copy for @arqel-dev/realtime's <ConnectionStatusBanner>
+    // (role=status, aria-live=polite). Shown on every WebSocket
+    // disconnect/failed state; keep wording matching the React fallbacks.
+    'realtime' => [
+        'connecting' => 'Connecting...',
+        'disconnected' => 'Connection lost. Reconnecting...',
+        'failed' => 'Connection failed. Refresh page.',
+    ],
     'pagination' => [
         'previous' => 'Previous',
         'next' => 'Next',
@@ -171,6 +179,10 @@ return [
         'translate_error_http' => 'Translation failed (HTTP :status).',
         'translate_error_invalid' => 'Translation failed: invalid response body.',
         'translate_error_network' => 'Translation failed: network error.',
+        // Client-side validation + configuration error banners.
+        'file_too_large' => 'File too large: :size (max :max).',
+        'missing_translate_url' => 'Missing translate URL: provide `translateUrl` or both `resource` and `field`.',
+        'missing_classify_url' => 'Missing classify URL: provide `classifyUrl` or both `resource` and `field`.',
         // sr-only / aria live-region status announcements.
         'status_generating' => 'Generating',
         'status_classifying' => 'Classifying',

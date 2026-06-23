@@ -114,9 +114,21 @@ it('returns 400 for invalid event values', function (): void {
 
     expect($response->getStatusCode())->toBe(400);
 
-    /** @var array{error: string} $payload */
+    /** @var array{error: string, message: string} $payload */
     $payload = $response->getData(true);
-    expect($payload['error'])->toBe('invalid_event');
+    expect($payload['error'])->toBe('invalid_event')
+        ->and($payload['message'])->toBe('event must be one of: created, updated, deleted, restored.');
+});
+
+it('localizes the invalid_event message in pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    $controller = new GlobalActivityLogController;
+    $response = $controller->index(Request::create('/admin/audit/activity?event=hacked', 'GET'));
+
+    /** @var array{message: string} $payload */
+    $payload = $response->getData(true);
+    expect($payload['message'])->toBe('event deve ser um de: created, updated, deleted, restored.');
 });
 
 it('filters by causer_type + causer_id', function (): void {
@@ -171,9 +183,21 @@ it('returns 400 for invalid date strings', function (): void {
 
     expect($response->getStatusCode())->toBe(400);
 
-    /** @var array{error: string} $payload */
+    /** @var array{error: string, message: string} $payload */
     $payload = $response->getData(true);
-    expect($payload['error'])->toBe('invalid_date');
+    expect($payload['error'])->toBe('invalid_date')
+        ->and($payload['message'])->toBe('from/to must be ISO 8601 date strings.');
+});
+
+it('localizes the invalid_date message in pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    $controller = new GlobalActivityLogController;
+    $response = $controller->index(Request::create('/admin/audit/activity?from=not-a-date', 'GET'));
+
+    /** @var array{message: string} $payload */
+    $payload = $response->getData(true);
+    expect($payload['message'])->toBe('from/to devem ser datas no formato ISO 8601.');
 });
 
 it('clamps per_page=999 to 200', function (): void {

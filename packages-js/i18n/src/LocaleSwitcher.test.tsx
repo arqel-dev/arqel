@@ -35,6 +35,17 @@ describe('<LocaleSwitcher>', () => {
     expect(screen.queryByText('arqel.locale.switch')).toBeNull();
   });
 
+  it('syncs document.documentElement.lang to the BCP-47 active locale', () => {
+    document.documentElement.lang = 'en';
+    render(
+      <I18nProvider i18n={{ ...baseProps, locale: 'pt_BR', available: ['en', 'pt_BR'] }}>
+        <LocaleSwitcher />
+      </I18nProvider>,
+    );
+    // Underscore Laravel tag is normalized to a valid BCP-47 language tag.
+    expect(document.documentElement.lang).toBe('pt-BR');
+  });
+
   it('honours an explicit label prop over the translation', () => {
     render(
       <I18nProvider i18n={baseProps}>

@@ -190,7 +190,12 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
       }
 
       if (maxFileSize > 0 && next.size > maxFileSize) {
-        setError(`File too large: ${formatBytes(next.size)} (max ${formatBytes(maxFileSize)}).`);
+        setError(
+          t('arqel.ai.file_too_large', 'File too large: :size (max :max).', {
+            size: formatBytes(next.size),
+            max: formatBytes(maxFileSize),
+          }),
+        );
         setFile(null);
         setPreviewUrl(null);
         return;
@@ -203,7 +208,7 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
         setPreviewUrl(null);
       }
     },
-    [maxFileSize],
+    [maxFileSize, t],
   );
 
   const handleAnalyze = useCallback(async (): Promise<void> => {

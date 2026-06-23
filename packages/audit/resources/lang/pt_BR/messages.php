@@ -1,0 +1,8 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'invalid_event' => 'event deve ser um de: :events.',
+    'invalid_date' => 'from/to devem ser datas no formato ISO 8601.',
+];

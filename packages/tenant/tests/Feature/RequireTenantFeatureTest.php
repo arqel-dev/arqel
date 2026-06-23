@@ -72,6 +72,44 @@ it('returns 402 with structured payload when the feature is not enabled', functi
         ->and($payload['message'])->toContain('analytics');
 });
 
+it('localizes the feature-unavailable message via the arqel translation namespace', function (): void {
+    $tenant = new FeatureGatedTenant(['id' => 1, 'features' => ['reports']]);
+    $middleware = buildFeatureMiddleware($tenant);
+
+    app()->setLocale('en');
+
+    $response = $middleware->handle(
+        Request::create('https://x.test/'),
+        fn () => new Response('should not reach'),
+        'analytics',
+    );
+
+    /** @var Illuminate\Http\JsonResponse $response */
+    $payload = $response->getData(true);
+
+    expect($payload['message'])
+        ->toBe("The 'analytics' feature is not available on your current plan.");
+});
+
+it('returns the pt_BR feature-unavailable message when the request locale is pt_BR', function (): void {
+    $tenant = new FeatureGatedTenant(['id' => 1, 'features' => ['reports']]);
+    $middleware = buildFeatureMiddleware($tenant);
+
+    app()->setLocale('pt_BR');
+
+    $response = $middleware->handle(
+        Request::create('https://x.test/'),
+        fn () => new Response('should not reach'),
+        'analytics',
+    );
+
+    /** @var Illuminate\Http\JsonResponse $response */
+    $payload = $response->getData(true);
+
+    expect($payload['message'])
+        ->toBe("O recurso 'analytics' não está disponível no seu plano atual.");
+});
+
 it('lets the request through when the feature is enabled', function (): void {
     $tenant = new FeatureGatedTenant(['id' => 1, 'features' => ['analytics']]);
     $middleware = buildFeatureMiddleware($tenant);

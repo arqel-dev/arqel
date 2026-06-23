@@ -42,7 +42,10 @@ export function I18nProvider({
       locale: resolved.locale,
       available: resolved.available,
       translations: resolved.translations,
-      t: buildTranslator(resolved.translations),
+      // Thread the active locale (normalized to BCP-47) so the translator's
+      // pluralization matches the rendered language and agrees with
+      // `useArqelTranslations()`.
+      t: buildTranslator(resolved.translations, resolved.locale.replace(/_/g, '-')),
     }),
     [resolved.locale, resolved.available, resolved.translations],
   );

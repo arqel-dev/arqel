@@ -57,7 +57,7 @@ final class RequireTenantFeature
             return new JsonResponse([
                 'error' => 'feature_not_available',
                 'feature' => $feature,
-                'message' => "The '{$feature}' feature is not available on your current plan.",
+                'message' => (string) __('arqel::messages.tenant.feature_unavailable', ['feature' => $feature]),
             ], Response::HTTP_PAYMENT_REQUIRED);
         }
 

@@ -90,7 +90,9 @@ final class GlobalActivityLogController extends Controller
         if ($event !== null && ! in_array($event, self::ALLOWED_EVENTS, true)) {
             return new JsonResponse([
                 'error' => 'invalid_event',
-                'message' => 'event must be one of: '.implode(', ', self::ALLOWED_EVENTS).'.',
+                'message' => (string) __('arqel-audit::messages.invalid_event', [
+                    'events' => implode(', ', self::ALLOWED_EVENTS),
+                ]),
             ], 400);
         }
 
@@ -107,7 +109,7 @@ final class GlobalActivityLogController extends Controller
         } catch (Throwable) {
             return new JsonResponse([
                 'error' => 'invalid_date',
-                'message' => 'from/to must be ISO 8601 date strings.',
+                'message' => (string) __('arqel-audit::messages.invalid_date'),
             ], 400);
         }
 

@@ -1,10 +1,14 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { reload } = vi.hoisted(() => ({ reload: vi.fn() }));
+const { reload, pageProps } = vi.hoisted(() => ({
+  reload: vi.fn(),
+  pageProps: { current: {} as Record<string, unknown> },
+}));
 
 vi.mock('@inertiajs/react', () => ({
   router: { reload },
+  usePage: () => ({ props: pageProps.current }),
 }));
 
 import { ConnectionStatusBanner } from './ConnectionStatusBanner';
@@ -49,9 +53,11 @@ describe('ConnectionStatusBanner', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     reload.mockClear();
+    pageProps.current = {};
   });
 
   afterEach(() => {
+    cleanup();
     delete (window as unknown as WindowWithEcho).Echo;
     vi.useRealTimers();
   });
@@ -86,6 +92,68 @@ describe('ConnectionStatusBanner', () => {
     expect(banner.getAttribute('aria-live')).toBe('polite');
     expect(banner.getAttribute('data-status')).toBe('disconnected');
     expect(banner.textContent).toContain('Connection lost');
+  });
+
+  it('renders the localized status message from props.i18n.translations', () => {
+    pageProps.current = {
+      i18n: {
+        locale: 'pt_BR',
+        available: ['pt_BR'],
+        translations: {
+          arqel: {
+            realtime: {
+              disconnected: 'Conexão perdida. Reconectando...',
+              failed: 'Falha na conexão. Atualize a página.',
+            },
+          },
+        },
+      },
+    };
+    const conn = makeFakeConnection('connecting');
+    installEcho(conn);
+
+    render(<ConnectionStatusBanner />);
+    act(() => conn.fire('connected'));
+    act(() => conn.fire('disconnected'));
+
+    const banner = screen.getByRole('status');
+    expect(banner.textContent).toContain('Conexão perdida. Reconectando...');
+    // The hardcoded English literal must not leak when a translation exists.
+    expect(banner.textContent).not.toContain('Connection lost');
+  });
+
+  it('falls back to the English literal when no translation prop is present', () => {
+    const conn = makeFakeConnection('connecting');
+    installEcho(conn);
+
+    render(<ConnectionStatusBanner />);
+    act(() => conn.fire('connected'));
+    act(() => conn.fire('disconnected'));
+
+    // No i18n prop → fallback keeps the original accessible name.
+    expect(screen.getByRole('status').textContent).toContain('Connection lost. Reconnecting...');
+  });
+
+  it('localizes the failed state through arqel.realtime.failed', () => {
+    pageProps.current = {
+      i18n: {
+        locale: 'pt_BR',
+        available: ['pt_BR'],
+        translations: {
+          arqel: { realtime: { failed: 'Falha na conexão. Atualize a página.' } },
+        },
+      },
+    };
+    const conn = makeFakeConnection('connecting');
+    installEcho(conn);
+
+    render(<ConnectionStatusBanner />);
+    act(() => conn.fire('connected'));
+    act(() => conn.fire('failed'));
+
+    const banner = screen.getByRole('status');
+    expect(banner.getAttribute('data-status')).toBe('failed');
+    expect(banner.textContent).toContain('Falha na conexão. Atualize a página.');
   });
 
   it('chama renderBanner com status e retryCount quando fornecido', () => {

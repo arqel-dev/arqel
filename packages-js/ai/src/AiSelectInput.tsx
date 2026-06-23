@@ -162,7 +162,12 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
   const handleClassify = useCallback(async (): Promise<void> => {
     const url = buildClassifyUrl(classifyUrl, resource, field);
     if (url === null) {
-      setError('Missing classify URL: provide `classifyUrl` or both `resource` and `field`.');
+      setError(
+        t(
+          'arqel.ai.missing_classify_url',
+          'Missing classify URL: provide `classifyUrl` or both `resource` and `field`.',
+        ),
+      );
       return;
     }
 

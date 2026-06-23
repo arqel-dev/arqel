@@ -38,4 +38,7 @@ return [
     'locale' => [
         'invalid' => 'Invalid locale.',
     ],
+    'tenant' => [
+        'feature_unavailable' => "The ':feature' feature is not available on your current plan.",
+    ],
 ];

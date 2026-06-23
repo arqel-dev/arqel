@@ -1,3 +1,4 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Alert, AlertDescription } from '@arqel-dev/ui';
 import type { ReactNode } from 'react';
 import { type ConnectionStatus, useConnectionStatus } from './useConnectionStatus';
@@ -24,12 +25,22 @@ export interface ConnectionStatusBannerProps {
   className?: string;
 }
 
-const DEFAULT_MESSAGES: Record<ConnectionStatus, string> = {
-  connected: '',
-  connecting: 'Connecting...',
-  disconnected: 'Connection lost. Reconnecting...',
-  failed: 'Connection failed. Refresh page.',
-  unavailable: '',
+/**
+ * Maps each connection state to its translation key and the English literal
+ * used as a fallback when the key is absent from the shared dictionary (a
+ * non-Arqel page or a translation gap). Resolved through
+ * `useArqelTranslations()` at render time so the active panel locale applies
+ * to this `role=status` / `aria-live` banner.
+ */
+const STATUS_MESSAGE: Record<ConnectionStatus, { key: string; fallback: string }> = {
+  connected: { key: '', fallback: '' },
+  connecting: { key: 'arqel.realtime.connecting', fallback: 'Connecting...' },
+  disconnected: {
+    key: 'arqel.realtime.disconnected',
+    fallback: 'Connection lost. Reconnecting...',
+  },
+  failed: { key: 'arqel.realtime.failed', fallback: 'Connection failed. Refresh page.' },
+  unavailable: { key: '', fallback: '' },
 };
 
 type AlertVariant = 'default' | 'destructive';
@@ -69,6 +80,7 @@ const STATUS_TONE: Record<ConnectionStatus, string> = {
 export function ConnectionStatusBanner(props: ConnectionStatusBannerProps): ReactNode {
   const { pollOnDisconnect, pollIntervalMs, pollOnly, renderBanner, className } = props;
   const { status, retryCount } = useConnectionStatus();
+  const t = useArqelTranslations();
 
   const pollingOptions: {
     enabled: boolean;
@@ -98,7 +110,9 @@ export function ConnectionStatusBanner(props: ConnectionStatusBannerProps): Reac
       data-arqel-connection-banner=""
       className={[STATUS_TONE[status], className].filter(Boolean).join(' ')}
     >
-      <AlertDescription>{DEFAULT_MESSAGES[status]}</AlertDescription>
+      <AlertDescription>
+        {t(STATUS_MESSAGE[status].key, STATUS_MESSAGE[status].fallback)}
+      </AlertDescription>
     </Alert>
   );
 }

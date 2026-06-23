@@ -60,6 +60,36 @@ it('falls back to the default locale when target locale is missing', function ()
     expect($payload['arqel']['actions']['create'])->toBe('Create');
 });
 
+it('falls back per-key to the default locale for a partial target locale', function (): void {
+    // A partially translated locale dir (exists on disk but omits keys) must
+    // inherit the default-locale string per key instead of leaking the raw
+    // dotted key to the React side. We synthesise a deliberately partial `zz`
+    // locale that overrides a single key and omits everything else.
+    config()->set('arqel.i18n.default', 'en');
+
+    $langDir = dirname(__DIR__, 3).'/resources/lang/zz';
+    mkdir($langDir, 0o755, true);
+    file_put_contents(
+        $langDir.'/actions.php',
+        "<?php\n\nreturn ['create' => 'ZZ-Create'];\n",
+    );
+
+    try {
+        $loader = app(TranslationLoader::class);
+        $payload = $loader->loadForLocale('zz');
+
+        // Overridden key wins.
+        expect($payload['actions']['create'])->toBe('ZZ-Create')
+            // Omitted key falls back to the default-locale value, NOT the raw key.
+            ->and($payload['actions']['delete'])->toBe('Delete')
+            // A whole lang file omitted by the partial locale still resolves.
+            ->and($payload['arqel']['actions']['create'])->toBe('Create');
+    } finally {
+        unlink($langDir.'/actions.php');
+        rmdir($langDir);
+    }
+});
+
 it('returns the default available locales', function (): void {
     $loader = app(TranslationLoader::class);
 

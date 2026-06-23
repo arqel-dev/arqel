@@ -38,10 +38,10 @@ final class Actions
             ->color(Action::COLOR_DESTRUCTIVE)
             ->variant(Action::VARIANT_GHOST)
             ->requiresConfirmation()
-            ->modalHeading('Delete record?')
-            ->modalDescription('This action cannot be undone.')
+            ->modalHeading('arqel::actions.delete_confirm.heading')
+            ->modalDescription('arqel::actions.delete_confirm.description')
             ->modalColor(Action::MODAL_COLOR_DESTRUCTIVE)
-            ->modalSubmitButtonLabel('Delete');
+            ->modalSubmitButtonLabel('arqel::actions.delete');
     }
 
     public static function restore(): RowAction
@@ -68,9 +68,9 @@ final class Actions
             ->color(Action::COLOR_DESTRUCTIVE)
             ->variant(Action::VARIANT_OUTLINE)
             ->requiresConfirmation()
-            ->modalHeading('Delete selected records?')
-            ->modalDescription('This action cannot be undone.')
+            ->modalHeading('arqel::actions.delete_bulk.heading')
+            ->modalDescription('arqel::actions.delete_bulk.description')
             ->modalColor(Action::MODAL_COLOR_DESTRUCTIVE)
-            ->modalSubmitButtonLabel('Delete');
+            ->modalSubmitButtonLabel('arqel::actions.delete');
     }
 }

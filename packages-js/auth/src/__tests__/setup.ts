@@ -34,6 +34,16 @@ export function setMockPageProps(props: Record<string, unknown>): void {
   mockPage.props = props;
 }
 
+/**
+ * Install a translation dictionary into the mocked Inertia `i18n` prop so
+ * `useArqelTranslations()` resolves keys against it (mirroring how
+ * `HandleArqelInertiaRequests` shares `props.i18n.translations`). Pass a
+ * nested object (e.g. `{ arqel: { auth: { login_title: 'Bem-vindo' } } }`).
+ */
+export function setMockTranslations(translations: Record<string, unknown>, locale = 'pt_BR'): void {
+  mockPage.props = { flash: {}, i18n: { locale, translations } };
+}
+
 export function resetMockForm(): void {
   mockState.data = {};
   mockState.errors = {};

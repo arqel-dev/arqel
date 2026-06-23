@@ -1,3 +1,4 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   Button,
   Card,
@@ -46,11 +47,12 @@ export function RegisterPage({
   canLogin = true,
   registerUrl = '/admin/register',
   loginUrl = '/admin/login',
-  title = 'Create an account',
-  description = 'Sign up to access the admin panel',
+  title,
+  description,
   heroImageSrc = '/login-hero.svg',
-  heroImageAlt = 'Register illustration',
+  heroImageAlt,
 }: RegisterPageProps): ReactElement {
+  const t = useArqelTranslations();
   const { data, setData, post, processing, errors, reset } = useForm<RegisterFormData>({
     name: '',
     email: '',
@@ -73,12 +75,17 @@ export function RegisterPage({
             <form onSubmit={handleSubmit} className="p-6 md:p-8" noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <h1 className="text-2xl font-bold">{title}</h1>
-                  <p className="text-balance text-muted-foreground">{description}</p>
+                  <h1 className="text-2xl font-bold">
+                    {title ?? t('arqel.auth.register_title', 'Create an account')}
+                  </h1>
+                  <p className="text-balance text-muted-foreground">
+                    {description ??
+                      t('arqel.auth.register_description', 'Sign up to access the admin panel')}
+                  </p>
                 </div>
 
                 <Field>
-                  <FieldLabel htmlFor="name">Name</FieldLabel>
+                  <FieldLabel htmlFor="name">{t('arqel.auth.name', 'Name')}</FieldLabel>
                   <Input
                     id="name"
                     type="text"
@@ -93,7 +100,7 @@ export function RegisterPage({
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <FieldLabel htmlFor="email">{t('arqel.auth.email', 'Email')}</FieldLabel>
                   <Input
                     id="email"
                     type="email"
@@ -108,7 +115,7 @@ export function RegisterPage({
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">{t('arqel.auth.password', 'Password')}</FieldLabel>
                   <Input
                     id="password"
                     type="password"
@@ -123,7 +130,9 @@ export function RegisterPage({
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="password_confirmation">Confirm password</FieldLabel>
+                  <FieldLabel htmlFor="password_confirmation">
+                    {t('arqel.auth.confirm_password', 'Confirm password')}
+                  </FieldLabel>
                   <Input
                     id="password_confirmation"
                     type="password"
@@ -137,15 +146,17 @@ export function RegisterPage({
 
                 <Field>
                   <Button type="submit" disabled={processing}>
-                    {processing ? 'Creating account…' : 'Create account'}
+                    {processing
+                      ? t('arqel.auth.register_submitting', 'Creating account…')
+                      : t('arqel.auth.register_submit', 'Create account')}
                   </Button>
                 </Field>
 
                 {canLogin ? (
                   <FieldDescription className="text-center">
-                    Already have an account?{' '}
+                    {t('arqel.auth.have_account', 'Already have an account?')}{' '}
                     <a href={loginUrl} className="underline underline-offset-4">
-                      Sign in
+                      {t('arqel.auth.sign_in', 'Sign in')}
                     </a>
                   </FieldDescription>
                 ) : null}
@@ -155,7 +166,7 @@ export function RegisterPage({
             <div className="bg-primary/10 relative hidden md:block">
               <img
                 src={heroImageSrc}
-                alt={heroImageAlt}
+                alt={heroImageAlt ?? t('arqel.auth.register_hero_alt', 'Register illustration')}
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>

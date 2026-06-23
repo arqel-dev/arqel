@@ -5,6 +5,88 @@ export type TranslationDictionary = Record<string, unknown>;
 export interface TranslateOptions {
   /** Substitution map for `:placeholder` tokens. */
   replacements?: Record<string, string | number>;
+  /**
+   * When set, the resolved value is treated as a pluralizable string and the
+   * matching form is selected for this count before `:placeholder` tokens are
+   * substituted. See {@link selectPluralForm} for the supported syntax.
+   */
+  count?: number;
+  /** BCP-47 locale tag driving `Intl.PluralRules` (defaults to `'en'`). */
+  locale?: string;
+}
+
+/**
+ * Pick the correct plural form from a Laravel-style pluralizable string.
+ *
+ * A pluralizable value is a list of forms separated by `|`. Each form may be
+ * prefixed by an explicit selector so authors keep full control per locale:
+ *
+ *   - `{0} ...` / `{1} ...` — exact-count match.
+ *   - `[2,*] ...` / `[2,4] ...` — inclusive numeric range (`*` = unbounded).
+ *   - `{one} ...` / `{other} ...` — CLDR category (matched via `Intl.PluralRules`).
+ *
+ * Forms without a selector fall back to positional order
+ * (`singular|plural` → index 0 for `one`, index 1 otherwise), matching
+ * Laravel's `trans_choice` convention. This lets `pt_BR` declare three forms
+ * while `en` declares two, with the right one chosen per the active locale.
+ */
+export function selectPluralForm(value: string, count: number, locale?: string): string {
+  const forms = value.split('|').map((segment) => segment.trim());
+  if (forms.length === 1) {
+    return forms[0] ?? value;
+  }
+
+  const tagged: Array<{ selector: string | null; text: string }> = forms.map((form) => {
+    const exact = /^\{\s*(-?\d+|one|other|zero|two|few|many)\s*\}\s*(.*)$/s.exec(form);
+    if (exact) {
+      return { selector: (exact[1] ?? '').trim(), text: (exact[2] ?? '').trim() };
+    }
+    const range = /^\[\s*(-?\d+)\s*,\s*(\*|-?\d+)\s*\]\s*(.*)$/s.exec(form);
+    if (range) {
+      const low = Number(range[1]);
+      const highRaw = range[2] ?? '*';
+      const high = highRaw === '*' ? Number.POSITIVE_INFINITY : Number(highRaw);
+      if (count >= low && count <= high) {
+        return { selector: '__range_match__', text: (range[3] ?? '').trim() };
+      }
+      return { selector: '__range_nomatch__', text: (range[3] ?? '').trim() };
+    }
+    return { selector: null, text: form };
+  });
+
+  // 1. Exact numeric / matched-range selectors win.
+  for (const form of tagged) {
+    if (form.selector === String(count) || form.selector === '__range_match__') {
+      return form.text;
+    }
+  }
+
+  // 2. CLDR category via Intl.PluralRules, when forms are category-tagged.
+  let category = 'other';
+  try {
+    category = new Intl.PluralRules(locale ?? 'en').select(count);
+  } catch {
+    category = count === 1 ? 'one' : 'other';
+  }
+  const byCategory = tagged.find((form) => form.selector === category);
+  if (byCategory) {
+    return byCategory.text;
+  }
+  const otherCategory = tagged.find((form) => form.selector === 'other');
+  if (otherCategory) {
+    return otherCategory.text;
+  }
+
+  // 3. Positional fallback (`singular|plural`): index 0 for `one`, else last.
+  const positional = tagged.filter((form) => form.selector === null);
+  if (positional.length > 0) {
+    if (category === 'one' && positional[0]) {
+      return positional[0].text;
+    }
+    return (positional[positional.length - 1] ?? positional[0])?.text ?? value;
+  }
+
+  return tagged[tagged.length - 1]?.text ?? value;
 }
 
 /**
@@ -49,7 +131,10 @@ export function translate(
     return key;
   }
 
-  return applyReplacements(value, options?.replacements);
+  const form =
+    options?.count === undefined ? value : selectPluralForm(value, options.count, options.locale);
+
+  return applyReplacements(form, options?.replacements);
 }
 
 /**

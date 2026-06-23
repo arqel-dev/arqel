@@ -77,17 +77,21 @@ abstract class Resource implements HasActions, HasFields, HasResource
 
     public static function getLabel(): string
     {
-        return static::$label ?? Str::of(class_basename(static::getModel()))
+        $label = static::$label ?? Str::of(class_basename(static::getModel()))
             ->snake(' ')
             ->title()
             ->toString();
+
+        return static::localizeLabel($label);
     }
 
     public static function getPluralLabel(): string
     {
-        return static::$pluralLabel ?? Str::of(static::getLabel())
+        $label = static::$pluralLabel ?? Str::of(static::getLabel())
             ->plural()
             ->toString();
+
+        return static::localizeLabel($label);
     }
 
     public static function getNavigationIcon(): ?string
@@ -97,7 +101,27 @@ abstract class Resource implements HasActions, HasFields, HasResource
 
     public static function getNavigationGroup(): ?string
     {
-        return static::$navigationGroup;
+        $group = static::$navigationGroup;
+
+        return $group === null ? null : static::localizeLabel($group);
+    }
+
+    /**
+     * Resolve a label through Laravel translation lazily so the active request
+     * locale applies at serialization time. A label that is a translation key
+     * renders in the current locale; a plain literal passes through unchanged
+     * (Laravel __() returns the key when no translation exists). Falls back to
+     * the raw literal when no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 
     public static function getNavigationSort(): ?int

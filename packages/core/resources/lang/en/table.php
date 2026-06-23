@@ -50,7 +50,9 @@ return [
         'date_to' => ':label to',
     ],
     'bulk' => [
-        'selected' => ':count selected',
+        // Pluralizable: the JS translator selects the form via Intl.PluralRules
+        // ({one}/{other}) so "1 selected" never reads "1 selected(s)".
+        'selected' => '{one} :count selected|{other} :count selected',
         'select_all' => 'Select all',
         // Accessible name for the header select-all checkbox (vs the short menu label above).
         'select_all_rows' => 'Select all rows',

@@ -391,6 +391,9 @@ importers:
 
   packages-js/auth:
     devDependencies:
+      '@arqel-dev/react':
+        specifier: workspace:*
+        version: link:../react
       '@arqel-dev/ui':
         specifier: workspace:*
         version: link:../ui

@@ -1,3 +1,4 @@
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import {
   Button,
   Card,
@@ -46,11 +47,12 @@ interface PageProps {
 export function ForgotPasswordPage({
   forgotPasswordUrl = '/admin/forgot-password',
   loginUrl = '/admin/login',
-  title = 'Recuperar senha',
-  description = 'Enviaremos um link de redefinição para o seu e-mail',
+  title,
+  description,
   heroImageSrc = '/login-hero.svg',
-  heroImageAlt = 'Forgot password illustration',
+  heroImageAlt,
 }: ForgotPasswordPageProps): ReactElement {
+  const t = useArqelTranslations();
   const { data, setData, post, processing, errors } = useForm<ForgotPasswordFormData>({
     email: '',
   });
@@ -71,8 +73,13 @@ export function ForgotPasswordPage({
             <form onSubmit={handleSubmit} className="p-6 md:p-8" noValidate>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <h1 className="text-2xl font-bold">{title}</h1>
-                  <p className="text-balance text-muted-foreground">{description}</p>
+                  <h1 className="text-2xl font-bold">
+                    {title ?? t('arqel.auth.forgot_title', 'Recover password')}
+                  </h1>
+                  <p className="text-balance text-muted-foreground">
+                    {description ??
+                      t('arqel.auth.forgot_description', 'We will send a reset link to your email')}
+                  </p>
                 </div>
 
                 {status ? (
@@ -82,7 +89,7 @@ export function ForgotPasswordPage({
                 ) : null}
 
                 <Field>
-                  <FieldLabel htmlFor="email">E-mail</FieldLabel>
+                  <FieldLabel htmlFor="email">{t('arqel.auth.email', 'Email')}</FieldLabel>
                   <Input
                     id="email"
                     type="email"
@@ -98,13 +105,15 @@ export function ForgotPasswordPage({
 
                 <Field>
                   <Button type="submit" disabled={processing}>
-                    {processing ? 'Enviando…' : 'Enviar link de reset'}
+                    {processing
+                      ? t('arqel.auth.forgot_submitting', 'Sending…')
+                      : t('arqel.auth.forgot_submit', 'Send reset link')}
                   </Button>
                 </Field>
 
                 <FieldDescription className="text-center">
                   <a href={loginUrl} className="underline underline-offset-4">
-                    Voltar ao login
+                    {t('arqel.auth.back_to_login', 'Back to login')}
                   </a>
                 </FieldDescription>
               </FieldGroup>
@@ -113,7 +122,9 @@ export function ForgotPasswordPage({
             <div className="bg-primary/10 relative hidden md:block">
               <img
                 src={heroImageSrc}
-                alt={heroImageAlt}
+                alt={
+                  heroImageAlt ?? t('arqel.auth.forgot_hero_alt', 'Forgot password illustration')
+                }
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>

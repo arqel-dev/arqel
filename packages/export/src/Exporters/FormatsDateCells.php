@@ -38,13 +38,36 @@ trait FormatsDateCells
         $mode = is_array($props) ? ($props['mode'] ?? 'date') : 'date';
 
         if ($mode === 'since') {
-            // Mirror the React `since` cell ("2 days ago"). The absolute value
-            // is still recoverable from the source data when needed.
-            return Carbon::instance($value)->diffForHumans();
+            // Mirror the React `since` cell ("há 2 dias"). Bind Carbon to the
+            // active application/request locale so the exported relative string
+            // matches the now-localized on-screen cell instead of Carbon's
+            // process-global default ('en'). The absolute value is still
+            // recoverable from the source data when needed.
+            return Carbon::instance($value)
+                ->locale($this->activeLocale())
+                ->diffForHumans();
         }
 
         $format = is_array($props) ? ($props['format'] ?? 'Y-m-d') : 'Y-m-d';
 
         return $value->format(is_string($format) ? $format : 'Y-m-d');
+    }
+
+    /**
+     * Resolve the active application locale for relative-date binding,
+     * normalised to Carbon's underscore form (`pt_BR`). Falls back to
+     * `en` when no translator is booted (bare unit context).
+     */
+    private function activeLocale(): string
+    {
+        if (function_exists('app') && app()->bound('translator')) {
+            $resolved = app()->getLocale();
+
+            if ($resolved !== '') {
+                return str_replace('-', '_', $resolved);
+            }
+        }
+
+        return 'en';
     }
 }

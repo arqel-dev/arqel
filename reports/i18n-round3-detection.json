@@ -1,0 +1,172 @@
+{
+  "total": 23,
+  "confirmed_count": 14,
+  "dupe_count": 2,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "DateColumn PHP never emits a `timezone` prop (no builder, not in getTypeSpecificProps) — round-2 JS timezone honoring is dead for table date cells",
+      "file": "packages/table/src/Columns/DateColumn.php",
+      "line": 53,
+      "kind": "plumbing-bug",
+      "severity": "high",
+      "dimension": "next-layer",
+      "detail": "getTypeSpecificProps() returns only ['mode','format']; there is no timezone()/getTimezone() and no 'timezone' key. But cells.tsx:155 reads `column.props.timezone` and DateColumnProps (types/src/tables.ts:75) declares `timezone?`. So the round-2 fix that made DateCell honor a server timezone (Intl.DateTimeFormat timeZone option) can NEVER trigger for a table column — every date/datetime/since cell formats in the viewer's browser zone, silently shifting a UTC-stored value by hours. DateField (fields) DOES emit timezone via getTimezone(); DateColumn is the asymmetric corner the round-1/2 fixes left open. Fix: add `protected ?string $timezone` + `timezone(string)` builder and include it in getTypeSpecificProps().",
+      "confidence": "med",
+      "why_real": "Verified against source. PHP DateColumn::getTypeSpecificProps() at packages/table/src/Columns/DateColumn.php:53 returns ONLY ['mode','format'] — there is no $timezone property, no timezone()/getTimezone() builder, and no 'timezone' key emitted. Meanwhile the JS side is fully wired to consume it: packages-js/ui/src/table/cells.tsx:155 reads column.props.timezone, and formatDate() (cells.tsx:167-177) applies it as Intl.DateTimeFormat timeZone; packages-js/types/src/tables.ts:75 declares DateColumnProps.timezone?. The asymmetry is confirmed: the sibling DateField (packages/fields/src/Types/DateField.php) has protected ?string $timezone (line 41), a timezone(string) builder (line 78), getTimezone() (line 95), and emits 'timezone' => $this->timezone in its serialization (line 135). So round-2's JS fix that taught DateCell to honor a server timezone can never trigger for a table column — the prop is never produced. This is a genuine plumbing/i18n correctness gap (UTC values format in the viewer's browser zone with no server override possible). Not a duplicate: the round-2 ledger entry at cells.tsx:155 fixed the JS consumer; this finding is the PHP producer gap in DateColumn.php, a different file/layer with no ledger entry. Confidence is medium rather than high because there is currently no public API to actually set a column timezone, so the impact is latent dead-plumbing (the no-timezone default already formats in viewer zone) rather than an actively misconfigured feature shifting hours — the real defect is that the declared/documented capability is unreachable for table cells."
+    },
+    {
+      "title": "CurrencyInput input/parse path is hardcoded en-US (`Number(raw)` + `String(numeric)`) — comma-decimal locales cannot type a value",
+      "file": "packages-js/fields-js/src/number/CurrencyInput.tsx",
+      "line": 64,
+      "kind": "locale-format",
+      "severity": "high",
+      "dimension": "next-layer",
+      "detail": "The blurred DISPLAY honors thousandsSeparator/decimalSeparator (formatNumber, line 71), but while focused the field shows `String(numeric)` (line 38 — always a '.' decimal) and onChange parses with `Number(raw)` (line 64), which only accepts '.' as the decimal mark. A pt-BR/de/fr user editing a currency field who types `1234,56` gets Number('1234,56') === NaN → value becomes null, silently wiping their input. Round 2 fixed the CurrencyField PHP separator DEFAULTS but the JS edit/parse round-trip still assumes en-US. Parse using the field's decimalSeparator before Number().",
+      "confidence": "med",
+      "why_real": "Verified against the actual file. CurrencyInput.tsx confirms the en-US-hardcoded edit/parse round-trip: line 38 shows the focused value as String(numeric) (always '.' decimal), and line 64 parses via Number(raw), which yields NaN for any comma-decimal string like '1234,56' -> line 65 calls onChange(null), silently nulling the user's input. The field carries f.props.decimalSeparator (used for blurred DISPLAY at line 36 via formatNumber) but the input/parse path ignores it entirely. So a pt-BR/de/fr user cannot reliably enter a value. This is a genuine user-facing i18n defect, not a dev-only string or aria-label.\\n\\nNovelty: the ledger's only CurrencyField entry is round-2 packages/fields/src/Types/CurrencyField.php:24 (PHP separator DEFAULTS). The JS file packages-js/fields-js/src/number/CurrencyInput.tsx does not appear in rounds 1 or 2. This is the next-layer JS parse round-trip at a distinct location, so not a duplicate.\\n\\nConfidence is med rather than high because of one mitigating factor: while focused, line 43 sets type='number'. In a number input some browsers normalize/reject comma input before it reaches e.target.value, which can change the exact failure mode (blocked entry vs. empty value) but still leaves comma-decimal users unable to type their locale's decimal form. The parse path being en-US-only and decimalSeparator being available-but-unused is unambiguous."
+    },
+    {
+      "title": "CurrencyField separator table omits many comma-decimal locales → silent en-US fallback",
+      "file": "packages/fields/src/Types/CurrencyField.php",
+      "line": 164,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "next-layer",
+      "detail": "separatorsForLocale() only maps pt/de/es/it/nl/fr. Other comma-decimal / space-grouping locales fall through to the en-US shape (',' thousands / '.' decimal): ru, pl, sv, nb/no, da, fi, cs, sk, hu, tr, uk, id, vi, el, ro, bg, hr, et, lv, lt and others all render a wrong numeric shape. Because the doc-block explicitly distrusts ICU separator data and relies on this table, every unlisted locale is wrong. Either widen the table or derive separators from ext-intl NumberFormatter (DECIMAL) symbols when present, keeping the table only as the no-intl fallback.",
+      "confidence": "med",
+      "why_real": "Verified against /home/diogo/PhpstormProjects/arqel/packages/fields/src/Types/CurrencyField.php. Separators are resolved ONLY from separatorsForLocale() (line 117), and the doc-block (lines 99-104) explicitly distrusts ICU separator data, deriving only the currency SYMBOL from NumberFormatter. The table at lines 164-171 maps just 6 language prefixes (pt, de, es, it, nl, fr); every other locale hits the fallback at lines 173-177 with en-US shape (',' thousands / '.' decimal). So comma-decimal / space-grouping locales such as ru, pl, sv, nb/no, da, fi, cs, sk, hu, tr, uk, etc. render the wrong numeric shape (e.g. a ru admin sees 1,234.56 instead of 1 234,56). This reproduces deterministically and is a real user-facing rendering defect, not a dev-only string. NOT a duplicate: the round-2 ledger entry (same file, line 24) was 'defaults hardcoded en-US and never derive from app locale' — that issue has since been fixed by ADDING this very locale derivation; the present finding is the genuine next layer (incomplete coverage of the derivation table) at a different line (164) with a distinct root cause. Nuance lowering confidence: the en-US fallback is a documented deliberate fallback ('Unknown locales fall back to en-US shape'), so it is partly a known-limitation; still, the silent wrong-shape for many common locales is a legitimate correctness gap and the proposed fix (widen table or derive separators from NumberFormatter DECIMAL symbols, keeping table as no-intl fallback) is sound."
+    },
+    {
+      "title": "Export `since` cell uses Carbon diffForHumans() unbound to the request/panel locale",
+      "file": "packages/export/src/Exporters/FormatsDateCells.php",
+      "line": 43,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "next-layer",
+      "detail": "The React `since` cell was localized in round 2 (Intl.RelativeTimeFormat in the active locale). The export equivalent calls `Carbon::instance($value)->diffForHumans()` with no Carbon::setLocale()/->locale() tied to the panel/request locale, so the exported relative string follows Carbon's process-global locale (default 'en') regardless of the user's locale — a pt-BR export still says '2 days ago'. Bind Carbon to the active locale (e.g. ->locale(app()->getLocale())) so export fidelity matches the now-localized on-screen cell.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages/export/src/Exporters/FormatsDateCells.php:43: the 'since' mode returns Carbon::instance($value)->diffForHumans() with no ->locale()/setLocale() binding to the request/panel locale. The trait imports Carbon\\Carbon directly (line 7), so the relative string follows Carbon's process-global locale rather than an explicitly bound active locale, producing English output ('2 days ago') for a pt-BR export. This is real user-facing exported content (not a dev-only/aria string). It is the next layer of the round-2 work that localized the on-screen 'since' cell: the ledger has cells.tsx:158 (formatRelative English strings) and VersionTimeline.tsx:36 (hardcoded 'en' in Intl.RelativeTimeFormat) for the React side, but NO entry for FormatsDateCells.php or the export diffForHumans path. The nearest export ledger entry (ExportDownloadController.php:41 abort messages) is a different concern. The React/export asymmetry — on-screen now localized, export still English — is a genuine fidelity defect and is novel."
+    },
+    {
+      "title": "LoginPage: every label/button/link/title hardcoded, no translation hook (arqel.auth.* keys already exist but unused)",
+      "file": "packages-js/auth/src/LoginPage.tsx",
+      "line": 55,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.auth.login / arqel.auth.email / arqel.auth.password / arqel.auth.forgot_password",
+      "detail": "The entire bundled login page is hardcoded English: title default 'Welcome back' (l.55), description 'Login to your account' (l.56), heroImageAlt 'Login illustration' (l.58), <FieldLabel>Email</FieldLabel> (l.86), <FieldLabel>Password</FieldLabel> (l.102), 'Forgot your password?' link (l.108), submit button 'Signing in…'/'Login' (l.127), \"Don't have an account?\" + 'Sign up' (l.133-135). The file imports nothing from @arqel-dev/react and never calls useArqelTranslations/t(). A full arqel.auth.* namespace (login/email/password/name/forgot_password) already ships in packages/core/resources/lang/{en,pt_BR}/arqel.php but is never consumed. This whole page renders in one fixed language regardless of locale.",
+      "confidence": "high",
+      "why_real": "Confirmed against packages-js/auth/src/LoginPage.tsx. Every cited string is a hardcoded English literal: 'Welcome back' (l.55), 'Login to your account' (l.56), 'Login illustration' (l.58), <FieldLabel>Email</FieldLabel> (l.86), <FieldLabel>Password</FieldLabel> (l.102), 'Forgot your password?' (l.108), submit 'Signing in…'/'Login' (l.127), \"Don't have an account?\"+'Sign up' (l.133-135). These are user-facing rendered strings, not dev-only. Verified the entire packages-js/auth/src/ directory has ZERO imports from @arqel-dev/react and never calls useArqelTranslations/t() — so the bundled login page renders in one fixed language regardless of locale. Verified the arqel.auth.* namespace (login/email/password/name/forgot_password/...) genuinely ships in packages/core/resources/lang/en/arqel.php (l.28-37) with a pt_BR counterpart, yet is never consumed by the JS auth package. Novel vs ledger: the i18n-fixed-ledger.json rounds 1-2 cover only packages-js/ui/*, packages/* PHP files, and react utils; a grep for 'login'/'auth' in the ledger returns nothing and there is no packages-js/auth/ entry. Genuine, reproducible, novel user-facing i18n defect on the most visible public page. (Side note: auth tests assert pt-BR via getByLabelText, conflicting with the English source — a separate inconsistency that does not affect this finding's validity.)"
+    },
+    {
+      "title": "RegisterPage: all labels/buttons/links hardcoded English, no t()",
+      "file": "packages-js/auth/src/RegisterPage.tsx",
+      "line": 49,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.auth.register / arqel.auth.name / arqel.auth.email / arqel.auth.password",
+      "detail": "Bundled register page is fully hardcoded: title 'Create an account' (l.49), description 'Sign up to access the admin panel' (l.50), heroImageAlt (l.52), labels Name/Email/Password/Confirm password (l.81,96,111,126), button 'Creating account…'/'Create account' (l.140), 'Already have an account?' + 'Sign in' (l.146-148). No translation utility imported; arqel.auth.name/email/password keys exist but are unused.",
+      "confidence": "med",
+      "why_real": "Reproduces: RegisterPage.tsx (packages-js/auth/src/RegisterPage.tsx) has all user-facing strings hardcoded in English with no translation utility imported. Confirmed lines: title 'Create an account' (l.49), description 'Sign up to access the admin panel' (l.50), heroImageAlt (l.52), labels Name (l.81), Email (l.96), Password (l.111), 'Confirm password' (l.126), button 'Creating account…'/'Create account' (l.140), 'Already have an account?' (l.146) + 'Sign in' link (l.148). grep confirms zero useArqelTranslations/t()/__() usage anywhere in the auth package. The field labels and submit button are not prop-overridable, so they are genuinely locked to English and render to end users on the bundled /admin/register screen — a real user-facing i18n defect. Not a dev-only string. Novel: scanned the entire i18n-fixed-ledger.json (rounds 1-2); no entry references packages-js/auth/ at all — rounds 1-2 covered packages-js/ui, packages-js/react, packages-js/versioning, and packages/* PHP files only. Note: the same pattern exists in sibling LoginPage.tsx (title 'Welcome back' l.55, etc.), so this is one representative instance of a package-wide gap rather than a uniquely isolated bug; confidence held at med rather than high for that reason."
+    },
+    {
+      "title": "ForgotPasswordPage: hardcoded text mixes PT-BR literals, no t()",
+      "file": "packages-js/auth/src/ForgotPasswordPage.tsx",
+      "line": 49,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.auth.reset_password / arqel.auth.email / arqel.actions.back",
+      "detail": "Strings are hardcoded and inconsistently in Portuguese: title 'Recuperar senha' (l.49), description 'Enviaremos um link de redefinição...' (l.50), heroImageAlt 'Forgot password illustration' (l.52, English), label 'E-mail' (l.85), button 'Enviando…'/'Enviar link de reset' (l.101), 'Voltar ao login' (l.107). No translation hook; cannot adapt to the active Arqel locale and ships baked-in PT-BR copy in an otherwise-English-default framework.",
+      "confidence": "med",
+      "why_real": "Verified against /home/diogo/PhpstormProjects/arqel/packages-js/auth/src/ForgotPasswordPage.tsx. The defect reproduces and is novel.\n\nREAL: The page ships PT-BR strings with no localization in an English-default framework. Two categories: (1) prop defaults that are PT-BR — title='Recuperar senha' (l.49), description='Enviaremos um link de redefinição para o seu e-mail' (l.50); (2) hardcoded PT-BR JSX literals that are NOT exposed as props and thus cannot be overridden at all — 'E-mail' label (l.85), 'Enviando…'/'Enviar link de reset' button (l.101), 'Voltar ao login' link (l.107). The sibling auth pages prove the framework's default language is English: LoginPage.tsx defaults title='Welcome back'/description='Login to your account' (l.55-56); RegisterPage.tsx defaults 'Create an account'/'Sign up to access the admin panel' (l.49-50). So ForgotPasswordPage is a genuine outlier shipping baked-in PT-BR that a non-PT-BR user cannot localize for the non-prop literals. heroImageAlt='Forgot password illustration' (l.52) being English while everything else is PT-BR further demonstrates the inconsistency. No useArqelTranslations/t() anywhere in the file (grep confirmed only post() calls match).\n\nNOT DUPLICATE: The ledger (/home/diogo/PhpstormProjects/arqel/reports/i18n-fixed-ledger.json) contains zero packages-js/auth entries across rounds 1-2; all prior fixes targeted packages-js/ui, packages-js/react, packages-js/versioning, and packages/* PHP. The auth bundle is untouched.\n\nCaveat (minor over-statement, not disqualifying): the 'no t() hook' framing is weak because the entire bundled auth page family lacks a t() hook by design — strings are intended as prop-overridable defaults. But the load-bearing, verifiable defect stands: the non-overridable hardcoded PT-BR JSX literals (E-mail, Enviando…, Enviar link de reset, Voltar ao login) plus PT-BR prop defaults are inconsistent with the English-default LoginPage/RegisterPage and break for any non-PT-BR user. Confidence med because the fix scope (props vs. true i18n wiring) is debatable, but the user-facing inconsistency itself is unambiguous."
+    },
+    {
+      "title": "VerifyEmailNoticePage: hardcoded PT-BR notice/buttons and English-template intro, no t()",
+      "file": "packages-js/auth/src/VerifyEmailNoticePage.tsx",
+      "line": 31,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.auth.verify_email_notice",
+      "detail": "Hardcoded: title 'Verifique seu e-mail' (l.31), heroImageAlt (l.32), the dynamic intro built from PT-BR template literals 'Enviamos um link de verificação para ${email}...' (l.42-43), 'Um novo link de verificação foi enviado.' (l.59), 'Não recebeu? Clique abaixo para reenviar.' (l.64), button 'Enviando…'/'Reenviar link' (l.69). No translation hook; interpolated email string cannot be localized.",
+      "confidence": "high",
+      "why_real": "Verified against /home/diogo/PhpstormProjects/arqel/packages-js/auth/src/VerifyEmailNoticePage.tsx. The component imports no translation hook (no useArqelTranslations/t()/__()) and renders hardcoded PT-BR user-facing strings: title default 'Verifique seu e-mail' (l.30), the email intro built from PT-BR template literals 'Enviamos um link de verificação para ${email}. Confira sua caixa de entrada.' (l.41-43), the status notice 'Um novo link de verificação foi enviado.' (l.59), the instruction 'Não recebeu? Clique abaixo para reenviar.' (l.64), and the button labels 'Enviando…'/'Reenviar link' (l.69). These are visible to end users, not dev-only. The interpolated email intro is built inline with no prop and no t(), so a consumer cannot localize it. The ecosystem convention (sibling LoginPage and the entire packages-js/ui tree) wires t(), confirming this file violates the pattern. Note: `title` and `heroImageAlt` are overridable props, so those two have an escape hatch, but the intro/status/instruction/button strings have neither prop nor t(), so the defect stands. Ledger check: the round-1/2 ledger contains entries only for packages-js/ui/*, packages-js/react/*, packages-js/versioning/*, and packages/* PHP files. There is no entry referencing packages-js/auth/ or VerifyEmailNoticePage. Therefore novel, not a duplicate."
+    },
+    {
+      "title": "RegisterRequest throttle message: English sentence passed as the translation key",
+      "file": "packages/auth/src/Http/Requests/RegisterRequest.php",
+      "line": 53,
+      "kind": "validation-i18n",
+      "severity": "med",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "auth.throttle",
+      "detail": "throw ValidationException::withMessages(['email' => __('Too many registration attempts. Please try again in :seconds seconds.', [...])]). The English full sentence is used as the lookup key, so a pt_BR/other-locale user always sees English (no such key exists in any lang file). Sibling requests (LoginRequest l.78, ResetPasswordRequest l.47, ForgotPasswordController l.69) correctly use the canonical 'auth.throttle' key — this one is the outlier and should reuse it.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages/auth/src/Http/Requests/RegisterRequest.php:53: throw ValidationException::withMessages(['email' => __('Too many registration attempts. Please try again in :seconds seconds.', ['seconds' => $seconds])]). The full English sentence is passed as the translation key. grep confirms this string exists nowhere as a defined key in any lang file (only at the usage site), so __() returns the literal English sentence for every locale, including pt_BR. The three sibling requests are confirmed to use the canonical Laravel-native 'auth.throttle' key (LoginRequest:78, ResetPasswordRequest:47, ForgotPasswordController:69), which resolves per-locale and supports the :seconds placeholder — RegisterRequest is the lone outlier. This is a user-facing auth flow (registration rate-limit 422), not a dev-only string. Ledger scan of rounds 1-2 shows no entry for RegisterRequest.php or this message (auth-package ledger entries are only LocaleController aborts and frontend strings), so it is novel."
+    },
+    {
+      "title": "ForgotPasswordController status flash: English sentence passed as translation key",
+      "file": "packages/auth/src/Http/Controllers/ForgotPasswordController.php",
+      "line": 44,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "arqel.auth.reset_link_sent",
+      "detail": "return back()->with('status', __('A reset link has been sent if the email exists.')). The English literal is the translation key; there is no matching entry in the lang files, so the status banner shown on ForgotPasswordPage is always English even in non-English locales. Should resolve a real key (e.g. arqel.auth.reset_link_sent) so it can be translated.",
+      "confidence": "med",
+      "why_real": "Verified at packages/auth/src/Http/Controllers/ForgotPasswordController.php:44: `back()->with('status', __('A reset link has been sent if the email exists.'))`. The English sentence is used as the translation key. grep across packages confirms this literal appears ONLY at this line — no lang file (the auth package ships no non-vendor lang/ dir, and no passwords.php/auth.php override) defines a matching key. Laravel's __() returns the key verbatim when unresolved, so this user-facing flash banner on ForgotPasswordPage is always English regardless of app locale. The same controller correctly uses dotted keys elsewhere (auth.throttle line 69) and ResetPasswordController uses __($status) resolving to translatable passwords.php — confirming the bare-literal here is an inconsistency, not intentional. Ledger (rounds 1-2) contains no entry for packages/auth or ForgotPasswordController; all auth-controller i18n sites are novel. Genuine untranslatable-literal-as-key defect of the same class the ledger flags for other PHP __() sites (e.g. ExportDownloadController, LocaleController). Confidence med because it's a same-page flash and a non-English dict would still need this key authored; the 'generic anti-enumeration' intent is preserved either way, slightly limiting user impact."
+    },
+    {
+      "title": "Resource::getLabel/getPluralLabel serialized verbatim — never passed through __()",
+      "file": "packages/core/src/Support/InertiaDataBuilder.php",
+      "line": 363,
+      "kind": "php-label-gap",
+      "severity": "high",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "translate Resource::$label/$pluralLabel/$navigationGroup through __() in getLabel()/getPluralLabel()/getNavigationGroup()",
+      "detail": "InertiaDataBuilder emits 'label' => $class::getLabel(), 'pluralLabel' => $class::getPluralLabel(), 'navigationGroup' => $class::getNavigationGroup() (l.363-366) with no __() wrapping. getLabel()/getPluralLabel() in Resources/Resource.php (l.78-91) auto-derive from the class basename via Str title()/plural() — English-only humanization — and even an explicitly-set static $label/$pluralLabel is returned verbatim. So resource titles/breadcrumbs/nav entries cannot be localized. This is the Resource analogue of the already-fixed Field/Column/Action/Widget label gaps.",
+      "confidence": "high",
+      "why_real": "CONFIRMED real and novel. Code reproduces: InertiaDataBuilder::resourceMeta() (packages/core/src/Support/InertiaDataBuilder.php:360-368) emits 'label' => $class::getLabel(), 'pluralLabel' => $class::getPluralLabel(), 'navigationGroup' => $class::getNavigationGroup() with zero __() wrapping. Resource::getLabel()/getPluralLabel() (packages/core/src/Resources/Resource.php:78-91) auto-derive from class basename via Str::snake()->title()/->plural() — English-only humanization — and an explicitly-set static $label/$pluralLabel is returned verbatim. getNavigationGroup() (l.98-101) returns the raw static prop. None pass through Laravel translation. This is the exact Resource analogue of the already-fixed Field/Column/Action/Widget gaps, which were ALL fixed by routing labels through a PHP-side localize helper at serialization time (verified: Field.php:181-186 getLabel()->localizeLabel(); Widget.php:238-239 self::localize()). Resource was NOT given that treatment. User-facing impact verified: resource.label populates page titles on ArqelShowPage/ArqelEditPage/ArqelCreatePage (props.resource?.label), and navigationGroup feeds sidebar/nav grouping — so resource titles, breadcrumbs, and nav entries cannot be localized. NOVEL: ledger scan shows no entry for Resource::getLabel/getPluralLabel/getNavigationGroup or InertiaDataBuilder::resourceMeta in rounds 1-2; closest entries (nav BreadcrumbsBuilder Create/Edit, Widget heading, Field/Column/Action labels) are distinct code paths. Not a dev-only string, not already-wired."
+    },
+    {
+      "title": "NavigationGroup label serialized verbatim in toArray()",
+      "file": "packages/nav/src/NavigationGroup.php",
+      "line": 141,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "wrap NavigationGroup::$label in __() in getLabel()/toArray()",
+      "detail": "toArray() returns 'label' => $this->label (l.141) and getLabel() returns $this->label raw (l.100-103). The nav-group label rendered in the sidebar GroupLabel (Sidebar.tsx l.49) is never run through __(), so app-registered nav group names cannot be translated. Parallel to the swept Field/Column label gaps.",
+      "confidence": "high",
+      "why_real": "CONFIRMED (with a minor correction to the render-path attribution).\n\nPHP defect reproduces: NavigationGroup::toArray() (packages/nav/src/NavigationGroup.php:141) returns 'label' => $this->label verbatim, and getLabel() (l.100-103) returns it raw. There is NO localization helper anywhere in the nav package (grep for localizeLabel/__() in packages/nav/src returned nothing). NavigationItem has the identical gap (getLabel l.160-162 raw; toArray l.212 raw).\n\nThis is the exact parallel of the swept Field/Column label gaps: Field::getLabel() (packages/fields/src/Field.php:181-186) calls self::localizeLabel($label), and Column::getLabel() (packages/table/src/Column.php:228-232) calls self::localizeLabel(). Both run the app-registered label through Laravel __() lazily at serialization time so translation keys resolve in the active locale. NavigationGroup/NavigationItem do not, so app-registered nav group/item labels passed as translation keys render verbatim and cannot be localized — a real, user-facing i18n parity gap on a genuine public API.\n\nIt is a real API: NavigationGroup is consumed by Navigation::group()/addGroup() and serialized via Navigation::toArray() (packages/nav/src/Navigation.php:140) into Inertia props that drive the sidebar.\n\nNot a duplicate: scanned reports/i18n-fixed-ledger.json (rounds 1-2). It covers Field.php:181, Column.php:382, Action.php:327, Widget.php:238, and BreadcrumbsBuilder.php:78/95 (the latter is in the nav package but is the hardcoded 'Create'/'Edit' string defect, different). The NavigationGroup/NavigationItem label-serialization gap is absent.\n\nMinor correction to the finding: the cited Sidebar.tsx:49 render line is imprecise — the sidebar groups via the item.group string (from Resource::getNavigationGroup()), not directly off NavigationGroup.toArray(). But the underlying PHP serialization defect is real independent of which React consumer renders it. Not dev-only, not already-wired."
+    },
+    {
+      "title": "NavigationItem label serialized verbatim in toArray()",
+      "file": "packages/nav/src/NavigationItem.php",
+      "line": 212,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "deep-chrome-php",
+      "suggested_key": "wrap NavigationItem::$label in __() in getLabel()/toArray()",
+      "detail": "toArray() returns 'label' => $this->label (l.212) and getLabel() returns it raw (l.160-163). Custom nav-item labels rendered in the sidebar menu (Sidebar.tsx l.63/68) are emitted verbatim, never through __(), so they can't be localized. (Resource-backed items resolve via getPluralLabel(), which has its own gap above.)",
+      "confidence": "high",
+      "why_real": "Confirmed and reproduces. NavigationItem.php emits the label verbatim and never localizes it: toArray() at line 212 returns 'label' => $this->label, and getLabel() (l.160-163) returns the raw property. There is no __() / localize() anywhere in packages/nav/src (grep: none). The sidebar consumer renders it verbatim too (Sidebar.tsx: <span>{item.label}</span>). This breaks the framework's own established i18n convention: sibling serializers DO localize at serialization time — Field::getLabel() calls self::localizeLabel($label) and Widget::toArray() calls self::localize($this->heading)/(...description). Because NavigationItem does neither, custom nav-item labels (NavigationItem::make('...') or a translation-key string) cannot be localized in the active request locale. This is user-facing: sidebar menu labels are primary navigation UI. Novelty: the ledger contains analogous entries for Field.php:181, Column.php:382, Action.php:327, Widget.php:238, and nav/BreadcrumbsBuilder.php (l.78/95), but NO entry for packages/nav/src/NavigationItem.php — distinct file/component, not previously covered. Not a dev-only string and not already wired through t()/__()."
+    },
+    {
+      "title": "Pluralized count strings use naive interpolation / '(s)' hack instead of plural rules",
+      "file": "packages-js/ui/src/table/TableToolbar.tsx",
+      "line": 43,
+      "kind": "plumbing-bug",
+      "severity": "med",
+      "dimension": "plumbing-edge",
+      "suggested_key": "table.bulk.selected",
+      "detail": "t('table.bulk.selected', `${selectedCount} selected`, {count: selectedCount}) renders ':count selected' (en) and ':count selecionado(s)' (pt_BR — resources/lang/pt_BR/table.php:52 uses the literal '(s)' suffix). Same pattern at packages-js/ui/src/table/TableFilters.tsx:58 (table.filters.clear) and packages-js/ui/src/palette/CommandPalette.tsx:293 (arqel.aria.palette_results = ':count commands' / ':count comandos'). Repro: select exactly 1 row -> screen reader / toolbar announces '1 commands' (en arqel.php:88) and '1 selecionado(s)' (pt_BR) instead of '1 command'/'1 selecionado'. Because translate() has no choice support these can never be correctly singularized.",
+      "confidence": "high",
+      "why_real": "Verified against source. translate() in packages-js/react/src/utils/translate.ts only performs :token regex interpolation (applyReplacements) — there is NO choice()/plural-rule support. So any count-bearing string cannot singularize.\n\nConfirmed defect sites:\n1. packages-js/ui/src/table/TableToolbar.tsx:43 — t('table.bulk.selected', ..., {count}). pt_BR table.php:52 = ':count selecionado(s)'. Selecting 1 row renders '1 selecionado(s)' — the literal '(s)' suffix hack, a real user-facing text defect in pt_BR.\n2. packages-js/ui/src/palette/CommandPalette.tsx:293 — t('arqel.aria.palette_results', ..., {count}) inside a role=\"status\" aria-live region. en/arqel.php:88 = ':count commands', pt_BR/arqel.php:88 = ':count comandos'. With 1 result the screen reader announces '1 commands' / '1 comandos' — wrong singular, an a11y defect in both locales.\n\nSub-claim that does NOT hold: TableFilters.tsx:58 'Clear filters (:count)' / 'Limpar filtros (:count)' is a parenthetical numeric count, not a pluralized noun — '(1)' is correct, no plural needed. The finding overreaches there, but the overall finding still identifies a genuine plural-rules gap with two valid repro sites.\n\nNovelty: the ledger's round-1 CommandPalette:291 entry was about the noun being HARDCODED (now fixed — it's wired through t()). No ledger entry covers the plural-rules absence, the '(s)' hack, or table.bulk.selected. TableToolbar:40 / TableFilters:47 ledger entries were aria-label hardcoding, a different defect. So this is novel, not a duplicate."
+    }
+  ]
+}

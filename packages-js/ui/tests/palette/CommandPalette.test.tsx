@@ -69,7 +69,7 @@ function usePtBr() {
           arqel: {
             aria: {
               palette_title: 'Paleta de comandos',
-              palette_results: ':count comandos',
+              palette_results: '{one} :count comando|{other} :count comandos',
               palette_list: 'Comandos',
             },
           },
@@ -235,5 +235,22 @@ describe('CommandPalette', () => {
     await flushMicrotasks();
     await flushMicrotasks();
     expect(screen.getByRole('status').textContent).toMatch(/2 comandos/);
+  });
+
+  it('singularizes the live-region count for exactly one result (pt_BR)', async () => {
+    usePtBr();
+    globalThis.fetch = mockFetch([sample[0] as PaletteCommand]) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    const input = screen.getByRole('combobox') as HTMLInputElement;
+    act(() => fireEvent.change(input, { target: { value: 'x' } }));
+    await act(async () => {
+      vi.advanceTimersByTime(160);
+    });
+    await flushMicrotasks();
+    await flushMicrotasks();
+    // 1 result -> "1 comando", never "1 comandos" / the old ":count comandos".
+    expect(screen.getByRole('status').textContent).toMatch(/^1 comando$/);
   });
 });

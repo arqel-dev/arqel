@@ -40,7 +40,7 @@ const PT_BR = {
       select_all_rows: 'Selecionar todas as linhas',
       select_row: 'Selecionar linha :id',
       label: 'Ações em massa',
-      selected: ':count selecionado(s)',
+      selected: '{one} :count selecionado|{other} :count selecionados',
       clear: 'Limpar',
     },
     column: { actions: 'Ações' },
@@ -148,6 +148,22 @@ describe('table chrome aria a11y i18n', () => {
     usePtBr();
     render(<TableToolbar selectedCount={2} bulkActions={<button type="button">go</button>} />);
     expect(screen.getByRole('region', { name: 'Ações em massa' })).toBeInTheDocument();
+  });
+
+  it('pluralizes the selected-count label per the active locale (1 vs N)', () => {
+    usePtBr();
+    const { rerender } = render(<TableToolbar selectedCount={1} />);
+    // 1 -> singular form, never the "(s)" hack.
+    expect(screen.getByText('1 selecionado')).toBeInTheDocument();
+    rerender(<TableToolbar selectedCount={3} />);
+    expect(screen.getByText('3 selecionados')).toBeInTheDocument();
+  });
+
+  it('pluralizes the selected-count fallback when no i18n prop is present', () => {
+    const { rerender } = render(<TableToolbar selectedCount={1} />);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    rerender(<TableToolbar selectedCount={5} />);
+    expect(screen.getByText('5 selected')).toBeInTheDocument();
   });
 
   it('translates the filters <fieldset> sr-only legend', () => {

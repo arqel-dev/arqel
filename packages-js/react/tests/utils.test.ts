@@ -7,7 +7,7 @@ import {
   fieldsVisibleIn,
   indexFieldsByName,
 } from '../src/utils/serializeFields.js';
-import { translate } from '../src/utils/translate.js';
+import { selectPluralForm, translate } from '../src/utils/translate.js';
 
 describe('route()', () => {
   afterEach(() => {
@@ -53,6 +53,72 @@ describe('translate()', () => {
     expect(translate(dict, 'arqel.hello', { replacements: { name: 'World' } })).toBe(
       'Hello World!',
     );
+  });
+
+  it('selects the singular plural form for count=1 and substitutes :count', () => {
+    const pdict = {
+      table: { bulk: { selected: '{one} :count selected|{other} :count selected' } },
+    };
+    expect(
+      translate(pdict, 'table.bulk.selected', {
+        count: 1,
+        locale: 'en',
+        replacements: { count: 1 },
+      }),
+    ).toBe('1 selected');
+    expect(
+      translate(pdict, 'table.bulk.selected', {
+        count: 4,
+        locale: 'en',
+        replacements: { count: 4 },
+      }),
+    ).toBe('4 selected');
+  });
+
+  it('pluralizes pt-BR forms with distinct singular/plural nouns', () => {
+    const pdict = {
+      table: { bulk: { selected: '{one} :count selecionado|{other} :count selecionados' } },
+    };
+    expect(
+      translate(pdict, 'table.bulk.selected', {
+        count: 1,
+        locale: 'pt-BR',
+        replacements: { count: 1 },
+      }),
+    ).toBe('1 selecionado');
+    expect(
+      translate(pdict, 'table.bulk.selected', {
+        count: 3,
+        locale: 'pt-BR',
+        replacements: { count: 3 },
+      }),
+    ).toBe('3 selecionados');
+  });
+});
+
+describe('selectPluralForm()', () => {
+  it('matches CLDR categories via Intl.PluralRules', () => {
+    const v = '{one} :count command|{other} :count commands';
+    expect(selectPluralForm(v, 1, 'en')).toBe(':count command');
+    expect(selectPluralForm(v, 0, 'en')).toBe(':count commands');
+    expect(selectPluralForm(v, 7, 'en')).toBe(':count commands');
+  });
+
+  it('honors explicit exact-count and range selectors', () => {
+    const v = '{0} none|{1} just one|[2,*] many';
+    expect(selectPluralForm(v, 0, 'en')).toBe('none');
+    expect(selectPluralForm(v, 1, 'en')).toBe('just one');
+    expect(selectPluralForm(v, 9, 'en')).toBe('many');
+  });
+
+  it('falls back to positional singular|plural ordering', () => {
+    const v = 'apple|apples';
+    expect(selectPluralForm(v, 1, 'en')).toBe('apple');
+    expect(selectPluralForm(v, 2, 'en')).toBe('apples');
+  });
+
+  it('returns the lone form unchanged when no separator is present', () => {
+    expect(selectPluralForm('just text', 5, 'en')).toBe('just text');
   });
 });
 

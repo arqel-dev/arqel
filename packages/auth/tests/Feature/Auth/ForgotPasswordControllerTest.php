@@ -88,6 +88,24 @@ it('sends reset link notification for an existing email', function (): void {
     );
 });
 
+it('flashes a translatable status key (not a raw English sentence)', function (): void {
+    Notification::fake();
+
+    // Reset the route-level `throttle:6,1` limiter so this extra POST doesn't
+    // push a later test in the run over the per-minute route throttle.
+    app('cache')->store()->flush();
+
+    $response = $this->from('/admin/forgot-password')->post('/admin/forgot-password', [
+        'email' => 'unknown@bar.com',
+    ]);
+
+    // The flash must resolve through the arqel translation namespace so it can
+    // be localized — never the raw English literal used as its own key.
+    $response->assertSessionHas('status', __('arqel::arqel.auth.reset_link_sent'));
+    expect(session('status'))->toBe('A reset link has been sent if the email exists.');
+    expect(session('status'))->not->toBe('arqel::arqel.auth.reset_link_sent');
+});
+
 it('returns generic status without revealing whether email exists', function (): void {
     Notification::fake();
 

@@ -145,10 +145,12 @@ final class CurrencyField extends NumberField
 
     /**
      * Deterministic symbol/separator shape per locale prefix. Matched on
-     * the language (and, where it disambiguates, the region) so e.g.
-     * `pt`, `pt_BR`, `de`, `fr`, `es` get comma-decimal / dot-grouping,
-     * while `en` keeps dot-decimal / comma-grouping. The `prefix` here is
-     * only a fallback symbol used when `ext-intl` is unavailable.
+     * the language so the common comma-decimal locales (dot-grouped:
+     * `pt`/`de`/`es`/`it`/`nl`/`da`/`id`/`tr`/…; space-grouped:
+     * `fr`/`ru`/`pl`/`sv`/`cs`/`hu`/`uk`/…) render the right numeric
+     * shape, while `en` keeps dot-decimal / comma-grouping. Unlisted
+     * locales fall back to the en-US shape. The `prefix` here is only a
+     * fallback symbol used when `ext-intl` is unavailable.
      *
      * @return array{prefix: string, thousandsSeparator: string, decimalSeparator: string}
      */
@@ -161,13 +163,47 @@ final class CurrencyField extends NumberField
             'decimalSeparator' => ',',
         ];
 
+        // Space-grouped, comma-decimal locales (NBSP/thin-space grouping
+        // collapsed to a regular space for the JS round-trip).
+        $spaceDecimal = [
+            'thousandsSeparator' => ' ',
+            'decimalSeparator' => ',',
+        ];
+
         $map = [
+            // Dot-grouping, comma-decimal.
             'pt' => ['prefix' => 'R$', ...$commaDecimal],
             'de' => ['prefix' => '€', ...$commaDecimal],
             'es' => ['prefix' => '€', ...$commaDecimal],
             'it' => ['prefix' => '€', ...$commaDecimal],
             'nl' => ['prefix' => '€', ...$commaDecimal],
-            'fr' => ['prefix' => '€', 'thousandsSeparator' => ' ', 'decimalSeparator' => ','],
+            'da' => ['prefix' => 'kr', ...$commaDecimal],
+            'id' => ['prefix' => 'Rp', ...$commaDecimal],
+            'tr' => ['prefix' => '₺', ...$commaDecimal],
+            'vi' => ['prefix' => '₫', ...$commaDecimal],
+            'el' => ['prefix' => '€', ...$commaDecimal],
+            'ro' => ['prefix' => 'lei', ...$commaDecimal],
+            'bg' => ['prefix' => 'лв', ...$commaDecimal],
+            'hr' => ['prefix' => '€', ...$commaDecimal],
+            'sl' => ['prefix' => '€', ...$commaDecimal],
+            'sr' => ['prefix' => 'дин', ...$commaDecimal],
+            // Space-grouping, comma-decimal.
+            'fr' => ['prefix' => '€', ...$spaceDecimal],
+            'ru' => ['prefix' => '₽', ...$spaceDecimal],
+            'pl' => ['prefix' => 'zł', ...$spaceDecimal],
+            'sv' => ['prefix' => 'kr', ...$spaceDecimal],
+            'nb' => ['prefix' => 'kr', ...$spaceDecimal],
+            'nn' => ['prefix' => 'kr', ...$spaceDecimal],
+            'no' => ['prefix' => 'kr', ...$spaceDecimal],
+            'fi' => ['prefix' => '€', ...$spaceDecimal],
+            'cs' => ['prefix' => 'Kč', ...$spaceDecimal],
+            'sk' => ['prefix' => '€', ...$spaceDecimal],
+            'hu' => ['prefix' => 'Ft', ...$spaceDecimal],
+            'uk' => ['prefix' => '₴', ...$spaceDecimal],
+            'et' => ['prefix' => '€', ...$spaceDecimal],
+            'lv' => ['prefix' => '€', ...$spaceDecimal],
+            'lt' => ['prefix' => '€', ...$spaceDecimal],
+            'kk' => ['prefix' => '₸', ...$spaceDecimal],
         ];
 
         return $map[$language] ?? [

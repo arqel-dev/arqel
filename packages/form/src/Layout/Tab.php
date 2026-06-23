@@ -73,9 +73,28 @@ final class Tab extends Component
 
         return array_filter([
             'id' => $this->id,
-            'label' => $this->label,
+            'label' => self::localizeLabel($this->label),
             'icon' => $this->icon,
             'badge' => $badge,
         ], fn ($v) => $v !== null);
+    }
+
+    /**
+     * Resolve the developer-supplied tab label through Laravel translation
+     * lazily so the active request locale applies at serialization time. A
+     * label that is a translation key renders in the current locale; a plain
+     * literal passes through unchanged (Laravel trans() returns the key when
+     * no translation exists). Falls back to the raw literal when no translator
+     * is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

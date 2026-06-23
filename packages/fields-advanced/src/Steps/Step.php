@@ -135,9 +135,28 @@ final class Step
     {
         return [
             'name' => $this->name,
-            'label' => $this->getLabel(),
+            'label' => self::localizeLabel($this->getLabel()),
             'icon' => $this->icon,
             'schema' => (new FieldSchemaSerializer)->serialize($this->schema),
         ];
+    }
+
+    /**
+     * Resolve the step label through Laravel translation lazily so the active
+     * request locale applies at serialization time. An explicit label that is
+     * a translation key renders in the current locale; a plain literal (or the
+     * humanised name fallback) passes through unchanged (Laravel trans()
+     * returns the key when no translation exists). Falls back to the raw value
+     * when no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

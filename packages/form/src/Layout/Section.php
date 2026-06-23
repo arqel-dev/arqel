@@ -103,8 +103,8 @@ final class Section extends Component
     public function getTypeSpecificProps(): array
     {
         return array_filter([
-            'heading' => $this->heading,
-            'description' => $this->description,
+            'heading' => self::localizeLabel($this->heading),
+            'description' => self::localizeLabel($this->description),
             'icon' => $this->icon,
             'collapsible' => $this->collapsible ?: null,
             'collapsed' => $this->collapsed ?: null,
@@ -112,5 +112,24 @@ final class Section extends Component
             'compact' => $this->compact ?: null,
             'aside' => $this->aside ?: null,
         ], fn ($v) => $v !== null);
+    }
+
+    /**
+     * Resolve the developer-supplied heading/description through Laravel
+     * translation lazily so the active request locale applies at serialization
+     * time. A value that is a translation key renders in the current locale; a
+     * plain literal passes through unchanged (Laravel trans() returns the key
+     * when no translation exists). Null and unbound-translator contexts return
+     * the raw value untouched.
+     */
+    private static function localizeLabel(?string $label): ?string
+    {
+        if ($label === null || ! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

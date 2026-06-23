@@ -3,9 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ThemeProvider } from '../ThemeProvider';
 import { ThemeToggle } from '../ThemeToggle';
-
-import { installMatchMedia } from './matchMedia.helper';
 import { resetMockPage, setMockTranslations } from './inertia.setup';
+import { installMatchMedia } from './matchMedia.helper';
 
 describe('ThemeToggle', () => {
   beforeEach(() => {

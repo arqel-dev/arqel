@@ -3,6 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AiSelectInput, type AiSelectInputFieldProps } from './AiSelectInput.js';
 
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} as Record<string, unknown> })),
+}));
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: pageMock };
+});
+
 const baseFieldProps: AiSelectInputFieldProps = {
   options: { low: 'Low', medium: 'Medium', high: 'High' },
   classifyFromFields: ['title', 'body'],
@@ -38,6 +46,7 @@ describe('<AiSelectInput>', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    pageMock.mockReturnValue({ props: {} });
   });
 
   // FIXME(post-shadcn-migration): native <select> replaced by shadcn Select
@@ -259,6 +268,38 @@ describe('<AiSelectInput>', () => {
       expect(onChange).toHaveBeenCalledWith('low');
     });
     expect(await screen.findByText('Used fallback')).toBeInTheDocument();
+  });
+
+  it('localizes the provenance badge text (pt_BR)', async () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: {
+              ai: { suggestion_ai: 'Sugerido por IA', suggestion_fallback: 'Usou alternativa' },
+            },
+          },
+        },
+      },
+    });
+    const fetchMock = makeFetchOk({ key: 'high', label: 'High' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <AiSelectInput
+        name="priority"
+        value={null}
+        onChange={vi.fn()}
+        props={baseFieldProps}
+        resource="tickets"
+        field="priority"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Classificar com IA|Classify with AI/ }));
+    expect(await screen.findByText('Sugerido por IA')).toBeInTheDocument();
+    expect(screen.queryByText('Suggested by AI')).toBeNull();
   });
 
   it('forwards the csrf token in the X-CSRF-TOKEN header', async () => {

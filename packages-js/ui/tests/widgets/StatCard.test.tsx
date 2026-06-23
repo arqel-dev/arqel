@@ -1,6 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { StatCard, type StatCardWidget } from '../../src/widgets/StatCard.js';
+
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} as Record<string, unknown> })),
+}));
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: pageMock };
+});
 
 function makeWidget(overrides: Partial<StatCardWidget> = {}): StatCardWidget {
   return {
@@ -14,10 +22,33 @@ function makeWidget(overrides: Partial<StatCardWidget> = {}): StatCardWidget {
 }
 
 describe('StatCard', () => {
+  afterEach(() => {
+    pageMock.mockReturnValue({ props: {} });
+  });
+
   it('renders heading and big-number value', () => {
     render(<StatCard widget={makeWidget()} />);
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Total Users');
-    expect(screen.getByText('1234')).toBeInTheDocument();
+    // Numeric values are grouped for the active (en fallback) locale.
+    expect(screen.getByText('1,234')).toBeInTheDocument();
+  });
+
+  it('formats large numeric values with the active locale grouping (pt_BR ≠ en)', () => {
+    pageMock.mockReturnValue({ props: { i18n: { locale: 'en' } } });
+    const { unmount } = render(<StatCard widget={makeWidget({ value: 1234567 })} />);
+    expect(screen.getByText('1,234,567')).toBeInTheDocument();
+    unmount();
+
+    pageMock.mockReturnValue({ props: { i18n: { locale: 'pt_BR' } } });
+    render(<StatCard widget={makeWidget({ value: 1234567 })} />);
+    // pt-BR uses '.' as the thousands separator.
+    expect(screen.getByText('1.234.567')).toBeInTheDocument();
+    expect(screen.queryByText('1234567')).toBeNull();
+  });
+
+  it('passes pre-formatted string values through verbatim', () => {
+    render(<StatCard widget={makeWidget({ value: 'R$ 1.234,00' })} />);
+    expect(screen.getByText('R$ 1.234,00')).toBeInTheDocument();
   });
 
   it('renders description and statDescription with icon glyph', () => {

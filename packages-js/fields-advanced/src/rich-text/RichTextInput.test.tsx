@@ -21,13 +21,16 @@ import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { RichTextInput, safeUrl } from './RichTextInput.js';
 
-// RichTextInput now localizes its toolbar aria-label via
-// `useArqelTranslations()`, which reads Inertia's `usePage()`. Stub an
+// RichTextInput localizes its toolbar aria-labels / titles / placeholder via
+// `useArqelTranslations()`, which reads Inertia's `usePage()`. The default is an
 // empty-props page so the hook falls back to the English literals these
-// assertions expect.
+// assertions expect; individual tests can override via `pageMock`.
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} as Record<string, unknown> })),
+}));
 vi.mock('@inertiajs/react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@inertiajs/react')>();
-  return { ...actual, usePage: vi.fn(() => ({ props: {} })) };
+  return { ...actual, usePage: pageMock };
 });
 
 /**
@@ -371,5 +374,57 @@ describe('<RichTextInput> (Tiptap)', () => {
 
     editor = getEditableHost();
     expect(editor.textContent).toContain('second');
+  });
+
+  it('localizes toolbar button aria-labels + titles (pt_BR)', () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: {
+              fields_advanced: {
+                richtext_bold: 'Negrito',
+                richtext_h1: 'Título 1',
+                richtext_image: 'Imagem',
+                richtext_image_disabled: 'Upload de imagem não configurado',
+              },
+            },
+          },
+        },
+      },
+    });
+    render(
+      <RichTextInput
+        field={buildField({ toolbar: ['bold', 'h1', 'image'], imageUploadRoute: null })}
+        value=""
+        onChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Negrito' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Título 1' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Bold' })).toBeNull();
+    const img = screen.getByRole('button', { name: 'Imagem' }) as HTMLButtonElement;
+    expect(img.title).toBe('Upload de imagem não configurado');
+    pageMock.mockReturnValue({ props: {} });
+  });
+
+  it('localizes the empty-editor placeholder fallback (pt_BR)', () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: { fields_advanced: { richtext_placeholder: 'Comece a escrever...' } },
+          },
+        },
+      },
+    });
+    render(<RichTextInput field={buildField()} value="" onChange={vi.fn()} />);
+    const editable = getEditableHost();
+    const para = editable.querySelector('[data-placeholder]');
+    expect(para?.getAttribute('data-placeholder')).toBe('Comece a escrever...');
+    pageMock.mockReturnValue({ props: {} });
   });
 });

@@ -268,7 +268,9 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
                 : 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
             }
           >
-            {suggestion === 'ai' ? 'Suggested by AI' : 'Used fallback'}
+            {suggestion === 'ai'
+              ? t('arqel.ai.suggestion_ai', 'Suggested by AI')
+              : t('arqel.ai.suggestion_fallback', 'Used fallback')}
           </Badge>
           <Button
             variant="ghost"

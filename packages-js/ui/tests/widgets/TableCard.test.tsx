@@ -1,7 +1,15 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TableCardWidget } from '../../src/widgets/TableCard.js';
 import { TableCard } from '../../src/widgets/TableCard.js';
+
+const { pageMock } = vi.hoisted(() => ({
+  pageMock: vi.fn(() => ({ props: {} as Record<string, unknown> })),
+}));
+vi.mock('@inertiajs/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inertiajs/react')>();
+  return { ...actual, usePage: pageMock };
+});
 
 const baseWidget = (overrides: Partial<TableCardWidget> = {}): TableCardWidget => ({
   name: 'recent-orders',
@@ -21,6 +29,27 @@ const baseWidget = (overrides: Partial<TableCardWidget> = {}): TableCardWidget =
 });
 
 describe('TableCard', () => {
+  afterEach(() => {
+    pageMock.mockReturnValue({ props: {} });
+  });
+
+  it('formats numeric cells with the active locale grouping (pt_BR ≠ en)', () => {
+    const widget = baseWidget({
+      columns: [{ name: 'revenue', label: 'Revenue' }],
+      records: [{ revenue: 1500000 }],
+    });
+
+    pageMock.mockReturnValue({ props: { i18n: { locale: 'en' } } });
+    const { unmount } = render(<TableCard widget={widget} />);
+    expect(screen.getByText('1,500,000')).toBeInTheDocument();
+    unmount();
+
+    pageMock.mockReturnValue({ props: { i18n: { locale: 'pt_BR' } } });
+    render(<TableCard widget={widget} />);
+    expect(screen.getByText('1.500.000')).toBeInTheDocument();
+    expect(screen.queryByText('1500000')).toBeNull();
+  });
+
   it('renders column headers + record rows', () => {
     render(<TableCard widget={baseWidget()} />);
     expect(screen.getByText('ID')).toBeInTheDocument();

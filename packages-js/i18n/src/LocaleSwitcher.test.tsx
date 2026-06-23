@@ -38,9 +38,7 @@ describe('<LocaleSwitcher>', () => {
   it('syncs document.documentElement.lang to the BCP-47 active locale', () => {
     document.documentElement.lang = 'en';
     render(
-      <I18nProvider
-        i18n={{ ...baseProps, locale: 'pt_BR', available: ['en', 'pt_BR'] }}
-      >
+      <I18nProvider i18n={{ ...baseProps, locale: 'pt_BR', available: ['en', 'pt_BR'] }}>
         <LocaleSwitcher />
       </I18nProvider>,
     );

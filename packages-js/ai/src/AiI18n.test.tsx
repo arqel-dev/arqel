@@ -46,8 +46,10 @@ const aiDict = {
       translate_error_invalid: 'Falha na tradução: corpo de resposta inválido.',
       translate_error_network: 'Falha na tradução: erro de rede.',
       file_too_large: 'Arquivo muito grande: :size (máx. :max).',
-      missing_translate_url: 'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
-      missing_classify_url: 'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
+      missing_translate_url:
+        'URL de tradução ausente: forneça `translateUrl` ou ambos `resource` e `field`.',
+      missing_classify_url:
+        'URL de classificação ausente: forneça `classifyUrl` ou ambos `resource` e `field`.',
       status_generating: 'Gerando',
       status_classifying: 'Classificando',
       status_extracting: 'Extraindo',

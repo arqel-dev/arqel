@@ -161,9 +161,7 @@ describe('FileInput visible browse label (i18n)', () => {
       },
     });
     render(<FileInput field={file} value={null} onChange={vi.fn()} />);
-    expect(
-      screen.getByText('Arraste um arquivo aqui ou clique para procurar'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Arraste um arquivo aqui ou clique para procurar')).toBeInTheDocument();
   });
 });
 

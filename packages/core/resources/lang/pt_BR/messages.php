@@ -62,6 +62,7 @@ return [
         'field_not_found' => ':type [:field] não encontrado no recurso [:resource]',
         'provider_failed' => 'A requisição ao provedor de IA falhou',
         'image_source_required' => 'É necessário fornecer imageUrl ou imageBase64',
+    ],
     'marketplace' => [
         'forbidden' => 'Acesso negado',
         'unauthenticated' => 'Não autenticado',
@@ -71,6 +72,7 @@ return [
         'review_not_found' => 'Avaliação não encontrada',
         'refund_failed' => 'Falha no reembolso pelo gateway',
         'payment_verification_failed' => 'Falha na verificação do pagamento',
+    ],
     'field_search' => [
         'not_searchable' => 'O campo não permite busca.',
         'disabled' => 'A busca está desabilitada para este campo.',

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { type FieldSchema, FieldsInspector } from './FieldsInspector.js';
 import { InertiaInspector } from './InertiaInspector.js';
+import { t } from './i18n.js';
 import { PerformanceMetrics, type PerformanceMetricsValue } from './PerformanceMetrics.js';
 import { PolicyDebugger, type PolicyLogEntry } from './PolicyDebugger.js';
 import { type NavigationSnapshot, TimeTravel } from './TimeTravel.js';
@@ -79,7 +80,7 @@ export function App({
               data-testid="top-tab-inertia"
               onClick={() => setTab('inertia')}
             >
-              Inertia State Inspector
+              {t('devtools.tab.inertia', 'Inertia State Inspector')}
             </button>
             <button
               type="button"
@@ -88,7 +89,7 @@ export function App({
               data-testid="top-tab-policies"
               onClick={() => setTab('policies')}
             >
-              Policies
+              {t('devtools.tab.policies', 'Policies')}
             </button>
             <button
               type="button"
@@ -97,7 +98,7 @@ export function App({
               data-testid="top-tab-fields"
               onClick={() => setTab('fields')}
             >
-              Fields
+              {t('devtools.tab.fields', 'Fields')}
             </button>
             <button
               type="button"
@@ -106,7 +107,7 @@ export function App({
               data-testid="top-tab-time-travel"
               onClick={() => setTab('time-travel')}
             >
-              Time Travel
+              {t('devtools.tab.time_travel', 'Time Travel')}
             </button>
             <button
               type="button"
@@ -115,7 +116,7 @@ export function App({
               data-testid="top-tab-performance"
               onClick={() => setTab('performance')}
             >
-              Performance
+              {t('devtools.tab.performance', 'Performance')}
             </button>
           </div>
           {tab === 'inertia' && <InertiaInspector />}
@@ -127,7 +128,12 @@ export function App({
           )}
         </>
       ) : (
-        <p>Open a page running an Arqel admin panel to activate DevTools.</p>
+        <p>
+          {t(
+            'devtools.inactive_hint',
+            'Open a page running an Arqel admin panel to activate DevTools.',
+          )}
+        </p>
       )}
     </main>
   );

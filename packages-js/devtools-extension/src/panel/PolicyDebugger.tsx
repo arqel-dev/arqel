@@ -10,6 +10,7 @@
  * panel falls back to an empty state — there is no info leak.
  */
 import { useMemo, useState } from 'react';
+import { t } from './i18n.js';
 
 export interface PolicyBacktraceFrame {
   readonly file: string | null;
@@ -71,26 +72,29 @@ export function PolicyDebugger({ entries }: PolicyDebuggerProps) {
     <div data-testid="arqel-policy-debugger" className="arqel-policy-debugger">
       <header className="arqel-policy-header">
         <span data-testid="policy-counter" className="arqel-policy-counter">
-          {counts.allow} allowed / {counts.deny} denied
+          {t('devtools.policy.counter', ':allow allowed / :deny denied', {
+            allow: counts.allow,
+            deny: counts.deny,
+          })}
         </span>
         <div className="arqel-policy-controls">
           <input
             type="search"
-            placeholder="Filter ability…"
+            placeholder={t('devtools.policy.filter_placeholder', 'Filter ability…')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             data-testid="policy-search"
-            aria-label="Filter ability"
+            aria-label={t('devtools.policy.filter_ability_aria', 'Filter ability')}
           />
           <select
             value={resultFilter}
             onChange={(e) => setResultFilter(e.target.value as ResultFilter)}
             data-testid="policy-result-filter"
-            aria-label="Filter by result"
+            aria-label={t('devtools.policy.filter_result_aria', 'Filter by result')}
           >
-            <option value="all">All</option>
-            <option value="allow">Allowed</option>
-            <option value="deny">Denied</option>
+            <option value="all">{t('devtools.policy.filter.all', 'All')}</option>
+            <option value="allow">{t('devtools.policy.filter.allow', 'Allowed')}</option>
+            <option value="deny">{t('devtools.policy.filter.deny', 'Denied')}</option>
           </select>
         </div>
       </header>
@@ -105,10 +109,10 @@ export function PolicyDebugger({ entries }: PolicyDebuggerProps) {
         <table data-testid="policy-table" className="arqel-policy-table">
           <thead>
             <tr>
-              <th>Ability</th>
-              <th>Arguments</th>
-              <th>Result</th>
-              <th>Stack</th>
+              <th>{t('devtools.policy.col.ability', 'Ability')}</th>
+              <th>{t('devtools.policy.col.arguments', 'Arguments')}</th>
+              <th>{t('devtools.policy.col.result', 'Result')}</th>
+              <th>{t('devtools.policy.col.stack', 'Stack')}</th>
             </tr>
           </thead>
           <tbody>
@@ -130,7 +134,9 @@ export function PolicyDebugger({ entries }: PolicyDebuggerProps) {
                       className={`arqel-policy-badge arqel-policy-badge--${entry.result ? 'allow' : 'deny'}`}
                       data-testid="policy-result-badge"
                     >
-                      {entry.result ? 'allow' : 'deny'}
+                      {entry.result
+                        ? t('devtools.policy.status.allow', 'allow')
+                        : t('devtools.policy.status.deny', 'deny')}
                     </span>
                   </td>
                   <td>

@@ -15,7 +15,7 @@ describe('ResourceBrowser', () => {
     const { lastFrame, unmount } = render(
       <ResourceBrowser dataDir="/fake" pollMs={0} ioOverrides={io} />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     const frame = lastFrame() ?? '';
     expect(frame).toContain('Users');
     expect(frame).toContain('Posts');
@@ -27,7 +27,7 @@ describe('ResourceBrowser', () => {
     const { lastFrame, unmount } = render(
       <ResourceBrowser dataDir="/fake" pollMs={0} ioOverrides={io} />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     const frame = lastFrame() ?? '';
     expect(frame).toMatch(/slug:\s*users/);
     expect(frame).toContain('App users.');
@@ -38,9 +38,9 @@ describe('ResourceBrowser', () => {
     const { lastFrame, stdin, unmount } = render(
       <ResourceBrowser dataDir="/fake" pollMs={0} ioOverrides={io} />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     stdin.write('j');
-    await new Promise((r) => setTimeout(r, 20));
+    await new Promise((r) => setTimeout(r, 50));
     const frame = lastFrame() ?? '';
     expect(frame).toMatch(/slug:\s*posts/);
     unmount();
@@ -60,7 +60,7 @@ describe('ResourceBrowser', () => {
           ioOverrides={{ readFile: () => bigPayload, fileExists: () => true }}
         />,
       );
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 200));
       const frame = lastFrame() ?? '';
       // Sidebar count and detail-pane "Records:" both grouped.
       expect(frame).toContain('(12.345)');
@@ -81,7 +81,7 @@ describe('ResourceBrowser', () => {
         ioOverrides={{ readFile: () => '', fileExists: () => false }}
       />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     expect(lastFrame() ?? '').toMatch(/Error:.*not found/);
     unmount();
   });

@@ -39,8 +39,8 @@ export function PublisherBadge({ publisher, showLink = true }: Props): JSX.Eleme
         <span
           data-testid="publisher-verified"
           role="img"
-          aria-label="Verified publisher"
-          title="Verified publisher"
+          aria-label="Editor verificado"
+          title="Editor verificado"
           className="text-blue-600"
         >
           ✓

@@ -28,13 +28,13 @@ export default function Browse({ plugins, categories, filters }: Props): JSX.Ele
   return (
     <>
       <MetaTags
-        title="Browse plugins — Arqel Marketplace"
+        title="Explorar plugins — Arqel Marketplace"
         description={
           filters.category !== null
-            ? `Browse plugins na categoria ${filters.category} — Arqel Marketplace.`
+            ? `Explore plugins na categoria ${filters.category} — Arqel Marketplace.`
             : filters.type !== null
-              ? `Browse plugins do tipo ${filters.type} — Arqel Marketplace.`
-              : 'Browse todos os plugins disponíveis no Arqel Marketplace — fields, widgets, integrações e themes.'
+              ? `Explore plugins do tipo ${filters.type} — Arqel Marketplace.`
+              : 'Explore todos os plugins disponíveis no Arqel Marketplace — fields, widgets, integrações e themes.'
         }
       />
       <main className="mx-auto max-w-7xl px-4 py-12">

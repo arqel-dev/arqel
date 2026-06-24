@@ -173,6 +173,31 @@ describe('<RichTextInput> (Tiptap)', () => {
     expect(toolbar).toBeInTheDocument();
   });
 
+  it('routes the link toolbar glyph visible face through t() (visible == aria)', () => {
+    const onChange = vi.fn();
+    render(<RichTextInput field={buildField({ toolbar: ['link'] })} value="" onChange={onChange} />);
+    // The link button has no language-neutral glyph; its visible face must
+    // equal the translated aria-label so they stay in sync across locales.
+    expect(screen.getByRole('button', { name: 'Link' })).toHaveTextContent('Link');
+  });
+
+  it('translates the link toolbar glyph visible face when a locale is active', () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: { fields_advanced: { richtext_link: 'Link PT' } },
+          },
+        },
+      } as Record<string, unknown>,
+    });
+    const onChange = vi.fn();
+    render(<RichTextInput field={buildField({ toolbar: ['link'] })} value="" onChange={onChange} />);
+    expect(screen.getByRole('button', { name: 'Link PT' })).toHaveTextContent('Link PT');
+    pageMock.mockReturnValue({ props: {} });
+  });
+
   it('initialises editor content from the `value` prop and renders parsed text', () => {
     const onChange = vi.fn();
     render(<RichTextInput field={buildField()} value="<p>hello world</p>" onChange={onChange} />);

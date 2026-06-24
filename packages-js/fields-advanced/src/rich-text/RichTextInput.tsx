@@ -198,7 +198,10 @@ const BUTTON_SPECS: Record<string, ButtonSpec> = {
     labelFallback: 'Blockquote',
     render: () => <>&ldquo;</>,
   },
-  link: { id: 'link', labelKey: 'richtext_link', labelFallback: 'Link', render: () => <>Link</> },
+  // The link button has no language-neutral glyph; its visible face is the
+  // localized label, supplied at the call site so the visible text matches the
+  // translated aria-label across locales.
+  link: { id: 'link', labelKey: 'richtext_link', labelFallback: 'Link', render: () => null },
   code: {
     id: 'code',
     labelKey: 'richtext_code',
@@ -422,7 +425,7 @@ export function RichTextInput({
                     : label
                 }
               >
-                {spec.render()}
+                {spec.render() ?? label}
               </button>
             );
           })}

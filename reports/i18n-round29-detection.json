@@ -1,0 +1,20 @@
+{
+  "total": 1,
+  "confirmed_count": 1,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "TableCard widget renders boolean cells as raw 'true'/'false' instead of a localized label",
+      "file": "packages-js/ui/src/widgets/TableCard.tsx",
+      "line": 112,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "table.boolean.true_label / table.boolean.false_label",
+      "detail": "In formatCell(), the branch `if (typeof value === 'string' || typeof value === 'boolean') return String(value);` returns the English JS literals 'true'/'false' for boolean column values. The main table cell renderer (packages-js/ui/src/table/cells.tsx:142-143) localizes the exact same case via t('table.boolean.true_label')/t('table.boolean.false_label') so a pt-BR viewer sees 'sim'/'n\u00e3o'. TableCard (a dashboard table-widget) was given locale-aware number grouping in a prior round (numberFormatter at line 46/108-109) but the boolean path was missed, leaving a locale-insensitive, untranslated truth label. Repro: configure a dashboard TableCard widget whose column data includes a boolean field (e.g. `active: true`); under any non-English panel locale the cell still renders the literal string 'true'/'false' rather than the localized table.boolean.* label used everywhere else. Fix: thread the translator into formatCell and return t('table.boolean.true_label','true') / t('table.boolean.false_label','false') for the boolean case (mirroring cells.tsx), keeping String(value) only for genuine strings.",
+      "confidence": "high",
+      "why_real": "Code confirmed: packages-js/ui/src/widgets/TableCard.tsx:111-112, formatCell() returns `String(value)` for the `typeof value === 'boolean'` branch, so a boolean column value renders the literal English 'true'/'false' verbatim to all users regardless of panel locale. This is genuine, visible, untranslated user-facing UI text in a first-party (non-vendored) dashboard table-widget.\n\nNovelty vs ledger: the ledger contains a Round-9 entry for this exact file/function (\"Dashboard TableCard formatCell uses String(value) for numbers \u2014 no locale grouping\", line 104) but that fix only addressed the NUMBER branch (numberFormatter), explicitly leaving the boolean branch as String(value). A Round-4 entry covers cells.tsx BooleanCell aria-label \u2014 a different file/component. No ledger entry covers the boolean branch of TableCard's formatCell. So this is not a duplicate of R1-R28.\n\nMinor inaccuracy in the finding (does not negate it): it claims the main table renderer (cells.tsx BooleanCell) makes a pt-BR viewer \"see 'sim'/'n\u00e3o'\". In reality BooleanCell renders a language-neutral glyph (\u2713/\u2014) and localizes only the aria-label, not visible text. So TableCard is not literally failing to mirror visible 'sim'/'n\u00e3o' output. Nonetheless the underlying defect \u2014 TableCard visibly emitting untranslated English 'true'/'false' \u2014 is real and reproduces: configure a dashboard TableCard whose column data includes a boolean field; under any locale the cell shows literal 'true'/'false'. The suggested fix (thread translator, return t('table.boolean.true_label')/t('table.boolean.false_label')) is a valid remediation.\n\nConfidence high on is_real and is_duplicate=false; the only caveat is the finding's slight mischaracterization of the comparison renderer, which affects the rationale but not the existence of the defect."
+    }
+  ]
+}

@@ -80,7 +80,7 @@ export function TableCard({ widget, className }: TableCardProps) {
                   >
                     {widget.columns.map((column) => (
                       <td key={column.name} className="px-2 py-1.5">
-                        {formatCell(record[column.name], numberFormatter)}
+                        {formatCell(record[column.name], numberFormatter, t)}
                       </td>
                     ))}
                   </tr>
@@ -101,14 +101,23 @@ export function TableCard({ widget, className }: TableCardProps) {
   );
 }
 
-function formatCell(value: unknown, numberFormatter: Intl.NumberFormat): string {
+function formatCell(
+  value: unknown,
+  numberFormatter: Intl.NumberFormat,
+  t: (key: string, fallback?: string) => string,
+): string {
   if (value === null || value === undefined) return '';
   // Numbers are grouped/decimal-formatted for the active locale so a cell of
   // `1500000` reads `1.500.000` under pt-BR instead of the raw en-US digits.
   if (typeof value === 'number') {
     return Number.isFinite(value) ? numberFormatter.format(value) : String(value);
   }
-  if (typeof value === 'string' || typeof value === 'boolean') {
+  // Booleans render a localized truth label (mirroring cells.tsx) so a pt-BR
+  // viewer sees the localized value instead of the literal 'true'/'false'.
+  if (typeof value === 'boolean') {
+    return value ? t('table.boolean.true_label', 'true') : t('table.boolean.false_label', 'false');
+  }
+  if (typeof value === 'string') {
     return String(value);
   }
   try {

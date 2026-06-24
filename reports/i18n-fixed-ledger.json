@@ -2032,5 +2032,11 @@
     "line": 25,
     "title": "PieChart/DonutChart slice values not locale-formatted and hardcoded English 'Slice N' fallback label",
     "round": 28
+  },
+  {
+    "file": "packages-js/ui/src/widgets/TableCard.tsx",
+    "line": 112,
+    "title": "TableCard widget renders boolean cells as raw 'true'/'false' instead of a localized label",
+    "round": 29
   }
 ]

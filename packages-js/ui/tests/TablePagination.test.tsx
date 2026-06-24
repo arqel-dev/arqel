@@ -96,12 +96,14 @@ describe('TablePagination', () => {
     });
     render(
       <TablePagination
-        meta={{ currentPage: 1, lastPage: 1235, perPage: 10, total: 12345 }}
+        meta={{ currentPage: 1, lastPage: 12345, perPage: 10, total: 12345 }}
         onPageChange={() => {}}
       />,
     );
     // pt-BR groups thousands with a dot (12.345), not the raw '12345'.
     expect(screen.getByText('Showing 1 to 10 of 12.345 results')).toBeInTheDocument();
+    // The page indicator (currentPage / lastPage) is grouped the same way.
+    expect(screen.getByText('1 / 12.345')).toBeInTheDocument();
   });
 
   it('groups large counts using the active locale (en)', () => {

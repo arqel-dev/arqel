@@ -90,7 +90,7 @@ export function TablePagination({
           {t('table.pagination.previous', 'Prev')}
         </Button>
         <span className="text-xs text-muted-foreground">
-          {meta.currentPage} / {meta.lastPage}
+          {numberFormatter.format(meta.currentPage)} / {numberFormatter.format(meta.lastPage)}
         </span>
         <Button
           variant="outline"

@@ -2038,5 +2038,29 @@
     "line": 112,
     "title": "TableCard widget renders boolean cells as raw 'true'/'false' instead of a localized label",
     "round": 29
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/PublisherBadge.tsx",
+    "line": 42,
+    "title": "PublisherBadge verified-icon aria-label/title hardcoded English in PT-BR app",
+    "round": 30
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+    "line": 64,
+    "title": "PublisherProfile verified-badge aria-label/title hardcoded English in PT-BR app",
+    "round": 30
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/Browse.tsx",
+    "line": 31,
+    "title": "Browse page MetaTags title/description leak English 'Browse' into PT-BR meta",
+    "round": 30
+  },
+  {
+    "file": "packages-js/ui/src/table/TablePagination.tsx",
+    "line": 93,
+    "title": "TablePagination page indicator interpolates raw page numbers, bypassing the component's own locale numberFormatter",
+    "round": 30
   }
 ]

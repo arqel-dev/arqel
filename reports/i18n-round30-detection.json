@@ -1,0 +1,56 @@
+{
+  "total": 7,
+  "confirmed_count": 4,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "PublisherBadge verified-icon aria-label/title hardcoded English in PT-BR app",
+      "file": "apps/marketplace/resources/js/Components/Marketplace/PublisherBadge.tsx",
+      "line": 42,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "publisher.verified_aria",
+      "detail": "The verified-publisher icon exposes aria-label=\"Verified publisher\" and title=\"Verified publisher\" (lines 42-43). The whole marketplace app is PT-BR (visible labels elsewhere read 'Verificado'). Screen-reader users and the title tooltip get untranslated English. No translator infra exists in this app, so this is a label-gap that should at minimum be PT-BR (e.g. 'Editor verificado'). Not in ledger (ledger only covers PublisherProfile number/date formatters).",
+      "confidence": "high",
+      "why_real": "Confirmed at apps/marketplace/resources/js/Components/Marketplace/PublisherBadge.tsx:42-43: the verified-publisher icon hardcodes aria-label=\"Verified publisher\" and title=\"Verified publisher\" in English. This is user-facing (screen-reader announcement + native hover tooltip) and the app is confirmed PT-BR: the sibling PublisherProfile.tsx:68 renders the visible label as \"\u2713 Verificado\" (Portuguese), making the English a11y text a genuine locale mismatch. No translation helper is used in PublisherBadge. Not in the R1-R29 ledger: marketplace PublisherProfile entries cover only number/date formatters (download-count suffixes, average-rating decimal, plugins_count grouping); no entry addresses the verified-publisher aria-label/title. Not a vendored shadcn primitive (it is an app component under apps/marketplace, not packages-js/ui/src/shadcn/*). Marketplace JS components are actively in-scope (CompareTable, PluginCard, ReviewList are in the ledger). Note: PublisherProfile.tsx:64-65 carries the identical defect and is likewise unrecorded, reinforcing that this label-gap is real and novel."
+    },
+    {
+      "title": "PublisherProfile verified-badge aria-label/title hardcoded English in PT-BR app",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+      "line": 64,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "publisher.verified_aria",
+      "detail": "aria-label=\"Verified publisher\" and title=\"Verified publisher\" (lines 64-65) on the profile verified badge, while the adjacent VISIBLE text is correctly PT-BR '\u2713 Verificado'. The a11y/tooltip name is English in a PT-BR app \u2014 accessible-name mismatch with visible label. Ledger entries for this file (lines 11/127/142) are all locale-number/decimal formatters, not this aria/title.",
+      "confidence": "high",
+      "why_real": "Confirmed at apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx lines 64-65: the verified badge has aria-label=\"Verified publisher\" and title=\"Verified publisher\" hardcoded in English, while the adjacent visible text (line 68) is correctly PT-BR \"\u2713 Verificado\". This is a genuine accessible-name vs visible-label i18n mismatch in a PT-BR app \u2014 screen-reader and tooltip users get English while sighted users get Portuguese. User-facing and reproduces exactly. Not vendored: it is an application page under apps/marketplace/, not packages-js/ui/src/shadcn/*. Not a duplicate: the three ledger entries for this file (lines 11/127/142 in the ledger context, round 14) are all locale-number formatting fixes (compact M/k suffixes, plugins_count grouping, average-rating decimal separator), none touching the badge's aria-label/title. The many aria-label entries elsewhere in the ledger are for unrelated components (table checkboxes, pagination, NumberInput steppers, FileInput, theme/tenant switchers) in different files \u2014 none for this PublisherProfile verified badge."
+    },
+    {
+      "title": "Browse page MetaTags title/description leak English 'Browse' into PT-BR meta",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/Browse.tsx",
+      "line": 31,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "marketplace.browse.meta_title",
+      "detail": "MetaTags title=\"Browse plugins \u2014 Arqel Marketplace\" (line 31) and three description variants (lines 34, 36, 37) start with English 'Browse plugins'/'Browse' mixed into otherwise-PT-BR sentences ('Browse plugins na categoria ...', 'Browse todos os plugins dispon\u00edveis ...'). The visible H1 is correctly PT 'Explorar plugins'. These document <title>/meta-description strings are user-facing (browser tab + SEO) and should be PT-BR ('Explorar plugins'). Other pages (Checkout/CheckoutSuccess) use PT-BR Head titles, so this is an inconsistency.",
+      "confidence": "high",
+      "why_real": "Reproduces exactly. apps/marketplace/resources/js/Pages/Marketplace/Browse.tsx passes English \"Browse\" into MetaTags: line 31 title=\"Browse plugins \u2014 Arqel Marketplace\", and three description variants at lines 34/36/37 embed English \"Browse plugins\"/\"Browse\" inside otherwise-PT-BR sentences (\"Browse plugins na categoria ${filters.category}...\", \"Browse plugins do tipo ${filters.type}...\", \"Browse todos os plugins dispon\u00edveis no Arqel Marketplace...\"). The visible H1 (line 41) is correctly PT \"Explorar plugins\", confirming the page is intended to be PT-BR and the meta is a code-mixed leak. MetaTags.tsx feeds these into Inertia <Head title> (document <title>/browser tab), meta description, og:title/og:description, and twitter:title/twitter:description \u2014 all user-facing (browser tab + SEO + social previews). Not in the R1-R29 ledger: the only \"Browse\" entries are fields-js FileInput button text (line 821) and cli-ink ResourceBrowser (line 1959), both unrelated; the Checkout.tsx ledger entry (line 1449) is about money formatting, not meta strings. Not a vendored shadcn primitive (it is an app-level marketplace page component). Not a deliberately out-of-scope item."
+    },
+    {
+      "title": "TablePagination page indicator interpolates raw page numbers, bypassing the component's own locale numberFormatter",
+      "file": "packages-js/ui/src/table/TablePagination.tsx",
+      "line": 93,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "",
+      "detail": "The page-position indicator renders `{meta.currentPage} / {meta.lastPage}` as raw JS numbers via JSX interpolation, with no locale grouping. This is inconsistent with the very same component, which already builds `numberFormatter = new Intl.NumberFormat(locale)` (line 31) and uses it for the `from`/`to`/`total` values in the 'Showing X to Y of Z results' summary (lines 36-38). The ledgered TablePagination fixes (R1/R26 \u2014 aria-labels, the 'showing' string, and number-grouping of the from/to/total counts) did not cover this separate indicator span. Repro: set panel locale to pt-BR (or any grouping locale), paginate a resource with >9999 pages (e.g. a large dataset at perPage=1, currentPage=12345, lastPage=98765). The 'Showing' line shows '12.345' grouping but the indicator shows '12345 / 98765' ungrouped \u2014 two different number renderings of the same magnitude side by side. Fix: wrap both in numberFormatter.format(...), e.g. `{numberFormatter.format(meta.currentPage)} / {numberFormatter.format(meta.lastPage)}`.",
+      "confidence": "high",
+      "why_real": "Verified at packages-js/ui/src/table/TablePagination.tsx:93. The page-position indicator span renders `{meta.currentPage} / {meta.lastPage}` as raw JS numbers via JSX interpolation, bypassing the component's own `numberFormatter = new Intl.NumberFormat(locale)` (line 31), which it correctly applies to from/to/total (lines 36-38). This produces a real, user-facing inconsistency: in a grouping locale (pt-BR) with large page counts (e.g. perPage=1, currentPage=12345, lastPage=98765), the 'Showing' summary shows grouped '12.345' while the indicator shows ungrouped '12345 / 98765' side by side. Ledger scan: 5 entries for this file \u2014 R1 (line 40 aria-label, line 43 'showing' range string) and R26 (line 50 from/to/total grouping in the 'showing' summary). None of these cover the separate line-93 indicator span; the R26 fix was scoped to the 'showing' summary counts, not the page indicator. Not vendored (src/table/, not src/shadcn/). Not a deliberately-out-of-scope item. Novel, reproduces, user-facing."
+    }
+  ]
+}

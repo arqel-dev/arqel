@@ -61,8 +61,8 @@ export default function PublisherProfile({ publisher, plugins, stats }: Props): 
                 <span
                   data-testid="profile-verified"
                   role="img"
-                  aria-label="Verified publisher"
-                  title="Verified publisher"
+                  aria-label="Editor verificado"
+                  title="Editor verificado"
                   className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800"
                 >
                   ✓ Verificado

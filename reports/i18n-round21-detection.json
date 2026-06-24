@@ -1,0 +1,116 @@
+{
+  "total": 11,
+  "confirmed_count": 9,
+  "dupe_count": 2,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "AiExtractInput empty-state 'No extraction yet \u2014 click button to start.' hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiExtractInput.tsx",
+      "line": 331,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.ai.extract_empty",
+      "detail": "Visible JSX text node. The empty/initial state of the AiExtract field renders a bare English literal `No extraction yet \u2014 click button to start.` inside a <p>. Every other user-facing string in this same file is wrapped in t() (the action buttons at line 268, the config error at 189, the status aria-label 'Extracting' at 271). This empty-state \u2014 arguably the most-seen state before any extraction runs \u2014 bypasses the translator entirely. NOT in the i18n-fixed-ledger (which covered lines 189 and 268 in this file but not 331). Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Confirmed at /home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiExtractInput.tsx:330-332: the empty/initial-state renders a bare English literal `No extraction yet \u2014 click button to start.` inside a <p>, with no t() wrapper. Every other user-facing string in the same file goes through the t() translator (lines 153, 190, 229, 238, 244, 256, 271, 286, 318, 320), so this is a genuine, inconsistent i18n gap. It is user-facing and arguably the most-seen state (rendered before any extraction runs). Ledger check (reports/i18n-fixed-ledger.json) shows only two AiExtractInput.tsx entries: line 268 'Apply/Apply all...' (round 4) and line 189 'Missing extract URL' config error (round 7). Line 331 / the empty-state text is NOT in the ledger across R1-R20. File is first-party (packages-js/ai), not a vendored shadcn primitive (packages-js/ui/src/shadcn/*). Reproduces as described, novel, not duplicate."
+    },
+    {
+      "title": "CommandPalette 'No commands found' empty-results message hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ui/src/palette/CommandPalette.tsx",
+      "line": 325,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.palette.no_results",
+      "detail": "Visible JSX text node inside the results <li role=\"presentation\"> rendered when groups.length === 0. The literal `No commands found` is not wrapped in t(), even though this component is one of the most heavily-localized in the codebase: the surrounding sr-only title (274), input placeholder (285), live-region count (291), listbox aria-label (297/320), and footer hints (356-358) are ALL keyed via t(). The no-results state is a primary, frequently-seen palette state. NOT in the ledger (which covers 274/285/291/297/356-358 but skips 325). Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages-js/ui/src/palette/CommandPalette.tsx:325. The empty-results state renders a hardcoded English JSX text node `No commands found` inside `<li role=\"presentation\">` (rendered when `groups.length === 0`), not wrapped in t(). Every other string in this same component is localized via t(): placeholder (306), aria live-region (312-314), listbox aria-label (320), footer hints (per ledger 356-358). This is a genuine, user-facing missing-i18n defect (visible text, not aria) in a primary/frequently-seen palette state, and the inconsistency with the rest of the file confirms it's an oversight. The file lives in src/palette/, not src/shadcn/*, so it is not a vendored primitive. Checked the ledger (reports/i18n-fixed-ledger.json): CommandPalette.tsx entries cover lines 274, 285, 291, 297 (round 1), 356/357/358 (round 8), and 111/154 (round 9) \u2014 line 325 is NOT present. Novel, reproduces, not vendored, not previously fixed in R1-R20."
+    },
+    {
+      "title": "InertiaInspector tab label 'Page Props' hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+      "line": 89,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "devtools.inertia.tab.page_props",
+      "detail": "Visible <button role=\"tab\"> face text `Page Props` is a bare English literal. The file imports `t` from './i18n.js' and uses it for the filter placeholder (devtools.filter_placeholder) and other controls, but the three tab labels are unlocalized and have no corresponding keys in src/panel/i18n.ts. The ledger lists InertiaInspector only for inertia.filter_aria / inertia.copy_aria \u2014 the visible tab labels were missed. Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Confirmed real and novel. At /home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx the three visible sub-tab button labels are bare English literals: line 89 `Page Props`, line 98 `Shared Props`, line 107 `Navigation History` (plus lines 125 `Copied!`/`Copy` and 139 empty-state, all hardcoded too). The file imports `t` from './i18n.js' (line 14) and uses it for the filter placeholder (devtools.filter_placeholder) and aria-labels (devtools.inertia.filter_aria, devtools.inertia.copy_aria), proving localization intent; the tab labels are inconsistent omissions. No corresponding keys (page_props/shared_props/navigation_history) exist in src/panel/i18n.ts.\n\nNot a duplicate. The ledger has only two InertiaInspector entries: round 10 line 145 (navigation timestamp toLocaleTimeString, a different defect) and round 19 line 112 (\"filter placeholder + aria-labels hardcoded\" \u2014 exactly the controls the finding acknowledges were covered, NOT the tab labels). The round-19 \"DevTools top-level tab labels hardcoded\" entry (line 82) is in App.tsx \u2014 those are the top-level panel tabs (Inertia/Policy/Fields), a different component from the Page Props/Shared Props/Navigation History sub-tabs inside InertiaInspector. So the visible sub-tab labels were genuinely missed.\n\nNot vendored: file lives in src/panel/, not packages-js/ui/src/shadcn/*. User-facing visible text (button face text, not aria)."
+    },
+    {
+      "title": "InertiaInspector tab label 'Shared Props' hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+      "line": 98,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "devtools.inertia.tab.shared_props",
+      "detail": "Visible <button role=\"tab\"> face text `Shared Props` is a bare English literal, unwrapped, with no key in src/panel/i18n.ts, despite the file otherwise using t(). Same gap as the 'Page Props' tab. Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx:98. The visible <button role=\"tab\"> face text `Shared Props` is a bare, unwrapped English literal (siblings `Page Props` at L89 and `Navigation History` at L107 share the same gap). The file otherwise uses t() at L113 (devtools.filter_placeholder), L117, L123, so the inconsistency is genuine. i18n.ts has NO devtools.inertia.tab.* keys, so non-English (pt_BR via navigator.language) users see English tab labels \u2014 real, user-facing.\n\nNot vendored: lives in packages-js/devtools-extension/src/panel/, not packages-js/ui/src/shadcn/*.\n\nNot a duplicate of R1-R20: the ledger's only InertiaInspector hit in that window is round 19 at line 112, titled 'InertiaInspector filter placeholder + aria-labels hardcoded' \u2014 that fix (now present at L113/117/123) explicitly scopes to the filter input placeholder and the filter/copy aria-labels, NOT the visible tab face text. The round-22 entry (L1373) is unrelated (navigation timestamp toLocaleTimeString locale). The App.tsx round-19 entry (L1763) covers the *top-level* DevTools tab labels in App.tsx, a different file/widget. So the visible InertiaInspector sub-tab labels were never addressed in R1-R20."
+    },
+    {
+      "title": "InertiaInspector tab label 'Navigation History' hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+      "line": 107,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "devtools.inertia.tab.navigation_history",
+      "detail": "Visible <button role=\"tab\"> face text `Navigation History` is a bare English literal, unwrapped, with no key in src/panel/i18n.ts, despite the file otherwise using t(). Completes the trio of unlocalized InertiaInspector tab labels. Visible text, not aria.",
+      "confidence": "med",
+      "why_real": "CONFIRMED. Verified at packages-js/devtools-extension/src/panel/InertiaInspector.tsx:107: the `<button type=\"button\" role=\"tab\" ... data-testid=\"tab-navigation\">` renders the bare English literal `Navigation History` with no t() wrapping, while the file imports `{ t }` from './i18n.js' (line 14) and routes its controls through it (filter placeholder line 113, aria-labels lines 117/123). The sibling tab labels Page Props (line 89) and Shared Props (line 98) are likewise hardcoded \u2014 the trio of inspector sub-tab labels is entirely unlocalized.\n\nNOVEL / NOT A DUPLICATE: The i18n-fixed-ledger.json has exactly two InertiaInspector.tsx entries: (1) round 10, line 145 \u2014 the navigation-event TIMESTAMP toLocaleTimeString() no-locale-arg; (2) round 19, line 112 \u2014 explicitly scoped to \"filter placeholder + aria-labels\" (the controls block, lines 112-123). The round-19 detection note confirms its scope is \"line 112 placeholder, line 116/122 aria-labels\" only. Neither entry touches the visible tab-button labels. The round-19 \"top-level tab labels hardcoded\" entry is for the DIFFERENT file App.tsx (line 82). The bundled i18n.ts dictionary has devtools.tab.* keys only for the App-level panel tabs (inertia/policies/fields/time_travel/performance) and no key for the inspector's internal Page Props / Shared Props / Navigation History sub-tabs \u2014 confirming there is no localization path. So this string is unledgered across R1-R20.\n\nNOT VENDORED: file lives in packages-js/devtools-extension/src/panel/, not packages-js/ui/src/shadcn/*. First-party authored component.\n\nUSER-FACING: i18n.ts activeLocale() derives from navigator.language; with pt-BR the surrounding devtools chrome renders translated (e.g. devtools.tab.inertia => 'Inspetor de Estado Inertia') while these tab faces stay English. Project precedent (rounds 9/10/12/19/20) consistently admits devtools-extension panel strings as in-scope i18n defects."
+    },
+    {
+      "title": "FieldsInspector empty-state 'No fields detected in the current pageProps.' hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+      "line": 72,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "devtools.fields.empty.no_fields",
+      "detail": "Visible <p data-testid=\"fields-empty\"> text. The no-fields empty state is a bare English literal while the file imports `t` from './i18n.js' and localizes its filter placeholder, type options, section headings and the 'No validation rules.' message (ledger lines 86/98/151/162). i18n.ts has devtools.policy.empty.no_match but NO key for the fields empty state. Ledger covered FieldsInspector line 162 ('No validation rules.') but not this line-72 panel-level empty state. Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Verified by reading /home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/FieldsInspector.tsx. Line 72 renders a bare English literal \"No fields detected in the current pageProps.\" inside <p data-testid=\"fields-empty\">, with no t() wrapping. The same file imports `t` from './i18n.js' (line 17) and localizes its filter placeholder (line 87), aria-labels (91/97), 'All types' option (99), section headings (152/169/175/181) and 'No validation rules.' (164). So this empty state is a genuine, user-facing i18n omission inconsistent with the file's own pattern. Ledger check: i18n-fixed-ledger.json has FieldsInspector entries for lines 86, 98, 151, 162 (all round 19) \u2014 line 72 is NOT among them. The line-162 entry covers the 'No validation rules.' detail empty-state, a different string from this panel-level empty state. Not vendored: the file is a devtools panel component, not under packages-js/ui/src/shadcn/*. Novel, reproduces, user-facing. (Sibling line 195 'No fields match the current filter.' is also untranslated but is outside this finding's scope.)"
+    },
+    {
+      "title": "FieldsInspector 'No fields match the current filter.' empty-filter message hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+      "line": 194,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "devtools.fields.empty.no_match",
+      "detail": "Visible <li data-testid=\"fields-no-match\"> text rendered when filtered.length === 0. Bare English literal, not wrapped in t(), and no key exists in src/panel/i18n.ts for it (there is a policy-side equivalent devtools.policy.empty.no_match but no fields-side key). Not in the ledger. Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Verified at packages-js/devtools-extension/src/panel/FieldsInspector.tsx:194: the empty-filter message 'No fields match the current filter.' is a bare English literal inside a visible <li data-testid=\\\"fields-no-match\\\">, rendered when filtered.length === 0. It is NOT wrapped in t(), and i18n.ts has no fields-side key for it \u2014 only a policy-side equivalent devtools.policy.empty.no_match (line 53/102) and an unrelated devtools.fields.no_rules. Round 19 of the ledger (lines 1791-1811) swept FieldsInspector for the filter placeholder/aria-labels, 'All types', section headings, and the 'No validation rules.' empty-state, but did NOT include this filter-empty string; it is a distinct, novel literal. Not a vendored shadcn primitive (it's an own devtools panel). Genuinely reproduces, user-facing visible text, novel."
+    },
+    {
+      "title": "TimeTravel empty-state 'No navigation snapshots captured yet...' hardcoded English",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+      "line": 62,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "devtools.time_travel.empty.no_snapshots",
+      "detail": "Visible <p data-testid=\"time-travel-empty\"> text. The snapshots-empty state renders a bare English literal `No navigation snapshots captured yet. Navigate within the app to record state.` while the file imports `t` from './i18n.js' and localizes the replay button label/aria (ledger lines 118; 56/82 covered pluralization+date). No key exists for this empty state in src/panel/i18n.ts. Not in the ledger. Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Verified at packages-js/devtools-extension/src/panel/TimeTravel.tsx:61-63: the empty-state renders a bare English literal `No navigation snapshots captured yet. Navigate within the app to record state.` inside `<p data-testid=\"time-travel-empty\">`, while the same file imports `t` from ./i18n.js and localizes the replay button label/aria (lines 119,123). i18n.ts ships both `en` and `pt_BR` dictionaries; grep confirms NO key (`devtools.time_travel.empty`) exists for this string, so under navigator.language=pt-BR the entire panel localizes except this empty state. The pattern was applied to the sibling PerformanceMetrics empty state (`devtools.performance.empty`, with pt_BR text) but missed here. NOVEL vs the ledger: the three TimeTravel.tsx ledger entries cover the snapshot timestamp toLocaleTimeString (round, line 1301), the snapshot-count pluralization (line 1565), and the replay button aria-label (line 1877) \u2014 none touch the empty-state text. The App.tsx empty-state entry (line 1757) is a different component (top-level inactive hint). User-facing visible text in a first-party package, not a vendored shadcn primitive (packages-js/ui/src/shadcn/*)."
+    },
+    {
+      "title": "TrashedFilter top-level filter label hardcoded to English 'Trashed' (framework default, never a translation key)",
+      "file": "packages/table/src/Filters/TrashedFilter.php",
+      "line": 55,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.filter.trashed",
+      "detail": "TrashedFilter::make() sets the filter's own visible name via $filter->label('Trashed'). At serialization Filter::getLabel() routes the value through localizeLabel(), which calls trans('Trashed'); because 'Trashed' is a literal display string and not a registered translation key, trans() returns it verbatim, so the filter's chrome label always renders English regardless of the active locale (pt_BR etc.). This is distinct from the soft-delete OPTION labels at line 134-136 ('Without deleted'/'With deleted'/'Only deleted'), which were already fixed in ledger round 8 (line 134); the top-level filter NAME was never covered by any round. Framework-hardcoded: the default should be a translation key such as 'arqel::messages.filter.trashed' (added to the en + pt_BR message catalogs) so the built-in filter name localizes out of the box, matching how the option-label defaults and other built-in filters are handled. App-can-override remains available via Filter::label().",
+      "confidence": "high",
+      "why_real": "Verified in /home/diogo/PhpstormProjects/arqel/packages/table/src/Filters/TrashedFilter.php:55: TrashedFilter::make() sets $filter->label('Trashed'). Filter::getLabel() (packages/table/src/Filter.php:100) routes this through localizeLabel() (line 110), which calls trans('Trashed') (line 116). 'Trashed' is a plain English display literal, not a registered translation key, and it is absent from any arqel/table lang catalog (no package lang dir defines it). Per the documented localizeLabel contract, a literal with no matching translation passes through unchanged, so the filter's chrome NAME renders English under every locale (pt_BR etc.). This is a genuine user-facing i18n defect in PHP framework code, not a vendored shadcn primitive (not in packages-js/ui/src/shadcn/*).\n\nNot a duplicate: the i18n-fixed-ledger.json has exactly one TrashedFilter entry (round 8) and it explicitly targets line 134 \u2014 the soft-delete OPTION labels 'Without deleted'/'With deleted'/'Only deleted' (now wrapped in localizeLabel at lines 134-136). The top-level filter NAME at line 55 is a distinct string at a distinct location and was never covered by rounds 1-20. The fix is also distinct: convert the make() default to a real key (e.g. arqel::messages.filter.trashed) registered in en + pt_BR catalogs, mirroring how the option-label defaults are handled, while leaving Filter::label() available for app overrides."
+    }
+  ]
+}

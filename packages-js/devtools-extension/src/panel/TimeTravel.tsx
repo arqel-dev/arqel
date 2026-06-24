@@ -59,7 +59,10 @@ export function TimeTravel({ snapshots, onReplay }: TimeTravelProps) {
     return (
       <div data-testid="arqel-time-travel" className="arqel-time-travel">
         <p data-testid="time-travel-empty" className="arqel-tt-empty">
-          No navigation snapshots captured yet. Navigate within the app to record state.
+          {t(
+            'devtools.time_travel.empty.no_snapshots',
+            'No navigation snapshots captured yet. Navigate within the app to record state.',
+          )}
         </p>
       </div>
     );

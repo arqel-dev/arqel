@@ -86,7 +86,7 @@ export function InertiaInspector({ stateSource, writeClipboard }: InertiaInspect
             data-testid="tab-page-props"
             onClick={() => setTab('pageProps')}
           >
-            Page Props
+            {t('devtools.inertia.tab.page_props', 'Page Props')}
           </button>
           <button
             type="button"
@@ -95,7 +95,7 @@ export function InertiaInspector({ stateSource, writeClipboard }: InertiaInspect
             data-testid="tab-shared-props"
             onClick={() => setTab('sharedProps')}
           >
-            Shared Props
+            {t('devtools.inertia.tab.shared_props', 'Shared Props')}
           </button>
           <button
             type="button"
@@ -104,7 +104,7 @@ export function InertiaInspector({ stateSource, writeClipboard }: InertiaInspect
             data-testid="tab-navigation"
             onClick={() => setTab('navigation')}
           >
-            Navigation History
+            {t('devtools.inertia.tab.navigation_history', 'Navigation History')}
           </button>
         </div>
         <div className="arqel-inspector-controls">
@@ -122,7 +122,7 @@ export function InertiaInspector({ stateSource, writeClipboard }: InertiaInspect
             data-testid="inspector-copy"
             aria-label={t('devtools.inertia.copy_aria', 'Copy state JSON')}
           >
-            {copied ? 'Copied!' : 'Copy'}
+            {copied ? t('devtools.inertia.copied', 'Copied!') : t('devtools.inertia.copy', 'Copy')}
           </button>
         </div>
       </header>
@@ -136,7 +136,9 @@ export function InertiaInspector({ stateSource, writeClipboard }: InertiaInspect
         {tab === 'navigation' && (
           <ol className="arqel-nav-history" data-testid="navigation-list">
             {filteredHistory.length === 0 && (
-              <li className="arqel-nav-empty">No navigation events recorded.</li>
+              <li className="arqel-nav-empty">
+                {t('devtools.inertia.empty.no_navigation', 'No navigation events recorded.')}
+              </li>
             )}
             {filteredHistory.map((entry, idx) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: timestamps can collide across rapid navigations; index disambiguates within a snapshot.

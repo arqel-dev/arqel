@@ -65,6 +65,7 @@ const aiDict = {
       status_analyzing: 'Analisando',
       status_translating: 'Traduzindo',
       translate_textarea_aria: 'Tradução para :language',
+      extract_empty: 'Nenhuma extração ainda — clique no botão para começar.',
     },
   },
 };
@@ -175,6 +176,28 @@ describe('@arqel-dev/ai i18n', () => {
     expect(screen.getByText('Fonte: raw')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Extrair com IA' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Aplicar tudo' })).toBeInTheDocument();
+  });
+
+  it('AiExtractInput localizes the empty-state message before any extraction', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiExtractInput
+        name="ex"
+        value={{}}
+        props={{
+          sourceField: 'raw',
+          targetFields: ['title'],
+          buttonLabel: '',
+          usingJsonMode: false,
+          provider: null,
+        }}
+        resource="docs"
+        field="ex"
+      />,
+    );
+    expect(
+      screen.getByText('Nenhuma extração ainda — clique no botão para começar.'),
+    ).toBeInTheDocument();
   });
 
   it('AiImageInput localizes the analyze button and image-file aria label', () => {

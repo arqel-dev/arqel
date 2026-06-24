@@ -328,7 +328,7 @@ export function AiExtractInput(props: AiExtractInputProps): ReactElement {
         </Card>
       ) : (
         <p className="text-sm text-muted-foreground italic">
-          No extraction yet — click button to start.
+          {t('arqel.ai.extract_empty', 'No extraction yet — click button to start.')}
         </p>
       )}
 

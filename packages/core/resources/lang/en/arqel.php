@@ -232,6 +232,8 @@ return [
         // Buttons rendered next to the provenance badge after a suggestion.
         'suggestion_accept' => 'Accept',
         'suggestion_pick_another' => 'Pick another',
+        // Empty/initial state shown before any extraction runs.
+        'extract_empty' => 'No extraction yet — click button to start.',
     ],
     // Visible group headings rendered in the <CommandPalette> listbox when a
     // command has no explicit category, plus the synthetic "Recent" bucket.

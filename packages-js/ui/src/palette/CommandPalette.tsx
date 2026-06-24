@@ -322,7 +322,7 @@ export function CommandPalette({ endpoint = '/admin/commands' }: CommandPaletteP
         >
           {groups.length === 0 && (
             <li role="presentation" className="px-4 py-3 text-sm opacity-60">
-              No commands found
+              {t('arqel.palette.no_results', 'No commands found')}
             </li>
           )}
           {groups.map((group) => {

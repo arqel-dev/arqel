@@ -1,3 +1,5 @@
+import { useArqelLocale } from '@arqel-dev/react/utils';
+import { useMemo } from 'react';
 import {
   Legend,
   PolarAngleAxis,
@@ -12,6 +14,8 @@ import { type ChartSubProps, colorFor, toRowShape } from '../types';
 
 export function RadarChart({ chartData, height, showLegend, showGrid }: ChartSubProps) {
   const rows = toRowShape(chartData);
+  const locale = useArqelLocale();
+  const nf = useMemo(() => new Intl.NumberFormat(locale), [locale]);
 
   return (
     <div data-testid="chart-radar" style={{ width: '100%', height }}>
@@ -19,7 +23,7 @@ export function RadarChart({ chartData, height, showLegend, showGrid }: ChartSub
         <RechartsRadarChart data={rows}>
           {showGrid ? <PolarGrid /> : null}
           <PolarAngleAxis dataKey="name" />
-          <PolarRadiusAxis />
+          <PolarRadiusAxis tickFormatter={(v) => nf.format(Number(v))} />
           {chartData.datasets.map((ds, i) => {
             const color = colorFor(ds, i);
             return (
@@ -33,7 +37,7 @@ export function RadarChart({ chartData, height, showLegend, showGrid }: ChartSub
               />
             );
           })}
-          <Tooltip />
+          <Tooltip formatter={(v) => nf.format(Number(v))} />
           {showLegend ? <Legend /> : null}
         </RechartsRadarChart>
       </ResponsiveContainer>

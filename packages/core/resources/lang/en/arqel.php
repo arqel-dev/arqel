@@ -141,6 +141,12 @@ return [
         'next' => 'Next',
         'showing' => 'Showing :from to :to of :total results',
     ],
+    // Chart widget copy consumed by @arqel-dev/ui chart components via
+    // useArqelTranslations(). :number is the 1-based slice index used when a
+    // pie/donut slice has no explicit label.
+    'chart' => [
+        'slice_fallback' => 'Slice :number',
+    ],
     // Visible H1 titles for the default CRUD pages. :label is the resource's
     // (already-translated) singular label; 'fallback' is used when no label
     // or record title is available.

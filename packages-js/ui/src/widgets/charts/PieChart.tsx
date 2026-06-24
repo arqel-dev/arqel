@@ -1,3 +1,5 @@
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
+import { useMemo } from 'react';
 import {
   Cell,
   Legend,
@@ -20,9 +22,13 @@ export function PieChart({
   innerRadius = 0,
   testId = 'chart-pie',
 }: PieChartProps) {
+  const locale = useArqelLocale();
+  const t = useArqelTranslations();
+  const nf = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const first = chartData.datasets[0];
   const slices = (first?.data ?? []).map((value, i) => ({
-    name: chartData.labels[i] ?? `Slice ${i + 1}`,
+    name:
+      chartData.labels[i] ?? t('arqel.chart.slice_fallback', 'Slice :number', { number: i + 1 }),
     value,
   }));
 
@@ -36,13 +42,13 @@ export function PieChart({
             nameKey="name"
             innerRadius={innerRadius}
             outerRadius="80%"
-            label
+            label={(entry) => nf.format(Number(entry.value))}
           >
             {slices.map((slice, i) => (
               <Cell key={slice.name} fill={colorFor(first ?? { label: '', data: [] }, i)} />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip formatter={(v) => nf.format(Number(v))} />
           {showLegend ? <Legend /> : null}
         </RechartsPieChart>
       </ResponsiveContainer>

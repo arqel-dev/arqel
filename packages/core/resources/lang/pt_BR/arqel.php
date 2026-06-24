@@ -140,6 +140,12 @@ return [
         'next' => 'Próximo',
         'showing' => 'Exibindo :from a :to de :total resultados',
     ],
+    // Textos do widget de gráfico consumidos pelos componentes de gráfico do
+    // @arqel-dev/ui via useArqelTranslations(). :number é o índice (base 1) da
+    // fatia, usado quando uma fatia de pizza/rosca não tem rótulo explícito.
+    'chart' => [
+        'slice_fallback' => 'Fatia :number',
+    ],
     // Títulos H1 visíveis das páginas CRUD padrão. :label é o rótulo
     // (já traduzido) singular do recurso; 'fallback' é usado quando não há
     // rótulo nem título de registro disponível.

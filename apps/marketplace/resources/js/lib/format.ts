@@ -59,6 +59,26 @@ export function formatCompact(value: number, locale: string): string {
   return new Intl.NumberFormat(locale, { notation: 'compact' }).format(value);
 }
 
+/** Cardinal plural forms keyed by Intl.PluralRules categories used in the app. */
+type PluralForms = {
+  one: string;
+  other: string;
+};
+
+/**
+ * Format a count followed by the grammatically correct noun for the active
+ * locale. The singular/plural category is selected with `Intl.PluralRules`
+ * (so `1` yields `one` and `2` yields `other` in both `en` and `pt-BR`), and
+ * the number itself is run through `Intl.NumberFormat` for locale-aware
+ * thousands grouping (e.g. `1234` -> `1,234` in `en`, `1.234` in `pt-BR`).
+ */
+export function formatPlural(count: number, locale: string, forms: PluralForms): string {
+  const category = new Intl.PluralRules(locale).select(count);
+  const noun = category === 'one' ? forms.one : forms.other;
+  const formatted = new Intl.NumberFormat(locale).format(count);
+  return `${formatted} ${noun}`;
+}
+
 /** Format an ISO/date string for the given locale. Returns the dash fallback when empty/invalid. */
 export function formatDate(
   value: string | null | undefined,

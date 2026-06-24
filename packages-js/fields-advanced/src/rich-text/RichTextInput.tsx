@@ -208,11 +208,14 @@ const BUTTON_SPECS: Record<string, ButtonSpec> = {
     labelFallback: 'Inline code',
     render: () => <>{'<>'}</>,
   },
+  // The image button has no language-neutral glyph; its visible face is the
+  // localized label (mirroring the `link` button) so the visible text matches
+  // the translated aria-label across locales instead of the English "Img".
   image: {
     id: 'image',
     labelKey: 'richtext_image',
     labelFallback: 'Image',
-    render: () => <>Img</>,
+    render: () => null,
   },
 };
 

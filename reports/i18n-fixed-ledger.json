@@ -2128,5 +2128,29 @@
     "line": 106,
     "title": "TimeTravel timestamp toLocaleTimeString no locale (sibling of InertiaInspector)",
     "round": 33
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+    "line": 131,
+    "title": "PublisherProfile 'Downloads' stat label hardcoded English in PT-BR app",
+    "round": 34
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/CheckoutSuccess.tsx",
+    "line": 34,
+    "title": "CheckoutSuccess license-key heading mixes English 'license key' into PT-BR copy",
+    "round": 34
+  },
+  {
+    "file": "packages-js/ai/src/AiTextInput.tsx",
+    "line": 215,
+    "title": "AI text field char-counter renders charCount/maxLength as raw numbers, bypassing Intl.NumberFormat",
+    "round": 34
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+    "line": 82,
+    "title": "Devtools FieldsInspector header counter 'X visible / Y total' hardcoded in English, bypassing the file's own t()",
+    "round": 34
   }
 ]

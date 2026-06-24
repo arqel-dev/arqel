@@ -1,0 +1,56 @@
+{
+  "total": 6,
+  "confirmed_count": 4,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "PublisherProfile 'Downloads' stat label hardcoded English in PT-BR app",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+      "line": 131,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "marketplace.publisher.stats.downloads",
+      "detail": "Visible uppercase stat label literal <p className=\"text-xs uppercase text-neutral-500\">Downloads</p>. Same profile-stats grid as the 'Plugins' label; the third sibling 'Rating m\u00e9dio' is PT-BR. Bare English 'Downloads' label is untranslated. Not in the ledger. Visible text, not aria.",
+      "confidence": "med",
+      "why_real": "Reproduces at apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx:131: `<p className=\"text-xs uppercase text-neutral-500\">Downloads</p>` is a hardcoded English visible stat label. The page is a PT-BR app context \u2014 the sibling stat label at line 140 is \"Rating m\u00e9dio\" (PT-BR), and the page body uses PT-BR (\"Plugins publicados\", \"Este publisher ainda n\u00e3o tem plugins publicados\"), making the bare English \"Downloads\" label an untranslated literal. It is user-facing (rendered text, not aria/test-id), not a vendored shadcn primitive (it lives in an app Page), and the marketplace app is actively in-scope for the i18n sweep. Ledger entries on this same file are all distinct concerns: R11 line 11 (total-downloads compact number suffixes), R14 line 142 (avg-rating decimal separator), R24 line 127 (plugins_count raw number grouping), R30 line 64 (verified-badge aria). None of them translate the visible \"Downloads\" stat label, and a targeted grep for a Plugins/Downloads label entry on PublisherProfile returned nothing. Novel and not a duplicate. Confidence is med rather than high only because \"Downloads\" is a widely-used loanword in PT-BR and the severity is low, but it remains an untranslated bare English literal inconsistent with its localized siblings."
+    },
+    {
+      "title": "CheckoutSuccess license-key heading mixes English 'license key' into PT-BR copy",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/CheckoutSuccess.tsx",
+      "line": 34,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "marketplace.checkout.success.license_key_heading",
+      "detail": "Visible heading <h2 ...>Sua license key</h2> mixes PT-BR 'Sua' with untranslated English 'license key'. Surrounding copy is PT-BR and already uses the correct term 'licen\u00e7a' (line 30: 'Sua licen\u00e7a foi gerada com sucesso'), so this heading should read 'Sua chave de licen\u00e7a'. Inconsistent half-translated string. CheckoutSuccess.tsx is not present in the i18n-fixed ledger at all. Visible text, not aria.",
+      "confidence": "high",
+      "why_real": "Confirmed at apps/marketplace/resources/js/Pages/Marketplace/CheckoutSuccess.tsx:34. The visible h2 heading reads \"Sua license key\" \u2014 mixing PT-BR \"Sua\" with untranslated English \"license key\". Surrounding copy is fully PT-BR and already uses the correct localized term: line 30 \"Sua licen\u00e7a foi gerada com sucesso\" and line 52 \"Guarde essa chave\". The intended string is clearly \"Sua chave de licen\u00e7a\", making this a genuine half-translated inconsistency. User-facing visible heading text, not aria, not a code identifier (the {license_key} prop on line 40 is data, untouched). The file uses hardcoded PT-BR strings throughout with no translation helper, consistent with the app's i18n approach. CheckoutSuccess.tsx is entirely absent from the R1-R33 ledger (0 hits); the ledger covers nine other Marketplace pages but not this one. Not a vendored shadcn primitive (it is an app page). Reproduces, novel, user-facing."
+    },
+    {
+      "title": "AI text field char-counter renders charCount/maxLength as raw numbers, bypassing Intl.NumberFormat",
+      "file": "packages-js/ai/src/AiTextInput.tsx",
+      "line": 215,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "ai.text.char_counter",
+      "detail": "The live char-counter under the textarea renders `{charCount} / {maxLength}` with raw JS numbers. For locales with thousands grouping (e.g. pt-BR) a maxLength of 5000 with 1234 typed chars displays `1234 / 5000` instead of the locale-correct `1.234 / 5.000`. The AI fields were swept in rounds 4/7 for button labels, status aria-labels and config-error strings (ledger entries at lines 57/155/215), but this numeric counter was not run through Intl.NumberFormat with the active locale. Repro: render AiTextInput with maxLength=5000 under a pt-BR locale, type >=1000 characters; the counter shows '1234 / 5000' with no decimal/grouping separators. Fix: format both via new Intl.NumberFormat(locale).format(...) using the locale already available from useArqelLocale/useTranslator in this component.",
+      "confidence": "high",
+      "why_real": "Confirmed real and novel. At packages-js/ai/src/AiTextInput.tsx:215 the char-counter renders `{charCount} / {maxLength}` as raw JS numbers (charCount = currentValue.length on line 200; maxLength is a number on line 116). Under a grouping locale like pt-BR, 1234/5000 displays as '1234 / 5000' instead of '1.234 / 5.000', bypassing Intl.NumberFormat. User-facing (visible counter under the textarea, not sr-only). Not vendored \u2014 it lives in packages-js/ai, not packages-js/ui/shadcn/*. The component already imports useArqelTranslations from @arqel-dev/react/utils, so a locale is available for the fix.\\n\\nNot a duplicate: the three existing AiTextInput ledger entries cover different concerns \u2014 line 57 (round 4, default button labels), line 155 (round 7, config-error 'Missing generate URL'), and line 215 (round 4, titled 'AI status sr-only/aria labels hardcoded Analyzing/Classifying/...'). The line-215 entry shares the line number only coincidentally; it is about aria status labels, not the numeric char-counter. Crucially, the ledger DOES contain the exact-same defect class for the sibling component at line 995 (round 7): 'RichTextInput character counter N / M emits un-grouped numbers (locale-insensitive)'. That precedent proves this is treated as an in-scope, real i18n bug \u2014 and the AiTextInput counter is the same pattern in a separate, un-swept file.\", \"confidence\": \"high\"}"
+    },
+    {
+      "title": "Devtools FieldsInspector header counter 'X visible / Y total' hardcoded in English, bypassing the file's own t()",
+      "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+      "line": 82,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "devtools.fields.counter",
+      "detail": "The fields header counter renders `{visibleCount} visible / {fields.length} total` with the literal English words 'visible' and 'total' inlined, even though the rest of this same file was localized via the self-contained `t()` from ./i18n.js (ledger covers FieldsInspector lines 72/86/98/151/162/194 \u2014 empty states, filter placeholder/aria, headings, 'All types', 'No validation rules'). This counter at line 82 was missed: the strings 'visible'/'total' never go through t(), and the two counts are also raw (no Intl grouping). The devtools panel i18n was explicitly in scope for the sweep. Repro: open the Fields tab in the devtools panel under a non-English locale \u2014 the counter still reads 'N visible / M total' while every neighbouring label is translated. Fix: wrap in t('devtools.fields.counter', '{visible} visible / {total} total', { visible: visibleCount, total: fields.length }) and format the counts with the panel's number formatter.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/devtools-extension/src/panel/FieldsInspector.tsx:82, which renders `{visibleCount} visible / {fields.length} total` with the literal English words 'visible' and 'total' inlined, bypassing the file's own self-contained t(). Every neighbouring string in the same render (lines 72, 87, 91, 97, 99) is localized via t(), so under a non-English locale this counter reads English while all surrounding labels are translated \u2014 a real user-facing i18n defect. The two counts are also raw (no Intl grouping). The ledger (reports/i18n-fixed-ledger.json) contains six prior FieldsInspector entries (filter placeholder/aria, 'All types', section headings, 'No validation rules', and two empty-state strings) but none for this header counter, so it is novel and not a duplicate of R1-R33. The devtools panel was explicitly in scope (six prior fixes prove it). The file is in src/panel, not packages-js/ui/src/shadcn/* (not vendored). Not a deliberately-out-of-scope item."
+    }
+  ]
+}

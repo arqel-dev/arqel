@@ -135,4 +135,7 @@ return [
     'workflow' => [
         'state_filter_label' => 'Estado',
     ],
+    'filter' => [
+        'trashed' => 'Excluídos',
+    ],
 ];

@@ -32,6 +32,16 @@ it('localizes TrashedFilter soft-delete option labels by active locale', functio
     ]);
 });
 
+it('localizes the TrashedFilter top-level label by active locale', function (): void {
+    $filter = TrashedFilter::make();
+
+    // English default is the original literal, preserving stability.
+    expect($filter->toArray()['label'])->toBe('Trashed');
+
+    app()->setLocale('pt_BR');
+    expect($filter->toArray()['label'])->toBe('Excluídos');
+});
+
 it('localizes the base Filter label in toArray by active locale', function (): void {
     Lang::addLines(['filters.status' => 'Status'], 'en', 'app');
     Lang::addLines(['filters.status' => 'Situação'], 'pt_BR', 'app');

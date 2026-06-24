@@ -52,7 +52,7 @@ final class TrashedFilter extends Filter
     public static function make(string $name = 'trashed'): static
     {
         $filter = new self($name);
-        $filter->label('Trashed');
+        $filter->label('arqel::messages.filter.trashed');
         $filter->default(self::STATE_WITHOUT);
 
         return $filter;

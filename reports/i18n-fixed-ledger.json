@@ -1996,5 +1996,23 @@
     "line": 127,
     "title": "PublisherProfile plugins_count stat rendered raw, no locale grouping",
     "round": 24
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Services/SecurityScanner.php",
+    "line": 136,
+    "title": "SecurityScanner 'Plugin has no declared license.' summary is framework-hardcoded English serialized to the marketplace admin security-scan UI",
+    "round": 26
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Services/SecurityScanner.php",
+    "line": 148,
+    "title": "SecurityScanner license allow-list warning summary is framework-hardcoded English serialized to the marketplace admin security-scan UI",
+    "round": 26
+  },
+  {
+    "file": "packages-js/ui/src/table/TablePagination.tsx",
+    "line": 50,
+    "title": "Pagination from/to/total counts interpolated raw, never locale number-grouped",
+    "round": 26
   }
 ]

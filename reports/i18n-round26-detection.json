@@ -1,0 +1,44 @@
+{
+  "total": 3,
+  "confirmed_count": 3,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "SecurityScanner 'Plugin has no declared license.' summary is framework-hardcoded English serialized to the marketplace admin security-scan UI",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Services/SecurityScanner.php",
+      "line": 136,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::marketplace.security.no_license",
+      "detail": "checkLicense() returns a finding with 'summary' => 'Plugin has no declared license.' This finding array is stored on the SecurityScan model and serialized verbatim via the 'findings' key in SecurityScanListController::__invoke() (packages/marketplace/src/Http/Controllers/SecurityScanListController.php line 47, $scan->findings), reaching the marketplace admin frontend untranslated. Framework-hardcoded; should route through trans() with a key like arqel::marketplace.security.no_license. Note SecurityScanListController itself is already localized for its forbidden/message responses, but the nested finding summaries from the scanner are not.",
+      "confidence": "high",
+      "why_real": "Confirmed real and novel. SecurityScanner::checkLicense() at packages/marketplace/src/Services/SecurityScanner.php:136 returns a finding array with 'summary' => 'Plugin has no declared license.' \u2014 framework-hardcoded English, never routed through __()/trans(). A second hardcoded summary exists at line 148 (\"License '{license}' is not in the recommended allow-list.\"). The SecurityScan model casts 'findings' to array and stores it verbatim. SecurityScanListController::__invoke() line 48 serializes $scan->findings directly into the admin JSON response, so the untranslated summary reaches the marketplace admin security-scan UI. The controller localizes its own forbidden response (line 22) but not the nested scanner finding summaries \u2014 the asymmetry the finding describes. Not vendored (packages/marketplace, not packages-js/ui/src/shadcn). Not in the R1-R25 ledger: no SecurityScanner / checkLicense / 'no declared license' entry exists; SecurityScanListController appears only under the generic 'Forbidden' systemic entry (a different string). The defect class has direct precedent (PluginAutoChecker round 11/12: hardcoded English check messages serialized to the submission UI), so this scanner-finding-summary i18n gap is treated as a genuine bug in this project. User-facing admin UI string."
+    },
+    {
+      "title": "SecurityScanner license allow-list warning summary is framework-hardcoded English serialized to the marketplace admin security-scan UI",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Services/SecurityScanner.php",
+      "line": 148,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::marketplace.security.license_not_allowed",
+      "detail": "checkLicense() returns 'summary' => \"License '{$license}' is not in the recommended allow-list.\" This English sentence is part of the findings array serialized verbatim to the admin frontend via SecurityScanListController (the 'findings' field, line 47). Framework-hardcoded; should be a trans() call with the license name as a placeholder, e.g. trans('arqel::marketplace.security.license_not_allowed', ['license' => $license]).",
+      "confidence": "high",
+      "why_real": "Confirmed at packages/marketplace/src/Services/SecurityScanner.php:148: checkLicense() returns 'summary' => \"License '{$license}' is not in the recommended allow-list.\" \u2014 hardcoded English with no trans()/__() wrapper (line 136 'Plugin has no declared license.' is the same defect class). This 'summary' is part of the findings array persisted on the SecurityScan model and serialized verbatim to the admin security-scan UI via SecurityScanListController (returns 'findings' => $scan->findings, ~line 47). So it is genuinely user-facing in the admin frontend. Ledger scan (reports/i18n-fixed-ledger.json) shows NO entry for SecurityScanner.php or its license-summary string in rounds 1-25. The existing marketplace entries cover different symbols/files: PluginAutoChecker.php (R11/R12, a separate service with no checkLicense and different messages), controller JSON error messages (forbidden/unauthenticated/not-found), and FormRequest/inline-validate attribute gaps \u2014 none overlap with the license-warning summary. Not a vendored shadcn primitive (it is PHP in packages/marketplace/src, not packages-js/ui/src/shadcn/*). Genuine, novel, user-facing missing-i18n defect."
+    },
+    {
+      "title": "Pagination from/to/total counts interpolated raw, never locale number-grouped",
+      "file": "packages-js/ui/src/table/TablePagination.tsx",
+      "line": 50,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "table.pagination.showing",
+      "detail": "The 'showing' range summary passes meta.total, from and to to the translator as raw integers, both in the inline fallback (`Showing ${from} to ${to} of ${meta.total} results`) and via the replacements map `{ from, to, total: meta.total }`. The translator (packages-js/react/src/utils/translate.ts applyReplacements) substitutes :placeholder tokens with plain `String(replacement)` \u2014 there is NO Intl.NumberFormat involved. So a table with 12345 rows renders 'of 12345 results' under EVERY locale, instead of '12.345' (pt_BR) / '12,345' (en). Prior ledger fixes (lines 40/43) only addressed the hardcoded English STRING and the missing translation KEY, not the locale-insensitive NUMBER formatting of the interpolated counts. This is the single place the unbounded total row count surfaces in the framework UI (DataTable/ResourceIndex delegate the count display entirely to TablePagination); sibling widgets (StatCard/TableCard) already run their numbers through `new Intl.NumberFormat(locale)`. Repro: render <TablePagination meta={{ total: 12345, currentPage:1, perPage:10, lastPage:1235 }} /> with i18n.locale='pt_BR' \u2192 text reads 'de 12345 resultados' (raw) rather than 'de 12.345 resultados'. Fix: format from/to/total through a locale Intl.NumberFormat (via useArqelLocale) before passing them as replacements and before building the fallback string.",
+      "confidence": "high",
+      "why_real": "Verified in packages-js/ui/src/table/TablePagination.tsx:50-51: from/to/meta.total are passed as raw integers both in the inline fallback `Showing ${from} to ${to} of ${meta.total} results` and via the replacements map { from, to, total: meta.total }. The translator's applyReplacements (packages-js/react/src/utils/translate.ts:115) substitutes with plain String(replacement) \u2014 no Intl.NumberFormat. So a 12345-row table renders 'of 12345 results' (and 'de 12345 resultados' under pt_BR) instead of locale-grouped '12.345'/'12,345'. This is the only place the unbounded total row count surfaces in the framework table UI. Sibling widgets confirmed to use the locale-aware pattern: StatCard.tsx:111 and TableCard.tsx:46 both run numbers through new Intl.NumberFormat(useArqelLocale()), so TablePagination is the divergent outlier. Ledger (333 entries, rounds 1-24) contains two prior TablePagination items scoped narrowly to the hardcoded English range STRING / missing 'showing' KEY (lines 75/77, 183) and the aria-label='Pagination' (lines 71, 179); neither touches locale number-grouping of the interpolated counts. All number-grouping ledger entries target other components (StatCard 1283, TableCard 1289, NumberCell 401, Pulse/showcase cards), never TablePagination. Not vendored (not under shadcn/*). User-facing. Genuinely novel."
+    }
+  ]
+}

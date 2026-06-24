@@ -5,8 +5,9 @@
  * (typically via Inertia `router.get` with `preserveState: true`).
  */
 
-import { useArqelTranslations } from '@arqel-dev/react/utils';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
 import type { PaginationMeta } from '@arqel-dev/types/resources';
+import { useMemo } from 'react';
 import { Button } from '../action/Button.js';
 import { cn } from '../utils/cn.js';
 
@@ -26,8 +27,15 @@ export function TablePagination({
   className,
 }: TablePaginationProps) {
   const t = useArqelTranslations();
-  const from = (meta.currentPage - 1) * meta.perPage + 1;
-  const to = Math.min(meta.currentPage * meta.perPage, meta.total);
+  const locale = useArqelLocale();
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const fromRaw = (meta.currentPage - 1) * meta.perPage + 1;
+  const toRaw = Math.min(meta.currentPage * meta.perPage, meta.total);
+  // Interpolated counts are locale number-grouped (12,345 / 12.345) before they
+  // reach the translator, whose applyReplacements does plain String() substitution.
+  const from = numberFormatter.format(fromRaw);
+  const to = numberFormatter.format(toRaw);
+  const total = numberFormatter.format(meta.total);
   const isFirst = meta.currentPage <= 1;
   const isLast = meta.currentPage >= meta.lastPage;
 
@@ -47,8 +55,8 @@ export function TablePagination({
               // Fallback is rendered verbatim when the key is missing, so it must
               // already carry the interpolated values (the replacements map only
               // applies to a resolved dictionary string).
-              `Showing ${from} to ${to} of ${meta.total} results`,
-              { from, to, total: meta.total },
+              `Showing ${from} to ${to} of ${total} results`,
+              { from, to, total },
             )}
       </span>
       <div className="flex items-center gap-2">

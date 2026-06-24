@@ -108,6 +108,10 @@ return [
             'name_duplicate' => 'Outro plugin já usa este nome.',
             'name_unique' => 'O nome do plugin é único.',
         ],
+        'security' => [
+            'no_license' => 'O plugin não tem licença declarada.',
+            'license_not_allowed' => 'A licença :license não está na lista de permissões recomendada.',
+        ],
     ],
     'field_search' => [
         'not_searchable' => 'O campo não permite busca.',

@@ -133,7 +133,7 @@ final readonly class SecurityScanner
                 'type' => 'license-warning',
                 'severity' => 'low',
                 'license' => '',
-                'summary' => 'Plugin has no declared license.',
+                'summary' => (string) trans('arqel::messages.marketplace.security.no_license'),
             ];
         }
 
@@ -145,7 +145,7 @@ final readonly class SecurityScanner
             'type' => 'license-warning',
             'severity' => 'low',
             'license' => $license,
-            'summary' => "License '{$license}' is not in the recommended allow-list.",
+            'summary' => (string) trans('arqel::messages.marketplace.security.license_not_allowed', ['license' => $license]),
         ];
     }
 

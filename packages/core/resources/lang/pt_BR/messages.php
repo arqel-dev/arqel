@@ -34,6 +34,9 @@ return [
         'invalid_id' => 'ID de exportação inválido.',
         'not_found' => 'Exportação não encontrada.',
         'ambiguous' => 'Exportação ambígua.',
+        'document_title' => 'Exportação',
+        'boolean_yes' => 'Sim',
+        'boolean_no' => 'Não',
     ],
     'locale' => [
         'invalid' => 'Idioma inválido.',
@@ -63,6 +66,8 @@ return [
         'field_not_found' => ':type [:field] não encontrado no recurso [:resource]',
         'provider_failed' => 'A requisição ao provedor de IA falhou',
         'image_source_required' => 'É necessário fornecer imageUrl ou imageBase64',
+        'daily_limit_exceeded' => 'Limite diário de IA de $:limit excedido',
+        'user_limit_exceeded' => 'Limite diário de IA de $:limit excedido para o usuário #:userId',
     ],
     'marketplace' => [
         'forbidden' => 'Acesso negado',

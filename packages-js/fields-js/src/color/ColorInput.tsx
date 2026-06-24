@@ -6,6 +6,7 @@
  * is a/11y-friendly out of the box.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ColorFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { cn } from '@arqel-dev/ui/utils';
@@ -20,6 +21,7 @@ export function ColorInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as ColorFieldSchema;
+  const t = useArqelTranslations();
   const hasError = errors !== undefined && errors.length > 0;
   const isDisabled = disabled || f.disabled || f.readonly;
   const current = typeof value === 'string' && value.length > 0 ? value : '#000000';
@@ -53,7 +55,7 @@ export function ColorInput({
             <button
               key={preset}
               type="button"
-              aria-label={`Preset ${preset}`}
+              aria-label={t('arqel.fields.color.preset_aria', 'Preset :color', { color: preset })}
               disabled={isDisabled}
               onClick={() => onChange(preset)}
               className="h-6 w-6 rounded-full border border-border disabled:cursor-not-allowed disabled:opacity-50"

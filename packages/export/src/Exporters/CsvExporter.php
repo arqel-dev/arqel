@@ -121,7 +121,7 @@ final class CsvExporter implements Exporter
                 'date' => $value instanceof DateTimeInterface
                     ? $this->formatDateCell($value, $column)
                     : ($value === null ? '' : (string) $value),
-                'boolean' => $value ? 'Yes' : 'No',
+                'boolean' => $this->formatBooleanCell($value),
                 default => $value === null ? '' : (string) $value,
             };
         }
@@ -139,7 +139,7 @@ final class CsvExporter implements Exporter
             'date' => $value instanceof DateTimeInterface
                 ? $this->formatDateCell($value, $column)
                 : ($value === null ? '' : (string) $value),
-            'boolean' => $value ? 'Yes' : 'No',
+            'boolean' => $this->formatBooleanCell($value),
             default => $value === null ? '' : (string) $value,
         };
     }

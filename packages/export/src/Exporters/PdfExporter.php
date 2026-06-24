@@ -114,7 +114,7 @@ final class PdfExporter implements Exporter
             $bodyRows .= '</tr>';
         }
 
-        $title = htmlspecialchars('Export', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $title = htmlspecialchars($this->documentTitle(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return '<!DOCTYPE html>'
             .'<html><head><meta charset="utf-8">'
@@ -127,6 +127,28 @@ final class PdfExporter implements Exporter
             .'<table><thead><tr>'.$headerCells.'</tr></thead>'
             .'<tbody>'.$bodyRows.'</tbody></table>'
             .'</body></html>';
+    }
+
+    /**
+     * Localised heading shown at the top of the generated PDF.
+     *
+     * Routed through `trans()` (resolved lazily at render time) so the
+     * document title honours `app()->getLocale()` — 'Exportação' under
+     * pt_BR — instead of the previously hardcoded English 'Export'.
+     */
+    private function documentTitle(): string
+    {
+        $key = 'arqel::messages.export.document_title';
+
+        if (function_exists('app') && app()->bound('translator')) {
+            $translated = trans($key);
+
+            if (is_string($translated) && $translated !== $key) {
+                return $translated;
+            }
+        }
+
+        return 'Export';
     }
 
     /**
@@ -149,7 +171,7 @@ final class PdfExporter implements Exporter
                 'date' => $value instanceof DateTimeInterface
                     ? $this->formatDateCell($value, $column)
                     : ($value === null ? '' : (string) $value),
-                'boolean' => $value ? 'Yes' : 'No',
+                'boolean' => $this->formatBooleanCell($value),
                 default => $value === null ? '' : (string) $value,
             };
         }
@@ -167,7 +189,7 @@ final class PdfExporter implements Exporter
             'date' => $value instanceof DateTimeInterface
                 ? $this->formatDateCell($value, $column)
                 : ($value === null ? '' : (string) $value),
-            'boolean' => $value ? 'Yes' : 'No',
+            'boolean' => $this->formatBooleanCell($value),
             default => $value === null ? '' : (string) $value,
         };
     }

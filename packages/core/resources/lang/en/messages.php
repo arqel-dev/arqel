@@ -34,6 +34,9 @@ return [
         'invalid_id' => 'Invalid export id.',
         'not_found' => 'Export not found.',
         'ambiguous' => 'Export ambiguous.',
+        'document_title' => 'Export',
+        'boolean_yes' => 'Yes',
+        'boolean_no' => 'No',
     ],
     'locale' => [
         'invalid' => 'Invalid locale.',
@@ -63,6 +66,8 @@ return [
         'field_not_found' => ':type [:field] not found on resource [:resource]',
         'provider_failed' => 'AI provider request failed',
         'image_source_required' => 'Either imageUrl or imageBase64 must be provided',
+        'daily_limit_exceeded' => 'Daily AI limit of $:limit exceeded',
+        'user_limit_exceeded' => 'User #:userId daily AI limit of $:limit exceeded',
     ],
     'marketplace' => [
         'forbidden' => 'Forbidden',

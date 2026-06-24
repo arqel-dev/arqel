@@ -1564,5 +1564,47 @@
     "line": 56,
     "title": "DevTools TimeTravel snapshot count uses naive English ternary pluralization",
     "round": 12
+  },
+  {
+    "file": "packages-js/fields-js/src/slug/SlugInput.tsx",
+    "line": 34,
+    "title": "SlugInput default placeholder hardcoded English example slug",
+    "round": 13
+  },
+  {
+    "file": "packages-js/fields-js/src/color/ColorInput.tsx",
+    "line": 56,
+    "title": "ColorInput preset swatch aria-label hardcoded English",
+    "round": 13
+  },
+  {
+    "file": "packages/export/src/Exporters/CsvExporter.php",
+    "line": 124,
+    "title": "Export boolean cells hardcode English 'Yes'/'No' in CSV download",
+    "round": 13
+  },
+  {
+    "file": "packages/export/src/Exporters/XlsxExporter.php",
+    "line": 133,
+    "title": "Export boolean cells hardcode English 'Yes'/'No' in XLSX download",
+    "round": 13
+  },
+  {
+    "file": "packages/export/src/Exporters/PdfExporter.php",
+    "line": 152,
+    "title": "Export boolean cells hardcode English 'Yes'/'No' in PDF download",
+    "round": 13
+  },
+  {
+    "file": "packages/export/src/Exporters/PdfExporter.php",
+    "line": 117,
+    "title": "PDF export document <h1> title hardcoded to literal 'Export'",
+    "round": 13
+  },
+  {
+    "file": "packages/ai/src/CostTracker.php",
+    "line": 42,
+    "title": "AI cost-limit exception messages are hardcoded English (with hardcoded '$') and reflected to the end user",
+    "round": 13
   }
 ]

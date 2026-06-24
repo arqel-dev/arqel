@@ -10,6 +10,7 @@
  * server-side via the Validator; the input itself just normalises.
  */
 
+import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { SlugFieldSchema } from '@arqel-dev/types/fields';
 import type { FieldRendererProps } from '@arqel-dev/ui/form';
 import { inputClasses } from '../shared/styles.js';
@@ -24,6 +25,7 @@ export function SlugInput({
   describedBy,
 }: FieldRendererProps) {
   const f = field as SlugFieldSchema;
+  const t = useArqelTranslations();
   const hasError = errors !== undefined && errors.length > 0;
   return (
     <input
@@ -31,7 +33,7 @@ export function SlugInput({
       type="text"
       className={inputClasses}
       value={typeof value === 'string' ? value : ''}
-      placeholder={f.placeholder ?? 'my-resource-slug'}
+      placeholder={f.placeholder ?? t('arqel.fields.slug.placeholder', 'my-resource-slug')}
       disabled={disabled || f.disabled || f.readonly}
       readOnly={f.readonly === true}
       required={f.required === true}

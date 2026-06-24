@@ -7,4 +7,10 @@ return [
         'key' => 'Chave',
         'value' => 'Valor',
     ],
+    'slug' => [
+        'placeholder' => 'meu-slug-de-recurso',
+    ],
+    'color' => [
+        'preset_aria' => 'Predefinição :color',
+    ],
 ];

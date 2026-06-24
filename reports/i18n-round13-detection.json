@@ -1,0 +1,92 @@
+{
+  "total": 8,
+  "confirmed_count": 7,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "SlugInput default placeholder hardcoded English example slug",
+      "file": "packages-js/fields-js/src/slug/SlugInput.tsx",
+      "line": 34,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "fields.slug.placeholder",
+      "detail": "`placeholder={f.placeholder ?? 'my-resource-slug'}` \u2014 the fallback placeholder shown to end users when the field schema provides no `placeholder` is a hardcoded English example word ('my-resource-slug'). This is the same pattern already fixed for RichTextInput ('Start writing...', ledger) and ResourceIndex/BelongsTo search placeholders, but SlugInput was missed. Should resolve through the translator (e.g. `t('fields.slug.placeholder', 'my-resource-slug')`) so non-English panels do not show an English slug example. (Note: UrlInput's sibling fallback `'https://\u2026'` on line 23 is a universal URI scheme literal, not translatable copy, so it is intentionally excluded.)",
+      "confidence": "med",
+      "why_real": "Verified at packages-js/fields-js/src/slug/SlugInput.tsx:34: `placeholder={f.placeholder ?? 'my-resource-slug'}`. The fallback placeholder is a hardcoded English example slug shown to end users when the field schema supplies no placeholder, so non-English panels see English copy \u2014 it does not route through any translator. This reproduces as described and is user-facing.\n\nNot vendored: the file is under packages-js/fields-js/src/slug/, not packages-js/ui/src/shadcn/*.\n\nNot a duplicate: the i18n-fixed-ledger.json (rounds 1-12) contains no entry for SlugInput.tsx nor any slug-field placeholder. The only \"slug\" hits in the ledger are unrelated PHP marketplace messages (\"Plugin [slug] not found\", \"Category [slug] not found\"). The cited sibling fixes are present and confirm this is an accepted defect class but a genuinely missed instance: RichTextInput 'Start writing...' (line 1133), BelongsTo fallback placeholder (line 95), Index search placeholder (line 125), and the localizeLabel-not-applied-to-placeholder serialization gap (line 1043). SlugInput is a novel, analogous, un-fixed case.\n\nThe finding's exclusion of UrlInput's sibling 'https://\u2026' fallback is correct \u2014 that is a universal URI scheme literal, not translatable copy. Confidence is med rather than high only because an example-slug placeholder is a low-severity format hint compared with instructional placeholder copy, but it remains a real English-leak consistent with prior accepted fixes."
+    },
+    {
+      "title": "ColorInput preset swatch aria-label hardcoded English",
+      "file": "packages-js/fields-js/src/color/ColorInput.tsx",
+      "line": 56,
+      "kind": "a11y-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "fields.color.preset_aria",
+      "detail": "`aria-label={`Preset ${preset}`}` builds the accessible name of each preset color swatch button from a hardcoded English word 'Preset'. Screen-reader users on non-English panels hear 'Preset #ff0000'. Same a11y-i18n family as the many already-fixed aria-labels (DataTable selection checkboxes, ActionMenu, etc.); ColorInput was not covered. Should use the translator with an interpolated value, e.g. `t('fields.color.preset_aria', 'Preset :color', { color: preset })`.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/fields-js/src/color/ColorInput.tsx:56: `aria-label={`Preset ${preset}`}` hardcodes the English word \"Preset\" as the accessible name of each preset swatch button. Screen-reader users on non-English panels hear \"Preset #ff0000\". The component imports no translator (verified: no useTranslator/t() anywhere in the file), unlike the sibling PasswordInput.tsx which uses t('arqel.fields.password.hide', ...). Same a11y-i18n family as ledger entries (DataTable checkboxes, ActionMenu, NumberInput/FileInput/ImageInput/PasswordInput aria-labels) but ColorInput is NOT in the R1-R12 ledger (scanned all 261 entries; fields-js entries cover number/date/select/relationship/file/text/image only \u2014 color is absent). Not a vendored shadcn primitive: ColorInput is an Arqel-authored field renderer in fields-js, not under packages-js/ui/src/shadcn/*. User-facing (accessible name read aloud to AT users) and reproduces as described."
+    },
+    {
+      "title": "Export boolean cells hardcode English 'Yes'/'No' in CSV download",
+      "file": "packages/export/src/Exporters/CsvExporter.php",
+      "line": 124,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.export.boolean_yes / arqel::messages.export.boolean_no",
+      "detail": "CsvExporter::formatCell renders boolean columns as the literal 'Yes'/'No' (two sites, lines 124 and 142 \u2014 the morph/relationship branch and the default branch). These strings are written verbatim into the downloaded CSV and reach the end user. The round-2/3/6 export i18n work fixed dates, relative-time, and currency but never touched boolean rendering. No arqel::messages.export.boolean.* (or boolean.yes/no) key exists. Framework-hardcoded; should route through trans (e.g. arqel::messages.boolean.yes / .no) bound to the export/request locale.",
+      "confidence": "high",
+      "why_real": "Verified against /home/diogo/PhpstormProjects/arqel/packages/export/src/Exporters/CsvExporter.php. Lines 124 and 142 both render boolean columns as the literal `$value ? 'Yes' : 'No'` \u2014 line 124 in the state_resolver/computed branch, line 142 in the default data_get branch. These strings are written verbatim by buildRow()/formatCell() into the CSV produced by both export() (disk) and streamDownload() (browser), so they reach the end user. No `__()`/`trans()` wrapping; no arqel boolean.yes/.no key exists (no lang files in the export package). Confirmed framework code, not a vendored shadcn primitive (not in packages-js/ui/src/shadcn/*). The same hardcoded pattern also appears in PdfExporter.php and XlsxExporter.php, reinforcing it as a genuine systemic gap rather than a one-off.\n\nLedger check (reports/i18n-fixed-ledger.json): export i18n entries are (R2) ExportDownloadController abort messages, (R3) FormatsDateCells diffForHumans `since`, (R6) FormatsDateCells absolute date format tokens. The only boolean-related entry is R4 'BooleanCell aria-label hardcodes English true/false' in packages-js/ui/src/table/cells.tsx \u2014 a different file, different strings (true/false aria-label vs Yes/No CSV cell), different surface (HTML table render vs file export). No entry touches CsvExporter.php or export boolean rendering. Finding is novel and user-facing."
+    },
+    {
+      "title": "Export boolean cells hardcode English 'Yes'/'No' in XLSX download",
+      "file": "packages/export/src/Exporters/XlsxExporter.php",
+      "line": 133,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.export.boolean_yes / arqel::messages.export.boolean_no",
+      "detail": "XlsxExporter::formatCell renders boolean columns as literal 'Yes'/'No' (two sites, lines 133 and 151). Written verbatim into the exported spreadsheet cell value and shown to the end user regardless of app locale. Same gap as CsvExporter; no localization key. Framework-hardcoded.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages/export/src/Exporters/XlsxExporter.php. formatCell() emits literal English boolean labels at two sites: line 133 (`'boolean' => $value ? 'Yes' : 'No'`) in the state_resolver Closure path, and line 151 (same expression) in the default data_get path. These string values are written verbatim into the exported XLSX cell value via $writer->addRow(), shown to the end user in the downloaded spreadsheet regardless of app()->getLocale(). No __() call, no translation key. Reproduces and is user-facing.\n\nNot a duplicate: the only export-package ledger entries are ExportDownloadController abort messages (R2) and FormatsDateCells diffForHumans/Carbon-format tokens (R3, R6). There is no ledger entry for XlsxExporter.php at all, and no entry covering boolean Yes/No hardcoding in any exporter (the 'same gap as CsvExporter' the finding references is also absent from the ledger). The TernaryFilter Yes/No entries (R1) are a frontend table-filter UI concern, not the export-cell serialization.\n\nNot vendored: file is in packages/export/, not packages-js/ui/src/shadcn/*."
+    },
+    {
+      "title": "Export boolean cells hardcode English 'Yes'/'No' in PDF download",
+      "file": "packages/export/src/Exporters/PdfExporter.php",
+      "line": 152,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.export.boolean_yes / arqel::messages.export.boolean_no",
+      "detail": "PdfExporter::formatCell renders boolean columns as literal 'Yes'/'No' (two sites, lines 152 and 170), embedded in the generated PDF table body. Same gap as Csv/Xlsx; reaches the end user, never localized. Framework-hardcoded.",
+      "confidence": "high",
+      "why_real": "Verified against /home/diogo/PhpstormProjects/arqel/packages/export/src/Exporters/PdfExporter.php. Lines 152 and 170 in PdfExporter::formatCell hardcode boolean cells as ($value ? 'Yes' : 'No'). These values are htmlspecialchars-escaped into the PDF table body via renderHtml() (line 112) and shipped to the end user in the downloaded/streamed PDF (export() / streamDownload()), never passed through __()/trans(). This is framework PHP in packages/export, not a vendored shadcn primitive (packages-js/ui/src/shadcn/*). Ledger scan (reports/i18n-fixed-ledger.json) shows export-package coverage only for FormatsDateCells.php (date localization, R2/R3) and ExportDownloadController.php (abort messages, R2); no PdfExporter/CsvExporter/XlsxExporter boolean Yes/No entry exists. The only Yes/No ledger hits are TableFilters.tsx ternary-filter option labels (R1) \u2014 a different file and a UI filter control, not the export cell formatter. Genuine user-facing i18n defect, novel relative to R1-R12."
+    },
+    {
+      "title": "PDF export document <h1> title hardcoded to literal 'Export'",
+      "file": "packages/export/src/Exporters/PdfExporter.php",
+      "line": 117,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.export.pdf_title",
+      "detail": "PdfExporter::renderHtml sets the visible PDF heading via `$title = htmlspecialchars('Export', ...)` then renders `<body><h1>$title</h1>`. The document title shown at the top of every exported PDF is the hardcoded English word 'Export' \u2014 it is not derived from the resource/plural label and not passed through trans(). Framework-hardcoded; should use a localized default or the resource's localized plural label.",
+      "confidence": "high",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages/export/src/Exporters/PdfExporter.php. Line 117 sets `$title = htmlspecialchars('Export', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')` and line 126 renders `<body><h1>'.$title.'</h1>` \u2014 so the heading at the top of every exported PDF is the literal English word 'Export', regardless of application locale. It is not passed through trans()/__() and not derived from the resource's localized plural label. This is genuinely user-facing (the visible PDF document title). The file is a framework PHP exporter, NOT a vendored shadcn primitive (packages-js/ui/src/shadcn/*). Scanned the R1-R12 ledger (reports/i18n-fixed-ledger.json): it contains other packages/export entries (ExportDownloadController.php, FormatsDateCells.php) but no PdfExporter.php / hardcoded 'Export' title entry, and no match for 'pdf'/'PdfExporter'/'Export' title across rounds 1-12. Novel, reproducible, not vendored."
+    },
+    {
+      "title": "AI cost-limit exception messages are hardcoded English (with hardcoded '$') and reflected to the end user",
+      "file": "packages/ai/src/CostTracker.php",
+      "line": 42,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.ai.daily_limit_exceeded / arqel::messages.ai.user_limit_exceeded",
+      "detail": "CostTracker::guard throws DailyLimitExceeded(\"Daily AI limit of \\${$dailyLimit} exceeded\") at line 42 and UserLimitExceeded(\"User #{$userId} daily AI limit of \\${$userLimit} exceeded\") at line 48. The five AI controllers (AiGenerate/AiClassify/AiExtract/AiTranslate/AiAnalyzeImage) deliberately reflect these to the client \u2014 e.g. AiGenerateController line 81 catches DailyLimitExceeded|UserLimitExceeded and returns `['message' => $e->getMessage()]` with the comment 'Framework-controlled, user-facing limit messages \u2014 safe to show.' So the message IS user-facing yet hardcoded English, plus a hardcoded '$' USD symbol and en-US number. The provider_failed/forbidden/registry paths in those controllers were already keyed in round 9; this limit-message path was missed because the string originates in CostTracker, not the controller. Framework-hardcoded; should be __('arqel::messages.ai.daily_limit_exceeded', [...]) / ai.user_limit_exceeded with locale-aware currency.",
+      "confidence": "high",
+      "why_real": "Verified in code: CostTracker.php:42 throws DailyLimitExceeded(\"Daily AI limit of \\${$dailyLimit} exceeded\") and lines 48-49 throw UserLimitExceeded(\"User #{$userId} daily AI limit of \\${$userLimit} exceeded\") \u2014 both hardcoded English, hardcoded '$' USD symbol, raw number interpolation, no __() call. User-facing confirmed: all five AI controllers (AiGenerate:79-81, AiTranslate:110-112, AiClassify:89-91, AiExtract:93-95, AiAnalyzeImage:104-106) catch DailyLimitExceeded|UserLimitExceeded and return ['message' => $e->getMessage()] with the comment 'Framework-controlled, user-facing limit messages \u2014 safe to show.' Not vendored \u2014 packages/ai/src is first-party framework code, not packages-js/ui/src/shadcn/*. Not a duplicate \u2014 the i18n-fixed-ledger.json has zero entries for packages/ai/src/CostTracker.php and zero matches for daily_limit/user_limit/DailyLimitExceeded/UserLimitExceeded/cost_tracking or any packages/ai PHP path across rounds 1-12. Round 9 keyed only the controller-originated provider_failed/forbidden/registry strings; this string originates in CostTracker and was missed. Genuine, novel, user-facing i18n defect."
+    }
+  ]
+}

@@ -428,6 +428,43 @@ describe('<BuilderInput>', () => {
     expect(screen.queryByRole('menu', { name: 'Add block' })).toBeNull();
   });
 
+  it('localizes the clone-block aria-label (English fallback, stable name)', () => {
+    const onChange = vi.fn();
+    render(
+      <BuilderInput
+        field={buildField({ cloneable: true })}
+        value={[
+          { type: 'heading', data: { text: 'A' } },
+          { type: 'heading', data: { text: 'B' } },
+        ]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Clone block 1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Clone block 2' })).toBeInTheDocument();
+  });
+
+  it('localizes the expand/collapse toggle aria-label (English fallback, stable name)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <BuilderInput
+        field={buildField({ collapsible: true })}
+        value={[{ type: 'heading', data: { text: 'A' } }]}
+        onChange={onChange}
+      />,
+    );
+
+    // Expanded by default -> shows the "Collapse" affordance.
+    const toggle = screen.getByRole('button', { name: 'Collapse block 1' });
+    expect(toggle).toBeInTheDocument();
+
+    await user.click(toggle);
+
+    expect(screen.getByRole('button', { name: 'Expand block 1' })).toBeInTheDocument();
+  });
+
   // #221: block schemas are now serialised through FieldSchemaSerializer,
   // which nests select options under `props.options` (the canonical shape
   // the top-level SelectInput consumes) and keeps label/placeholder flat.

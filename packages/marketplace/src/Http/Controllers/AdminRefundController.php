@@ -44,14 +44,14 @@ final class AdminRefundController
         if ($purchase->status === 'refunded') {
             return new JsonResponse([
                 'message' => (string) __('arqel::messages.marketplace.validation_failed'),
-                'errors' => ['purchase' => ['Purchase is already refunded.']],
+                'errors' => ['purchase' => [(string) __('arqel::messages.marketplace.purchase_already_refunded')]],
             ], 422);
         }
 
         if ($purchase->status !== 'completed') {
             return new JsonResponse([
                 'message' => (string) __('arqel::messages.marketplace.validation_failed'),
-                'errors' => ['purchase' => ['Only completed purchases can be refunded.']],
+                'errors' => ['purchase' => [(string) __('arqel::messages.marketplace.refund_only_completed')]],
             ], 422);
         }
 

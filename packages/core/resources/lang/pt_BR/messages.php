@@ -44,6 +44,7 @@ return [
     'tenant' => [
         'feature_unavailable' => "O recurso ':feature' não está disponível no seu plano atual.",
         'no_current_tenant' => 'Nenhum tenant atual.',
+        'not_resolved' => 'Nenhum tenant pôde ser resolvido para a requisição.',
     ],
     'action' => [
         'missing_selection' => 'Nenhuma seleção informada.',
@@ -68,6 +69,17 @@ return [
         'image_source_required' => 'É necessário fornecer imageUrl ou imageBase64',
         'daily_limit_exceeded' => 'Limite diário de IA de $:limit excedido',
         'user_limit_exceeded' => 'Limite diário de IA de $:limit excedido para o usuário #:userId',
+        'fields' => [
+            'text' => [
+                'button' => 'Gerar com IA',
+            ],
+            'extract' => [
+                'button' => 'Extrair com IA',
+            ],
+            'image' => [
+                'button' => 'Analisar com IA',
+            ],
+        ],
     ],
     'marketplace' => [
         'forbidden' => 'Acesso negado',
@@ -78,6 +90,10 @@ return [
         'review_not_found' => 'Avaliação não encontrada',
         'refund_failed' => 'Falha no reembolso pelo gateway',
         'payment_verification_failed' => 'Falha na verificação do pagamento',
+        'purchase_already_refunded' => 'A compra já foi reembolsada.',
+        'refund_only_completed' => 'Apenas compras concluídas podem ser reembolsadas.',
+        'plugin_is_free' => 'O plugin é gratuito.',
+        'payment_id_required' => 'paymentId é obrigatório.',
         'plugin_not_found' => 'Plugin [:slug] não encontrado',
         'category_not_found' => 'Categoria [:slug] não encontrada',
         'screenshots_count' => '{1}:count captura de tela fornecida.|[2,*]:count capturas de tela fornecidas.',

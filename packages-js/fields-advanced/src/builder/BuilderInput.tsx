@@ -634,7 +634,11 @@ export function BuilderInput({
                             <button
                               type="button"
                               className={dragHandleClasses}
-                              aria-label={`Drag to reorder block ${index + 1}`}
+                              aria-label={t(
+                                'arqel.fields_advanced.builder_drag_reorder',
+                                `Drag to reorder block ${index + 1}`,
+                                { number: index + 1 },
+                              )}
                               data-testid={`builder-drag-handle-${index}`}
                               {...attributes}
                               {...listeners}
@@ -653,8 +657,16 @@ export function BuilderInput({
                               className={iconButtonClasses}
                               aria-label={
                                 isCollapsed
-                                  ? `Expand block ${index + 1}`
-                                  : `Collapse block ${index + 1}`
+                                  ? t(
+                                      'arqel.fields_advanced.builder_expand_block',
+                                      `Expand block ${index + 1}`,
+                                      { number: index + 1 },
+                                    )
+                                  : t(
+                                      'arqel.fields_advanced.builder_collapse_block',
+                                      `Collapse block ${index + 1}`,
+                                      { number: index + 1 },
+                                    )
                               }
                               aria-expanded={!isCollapsed}
                               onClick={() => toggleCollapsed(item.__id)}
@@ -667,7 +679,11 @@ export function BuilderInput({
                               <button
                                 type="button"
                                 className={iconButtonClasses}
-                                aria-label={`Move block ${index + 1} up`}
+                                aria-label={t(
+                                  'arqel.fields_advanced.builder_move_block_up',
+                                  `Move block ${index + 1} up`,
+                                  { number: index + 1 },
+                                )}
                                 disabled={index === 0}
                                 onClick={() => moveItem(index, -1)}
                               >
@@ -676,7 +692,11 @@ export function BuilderInput({
                               <button
                                 type="button"
                                 className={iconButtonClasses}
-                                aria-label={`Move block ${index + 1} down`}
+                                aria-label={t(
+                                  'arqel.fields_advanced.builder_move_block_down',
+                                  `Move block ${index + 1} down`,
+                                  { number: index + 1 },
+                                )}
                                 disabled={index === items.length - 1}
                                 onClick={() => moveItem(index, 1)}
                               >
@@ -688,7 +708,11 @@ export function BuilderInput({
                             <button
                               type="button"
                               className={iconButtonClasses}
-                              aria-label={`Clone block ${index + 1}`}
+                              aria-label={t(
+                                'arqel.fields_advanced.builder_clone_block',
+                                `Clone block ${index + 1}`,
+                                { number: index + 1 },
+                              )}
                               disabled={atMax}
                               onClick={() => cloneItem(item.__id)}
                             >

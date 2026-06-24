@@ -44,6 +44,7 @@ return [
     'tenant' => [
         'feature_unavailable' => "The ':feature' feature is not available on your current plan.",
         'no_current_tenant' => 'No current tenant.',
+        'not_resolved' => 'No tenant could be resolved for the request.',
     ],
     'action' => [
         'missing_selection' => 'Missing selection.',
@@ -68,6 +69,17 @@ return [
         'image_source_required' => 'Either imageUrl or imageBase64 must be provided',
         'daily_limit_exceeded' => 'Daily AI limit of $:limit exceeded',
         'user_limit_exceeded' => 'User #:userId daily AI limit of $:limit exceeded',
+        'fields' => [
+            'text' => [
+                'button' => 'Generate with AI',
+            ],
+            'extract' => [
+                'button' => 'Extract with AI',
+            ],
+            'image' => [
+                'button' => 'Analyze with AI',
+            ],
+        ],
     ],
     'marketplace' => [
         'forbidden' => 'Forbidden',
@@ -78,6 +90,10 @@ return [
         'review_not_found' => 'Review not found',
         'refund_failed' => 'Refund failed at gateway',
         'payment_verification_failed' => 'Payment verification failed',
+        'purchase_already_refunded' => 'Purchase is already refunded.',
+        'refund_only_completed' => 'Only completed purchases can be refunded.',
+        'plugin_is_free' => 'Plugin is free.',
+        'payment_id_required' => 'paymentId is required.',
         'plugin_not_found' => 'Plugin [:slug] not found',
         'category_not_found' => 'Category [:slug] not found',
         'screenshots_count' => '{1}Provided :count screenshot.|[2,*]Provided :count screenshots.',

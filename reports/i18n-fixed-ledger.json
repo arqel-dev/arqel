@@ -1624,5 +1624,89 @@
     "line": 142,
     "title": "Publisher average-rating stat renders with locale-insensitive decimal separator (toFixed)",
     "round": 14
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+    "line": 637,
+    "title": "BuilderInput drag-handle aria-label hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+    "line": 654,
+    "title": "BuilderInput Expand/Collapse block aria-label hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+    "line": 670,
+    "title": "BuilderInput move-up aria-label hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+    "line": 679,
+    "title": "BuilderInput move-down aria-label hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+    "line": 691,
+    "title": "BuilderInput clone-block aria-label hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiTranslateInput.tsx",
+    "line": 333,
+    "title": "AiTranslateInput per-language textarea aria-label hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/AdminRefundController.php",
+    "line": 47,
+    "title": "AdminRefundController 'errors' detail strings hardcoded English (already-refunded)",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/AdminRefundController.php",
+    "line": 54,
+    "title": "AdminRefundController 'errors' detail string hardcoded English (only-completed)",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/PluginPurchaseController.php",
+    "line": 42,
+    "title": "PluginPurchaseController 'errors' detail string hardcoded English (free plugin)",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Http/Controllers/PluginPurchaseController.php",
+    "line": 121,
+    "title": "PluginPurchaseController 'errors' detail string hardcoded English (paymentId required)",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/tenant/src/Exceptions/TenantNotFoundException.php",
+    "line": 29,
+    "title": "TenantNotFoundException default message hardcoded English, serialized to 404 render",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Fields/AiTextField.php",
+    "line": 40,
+    "title": "AiTextField default buttonLabel 'Generate with AI' hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Fields/AiExtractField.php",
+    "line": 49,
+    "title": "AiExtractField default buttonLabel 'Extract with AI' hardcoded English",
+    "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/ai/src/Fields/AiImageField.php",
+    "line": 69,
+    "title": "AiImageField default buttonLabel 'Analyze with AI' hardcoded English",
+    "round": 15
   }
 ]

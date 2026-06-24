@@ -98,7 +98,7 @@ return [
         'disabled' => 'Field has search disabled.',
     ],
     'versioning' => [
-        'not_versionable' => 'Model does not use the Versionable trait.',
+        'not_versionable' => 'Model [:model] does not use the Versionable trait',
         'restore_failed' => 'Restore failed.',
         'registry_not_bound' => 'ResourceRegistry not bound',
         'forbidden' => 'Forbidden',

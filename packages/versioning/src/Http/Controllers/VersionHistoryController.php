@@ -80,7 +80,11 @@ final class VersionHistoryController
 
         if (! $this->usesVersionable($model)) {
             return new JsonResponse([
-                'message' => sprintf('Model [%s] does not use the Versionable trait', $modelClass),
+                'message' => $this->message(
+                    'arqel::messages.versioning.not_versionable',
+                    "Model [{$modelClass}] does not use the Versionable trait",
+                    ['model' => $modelClass],
+                ),
             ], 422);
         }
 

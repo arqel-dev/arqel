@@ -98,7 +98,7 @@ return [
         'disabled' => 'A busca está desabilitada para este campo.',
     ],
     'versioning' => [
-        'not_versionable' => 'O model não usa a trait Versionable.',
+        'not_versionable' => 'O modelo [:model] não usa o trait Versionable',
         'restore_failed' => 'Falha ao restaurar.',
         'registry_not_bound' => 'ResourceRegistry não está registrado',
         'forbidden' => 'Acesso negado',

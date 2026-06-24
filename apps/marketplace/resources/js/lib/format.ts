@@ -42,6 +42,18 @@ export function formatCurrency(cents: number, currency: string, locale: string):
   return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
 }
 
+/**
+ * Format a number with a fixed number of fraction digits in the given locale.
+ * Unlike `Number.prototype.toFixed`, the decimal separator follows the locale
+ * (e.g. `4.5` in `en` but `4,5` in `pt-BR`).
+ */
+export function formatDecimal(value: number, locale: string, digits: number): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value);
+}
+
 /** Format a number using locale-aware compact notation (e.g. 12K / 12 mil). */
 export function formatCompact(value: number, locale: string): string {
   return new Intl.NumberFormat(locale, { notation: 'compact' }).format(value);

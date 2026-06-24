@@ -1,6 +1,6 @@
 import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { PluginList } from '../../Components/Marketplace/PluginList';
-import { formatCompact, useActiveLocale } from '../../lib/format';
+import { formatCompact, formatDecimal, useActiveLocale } from '../../lib/format';
 import type { Plugin, Publisher, PublisherStats } from '../../types';
 
 type Props = {
@@ -139,7 +139,7 @@ export default function PublisherProfile({ publisher, plugins, stats }: Props): 
           <div className="rounded border border-neutral-200 p-4">
             <p className="text-xs uppercase text-neutral-500">Rating médio</p>
             <p data-testid="stat-rating" className="mt-1 text-2xl font-semibold text-neutral-900">
-              {stats.avg_rating.toFixed(1)} ★
+              {formatDecimal(stats.avg_rating, locale, 1)} ★
             </p>
           </div>
         </section>

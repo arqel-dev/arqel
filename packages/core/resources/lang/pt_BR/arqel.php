@@ -231,6 +231,8 @@ return [
         // Botões exibidos ao lado do selo de proveniência após uma sugestão.
         'suggestion_accept' => 'Aceitar',
         'suggestion_pick_another' => 'Escolher outro',
+        // Estado vazio/inicial exibido antes de qualquer extração.
+        'extract_empty' => 'Nenhuma extração ainda — clique no botão para começar.',
     ],
     // Títulos de grupo visíveis na listbox do <CommandPalette> quando um comando
     // não tem categoria explícita, além do grupo sintético "Recentes". Resolvido

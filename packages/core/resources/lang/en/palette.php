@@ -6,6 +6,9 @@ return [
     // Command palette combobox input placeholder (also its accessible hint).
     'placeholder' => 'Type a command…',
 
+    // Empty-results message shown when no commands match the query.
+    'no_results' => 'No commands found',
+
     // Built-in command provider categories (grouping headers in the palette).
     'category' => [
         'navigation' => 'Navigation',

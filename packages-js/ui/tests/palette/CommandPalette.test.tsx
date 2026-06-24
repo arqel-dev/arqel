@@ -76,6 +76,7 @@ function usePtBr() {
               hint_navigate: '↑↓ navegar',
               hint_select: '↵ selecionar',
               hint_close: 'esc fechar',
+              no_results: 'Nenhum comando encontrado',
             },
             command_palette: {
               category_general: 'Geral',
@@ -282,6 +283,24 @@ describe('CommandPalette', () => {
     await flushMicrotasks();
     // 1 result -> "1 comando", never "1 comandos" / the old ":count comandos".
     expect(screen.getByRole('status').textContent).toMatch(/^1 comando$/);
+  });
+
+  it('renders the empty-results message with English fallback when no commands match', async () => {
+    globalThis.fetch = mockFetch([]) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    expect(screen.getByText('No commands found')).toBeInTheDocument();
+  });
+
+  it('localizes the empty-results message (pt_BR)', async () => {
+    usePtBr();
+    globalThis.fetch = mockFetch([]) as unknown as typeof fetch;
+    render(<CommandPalette />);
+    act(() => pressCmdK());
+    await flushMicrotasks();
+    expect(screen.getByText('Nenhum comando encontrado')).toBeInTheDocument();
+    expect(screen.queryByText('No commands found')).toBeNull();
   });
 
   it('buckets uncategorized commands under the English "General" heading by default', async () => {

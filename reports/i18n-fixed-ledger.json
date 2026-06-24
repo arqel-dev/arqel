@@ -1486,5 +1486,83 @@
     "line": 133,
     "title": "PluginAutoChecker emits naive '(s)' pluralization for screenshot count",
     "round": 11
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiSelectInput.tsx",
+    "line": 284,
+    "title": "AiSelectInput suggestion 'Accept' button: visible text hardcoded English",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiSelectInput.tsx",
+    "line": 293,
+    "title": "AiSelectInput suggestion 'Pick another' button: visible text hardcoded English",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 470,
+    "title": "MarkdownInput 'Link' toolbar button: visible glyph text hardcoded English while aria-label is translated",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 479,
+    "title": "MarkdownInput 'List' toolbar button: visible glyph text hardcoded English while aria-label is translated",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 527,
+    "title": "MarkdownInput 'Edit' tab: visible tab label hardcoded English",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 536,
+    "title": "MarkdownInput 'Preview' tab: visible tab label hardcoded English",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/markdown/MarkdownInput.tsx",
+    "line": 587,
+    "title": "MarkdownInput popup 'Close' button: visible text hardcoded English",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/wizard/WizardInput.tsx",
+    "line": 584,
+    "title": "WizardInput 'Back' nav button: visible text hardcoded English while aria-label is translated",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-advanced/src/rich-text/RichTextInput.tsx",
+    "line": 201,
+    "title": "RichTextInput 'Link' toolbar glyph: visible button face hardcoded English",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/marketplace/src/Services/PluginAutoChecker.php",
+    "line": 59,
+    "title": "PluginAutoChecker emits 8 hardcoded English check messages serialized to the plugin-submission UI",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/actions/src/Http/Controllers/ActionController.php",
+    "line": 135,
+    "title": "Action failure flashes raw exception message (English) verbatim \u2014 no localized default",
+    "round": 12
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/core/src/Http/Controllers/ResourceController.php",
+    "line": 416,
+    "title": "ResourceController action failure flashes raw exception message (English) verbatim \u2014 same gap as ActionController",
+    "round": 12
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+    "line": 56,
+    "title": "DevTools TimeTravel snapshot count uses naive English ternary pluralization",
+    "round": 12
   }
 ]

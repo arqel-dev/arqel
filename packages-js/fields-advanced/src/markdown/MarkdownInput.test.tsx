@@ -228,7 +228,9 @@ describe('<MarkdownInput>', () => {
 
   it('routes the edit/preview tab labels through t()', () => {
     const onChange = vi.fn();
-    render(<MarkdownInput field={buildField({ previewMode: 'tab' })} value="" onChange={onChange} />);
+    render(
+      <MarkdownInput field={buildField({ previewMode: 'tab' })} value="" onChange={onChange} />,
+    );
     expect(screen.getByRole('tab', { name: 'Edit' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Preview' })).toBeInTheDocument();
   });

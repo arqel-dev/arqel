@@ -175,7 +175,9 @@ describe('<RichTextInput> (Tiptap)', () => {
 
   it('routes the link toolbar glyph visible face through t() (visible == aria)', () => {
     const onChange = vi.fn();
-    render(<RichTextInput field={buildField({ toolbar: ['link'] })} value="" onChange={onChange} />);
+    render(
+      <RichTextInput field={buildField({ toolbar: ['link'] })} value="" onChange={onChange} />,
+    );
     // The link button has no language-neutral glyph; its visible face must
     // equal the translated aria-label so they stay in sync across locales.
     expect(screen.getByRole('button', { name: 'Link' })).toHaveTextContent('Link');
@@ -193,7 +195,9 @@ describe('<RichTextInput> (Tiptap)', () => {
       } as Record<string, unknown>,
     });
     const onChange = vi.fn();
-    render(<RichTextInput field={buildField({ toolbar: ['link'] })} value="" onChange={onChange} />);
+    render(
+      <RichTextInput field={buildField({ toolbar: ['link'] })} value="" onChange={onChange} />,
+    );
     expect(screen.getByRole('button', { name: 'Link PT' })).toHaveTextContent('Link PT');
     pageMock.mockReturnValue({ props: {} });
   });

@@ -227,6 +227,9 @@ return [
         // Selo de proveniência exibido após uma classificação (role="status").
         'suggestion_ai' => 'Sugerido por IA',
         'suggestion_fallback' => 'Usou alternativa',
+        // Botões exibidos ao lado do selo de proveniência após uma sugestão.
+        'suggestion_accept' => 'Aceitar',
+        'suggestion_pick_another' => 'Escolher outro',
     ],
     // Títulos de grupo visíveis na listbox do <CommandPalette> quando um comando
     // não tem categoria explícita, além do grupo sintético "Recentes". Resolvido

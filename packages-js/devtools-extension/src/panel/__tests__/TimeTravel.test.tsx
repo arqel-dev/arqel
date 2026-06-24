@@ -44,6 +44,18 @@ describe('<TimeTravel />', () => {
     expect(rows[0]).toHaveAttribute('data-slow', 'false');
   });
 
+  it('uses Intl.PluralRules to select the singular counter form for one snapshot', () => {
+    const [first] = makeSnapshots();
+    if (first === undefined) {
+      throw new Error('expected at least one snapshot fixture');
+    }
+    render(<TimeTravel snapshots={[first]} />);
+    const counter = screen.getByTestId('time-travel-counter');
+    expect(counter).toHaveTextContent('1 snapshot');
+    // Guard against the naive `+ 's'` regression (no Latin plural on singular).
+    expect(counter.textContent).not.toContain('1 snapshots');
+  });
+
   it('expands pageProps when an entry is clicked and collapses on second click', () => {
     render(<TimeTravel snapshots={makeSnapshots()} />);
     expect(screen.queryByTestId('time-travel-detail')).not.toBeInTheDocument();

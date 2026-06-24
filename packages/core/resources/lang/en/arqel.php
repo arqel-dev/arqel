@@ -228,6 +228,9 @@ return [
         // Provenance badge shown after a classification (role="status").
         'suggestion_ai' => 'Suggested by AI',
         'suggestion_fallback' => 'Used fallback',
+        // Buttons rendered next to the provenance badge after a suggestion.
+        'suggestion_accept' => 'Accept',
+        'suggestion_pick_another' => 'Pick another',
     ],
     // Visible group headings rendered in the <CommandPalette> listbox when a
     // command has no explicit category, plus the synthetic "Recent" bucket.

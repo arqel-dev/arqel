@@ -302,6 +302,63 @@ describe('<AiSelectInput>', () => {
     expect(screen.queryByText('Suggested by AI')).toBeNull();
   });
 
+  it('renders the suggestion accept/pick-another buttons in English by default', async () => {
+    const fetchMock = makeFetchOk({ key: 'high', label: 'High' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <AiSelectInput
+        name="priority"
+        value={null}
+        onChange={vi.fn()}
+        props={baseFieldProps}
+        resource="tickets"
+        field="priority"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Classify with AI' }));
+    expect(await screen.findByRole('button', { name: 'Accept' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pick another' })).toBeInTheDocument();
+  });
+
+  it('localizes the suggestion accept/pick-another buttons (pt_BR)', async () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: {
+              ai: {
+                suggestion_accept: 'Aceitar',
+                suggestion_pick_another: 'Escolher outro',
+              },
+            },
+          },
+        },
+      },
+    });
+    const fetchMock = makeFetchOk({ key: 'high', label: 'High' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <AiSelectInput
+        name="priority"
+        value={null}
+        onChange={vi.fn()}
+        props={baseFieldProps}
+        resource="tickets"
+        field="priority"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Classificar com IA|Classify with AI/ }));
+    expect(await screen.findByRole('button', { name: 'Aceitar' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Escolher outro' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Accept' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Pick another' })).toBeNull();
+  });
+
   it('forwards the csrf token in the X-CSRF-TOKEN header', async () => {
     const fetchMock = makeFetchOk({ key: 'low', label: 'Low' });
     vi.stubGlobal('fetch', fetchMock);

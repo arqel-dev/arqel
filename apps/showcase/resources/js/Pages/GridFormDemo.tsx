@@ -1,3 +1,4 @@
+import { useTranslation } from '@arqel-dev/i18n';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FormSchema, GridEntry } from '@arqel-dev/types/forms';
 import { FormRenderer } from '@arqel-dev/ui/form';
@@ -59,9 +60,17 @@ const schema: FormSchema = {
 };
 
 export default function GridFormDemo(): JSX.Element {
+  const t = useTranslation();
+  // `t()` returns the key itself when no catalog entry exists; fall back to the
+  // English literal so the accessible heading name (and the responsive E2E that
+  // asserts it) stays stable until a `showcase.*` catalog is wired.
+  const titleKey = 'showcase.grid_form_demo.title';
+  const title = t(titleKey);
+  const heading = title === titleKey ? 'Grid Form Demo' : title;
+
   return (
     <main id="arqel-main" className="p-6" data-testid="grid-form-demo">
-      <h1 className="mb-4 text-xl font-semibold">Grid Form Demo</h1>
+      <h1 className="mb-4 text-xl font-semibold">{heading}</h1>
       <FormRenderer schema={schema} fields={fields} values={{}} onChange={() => {}} />
     </main>
   );

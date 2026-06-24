@@ -1,0 +1,104 @@
+{
+  "total": 12,
+  "confirmed_count": 8,
+  "dupe_count": 1,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "cli-ink Dashboard heading, states and tile labels hardcoded",
+      "file": "packages-js/cli-ink/src/components/Dashboard.tsx",
+      "line": 66,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel-cli.dashboard.title / .loading / .error / .empty / .tile.queries_per_sec / .active_users / .errors_5m / .ai_tokens",
+      "detail": "Hardcoded English throughout: heading 'Arqel Dashboard' (line 66); loading state 'Loading dashboard\u2026' (line 54); error prefix 'Error:' (line 57); empty state 'No data available.' (line 60); and the four tile labels 'Queries / sec' (69), 'Active users' (70), 'Errors (5m)' (73), 'AI tokens' (74). All are visible operator-facing copy with no translation path. Visible text.",
+      "confidence": "high",
+      "why_real": "Confirmed in /home/diogo/PhpstormProjects/arqel/packages-js/cli-ink/src/components/Dashboard.tsx: hardcoded English operator-facing strings \u2014 'Arqel Dashboard' (L66), 'Loading dashboard\u2026' (L54), 'Error: {error}' (L57), 'No data available.' (L60), and tile labels 'Queries / sec' (L69), 'Active users' (L70), 'Errors (5m)' (L73), 'AI tokens' (L74). All rendered directly as visible Ink TUI text with no translation/i18n path. NOT vendored: lives in first-party packages-js/cli-ink/, not packages-js/ui/src/shadcn/*. NOT a duplicate: the R1-R23 ledger has zero cli-ink entries (grep count 0); every prior 'Dashboard' entry targets packages-js/ui/src/widgets/DashboardFilters.tsx or PHP demo dashboards \u2014 different files/package. Novel, reproduces, user-facing."
+    },
+    {
+      "title": "cli-ink ResourceBrowser heading, states and detail labels hardcoded",
+      "file": "packages-js/cli-ink/src/components/ResourceBrowser.tsx",
+      "line": 40,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel-cli.resources.loading / .error / .empty / .heading / .slug / .records",
+      "detail": "Hardcoded English: loading state 'Loading resources\u2026' (line 40); error prefix 'Error:' (42); empty state 'No resources found.' (45); list panel heading 'Resources' (54); detail labels 'slug:' (77) and 'Records:' (78). All visible TUI copy with no i18n. Visible text.",
+      "confidence": "med",
+      "why_real": "Verified against the file: packages-js/cli-ink/src/components/ResourceBrowser.tsx contains the cited hardcoded English strings exactly where claimed \u2014 line 40 'Loading resources\u2026', line 42 'Error:', line 45 'No resources found.', line 54 'Resources', line 77 'slug:', line 78 'Records:'. All are user-facing TUI copy rendered via Ink <Text>, with no translator/i18n hook anywhere in the cli-ink package (no useTranslator import; package has no i18n plumbing). NOT vendored: path is packages-js/cli-ink/, not packages-js/ui/src/shadcn/*. NOT a duplicate: grep across the full 1953-line ledger finds zero references to cli-ink, ResourceBrowser, MainMenu, Dashboard, or LogTailer; R1-R23 covered packages-js/ui, fields-js, fields-advanced, ai, versioning, workflow, auth, and PHP packages, but never touched the cli-ink TUI. So it is real, novel, user-facing, and non-vendored. Confidence is med rather than high because cli-ink is a developer-facing CLI rather than the panel UI that is i18n's primary surface, and the package having no i18n wiring at all makes this closer to a not-yet-built feature than an inconsistency defect \u2014 but the literal confirm criteria (real visible text, novel, not in ledger, not shadcn) are met."
+    },
+    {
+      "title": "cli-ink LogTailer header, error prefix and follow indicator hardcoded",
+      "file": "packages-js/cli-ink/src/components/LogTailer.tsx",
+      "line": 87,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel-cli.logs.header / .following / .error / .file_not_found",
+      "detail": "Hardcoded English: the log panel header prefix 'Log:' plus the follow-mode indicator '(following)' (line 87), the error prefix 'Error:' (line 81), and the 'File not found: ' message set via setError (line 54), which is surfaced to the user as the error <Text> at line 81. All visible/operator-facing with no translation path. Visible text + user-facing error.",
+      "confidence": "med",
+      "why_real": "Verified against /home/diogo/PhpstormProjects/arqel/packages-js/cli-ink/src/components/LogTailer.tsx. All three claims reproduce exactly: line 54 setError(`File not found: ${filePath}`), line 81 <Text color=\"red\">Error: {error}</Text>, line 87 `Log: {filePath} {follow ? '(following)' : ''}`. All are hardcoded English with no translation path \u2014 confirmed no translator import in the file (grep for translate/useArqelTranslations/@arqel import returns nothing; earlier substring \"t(\" matches were false positives from setError/existsSync). The component is wired into the real CLI at cli.tsx:72 (<LogTailer filePath={screen.file} follow={cli.flags.follow} />), so these strings render to the operator terminal \u2014 genuinely user/operator-facing. NOT a duplicate: the ledger has 325 entries spanning rounds 1-23 and contains zero references to cli-ink, LogTailer, \"Log:\", \"(following)\", \"File not found\", or \"Error:\". NOT vendored: cli-ink is a hand-written Ink TUI package, not packages-js/ui/src/shadcn/*. Confidence is med rather than high only because this is a developer/operator-facing CLI TUI, a lower-priority i18n tier than the admin-panel UI that dominates prior rounds \u2014 but it still qualifies as a real, novel, user-facing untranslated-text defect."
+    },
+    {
+      "title": "CompareTable install_count rendered raw (String()), bypassing locale number grouping",
+      "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+      "line": 25,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "",
+      "detail": "The 'Downloads' row renders `String(p.install_count ?? 0)` with no locale-aware thousands grouping, even though this same file already imports and uses the locale-aware `formatCurrency`/`formatDate` helpers (and the sibling PluginCard formats install_count via `formatCompact`). A count like 12345 displays as '12345' for every locale instead of '12,345' (en) / '12.345' (pt-BR). Repro: open the Compare page with a plugin whose install_count > 999 under pt_BR (i18n.locale='pt_BR'); the Downloads cell shows ungrouped digits while the Price/last-release cells in the same table are locale-formatted. Fix: import `formatCompact`/`formatDecimal` from ../../lib/format and pass `locale`.",
+      "confidence": "high",
+      "why_real": "Confirmed real, user-facing, app-code (not vendored shadcn). At apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx:25 the Downloads row uses `String(p.install_count ?? 0)`, bypassing locale number grouping. The file already imports/uses locale-aware formatCurrency/formatDate (and useActiveLocale), and the sibling PluginCard.tsx:43 formats install_count via formatCompact(value, locale). The locale-aware helpers formatDecimal/formatCompact exist in ../../lib/format and take a locale arg. So install_count=12345 renders as '12345' for every locale instead of '12,345' (en) / '12.345' (pt-BR) \u2014 reproduces by opening the Compare page under pt_BR with a plugin whose install_count>999, while the Price/last-release cells in the same table are locale-formatted. Not a duplicate: the ledger's two CompareTable entries (round 11) cover only the price formatter (line 14) and the last-release ISO date (line 28); neither touches the install_count/Downloads row. The PluginCard round-11 entry is a different file. Caveat: the sibling stars/reviews_count rows share the same raw-String() pattern, so this is one instance of a tiny family, but the install_count cell as scoped is genuinely uncovered."
+    },
+    {
+      "title": "CompareTable stars count rendered raw (String()), no locale number grouping",
+      "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+      "line": 26,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "",
+      "detail": "The 'Estrelas' row renders `String(p.stars ?? 0)` (total star count, an integer) with no `Intl.NumberFormat`. Large star totals render ungrouped (e.g. '12345' instead of '12.345' in pt-BR), inconsistent with the locale-formatted Price/date rows in the same table. Repro: Compare page, plugin with stars > 999, locale pt_BR. Fix: route through `formatDecimal(p.stars ?? 0, locale, 0)`.",
+      "confidence": "med",
+      "why_real": "Verified against the file and the R1-R23 ledger.\n\nFILE (apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx:26): The 'Estrelas' row is `value: (p) => String(p.stars ?? 0)`. stars is an integer total star count rendered with no Intl.NumberFormat. The sibling 'Pre\u00e7o' row (line 20) uses formatCurrency and '\u00daltimo release' (line 33) uses formatDate, both locale-aware. So for stars > 999 in pt_BR, the cell renders '12345' instead of the locale-grouped '12.345', visibly inconsistent with the locale-formatted rows in the same table. The app already exports formatDecimal(value, locale, 0) in resources/js/lib/format.ts, which would produce correct grouping; routing through it is the right fix. Reproduces (Compare page, plugin stars>999, pt_BR), user-facing, and NOT vendored (it is an app component, not packages-js/ui/src/shadcn/*).\n\nLEDGER (reports/i18n-fixed-ledger.json): CompareTable.tsx appears twice, both round 11: line 14 'price formatter locale-insensitive' and line 28 'renders raw ISO date for last release'. Those two were fixed (price now uses formatCurrency, date uses formatDate, confirmed in current file). The integer count rows (stars line 26, install_count line 25, reviews_count line 35) rendered via raw String() were NOT ledgered. So the stars locale-grouping defect at line 26 is novel relative to R1-R23.\n\nConfidence is med rather than high: the round-11 sweep touched this exact component and deliberately left the integer count rows as raw String(), which suggests a verifier could argue plain counts are below the i18n threshold. But the grouping inconsistency against the locale-formatted price/date rows in the same table is a real, reproducible, user-facing pt-BR defect and is not in the ledger."
+    },
+    {
+      "title": "CompareTable reviews_count rendered raw (String()), no locale number grouping",
+      "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+      "line": 35,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "",
+      "detail": "The 'Reviews' row renders `String(p.reviews_count ?? 0)` with no locale-aware grouping. A four/five-digit review count shows ungrouped digits in every locale, inconsistent with the Price/date rows already formatted via the imported helpers. Repro: Compare page, plugin with reviews_count > 999, locale pt_BR. Fix: `formatDecimal(p.reviews_count ?? 0, locale, 0)`.",
+      "confidence": "med",
+      "why_real": "Verified at apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx:35: the 'Reviews' row renders `String(p.reviews_count ?? 0)` with no locale-aware grouping, while sibling rows in the same table use locale helpers (Price via formatCurrency line 20, \u00daltimo release via formatDate line 33). The proposed fix is valid: formatDecimal(value, locale, 0) exists in lib/format.ts:50 and applies Intl.NumberFormat grouping (e.g. pt-BR '1.234' vs raw '1234'), differing from String() only for values >= 1000. Ledger check: i18n-fixed-ledger.json contains two CompareTable entries (price formatter; raw ISO date for last release) \u2014 both distinct from the reviews row and both already addressed (the file now imports formatCurrency/formatDate). The reviews_count row is novel relative to R1-R23. Not a vendored shadcn primitive \u2014 it is an app-level component, not under packages-js/ui/src/shadcn/*. Caveat lowering confidence: the identical String() pattern is also used for install_count (line 25) and stars (line 26); the finding cherry-picks one of three identically-rendered integer rows and the visible defect is purely cosmetic (separator style, only for counts >= 1000). But the specific claim at line 35 reproduces as described, so it qualifies as a real, novel, user-facing i18n inconsistency."
+    },
+    {
+      "title": "PluginCard stars count rendered raw, no locale number grouping",
+      "file": "apps/marketplace/resources/js/Components/Marketplace/PluginCard.tsx",
+      "line": 45,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "",
+      "detail": "`\u2b50 {plugin.stars}` interpolates the raw star count with no `Intl.NumberFormat`, while the line directly above (line 43) formats install_count via the locale-aware `formatCompact(plugin.install_count ?? 0, locale)`. The star total therefore renders ungrouped ('12345') under every locale, inconsistent with the install count beside it. Repro: Browse/Landing grid, plugin with stars > 999, locale pt_BR. Fix: wrap in `formatCompact(plugin.stars, locale)` or `formatDecimal(plugin.stars, locale, 0)`.",
+      "confidence": "med",
+      "why_real": "Verified at apps/marketplace/resources/js/Components/Marketplace/PluginCard.tsx:45: `{typeof plugin.stars === 'number' && <span data-testid=\"stars\">\u2b50 {plugin.stars}</span>}` interpolates the raw star count with no Intl.NumberFormat / formatCompact, while line 43 directly above formats install_count via the locale-aware `formatCompact(plugin.install_count ?? 0, locale)`. A plugin with stars > 999 therefore renders ungrouped ('12345') under every locale (e.g. pt_BR would expect '12.345'), inconsistent with the formatted install count in the same footer. User-facing: appears in the Browse/Landing plugin grid card footer. Not vendored: this is an app component under apps/marketplace, not packages-js/ui/src/shadcn/*.\\n\\nNot a duplicate: the only prior PluginCard ledger entry is round 11 (line 1467), 'PluginCard install-count uses hardcoded English compact suffixes (M/k) and .' decimal' \u2014 that fix addressed ONLY install_count and is responsible for the formatCompact call now at line 43. The stars value on line 45 was left unformatted and is not covered by any R1-R23 ledger entry (grep for stars/PluginCard/formatCompact confirms; the only other 'stars' entry, line 1733, is ReviewList sr-only pluralization, a different file/concern). Same defect family (locale-format) but a distinct, uncovered line.\\n\\nConfidence is medium because the visible grouping difference only manifests when stars > 999; below that the raw value coincides with formatted output, though the inconsistency-with-sibling argument holds regardless."
+    },
+    {
+      "title": "PublisherProfile plugins_count stat rendered raw, no locale grouping",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+      "line": 127,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "",
+      "detail": "The 'Plugins' stat card renders `{stats.plugins_count}` raw, while its two sibling stat cards in the same section format their numbers locale-aware: `formatCompact(stats.total_downloads, locale)` (line 136) and `formatDecimal(stats.avg_rating, locale, 1)` (line 142). A publisher with 1000+ plugins would show '1234' here while the adjacent downloads stat shows the locale-grouped form, an inconsistent mix within one stats grid. Repro: publisher profile with plugins_count > 999 under pt_BR. Fix: `formatCompact(stats.plugins_count, locale)` or `formatDecimal(stats.plugins_count, locale, 0)`.",
+      "confidence": "med",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx:127. The 'Plugins' stat card renders {stats.plugins_count} raw, while the two sibling cards in the same profile-stats grid format locale-aware: formatCompact(stats.total_downloads, locale) (line 136) and formatDecimal(stats.avg_rating, locale, 1) (line 142). Under pt_BR a publisher with >999 plugins shows ungrouped '1234' beside locale-grouped siblings \u2014 a real intra-grid inconsistency. Formatters exist in apps/marketplace/resources/js/lib/format.ts (formatDecimal, formatCompact). NOT a duplicate: the ledger's two prior PublisherProfile.tsx entries cover the total-downloads card (M/k suffixes) and the avg-rating card (decimal separator) \u2014 the already-fixed siblings, not plugins_count; grep for plugins_count/stat-plugins returns no ledger match across all 325 entries (rounds 1-23). NOT vendored: it is an app page under apps/marketplace/, not packages-js/ui/src/shadcn/*. User-facing public profile stat. Confidence reduced to med because the grouping defect only manifests at 1000+ plugins, an uncommon threshold; below that the raw integer is identical to the formatted output."
+    }
+  ]
+}

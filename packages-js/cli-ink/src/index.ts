@@ -10,3 +10,5 @@ export type { DataSourceState, UseDataSourceOptions } from './hooks/useDataSourc
 export { useDataSource } from './hooks/useDataSource.js';
 export type { UseNavigableListOptions, UseNavigableListResult } from './hooks/useNavigableList.js';
 export { useNavigableList } from './hooks/useNavigableList.js';
+export type { CliLocale } from './i18n.js';
+export { resolveLocale, t } from './i18n.js';

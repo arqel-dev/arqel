@@ -1,6 +1,7 @@
 import { Box, Text } from 'ink';
 import type { ReactElement } from 'react';
 import { useNavigableList } from '../hooks/useNavigableList.js';
+import { t } from '../i18n.js';
 
 export type MenuOption = 'dashboard' | 'resources' | 'logs' | 'quit';
 
@@ -9,11 +10,11 @@ export type MainMenuProps = {
   onCancel?: () => void;
 };
 
-const OPTIONS: { value: MenuOption; label: string }[] = [
-  { value: 'dashboard', label: 'Dashboard' },
-  { value: 'resources', label: 'Resources' },
-  { value: 'logs', label: 'Logs' },
-  { value: 'quit', label: 'Quit' },
+const OPTIONS: { value: MenuOption; labelKey: string; fallback: string }[] = [
+  { value: 'dashboard', labelKey: 'cli.menu.dashboard', fallback: 'Dashboard' },
+  { value: 'resources', labelKey: 'cli.menu.resources', fallback: 'Resources' },
+  { value: 'logs', labelKey: 'cli.menu.logs', fallback: 'Logs' },
+  { value: 'quit', labelKey: 'cli.menu.quit', fallback: 'Quit' },
 ];
 
 export function MainMenu({ onSelect, onCancel }: MainMenuProps): ReactElement {
@@ -29,16 +30,18 @@ export function MainMenu({ onSelect, onCancel }: MainMenuProps): ReactElement {
   return (
     <Box flexDirection="column" padding={1} borderStyle="round" borderColor="cyan">
       <Text bold color="cyan">
-        Arqel — Terminal UI
+        {t('cli.menu.title', 'Arqel — Terminal UI')}
       </Text>
-      <Text dimColor>Use arrows to navigate, enter to select, q to quit.</Text>
+      <Text dimColor>
+        {t('cli.menu.hint', 'Use arrows to navigate, enter to select, q to quit.')}
+      </Text>
       <Box marginTop={1} flexDirection="column">
         {OPTIONS.map((opt, i) => {
           const active = i === index;
           return (
             <Text key={opt.value} {...(active ? { color: 'green' } : {})}>
               {active ? '> ' : '  '}
-              {opt.label}
+              {t(opt.labelKey, opt.fallback)}
             </Text>
           );
         })}

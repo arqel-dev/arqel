@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { useCompareSlugs } from '../../hooks/useCompareSlugs';
-import { formatCompact, useActiveLocale } from '../../lib/format';
+import { formatCompact, formatDecimal, useActiveLocale } from '../../lib/format';
 import type { Plugin } from '../../types';
 import { PublisherBadge } from './PublisherBadge';
 
@@ -42,7 +42,9 @@ export function PluginCard({ plugin }: Props): JSX.Element {
           <span data-testid="install-count">
             {formatCompact(plugin.install_count ?? 0, locale)} installs
           </span>
-          {typeof plugin.stars === 'number' && <span data-testid="stars">⭐ {plugin.stars}</span>}
+          {typeof plugin.stars === 'number' && (
+            <span data-testid="stars">⭐ {formatDecimal(plugin.stars, locale, 0)}</span>
+          )}
         </footer>
       </Link>
       {plugin.publisher !== null && plugin.publisher !== undefined && (

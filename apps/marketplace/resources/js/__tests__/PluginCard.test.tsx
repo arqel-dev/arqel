@@ -49,4 +49,11 @@ describe('<PluginCard />', () => {
     expect(screen.getByTestId('install-count')).toHaveTextContent('12 mil installs');
     localeRef.current = 'en';
   });
+
+  it('formats the star count with locale-aware grouping (pt_BR)', () => {
+    localeRef.current = 'pt_BR';
+    render(<PluginCard plugin={{ ...basePlugin, stars: 12345 }} />);
+    expect(screen.getByTestId('stars')).toHaveTextContent('12.345');
+    localeRef.current = 'en';
+  });
 });

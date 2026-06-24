@@ -1948,5 +1948,53 @@
     "line": 361,
     "title": "Synthetic table group label 'All' hardcoded in Table::buildGroups()",
     "round": 23
+  },
+  {
+    "file": "packages-js/cli-ink/src/components/Dashboard.tsx",
+    "line": 66,
+    "title": "cli-ink Dashboard heading, states and tile labels hardcoded",
+    "round": 24
+  },
+  {
+    "file": "packages-js/cli-ink/src/components/ResourceBrowser.tsx",
+    "line": 40,
+    "title": "cli-ink ResourceBrowser heading, states and detail labels hardcoded",
+    "round": 24
+  },
+  {
+    "file": "packages-js/cli-ink/src/components/LogTailer.tsx",
+    "line": 87,
+    "title": "cli-ink LogTailer header, error prefix and follow indicator hardcoded",
+    "round": 24
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+    "line": 25,
+    "title": "CompareTable install_count rendered raw (String()), bypassing locale number grouping",
+    "round": 24
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+    "line": 26,
+    "title": "CompareTable stars count rendered raw (String()), no locale number grouping",
+    "round": 24
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+    "line": 35,
+    "title": "CompareTable reviews_count rendered raw (String()), no locale number grouping",
+    "round": 24
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/PluginCard.tsx",
+    "line": 45,
+    "title": "PluginCard stars count rendered raw, no locale number grouping",
+    "round": 24
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+    "line": 127,
+    "title": "PublisherProfile plugins_count stat rendered raw, no locale grouping",
+    "round": 24
   }
 ]

@@ -1,4 +1,10 @@
-import { formatCurrency, formatDate, useActiveLocale } from '../../lib/format';
+import {
+  formatCompact,
+  formatCurrency,
+  formatDate,
+  formatDecimal,
+  useActiveLocale,
+} from '../../lib/format';
 import type { Plugin } from '../../types';
 
 type Props = {
@@ -22,8 +28,12 @@ function buildRows(locale: string): Row[] {
 
   return [
     { key: 'price', label: 'Preço', value: formatPrice },
-    { key: 'installs', label: 'Downloads', value: (p) => String(p.install_count ?? 0) },
-    { key: 'stars', label: 'Estrelas', value: (p) => String(p.stars ?? 0) },
+    {
+      key: 'installs',
+      label: 'Downloads',
+      value: (p) => formatCompact(p.install_count ?? 0, locale),
+    },
+    { key: 'stars', label: 'Estrelas', value: (p) => formatDecimal(p.stars ?? 0, locale, 0) },
     { key: 'type', label: 'Tipo', value: (p) => p.type },
     { key: 'compat', label: 'Compat (versão)', value: (p) => p.latest_version ?? '—' },
     { key: 'license', label: 'Licença', value: (p) => p.license ?? '—' },
@@ -32,7 +42,11 @@ function buildRows(locale: string): Row[] {
       label: 'Último release',
       value: (p) => formatDate(p.updated_at, locale),
     },
-    { key: 'reviews', label: 'Reviews', value: (p) => String(p.reviews_count ?? 0) },
+    {
+      key: 'reviews',
+      label: 'Reviews',
+      value: (p) => formatDecimal(p.reviews_count ?? 0, locale, 0),
+    },
   ];
 }
 

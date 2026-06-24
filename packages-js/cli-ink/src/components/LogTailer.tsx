@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { Box, Text } from 'ink';
 import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
+import { t } from '../i18n.js';
 
 export type LogTailerProps = {
   filePath: string;
@@ -51,7 +52,7 @@ export function LogTailer({
       if (cancelled) return;
       try {
         if (!fileExists(filePath)) {
-          setError(`File not found: ${filePath}`);
+          setError(`${t('cli.logs.file_not_found', 'File not found: ')}${filePath}`);
           return;
         }
         const raw = readFile(filePath);
@@ -78,13 +79,18 @@ export function LogTailer({
   }, [filePath, follow, pollMs, maxLines, readFile, fileExists]);
 
   if (error) {
-    return <Text color="red">Error: {error}</Text>;
+    return (
+      <Text color="red">
+        {t('cli.error.prefix', 'Error:')} {error}
+      </Text>
+    );
   }
 
   return (
     <Box flexDirection="column">
       <Text bold color="cyan">
-        Log: {filePath} {follow ? '(following)' : ''}
+        {t('cli.logs.header', 'Log:')} {filePath}{' '}
+        {follow ? t('cli.logs.following', '(following)') : ''}
       </Text>
       {lines.map((line) => {
         const level = classifyLine(line);

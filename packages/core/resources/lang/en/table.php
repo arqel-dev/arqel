@@ -30,6 +30,10 @@ return [
         // Accessible name for the otherwise-empty row-actions column header.
         'actions' => 'Actions',
     ],
+    'group' => [
+        // Synthetic group header label shown when a table has no groupBy.
+        'all' => 'All',
+    ],
     'sort' => [
         'asc' => 'Ascending',
         'desc' => 'Descending',

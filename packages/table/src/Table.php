@@ -358,7 +358,7 @@ final class Table
     {
         if ($this->groupBy === null) {
             return [[
-                'label' => 'All',
+                'label' => self::localizeLabel('arqel::table.group.all'),
                 'key' => null,
                 'records' => $records,
                 'summaries' => $this->computeSummaries($records),
@@ -523,5 +523,22 @@ final class Table
             ),
             'reorderable' => $this->reorderColumn,
         ];
+    }
+
+    /**
+     * Resolve a label through Laravel translation lazily so the active request
+     * locale applies at serialization time. A translation key renders in the
+     * current locale; a plain literal passes through unchanged. Falls back to
+     * the raw value when no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

@@ -1942,5 +1942,11 @@
     "line": 55,
     "title": "TrashedFilter top-level filter label hardcoded to English 'Trashed' (framework default, never a translation key)",
     "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/table/src/Table.php",
+    "line": 361,
+    "title": "Synthetic table group label 'All' hardcoded in Table::buildGroups()",
+    "round": 23
   }
 ]

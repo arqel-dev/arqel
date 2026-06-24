@@ -1,0 +1,44 @@
+{
+  "total": 9,
+  "confirmed_count": 3,
+  "dupe_count": 2,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "LineChart Y-axis ticks and tooltip values not locale-formatted",
+      "file": "packages-js/ui/src/widgets/charts/LineChart.tsx",
+      "line": 21,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "n/a (Intl.NumberFormat tickFormatter, no message key)",
+      "detail": "<YAxis /> (line 21) and <Tooltip /> (line 22) are rendered with no `tickFormatter`/`formatter`, so recharts falls back to its default numeric rendering (effectively String(value)) with no locale thousands grouping or decimal separator. A pt-BR/de/fr user viewing a dataset of e.g. 1500000 sees `1500000` on the Y axis and tooltip instead of `1.500.000`. The component imports no locale (no useArqelLocale) and the chart data carries only raw number[] (types.ts ChartDataset.data: number[]), so there is no locale plumbing into the axis/tooltip at all. Repro: register a Chart widget with a line dataset containing a large number, set app locale to pt_BR, render \u2014 axis/tooltip digits are ungrouped en-style. Fix: thread the active locale (useArqelLocale) and pass tickFormatter={(v)=>new Intl.NumberFormat(locale).format(v)} to YAxis plus a tooltip formatter.",
+      "confidence": "high",
+      "why_real": "VERIFIED REAL, NOT DUPLICATE. Read packages-js/ui/src/widgets/charts/LineChart.tsx: line 21 renders <YAxis /> and line 22 <Tooltip /> with no tickFormatter/formatter. Recharts falls back to String(value), so a pt-BR/de/fr user viewing a large value (e.g. 1500000) sees ungrouped en-style digits instead of 1.500.000. The component imports no locale hook, so there is zero locale plumbing into the axis/tooltip. This is genuinely user-facing.\n\nDefect class is established and in-scope: Round 9 of the ledger fixed the directly analogous 'StatCard numeric KPI value rendered raw without Intl.NumberFormat grouping' using the exact suggested fix (const locale = useArqelLocale(); new Intl.NumberFormat(locale).format(value)). The useArqelLocale hook from @arqel-dev/react/utils exists and is already used in StatCard.tsx:110-111, cells.tsx, TablePagination.tsx, TableCard.tsx \u2014 so the fix is trivially plumbable.\n\nNOT a duplicate: scanned the full 337-entry R1-R26 ledger (max round 26). No chart axis/tooltip/tickFormatter entry exists for any widgets/charts/*.tsx file. The only chart-related ledger entry is ChartCard.tsx 'Loading chart' aria-label (Round 1), which is unrelated.\n\nNOT vendored: path is packages-js/ui/src/widgets/charts/, not packages-js/ui/src/shadcn/*.\n\nCaveat (lowers confidence on scope, not on realness): the identical unformatted YAxis/Tooltip defect also exists in sibling BarChart.tsx (lines 21-22), AreaChart.tsx (lines 21-22), RadarChart.tsx, and PieChart.tsx \u2014 an un-swept family of 5+ chart files. The finding as written correctly identifies LineChart as one real, novel, reproducible instance."
+    },
+    {
+      "title": "AreaChart Y-axis ticks and tooltip values not locale-formatted",
+      "file": "packages-js/ui/src/widgets/charts/AreaChart.tsx",
+      "line": 21,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "n/a (Intl.NumberFormat tickFormatter)",
+      "detail": "Same gap as LineChart: <YAxis /> (line 21) and <Tooltip /> (line 22) have no tickFormatter/formatter, so numeric axis ticks and tooltip values render via recharts' default (raw, ungrouped) instead of through Intl.NumberFormat in the active locale. No useArqelLocale import; ChartSubProps carries no locale. Repro: area chart with value 1234567 under pt_BR shows `1234567` not `1.234.567`. Fix: add a locale-aware tickFormatter + tooltip formatter.",
+      "confidence": "med",
+      "why_real": "Code state verified at packages-js/ui/src/widgets/charts/AreaChart.tsx:21-22: bare <YAxis /> and <Tooltip /> with no tickFormatter/formatter, no useArqelLocale import, and ChartSubProps (widgets/types.ts) carries no locale. Numeric axis ticks and tooltip values therefore render via recharts' default raw/ungrouped formatting.\n\nThis is a genuine i18n defect, not a greenfield enhancement, because the framework already establishes a numeric-locale-formatting contract elsewhere: StatCard.tsx:110-118 formats numbers via `new Intl.NumberFormat(locale)` with the exact documented behavior `1234567 \u2192 1.234.567` under pt-BR; TableCard.tsx and table/cells.tsx use useArqelLocale + Intl.NumberFormat the same way. So chart axis/tooltip numbers being raw is an inconsistency with the framework's own active-locale number formatting \u2014 user-facing (a pt-BR user sees `1234567` in chart ticks/tooltip while the same value is `1.234.567` in StatCards/tables). Repro is valid.\n\nLedger check (reports/i18n-fixed-ledger.json, rounds 1-27): no chart locale-format / tickFormatter / YAxis / Tooltip entry for any chart exists. Closest entries are ChartCard.tsx aria-label (Loading chart) and a demo dashboard ->format('M j') month abbreviation \u2014 both unrelated. Not a duplicate.\n\nNot vendored: file is under widgets/charts/, not shadcn/*.\n\nCaveat lowering confidence: the defect is systemic and identical across LineChart, AreaChart, BarChart, and RadarChart (all have bare <YAxis/>/<Tooltip/>); the finding itself notes 'Same gap as LineChart.' It is a defect-family reported per-file. Since no chart-locale entry is in the ledger, AreaChart is not a duplicate of any recorded item, but it is one slice of a multi-file family."
+    },
+    {
+      "title": "PieChart/DonutChart slice values not locale-formatted and hardcoded English 'Slice N' fallback label",
+      "file": "packages-js/ui/src/widgets/charts/PieChart.tsx",
+      "line": 25,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "arqel::chart.slice_fallback (label) + Intl.NumberFormat for values",
+      "detail": "Two issues. (1) locale-format: the `label` prop on <Pie> (line 39) and <Tooltip /> (line 45) render the raw numeric `value` with no formatter, so slice value labels/tooltips show ungrouped en-style digits regardless of locale (e.g. 1200000 not 1.200.000 under pt_BR). No useArqelLocale import; ChartSubProps carries no locale. (2) missing-i18n: line 25 uses a hardcoded English fallback name `Slice ${i + 1}` when chartData.labels[i] is absent, so an unlabeled slice always reads 'Slice 1' even under pt_BR. DonutChart delegates entirely to PieChart so it inherits both. Repro: pie widget with fewer labels than data points under pt_BR \u2014 fallback slice reads 'Slice 2' and its value label is ungrouped. Fix: route value through Intl.NumberFormat(locale) in a Pie label/tooltip formatter, and replace the literal with a translated key like arqel::chart.slice_fallback with a :number placeholder.",
+      "confidence": "high",
+      "why_real": "Verified against /home/diogo/PhpstormProjects/arqel/packages-js/ui/src/widgets/charts/PieChart.tsx. Both sub-claims reproduce. (1) locale-format: line 39 `label` on <Pie> and line 45 <Tooltip /> render raw numeric slice values; there is no useArqelLocale import and ChartSubProps (types.ts:29) carries no locale, so values display ungrouped en-style digits under pt_BR (1200000 not 1.200.000). The same package proves this is a real gap by formatting numbers via useArqelLocale + Intl.NumberFormat in StatCard.tsx:110-111, TableCard.tsx:45-46, TablePagination.tsx:30-31 and cells.tsx:218/247. (2) missing-i18n: line 25 `chartData.labels[i] ?? `Slice ${i + 1}`` hardcodes an English fallback. types.ts confirms labels:string[] and datasets[0].data:number[] are independent arrays with no enforced length parity, so when data outnumbers labels an unlabeled slice renders literal 'Slice N' regardless of locale \u2014 the repro is valid. DonutChart.tsx delegates entirely to PieChart and inherits both defects. Not vendored: file lives in widgets/charts/, not shadcn/*; it is first-party framework code shipped to consumers. Not a duplicate: scanned all 336 ledger entries (rounds 1-27); nearest neighbors are StatCard raw-KPI R9, VersionTimeline RelativeTimeFormat R2, ChartCard aria-label R1 \u2014 none cover PieChart/DonutChart slice value formatting or the 'Slice N' fallback."
+    }
+  ]
+}

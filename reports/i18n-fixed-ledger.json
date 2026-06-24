@@ -2014,5 +2014,23 @@
     "line": 50,
     "title": "Pagination from/to/total counts interpolated raw, never locale number-grouped",
     "round": 26
+  },
+  {
+    "file": "packages-js/ui/src/widgets/charts/LineChart.tsx",
+    "line": 21,
+    "title": "LineChart Y-axis ticks and tooltip values not locale-formatted",
+    "round": 28
+  },
+  {
+    "file": "packages-js/ui/src/widgets/charts/AreaChart.tsx",
+    "line": 21,
+    "title": "AreaChart Y-axis ticks and tooltip values not locale-formatted",
+    "round": 28
+  },
+  {
+    "file": "packages-js/ui/src/widgets/charts/PieChart.tsx",
+    "line": 25,
+    "title": "PieChart/DonutChart slice values not locale-formatted and hardcoded English 'Slice N' fallback label",
+    "round": 28
   }
 ]

@@ -113,6 +113,23 @@ it('returns 422 when the model does not use the Versionable trait', function ():
     $response = getVersionHistory($this, 'plain-articles', $plain->id);
 
     $response->assertStatus(422);
+    $response->assertJsonPath('message', "Model [{$plain->getMorphClass()}] does not use the Versionable trait");
+});
+
+it('localizes the 422 not-versionable message under pt_BR', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(PlainArticleResource::class);
+
+    $plain = PlainArticle::create(['title' => 'plain']);
+
+    app()->setLocale('pt_BR');
+
+    /** @var TestCase $this */
+    $response = getVersionHistory($this, 'plain-articles', $plain->id);
+
+    $response->assertStatus(422);
+    $response->assertJsonPath('message', "O modelo [{$plain->getMorphClass()}] não usa o trait Versionable");
 });
 
 it('respects per_page paginating the result set', function (): void {

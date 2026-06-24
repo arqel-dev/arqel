@@ -202,6 +202,43 @@ describe('<RichTextInput> (Tiptap)', () => {
     pageMock.mockReturnValue({ props: {} });
   });
 
+  it('routes the image toolbar button visible face through t() (visible == aria)', () => {
+    const onChange = vi.fn();
+    render(
+      <RichTextInput
+        field={buildField({ toolbar: ['image'], imageUploadRoute: '/upload' })}
+        value=""
+        onChange={onChange}
+      />,
+    );
+    // The image button has no language-neutral glyph; its visible face must
+    // equal the translated aria-label so they stay in sync across locales.
+    expect(screen.getByRole('button', { name: 'Image' })).toHaveTextContent('Image');
+  });
+
+  it('translates the image toolbar button visible face when a locale is active', () => {
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: { fields_advanced: { richtext_image: 'Imagem' } },
+          },
+        },
+      } as Record<string, unknown>,
+    });
+    const onChange = vi.fn();
+    render(
+      <RichTextInput
+        field={buildField({ toolbar: ['image'], imageUploadRoute: '/upload' })}
+        value=""
+        onChange={onChange}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Imagem' })).toHaveTextContent('Imagem');
+    pageMock.mockReturnValue({ props: {} });
+  });
+
   it('initialises editor content from the `value` prop and renders parsed text', () => {
     const onChange = vi.fn();
     render(<RichTextInput field={buildField()} value="<p>hello world</p>" onChange={onChange} />);

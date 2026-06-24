@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatCompact, formatCurrency, formatDate, toBcp47 } from '../lib/format';
+import { formatCompact, formatCurrency, formatDate, formatDecimal, toBcp47 } from '../lib/format';
 
 describe('toBcp47', () => {
   it('maps underscore locales to BCP-47 tags', () => {
@@ -28,6 +28,20 @@ describe('formatCompact', () => {
   it('uses localized compact words in pt-BR', () => {
     // Intl separates the value and the "mil" unit with a narrow no-break space.
     expect(formatCompact(12345, 'pt-BR')).toMatch(/^12\s*mil$/);
+  });
+});
+
+describe('formatDecimal', () => {
+  it('formats with a dot decimal separator in en', () => {
+    expect(formatDecimal(4.5, 'en', 1)).toBe('4.5');
+  });
+
+  it('formats with a comma decimal separator in pt-BR', () => {
+    expect(formatDecimal(4.5, 'pt-BR', 1)).toBe('4,5');
+  });
+
+  it('pads to the requested fraction digits', () => {
+    expect(formatDecimal(4, 'en', 1)).toBe('4.0');
   });
 });
 

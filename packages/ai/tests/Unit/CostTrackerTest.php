@@ -49,6 +49,41 @@ it('throws UserLimitExceeded when a user is over budget', function (): void {
     (new CostTracker)->assertWithinLimit(7);
 })->throws(UserLimitExceeded::class);
 
+it('localizes the daily-limit message under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+    config()->set('arqel-ai.cost_tracking.daily_limit_usd', 1.0);
+
+    AiUsage::query()->create([
+        'user_id' => null,
+        'provider' => 'claude',
+        'model' => 'm',
+        'input_tokens' => 0,
+        'output_tokens' => 0,
+        'cost_usd' => 1.5,
+    ]);
+
+    expect(fn () => (new CostTracker)->assertWithinLimit(null))
+        ->toThrow(DailyLimitExceeded::class, 'Limite diário de IA de $1 excedido');
+});
+
+it('localizes the user-limit message under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+    config()->set('arqel-ai.cost_tracking.daily_limit_usd', 1000.0);
+    config()->set('arqel-ai.cost_tracking.per_user_limit_usd', 0.5);
+
+    AiUsage::query()->create([
+        'user_id' => 7,
+        'provider' => 'claude',
+        'model' => 'm',
+        'input_tokens' => 0,
+        'output_tokens' => 0,
+        'cost_usd' => 0.6,
+    ]);
+
+    expect(fn () => (new CostTracker)->assertWithinLimit(7))
+        ->toThrow(UserLimitExceeded::class, 'Limite diário de IA de $0.5 excedido para o usuário #7');
+});
+
 it('treats null limits as unlimited', function (): void {
     config()->set('arqel-ai.cost_tracking.daily_limit_usd', null);
     config()->set('arqel-ai.cost_tracking.per_user_limit_usd', null);

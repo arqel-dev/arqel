@@ -39,14 +39,17 @@ final class CostTracker
 
         if ($dailyLimit !== null && $this->getCostSince() >= $dailyLimit) {
             throw new DailyLimitExceeded(
-                "Daily AI limit of \${$dailyLimit} exceeded",
+                (string) __('arqel::messages.ai.daily_limit_exceeded', ['limit' => (string) $dailyLimit]),
             );
         }
 
         if ($userId !== null && $userLimit !== null
             && $this->getCostForUserSince($userId) >= $userLimit) {
             throw new UserLimitExceeded(
-                "User #{$userId} daily AI limit of \${$userLimit} exceeded",
+                (string) __('arqel::messages.ai.user_limit_exceeded', [
+                    'userId' => (string) $userId,
+                    'limit' => (string) $userLimit,
+                ]),
             );
         }
     }

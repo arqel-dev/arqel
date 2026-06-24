@@ -1888,5 +1888,59 @@
     "line": 124,
     "title": "PerformanceMetrics numeric values use toFixed() with hardcoded '.' decimal separator (locale-insensitive)",
     "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ai/src/AiExtractInput.tsx",
+    "line": 331,
+    "title": "AiExtractInput empty-state 'No extraction yet \u2014 click button to start.' hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/ui/src/palette/CommandPalette.tsx",
+    "line": 325,
+    "title": "CommandPalette 'No commands found' empty-results message hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+    "line": 89,
+    "title": "InertiaInspector tab label 'Page Props' hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+    "line": 98,
+    "title": "InertiaInspector tab label 'Shared Props' hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+    "line": 107,
+    "title": "InertiaInspector tab label 'Navigation History' hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+    "line": 72,
+    "title": "FieldsInspector empty-state 'No fields detected in the current pageProps.' hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+    "line": 194,
+    "title": "FieldsInspector 'No fields match the current filter.' empty-filter message hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+    "line": 62,
+    "title": "TimeTravel empty-state 'No navigation snapshots captured yet...' hardcoded English",
+    "round": 21
+  },
+  {
+    "file": "packages/table/src/Filters/TrashedFilter.php",
+    "line": 55,
+    "title": "TrashedFilter top-level filter label hardcoded to English 'Trashed' (framework default, never a translation key)",
+    "round": 21
   }
 ]

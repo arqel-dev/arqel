@@ -1732,5 +1732,23 @@
     "line": 19,
     "title": "Naive pluralization of review star rating ('estrelas') in sr-only label bypasses Intl.PluralRules",
     "round": 16
+  },
+  {
+    "file": "packages/marketplace/src/Http/Controllers/PluginReviewController.php",
+    "line": 33,
+    "title": "Marketplace PluginReviewController inline validate() has no attributes()/messages() \u2014 per-field validation errors render raw English",
+    "round": 17
+  },
+  {
+    "file": "packages/marketplace/src/Http/Controllers/PluginReviewModerationController.php",
+    "line": 78,
+    "title": "Marketplace PluginReviewModerationController inline validate() lacks attributes()/messages() \u2014 raw English field errors",
+    "round": 17
+  },
+  {
+    "file": "packages/marketplace/src/Http/Controllers/PluginAdminReviewController.php",
+    "line": 31,
+    "title": "Marketplace PluginAdminReviewController inline validate() lacks attributes()/messages() \u2014 raw English field errors",
+    "round": 17
   }
 ]

@@ -31,6 +31,14 @@ final class PluginAdminReviewController
             $data = $request->validate([
                 'action' => ['required', 'in:approve,reject'],
                 'rejection_reason' => ['nullable', 'string', 'max:2000', 'required_if:action,reject'],
+            ], [
+                'action.required' => __('arqel::arqel.marketplace.admin_review.messages.action_required'),
+                'action.in' => __('arqel::arqel.marketplace.admin_review.messages.action_in'),
+                'rejection_reason.required_if' => __('arqel::arqel.marketplace.admin_review.messages.rejection_reason_required_if'),
+                'rejection_reason.max' => __('arqel::arqel.marketplace.admin_review.messages.rejection_reason_max'),
+            ], [
+                'action' => __('arqel::arqel.marketplace.admin_review.attributes.action'),
+                'rejection_reason' => __('arqel::arqel.marketplace.admin_review.attributes.rejection_reason'),
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([

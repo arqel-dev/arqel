@@ -34,6 +34,11 @@ final class PluginReviewVoteController
             /** @var array{vote: string} $data */
             $data = $request->validate([
                 'vote' => ['required', 'in:helpful,unhelpful'],
+            ], [
+                'vote.required' => __('arqel::arqel.marketplace.vote.messages.vote_required'),
+                'vote.in' => __('arqel::arqel.marketplace.vote.messages.vote_in'),
+            ], [
+                'vote' => __('arqel::arqel.marketplace.vote.attributes.vote'),
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([

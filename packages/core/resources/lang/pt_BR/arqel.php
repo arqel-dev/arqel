@@ -395,5 +395,63 @@ return [
             'composer_package_regex' => 'O pacote Composer deve seguir o formato vendor/nome.',
             'type_in' => 'O tipo selecionado é inválido.',
         ],
+        // Controllers com validate() inline (PluginReviewController, etc.)
+        // localizam as mensagens de erro por campo e os rótulos de atributo
+        // através destas chaves, para que $e->errors() não vaze as strings
+        // padrão em inglês do Laravel com nomes de campo em snake_case.
+        'review' => [
+            'attributes' => [
+                'stars' => 'avaliação',
+                'comment' => 'comentário',
+            ],
+            'messages' => [
+                'stars_required' => 'O campo de avaliação é obrigatório.',
+                'stars_min' => 'O campo de avaliação deve ser no mínimo :min.',
+                'stars_max' => 'O campo de avaliação não pode ser maior que :max.',
+                'comment_max' => 'O campo de comentário não pode ter mais de :max caracteres.',
+            ],
+        ],
+        'review_moderation' => [
+            'attributes' => [
+                'action' => 'ação',
+                'reason' => 'motivo',
+            ],
+            'messages' => [
+                'action_required' => 'O campo de ação é obrigatório.',
+                'action_in' => 'A ação selecionada é inválida.',
+                'reason_required_if' => 'O campo de motivo é obrigatório quando a ação é :value.',
+                'reason_max' => 'O campo de motivo não pode ter mais de :max caracteres.',
+            ],
+        ],
+        'admin_review' => [
+            'attributes' => [
+                'action' => 'ação',
+                'rejection_reason' => 'motivo da rejeição',
+            ],
+            'messages' => [
+                'action_required' => 'O campo de ação é obrigatório.',
+                'action_in' => 'A ação selecionada é inválida.',
+                'rejection_reason_required_if' => 'O campo de motivo da rejeição é obrigatório quando a ação é :value.',
+                'rejection_reason_max' => 'O campo de motivo da rejeição não pode ter mais de :max caracteres.',
+            ],
+        ],
+        'feature' => [
+            'attributes' => [
+                'featured' => 'destaque',
+            ],
+            'messages' => [
+                'featured_required' => 'O campo de destaque é obrigatório.',
+                'featured_boolean' => 'O campo de destaque deve ser verdadeiro ou falso.',
+            ],
+        ],
+        'vote' => [
+            'attributes' => [
+                'vote' => 'voto',
+            ],
+            'messages' => [
+                'vote_required' => 'O campo de voto é obrigatório.',
+                'vote_in' => 'O voto selecionado é inválido.',
+            ],
+        ],
     ],
 ];

@@ -33,6 +33,14 @@ final class PluginReviewController
             $data = $request->validate([
                 'stars' => ['required', 'integer', 'min:1', 'max:5'],
                 'comment' => ['nullable', 'string', 'max:5000'],
+            ], [
+                'stars.required' => __('arqel::arqel.marketplace.review.messages.stars_required'),
+                'stars.min' => __('arqel::arqel.marketplace.review.messages.stars_min'),
+                'stars.max' => __('arqel::arqel.marketplace.review.messages.stars_max'),
+                'comment.max' => __('arqel::arqel.marketplace.review.messages.comment_max'),
+            ], [
+                'stars' => __('arqel::arqel.marketplace.review.attributes.stars'),
+                'comment' => __('arqel::arqel.marketplace.review.attributes.comment'),
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([

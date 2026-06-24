@@ -93,3 +93,18 @@ it('is idempotent for same user + plugin', function (): void {
     expect($review)->not->toBeNull();
     expect($review->stars)->toBe(5);
 });
+
+it('localizes per-field validation errors under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+    reviewPlugin();
+    $user = reviewUser();
+
+    $response = $this->actingAs($user)
+        ->postJson('/api/marketplace/plugins/review-target/reviews', [
+            'comment' => str_repeat('x', 5001),
+        ]);
+
+    $response->assertStatus(422);
+    expect($response->json('errors.stars.0'))->toBe('O campo de avaliação é obrigatório.');
+    expect($response->json('errors.comment.0'))->toBe('O campo de comentário não pode ter mais de 5000 caracteres.');
+});

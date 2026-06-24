@@ -132,3 +132,19 @@ it('does not dispatch approved event on reject', function (): void {
     Event::assertNotDispatched(PluginApproved::class);
     Event::assertDispatched(PluginRejected::class);
 });
+
+it('localizes per-field validation errors under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+    allowAdminGate();
+    pendingPlugin();
+    $admin = adminUser();
+
+    $response = $this->actingAs($admin)
+        ->postJson('/api/marketplace/admin/plugins/pending-one/review', [
+            'action' => 'reject',
+        ]);
+
+    $response->assertStatus(422);
+    expect($response->json('errors.rejection_reason.0'))
+        ->toBe('O campo de motivo da rejeição é obrigatório quando a ação é reject.');
+});

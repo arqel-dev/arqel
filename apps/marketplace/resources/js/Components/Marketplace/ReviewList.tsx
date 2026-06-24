@@ -1,3 +1,4 @@
+import { formatPlural, useActiveLocale } from '../../lib/format';
 import type { PluginReview } from '../../types';
 
 type Props = {
@@ -5,6 +6,8 @@ type Props = {
 };
 
 export function ReviewList({ reviews }: Props): JSX.Element {
+  const locale = useActiveLocale();
+
   if (reviews.length === 0) {
     return <p className="text-sm text-neutral-500">Ainda não há reviews.</p>;
   }
@@ -16,10 +19,14 @@ export function ReviewList({ reviews }: Props): JSX.Element {
           <header className="flex items-center justify-between">
             <span className="text-sm font-medium text-neutral-900">
               {'⭐'.repeat(review.stars)}
-              <span className="sr-only">{review.stars} estrelas</span>
+              <span className="sr-only">
+                {formatPlural(review.stars, locale, { one: 'estrela', other: 'estrelas' })}
+              </span>
             </span>
             {typeof review.helpful_count === 'number' && (
-              <span className="text-xs text-neutral-500">{review.helpful_count} úteis</span>
+              <span className="text-xs text-neutral-500">
+                {formatPlural(review.helpful_count, locale, { one: 'útil', other: 'úteis' })}
+              </span>
             )}
           </header>
           {review.comment && <p className="mt-1 text-sm text-neutral-700">{review.comment}</p>}

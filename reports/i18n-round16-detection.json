@@ -1,0 +1,56 @@
+{
+  "total": 7,
+  "confirmed_count": 4,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Built-in deleteBulk action label 'Delete selected' is a raw English literal, not a translation key",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/actions/src/Actions.php",
+      "line": 66,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::actions.delete_selected",
+      "detail": "Actions::deleteBulk() sets ->label('Delete selected') as a raw literal (line 66), while the SAME method's modal strings on lines 71/72/74 correctly use arqel:: keys ('arqel::actions.delete_bulk.heading', etc.). Action::toArray() serializes the label through localizeAction() which calls __($value); because 'Delete selected' is not a translation key, __() returns it unchanged and an app providing e.g. arqel::actions.delete_selected cannot localize the bulk-delete button. This is a leftover inconsistency from the round-1-15 delete-modal fix that keyed everything except this label. Framework-hardcoded. Fix: ->label('arqel::actions.delete_selected') with an English fallback in the lang file.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages/actions/src/Actions.php:66: Actions::deleteBulk() does ->label('Delete selected') as a raw English literal, while lines 71-74 of the same method correctly use arqel::actions.delete_bulk.* keys. Action::toArray() (Action.php:354) serializes the label through localizeAction() (Action.php:379-388), which calls __($value); since 'Delete selected' is not a translation key and no matching key exists in packages/core/resources/lang/en/actions.php or pt_BR/actions.php (which only define view/edit/delete/restore/... and the delete_bulk modal group), __() returns the literal unchanged. Result: the visible bulk-delete button label is permanently English and cannot be localized by an app. User-facing (button label), framework-hardcoded, not a vendored shadcn primitive. Searched the full 1713-line ledger for 'Delete selected', 'delete_selected', 'deleteBulk', and 'Actions.php' \u2014 zero matches across all rounds. The nearest ledger item (Action.php:327, round 1) concerned the serialization path itself, which has since been fixed (localizeAction now exists and is applied to label); the residual defect is the factory supplying a non-key literal, a distinct novel issue."
+    },
+    {
+      "title": "Built-in ExportAction default label 'Export' is a raw English literal, not a translation key",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/export/src/Actions/ExportAction.php",
+      "line": 64,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::actions.export",
+      "detail": "ExportAction::make() sets $action->label('Export') as a raw literal (line 64). The label is serialized via Action::toArray() -> localizeAction() -> __($value); since 'Export' is not a translation key it passes through untranslated, so the default Export toolbar button cannot be localized by an app. Parallel to the deleteBulk gap. Framework-hardcoded; not in ledger. Fix: $action->label('arqel::actions.export') with an English fallback.",
+      "confidence": "high",
+      "why_real": "Confirmed genuine, novel, user-facing i18n defect. At /home/diogo/PhpstormProjects/arqel/packages/export/src/Actions/ExportAction.php:64, ExportAction::make() sets $action->label('Export') \u2014 a raw English literal. The label is serialized via Action::toArray() (packages/actions/src/Action.php:354) through localizeAction() (line 379-388), which runs __($value). Since 'Export' is not a translation key, __('Export') passes it through verbatim, so the default Export toolbar button renders English regardless of app locale.\n\nDecisively, the correct key already exists: packages/core/resources/lang/en/actions.php and pt_BR/actions.php both define 'export' => 'Export'/'Exportar' under the arqel::actions namespace. So the proposed fix (->label('arqel::actions.export')) is exactly the established convention used by the framework's other actions (DeleteAction uses arqel::actions.* keys), making the raw literal a clear oversight. The 'parallel deleteBulk gap' premise also holds: Actions.php:66 ->label('Delete selected') is likewise a raw literal not yet keyed.\n\nNot a duplicate: the ledger (reports/i18n-fixed-ledger.json) has 8+ export-package entries (download abort messages, Carbon date cells, boolean Yes/No in CSV/XLSX/PDF, PdfExporter <h1> literal 'Export') but NONE covers the ExportAction::make() toolbar button label. The DeleteBulkAction ledger entries cover only modal heading/description/submit, not the button label. File is framework source under packages/export/src/, not a vendored shadcn primitive."
+    },
+    {
+      "title": "Naive pluralization of review helpful_count ('\u00fateis') bypasses Intl.PluralRules",
+      "file": "/home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Components/Marketplace/ReviewList.tsx",
+      "line": 22,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "marketplace.reviews.helpful_count",
+      "detail": "`<span>{review.helpful_count} \u00fateis</span>` hardcodes the PT-BR plural form regardless of count. With helpful_count === 1 it renders the grammatically wrong '1 \u00fateis' (should be '1 \u00fatil'); with 0 it renders '0 \u00fateis' which may also be undesirable. The count is also not run through Intl.NumberFormat, so for large counts there is no locale thousands grouping. The correct singular/plural category should be selected via Intl.PluralRules in the active locale (the marketplace app already exposes a BCP-47 locale via apps/marketplace/resources/js/lib/format.ts / usePage().props.i18n.locale). Repro: render a review whose helpful_count is 1 -> UI shows '1 \u00fateis' instead of '1 \u00fatil'. Not in the i18n-fixed-ledger.json (rounds 1-15).",
+      "confidence": "high",
+      "why_real": "Confirmed at /home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Components/Marketplace/ReviewList.tsx:22, which renders `<span ...>{review.helpful_count} \u00fateis</span>`. This hardcodes the PT-BR plural form regardless of count: with helpful_count===1 the UI shows the grammatically wrong \"1 \u00fateis\" (correct: \"1 \u00fatil\"), bypassing Intl.PluralRules. The render is gated by `typeof review.helpful_count === 'number'` and the type is `helpful_count?: number`, so count===1 is reachable \u2014 the repro holds. The count is also not passed through Intl.NumberFormat, so there is no locale thousands grouping. The fix path is real, not speculative: apps/marketplace/resources/js/lib/format.ts already provides locale-aware helpers (useActiveLocale reading usePage().props.i18n.locale, formatCurrency/formatDecimal via Intl.NumberFormat), so a PluralRules/NumberFormat-based fix fits existing infra. Novelty: grep of the R1-R15 ledger (reports/i18n-fixed-ledger.json) returns 0 matches for ReviewList.tsx and no helpful_count/\u00fateis entry; the marketplace entries present cover other files (CompareTable, PluginCard, controllers, app.blade.php, etc.). Not vendored: the component lives under apps/marketplace, not packages-js/ui/src/shadcn/*. User-facing review-list UI. Genuine missing-i18n/pluralization defect."
+    },
+    {
+      "title": "Naive pluralization of review star rating ('estrelas') in sr-only label bypasses Intl.PluralRules",
+      "file": "/home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Components/Marketplace/ReviewList.tsx",
+      "line": 19,
+      "kind": "a11y-i18n",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "marketplace.reviews.star_rating",
+      "detail": "`<span className=\"sr-only\">{review.stars} estrelas</span>` hardcodes the PT-BR plural noun for every value of review.stars. A 1-star review yields the screen-reader announcement '1 estrelas' (should be '1 estrela'). This is both a pluralization and an accessibility-i18n defect because it is the accessible name read to assistive tech. The singular/plural category should be derived with Intl.PluralRules in the active locale rather than a fixed plural word. Repro: render a review with stars === 1 -> screen reader announces '1 estrelas'. Not in the i18n-fixed-ledger.json.",
+      "confidence": "high",
+      "why_real": "Verified line 19 of /home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Components/Marketplace/ReviewList.tsx: `<span className=\"sr-only\">{review.stars} estrelas</span>`. The plural noun \"estrelas\" is hardcoded for all values of review.stars, so a 1-star review produces the screen-reader accessible name \"1 estrelas\" (grammatically wrong PT-BR; should be \"1 estrela\"). This is a genuine, reproducible, user-facing a11y-i18n defect because it is the sr-only accessible name read by assistive tech. The file lives in apps/marketplace, NOT in packages-js/ui/src/shadcn/* \u2014 it is not a vendored shadcn primitive. Scanned i18n-fixed-ledger.json: it contains many marketplace entries (PluginCard, CompareTable, Checkout, PublisherProfile, PluginDetail, app.blade.php, several PHP controllers) but NONE reference ReviewList.tsx or the star/estrelas pluralization, so it was not covered in rounds 1-15. Minor caveat: the finding prescribes Intl.PluralRules, but the component has no i18n runtime (sibling strings like \"\u00fateis\" and \"Ainda n\u00e3o h\u00e1 reviews\" are also hardcoded PT-BR); the underlying plural-mismatch defect is real independent of the suggested remedy."
+    }
+  ]
+}

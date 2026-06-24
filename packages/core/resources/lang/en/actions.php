@@ -10,6 +10,7 @@ return [
     'force_delete' => 'Force delete',
     'duplicate' => 'Duplicate',
     'export' => 'Export',
+    'delete_selected' => 'Delete selected',
 
     'confirm' => [
         'submit' => 'Confirm',

@@ -1708,5 +1708,29 @@
     "line": 69,
     "title": "AiImageField default buttonLabel 'Analyze with AI' hardcoded English",
     "round": 15
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/actions/src/Actions.php",
+    "line": 66,
+    "title": "Built-in deleteBulk action label 'Delete selected' is a raw English literal, not a translation key",
+    "round": 16
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/export/src/Actions/ExportAction.php",
+    "line": 64,
+    "title": "Built-in ExportAction default label 'Export' is a raw English literal, not a translation key",
+    "round": 16
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Components/Marketplace/ReviewList.tsx",
+    "line": 22,
+    "title": "Naive pluralization of review helpful_count ('\u00fateis') bypasses Intl.PluralRules",
+    "round": 16
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Components/Marketplace/ReviewList.tsx",
+    "line": 19,
+    "title": "Naive pluralization of review star rating ('estrelas') in sr-only label bypasses Intl.PluralRules",
+    "round": 16
   }
 ]

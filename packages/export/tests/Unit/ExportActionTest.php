@@ -10,7 +10,7 @@ it('creates an action with sensible defaults', function (): void {
 
     expect($action)->toBeInstanceOf(ExportAction::class);
     expect($action->getName())->toBe('export');
-    expect($action->getLabel())->toBe('Export');
+    expect($action->getLabel())->toBe('arqel::actions.export');
     expect($action->getType())->toBe('bulk');
     expect($action->getFormat())->toBe(ExportFormat::CSV);
 });

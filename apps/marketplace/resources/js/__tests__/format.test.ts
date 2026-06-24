@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { formatCompact, formatCurrency, formatDate, formatDecimal, toBcp47 } from '../lib/format';
+import {
+  formatCompact,
+  formatCurrency,
+  formatDate,
+  formatDecimal,
+  formatPlural,
+  toBcp47,
+} from '../lib/format';
 
 describe('toBcp47', () => {
   it('maps underscore locales to BCP-47 tags', () => {
@@ -42,6 +49,30 @@ describe('formatDecimal', () => {
 
   it('pads to the requested fraction digits', () => {
     expect(formatDecimal(4, 'en', 1)).toBe('4.0');
+  });
+});
+
+describe('formatPlural', () => {
+  const stars = { one: 'estrela', other: 'estrelas' };
+
+  it('selects the singular form for a count of 1 in pt-BR', () => {
+    expect(formatPlural(1, 'pt-BR', stars)).toBe('1 estrela');
+    expect(formatPlural(1, 'pt-BR', { one: 'útil', other: 'úteis' })).toBe('1 útil');
+  });
+
+  it('selects the plural form for counts in the other category in pt-BR', () => {
+    expect(formatPlural(2, 'pt-BR', stars)).toBe('2 estrelas');
+    expect(formatPlural(5, 'pt-BR', { one: 'útil', other: 'úteis' })).toBe('5 úteis');
+  });
+
+  it('follows CLDR for 0, which is the one category in pt-BR but other in en', () => {
+    expect(formatPlural(0, 'pt-BR', stars)).toBe('0 estrela');
+    expect(formatPlural(0, 'en', { one: 'item', other: 'items' })).toBe('0 items');
+  });
+
+  it('applies locale-aware thousands grouping to the count', () => {
+    expect(formatPlural(1234, 'en', { one: 'item', other: 'items' })).toBe('1,234 items');
+    expect(formatPlural(1234, 'pt-BR', stars)).toBe('1.234 estrelas');
   });
 });
 

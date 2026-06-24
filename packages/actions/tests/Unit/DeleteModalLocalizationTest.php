@@ -43,3 +43,19 @@ it('keeps the built-in bulk-delete modal English under en (stability)', function
         ->and($config['description'])->toBe('This action cannot be undone.')
         ->and($config['submitLabel'])->toBe('Delete');
 });
+
+it('localizes the built-in bulk-delete button label under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    $array = Actions::deleteBulk()->toArray();
+
+    expect($array['label'])->toBe('Excluir selecionados');
+});
+
+it('keeps the built-in bulk-delete button label English under en (stability)', function (): void {
+    app()->setLocale('en');
+
+    $array = Actions::deleteBulk()->toArray();
+
+    expect($array['label'])->toBe('Delete selected');
+});

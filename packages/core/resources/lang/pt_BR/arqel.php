@@ -276,6 +276,7 @@ return [
     // rico fornecida por @arqel-dev/fields-advanced (Markdown / Repeater /
     // Wizard / Builder / RichText).
     'fields_advanced' => [
+        'unsupported_field_type' => 'tipo :type ainda não suportado',
         'markdown_formatting' => 'Formatação Markdown',
         'markdown_bold' => 'Negrito',
         'markdown_italic' => 'Itálico',

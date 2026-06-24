@@ -161,6 +161,20 @@ function activeLocale(): Locale {
   return 'en';
 }
 
+const BCP47_TAGS: Readonly<Record<Locale, string>> = {
+  en: 'en',
+  pt_BR: 'pt-BR',
+};
+
+/**
+ * BCP-47 tag for the active locale, suitable for `Intl.*` / `toLocale*`
+ * APIs. Derived from `navigator.language` via the same normalization used
+ * for translations, so e.g. `pt-BR` browsers get `pt-BR` (24h) timestamps.
+ */
+export function localeBcp47(): string {
+  return BCP47_TAGS[activeLocale()];
+}
+
 function interpolate(value: string, replacements?: Record<string, string | number>): string {
   if (!replacements) return value;
   return value.replace(/:(\w+)/g, (match, name: string) => {

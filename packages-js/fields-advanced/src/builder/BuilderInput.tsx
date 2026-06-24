@@ -281,6 +281,7 @@ interface SubFieldInputProps {
 }
 
 function SubFieldInput({ field, value, onChange, disabled, inputId }: SubFieldInputProps) {
+  const t = useArqelTranslations();
   const type = field.type;
 
   if (type === 'textarea') {
@@ -358,7 +359,9 @@ function SubFieldInput({ field, value, onChange, disabled, inputId }: SubFieldIn
   }
 
   const note = SUPPORTED_TYPES.has(type) ? null : (
-    <p className="mt-1 text-xs text-muted-foreground">type {type} not yet supported</p>
+    <p className="mt-1 text-xs text-muted-foreground">
+      {t('arqel.fields_advanced.unsupported_field_type', 'type :type not yet supported', { type })}
+    </p>
   );
 
   return (

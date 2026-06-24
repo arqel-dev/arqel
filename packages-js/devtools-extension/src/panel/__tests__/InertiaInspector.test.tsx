@@ -54,6 +54,25 @@ describe('<InertiaInspector />', () => {
     expect(entries[0]).toHaveTextContent('/admin/posts');
   });
 
+  it('formats navigation timestamps with the active navigator.language locale', () => {
+    const original = navigator.language;
+    Object.defineProperty(navigator, 'language', { value: 'pt-BR', configurable: true });
+    try {
+      render(<InertiaInspector stateSource={staticSource(makeState())} />);
+      fireEvent.click(screen.getByTestId('tab-navigation'));
+      const timestamp = screen
+        .getAllByTestId('navigation-entry')[0]
+        ?.querySelector('.arqel-nav-timestamp')?.textContent;
+      const expected = new Date(1_700_000_000_000).toLocaleTimeString('pt-BR');
+      // Guard: pt-BR 24h formatting must differ from the en-US default so
+      // this asserts the locale is actually threaded into toLocaleTimeString.
+      expect(new Date(1_700_000_000_000).toLocaleTimeString('en-US')).not.toBe(expected);
+      expect(timestamp).toBe(expected);
+    } finally {
+      Object.defineProperty(navigator, 'language', { value: original, configurable: true });
+    }
+  });
+
   it('filters JSON tree by highlighting matches', () => {
     render(<InertiaInspector stateSource={staticSource(makeState())} />);
     fireEvent.change(screen.getByTestId('inspector-search'), { target: { value: 'Ada' } });

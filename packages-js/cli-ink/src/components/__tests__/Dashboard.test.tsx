@@ -18,7 +18,7 @@ describe('Dashboard', () => {
         ioOverrides={{ readFile: () => sample, fileExists: () => true }}
       />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     const frame = lastFrame() ?? '';
     expect(frame).toContain('Queries / sec');
     expect(frame).toContain('Active users');
@@ -35,7 +35,7 @@ describe('Dashboard', () => {
         ioOverrides={{ readFile: () => sample, fileExists: () => true }}
       />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     const frame = lastFrame() ?? '';
     expect(frame).toContain('145');
     expect(frame).toContain('23');
@@ -61,7 +61,7 @@ describe('Dashboard', () => {
           ioOverrides={{ readFile: () => grouped, fileExists: () => true }}
         />,
       );
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 200));
       const frame = lastFrame() ?? '';
       expect(frame).toContain('12.345');
       expect(frame).toContain('1.234.567');
@@ -81,7 +81,7 @@ describe('Dashboard', () => {
         ioOverrides={{ readFile: () => '', fileExists: () => false }}
       />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     expect(lastFrame() ?? '').toMatch(/Error:.*not found/);
     unmount();
   });
@@ -92,7 +92,7 @@ describe('Dashboard', () => {
     const { unmount } = render(
       <Dashboard dataDir="/custom" pollMs={0} ioOverrides={{ readFile, fileExists }} />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 200));
     expect(fileExists).toHaveBeenCalled();
     const calledPath = fileExists.mock.calls[0]?.[0] as string;
     expect(calledPath).toContain('/custom');

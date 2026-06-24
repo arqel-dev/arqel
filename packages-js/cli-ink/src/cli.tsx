@@ -6,6 +6,7 @@ import { Dashboard } from './components/Dashboard.js';
 import { LogTailer } from './components/LogTailer.js';
 import { MainMenu, type MenuOption } from './components/MainMenu.js';
 import { ResourceBrowser } from './components/ResourceBrowser.js';
+import { t } from './i18n.js';
 
 const cli = meow(
   `
@@ -79,7 +80,9 @@ else if (command === 'resources') initial = { kind: 'resources' };
 else if (command === 'logs') {
   const file = cli.input[1];
   if (!file) {
-    console.error('Error: `logs` requires a file path. Try: arqel-ink logs <file>');
+    console.error(
+      `${t('cli.error.prefix', 'Error:')} ${t('cli.error.logs_requires_file', '`logs` requires a file path. Try: arqel-ink logs <file>')}`,
+    );
     process.exit(1);
   }
   initial = { kind: 'logs', file };

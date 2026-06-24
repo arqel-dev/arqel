@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import { Box, Text } from 'ink';
 import type { ReactElement } from 'react';
 import { type UseDataSourceOptions, useDataSource } from '../hooks/useDataSource.js';
+import { t } from '../i18n.js';
 
 export type DashboardSnapshot = {
   queriesPerSec: number;
@@ -51,27 +52,47 @@ export function Dashboard({ dataDir, pollMs = 1000, ioOverrides }: DashboardProp
   });
 
   if (loading) {
-    return <Text>Loading dashboard…</Text>;
+    return <Text>{t('cli.dashboard.loading', 'Loading dashboard…')}</Text>;
   }
   if (error) {
-    return <Text color="red">Error: {error}</Text>;
+    return (
+      <Text color="red">
+        {t('cli.error.prefix', 'Error:')} {error}
+      </Text>
+    );
   }
   if (!data) {
-    return <Text color="yellow">No data available.</Text>;
+    return <Text color="yellow">{t('cli.dashboard.empty', 'No data available.')}</Text>;
   }
 
   return (
     <Box flexDirection="column">
       <Text bold color="cyan">
-        Arqel Dashboard
+        {t('cli.dashboard.title', 'Arqel Dashboard')}
       </Text>
       <Box marginTop={1} flexDirection="row">
-        <Tile label="Queries / sec" value={String(data.queriesPerSec)} color="green" />
-        <Tile label="Active users" value={String(data.activeUsers)} color="cyan" />
+        <Tile
+          label={t('cli.dashboard.tile.queries_per_sec', 'Queries / sec')}
+          value={String(data.queriesPerSec)}
+          color="green"
+        />
+        <Tile
+          label={t('cli.dashboard.tile.active_users', 'Active users')}
+          value={String(data.activeUsers)}
+          color="cyan"
+        />
       </Box>
       <Box flexDirection="row">
-        <Tile label="Errors (5m)" value={String(data.errors)} color="red" />
-        <Tile label="AI tokens" value={String(data.aiTokens)} color="magenta" />
+        <Tile
+          label={t('cli.dashboard.tile.errors_5m', 'Errors (5m)')}
+          value={String(data.errors)}
+          color="red"
+        />
+        <Tile
+          label={t('cli.dashboard.tile.ai_tokens', 'AI tokens')}
+          value={String(data.aiTokens)}
+          color="magenta"
+        />
       </Box>
     </Box>
   );

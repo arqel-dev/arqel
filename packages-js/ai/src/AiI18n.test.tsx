@@ -64,6 +64,7 @@ const aiDict = {
       status_extracting: 'Extraindo',
       status_analyzing: 'Analisando',
       status_translating: 'Traduzindo',
+      translate_textarea_aria: 'Tradução para :language',
     },
   },
 };
@@ -218,6 +219,8 @@ describe('@arqel-dev/ai i18n', () => {
     // Switch to the non-default tab to reveal the per-language translate button.
     fireEvent.click(screen.getByRole('tab', { name: /pt/ }));
     expect(screen.getByRole('button', { name: 'Traduzir de en' })).toBeInTheDocument();
+    // Per-language textarea aria-label is localized with the :language placeholder.
+    expect(screen.getByLabelText('Tradução para pt')).toBeInTheDocument();
   });
 
   it('AiImageInput localizes the file-too-large validation error with :size/:max', () => {

@@ -330,7 +330,9 @@ export function AiTranslateInput(props: AiTranslateInputProps): ReactElement {
           value={activeText}
           onChange={handleTextareaChange}
           rows={6}
-          aria-label={`Translation in ${activeLang}`}
+          aria-label={t('arqel.ai.translate_textarea_aria', 'Translation in :language', {
+            language: activeLang,
+          })}
         />
 
         {activeLang !== defaultLanguage ? (

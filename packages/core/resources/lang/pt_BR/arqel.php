@@ -224,6 +224,7 @@ return [
         'status_extracting' => 'Extraindo',
         'status_analyzing' => 'Analisando',
         'status_translating' => 'Traduzindo',
+        'translate_textarea_aria' => 'Tradução para :language',
         // Selo de proveniência exibido após uma classificação (role="status").
         'suggestion_ai' => 'Sugerido por IA',
         'suggestion_fallback' => 'Usou alternativa',

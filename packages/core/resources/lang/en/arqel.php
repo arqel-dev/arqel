@@ -225,6 +225,7 @@ return [
         'status_extracting' => 'Extracting',
         'status_analyzing' => 'Analyzing',
         'status_translating' => 'Translating',
+        'translate_textarea_aria' => 'Translation in :language',
         // Provenance badge shown after a classification (role="status").
         'suggestion_ai' => 'Suggested by AI',
         'suggestion_fallback' => 'Used fallback',

@@ -7,6 +7,7 @@ use Arqel\Table\Filters\SelectFilter;
 use Arqel\Table\Filters\TrashedFilter;
 use Arqel\Table\Summaries\Summary;
 use Arqel\Table\Summaries\SumSummary;
+use Arqel\Table\Table;
 use Illuminate\Support\Facades\Lang;
 
 afterEach(function (): void {
@@ -65,6 +66,17 @@ it('localizes the Summary label in toArray by active locale', function (): void 
     app()->setLocale('pt_BR');
     expect($keyed->toArray()['label'])->toBe('Total geral');
     expect($literal->toArray()['label'])->toBe('Sum');
+});
+
+it('localizes the synthetic ungrouped group label by active locale', function (): void {
+    $table = new Table;
+    $records = collect([['id' => 1], ['id' => 2]]);
+
+    // English default is the original literal, preserving stability.
+    expect($table->buildGroups($records)[0]['label'])->toBe('All');
+
+    app()->setLocale('pt_BR');
+    expect($table->buildGroups($records)[0]['label'])->toBe('Todos');
 });
 
 it('leaves a null Summary label as null in toArray', function (): void {

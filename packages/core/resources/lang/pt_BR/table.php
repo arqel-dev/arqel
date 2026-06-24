@@ -30,6 +30,10 @@ return [
         // Nome acessível do cabeçalho (vazio) da coluna de ações da linha.
         'actions' => 'Ações',
     ],
+    'group' => [
+        // Rótulo do cabeçalho do grupo sintético exibido quando a tabela não tem groupBy.
+        'all' => 'Todos',
+    ],
     'sort' => [
         'asc' => 'Crescente',
         'desc' => 'Decrescente',

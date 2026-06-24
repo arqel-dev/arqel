@@ -1,0 +1,20 @@
+{
+  "total": 3,
+  "confirmed_count": 1,
+  "dupe_count": 2,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Synthetic table group label 'All' hardcoded in Table::buildGroups()",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/table/src/Table.php",
+      "line": 361,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::arqel.table.group.all",
+      "detail": "When a Table has no groupBy configured, buildGroups() returns a single synthetic group whose 'label' is the literal English string 'All'. This array {label, key, records, summaries} is a documented public render-time API (see packages/table/SKILL.md line 46) consumed by the React render layer and displayed verbatim as a group header. It is framework-hardcoded and not routed through __()/trans(); every other label in this file (e.g. Summary labels via Summary::localizeLabel, and the groupBy labelResolver path) is localized, making this the lone gap. Suggest routing through the translator with a fallback, e.g. self::localizeLabel('arqel::arqel.table.group.all') or the existing $this->message() pattern, defaulting to 'All'. Severity low because the synthetic group only arises in the ungrouped case where a render layer typically omits the group header, and buildGroups() currently has no in-framework caller (invoked by app code at render time). Framework-hardcoded.",
+      "confidence": "med",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages/table/src/Table.php:361: buildGroups() returns a synthetic group with hardcoded English 'label' => 'All' when no groupBy is configured, not routed through __()/trans(). This is a documented public render-time API: SKILL.md:46 and MCP docs in 3 languages (packages-js/mcp-server/docs/{,pt-BR,es}/advanced/tables-v2.md) all document the {label,key,records,summaries} shape with the 'All' group. The inconsistency is real within the package: Summary labels ARE localized via Summary::localizeLabel/trans() (packages/table/src/Summaries/Summary.php:121,132-138), so the synthetic group label is the lone un-localized label in the grouping path.\n\nCorrection to the finding: it claims 'every other label in this file is localized' \u2014 false; Table.php itself has ZERO __()/trans()/localizeLabel/message() calls (the localization lives in Summary.php, a different file). This does not change the verdict, only the rationale.\n\nNot a duplicate: the only 'All' entry in the ledger is packages-js/ui/src/widgets/DashboardFilters.tsx:146 (a JS select-filter option, round 1) \u2014 different file, layer, and context. No Table.php / buildGroups entry exists in rounds 1-22.\n\nNot vendored: it is framework PHP in packages/table/src, not packages-js/ui/src/shadcn/*.\n\nSeverity is genuinely low and user-facing reach is conditional: confirmed via grep that buildGroups has NO in-framework React consumer \u2014 the only JS 'group' usage in packages-js/ui/src/table is TanStack's getHeaderGroups (column header groups, unrelated to data-row grouping). The label only surfaces if app code renders the ungrouped synthetic group header. Still a real defect: it is a hardcoded English string in a documented public payload contract, inconsistent with the localized sibling path."
+    }
+  ]
+}

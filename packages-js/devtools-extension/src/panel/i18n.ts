@@ -49,6 +49,19 @@ const EN: Dictionary = {
   'devtools.fields.heading.visibility': 'Visibility rule',
   'devtools.fields.heading.meta': 'Meta',
   'devtools.fields.no_rules': 'No validation rules.',
+  'devtools.policy.empty.no_checks': 'No policy checks recorded for this request.',
+  'devtools.policy.empty.no_match': 'No entries match the current filter.',
+  'devtools.performance.empty':
+    'No performance metrics captured yet. Interact with the page to populate Web Vitals.',
+  'devtools.performance.label.navigation': 'Navigation',
+  'devtools.performance.hint.lcp': 'Largest Contentful Paint',
+  'devtools.performance.hint.responsiveness': 'Interaction latency',
+  'devtools.performance.hint.cls': 'Cumulative Layout Shift',
+  'devtools.performance.hint.navigation': 'Initial navigation duration',
+  'devtools.performance.server.queries': 'Queries',
+  'devtools.performance.server.memory': 'Memory',
+  'devtools.time_travel.replay': 'Replay',
+  'devtools.time_travel.replay_aria': 'Replay :url',
 };
 
 const PT_BR: Dictionary = {
@@ -84,6 +97,20 @@ const PT_BR: Dictionary = {
   'devtools.fields.heading.visibility': 'Regra de visibilidade',
   'devtools.fields.heading.meta': 'Meta',
   'devtools.fields.no_rules': 'Nenhuma regra de validação.',
+  'devtools.policy.empty.no_checks':
+    'Nenhuma verificação de política registrada para esta requisição.',
+  'devtools.policy.empty.no_match': 'Nenhuma entrada corresponde ao filtro atual.',
+  'devtools.performance.empty':
+    'Nenhuma métrica de desempenho capturada ainda. Interaja com a página para popular os Web Vitals.',
+  'devtools.performance.label.navigation': 'Navegação',
+  'devtools.performance.hint.lcp': 'Maior Conteúdo Renderizado',
+  'devtools.performance.hint.responsiveness': 'Latência de interação',
+  'devtools.performance.hint.cls': 'Mudança Cumulativa de Layout',
+  'devtools.performance.hint.navigation': 'Duração da navegação inicial',
+  'devtools.performance.server.queries': 'Consultas',
+  'devtools.performance.server.memory': 'Memória',
+  'devtools.time_travel.replay': 'Reproduzir',
+  'devtools.time_travel.replay_aria': 'Reproduzir :url',
 };
 
 const DICTIONARIES: Readonly<Record<Locale, Dictionary>> = {

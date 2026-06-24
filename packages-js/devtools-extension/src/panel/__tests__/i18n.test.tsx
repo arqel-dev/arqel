@@ -3,6 +3,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../App';
 import { FieldsInspector } from '../FieldsInspector';
 import { normalizeLocale, t } from '../i18n';
+import { PerformanceMetrics } from '../PerformanceMetrics';
+
+const EMPTY_METRICS = {
+  lcp: null,
+  inp: null,
+  fid: null,
+  cls: null,
+  navigationTime: null,
+} as const;
 
 function mockLanguage(tag: string): void {
   vi.spyOn(navigator, 'language', 'get').mockReturnValue(tag);
@@ -79,5 +88,21 @@ describe('panel localization', () => {
       'Filtrar por tipo',
     );
     expect(screen.getByText('Todos os tipos')).toBeInTheDocument();
+  });
+
+  it('renders the PerformanceMetrics empty-state in English by default', () => {
+    mockLanguage('en-US');
+    render(<PerformanceMetrics metrics={EMPTY_METRICS} />);
+    expect(screen.getByTestId('performance-empty')).toHaveTextContent(
+      'No performance metrics captured yet. Interact with the page to populate Web Vitals.',
+    );
+  });
+
+  it('localizes the PerformanceMetrics empty-state under a pt_BR navigator.language', () => {
+    mockLanguage('pt-BR');
+    render(<PerformanceMetrics metrics={EMPTY_METRICS} />);
+    expect(screen.getByTestId('performance-empty')).toHaveTextContent(
+      'Nenhuma métrica de desempenho capturada ainda. Interaja com a página para popular os Web Vitals.',
+    );
   });
 });

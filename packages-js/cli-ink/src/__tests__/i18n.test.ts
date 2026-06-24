@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { resolveLocale, t } from '../i18n.js';
+import { formatNumber, resolveBcp47, resolveLocale, t } from '../i18n.js';
 
 const LOCALE_VARS = ['LC_ALL', 'LC_MESSAGES', 'LANG'] as const;
 
@@ -54,5 +54,23 @@ describe('cli-ink i18n', () => {
 
   it('interpolates :placeholder tokens', () => {
     expect(t('cli.unknown.key', 'Found :count items', { count: 3 })).toBe('Found 3 items');
+  });
+
+  it('maps the active locale to a BCP-47 tag for Intl APIs', () => {
+    expect(resolveBcp47('en')).toBe('en');
+    expect(resolveBcp47('pt_BR')).toBe('pt-BR');
+    process.env['LANG'] = 'pt_BR.UTF-8';
+    expect(resolveBcp47()).toBe('pt-BR');
+  });
+
+  it('groups numbers with the period separator under pt_BR', () => {
+    process.env['LANG'] = 'pt_BR.UTF-8';
+    expect(formatNumber(12345)).toBe('12.345');
+    expect(formatNumber(1234567)).toBe('1.234.567');
+  });
+
+  it('groups numbers with the comma separator under the default en locale', () => {
+    expect(formatNumber(12345)).toBe('12,345');
+    expect(formatNumber(999)).toBe('999');
   });
 });

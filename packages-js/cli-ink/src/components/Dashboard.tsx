@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { Box, Text } from 'ink';
 import type { ReactElement } from 'react';
 import { type UseDataSourceOptions, useDataSource } from '../hooks/useDataSource.js';
-import { t } from '../i18n.js';
+import { formatNumber, t } from '../i18n.js';
 
 export type DashboardSnapshot = {
   queriesPerSec: number;
@@ -73,24 +73,24 @@ export function Dashboard({ dataDir, pollMs = 1000, ioOverrides }: DashboardProp
       <Box marginTop={1} flexDirection="row">
         <Tile
           label={t('cli.dashboard.tile.queries_per_sec', 'Queries / sec')}
-          value={String(data.queriesPerSec)}
+          value={formatNumber(data.queriesPerSec)}
           color="green"
         />
         <Tile
           label={t('cli.dashboard.tile.active_users', 'Active users')}
-          value={String(data.activeUsers)}
+          value={formatNumber(data.activeUsers)}
           color="cyan"
         />
       </Box>
       <Box flexDirection="row">
         <Tile
           label={t('cli.dashboard.tile.errors_5m', 'Errors (5m)')}
-          value={String(data.errors)}
+          value={formatNumber(data.errors)}
           color="red"
         />
         <Tile
           label={t('cli.dashboard.tile.ai_tokens', 'AI tokens')}
-          value={String(data.aiTokens)}
+          value={formatNumber(data.aiTokens)}
           color="magenta"
         />
       </Box>

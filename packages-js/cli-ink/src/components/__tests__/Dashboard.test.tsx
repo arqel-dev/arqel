@@ -39,8 +39,38 @@ describe('Dashboard', () => {
     const frame = lastFrame() ?? '';
     expect(frame).toContain('145');
     expect(frame).toContain('23');
-    expect(frame).toContain('8400');
+    // 8400 is locale-grouped (default en -> '8,400').
+    expect(frame).toContain('8,400');
     unmount();
+  });
+
+  it('groups large KPI values with the period separator under a pt_BR locale', async () => {
+    const saved = process.env['LANG'];
+    process.env['LANG'] = 'pt_BR.UTF-8';
+    try {
+      const grouped = JSON.stringify({
+        queriesPerSec: 145,
+        activeUsers: 12345,
+        errors: 2,
+        aiTokens: 1234567,
+      });
+      const { lastFrame, unmount } = render(
+        <Dashboard
+          dataDir="/fake"
+          pollMs={0}
+          ioOverrides={{ readFile: () => grouped, fileExists: () => true }}
+        />,
+      );
+      await new Promise((r) => setTimeout(r, 10));
+      const frame = lastFrame() ?? '';
+      expect(frame).toContain('12.345');
+      expect(frame).toContain('1.234.567');
+      expect(frame).not.toContain('12345');
+      unmount();
+    } finally {
+      if (saved === undefined) delete process.env['LANG'];
+      else process.env['LANG'] = saved;
+    }
   });
 
   it('renders an error message when the data file is missing', async () => {

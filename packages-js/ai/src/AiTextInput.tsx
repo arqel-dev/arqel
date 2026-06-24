@@ -28,9 +28,9 @@
  * the network call only fires from the click handler (post-mount).
  */
 
-import { useArqelTranslations } from '@arqel-dev/react/utils';
+import { useArqelLocale, useArqelTranslations } from '@arqel-dev/react/utils';
 import { Alert, AlertDescription, Button, Textarea } from '@arqel-dev/ui';
-import { type ChangeEvent, type ReactElement, useCallback, useId, useState } from 'react';
+import { type ChangeEvent, type ReactElement, useCallback, useId, useMemo, useState } from 'react';
 
 export interface AiTextInputFieldProps {
   provider?: string | null;
@@ -108,6 +108,8 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
   } = props;
 
   const t = useArqelTranslations();
+  const locale = useArqelLocale();
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const serverLabel = fieldProps?.buttonLabel;
   const buttonLabel =
     serverLabel !== undefined && serverLabel !== ''
@@ -212,7 +214,7 @@ export function AiTextInput(props: AiTextInputProps): ReactElement {
 
       {maxLength !== null ? (
         <div className="text-xs text-muted-foreground self-end" aria-live="polite">
-          {charCount} / {maxLength}
+          {numberFormatter.format(charCount)} / {numberFormatter.format(maxLength)}
         </div>
       ) : null}
 

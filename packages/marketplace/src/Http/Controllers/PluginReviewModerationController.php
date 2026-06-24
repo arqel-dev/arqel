@@ -78,6 +78,14 @@ final class PluginReviewModerationController
             $data = $request->validate([
                 'action' => ['required', 'in:publish,hide'],
                 'reason' => ['nullable', 'string', 'max:2000', 'required_if:action,hide'],
+            ], [
+                'action.required' => __('arqel::arqel.marketplace.review_moderation.messages.action_required'),
+                'action.in' => __('arqel::arqel.marketplace.review_moderation.messages.action_in'),
+                'reason.required_if' => __('arqel::arqel.marketplace.review_moderation.messages.reason_required_if'),
+                'reason.max' => __('arqel::arqel.marketplace.review_moderation.messages.reason_max'),
+            ], [
+                'action' => __('arqel::arqel.marketplace.review_moderation.attributes.action'),
+                'reason' => __('arqel::arqel.marketplace.review_moderation.attributes.reason'),
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([

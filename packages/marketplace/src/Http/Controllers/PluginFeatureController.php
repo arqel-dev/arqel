@@ -28,6 +28,11 @@ final class PluginFeatureController
             /** @var array{featured: bool} $data */
             $data = $request->validate([
                 'featured' => ['required', 'boolean'],
+            ], [
+                'featured.required' => __('arqel::arqel.marketplace.feature.messages.featured_required'),
+                'featured.boolean' => __('arqel::arqel.marketplace.feature.messages.featured_boolean'),
+            ], [
+                'featured' => __('arqel::arqel.marketplace.feature.attributes.featured'),
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([

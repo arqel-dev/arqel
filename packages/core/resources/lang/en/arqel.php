@@ -400,5 +400,64 @@ return [
             'composer_package_regex' => 'The Composer package must follow the vendor/name format.',
             'type_in' => 'The selected type is invalid.',
         ],
+        // Inline-validate controllers (PluginReviewController, etc.) localize
+        // per-field error messages and attribute labels through these keys so
+        // $e->errors() no longer leaks Laravel's default English strings with
+        // raw snake_case field names. EN values mirror the framework defaults
+        // to keep accessible names stable; pt_BR carries the translations.
+        'review' => [
+            'attributes' => [
+                'stars' => 'stars',
+                'comment' => 'comment',
+            ],
+            'messages' => [
+                'stars_required' => 'The stars field is required.',
+                'stars_min' => 'The stars field must be at least :min.',
+                'stars_max' => 'The stars field must not be greater than :max.',
+                'comment_max' => 'The comment field must not be greater than :max characters.',
+            ],
+        ],
+        'review_moderation' => [
+            'attributes' => [
+                'action' => 'action',
+                'reason' => 'reason',
+            ],
+            'messages' => [
+                'action_required' => 'The action field is required.',
+                'action_in' => 'The selected action is invalid.',
+                'reason_required_if' => 'The reason field is required when action is :value.',
+                'reason_max' => 'The reason field must not be greater than :max characters.',
+            ],
+        ],
+        'admin_review' => [
+            'attributes' => [
+                'action' => 'action',
+                'rejection_reason' => 'rejection reason',
+            ],
+            'messages' => [
+                'action_required' => 'The action field is required.',
+                'action_in' => 'The selected action is invalid.',
+                'rejection_reason_required_if' => 'The rejection reason field is required when action is :value.',
+                'rejection_reason_max' => 'The rejection reason field must not be greater than :max characters.',
+            ],
+        ],
+        'feature' => [
+            'attributes' => [
+                'featured' => 'featured',
+            ],
+            'messages' => [
+                'featured_required' => 'The featured field is required.',
+                'featured_boolean' => 'The featured field must be true or false.',
+            ],
+        ],
+        'vote' => [
+            'attributes' => [
+                'vote' => 'vote',
+            ],
+            'messages' => [
+                'vote_required' => 'The vote field is required.',
+                'vote_in' => 'The selected vote is invalid.',
+            ],
+        ],
     ],
 ];

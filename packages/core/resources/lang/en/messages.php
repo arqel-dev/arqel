@@ -72,6 +72,9 @@ return [
         'review_not_found' => 'Review not found',
         'refund_failed' => 'Refund failed at gateway',
         'payment_verification_failed' => 'Payment verification failed',
+        'plugin_not_found' => 'Plugin [:slug] not found',
+        'category_not_found' => 'Category [:slug] not found',
+        'screenshots_count' => '{1}Provided :count screenshot.|[2,*]Provided :count screenshots.',
     ],
     'field_search' => [
         'not_searchable' => 'Field is not searchable.',
@@ -86,6 +89,15 @@ return [
         'registry_unavailable' => 'Resource registry unavailable.',
         'resource_not_found' => "Resource ':resource' not found.",
         'resource_no_model' => "Resource ':resource' has no model bound.",
+        'resource_not_registered' => 'Resource [:resource] not registered',
+        'resource_invalid' => 'Resource [:resource] is invalid',
+    ],
+    'realtime' => [
+        'collab' => [
+            'invalid_state' => 'state must be a non-empty base64 string',
+            'invalid_base64' => 'state is not valid base64',
+            'version_conflict' => 'version conflict',
+        ],
     ],
     'workflow' => [
         'state_filter_label' => 'State',

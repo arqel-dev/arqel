@@ -121,6 +121,7 @@ return [
         'multiselect' => [
             'remove' => 'Remove :label',
         ],
+        'has_many_empty' => 'No :resource linked.',
     ],
     'locale' => [
         'switch' => 'Language',

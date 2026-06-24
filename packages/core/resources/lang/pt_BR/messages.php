@@ -72,6 +72,9 @@ return [
         'review_not_found' => 'Avaliação não encontrada',
         'refund_failed' => 'Falha no reembolso pelo gateway',
         'payment_verification_failed' => 'Falha na verificação do pagamento',
+        'plugin_not_found' => 'Plugin [:slug] não encontrado',
+        'category_not_found' => 'Categoria [:slug] não encontrada',
+        'screenshots_count' => '{1}:count captura de tela fornecida.|[2,*]:count capturas de tela fornecidas.',
     ],
     'field_search' => [
         'not_searchable' => 'O campo não permite busca.',
@@ -86,6 +89,15 @@ return [
         'registry_unavailable' => 'Registro de recursos indisponível.',
         'resource_not_found' => "Recurso ':resource' não encontrado.",
         'resource_no_model' => "O recurso ':resource' não tem um model vinculado.",
+        'resource_not_registered' => 'Recurso [:resource] não está registrado',
+        'resource_invalid' => 'Recurso [:resource] é inválido',
+    ],
+    'realtime' => [
+        'collab' => [
+            'invalid_state' => 'state deve ser uma string base64 não vazia',
+            'invalid_base64' => 'state não é um base64 válido',
+            'version_conflict' => 'conflito de versão',
+        ],
     ],
     'workflow' => [
         'state_filter_label' => 'Estado',

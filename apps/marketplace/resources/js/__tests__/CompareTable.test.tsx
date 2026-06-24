@@ -1,5 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+const localeRef = { current: 'en' };
+
+vi.mock('@inertiajs/react', () => ({
+  usePage: () => ({ props: { i18n: { locale: localeRef.current } } }),
+}));
+
 import { CompareTable } from '../Components/Marketplace/CompareTable';
 import type { Plugin } from '../types';
 
@@ -45,5 +52,28 @@ describe('<CompareTable />', () => {
     expect(screen.getByTestId('compare-header-a')).toBeInTheDocument();
     expect(screen.getByTestId('compare-header-b')).toBeInTheDocument();
     expect(screen.getByTestId('compare-header-c')).toBeInTheDocument();
+  });
+
+  it('formats price as currency and last release as a localized date (pt_BR)', () => {
+    localeRef.current = 'pt_BR';
+    const p = makePlugin({
+      slug: 'paid',
+      name: 'Paid',
+      price_cents: 1999,
+      currency: 'BRL',
+      updated_at: '2026-06-23T14:05:00Z',
+    });
+    render(<CompareTable plugins={[p]} />);
+    expect(screen.getByTestId('compare-cell-price-paid')).toHaveTextContent('R$');
+    expect(screen.getByTestId('compare-cell-price-paid')).toHaveTextContent('19,99');
+    expect(screen.getByTestId('compare-cell-last_release-paid')).toHaveTextContent('23/06/2026');
+    localeRef.current = 'en';
+  });
+
+  it('falls back to dash when there is no release date', () => {
+    localeRef.current = 'en';
+    const p = makePlugin({ slug: 'norel', name: 'NoRel' });
+    render(<CompareTable plugins={[p]} />);
+    expect(screen.getByTestId('compare-cell-last_release-norel')).toHaveTextContent('—');
   });
 });

@@ -1372,5 +1372,119 @@
     "line": 145,
     "title": "DevTools InertiaInspector navigation timestamp uses toLocaleTimeString() with no locale arg \u2014 the exact pattern fixed in sibling TimeTravel",
     "round": 10
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/fields-js/src/relationship/HasManyReadonly.tsx",
+    "line": 25,
+    "title": "HasManyReadonly empty-state hardcoded English 'No {relatedResource} linked.'",
+    "round": 11
+  },
+  {
+    "file": "packages/actions/src/Action.php",
+    "line": 41,
+    "title": "Built-in DeleteAction modal heading hardcoded English",
+    "round": 11
+  },
+  {
+    "file": "packages/actions/src/Action.php",
+    "line": 42,
+    "title": "Built-in DeleteAction modal description hardcoded English",
+    "round": 11
+  },
+  {
+    "file": "packages/actions/src/Action.php",
+    "line": 44,
+    "title": "Built-in DeleteAction modal submit button label hardcoded",
+    "round": 11
+  },
+  {
+    "file": "packages/actions/src/Action.php",
+    "line": 71,
+    "title": "Built-in DeleteBulkAction modal heading hardcoded English",
+    "round": 11
+  },
+  {
+    "file": "packages/actions/src/Action.php",
+    "line": 72,
+    "title": "Built-in DeleteBulkAction modal description + submit label hardcoded",
+    "round": 11
+  },
+  {
+    "file": "packages/versioning/src/Http/Controllers/VersionHistoryController.php",
+    "line": 60,
+    "title": "VersionHistoryController 'Resource [..] not registered' hardcoded",
+    "round": 11
+  },
+  {
+    "file": "packages/versioning/src/Http/Controllers/VersionHistoryController.php",
+    "line": 64,
+    "title": "VersionHistoryController 'Resource [..] is invalid' hardcoded",
+    "round": 11
+  },
+  {
+    "file": "packages/marketplace/src/Http/Controllers/PluginDetailController.php",
+    "line": 29,
+    "title": "Marketplace controllers 'Plugin [slug] not found' hardcoded (10 sites)",
+    "round": 11
+  },
+  {
+    "file": "packages/marketplace/src/Http/Controllers/PluginsByCategoryController.php",
+    "line": 22,
+    "title": "PluginsByCategoryController 'Category [slug] not found' hardcoded",
+    "round": 11
+  },
+  {
+    "file": "packages/realtime/src/Http/Controllers/CollabDocumentController.php",
+    "line": 66,
+    "title": "CollabDocumentController validation message hardcoded English",
+    "round": 11
+  },
+  {
+    "file": "packages/realtime/src/Http/Controllers/CollabDocumentController.php",
+    "line": 110,
+    "title": "CollabDocumentController 'version conflict' hardcoded English",
+    "round": 11
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/Checkout.tsx",
+    "line": 16,
+    "title": "Checkout money formatter is locale-insensitive (hardcoded '.' decimal, no grouping, fixed currency-code-first order)",
+    "round": 11
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+    "line": 14,
+    "title": "CompareTable price formatter is locale-insensitive (same toFixed/'.' money pattern)",
+    "round": 11
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/CompareTable.tsx",
+    "line": 28,
+    "title": "CompareTable renders raw ISO date string for last release (no locale formatting)",
+    "round": 11
+  },
+  {
+    "file": "apps/marketplace/resources/js/Components/Marketplace/PluginCard.tsx",
+    "line": 10,
+    "title": "PluginCard install-count uses hardcoded English compact suffixes (M/k) and '.' decimal",
+    "round": 11
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+    "line": 11,
+    "title": "PublisherProfile total-downloads uses hardcoded English compact suffixes (M/k)",
+    "round": 11
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/PluginDetail.tsx",
+    "line": 119,
+    "title": "PluginDetail renders raw ISO version-release date (no locale formatting)",
+    "round": 11
+  },
+  {
+    "file": "packages/marketplace/src/Services/PluginAutoChecker.php",
+    "line": 133,
+    "title": "PluginAutoChecker emits naive '(s)' pluralization for screenshot count",
+    "round": 11
   }
 ]

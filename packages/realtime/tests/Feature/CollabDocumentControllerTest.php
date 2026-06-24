@@ -39,6 +39,15 @@ final class CollabControllerFakePostResource extends Resource
 }
 
 beforeEach(function (): void {
+    // realtime tests don't boot the core ArqelServiceProvider (several
+    // suites assert the registry is unbound for standalone/scaffold mode),
+    // so register the `arqel::` translation namespace directly here to make
+    // the localized collab messages resolvable under pt_BR.
+    $langPath = dirname(__DIR__, 3).'/core/resources/lang';
+    if (is_dir($langPath)) {
+        app('translator')->addNamespace('arqel', $langPath);
+    }
+
     if (! Schema::hasTable('collab_controller_fake_posts')) {
         Schema::create('collab_controller_fake_posts', static function (Blueprint $table): void {
             $table->id();
@@ -173,4 +182,57 @@ it('returns 422 when state is missing or invalid base64', function (): void {
         ->postJson('/admin/posts/42/collab/body', ['state' => '', 'version' => 0]);
 
     $response->assertStatus(422);
+});
+
+it('localizes the empty-state 422 message under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    /** @var TestCase $this */
+    $response = $this->actingAs(authedCollabUser())
+        ->postJson('/admin/posts/42/collab/body', ['state' => '', 'version' => 0]);
+
+    $response->assertStatus(422)
+        ->assertJsonPath('message', 'state deve ser uma string base64 não vazia');
+
+    app()->setLocale('en');
+});
+
+it('localizes the invalid-base64 422 message under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    /** @var TestCase $this */
+    $response = $this->actingAs(authedCollabUser())
+        ->postJson('/admin/posts/42/collab/body', ['state' => '!!!not base64!!!', 'version' => 0]);
+
+    $response->assertStatus(422)
+        ->assertJsonPath('message', 'state não é um base64 válido');
+
+    app()->setLocale('en');
+});
+
+it('localizes the version-conflict 409 message under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    YjsDocument::query()->create([
+        'model_type' => 'posts',
+        'model_id' => 42,
+        'field' => 'body',
+        'state' => 'current',
+        'version' => 10,
+        'last_user_id' => 1,
+        'updated_at' => now(),
+    ]);
+
+    /** @var TestCase $this */
+    $response = $this->actingAs(authedCollabUser())
+        ->postJson('/admin/posts/42/collab/body', [
+            'state' => base64_encode('stale'),
+            'version' => 3,
+        ]);
+
+    $response->assertStatus(409)
+        ->assertJsonPath('message', 'conflito de versão')
+        ->assertJsonPath('serverVersion', 10);
+
+    app()->setLocale('en');
 });

@@ -53,6 +53,16 @@ it('returns 404 when plugin does not exist', function (): void {
     $response = $this->getJson('/api/marketplace/plugins/nonexistent');
 
     $response->assertNotFound();
+    expect($response->json('message'))->toBe('Plugin [nonexistent] not found');
+});
+
+it('localizes the 404 body to pt_BR', function (): void {
+    Illuminate\Support\Facades\App::setLocale('pt_BR');
+
+    $response = $this->getJson('/api/marketplace/plugins/nonexistent');
+
+    $response->assertNotFound();
+    expect($response->json('message'))->toBe('Plugin [nonexistent] não encontrado');
 });
 
 it('returns 404 when plugin is draft', function (): void {

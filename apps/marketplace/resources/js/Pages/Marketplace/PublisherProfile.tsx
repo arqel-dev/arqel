@@ -1,5 +1,6 @@
 import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { PluginList } from '../../Components/Marketplace/PluginList';
+import { formatCompact, useActiveLocale } from '../../lib/format';
 import type { Plugin, Publisher, PublisherStats } from '../../types';
 
 type Props = {
@@ -8,13 +9,8 @@ type Props = {
   stats: PublisherStats;
 };
 
-function formatNumber(value: number): string {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
-  return String(value);
-}
-
 export default function PublisherProfile({ publisher, plugins, stats }: Props): JSX.Element {
+  const locale = useActiveLocale();
   const initials = publisher.name
     .split(' ')
     .map((word) => word.charAt(0))
@@ -137,7 +133,7 @@ export default function PublisherProfile({ publisher, plugins, stats }: Props): 
               data-testid="stat-downloads"
               className="mt-1 text-2xl font-semibold text-neutral-900"
             >
-              {formatNumber(stats.total_downloads)}
+              {formatCompact(stats.total_downloads, locale)}
             </p>
           </div>
           <div className="rounded border border-neutral-200 p-4">

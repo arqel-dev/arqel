@@ -15,4 +15,14 @@ return [
         'submit' => 'Confirmar',
         'cancel' => 'Cancelar',
     ],
+
+    'delete_confirm' => [
+        'heading' => 'Excluir registro?',
+        'description' => 'Esta ação não pode ser desfeita.',
+    ],
+
+    'delete_bulk' => [
+        'heading' => 'Excluir registros selecionados?',
+        'description' => 'Esta ação não pode ser desfeita.',
+    ],
 ];

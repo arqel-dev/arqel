@@ -63,14 +63,20 @@ final class CollabDocumentController
         $rawVersion = $request->input('version', 0);
 
         if (! is_string($rawState) || $rawState === '') {
-            return new JsonResponse(['message' => 'state must be a non-empty base64 string'], 422);
+            return new JsonResponse(['message' => $this->message(
+                'arqel::messages.realtime.collab.invalid_state',
+                'state must be a non-empty base64 string',
+            )], 422);
         }
 
         $incomingVersion = is_numeric($rawVersion) ? (int) $rawVersion : 0;
 
         $stateBlob = base64_decode($rawState, true);
         if ($stateBlob === false) {
-            return new JsonResponse(['message' => 'state is not valid base64'], 422);
+            return new JsonResponse(['message' => $this->message(
+                'arqel::messages.realtime.collab.invalid_base64',
+                'state is not valid base64',
+            )], 422);
         }
 
         $document = YjsDocument::query()
@@ -107,7 +113,10 @@ final class CollabDocumentController
 
         if ($incomingVersion < $document->version) {
             return new JsonResponse([
-                'message' => 'version conflict',
+                'message' => $this->message(
+                    'arqel::messages.realtime.collab.version_conflict',
+                    'version conflict',
+                ),
                 'serverVersion' => $document->version,
             ], 409);
         }
@@ -130,6 +139,22 @@ final class CollabDocumentController
         return new JsonResponse([
             'version' => $document->version,
         ]);
+    }
+
+    /**
+     * Localize a user-facing JSON message lazily so the request locale
+     * applies. Falls back to the English literal when no translator is bound
+     * or the key is untranslated, keeping the response text stable.
+     */
+    private function message(string $key, string $fallback): string
+    {
+        if (! app()->bound('translator')) {
+            return $fallback;
+        }
+
+        $translated = trans($key);
+
+        return is_string($translated) && $translated !== $key ? $translated : $fallback;
     }
 
     private function resolveUserId(Request $request): ?int

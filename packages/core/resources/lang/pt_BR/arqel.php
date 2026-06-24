@@ -120,6 +120,7 @@ return [
         'multiselect' => [
             'remove' => 'Remover :label',
         ],
+        'has_many_empty' => 'Nenhum :resource vinculado.',
     ],
     'locale' => [
         'switch' => 'Idioma',

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MetaTags } from '../../Components/Marketplace/MetaTags';
 import { PluginList } from '../../Components/Marketplace/PluginList';
 import { ReviewList } from '../../Components/Marketplace/ReviewList';
+import { formatDate, useActiveLocale } from '../../lib/format';
 import type { Paginator, Plugin, PluginReview, PluginVersion } from '../../types';
 
 type Props = {
@@ -22,6 +23,7 @@ export default function PluginDetail({
   has_purchase = false,
 }: Props): JSX.Element {
   const [tab, setTab] = useState<Tab>('readme');
+  const locale = useActiveLocale();
 
   const truncatedDescription =
     plugin.description.length > 160
@@ -116,7 +118,9 @@ export default function PluginDetail({
                   <li key={v.id} className="rounded border border-neutral-200 p-3">
                     <strong>{v.version}</strong>
                     {v.released_at && (
-                      <span className="ml-2 text-xs text-neutral-500">{v.released_at}</span>
+                      <span className="ml-2 text-xs text-neutral-500">
+                        {formatDate(v.released_at, locale, { dateStyle: 'medium' })}
+                      </span>
                     )}
                     {v.changelog && <p className="mt-1 text-sm text-neutral-700">{v.changelog}</p>}
                   </li>

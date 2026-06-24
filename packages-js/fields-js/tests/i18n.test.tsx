@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DateTimeInput } from '../src/date/index.js';
 import { FileInput, ImageInput } from '../src/file/index.js';
 import { NumberInput } from '../src/number/index.js';
-import { BelongsToInput } from '../src/relationship/index.js';
+import { BelongsToInput, HasManyReadonly } from '../src/relationship/index.js';
 import { MultiSelectInput } from '../src/select/index.js';
 import { PasswordInput } from '../src/text/index.js';
 import { setMockTranslations } from './setup.js';
@@ -85,6 +85,18 @@ const belongsTo: FieldSchema = {
     searchColumns: ['name'],
     preload: false,
     searchRoute: '/search',
+  },
+};
+
+const hasMany: FieldSchema = {
+  ...baseField,
+  type: 'hasMany',
+  name: 'posts',
+  label: 'Posts',
+  component: 'HasManyReadonly',
+  props: {
+    relatedResource: 'posts',
+    relationship: 'posts',
   },
 };
 
@@ -250,6 +262,29 @@ describe('BelongsToInput search placeholder (i18n)', () => {
     );
     const input = container.querySelector('input[type="text"]') as HTMLInputElement;
     expect(input.placeholder).toBe('Pick one');
+  });
+});
+
+describe('HasManyReadonly empty-state (i18n)', () => {
+  it('falls back to the English template with the resource interpolated', () => {
+    render(<HasManyReadonly field={hasMany} value={[]} onChange={vi.fn()} />);
+    expect(screen.getByText('No posts linked.')).toBeInTheDocument();
+  });
+
+  it('localizes the empty-state message with the interpolated resource', () => {
+    setMockTranslations({
+      arqel: { fields: { has_many_empty: 'Nenhum :resource vinculado.' } },
+    });
+    render(<HasManyReadonly field={hasMany} value={[]} onChange={vi.fn()} />);
+    expect(screen.getByText('Nenhum posts vinculado.')).toBeInTheDocument();
+  });
+
+  it('renders the list (not the empty state) when items are present', () => {
+    render(
+      <HasManyReadonly field={hasMany} value={[{ id: 1, label: 'First' }]} onChange={vi.fn()} />,
+    );
+    expect(screen.getByText('First')).toBeInTheDocument();
+    expect(screen.queryByText('No posts linked.')).not.toBeInTheDocument();
   });
 });
 

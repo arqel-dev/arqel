@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { formatCurrency, useActiveLocale } from '../../lib/format';
 import type { Plugin } from '../../types';
 
 type Summary = {
@@ -13,12 +14,11 @@ type Props = {
   summary: Summary;
 };
 
-function formatMoney(cents: number, currency: string): string {
-  const value = (cents / 100).toFixed(2);
-  return `${currency} ${value}`;
-}
-
 export default function Checkout({ plugin, summary }: Props): JSX.Element {
+  const locale = useActiveLocale();
+  const formatMoney = (cents: number, currency: string): string =>
+    formatCurrency(cents, currency, locale);
+
   return (
     <>
       <Head title={`Checkout — ${plugin.name}`} />

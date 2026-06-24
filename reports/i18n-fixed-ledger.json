@@ -2152,5 +2152,11 @@
     "line": 82,
     "title": "Devtools FieldsInspector header counter 'X visible / Y total' hardcoded in English, bypassing the file's own t()",
     "round": 34
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/Checkout.tsx",
+    "line": 24,
+    "title": "Marketplace Checkout document title hardcoded English 'Checkout' while page + sibling pages are pt-BR",
+    "round": 35
   }
 ]

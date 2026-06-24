@@ -1,0 +1,20 @@
+{
+  "total": 2,
+  "confirmed_count": 1,
+  "dupe_count": 1,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Marketplace Checkout document title hardcoded English 'Checkout' while page + sibling pages are pt-BR",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/Checkout.tsx",
+      "line": 24,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "literal swap: `Finalizar compra \u2014 ${plugin.name}` (marketplace app has no t() runtime; match CheckoutSuccess/CheckoutCancelled Head title pattern)",
+      "detail": "<Head title={`Checkout \u2014 ${plugin.name}`} /> ships the literal English word 'Checkout' as the browser tab / document title. This is user-facing chrome (window title, bookmarks, history). It is inconsistent with (a) the page's own visible <h1>Finalizar compra</h1> on line 31, and (b) the sibling checkout pages CheckoutSuccess.tsx:23 (`Compra confirmada \u2014 ...`) and CheckoutCancelled.tsx:11 (`Compra cancelada \u2014 ...`), both of which use pt-BR title prefixes. Should read e.g. `Finalizar compra \u2014 ${plugin.name}`. Not in the ledger: the only prior Checkout.tsx entry (round 11) covered the money formatter at line 16, not this Head title. Note: the marketplace app uses static pt-BR copy (no t() runtime), so the fix is a literal swap to pt-BR, matching the sibling pattern.",
+      "confidence": "high",
+      "why_real": "Confirmed at apps/marketplace/resources/js/Pages/Marketplace/Checkout.tsx:24: <Head title={`Checkout \u2014 ${plugin.name}`} /> ships the English word 'Checkout' as the document title (browser tab/bookmarks/history) \u2014 user-facing chrome. The marketplace app uses static pt-BR copy throughout, and the inconsistency is verifiable: the same page's visible h1 is 'Finalizar compra' (line 26), and sibling pages use pt-BR title prefixes \u2014 CheckoutSuccess.tsx:23 ('Compra confirmada \u2014 ...') and CheckoutCancelled.tsx:11 ('Compra cancelada \u2014 ...'). Ledger check: the only prior Checkout.tsx entry is round 11 line 16, covering the money formatter, NOT the Head title at line 24 \u2014 so this is novel and not a duplicate. Not a vendored shadcn primitive (it's an app page, not packages-js/ui/src/shadcn/*). Not deliberately out of scope. Fix is a literal pt-BR swap (e.g. 'Finalizar compra \u2014 ${plugin.name}') matching the sibling pattern."
+    }
+  ]
+}

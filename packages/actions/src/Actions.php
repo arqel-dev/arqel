@@ -63,7 +63,7 @@ final class Actions
     public static function deleteBulk(): BulkAction
     {
         return BulkAction::make('delete')
-            ->label('Delete selected')
+            ->label('arqel::actions.delete_selected')
             ->icon('trash')
             ->color(Action::COLOR_DESTRUCTIVE)
             ->variant(Action::VARIANT_OUTLINE)

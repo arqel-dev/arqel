@@ -10,6 +10,7 @@ return [
     'force_delete' => 'Excluir permanentemente',
     'duplicate' => 'Duplicar',
     'export' => 'Exportar',
+    'delete_selected' => 'Excluir selecionados',
 
     'confirm' => [
         'submit' => 'Confirmar',

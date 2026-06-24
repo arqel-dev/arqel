@@ -61,7 +61,7 @@ final class ExportAction extends Action
     public static function make(string $name): static
     {
         $action = new self($name);
-        $action->label('Export');
+        $action->label('arqel::actions.export');
         $action->icon('download');
         // Default to the dir the bundled ExportDownloadController globs
         // (#67 B), so a freshly produced file is reachable end to end

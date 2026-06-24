@@ -31,6 +31,26 @@ export interface TimeTravelProps {
 
 const SLOW_THRESHOLD_MS = 100;
 
+// The devtools panel is an internal, English-only developer tool and has no
+// translator wired (no useArqelTranslations / trans imports anywhere in this
+// package). Until i18n is introduced here, use Intl.PluralRules instead of a
+// naive `+ 's'` so the plural category is selected by locale rules rather than
+// hardcoded. English ('en') is intentional for this tooling surface.
+const SNAPSHOT_PLURAL_RULES = new Intl.PluralRules('en');
+const SNAPSHOT_LABELS: Readonly<Record<Intl.LDMLPluralRule, string>> = {
+  zero: 'snapshots',
+  one: 'snapshot',
+  two: 'snapshots',
+  few: 'snapshots',
+  many: 'snapshots',
+  other: 'snapshots',
+};
+
+function snapshotCountLabel(count: number): string {
+  const category = SNAPSHOT_PLURAL_RULES.select(count);
+  return `${count} ${SNAPSHOT_LABELS[category]}`;
+}
+
 export function TimeTravel({ snapshots, onReplay }: TimeTravelProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -53,7 +73,7 @@ export function TimeTravel({ snapshots, onReplay }: TimeTravelProps) {
     <div data-testid="arqel-time-travel" className="arqel-time-travel">
       <header className="arqel-tt-header">
         <span data-testid="time-travel-counter" className="arqel-tt-counter">
-          {snapshots.length} snapshot{snapshots.length === 1 ? '' : 's'}
+          {snapshotCountLabel(snapshots.length)}
         </span>
       </header>
       <ol className="arqel-tt-list" data-testid="time-travel-list">

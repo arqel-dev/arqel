@@ -413,7 +413,19 @@ final class ResourceController
                 $actionInstance->execute($record, $data);
             }
         } catch (Throwable $e) {
-            $message = is_string($failureNotification) ? $failureNotification : $e->getMessage();
+            // Never leak the raw exception text to the end user: it is
+            // unlocalized (often English/internal) and can disclose internals.
+            // Log the real detail server-side; flash either the app-supplied
+            // failure notification or a localized generic fallback.
+            Log::error('Arqel: action execution failed.', [
+                'action' => $action,
+                'resource' => $instance::class,
+                'exception' => $e,
+            ]);
+
+            $message = is_string($failureNotification)
+                ? $failureNotification
+                : (string) __('arqel::messages.action.failed');
 
             return back()->with('error', $message);
         }

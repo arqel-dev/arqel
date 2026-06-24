@@ -141,6 +141,45 @@ it('flashes the failure notification when the action callback throws', function 
     expect($response->getSession()?->get('error'))->toBe('Export failed.');
 });
 
+it('flashes a localized generic message (not the raw exception) when no failureNotification is set', function (): void {
+    StubResourceWithToolbarAction::$toolbar = [
+        ToolbarAction::make('export')
+            ->action(function (): void {
+                throw new RuntimeException('SQLSTATE[HY000]: internal disk full leak');
+            }),
+    ];
+
+    /** @var ActionController $controller */
+    $controller = $this->app->make(ActionController::class);
+
+    $response = $controller->invokeToolbar(new Request, 'controller-stub', 'export');
+
+    expect($response->getSession()?->get('error'))
+        ->toBe('The action could not be completed.')
+        ->not->toContain('disk full')
+        ->not->toContain('SQLSTATE');
+});
+
+it('flashes the pt_BR generic message when locale is pt_BR and no failureNotification is set', function (): void {
+    app()->setLocale('pt_BR');
+
+    StubResourceWithToolbarAction::$toolbar = [
+        ToolbarAction::make('export')
+            ->action(function (): void {
+                throw new RuntimeException('raw english internals leak');
+            }),
+    ];
+
+    /** @var ActionController $controller */
+    $controller = $this->app->make(ActionController::class);
+
+    $response = $controller->invokeToolbar(new Request, 'controller-stub', 'export');
+
+    expect($response->getSession()?->get('error'))
+        ->toBe('A ação não pôde ser concluída.')
+        ->not->toContain('raw english internals leak');
+});
+
 it('rejects bulk requests with no ids before any DB lookup (422)', function (): void {
     StubResourceWithToolbarAction::$bulk = [
         BulkAction::make('archive')->action(fn () => null),

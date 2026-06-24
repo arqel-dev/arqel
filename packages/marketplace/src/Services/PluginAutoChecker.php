@@ -56,14 +56,14 @@ final readonly class PluginAutoChecker
             return [
                 'name' => 'composer_package_format',
                 'status' => 'fail',
-                'message' => 'composer_package must match vendor/package (lowercase alnum + hyphens).',
+                'message' => (string) __('arqel::messages.marketplace.auto_check.composer_package_invalid'),
             ];
         }
 
         return [
             'name' => 'composer_package_format',
             'status' => 'ok',
-            'message' => 'Composer package follows vendor/package convention.',
+            'message' => (string) __('arqel::messages.marketplace.auto_check.composer_package_ok'),
         ];
     }
 
@@ -78,14 +78,14 @@ final readonly class PluginAutoChecker
             return [
                 'name' => 'github_url_format',
                 'status' => 'fail',
-                'message' => 'github_url must point to github.com.',
+                'message' => (string) __('arqel::messages.marketplace.auto_check.github_url_invalid'),
             ];
         }
 
         return [
             'name' => 'github_url_format',
             'status' => 'ok',
-            'message' => 'GitHub URL points to github.com.',
+            'message' => (string) __('arqel::messages.marketplace.auto_check.github_url_ok'),
         ];
     }
 
@@ -100,14 +100,14 @@ final readonly class PluginAutoChecker
             return [
                 'name' => 'description_length',
                 'status' => 'warn',
-                'message' => 'Description is short; consider 50+ characters for better discoverability.',
+                'message' => (string) __('arqel::messages.marketplace.auto_check.description_short'),
             ];
         }
 
         return [
             'name' => 'description_length',
             'status' => 'ok',
-            'message' => 'Description length is adequate.',
+            'message' => (string) __('arqel::messages.marketplace.auto_check.description_ok'),
         ];
     }
 
@@ -123,7 +123,7 @@ final readonly class PluginAutoChecker
             return [
                 'name' => 'screenshots_count',
                 'status' => 'warn',
-                'message' => 'No screenshots provided; at least one is recommended.',
+                'message' => (string) __('arqel::messages.marketplace.auto_check.screenshots_missing'),
             ];
         }
 
@@ -148,14 +148,14 @@ final readonly class PluginAutoChecker
             return [
                 'name' => 'name_uniqueness',
                 'status' => 'warn',
-                'message' => 'Another plugin already uses this name.',
+                'message' => (string) __('arqel::messages.marketplace.auto_check.name_duplicate'),
             ];
         }
 
         return [
             'name' => 'name_uniqueness',
             'status' => 'ok',
-            'message' => 'Plugin name is unique.',
+            'message' => (string) __('arqel::messages.marketplace.auto_check.name_unique'),
         ];
     }
 }

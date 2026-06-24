@@ -11,6 +11,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
 
@@ -132,7 +133,18 @@ final class ActionController
         try {
             $action->execute($target, $data);
         } catch (Throwable $e) {
-            $message = $action->getFailureNotification() ?? $e->getMessage();
+            // Never leak the raw exception text to the end user: it is
+            // unlocalized (often English/internal) and can disclose internals.
+            // Log the real detail server-side; flash either the app-supplied
+            // failure notification or a localized generic fallback.
+            Log::error('Arqel: action execution failed.', [
+                'action' => $action->getName(),
+                'resource' => $resource::class,
+                'exception' => $e,
+            ]);
+
+            $message = $action->getFailureNotification()
+                ?? (string) __('arqel::messages.action.failed');
 
             return back()->with('error', $message);
         }

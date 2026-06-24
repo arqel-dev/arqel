@@ -217,6 +217,33 @@ describe('<MarkdownInput>', () => {
     const fullscreen = screen.getByRole('button', { name: 'Enter fullscreen' });
     expect(fullscreen).toHaveTextContent('Full');
   });
+
+  it('routes the link/list toolbar glyphs through t() (visible == aria)', () => {
+    const onChange = vi.fn();
+    render(<MarkdownInput field={buildField()} value="" onChange={onChange} />);
+    // Visible face must equal the (translated) aria-label so they stay in sync.
+    expect(screen.getByRole('button', { name: 'Link' })).toHaveTextContent('Link');
+    expect(screen.getByRole('button', { name: 'List' })).toHaveTextContent('List');
+  });
+
+  it('routes the edit/preview tab labels through t()', () => {
+    const onChange = vi.fn();
+    render(
+      <MarkdownInput field={buildField({ previewMode: 'tab' })} value="" onChange={onChange} />,
+    );
+    expect(screen.getByRole('tab', { name: 'Edit' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Preview' })).toBeInTheDocument();
+  });
+
+  it('routes the popup close button through t()', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <MarkdownInput field={buildField({ previewMode: 'popup' })} value="" onChange={onChange} />,
+    );
+    await user.click(screen.getByRole('button', { name: 'Open preview' }));
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveTextContent('Close');
+  });
 });
 
 describe('<MarkdownInput> localization', () => {
@@ -258,5 +285,39 @@ describe('<MarkdownInput> localization', () => {
     expect(screen.getByRole('button', { name: 'Entrar em tela cheia' })).toHaveTextContent(
       'Tela cheia',
     );
+  });
+
+  it('translates the edit/preview tabs and popup close button', async () => {
+    vi.mocked(usePage).mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: {
+            arqel: {
+              fields_advanced: {
+                markdown_tab_edit: 'Editar',
+                markdown_tab_preview: 'Pré-visualizar',
+                markdown_close: 'Fechar',
+                markdown_preview_open: 'Abrir pré-visualização',
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ReturnType<typeof usePage>);
+
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <MarkdownInput field={buildField({ previewMode: 'tab' })} value="" onChange={onChange} />,
+    );
+    expect(screen.getByRole('tab', { name: 'Editar' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Pré-visualizar' })).toBeInTheDocument();
+
+    rerender(
+      <MarkdownInput field={buildField({ previewMode: 'popup' })} value="" onChange={onChange} />,
+    );
+    await user.click(screen.getByRole('button', { name: 'Abrir pré-visualização' }));
+    expect(screen.getByRole('button', { name: 'Fechar' })).toHaveTextContent('Fechar');
   });
 });

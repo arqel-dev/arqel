@@ -281,7 +281,7 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
               setSuggestion(null);
             }}
           >
-            Accept
+            {t('arqel.ai.suggestion_accept', 'Accept')}
           </Button>
           <Button
             variant="ghost"
@@ -290,7 +290,7 @@ export function AiSelectInput(props: AiSelectInputProps): ReactElement {
               setSuggestion(null);
             }}
           >
-            Pick another
+            {t('arqel.ai.suggestion_pick_another', 'Pick another')}
           </Button>
         </div>
       ) : null}

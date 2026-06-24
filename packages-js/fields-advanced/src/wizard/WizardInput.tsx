@@ -581,7 +581,7 @@ export function WizardInput({
           disabled={disabled || isFirst}
           aria-label={t('arqel.fields_advanced.wizard_back', 'Back')}
         >
-          Back
+          {t('arqel.fields_advanced.wizard_back', 'Back')}
         </button>
         {isLast ? (
           <button

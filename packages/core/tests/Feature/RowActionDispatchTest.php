@@ -49,6 +49,8 @@ final class SideEffectRowAction
 
     public static bool $disabled = false;
 
+    public static ?string $throwMessage = null;
+
     public function __construct(
         private readonly string $name,
         private readonly string $type = 'row',
@@ -108,6 +110,10 @@ final class SideEffectRowAction
         self::$ranAgainst = $record;
         self::$ranWithData = $data;
 
+        if (self::$throwMessage !== null) {
+            throw new RuntimeException(self::$throwMessage);
+        }
+
         return null;
     }
 }
@@ -137,6 +143,7 @@ beforeEach(function (): void {
     SideEffectRowAction::$allowExecution = true;
     SideEffectRowAction::$visible = true;
     SideEffectRowAction::$disabled = false;
+    SideEffectRowAction::$throwMessage = null;
 
     $this->registry = app(ResourceRegistry::class);
     $this->registry->clear();
@@ -176,6 +183,37 @@ it('runs a custom row action callback against the resolved record and flashes su
         ->and(SideEffectRowAction::$ranAgainst->getKey())->toBe(2)
         ->and($response->getSession()->get('success'))->toBe('Published.')
         ->and($response->getSession()->get('error'))->toBeNull();
+});
+
+it('flashes a localized generic message (not the raw exception) when the action throws without a failureNotification', function (): void {
+    SideEffectRowAction::$throwMessage = 'SQLSTATE[HY000]: internal disk full leak';
+
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $request = Request::create('/admin/row-dispatch/actions/publish/2', 'POST');
+
+    $response = $controller->rowAction($request, 'row-dispatch', 'publish', '2');
+
+    expect($response->getSession()->get('error'))
+        ->toBe('The action could not be completed.')
+        ->not->toContain('disk full')
+        ->not->toContain('SQLSTATE')
+        ->and($response->getSession()->get('success'))->toBeNull();
+});
+
+it('flashes the pt_BR generic message when locale is pt_BR and the action throws', function (): void {
+    app()->setLocale('pt_BR');
+    SideEffectRowAction::$throwMessage = 'raw english internals leak';
+
+    $controller = new ResourceController($this->registry, $this->dataBuilder);
+
+    $request = Request::create('/admin/row-dispatch/actions/publish/2', 'POST');
+
+    $response = $controller->rowAction($request, 'row-dispatch', 'publish', '2');
+
+    expect($response->getSession()->get('error'))
+        ->toBe('A ação não pôde ser concluída.')
+        ->not->toContain('raw english internals leak');
 });
 
 it('aborts 404 when the slug does not resolve', function (): void {

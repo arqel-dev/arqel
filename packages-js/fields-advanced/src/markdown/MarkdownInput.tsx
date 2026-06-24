@@ -467,7 +467,7 @@ export function MarkdownInput({
             disabled={disabled}
             aria-label={t('arqel.fields_advanced.markdown_link', 'Link')}
           >
-            Link
+            {t('arqel.fields_advanced.markdown_link', 'Link')}
           </button>
           <button
             type="button"
@@ -476,7 +476,7 @@ export function MarkdownInput({
             disabled={disabled}
             aria-label={t('arqel.fields_advanced.markdown_list', 'List')}
           >
-            List
+            {t('arqel.fields_advanced.markdown_list', 'List')}
           </button>
 
           <span className="ml-auto inline-flex gap-1">
@@ -524,7 +524,7 @@ export function MarkdownInput({
             className={tabClasses}
             onClick={() => setActiveTab('edit')}
           >
-            Edit
+            {t('arqel.fields_advanced.markdown_tab_edit', 'Edit')}
           </button>
           <button
             type="button"
@@ -533,7 +533,7 @@ export function MarkdownInput({
             className={tabClasses}
             onClick={() => setActiveTab('preview')}
           >
-            Preview
+            {t('arqel.fields_advanced.markdown_tab_preview', 'Preview')}
           </button>
         </div>
       ) : null}
@@ -584,7 +584,7 @@ export function MarkdownInput({
             className={`${buttonClasses} mt-2`}
             onClick={() => setIsPopupOpen(false)}
           >
-            Close
+            {t('arqel.fields_advanced.markdown_close', 'Close')}
           </button>
         </dialog>
       ) : null}

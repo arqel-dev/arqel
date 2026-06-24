@@ -227,6 +227,9 @@ return [
         // Selo de proveniência exibido após uma classificação (role="status").
         'suggestion_ai' => 'Sugerido por IA',
         'suggestion_fallback' => 'Usou alternativa',
+        // Botões exibidos ao lado do selo de proveniência após uma sugestão.
+        'suggestion_accept' => 'Aceitar',
+        'suggestion_pick_another' => 'Escolher outro',
     ],
     // Títulos de grupo visíveis na listbox do <CommandPalette> quando um comando
     // não tem categoria explícita, além do grupo sintético "Recentes". Resolvido
@@ -278,6 +281,9 @@ return [
         'markdown_fullscreen_short' => 'Tela cheia',
         'markdown_exit_short' => 'Sair',
         'markdown_editor_mode' => 'Modo do editor',
+        'markdown_tab_edit' => 'Editar',
+        'markdown_tab_preview' => 'Pré-visualizar',
+        'markdown_close' => 'Fechar',
         'markdown_preview' => 'Pré-visualização Markdown',
         'repeater_move_up' => 'Mover para cima',
         'repeater_move_down' => 'Mover para baixo',

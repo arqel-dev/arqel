@@ -44,6 +44,7 @@ return [
     ],
     'action' => [
         'missing_selection' => 'Missing selection.',
+        'failed' => 'The action could not be completed.',
     ],
     'upload' => [
         'not_file_field' => 'Field is not a file upload.',
@@ -75,6 +76,17 @@ return [
         'plugin_not_found' => 'Plugin [:slug] not found',
         'category_not_found' => 'Category [:slug] not found',
         'screenshots_count' => '{1}Provided :count screenshot.|[2,*]Provided :count screenshots.',
+        'auto_check' => [
+            'composer_package_invalid' => 'composer_package must match vendor/package (lowercase alnum + hyphens).',
+            'composer_package_ok' => 'Composer package follows vendor/package convention.',
+            'github_url_invalid' => 'github_url must point to github.com.',
+            'github_url_ok' => 'GitHub URL points to github.com.',
+            'description_short' => 'Description is short; consider 50+ characters for better discoverability.',
+            'description_ok' => 'Description length is adequate.',
+            'screenshots_missing' => 'No screenshots provided; at least one is recommended.',
+            'name_duplicate' => 'Another plugin already uses this name.',
+            'name_unique' => 'Plugin name is unique.',
+        ],
     ],
     'field_search' => [
         'not_searchable' => 'Field is not searchable.',

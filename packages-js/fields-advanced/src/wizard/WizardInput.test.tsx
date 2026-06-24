@@ -159,6 +159,12 @@ describe('<WizardInput>', () => {
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
   });
 
+  it('routes the Back nav button visible text through t() (visible == aria)', () => {
+    render(<WizardInput field={buildField()} value={{}} onChange={vi.fn()} />);
+    // Visible face must match the (translated) aria-label, not stay English-only.
+    expect(screen.getByRole('button', { name: 'Back' })).toHaveTextContent('Back');
+  });
+
   it('shows a Submit button on the last step instead of Next', async () => {
     const user = userEvent.setup();
     render(

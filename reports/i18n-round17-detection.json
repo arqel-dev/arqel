@@ -1,0 +1,44 @@
+{
+  "total": 7,
+  "confirmed_count": 3,
+  "dupe_count": 4,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Marketplace PluginReviewController inline validate() has no attributes()/messages() \u2014 per-field validation errors render raw English",
+      "file": "packages/marketplace/src/Http/Controllers/PluginReviewController.php",
+      "line": 33,
+      "kind": "validation-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.marketplace.review.attributes",
+      "detail": "$request->validate(['stars' => ['required','integer','min:1','max:5'], 'comment' => [...]]) is called with no messages()/attributes() array. The wrapper 'message' is keyed via __('arqel::messages.marketplace.validation_failed'), but $e->errors() (returned at line 40 and serialized to the marketplace review UI) contains Laravel's default English messages with the raw snake_case attribute names ('The stars field is required.', 'The comment must not be greater than 5000 characters.'). This is the same validation-i18n family already fixed for SubmitPluginRequest (ledger round 7) but was missed for these inline-validate controllers. Framework-hardcoded \u2014 fix by passing a third arg of localized rule messages plus an attributes() map (e.g. __('arqel::messages.marketplace.review.stars_label')).",
+      "confidence": "high",
+      "why_real": "CONFIRMED. packages/marketplace/src/Http/Controllers/PluginReviewController.php:33 calls $request->validate(['stars'=>[...'min:1','max:5'],'comment'=>['nullable','string','max:5000']]) with no third messages arg, and the controller has no messages()/attributes(). The wrapper 'message' at line 39 is localized via __('arqel::messages.marketplace.validation_failed'), but the per-field 'errors' array at line 40 ($e->errors()) is serialized raw to the review-submission UI, carrying Laravel's default English strings ('The stars field is required.', 'The comment field must not be greater than 5000 characters.') with snake_case attribute names. No published validation.php override exists in the package or apps/marketplace (only vendor's en/validation.php), so these render in the default English locale. This is the identical validation-i18n defect class confirmed real for SubmitPluginRequest in ledger round 7.\n\nNOT a duplicate: searched the ledger for all marketplace/review/validation entries. Round 7 fixed SubmitPluginRequest.php (a FormRequest, different file). Round 9 fixed only the top-level wrapper 'Validation failed' string in PluginPurchaseController and siblings; that explicitly left $e->errors() untranslated. No ledger entry covers PluginReviewController's inline-validate per-field i18n gap. (Note: 4 sibling inline-validate controllers \u2014 PluginReviewModerationController:78, PluginFeatureController:29, PluginAdminReviewController:31, PluginReviewVoteController:35 \u2014 share the same gap and are likewise absent, corroborating this is a real un-swept family rather than a one-off.) Not vendored shadcn."
+    },
+    {
+      "title": "Marketplace PluginReviewModerationController inline validate() lacks attributes()/messages() \u2014 raw English field errors",
+      "file": "packages/marketplace/src/Http/Controllers/PluginReviewModerationController.php",
+      "line": 78,
+      "kind": "validation-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.marketplace.review_moderation.attributes",
+      "detail": "$request->validate(['action' => ['required','in:publish,hide'], 'reason' => ['nullable','string','max:2000','required_if:action,hide']]) has no localized messages()/attributes(). $e->errors() (serialized at line 85) renders English defaults ('The action field is required.', 'The reason field is required when action is hide.') with raw attribute names 'action'/'reason'. Admin moderation surface; wrapper message keyed but field-level strings are not. Not in ledger.",
+      "confidence": "med",
+      "why_real": "Verified at packages/marketplace/src/Http/Controllers/PluginReviewModerationController.php:76-87. moderate() catches ValidationException and localizes only the wrapper ('arqel::messages.marketplace.validation_failed', line 84), but serializes $e->errors() verbatim at line 85. The inline $request->validate(['action'=>['required','in:publish,hide'],'reason'=>['nullable','string','max:2000','required_if:action,hide']]) has no messages()/attributes() and no inline :attribute overrides, so Laravel emits raw English field-level strings ('The action field is required.', 'The reason field is required when action is hide.') with raw attribute names action/reason. Reproduces; user-facing on the admin moderation surface; not a vendored shadcn primitive. Ledger scan: the closest entries are round-7 SubmitPluginRequest (packages/marketplace/.../Http/Requests/SubmitPluginRequest.php:43) with a near-identical title, the systemic ResourceController:763 / ActionController:115 entries, and round-9 PluginPurchaseController which ledgers ONLY the hardcoded wrapper 'Validation failed' string \u2014 none of these cover this controller's inline-validate field-level errors() path. This exact file and code-path is not in rounds 1-16, so by the strict by-file criterion it is not a duplicate, though it belongs to the same validation-i18n family the ledger has repeatedly swept (which lowers novelty/severity)."
+    },
+    {
+      "title": "Marketplace PluginAdminReviewController inline validate() lacks attributes()/messages() \u2014 raw English field errors",
+      "file": "packages/marketplace/src/Http/Controllers/PluginAdminReviewController.php",
+      "line": 31,
+      "kind": "validation-i18n",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::messages.marketplace.admin_review.attributes",
+      "detail": "$request->validate(['action' => ['required','in:approve,reject'], 'rejection_reason' => ['nullable','string','max:2000','required_if:action,reject']]) provides no messages()/attributes(). $e->errors() (line 38) returns English defaults with the snake_case attribute 'rejection_reason' rendered verbatim ('The rejection reason field is required when action is reject.'). Admin plugin-approval surface. Framework-hardcoded gap, not in ledger.",
+      "confidence": "high",
+      "why_real": "Verified at packages/marketplace/src/Http/Controllers/PluginAdminReviewController.php:31-39. The __invoke handler calls inline $request->validate(['action'=>['required','in:approve,reject'],'rejection_reason'=>['nullable','string','max:2000','required_if:action,reject']]) with no accompanying messages()/attributes(). On failure it catches ValidationException and returns $e->errors() (line 38) directly in the JSON 'errors' payload. Because nothing localizes the attribute, Laravel renders defaults with the snake_case key verbatim, e.g. \"The rejection reason field is required when action is reject.\" This is a real, reproducible, user-facing i18n defect on the admin plugin-approval surface (the JSON 'message' itself uses __() but the per-field 'errors' do not). The contrast is concrete: the sibling SubmitPluginRequest.php DID receive full messages()/attributes() localization (lines 63-89, using arqel::arqel.marketplace.attributes.* / messages.* keys), proving the project's intended pattern and that this controller diverges from it.\n\nNot a vendored shadcn primitive (it is a PHP controller). Not in the R1-R16 ledger: I grepped reports/i18n-fixed-ledger.json for this file path, \"PluginAdminReview\", \"rejection_reason\", \"approve/reject\", and \"inline validate\" \u2014 zero matches. The closest ledger entries are (a) \"SubmitPluginRequest has no messages()/attributes()\" which is a DIFFERENT file (a FormRequest, now fixed) and (b) the generic \"Default CRUD validation path ignores custom messages()/attributes()\" which concerns the framework CRUD pipeline, not this marketplace controller's inline validate(). Neither covers this distinct file/line, so it is novel. (Note: PluginReviewController, PluginFeatureController, PluginReviewModerationController, PluginReviewVoteController, PluginSubmissionController share the same inline-validate pattern and are likewise un-ledgered, but this finding specifically and correctly identifies PluginAdminReviewController.)"
+    }
+  ]
+}

@@ -50,6 +50,34 @@ describe('TableCard', () => {
     expect(screen.queryByText('1500000')).toBeNull();
   });
 
+  it('localizes boolean cells via the table.boolean.* labels (pt_BR ≠ en)', () => {
+    const widget = baseWidget({
+      columns: [{ name: 'active', label: 'Active' }],
+      records: [{ active: true }, { active: false }],
+    });
+
+    // English: no translations → the t() fallback renders the literal labels.
+    pageMock.mockReturnValue({ props: { i18n: { locale: 'en' } } });
+    const { unmount } = render(<TableCard widget={widget} />);
+    expect(screen.getByText('true')).toBeInTheDocument();
+    expect(screen.getByText('false')).toBeInTheDocument();
+    unmount();
+
+    // pt_BR: the translations dict resolves the localized truth labels.
+    pageMock.mockReturnValue({
+      props: {
+        i18n: {
+          locale: 'pt_BR',
+          translations: { table: { boolean: { true_label: 'sim', false_label: 'não' } } },
+        },
+      },
+    });
+    render(<TableCard widget={widget} />);
+    expect(screen.getByText('sim')).toBeInTheDocument();
+    expect(screen.getByText('não')).toBeInTheDocument();
+    expect(screen.queryByText('true')).toBeNull();
+  });
+
   it('renders column headers + record rows', () => {
     render(<TableCard widget={baseWidget()} />);
     expect(screen.getByText('ID')).toBeInTheDocument();

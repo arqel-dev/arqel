@@ -76,4 +76,20 @@ describe('<CompareTable />', () => {
     render(<CompareTable plugins={[p]} />);
     expect(screen.getByTestId('compare-cell-last_release-norel')).toHaveTextContent('—');
   });
+
+  it('formats install, stars and review counts with locale grouping (pt_BR)', () => {
+    localeRef.current = 'pt_BR';
+    const p = makePlugin({
+      slug: 'big',
+      name: 'Big',
+      install_count: 12345,
+      stars: 12345,
+      reviews_count: 12345,
+    });
+    render(<CompareTable plugins={[p]} />);
+    expect(screen.getByTestId('compare-cell-installs-big')).toHaveTextContent('12 mil');
+    expect(screen.getByTestId('compare-cell-stars-big')).toHaveTextContent('12.345');
+    expect(screen.getByTestId('compare-cell-reviews-big')).toHaveTextContent('12.345');
+    localeRef.current = 'en';
+  });
 });

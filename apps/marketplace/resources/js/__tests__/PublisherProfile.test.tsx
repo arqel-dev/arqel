@@ -77,4 +77,17 @@ describe('<PublisherProfile />', () => {
     render(<PublisherProfile publisher={publisher} plugins={[]} stats={stats} />);
     expect(screen.getByTestId('profile-verified')).toBeInTheDocument();
   });
+
+  it('formats the plugins_count stat with locale grouping (pt_BR)', () => {
+    localeRef.current = 'pt_BR';
+    render(
+      <PublisherProfile
+        publisher={publisher}
+        plugins={[]}
+        stats={{ plugins_count: 1234, total_downloads: 0, avg_rating: 0 }}
+      />,
+    );
+    expect(screen.getByTestId('stat-plugins')).toHaveTextContent('1.234');
+    localeRef.current = 'en';
+  });
 });

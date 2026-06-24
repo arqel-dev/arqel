@@ -124,7 +124,7 @@ export default function PublisherProfile({ publisher, plugins, stats }: Props): 
           <div className="rounded border border-neutral-200 p-4">
             <p className="text-xs uppercase text-neutral-500">Plugins</p>
             <p data-testid="stat-plugins" className="mt-1 text-2xl font-semibold text-neutral-900">
-              {stats.plugins_count}
+              {formatDecimal(stats.plugins_count, locale, 0)}
             </p>
           </div>
           <div className="rounded border border-neutral-200 p-4">

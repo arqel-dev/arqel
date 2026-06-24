@@ -1606,5 +1606,23 @@
     "line": 42,
     "title": "AI cost-limit exception messages are hardcoded English (with hardcoded '$') and reflected to the end user",
     "round": 13
+  },
+  {
+    "file": "packages-js/fields-advanced/src/rich-text/RichTextInput.tsx",
+    "line": 215,
+    "title": "RichText image toolbar button visible face hardcodes English \"Img\"",
+    "round": 14
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/versioning/src/Http/Controllers/VersionHistoryController.php",
+    "line": 83,
+    "title": "VersionHistoryController Versionable-trait 422 message hardcoded English (sibling lines localize)",
+    "round": 14
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/apps/marketplace/resources/js/Pages/Marketplace/PublisherProfile.tsx",
+    "line": 142,
+    "title": "Publisher average-rating stat renders with locale-insensitive decimal separator (toFixed)",
+    "round": 14
   }
 ]

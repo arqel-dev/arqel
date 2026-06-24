@@ -205,10 +205,10 @@ class StatWidget extends Widget
         if ($this->statDescription instanceof Closure) {
             $resolved = ($this->statDescription)();
 
-            return is_string($resolved) ? $resolved : null;
+            return self::localize(is_string($resolved) ? $resolved : null);
         }
 
-        return is_string($this->statDescription) ? $this->statDescription : null;
+        return self::localize(is_string($this->statDescription) ? $this->statDescription : null);
     }
 
     /**

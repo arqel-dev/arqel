@@ -31,7 +31,7 @@ export default function CheckoutSuccess({ plugin, license_key, download_url }: P
         </p>
 
         <section className="mt-8 rounded-lg border border-neutral-200 bg-neutral-50 p-6 text-left">
-          <h2 className="text-sm font-semibold text-neutral-700">Sua license key</h2>
+          <h2 className="text-sm font-semibold text-neutral-700">Sua chave de licença</h2>
           <div className="mt-2 flex items-center gap-2">
             <code
               data-testid="license-key"

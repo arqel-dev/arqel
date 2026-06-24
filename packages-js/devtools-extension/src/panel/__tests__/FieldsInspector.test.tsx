@@ -1,6 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type FieldSchema, FieldsInspector } from '../FieldsInspector';
+
+function stubLanguage(tag: string): void {
+  vi.spyOn(navigator, 'language', 'get').mockReturnValue(tag);
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 function makeFields(): FieldSchema[] {
   return [
@@ -70,6 +78,26 @@ describe('<FieldsInspector />', () => {
 
     fireEvent.click(toggles[0] as HTMLElement);
     expect(screen.queryByTestId('field-detail')).not.toBeInTheDocument();
+  });
+
+  it('localizes the visible/total counter under a pt_BR navigator.language', () => {
+    stubLanguage('pt-BR');
+    render(<FieldsInspector fields={makeFields()} />);
+    expect(screen.getByTestId('fields-counter')).toHaveTextContent('2 visíveis / 3 no total');
+  });
+
+  it('groups large counts locale-aware via Intl.NumberFormat (pt_BR)', () => {
+    stubLanguage('pt-BR');
+    const many: FieldSchema[] = Array.from({ length: 1500 }, (_, i) => ({
+      name: `field_${i}`,
+      type: 'text',
+      visible: true,
+    }));
+    render(<FieldsInspector fields={many} />);
+    // pt-BR groups thousands with a dot: 1.500
+    expect(screen.getByTestId('fields-counter')).toHaveTextContent(
+      '1.500 visíveis / 1.500 no total',
+    );
   });
 
   it('shows empty state when there are no fields', () => {

@@ -14,7 +14,7 @@
  *     (`meta.visibleWhen`) and the full meta JSON tree.
  */
 import { useMemo, useState } from 'react';
-import { t } from './i18n.js';
+import { localeBcp47, t } from './i18n.js';
 import { JsonNode } from './JsonNode.js';
 
 export interface FieldSchema {
@@ -55,6 +55,8 @@ export function FieldsInspector({ fields }: FieldsInspectorProps) {
 
   const visibleCount = useMemo(() => fields.filter((f) => f.visible !== false).length, [fields]);
 
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(localeBcp47()), []);
+
   function toggle(index: number) {
     const next = new Set(expanded);
     if (next.has(index)) {
@@ -79,7 +81,10 @@ export function FieldsInspector({ fields }: FieldsInspectorProps) {
     <div data-testid="arqel-fields-inspector" className="arqel-fields-inspector">
       <header className="arqel-fields-header">
         <span data-testid="fields-counter" className="arqel-fields-counter">
-          {visibleCount} visible / {fields.length} total
+          {t('devtools.fields.counter', ':visible visible / :total total', {
+            visible: numberFormatter.format(visibleCount),
+            total: numberFormatter.format(fields.length),
+          })}
         </span>
         <div className="arqel-fields-controls">
           <input

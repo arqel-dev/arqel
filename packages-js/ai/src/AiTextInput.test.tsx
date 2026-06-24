@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setMockTranslations } from '../tests/setup.js';
 import { AiTextInput, type AiTextInputFieldProps } from './AiTextInput.js';
 
 const baseFieldProps: AiTextInputFieldProps = {
@@ -187,6 +188,20 @@ describe('<AiTextInput>', () => {
       />,
     );
     expect(screen.getByText('3 / 100')).toBeInTheDocument();
+  });
+
+  it('formats the char counter using the active locale grouping (pt_BR)', () => {
+    setMockTranslations({}, 'pt_BR');
+    render(
+      <AiTextInput
+        name="bio"
+        value={'a'.repeat(1234)}
+        props={{ ...baseFieldProps, maxLength: 5000 }}
+        resource="users"
+        field="bio"
+      />,
+    );
+    expect(screen.getByText('1.234 / 5.000')).toBeInTheDocument();
   });
 
   it('changes the button label to "Regenerate" after a successful generation', async () => {

@@ -69,7 +69,7 @@ export function FieldsInspector({ fields }: FieldsInspectorProps) {
     return (
       <div data-testid="arqel-fields-inspector" className="arqel-fields-inspector">
         <p data-testid="fields-empty" className="arqel-fields-empty">
-          No fields detected in the current pageProps.
+          {t('devtools.fields.empty.no_fields', 'No fields detected in the current pageProps.')}
         </p>
       </div>
     );
@@ -191,7 +191,7 @@ export function FieldsInspector({ fields }: FieldsInspectorProps) {
         })}
         {filtered.length === 0 && (
           <li className="arqel-fields-empty" data-testid="fields-no-match">
-            No fields match the current filter.
+            {t('devtools.fields.empty.no_match', 'No fields match the current filter.')}
           </li>
         )}
       </ul>

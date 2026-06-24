@@ -27,6 +27,12 @@ const EN: Dictionary = {
   'devtools.filter_placeholder': 'Filter…',
   'devtools.inertia.filter_aria': 'Filter inspector',
   'devtools.inertia.copy_aria': 'Copy state JSON',
+  'devtools.inertia.tab.page_props': 'Page Props',
+  'devtools.inertia.tab.shared_props': 'Shared Props',
+  'devtools.inertia.tab.navigation_history': 'Navigation History',
+  'devtools.inertia.copy': 'Copy',
+  'devtools.inertia.copied': 'Copied!',
+  'devtools.inertia.empty.no_navigation': 'No navigation events recorded.',
   'devtools.policy.filter_placeholder': 'Filter ability…',
   'devtools.policy.filter_ability_aria': 'Filter ability',
   'devtools.policy.filter_result_aria': 'Filter by result',
@@ -49,8 +55,12 @@ const EN: Dictionary = {
   'devtools.fields.heading.visibility': 'Visibility rule',
   'devtools.fields.heading.meta': 'Meta',
   'devtools.fields.no_rules': 'No validation rules.',
+  'devtools.fields.empty.no_fields': 'No fields detected in the current pageProps.',
+  'devtools.fields.empty.no_match': 'No fields match the current filter.',
   'devtools.policy.empty.no_checks': 'No policy checks recorded for this request.',
   'devtools.policy.empty.no_match': 'No entries match the current filter.',
+  'devtools.policy.stack.show': 'Show',
+  'devtools.policy.stack.hide': 'Hide',
   'devtools.performance.empty':
     'No performance metrics captured yet. Interact with the page to populate Web Vitals.',
   'devtools.performance.label.navigation': 'Navigation',
@@ -62,6 +72,8 @@ const EN: Dictionary = {
   'devtools.performance.server.memory': 'Memory',
   'devtools.time_travel.replay': 'Replay',
   'devtools.time_travel.replay_aria': 'Replay :url',
+  'devtools.time_travel.empty.no_snapshots':
+    'No navigation snapshots captured yet. Navigate within the app to record state.',
 };
 
 const PT_BR: Dictionary = {
@@ -75,6 +87,12 @@ const PT_BR: Dictionary = {
   'devtools.filter_placeholder': 'Filtrar…',
   'devtools.inertia.filter_aria': 'Filtrar inspetor',
   'devtools.inertia.copy_aria': 'Copiar JSON de estado',
+  'devtools.inertia.tab.page_props': 'Props da Página',
+  'devtools.inertia.tab.shared_props': 'Props Compartilhadas',
+  'devtools.inertia.tab.navigation_history': 'Histórico de Navegação',
+  'devtools.inertia.copy': 'Copiar',
+  'devtools.inertia.copied': 'Copiado!',
+  'devtools.inertia.empty.no_navigation': 'Nenhum evento de navegação registrado.',
   'devtools.policy.filter_placeholder': 'Filtrar habilidade…',
   'devtools.policy.filter_ability_aria': 'Filtrar habilidade',
   'devtools.policy.filter_result_aria': 'Filtrar por resultado',
@@ -97,9 +115,13 @@ const PT_BR: Dictionary = {
   'devtools.fields.heading.visibility': 'Regra de visibilidade',
   'devtools.fields.heading.meta': 'Meta',
   'devtools.fields.no_rules': 'Nenhuma regra de validação.',
+  'devtools.fields.empty.no_fields': 'Nenhum campo detectado nas pageProps atuais.',
+  'devtools.fields.empty.no_match': 'Nenhum campo corresponde ao filtro atual.',
   'devtools.policy.empty.no_checks':
     'Nenhuma verificação de política registrada para esta requisição.',
   'devtools.policy.empty.no_match': 'Nenhuma entrada corresponde ao filtro atual.',
+  'devtools.policy.stack.show': 'Mostrar',
+  'devtools.policy.stack.hide': 'Ocultar',
   'devtools.performance.empty':
     'Nenhuma métrica de desempenho capturada ainda. Interaja com a página para popular os Web Vitals.',
   'devtools.performance.label.navigation': 'Navegação',
@@ -111,6 +133,8 @@ const PT_BR: Dictionary = {
   'devtools.performance.server.memory': 'Memória',
   'devtools.time_travel.replay': 'Reproduzir',
   'devtools.time_travel.replay_aria': 'Reproduzir :url',
+  'devtools.time_travel.empty.no_snapshots':
+    'Nenhum snapshot de navegação capturado ainda. Navegue pelo aplicativo para registrar o estado.',
 };
 
 const DICTIONARIES: Readonly<Record<Locale, Dictionary>> = {

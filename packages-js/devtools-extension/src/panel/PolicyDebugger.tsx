@@ -146,7 +146,10 @@ export function PolicyDebugger({ entries }: PolicyDebuggerProps) {
                       data-testid="policy-stack-toggle"
                       aria-expanded={isOpen}
                     >
-                      {isOpen ? 'Hide' : 'Show'} ({entry.backtrace.length})
+                      {isOpen
+                        ? t('devtools.policy.stack.hide', 'Hide')
+                        : t('devtools.policy.stack.show', 'Show')}{' '}
+                      ({entry.backtrace.length})
                     </button>
                     {isOpen && (
                       <ol className="arqel-policy-stack" data-testid="policy-stack">

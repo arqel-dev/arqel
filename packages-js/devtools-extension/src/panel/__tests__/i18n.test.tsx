@@ -2,8 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../App';
 import { FieldsInspector } from '../FieldsInspector';
+import { InertiaInspector } from '../InertiaInspector';
 import { normalizeLocale, t } from '../i18n';
 import { PerformanceMetrics } from '../PerformanceMetrics';
+import { TimeTravel } from '../TimeTravel';
 
 const EMPTY_METRICS = {
   lcp: null,
@@ -103,6 +105,30 @@ describe('panel localization', () => {
     render(<PerformanceMetrics metrics={EMPTY_METRICS} />);
     expect(screen.getByTestId('performance-empty')).toHaveTextContent(
       'Nenhuma métrica de desempenho capturada ainda. Interaja com a página para popular os Web Vitals.',
+    );
+  });
+
+  it('localizes the InertiaInspector sub-tab labels under a pt_BR navigator.language', () => {
+    mockLanguage('pt-BR');
+    render(<InertiaInspector stateSource={() => () => {}} />);
+    expect(screen.getByTestId('tab-page-props')).toHaveTextContent('Props da Página');
+    expect(screen.getByTestId('tab-shared-props')).toHaveTextContent('Props Compartilhadas');
+    expect(screen.getByTestId('tab-navigation')).toHaveTextContent('Histórico de Navegação');
+  });
+
+  it('localizes the FieldsInspector empty-state under a pt_BR navigator.language', () => {
+    mockLanguage('pt-BR');
+    render(<FieldsInspector fields={[]} />);
+    expect(screen.getByTestId('fields-empty')).toHaveTextContent(
+      'Nenhum campo detectado nas pageProps atuais.',
+    );
+  });
+
+  it('localizes the TimeTravel empty-state under a pt_BR navigator.language', () => {
+    mockLanguage('pt-BR');
+    render(<TimeTravel snapshots={[]} />);
+    expect(screen.getByTestId('time-travel-empty')).toHaveTextContent(
+      'Nenhum snapshot de navegação capturado ainda. Navegue pelo aplicativo para registrar o estado.',
     );
   });
 });

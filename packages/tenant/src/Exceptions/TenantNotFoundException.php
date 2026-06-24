@@ -26,10 +26,10 @@ use Throwable;
 class TenantNotFoundException extends Exception
 {
     public function __construct(
-        string $message = 'No tenant could be resolved for the request.',
+        ?string $message = null,
         public readonly ?string $identifier = null,
     ) {
-        parent::__construct($message);
+        parent::__construct($message ?? (string) __('arqel::messages.tenant.not_resolved'));
     }
 
     public function render(Request $request): Response

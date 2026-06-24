@@ -44,6 +44,7 @@ return [
     'tenant' => [
         'feature_unavailable' => "The ':feature' feature is not available on your current plan.",
         'no_current_tenant' => 'No current tenant.',
+        'not_resolved' => 'No tenant could be resolved for the request.',
     ],
     'action' => [
         'missing_selection' => 'Missing selection.',
@@ -68,6 +69,17 @@ return [
         'image_source_required' => 'Either imageUrl or imageBase64 must be provided',
         'daily_limit_exceeded' => 'Daily AI limit of $:limit exceeded',
         'user_limit_exceeded' => 'User #:userId daily AI limit of $:limit exceeded',
+        'fields' => [
+            'text' => [
+                'button' => 'Generate with AI',
+            ],
+            'extract' => [
+                'button' => 'Extract with AI',
+            ],
+            'image' => [
+                'button' => 'Analyze with AI',
+            ],
+        ],
     ],
     'marketplace' => [
         'forbidden' => 'Forbidden',

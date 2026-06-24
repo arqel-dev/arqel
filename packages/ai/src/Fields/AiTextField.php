@@ -37,7 +37,7 @@ final class AiTextField extends TextField
     /** @var array<int, string> */
     protected array $contextFields = [];
 
-    protected string $buttonLabel = 'Generate with AI';
+    protected ?string $buttonLabel = null;
 
     /**
      * Define o prompt template — string com placeholders `{fieldName}`
@@ -96,7 +96,7 @@ final class AiTextField extends TextField
 
     public function getButtonLabel(): string
     {
-        return $this->buttonLabel;
+        return $this->buttonLabel ?? (string) __('arqel::messages.ai.fields.text.button');
     }
 
     public function getProviderName(): ?string
@@ -185,7 +185,7 @@ final class AiTextField extends TextField
         return array_filter([
             ...parent::getTypeSpecificProps(),
             'provider' => $this->providerName,
-            'buttonLabel' => $this->buttonLabel,
+            'buttonLabel' => $this->getButtonLabel(),
             'maxLength' => $this->maxLength,
             'hasContextFields' => count($this->contextFields) > 0,
             'contextFields' => $this->contextFields !== [] ? $this->contextFields : null,

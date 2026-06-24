@@ -44,6 +44,7 @@ return [
     'tenant' => [
         'feature_unavailable' => "O recurso ':feature' não está disponível no seu plano atual.",
         'no_current_tenant' => 'Nenhum tenant atual.',
+        'not_resolved' => 'Nenhum tenant pôde ser resolvido para a requisição.',
     ],
     'action' => [
         'missing_selection' => 'Nenhuma seleção informada.',
@@ -68,6 +69,17 @@ return [
         'image_source_required' => 'É necessário fornecer imageUrl ou imageBase64',
         'daily_limit_exceeded' => 'Limite diário de IA de $:limit excedido',
         'user_limit_exceeded' => 'Limite diário de IA de $:limit excedido para o usuário #:userId',
+        'fields' => [
+            'text' => [
+                'button' => 'Gerar com IA',
+            ],
+            'extract' => [
+                'button' => 'Extrair com IA',
+            ],
+            'image' => [
+                'button' => 'Analisar com IA',
+            ],
+        ],
     ],
     'marketplace' => [
         'forbidden' => 'Acesso negado',

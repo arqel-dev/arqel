@@ -46,7 +46,7 @@ final class AiExtractField extends Field
     /** @var array<string, mixed> */
     protected array $aiOptions = [];
 
-    protected string $buttonLabel = 'Extract with AI';
+    protected ?string $buttonLabel = null;
 
     /**
      * Nome do campo do form que contém o texto-fonte (e.g. `'raw_text'`).
@@ -137,7 +137,7 @@ final class AiExtractField extends Field
 
     public function getButtonLabel(): string
     {
-        return $this->buttonLabel;
+        return $this->buttonLabel ?? (string) __('arqel::messages.ai.fields.extract.button');
     }
 
     /**
@@ -222,7 +222,7 @@ final class AiExtractField extends Field
         return [
             'sourceField' => $this->sourceField,
             'targetFields' => array_keys($this->extractTo),
-            'buttonLabel' => $this->buttonLabel,
+            'buttonLabel' => $this->getButtonLabel(),
             'usingJsonMode' => $this->jsonMode,
             'provider' => $this->providerName,
         ];

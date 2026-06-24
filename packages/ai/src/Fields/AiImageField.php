@@ -66,7 +66,7 @@ final class AiImageField extends Field
 
     protected int $maxFileSize = 10_485_760;
 
-    protected string $buttonLabel = 'Analyze with AI';
+    protected ?string $buttonLabel = null;
 
     /**
      * Mapeia `analysis_key => prompt_description`.
@@ -172,7 +172,7 @@ final class AiImageField extends Field
 
     public function getButtonLabel(): string
     {
-        return $this->buttonLabel;
+        return $this->buttonLabel ?? (string) __('arqel::messages.ai.fields.image.button');
     }
 
     /**
@@ -223,7 +223,7 @@ final class AiImageField extends Field
             'provider' => $this->providerName,
             'acceptedMimes' => $this->acceptedMimes,
             'maxFileSize' => $this->maxFileSize,
-            'buttonLabel' => $this->buttonLabel,
+            'buttonLabel' => $this->getButtonLabel(),
         ];
     }
 }

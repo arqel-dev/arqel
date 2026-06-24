@@ -11,7 +11,7 @@
  * unit tests that mock only `sendMessage`).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { t } from './i18n.js';
+import { localeBcp47, t } from './i18n.js';
 import { JsonNode } from './JsonNode.js';
 
 export interface NavigationEntry {
@@ -145,7 +145,7 @@ export function InertiaInspector({ stateSource, writeClipboard }: InertiaInspect
               <li key={`${entry.timestamp}-${entry.path}-${idx}`} data-testid="navigation-entry">
                 <code>{entry.path || '<unknown>'}</code>
                 <span className="arqel-nav-timestamp">
-                  {new Date(entry.timestamp).toLocaleTimeString()}
+                  {new Date(entry.timestamp).toLocaleTimeString(localeBcp47())}
                 </span>
                 {entry.durationMs !== undefined && (
                   <span className="arqel-nav-duration">{entry.durationMs}ms</span>

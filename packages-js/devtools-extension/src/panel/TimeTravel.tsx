@@ -12,7 +12,7 @@
  * inert until the runtime side wires it up.
  */
 import { useState } from 'react';
-import { t } from './i18n.js';
+import { localeBcp47, t } from './i18n.js';
 import { JsonNode } from './JsonNode.js';
 
 export interface NavigationSnapshot {
@@ -103,7 +103,7 @@ export function TimeTravel({ snapshots, onReplay }: TimeTravelProps) {
                   <span aria-hidden="true">{isOpen ? '▼' : '▶'}</span>
                   <code className="arqel-tt-url">{snap.url || '<unknown>'}</code>
                   <span className="arqel-tt-time" data-testid="time-travel-timestamp">
-                    {new Date(snap.timestamp).toLocaleTimeString()}
+                    {new Date(snap.timestamp).toLocaleTimeString(localeBcp47())}
                   </span>
                   {snap.durationMs !== undefined && (
                     <span

@@ -279,6 +279,7 @@ return [
     // Builder / RichText). Values must equal the original English literals so
     // accessible names stay stable for screen readers and consumer tests.
     'fields_advanced' => [
+        'unsupported_field_type' => 'type :type not yet supported',
         'markdown_formatting' => 'Markdown formatting',
         'markdown_bold' => 'Bold',
         'markdown_italic' => 'Italic',

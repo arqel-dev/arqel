@@ -42,6 +42,7 @@ const ptBr = {
         code_fullscreen_short: 'Tela cheia',
         wizard_empty: 'Nenhuma etapa do assistente configurada.',
         wizard_step_label: 'Etapa :number: :label',
+        unsupported_field_type: 'tipo :type ainda não suportado',
       },
     },
   },
@@ -182,5 +183,53 @@ describe('advanced field editors — i18n', () => {
       />,
     );
     expect(screen.getByLabelText('Etapa 1: Profile')).toBeInTheDocument();
+  });
+
+  it('SubFieldInput unsupported-type note localizes under pt_BR (via WizardInput)', () => {
+    setLocale(ptBr);
+    render(
+      <WizardInput
+        field={field('wizard', {
+          steps: [
+            {
+              name: 's1',
+              label: 'Profile',
+              schema: [{ name: 'hue', type: 'color', label: 'Hue' }],
+            },
+          ],
+        })}
+        value={{}}
+        onChange={noop}
+        errors={undefined}
+        disabled={false}
+        inputId="wiz3"
+        describedBy={undefined}
+      />,
+    );
+    expect(screen.getByText('tipo color ainda não suportado')).toBeInTheDocument();
+  });
+
+  it('SubFieldInput unsupported-type note falls back to the English literal', () => {
+    setLocale(null);
+    render(
+      <WizardInput
+        field={field('wizard', {
+          steps: [
+            {
+              name: 's1',
+              label: 'Profile',
+              schema: [{ name: 'hue', type: 'color', label: 'Hue' }],
+            },
+          ],
+        })}
+        value={{}}
+        onChange={noop}
+        errors={undefined}
+        disabled={false}
+        inputId="wiz4"
+        describedBy={undefined}
+      />,
+    );
+    expect(screen.getByText('type color not yet supported')).toBeInTheDocument();
   });
 });

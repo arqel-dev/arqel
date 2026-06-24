@@ -44,6 +44,7 @@ return [
     ],
     'action' => [
         'missing_selection' => 'Nenhuma seleção informada.',
+        'failed' => 'A ação não pôde ser concluída.',
     ],
     'upload' => [
         'not_file_field' => 'O campo não é de upload de arquivo.',

@@ -44,6 +44,7 @@ return [
     ],
     'action' => [
         'missing_selection' => 'Missing selection.',
+        'failed' => 'The action could not be completed.',
     ],
     'upload' => [
         'not_file_field' => 'Field is not a file upload.',

@@ -2098,5 +2098,41 @@
     "line": 66,
     "title": "cli-ink ResourceBrowser record counts interpolated raw, bypassing locale number grouping",
     "round": 31
+  },
+  {
+    "file": "packages-js/fields-advanced/src/repeater/RepeaterInput.tsx",
+    "line": 334,
+    "title": "Unsupported sub-field-type note rendered as hardcoded English (repeater)",
+    "round": 33
+  },
+  {
+    "file": "packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+    "line": 361,
+    "title": "Unsupported sub-field-type note rendered as hardcoded English (builder)",
+    "round": 33
+  },
+  {
+    "file": "packages-js/fields-advanced/src/wizard/WizardInput.tsx",
+    "line": 276,
+    "title": "Unsupported sub-field-type note rendered as hardcoded English (wizard)",
+    "round": 33
+  },
+  {
+    "file": "apps/showcase/resources/js/Pages/GridFormDemo.tsx",
+    "line": 64,
+    "title": "Showcase E2E demo heading hardcoded English (GridFormDemo)",
+    "round": 33
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+    "line": 148,
+    "title": "DevTools InertiaInspector navigation timestamp still uses toLocaleTimeString() with no locale arg (ledger claims fixed, code unchanged)",
+    "round": 33
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+    "line": 106,
+    "title": "TimeTravel timestamp toLocaleTimeString no locale (sibling of InertiaInspector)",
+    "round": 33
   }
 ]

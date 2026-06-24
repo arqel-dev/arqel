@@ -1,0 +1,68 @@
+{
+  "total": 8,
+  "confirmed_count": 5,
+  "dupe_count": 2,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Unsupported sub-field-type note rendered as hardcoded English (repeater)",
+      "file": "packages-js/fields-advanced/src/repeater/RepeaterInput.tsx",
+      "line": 334,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.fields_advanced.unsupported_field_type",
+      "detail": "Inside SubFieldInput's text/unknown fallback, the visible muted note `<p>type {type} not yet supported</p>` is hardcoded English. The component already imports `useArqelTranslations` (line 43), so a translator is available. This is user-visible chrome shown when a repeater row contains a field type not in SUPPORTED_TYPES. Not covered by the existing ledger entries for this file (those targeted per-block editor faces, not this fallback note).",
+      "confidence": "med",
+      "why_real": "Confirmed at packages-js/fields-advanced/src/repeater/RepeaterInput.tsx:334, inside SubFieldInput's text/unknown fallback: `<p className=\"mt-1 text-xs text-muted-foreground\">type {type} not yet supported</p>` \u2014 hardcoded English with no __() / translator. The module already imports useArqelTranslations (line 43) and uses it at line 393 in another component, so a translator is reachable; SubFieldInput is itself a React function component and could call the hook. This is user-visible muted chrome rendered when a repeater row holds a sub-field type not in SUPPORTED_TYPES.\n\nNot a duplicate: the two existing ledger entries for this file (round 7) target line 516 (drag/clone/remove/expand-collapse aria-labels) and line 633 (visible '+ Add item' text + 'Remove item N' aria-label). Neither touches the SubFieldInput unsupported-type note. The i18n loop has previously treated analogous empty-state/diagnostic strings as in-scope (e.g. WizardInput 'No wizard steps configured.').\n\nNot vendored: located in fields-advanced, not packages-js/ui/src/shadcn/*. Not a deliberately out-of-scope item. Genuinely reproduces, novel, user-facing. Confidence med because the string is a developer-leaning diagnostic ('not yet supported') rather than core end-user content, but it is still rendered English chrome and consistent with prior accepted findings."
+    },
+    {
+      "title": "Unsupported sub-field-type note rendered as hardcoded English (builder)",
+      "file": "packages-js/fields-advanced/src/builder/BuilderInput.tsx",
+      "line": 361,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.fields_advanced.unsupported_field_type",
+      "detail": "Same pattern as RepeaterInput: `<p className=\"mt-1 text-xs text-muted-foreground\">type {type} not yet supported</p>` is hardcoded visible English in the SubFieldInput text/unknown fallback. `useArqelTranslations` is imported (line 30) so t() is reachable. Distinct from the ledger BuilderInput entry (per-block visible face).",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/fields-advanced/src/builder/BuilderInput.tsx:361: `<p className=\"mt-1 text-xs text-muted-foreground\">type {type} not yet supported</p>` \u2014 hardcoded visible English rendered inside the SubFieldInput component when a sub-field type is unsupported. This is genuinely user-facing (a muted-foreground paragraph shown under the input), not an aria-label.\n\nLedger check: the file has six prior BuilderInput entries \u2014 R7 (\"+ Add block\" / \"Remove block N\"), and R15 (drag-handle, expand/collapse, move-up, move-down, clone-block aria-labels). None cover the \"type {type} not yet supported\" note. A grep for \"not yet supported\"/\"not_supported\" in the ledger returns nothing. So this string is novel.\n\nuseArqelTranslations is imported (line 30) and used in two other components in the same file (lines 387, 498). SubFieldInput is itself a React function component (line 283), so t() is reachable by adding the hook call. Not a vendored shadcn primitive (it is in fields-advanced/src/builder, not packages-js/ui/src/shadcn). Not a deliberately out-of-scope item.\n\nconfidence high."
+    },
+    {
+      "title": "Unsupported sub-field-type note rendered as hardcoded English (wizard)",
+      "file": "packages-js/fields-advanced/src/wizard/WizardInput.tsx",
+      "line": 276,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.fields_advanced.unsupported_field_type",
+      "detail": "Same hardcoded visible note `<p>type {type} not yet supported</p>` in WizardInput's SubFieldInput fallback. `useArqelTranslations` is imported (line 27). Not the same line/concern as the ledger WizardInput visible-face entry.",
+      "confidence": "high",
+      "why_real": "Confirmed at WizardInput.tsx:276: `<p className=\"mt-1 text-xs text-muted-foreground\">type {type} not yet supported</p>` renders a visible, user-facing hardcoded English note in the SubFieldInput fallback. This is genuinely untranslated: SubFieldInput (lines 198-293) never calls useArqelTranslations \u2014 the hook is imported at line 27 but only consumed at line 304 in a separate component, so the translator is not even in scope here. The R1-R32 ledger has five WizardInput entries (lines 436, 474, 513, 584 \u2014 empty-state, step counter, per-step aria-label, sr-only progress, and the 'Back' nav-button visible face) but none cover line 276 or the 'not yet supported' note. Nearby ledger lines 271/274/277 belong to unrelated files (AiSelectInput, CommandPalette, vendored shadcn sidebar). Not under packages-js/ui/src/shadcn/* (not vendored) and not a deliberately-out-of-scope item. Novel, real, user-facing i18n defect."
+    },
+    {
+      "title": "Showcase E2E demo heading hardcoded English (GridFormDemo)",
+      "file": "apps/showcase/resources/js/Pages/GridFormDemo.tsx",
+      "line": 64,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "showcase.grid_form_demo.title",
+      "detail": "`<h1 ...>Grid Form Demo</h1>` is a hardcoded English visible heading in a showcase E2E demo page with no i18n infrastructure available in the app. Same caveat as VersionsDemo: borderline out-of-scope test scaffold, low severity.",
+      "confidence": "med",
+      "why_real": "Reproduces at apps/showcase/resources/js/Pages/GridFormDemo.tsx:64 \u2014 `<h1 className=\"mb-4 text-xl font-semibold\">Grid Form Demo</h1>` is a hardcoded English visible heading rendered on the live /admin/grid-form-demo route (registered in apps/showcase/app/Providers/AppServiceProvider.php:43). NOT a duplicate: the ledger (reports/i18n-fixed-ledger.json) has zero apps/showcase entries and no detection JSON references GridFormDemo/grid-form-demo. NOT vendored shadcn (it's an app page, not packages-js/ui/src/shadcn/*). Precedent supports in-scope: the ledger already includes app-level pages (apps/demo, apps/marketplace Pages/Components were localized in prior rounds), so app pages are not categorically excluded. The finding's own rationale is factually wrong on a load-bearing point: it claims \"no i18n infrastructure available in the app,\" but apps/showcase/resources/js/app.tsx imports and mounts I18nProvider + LocaleSwitcher from @arqel-dev/i18n \u2014 so t()/useI18n IS available here. A logged-in admin visiting the route sees untranslated English. Severity is low (E2E test scaffold fixture, login-gated, heading incidental to its responsive-reflow purpose; sibling synthetic \"Field A\"..\"Field F\" labels are intentional placeholders), but it is a genuine, novel, user-facing hardcoded-string defect in an in-scope app with i18n infra present."
+    },
+    {
+      "title": "DevTools InertiaInspector navigation timestamp still uses toLocaleTimeString() with no locale arg (ledger claims fixed, code unchanged)",
+      "file": "packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+      "line": 148,
+      "kind": "locale-format",
+      "severity": "med",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "(self-contained devtools i18n: pass navigator.language-derived locale to toLocaleTimeString)",
+      "detail": "`{new Date(entry.timestamp).toLocaleTimeString()}` in the navigation-history list is called with no locale argument, so each navigation event's timestamp is formatted in the engine default locale rather than the panel's active locale (`navigator.language`). The ledger records this surface as fixed at InertiaInspector.tsx:145 (\"DevTools InertiaInspector navigation timestamp uses toLocaleTimeString() with no locale arg \u2014 the exact pattern fixed in sibling TimeTravel\"), but the call is still un-argumented and `git` shows no modification to the `toLocaleTimeString()` line. Same root cause and same un-applied/regressed fix as TimeTravel.tsx:106. Repro: browser language pt-BR, open Inertia inspector panel, navigate; the Navigation tab shows en-US 12h timestamps instead of pt-BR 24h. Fix: pass the BCP-47 locale resolved from navigator.language (as i18n.ts already does for translations).",
+      "confidence": "high",
+      "why_real": "Verified against the actual code: InertiaInspector.tsx:148 still reads `{new Date(entry.timestamp).toLocaleTimeString()}` with no locale argument. The panel HAS a resolved active locale \u2014 i18n.ts:159 exports activeLocale() derived from navigator.language and uses it for all translations \u2014 so this timestamp is formatted in the JS engine default locale instead of the panel's active locale. Under navigator.language=pt-BR the Navigation tab shows en-US 12h timestamps rather than pt-BR 24h, a genuine user-facing i18n defect. Not vendored (devtools-extension, not packages-js/ui/src/shadcn/*). The sibling TimeTravel.tsx:106 carries the identical un-argumented pattern, confirming a shared, un-applied fix. The ledger DOES contain an entry for this exact surface (line 1371-1374, round 10) claiming it was fixed ('the exact pattern fixed in sibling TimeTravel'), but the code was never modified \u2014 the toLocaleTimeString() line is unchanged and still un-argumented. Because the recorded fix was never applied and the defect persists verbatim in shipping code, this is a false/regressed ledger entry, not a genuinely-resolved duplicate; the live defect remains actionable. is_duplicate=false because no actual fix exists in the codebase despite the ledger record."
+    }
+  ]
+}

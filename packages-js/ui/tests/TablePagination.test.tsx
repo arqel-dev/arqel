@@ -90,6 +90,34 @@ describe('TablePagination', () => {
     expect(screen.getByText('Exibindo 11 a 20 de 47 resultados')).toBeInTheDocument();
   });
 
+  it('groups large counts using the active locale (pt_BR)', () => {
+    pageMock.mockReturnValue({
+      props: { i18n: { locale: 'pt_BR', available: ['pt_BR'], translations: {} } },
+    });
+    render(
+      <TablePagination
+        meta={{ currentPage: 1, lastPage: 1235, perPage: 10, total: 12345 }}
+        onPageChange={() => {}}
+      />,
+    );
+    // pt-BR groups thousands with a dot (12.345), not the raw '12345'.
+    expect(screen.getByText('Showing 1 to 10 of 12.345 results')).toBeInTheDocument();
+  });
+
+  it('groups large counts using the active locale (en)', () => {
+    pageMock.mockReturnValue({
+      props: { i18n: { locale: 'en', available: ['en'], translations: {} } },
+    });
+    render(
+      <TablePagination
+        meta={{ currentPage: 1, lastPage: 1235, perPage: 10, total: 12345 }}
+        onPageChange={() => {}}
+      />,
+    );
+    // en groups thousands with a comma (12,345).
+    expect(screen.getByText('Showing 1 to 10 of 12,345 results')).toBeInTheDocument();
+  });
+
   // ── Responsive touch targets (Phase 4): 44px on mobile, dense on >=md ──
 
   it('Prev/Next/per-page carry the h-11 md:h-8 responsive touch sizing', () => {

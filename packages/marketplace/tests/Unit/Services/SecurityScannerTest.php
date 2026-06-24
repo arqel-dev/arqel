@@ -158,3 +158,28 @@ it('looks up both composer and npm packages', function (): void {
     expect($scan->status)->toBe('flagged');
     expect($scan->severity)->toBe('medium');
 });
+
+it('localizes the no-license finding summary under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    $scanner = new SecurityScanner(new FakeVulnerabilityDatabase);
+    $plugin = makeScanPlugin(['license' => '']);
+
+    $scan = $scanner->scan($plugin);
+
+    $findings = $scan->findings ?? [];
+    expect($findings[0]['type'] ?? null)->toBe('license-warning');
+    expect($findings[0]['summary'] ?? null)->toBe('O plugin não tem licença declarada.');
+});
+
+it('localizes the license allow-list warning summary with placeholder under pt_BR', function (): void {
+    app()->setLocale('pt_BR');
+
+    $scanner = new SecurityScanner(new FakeVulnerabilityDatabase);
+    $plugin = makeScanPlugin(['license' => 'Proprietary']);
+
+    $scan = $scanner->scan($plugin);
+
+    $findings = $scan->findings ?? [];
+    expect($findings[0]['summary'] ?? null)->toBe('A licença Proprietary não está na lista de permissões recomendada.');
+});

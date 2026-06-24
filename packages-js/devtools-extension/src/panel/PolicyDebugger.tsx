@@ -102,8 +102,8 @@ export function PolicyDebugger({ entries }: PolicyDebuggerProps) {
       {filtered.length === 0 ? (
         <p data-testid="policy-empty" className="arqel-policy-empty">
           {entries.length === 0
-            ? 'No policy checks recorded for this request.'
-            : 'No entries match the current filter.'}
+            ? t('devtools.policy.empty.no_checks', 'No policy checks recorded for this request.')
+            : t('devtools.policy.empty.no_match', 'No entries match the current filter.')}
         </p>
       ) : (
         <table data-testid="policy-table" className="arqel-policy-table">

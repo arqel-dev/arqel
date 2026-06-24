@@ -1810,5 +1810,83 @@
     "line": 162,
     "title": "FieldsInspector 'No validation rules.' empty-state hardcoded",
     "round": 19
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 83,
+    "title": "PerformanceMetrics panel empty-state message hardcoded English (not via t())",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 50,
+    "title": "PerformanceMetrics tile hint 'Largest Contentful Paint' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 58,
+    "title": "PerformanceMetrics tile hint 'Interaction latency' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 66,
+    "title": "PerformanceMetrics tile hint 'Cumulative Layout Shift' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 74,
+    "title": "PerformanceMetrics tile hint 'Initial navigation duration' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 70,
+    "title": "PerformanceMetrics tile label 'Navigation' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 111,
+    "title": "PerformanceMetrics server counter label 'Queries' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 115,
+    "title": "PerformanceMetrics server counter label 'Memory' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+    "line": 105,
+    "title": "PolicyDebugger empty-state 'No policy checks recorded for this request.' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+    "line": 106,
+    "title": "PolicyDebugger empty-state 'No entries match the current filter.' hardcoded (visible)",
+    "round": 20
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+    "line": 118,
+    "title": "TimeTravel replay button aria-label 'Replay ${url}' hardcoded English word",
+    "round": 20
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 83,
+    "title": "PerformanceMetrics devtools panel entirely unlocalized (sibling panels were i18n-wired, this one missed)",
+    "round": 20
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/PerformanceMetrics.tsx",
+    "line": 124,
+    "title": "PerformanceMetrics numeric values use toFixed() with hardcoded '.' decimal separator (locale-insensitive)",
+    "round": 20
   }
 ]

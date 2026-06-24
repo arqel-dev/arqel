@@ -12,6 +12,7 @@
  * inert until the runtime side wires it up.
  */
 import { useState } from 'react';
+import { t } from './i18n.js';
 import { JsonNode } from './JsonNode.js';
 
 export interface NavigationSnapshot {
@@ -115,9 +116,11 @@ export function TimeTravel({ snapshots, onReplay }: TimeTravelProps) {
                   className="arqel-tt-replay"
                   data-testid="time-travel-replay"
                   onClick={() => handleReplay(snap)}
-                  aria-label={`Replay ${snap.url}`}
+                  aria-label={t('devtools.time_travel.replay_aria', 'Replay :url', {
+                    url: snap.url,
+                  })}
                 >
-                  Replay
+                  {t('devtools.time_travel.replay', 'Replay')}
                 </button>
               </div>
               {isOpen && (

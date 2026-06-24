@@ -7,6 +7,7 @@
  * sourced from the `__devtools` shared prop emitted by `arqel-dev/core` in
  * `local` environment.
  */
+import { t } from './i18n.js';
 
 export interface PerformanceMetricsValue {
   readonly lcp: number | null;
@@ -47,7 +48,7 @@ export function PerformanceMetrics({ metrics, server = null }: PerformanceMetric
       value: metrics.lcp,
       status: classifyLcp(metrics.lcp),
       format: formatMs,
-      hint: 'Largest Contentful Paint',
+      hint: t('devtools.performance.hint.lcp', 'Largest Contentful Paint'),
     },
     {
       key: 'responsiveness',
@@ -55,7 +56,7 @@ export function PerformanceMetrics({ metrics, server = null }: PerformanceMetric
       value: responsivenessValue,
       status: classifyResponsiveness(responsivenessValue),
       format: formatMs,
-      hint: 'Interaction latency',
+      hint: t('devtools.performance.hint.responsiveness', 'Interaction latency'),
     },
     {
       key: 'cls',
@@ -63,15 +64,15 @@ export function PerformanceMetrics({ metrics, server = null }: PerformanceMetric
       value: metrics.cls,
       status: classifyCls(metrics.cls),
       format: (v) => v.toFixed(3),
-      hint: 'Cumulative Layout Shift',
+      hint: t('devtools.performance.hint.cls', 'Cumulative Layout Shift'),
     },
     {
       key: 'navigationTime',
-      label: 'Navigation',
+      label: t('devtools.performance.label.navigation', 'Navigation'),
       value: metrics.navigationTime,
       status: classifyNavigation(metrics.navigationTime),
       format: formatMs,
-      hint: 'Initial navigation duration',
+      hint: t('devtools.performance.hint.navigation', 'Initial navigation duration'),
     },
   ];
 
@@ -80,7 +81,10 @@ export function PerformanceMetrics({ metrics, server = null }: PerformanceMetric
     return (
       <div data-testid="arqel-performance" className="arqel-performance">
         <p data-testid="performance-empty" className="arqel-perf-empty">
-          No performance metrics captured yet. Interact with the page to populate Web Vitals.
+          {t(
+            'devtools.performance.empty',
+            'No performance metrics captured yet. Interact with the page to populate Web Vitals.',
+          )}
         </p>
       </div>
     );
@@ -108,11 +112,15 @@ export function PerformanceMetrics({ metrics, server = null }: PerformanceMetric
       {server && (
         <footer className="arqel-perf-server" data-testid="performance-server">
           <div data-testid="performance-query-count">
-            <span className="arqel-perf-server-label">Queries</span>
+            <span className="arqel-perf-server-label">
+              {t('devtools.performance.server.queries', 'Queries')}
+            </span>
             <span className="arqel-perf-server-value">{server.queryCount}</span>
           </div>
           <div data-testid="performance-memory">
-            <span className="arqel-perf-server-label">Memory</span>
+            <span className="arqel-perf-server-label">
+              {t('devtools.performance.server.memory', 'Memory')}
+            </span>
             <span className="arqel-perf-server-value">{formatBytes(server.memoryUsage)}</span>
           </div>
         </footer>

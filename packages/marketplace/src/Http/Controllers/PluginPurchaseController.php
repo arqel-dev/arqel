@@ -39,7 +39,7 @@ final class PluginPurchaseController
         if (! $plugin->isPremium()) {
             return new JsonResponse([
                 'message' => (string) __('arqel::messages.marketplace.validation_failed'),
-                'errors' => ['plugin' => ['Plugin is free.']],
+                'errors' => ['plugin' => [(string) __('arqel::messages.marketplace.plugin_is_free')]],
             ], 422);
         }
 
@@ -118,7 +118,7 @@ final class PluginPurchaseController
         if (! is_string($rawPaymentId) || $rawPaymentId === '') {
             return new JsonResponse([
                 'message' => (string) __('arqel::messages.marketplace.validation_failed'),
-                'errors' => ['paymentId' => ['paymentId is required.']],
+                'errors' => ['paymentId' => [(string) __('arqel::messages.marketplace.payment_id_required')]],
             ], 422);
         }
 

@@ -112,6 +112,40 @@ it('translates the screenshot count to pt_BR', function (): void {
         ->toBe('2 capturas de tela fornecidas.');
 });
 
+it('localizes the composer package fail message to pt_BR', function (): void {
+    Illuminate\Support\Facades\App::setLocale('pt_BR');
+
+    $plugin = makeCheckerPlugin(['composer_package' => 'INVALID']);
+    $report = (new PluginAutoChecker)->check($plugin);
+
+    $check = findCheck($report['checks'], 'composer_package_format');
+    expect($check['message'])
+        ->toBe('composer_package deve seguir o formato vendor/package (alfanumérico minúsculo + hifens).');
+});
+
+it('localizes the name uniqueness ok message to pt_BR', function (): void {
+    Illuminate\Support\Facades\App::setLocale('pt_BR');
+
+    $plugin = makeCheckerPlugin([
+        'screenshots' => ['https://example.com/a.png'],
+    ]);
+    $report = (new PluginAutoChecker)->check($plugin);
+
+    $check = findCheck($report['checks'], 'name_uniqueness');
+    expect($check['message'])->toBe('O nome do plugin é único.');
+});
+
+it('keeps the en composer fail message equal to the original literal', function (): void {
+    Illuminate\Support\Facades\App::setLocale('en');
+
+    $plugin = makeCheckerPlugin(['composer_package' => 'INVALID']);
+    $report = (new PluginAutoChecker)->check($plugin);
+
+    $check = findCheck($report['checks'], 'composer_package_format');
+    expect($check['message'])
+        ->toBe('composer_package must match vendor/package (lowercase alnum + hyphens).');
+});
+
 it('returns shape with checks list and passed flag for happy plugin', function (): void {
     $plugin = makeCheckerPlugin([
         'screenshots' => ['https://example.com/a.png'],

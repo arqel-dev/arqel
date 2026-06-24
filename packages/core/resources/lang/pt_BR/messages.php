@@ -75,6 +75,17 @@ return [
         'plugin_not_found' => 'Plugin [:slug] não encontrado',
         'category_not_found' => 'Categoria [:slug] não encontrada',
         'screenshots_count' => '{1}:count captura de tela fornecida.|[2,*]:count capturas de tela fornecidas.',
+        'auto_check' => [
+            'composer_package_invalid' => 'composer_package deve seguir o formato vendor/package (alfanumérico minúsculo + hifens).',
+            'composer_package_ok' => 'O pacote Composer segue a convenção vendor/package.',
+            'github_url_invalid' => 'github_url deve apontar para github.com.',
+            'github_url_ok' => 'A URL do GitHub aponta para github.com.',
+            'description_short' => 'A descrição é curta; considere 50+ caracteres para melhor descoberta.',
+            'description_ok' => 'O tamanho da descrição é adequado.',
+            'screenshots_missing' => 'Nenhuma captura de tela fornecida; pelo menos uma é recomendada.',
+            'name_duplicate' => 'Outro plugin já usa este nome.',
+            'name_unique' => 'O nome do plugin é único.',
+        ],
     ],
     'field_search' => [
         'not_searchable' => 'O campo não permite busca.',

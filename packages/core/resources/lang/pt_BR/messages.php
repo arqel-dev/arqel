@@ -34,6 +34,9 @@ return [
         'invalid_id' => 'ID de exportação inválido.',
         'not_found' => 'Exportação não encontrada.',
         'ambiguous' => 'Exportação ambígua.',
+        'document_title' => 'Exportação',
+        'boolean_yes' => 'Sim',
+        'boolean_no' => 'Não',
     ],
     'locale' => [
         'invalid' => 'Idioma inválido.',

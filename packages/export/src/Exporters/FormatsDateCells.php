@@ -60,6 +60,32 @@ trait FormatsDateCells
     }
 
     /**
+     * Localise a boolean cell to the active request/export locale.
+     *
+     * Before this, every exporter hardcoded the literal English 'Yes'/'No'
+     * into the downloaded file regardless of `app()->getLocale()`. Routing
+     * through `trans()` (resolved lazily at render time) makes a boolean
+     * column export 'Sim'/'Não' under pt_BR, matching the on-screen cell.
+     * The `arqel::messages.export.boolean_*` keys live in arqel/core, on
+     * which this package already depends.
+     */
+    private function formatBooleanCell(mixed $value): string
+    {
+        $key = $value ? 'arqel::messages.export.boolean_yes' : 'arqel::messages.export.boolean_no';
+        $fallback = $value ? 'Yes' : 'No';
+
+        if (function_exists('app') && app()->bound('translator')) {
+            $translated = trans($key);
+
+            if (is_string($translated) && $translated !== $key) {
+                return $translated;
+            }
+        }
+
+        return $fallback;
+    }
+
+    /**
      * Resolve the active application locale for relative-date binding,
      * normalised to Carbon's underscore form (`pt_BR`). Falls back to
      * `en` when no translator is booted (bare unit context).

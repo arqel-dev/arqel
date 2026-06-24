@@ -130,7 +130,7 @@ final class XlsxExporter implements Exporter
                 'date' => $value instanceof DateTimeInterface
                     ? $this->formatDateCell($value, $column)
                     : ($value === null ? '' : (string) $value),
-                'boolean' => $value ? 'Yes' : 'No',
+                'boolean' => $this->formatBooleanCell($value),
                 default => $value ?? '',
             };
         }
@@ -148,7 +148,7 @@ final class XlsxExporter implements Exporter
             'date' => $value instanceof DateTimeInterface
                 ? $this->formatDateCell($value, $column)
                 : ($value === null ? '' : (string) $value),
-            'boolean' => $value ? 'Yes' : 'No',
+            'boolean' => $this->formatBooleanCell($value),
             default => $value ?? '',
         };
     }

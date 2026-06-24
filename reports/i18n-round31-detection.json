@@ -1,0 +1,80 @@
+{
+  "total": 8,
+  "confirmed_count": 6,
+  "dupe_count": 1,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Visible section heading 'Featured' hardcoded in English",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx",
+      "line": 40,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "marketplace.landing.section.featured",
+      "detail": "<Section title=\"Featured\" plugins={featured} /> renders the literal as a visible <h2>{title}</h2> (Section, line 66) AND as PluginList emptyMessage `Nenhum plugin em ${title.toLowerCase()}.` The two sibling sections use PT-BR/loanword copy ('Novos esta semana'), so 'Featured' is a mixed-language visible heading in a PT-BR-convention app. Should be 'Destaques' / localized via a marketplace i18n key. Not in ledger (ledger covers Browse/Checkout/PluginDetail/PublisherProfile/ReviewList/CompareTable/PluginCard/PublisherBadge but not Landing).",
+      "confidence": "high",
+      "why_real": "Confirmed reproduction at apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx:40. The literal \"Featured\" is passed as the title prop to the local Section component (line 63), which renders it directly as a visible <h2 className=\"mb-4 text-2xl font-semibold\">{title}</h2> (line 66) and also interpolates it into the PluginList emptyMessage `Nenhum plugin em ${title.toLowerCase()}.` (line 67). The sibling sections use PT-BR copy (\"Novos esta semana\", line 42) and the rest of the page is PT-BR (\"Descubra plugins community\", \"Explorar plugins\", \"Categorias\"), making \"Featured\" (and \"Trending\" on line 41) a mixed-language, user-facing heading in a PT-BR-convention app. The marketplace app has no useTranslation/i18n abstraction, so localization here means static PT-BR copy (e.g. \"Destaques\"). Novel and not vendored: ledger has no Landing.tsx/\"Featured\"/\"Trending\"/\"Destaques\" entry. The ledger's Section entries (lines 879, 927) are for packages/form/src/Layout/Section.php and packages-js/ui/src/form/FormSection.tsx \u2014 a different Form-layout Section component, not this marketplace landing's local Section helper. Not a shadcn primitive (it's app-level page code under apps/marketplace), and marketplace app copy is in-scope (ledger already covers Browse/Checkout/PluginDetail/PublisherProfile/ReviewList/CompareTable/PluginCard/PublisherBadge). One caveat: the finding flags only \"Featured\" but \"Trending\" (line 41) is the same defect; the defect is genuine regardless."
+    },
+    {
+      "title": "Visible section heading 'Trending' hardcoded in English",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx",
+      "line": 41,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "marketplace.landing.section.trending",
+      "detail": "<Section title=\"Trending\" plugins={trending} /> renders the literal as a visible <h2>{title}</h2> and feeds the PluginList emptyMessage. Same mixed-language defect as the 'Featured' heading; PT-BR equivalent would be 'Em alta'. Landing.tsx is not in the round 1-30 ledger.",
+      "confidence": "high",
+      "why_real": "Confirmed at apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx:41 \u2014 `<Section title=\"Trending\" plugins={trending} />`. The Section component (lines 63-69) renders title as a visible `<h2>{title}</h2>` (line 66) and interpolates it into the PT-BR empty message (line 67: `Nenhum plugin em ${title.toLowerCase()}.` \u2192 \"Nenhum plugin em trending.\"). The rest of the page is PT-BR (line 30 \"Descubra plugins community\", line 36 \"Explorar plugins\", line 42 \"Novos esta semana\", line 45 \"Categorias\"), so the hardcoded English \"Trending\" (and the sibling \"Featured\" at line 40) is a genuine mixed-language, user-facing i18n defect; PT-BR equivalent would be \"Em alta\". The file is an application page under apps/marketplace/, not a vendored shadcn primitive in packages-js/ui/src/shadcn/*. The R1-R30 ledger (i18n-fixed-ledger.json) contains many marketplace entries but all are in packages/marketplace/* PHP controllers/requests or the app.blade.php SSR lang attr \u2014 none reference Landing.tsx or the \"Trending\"/\"Featured\" section headings. Novel, reproduces, not vendored, not a duplicate."
+    },
+    {
+      "title": "Browser/og meta title subtitle in English on PT-BR landing page",
+      "file": "apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx",
+      "line": 22,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "marketplace.landing.meta_title",
+      "detail": "<MetaTags title=\"Arqel Marketplace \u2014 Plugins for Laravel admin panels\" /> sets the visible <title>/og:title. The description prop right below is PT-BR ('Descubra plugins community...'), and the analogous Browse.tsx meta title (line 31) is PT-BR ('Explorar plugins \u2014 Arqel Marketplace'). The English subtitle 'Plugins for Laravel admin panels' is an inconsistent, non-localized user-facing tab/share title. Should be PT-BR e.g. 'Plugins para pain\u00e9is admin Laravel'.",
+      "confidence": "high",
+      "why_real": "Reproduces: apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx:22 sets title=\"Arqel Marketplace \u2014 Plugins for Laravel admin panels\" (English) while the description prop on line 23 and the page h1/copy (lines 28-36) are all PT-BR. The MetaTags component (Components/Marketplace/MetaTags.tsx) feeds this prop into Inertia's <Head> as the visible <title>/og:title \u2014 so it surfaces as the English browser tab title and social-share title on an otherwise PT-BR landing page. User-facing and inconsistent. Not a duplicate: the ledger contains an entry for the analogous defect in the sibling file Browse.tsx:31 (round 30, 'Browse page MetaTags title/description leak English Browse'), but NO entry for Landing.tsx:22 \u2014 grep for 'Landing.tsx' in the ledger returns nothing. The sibling Browse.tsx title is already PT-BR ('Explorar plugins \u2014 Arqel Marketplace'), confirming Landing's English title is the remaining inconsistency. Not a vendored shadcn primitive (it's an app page) and not flagged out-of-scope. Suggested fix to PT-BR (e.g. 'Plugins para pain\u00e9is admin Laravel') is appropriate."
+    },
+    {
+      "title": "StatWidget statDescription serialized verbatim \u2014 bypasses Widget::localize() applied to the base description",
+      "file": "packages/widgets/src/StatWidget.php",
+      "line": 203,
+      "kind": "plumbing-bug",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "n/a (route through Widget::localize() like description)",
+      "detail": "StatWidget extends Widget, and Widget::toArray() now routes both 'heading' and 'description' through the private static Widget::localize() (Widget.php:238, already in the ledger). But StatWidget emits a SEPARATE user-facing subtitle field 'statDescription' via resolveStatDescription() (StatWidget.php:203, serialized in data() at line 178) which returns the raw string with NO __()/trans() and NO localize() pass. The React StatCard.tsx renders this verbatim. Because Widget::localize() is declared `private static`, the subclass cannot even reach it, so a stat-card subtitle set as a translation key (e.g. ->statDescription('arqel::dashboard.users.delta')) or a literal is shipped untranslated to the frontend \u2014 the exact 'serialized verbatim' family already fixed for the base heading/description but left open on this parallel field. Framework-hardcoded plumbing gap (the verbatim value is whatever the app supplies; the framework should run it through the same localize() as description). Fix: change Widget::localize() to protected static (or add a protected helper) and wrap resolveStatDescription()'s return in it.",
+      "confidence": "high",
+      "why_real": "Verified in source. StatWidget::data() (packages/widgets/src/StatWidget.php:178) emits a user-facing 'statDescription' subtitle via resolveStatDescription() (line 203), which returns the raw string with no __()/trans()/localize() pass (lines 205-211). The base Widget routes 'heading' and 'description' through Widget::localize() (Widget.php:238-239), but that method is declared `private static` (Widget.php:258), so the subclass cannot reach it \u2014 confirming the plumbing gap exactly as described. StatCard.tsx renders the value verbatim at line 134 ({statDescription}). So an app passing a translation key (e.g. ->statDescription('arqel::dashboard.users.delta')) or a literal ships untranslated. This is a real, user-facing i18n defect in framework code (packages/widgets, not a vendored shadcn primitive, not out-of-scope). Ledger check: 'statDescription' appears 0 times in i18n-fixed-ledger.json. The Widget.php:238 R2 entry covers only heading/description. The two StatCard.tsx ledger entries cover the sparkline aria-label (R1) and numeric KPI value grouping (R9) \u2014 neither touches the statDescription subtitle string. Novel and not a duplicate of rounds 1-30."
+    },
+    {
+      "title": "cli-ink Dashboard KPI values rendered via String(number), bypassing locale number grouping",
+      "file": "packages-js/cli-ink/src/components/Dashboard.tsx",
+      "line": 76,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "(helper) cli i18n formatNumber",
+      "detail": "The four dashboard tiles render numeric KPIs with raw String() coercion: value={String(data.queriesPerSec)} (L76), String(data.activeUsers) (L81), String(data.errors) (L88), String(data.aiTokens) (L93). activeUsers and aiTokens routinely exceed 1000, so a pt_BR user sees '12345' instead of '12.345'. The cli-ink TUI already resolves a locale (resolveLocale in src/i18n.ts returns 'pt_BR'/'en' from LANG/LC_ALL), but its self-contained i18n has no number formatter, so these counts are never grouped. The ledger localized the equivalent count grouping for the React TablePagination/StatCard surfaces (Intl.NumberFormat) but never the cli-ink TUI. Repro: LANG=pt_BR.UTF-8 arqel-ink dashboard with aiTokens=12345 -> shows '12345' (should be '12.345'). Fix: add a formatNumber(locale) helper to src/i18n.ts mapping CliLocale->BCP-47 ('pt_BR'->'pt-BR') and use Intl.NumberFormat.",
+      "confidence": "high",
+      "why_real": "Verified against source and ledger. In packages-js/cli-ink/src/components/Dashboard.tsx the four KPI tiles render numeric values via raw String() coercion: value={String(data.queriesPerSec)} (L76), String(data.activeUsers) (L81), String(data.errors) (L88), String(data.aiTokens) (L93). The self-contained TUI i18n (src/i18n.ts) resolves a locale (resolveLocale returns 'pt_BR'/'en' from LC_ALL/LANG) but exposes only t()/interpolate \u2014 there is NO number formatter and no Intl.NumberFormat anywhere in the module. So a pt_BR user sees ungrouped digits (e.g. '12345' instead of '12.345') for activeUsers/aiTokens, which the README/SKILL.md document as realistic large counts. This is a genuine, user-facing localization defect on a real rendered surface.\\n\\nNot a duplicate: the only cli-ink Dashboard ledger entry (round 24, ledger L1953-1956) is titled 'cli-ink Dashboard heading, states and tile labels hardcoded' \u2014 it localized the TEXT strings (title/loading/empty/tile labels), confirmed by the present file already calling t() for every label. It did not touch the numeric tile values. Every number-grouping entry in the ledger (StatCard L1283, Dashboard TableCard L1289, CompareTable install/stars/reviews, PluginCard stars) is a React/web surface using Intl.NumberFormat; none cover the cli-ink TUI numeric values. Not vendored (not under packages-js/ui/src/shadcn/*). Not out-of-scope: cli-ink self-contained i18n is explicitly in scope per project memory, and the loop has been sweeping locale number grouping across surfaces."
+    },
+    {
+      "title": "cli-ink ResourceBrowser record counts interpolated raw, bypassing locale number grouping",
+      "file": "packages-js/cli-ink/src/components/ResourceBrowser.tsx",
+      "line": 66,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-locale-format",
+      "suggested_key": "(helper) cli i18n formatNumber",
+      "detail": "Per-resource record counts are interpolated as raw integers: '{item.label} ({item.count})' (L66) in the sidebar list and 'Records: {selected?.count ?? 0}' (L86, behind the localized t('cli.resources.records') label) in the detail pane. A resource with 12345 records shows '(12345)' / 'Records: 12345' rather than the pt_BR-grouped '12.345'. Same root cause as Dashboard: the self-contained cli-ink i18n (src/i18n.ts) is locale-aware (resolveLocale) but offers no Intl.NumberFormat helper, so counts skip grouping. Not covered by the ledger (which localized count grouping only on the React TablePagination side). Repro: LANG=pt_BR.UTF-8, browse a resource with >1000 records -> ungrouped count. Fix: route both counts through a locale-aware formatNumber helper added to src/i18n.ts.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/cli-ink/src/components/ResourceBrowser.tsx. L66 renders the sidebar list as `{item.label} ({item.count})` and L86 renders the detail pane as `t('cli.resources.records','Records:') {selected?.count ?? 0}` \u2014 both interpolate the count as a raw integer. The cli-ink self-contained i18n (src/i18n.ts) is locale-aware (resolveLocale derives pt_BR from LC_ALL/LC_MESSAGES/LANG) but exposes no Intl.NumberFormat / formatNumber helper; a grep for formatNumber|Intl.NumberFormat|toLocaleString across packages-js/cli-ink/src returns nothing. So under LANG=pt_BR.UTF-8 a resource with >1000 records shows '(12345)' / 'Records: 12345' rather than the pt_BR-grouped '12.345'. This is a real, reproducible, user-facing i18n defect in a first-party (non-vendored, non-shadcn) package, and it is consistent with the project standard that numeric counts go through locale grouping (enforced in R9 StatCard/TableCard, R24 marketplace counts, R26 TablePagination, R28 charts, R30 page indicator). NOT a duplicate: the only prior ResourceBrowser ledger entry (R24, line 40, 'heading, states and detail labels hardcoded') added the t() string keys \u2014 a distinct defect class \u2014 and explicitly did not touch number grouping; the ledger note even calls out that count grouping was localized 'only on the React TablePagination side.' No ledger entry covers cli-ink number grouping. Confidence high; minor caveat that cli-ink is a TUI fed by a local resources.json, but it remains a shipped, deliberately locale-aware component, so the gap is in-scope."
+    }
+  ]
+}

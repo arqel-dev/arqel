@@ -14,6 +14,7 @@
  *     (`meta.visibleWhen`) and the full meta JSON tree.
  */
 import { useMemo, useState } from 'react';
+import { t } from './i18n.js';
 import { JsonNode } from './JsonNode.js';
 
 export interface FieldSchema {
@@ -83,19 +84,19 @@ export function FieldsInspector({ fields }: FieldsInspectorProps) {
         <div className="arqel-fields-controls">
           <input
             type="search"
-            placeholder="Filter name…"
+            placeholder={t('devtools.fields.filter_placeholder', 'Filter name…')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             data-testid="fields-search"
-            aria-label="Filter field name"
+            aria-label={t('devtools.fields.filter_name_aria', 'Filter field name')}
           />
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
             data-testid="fields-type-filter"
-            aria-label="Filter by type"
+            aria-label={t('devtools.fields.filter_type_aria', 'Filter by type')}
           >
-            <option value="all">All types</option>
+            <option value="all">{t('devtools.fields.all_types', 'All types')}</option>
             {types.map((t) => (
               <option key={t} value={t}>
                 {t}
@@ -148,7 +149,7 @@ export function FieldsInspector({ fields }: FieldsInspectorProps) {
                 <div className="arqel-field-detail" data-testid="field-detail">
                   {field.rules && field.rules.length > 0 ? (
                     <section>
-                      <h4>Validation rules</h4>
+                      <h4>{t('devtools.fields.heading.validation', 'Validation rules')}</h4>
                       <ul data-testid="field-rules">
                         {field.rules.map((rule, rIdx) => (
                           // biome-ignore lint/suspicious/noArrayIndexKey: rules are positional within an immutable schema snapshot.
@@ -159,23 +160,25 @@ export function FieldsInspector({ fields }: FieldsInspectorProps) {
                       </ul>
                     </section>
                   ) : (
-                    <p className="arqel-field-no-rules">No validation rules.</p>
+                    <p className="arqel-field-no-rules">
+                      {t('devtools.fields.no_rules', 'No validation rules.')}
+                    </p>
                   )}
                   {dependsOn !== undefined && (
                     <section>
-                      <h4>Depends on</h4>
+                      <h4>{t('devtools.fields.heading.depends_on', 'Depends on')}</h4>
                       <code data-testid="field-depends-on">{dependsOn}</code>
                     </section>
                   )}
                   {visibleWhen !== undefined && (
                     <section>
-                      <h4>Visibility rule</h4>
+                      <h4>{t('devtools.fields.heading.visibility', 'Visibility rule')}</h4>
                       <pre data-testid="field-visible-when">{safeStringify(visibleWhen)}</pre>
                     </section>
                   )}
                   {field.meta && Object.keys(field.meta).length > 0 && (
                     <section>
-                      <h4>Meta</h4>
+                      <h4>{t('devtools.fields.heading.meta', 'Meta')}</h4>
                       <div data-testid="field-meta">
                         <JsonNode value={field.meta} path={`field-${index}-meta`} defaultExpanded />
                       </div>

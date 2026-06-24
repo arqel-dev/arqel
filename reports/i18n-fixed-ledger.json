@@ -1750,5 +1750,65 @@
     "line": 31,
     "title": "Marketplace PluginAdminReviewController inline validate() lacks attributes()/messages() \u2014 raw English field errors",
     "round": 17
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/App.tsx",
+    "line": 130,
+    "title": "DevTools inactive empty-state message hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/App.tsx",
+    "line": 82,
+    "title": "DevTools top-level tab labels hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+    "line": 112,
+    "title": "InertiaInspector filter placeholder + aria-labels hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+    "line": 79,
+    "title": "PolicyDebugger filter placeholder + aria-labels hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+    "line": 91,
+    "title": "PolicyDebugger result-filter option labels hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+    "line": 108,
+    "title": "PolicyDebugger table column headers hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+    "line": 86,
+    "title": "FieldsInspector filter placeholder + aria-labels hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+    "line": 98,
+    "title": "FieldsInspector 'All types' option label hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+    "line": 151,
+    "title": "FieldsInspector section headings hardcoded",
+    "round": 19
+  },
+  {
+    "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+    "line": 162,
+    "title": "FieldsInspector 'No validation rules.' empty-state hardcoded",
+    "round": 19
   }
 ]

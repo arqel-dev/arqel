@@ -11,6 +11,7 @@
  * unit tests that mock only `sendMessage`).
  */
 import { useEffect, useMemo, useState } from 'react';
+import { t } from './i18n.js';
 import { JsonNode } from './JsonNode.js';
 
 export interface NavigationEntry {
@@ -109,17 +110,17 @@ export function InertiaInspector({ stateSource, writeClipboard }: InertiaInspect
         <div className="arqel-inspector-controls">
           <input
             type="search"
-            placeholder="Filter…"
+            placeholder={t('devtools.filter_placeholder', 'Filter…')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             data-testid="inspector-search"
-            aria-label="Filter inspector"
+            aria-label={t('devtools.inertia.filter_aria', 'Filter inspector')}
           />
           <button
             type="button"
             onClick={handleCopy}
             data-testid="inspector-copy"
-            aria-label="Copy state JSON"
+            aria-label={t('devtools.inertia.copy_aria', 'Copy state JSON')}
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>

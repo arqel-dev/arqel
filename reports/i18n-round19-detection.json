@@ -1,0 +1,128 @@
+{
+  "total": 24,
+  "confirmed_count": 10,
+  "dupe_count": 1,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "DevTools inactive empty-state message hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/App.tsx",
+      "line": 130,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.inactive_hint",
+      "detail": "Visible <p> text 'Open a page running an Arqel admin panel to activate DevTools.' is a hardcoded English empty-state message.",
+      "confidence": "high",
+      "why_real": "Verified at packages-js/devtools-extension/src/panel/App.tsx:130. The line literally contains <p>Open a page running an Arqel admin panel to activate DevTools.</p> \u2014 a hardcoded English empty-state message rendered when no Arqel panel is active. It is user-facing (visible text in the DevTools panel). Scanned the R1-R18 ledger (/home/diogo/PhpstormProjects/arqel/reports/i18n-fixed-ledger.json): the only devtools-extension entries are TimeTravel.tsx:82 (round 9), TimeTravel.tsx:56 (round 12), and InertiaInspector.tsx:145 (round 10) \u2014 all about toLocaleTimeString/pluralization in sibling files. No entry references App.tsx or this empty-state string, so it is novel. The file is panel/App.tsx, not a vendored shadcn primitive (packages-js/ui/src/shadcn/*). Genuine, novel, user-facing i18n defect."
+    },
+    {
+      "title": "DevTools top-level tab labels hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/App.tsx",
+      "line": 82,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.tab.inertia / .policies / .fields / .time_travel / .performance",
+      "detail": "Tab button faces 'Inertia State Inspector', 'Policies', 'Fields', 'Time Travel', 'Performance' (lines 82, 92, 102, 112, 122) are hardcoded English visible labels.",
+      "confidence": "high",
+      "why_real": "Verified packages-js/devtools-extension/src/panel/App.tsx: lines 82/92/102/112/122 render top-level tab buttons with hardcoded English visible faces ('Inertia State Inspector', 'Policies', 'Fields', 'Time Travel', 'Performance'). The component imports no translator (no useArqelTranslations/useTranslator/t()), so these strings cannot localize. The labels are genuine visible UI text (button children inside role=tablist), reproducing exactly as the finding states.\n\nLedger check: grep across reports/i18n-fixed-ledger.json for 'panel/App.tsx', the literal tab labels, 'top-tab', and 'Inertia State Inspector' returns nothing. The only devtools-extension entry in rounds 1-18 is TimeTravel.tsx:82 (round 9), a DIFFERENT file addressing toLocaleTimeString() with no locale arg \u2014 not these tab labels. So this is novel, not in the R1-R18 ledger.\n\nNot vendored: path is packages-js/devtools-extension/src/panel/, not packages-js/ui/src/shadcn/*.\n\nBorderline note: a browser DevTools extension is developer-facing rather than end-user-facing, but the package is already within the i18n sweep's established scope (the round-9 TimeTravel.tsx fix), and these are visible rendered labels with no translation path. Confirming as a real, novel, non-duplicate, non-vendored i18n defect."
+    },
+    {
+      "title": "InertiaInspector filter placeholder + aria-labels hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
+      "line": 112,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.filter_placeholder / arqel.devtools.inertia.filter_aria / arqel.devtools.inertia.copy_aria",
+      "detail": "placeholder=\"Filter\u2026\" (112), aria-label=\"Filter inspector\" (116), aria-label=\"Copy state JSON\" (122) are hardcoded English. NOTE: the round-10 ledger entry for this file (line 145) only covered the timestamp locale, not these strings.",
+      "confidence": "med",
+      "why_real": "Verified at packages-js/devtools-extension/src/panel/InertiaInspector.tsx: line 112 placeholder=\"Filter\u2026\", line 116 aria-label=\"Filter inspector\", line 122 aria-label=\"Copy state JSON\" are all hardcoded English with no i18n. The ledger contains exactly one entry for this file (round 10, line 145) that covers only the navigation timestamp toLocaleTimeString locale issue \u2014 it does not touch these placeholder/aria-label strings, so the finding is novel, not a duplicate of rounds 1-18. The file lives in packages-js/devtools-extension, not packages-js/ui/src/shadcn/*, so it is not a vendored primitive. The strings reproduce exactly as reported and are rendered to the user (placeholder visible in UI; aria-labels exposed to screen readers), so they are user-facing. Confidence is med rather than high because this is a developer-facing DevTools extension panel rather than the core admin UI, making the i18n severity lower, but it still qualifies under the gate."
+    },
+    {
+      "title": "PolicyDebugger filter placeholder + aria-labels hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+      "line": 79,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.policy.filter_placeholder / .filter_ability_aria / .filter_result_aria",
+      "detail": "placeholder=\"Filter ability\u2026\" (79), aria-label=\"Filter ability\" (83), aria-label=\"Filter by result\" (89) are hardcoded English.",
+      "confidence": "high",
+      "why_real": "Verified in source: packages-js/devtools-extension/src/panel/PolicyDebugger.tsx has placeholder=\"Filter ability\u2026\" (line 79), aria-label=\"Filter ability\" (line 83), and aria-label=\"Filter by result\" (line 89) \u2014 all hardcoded English with no i18n/t() wrapping. The entire component uses zero i18n (also \"allowed / denied\", All/Allowed/Denied options, empty-state strings), confirming these are genuinely untranslated user-facing strings in the devtools panel.\n\nNot vendored: the file lives under devtools-extension/src/panel/ and is authored in-house (DEVTOOLS-004 docblock describing the policyLog shared prop), not under packages-js/ui/src/shadcn/*.\n\nNot a duplicate: the ledger contains only three devtools-extension entries, all for sibling files TimeTravel.tsx (lines 82, 56) and InertiaInspector.tsx (line 145) covering toLocaleTimeString locale and pluralization \u2014 never PolicyDebugger.tsx and never these aria-label/placeholder lines. Rounds 1-17 are present in the ledger; none touch this file. The sibling devtools i18n fixes actually corroborate that this layer is intended to be localizable."
+    },
+    {
+      "title": "PolicyDebugger result-filter option labels hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+      "line": 91,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.policy.filter.all / .allow / .deny",
+      "detail": "Visible <option> faces 'All' (91), 'Allowed' (92), 'Denied' (93) are hardcoded English select options.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/devtools-extension/src/panel/PolicyDebugger.tsx:91-93. The <option> faces 'All' (91), 'Allowed' (92), 'Denied' (93) are hardcoded English in a visible <select> result-filter (data-testid=policy-result-filter, aria-label=\"Filter by result\"). These are user-facing rendered text, not i18n'd.\n\nNOT vendored: file has no imports from packages-js/ui/src/shadcn/*; it is a hand-written panel component (only imports from 'react').\n\nNOT a duplicate: ledger (max round 17, 293 round entries) contains other devtools-extension panels (TimeTravel.tsx lines 1299/1563, InertiaInspector.tsx line 1371) confirming this package is in the i18n sweep scope, but PolicyDebugger.tsx appears nowhere in the ledger. The specific 'All'/'Allowed'/'Denied' option labels are not covered in any of rounds 1-18.\n\nCaveat on materiality: this is a dev-only devtools panel that only populates in the local environment (production builds never render it), so end-user i18n impact is limited to developers/maintainers. But the sweep has consistently treated sibling devtools-extension panels as in-scope user-facing strings, so this is a genuine, novel, non-vendored missing-i18n defect consistent with prior accepted findings."
+    },
+    {
+      "title": "PolicyDebugger table column headers hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/PolicyDebugger.tsx",
+      "line": 108,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.policy.col.ability / .arguments / .result / .stack",
+      "detail": "Visible <th> headers 'Ability' (108), 'Arguments' (109), 'Result' (110), 'Stack' (111) are hardcoded English.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/devtools-extension/src/panel/PolicyDebugger.tsx:108-111: the <thead> renders four hardcoded English <th> headers ('Ability', 'Arguments', 'Result', 'Stack') with no i18n/translation wrapping. These are visible, user-facing table column headers, so this genuinely reproduces as a missing-i18n defect. The file lives under devtools-extension, not packages-js/ui/src/shadcn/*, so it is NOT a vendored shadcn primitive. The R1-R18 ledger (i18n-fixed-ledger.json) contains zero entries for PolicyDebugger.tsx (0 matches); its only devtools-extension entries are for TimeTravel.tsx and InertiaInspector.tsx (timestamp-locale and pluralization issues), which are unrelated. Therefore novel and not a duplicate."
+    },
+    {
+      "title": "FieldsInspector filter placeholder + aria-labels hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+      "line": 86,
+      "kind": "a11y-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.fields.filter_placeholder / .filter_name_aria / .filter_type_aria",
+      "detail": "placeholder=\"Filter name\u2026\" (86), aria-label=\"Filter field name\" (90), aria-label=\"Filter by type\" (96) are hardcoded English.",
+      "confidence": "high",
+      "why_real": "Confirmed in packages-js/devtools-extension/src/panel/FieldsInspector.tsx: line 86 placeholder=\"Filter name\u2026\", line 90 aria-label=\"Filter field name\", line 96 aria-label=\"Filter by type\" are hardcoded English strings in a user-facing devtools panel. Not a vendored shadcn primitive (path is devtools-extension/src/panel/, not ui/src/shadcn/*). The i18n-fixed-ledger.json (rounds 1-17) contains NO entry for FieldsInspector.tsx \u2014 it covers only sibling panels TimeTravel.tsx and InertiaInspector.tsx. grep for FieldsInspector returns 0 matches in the ledger. Genuine, novel, reproduces, user-facing, not vendored, not previously fixed."
+    },
+    {
+      "title": "FieldsInspector 'All types' option label hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+      "line": 98,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.fields.all_types",
+      "detail": "Visible <option> face 'All types' is hardcoded English.",
+      "confidence": "high",
+      "why_real": "Confirmed at /home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/FieldsInspector.tsx:98: `<option value=\"all\">All types</option>` is a visible, user-facing English string in the type-filter select, hardcoded with no i18n wrapping. It is genuinely user-facing (rendered text in the DevTools panel dropdown), not just an attribute. Not vendored: the file lives in devtools-extension/src/panel/, not packages-js/ui/src/shadcn/*. Novel against the ledger (rounds 1-17 present): the only devtools-extension entries are TimeTravel.tsx (timestamp/pluralization, rounds 9 & 12) and InertiaInspector.tsx (timestamp, round 10); there is no entry for FieldsInspector.tsx, for 'All types', or for the type-filter. All checks for confirmation pass."
+    },
+    {
+      "title": "FieldsInspector section headings hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+      "line": 151,
+      "kind": "missing-i18n",
+      "severity": "med",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.fields.heading.validation / .depends_on / .visibility / .meta",
+      "detail": "Visible <h4> section headings 'Validation rules' (151), 'Depends on' (166), 'Visibility rule' (172), 'Meta' (178) are hardcoded English.",
+      "confidence": "med",
+      "why_real": "Confirmed at packages-js/devtools-extension/src/panel/FieldsInspector.tsx: the four <h4> section headings are hardcoded English \u2014 'Validation rules' (line 151), 'Depends on' (line 166), 'Visibility rule' (line 172), 'Meta' (line 178). They reproduce exactly as reported and render verbatim in the DevTools panel.\n\nNot vendored: the file is the extension's own source under devtools-extension/src/panel/, not packages-js/ui/src/shadcn/*.\n\nNot in the R1-R18 ledger: a grep/JSON scan shows zero FieldsInspector entries. The three existing devtools-extension entries are all in sibling files \u2014 TimeTravel.tsx lines 82 (round 9) and 56 (round 12), and InertiaInspector.tsx line 145 (round 10) \u2014 and concern toLocaleTimeString() locale args and ternary pluralization, not these headings. So the finding is novel.\n\nReal and user-facing within the established scope: prior rounds (9, 10, 12) already accepted devtools-extension strings as in-scope i18n defects, so the developer-tool nature is not disqualifying by precedent. The headings are visible UI text with no translation indirection (the panel has no i18n infrastructure at all).\n\nCaveat lowering confidence: the panel is saturated with other equally-hardcoded English ('required', 'hidden', 'No validation rules.', 'No fields match the current filter.') that are likewise absent from the ledger; this finding cherry-picks 4 of many. That doesn't make it false, but it is a low-severity, developer-only string rather than an end-user admin-panel defect."
+    },
+    {
+      "title": "FieldsInspector 'No validation rules.' empty-state hardcoded",
+      "file": "packages-js/devtools-extension/src/panel/FieldsInspector.tsx",
+      "line": 162,
+      "kind": "missing-i18n",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.devtools.fields.no_rules",
+      "detail": "Visible empty-state <p> 'No validation rules.' is hardcoded English.",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/devtools-extension/src/panel/FieldsInspector.tsx:162: <p className=\"arqel-field-no-rules\">No validation rules.</p> is a hardcoded English empty-state rendered in a user-facing DevTools field-inspector panel (shown when a field has no rules). Not vendored \u2014 located in devtools-extension/src/panel/, not packages-js/ui/src/shadcn/*. Not a duplicate: the i18n-fixed-ledger.json has zero FieldsInspector entries; the only devtools-extension ledger items concern TimeTravel.tsx and InertiaInspector.tsx (toLocaleTimeString locale + ternary pluralization), unrelated to this string. Genuine, novel, user-facing missing-i18n defect."
+    }
+  ]
+}

@@ -54,6 +54,27 @@ it('statDescription() Closure non-string returns null', function (): void {
     expect($widget->data()['statDescription'])->toBeNull();
 });
 
+it('statDescription() localizes a translation key under the active locale', function (): void {
+    app()->setLocale('pt_BR');
+
+    // Literal key passed directly and via Closure both resolve at data() time.
+    expect(
+        StatWidget::make('a')->statDescription('arqel::arqel.actions.create')->data()['statDescription'],
+    )->toBe('Criar');
+
+    expect(
+        StatWidget::make('b')->statDescription(fn () => 'arqel::arqel.actions.edit')->data()['statDescription'],
+    )->toBe('Editar');
+});
+
+it('statDescription() passes a plain literal through unchanged', function (): void {
+    app()->setLocale('pt_BR');
+
+    expect(
+        StatWidget::make('a')->statDescription('+12% vs last week')->data()['statDescription'],
+    )->toBe('+12% vs last week');
+});
+
 it('color() honours canonical palette and falls back to primary on unknown', function (): void {
     expect(StatWidget::make('a')->color('success')->data()['color'])->toBe('success')
         ->and(StatWidget::make('b')->color('danger')->data()['color'])->toBe('danger')

@@ -3,7 +3,7 @@ import { Box, Text } from 'ink';
 import type { ReactElement } from 'react';
 import { type UseDataSourceOptions, useDataSource } from '../hooks/useDataSource.js';
 import { useNavigableList } from '../hooks/useNavigableList.js';
-import { t } from '../i18n.js';
+import { formatNumber, t } from '../i18n.js';
 
 export type ResourceEntry = {
   slug: string;
@@ -63,7 +63,7 @@ export function ResourceBrowser({
           return (
             <Text key={item.slug} {...(active ? { color: 'green' } : {})}>
               {active ? '> ' : '  '}
-              {item.label} ({item.count})
+              {item.label} ({formatNumber(item.count)})
             </Text>
           );
         })}
@@ -83,7 +83,7 @@ export function ResourceBrowser({
           {t('cli.resources.slug', 'slug:')} {selected?.slug ?? '-'}
         </Text>
         <Text>
-          {t('cli.resources.records', 'Records:')} {selected?.count ?? 0}
+          {t('cli.resources.records', 'Records:')} {formatNumber(selected?.count ?? 0)}
         </Text>
         {selected?.description ? <Text>{selected.description}</Text> : null}
       </Box>

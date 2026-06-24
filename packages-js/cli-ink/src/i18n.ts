@@ -79,6 +79,28 @@ export function resolveLocale(env: NodeJS.ProcessEnv = process.env): CliLocale {
   return 'en';
 }
 
+const bcp47ByLocale: Record<CliLocale, string> = {
+  en: 'en',
+  pt_BR: 'pt-BR',
+};
+
+/**
+ * Map the active CLI locale to its BCP-47 tag for `Intl.*` APIs
+ * (e.g. `pt_BR` -> `pt-BR`). Defaults to the resolved environment locale.
+ */
+export function resolveBcp47(locale: CliLocale = resolveLocale()): string {
+  return bcp47ByLocale[locale];
+}
+
+/**
+ * Format an integer/number with locale-aware digit grouping for the active
+ * environment locale (e.g. `12345` -> `12.345` under `pt_BR`, `12,345` under
+ * `en`). Used for KPI tiles and record counts in the TUI.
+ */
+export function formatNumber(value: number, locale: CliLocale = resolveLocale()): string {
+  return new Intl.NumberFormat(resolveBcp47(locale)).format(value);
+}
+
 function interpolate(template: string, replacements?: Replacements): string {
   if (!replacements) return template;
   return template.replace(/:([a-zA-Z_]+)/g, (match, name: string) => {

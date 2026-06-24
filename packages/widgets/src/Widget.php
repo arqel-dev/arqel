@@ -255,7 +255,7 @@ abstract class Widget
      * through unchanged (trans() returns the key when no translation exists).
      * Falls back to the raw value when no translator is bound (unit context).
      */
-    private static function localize(?string $value): ?string
+    protected static function localize(?string $value): ?string
     {
         if ($value === null || ! app()->bound('translator')) {
             return $value;

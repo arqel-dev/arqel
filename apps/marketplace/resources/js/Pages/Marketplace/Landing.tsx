@@ -19,7 +19,7 @@ export default function Landing({
   return (
     <>
       <MetaTags
-        title="Arqel Marketplace — Plugins for Laravel admin panels"
+        title="Arqel Marketplace — Plugins para painéis admin Laravel"
         description="Descubra plugins community para estender seu admin panel Arqel. Fields, widgets, integrações e themes em um só lugar."
         ogImage="/images/og/marketplace-landing.png"
       />
@@ -37,8 +37,8 @@ export default function Landing({
           </Link>
         </section>
 
-        <Section title="Featured" plugins={featured} />
-        <Section title="Trending" plugins={trending} />
+        <Section title="Destaques" plugins={featured} />
+        <Section title="Em alta" plugins={trending} />
         <Section title="Novos esta semana" plugins={newPlugins} />
 
         <section className="mt-12">

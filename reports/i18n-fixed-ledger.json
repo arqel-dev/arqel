@@ -2062,5 +2062,41 @@
     "line": 93,
     "title": "TablePagination page indicator interpolates raw page numbers, bypassing the component's own locale numberFormatter",
     "round": 30
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx",
+    "line": 40,
+    "title": "Visible section heading 'Featured' hardcoded in English",
+    "round": 31
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx",
+    "line": 41,
+    "title": "Visible section heading 'Trending' hardcoded in English",
+    "round": 31
+  },
+  {
+    "file": "apps/marketplace/resources/js/Pages/Marketplace/Landing.tsx",
+    "line": 22,
+    "title": "Browser/og meta title subtitle in English on PT-BR landing page",
+    "round": 31
+  },
+  {
+    "file": "packages/widgets/src/StatWidget.php",
+    "line": 203,
+    "title": "StatWidget statDescription serialized verbatim \u2014 bypasses Widget::localize() applied to the base description",
+    "round": 31
+  },
+  {
+    "file": "packages-js/cli-ink/src/components/Dashboard.tsx",
+    "line": 76,
+    "title": "cli-ink Dashboard KPI values rendered via String(number), bypassing locale number grouping",
+    "round": 31
+  },
+  {
+    "file": "packages-js/cli-ink/src/components/ResourceBrowser.tsx",
+    "line": 66,
+    "title": "cli-ink ResourceBrowser record counts interpolated raw, bypassing locale number grouping",
+    "round": 31
   }
 ]

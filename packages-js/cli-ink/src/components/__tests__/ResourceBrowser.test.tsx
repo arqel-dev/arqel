@@ -46,6 +46,33 @@ describe('ResourceBrowser', () => {
     unmount();
   });
 
+  it('groups record counts with the period separator under a pt_BR locale', async () => {
+    const saved = process.env['LANG'];
+    process.env['LANG'] = 'pt_BR.UTF-8';
+    try {
+      const bigPayload = JSON.stringify([
+        { slug: 'users', label: 'Users', count: 12345, description: 'App users.' },
+      ]);
+      const { lastFrame, unmount } = render(
+        <ResourceBrowser
+          dataDir="/fake"
+          pollMs={0}
+          ioOverrides={{ readFile: () => bigPayload, fileExists: () => true }}
+        />,
+      );
+      await new Promise((r) => setTimeout(r, 10));
+      const frame = lastFrame() ?? '';
+      // Sidebar count and detail-pane "Records:" both grouped.
+      expect(frame).toContain('(12.345)');
+      expect(frame).toContain('12.345');
+      expect(frame).not.toContain('12345');
+      unmount();
+    } finally {
+      if (saved === undefined) delete process.env['LANG'];
+      else process.env['LANG'] = saved;
+    }
+  });
+
   it('renders an error when resources file is missing', async () => {
     const { lastFrame, unmount } = render(
       <ResourceBrowser

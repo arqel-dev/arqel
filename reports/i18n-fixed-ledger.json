@@ -2118,12 +2118,6 @@
     "round": 33
   },
   {
-    "file": "apps/showcase/resources/js/Pages/GridFormDemo.tsx",
-    "line": 64,
-    "title": "Showcase E2E demo heading hardcoded English (GridFormDemo)",
-    "round": 33
-  },
-  {
     "file": "packages-js/devtools-extension/src/panel/InertiaInspector.tsx",
     "line": 148,
     "title": "DevTools InertiaInspector navigation timestamp still uses toLocaleTimeString() with no locale arg (ledger claims fixed, code unchanged)",

@@ -72,7 +72,7 @@ Factory pública. **Não** chame `new TextField('name')` — use `FieldFactory::
 
 ## `Arqel\Fields\ValidationBridge` (final)
 
-Traduz arrays de regras Laravel para schema Zod. 19 translators built-in.
+Traduz arrays de regras Laravel para schema Zod. 21 translators built-in.
 
 | Método | Função |
 |---|---|

@@ -184,8 +184,31 @@ final class RepeaterField extends Field
             'reorderable' => $this->reorderable,
             'collapsible' => $this->collapsible,
             'cloneable' => $this->cloneable,
-            'itemLabel' => $this->itemLabel,
+            'itemLabel' => $this->itemLabel === null
+                ? null
+                : self::localizeLabel($this->itemLabel),
             'relationship' => $this->relationship,
         ];
+    }
+
+    /**
+     * Resolve the item-label template through Laravel translation lazily so the
+     * active request locale applies at serialization time. A template that is a
+     * translation key (e.g. `arqel::...`) renders in the current locale; a plain
+     * literal such as `Address {{label}}` passes through unchanged (Laravel
+     * trans() returns the key when no translation exists). The localization runs
+     * on the whole template before the client-side `{{label}}` interpolation, so
+     * the `{{...}}` tokens survive untouched. Falls back to the raw literal when
+     * no translator is bound (e.g. unit context).
+     */
+    private static function localizeLabel(string $template): string
+    {
+        if (! app()->bound('translator')) {
+            return $template;
+        }
+
+        $translated = trans($template);
+
+        return is_string($translated) ? $translated : $template;
     }
 }

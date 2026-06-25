@@ -21,7 +21,7 @@ export default function Checkout({ plugin, summary }: Props): JSX.Element {
 
   return (
     <>
-      <Head title={`Checkout — ${plugin.name}`} />
+      <Head title={`Finalizar compra — ${plugin.name}`} />
       <main className="mx-auto max-w-2xl px-4 py-12">
         <h1 className="text-2xl font-bold">Finalizar compra</h1>
         <p className="mt-2 text-neutral-600">

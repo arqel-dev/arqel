@@ -1,0 +1,20 @@
+{
+  "total": 2,
+  "confirmed_count": 1,
+  "dupe_count": 1,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Built-in Actions::view()/edit()/restore()/create() factories serialize hardcoded English labels \u2014 never reference the arqel::actions.* keys (unlike deleteBulk)",
+      "file": "packages/actions/src/Actions.php",
+      "line": 18,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::actions.view / arqel::actions.edit / arqel::actions.restore / arqel::actions.create",
+      "detail": "Actions::view() (l.18), edit() (l.26), restore() (l.47) and create() (l.55) never call ->label(). The Action constructor (packages/actions/src/Action.php:94) sets $this->label = Str::of($name)->snake()->replace('_',' ')->title()->toString(), producing literal English 'View'/'Edit'/'Restore'/'Create'. toArray() runs that through localizeAction() (Action.php:379) which is just __($value) \u2014 passing 'View' (not a key) returns 'View' unchanged. So an app using these convenience factories ships English action-menu labels even under pt_BR, while the sibling factory deleteBulk() (l.66) correctly does ->label('arqel::actions.delete_selected'). The translation keys already exist: packages/core/resources/lang/{en,pt_BR}/actions.php define view/edit/delete/restore (pt_BR: Visualizar/Editar/Excluir/Restaurar). Fix: add ->label('arqel::actions.view') etc. to each factory (create has no actions.php key yet \u2014 add one). Framework-hardcoded, not app-must-key.",
+      "confidence": "high",
+      "why_real": "Reproduces at code level. packages/actions/src/Actions.php: view() (l.18), edit() (l.26), restore() (l.47), create() (l.55) never call ->label(). Action::__construct (Action.php:94) seeds $this->label = Str::of($name)->snake()->replace('_',' ')->title()->toString(), yielding literal 'View'/'Edit'/'Restore'/'Create'. toArray() (Action.php:354) serializes 'label' => self::localizeAction($this->label); localizeAction (l.379) is just __($value), so passing the literal 'View' (not a registered key) returns it unchanged. Under pt_BR the action menu therefore shows English. The sibling deleteBulk() (l.66) correctly uses ->label('arqel::actions.delete_selected'). Keys already exist: core/resources/lang/{en,pt_BR}/actions.php define view/edit/delete/restore (pt_BR Visualizar/Editar/Excluir/Restaurar); 'create' key is absent and must be added. Confirmed user-facing: these are public-API factories (referenced in ResourceController/routes for restore) whose labels render in the row/toolbar action menu. NOT vendored shadcn. NOT a duplicate: ledger covers only deleteBulk label (round 16, Actions.php:66) and delete() modal strings (round 11, Action.php:41-44); no ledger entry addresses the view/edit/restore/create factory label gap. Same systemic family as the R16 deleteBulk fix but a distinct, untouched surface (4 sibling factories the R16 fix did not address). Framework-hardcoded, not app-must-key."
+    }
+  ]
+}

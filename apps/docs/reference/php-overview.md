@@ -18,7 +18,7 @@ php artisan arqel:install
 | `arqel-dev/framework` | Meta-package + `InstallCommand` + `MakeUserCommand` | [Core →](/reference/php/core) |
 | `arqel-dev/core` | Resource, ResourceRegistry, Panel, PanelRegistry, controller, middleware | [Core →](/reference/php/core) |
 | `arqel-dev/fields` | Field abstract, FieldFactory, 21 field types, ValidationBridge | [Fields →](/reference/php/fields) |
-| `arqel-dev/table` | Table builder, 9 column types, 6 filter types, TableQueryBuilder | [Table →](/reference/php/table) |
+| `arqel-dev/table` | Table builder, 12 column types, 8 filter types, TableQueryBuilder | [Table →](/reference/php/table) |
 | `arqel-dev/form` | Form builder, 7 layout components, FieldRulesExtractor, FormRequestGenerator | [Form →](/reference/php/form) |
 | `arqel-dev/actions` | Action abstract, 4 variants, Confirmable + HasForm + HasAuthorization, ActionController | [Actions →](/reference/php/actions) |
 | `arqel-dev/auth` | AbilityRegistry, PolicyDiscovery, ArqelGate, EnsureUserCanAccessPanel, helpers | [Auth →](/reference/php/auth) |

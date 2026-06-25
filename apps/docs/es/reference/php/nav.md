@@ -8,7 +8,6 @@ Namespace `Arqel\Nav\`. NavigationItem + NavigationGroup + Navigation builder + 
 |---|---|---|
 | `NavigationItem::make(string $label)` | `self` | Factory |
 | `NavigationItem::resource(class-string<Resource>)` | `self` | Extrae label/icon/sort/URL automáticamente |
-| `label(string)` | `self` | |
 | `icon(string)` | `self` | ID de `lucide-react` |
 | `url(string)` | `self` | XOR con `route` |
 | `route(string $name, array $params = [])` | `self` | XOR con `url` |
@@ -28,7 +27,7 @@ Grupo colapsable.
 | Método | Descripción |
 |---|---|
 | `NavigationGroup::make(string $label)` | Factory |
-| `label(string)`, `icon(string)`, `sort(int)` | Setters base |
+| `icon(string)`, `sort(int)` | Setters base |
 | `collapsible(bool=true)`, `collapsed(bool=true)` | `collapsed()` implica `collapsible()` |
 | `items(array<NavigationItem>)` | Rechaza no-NavigationItem |
 | `addItem(NavigationItem)` | Acumulación dinámica |

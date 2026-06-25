@@ -53,8 +53,8 @@ Use these examples as a starting point when you design your own workflow: copy t
 
 ## See also
 
-- [`packages/workflow/SKILL.md`](../../../packages/workflow/SKILL.md) — the package's canonical context.
-- [`PLANNING/10-fase-3-avancadas.md`](../../../PLANNING/10-fase-3-avancadas.md) §WF-001..WF-010 — tickets that originated the package.
-- [`PLANNING/05-api-php.md`](../../../PLANNING/05-api-php.md) §Workflow — public API reference.
-- [`PLANNING/03-adrs.md`](../../../PLANNING/03-adrs.md) ADR-017 — Authorization is UX-only on the client.
+- [`packages/workflow/SKILL.md`](../../../../packages/workflow/SKILL.md) — the package's canonical context.
+- [`PLANNING/10-fase-3-avancadas.md`](../../../../PLANNING/10-fase-3-avancadas.md) §WF-001..WF-010 — tickets that originated the package.
+- [`PLANNING/05-api-php.md`](../../../../PLANNING/05-api-php.md) §Workflow — public API reference.
+- [`PLANNING/03-adrs.md`](../../../../PLANNING/03-adrs.md) ADR-017 — Authorization is UX-only on the client.
 - [`spatie/laravel-model-states`](https://spatie.be/docs/laravel-model-states) — optional canonical integration (suggest-only).

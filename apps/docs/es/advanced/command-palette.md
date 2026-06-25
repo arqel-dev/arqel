@@ -1,6 +1,6 @@
 # Paleta de comandos (Cmd+K)
 
-> Paquete: [`arqel-dev/core`](../../packages/core/) · Tickets: CMDPAL-001..003
+> Paquete: [`arqel-dev/core`](../../../packages/core/) · Tickets: CMDPAL-001..003
 
 ## Propósito
 
@@ -158,6 +158,6 @@ El endpoint actual es único (`/admin/commands`). Para un frontend separado, ins
 
 ## Relacionado
 
-- [`packages/core/SKILL.md`](../../packages/core/SKILL.md) §CommandPalette
-- [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §CMDPAL-001..003
-- [`PLANNING/01-spec-tecnica.md`](../../PLANNING/01-spec-tecnica.md) §RF-N-08
+- [`packages/core/SKILL.md`](../../../packages/core/SKILL.md) §CommandPalette
+- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §CMDPAL-001..003
+- [`PLANNING/01-spec-tecnica.md`](../../../PLANNING/01-spec-tecnica.md) §RF-N-08

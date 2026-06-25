@@ -53,8 +53,8 @@ Use estes exemplos como ponto de partida quando for desenhar seu próprio workfl
 
 ## Veja também
 
-- [`packages/workflow/SKILL.md`](../../../packages/workflow/SKILL.md) — contexto canônico do pacote.
-- [`PLANNING/10-fase-3-avancadas.md`](../../../PLANNING/10-fase-3-avancadas.md) §WF-001..WF-010 — tickets que originaram o pacote.
-- [`PLANNING/05-api-php.md`](../../../PLANNING/05-api-php.md) §Workflow — referência da API pública.
-- [`PLANNING/03-adrs.md`](../../../PLANNING/03-adrs.md) ADR-017 — Authorization UX-only no client.
+- [`packages/workflow/SKILL.md`](../../../../packages/workflow/SKILL.md) — contexto canônico do pacote.
+- [`PLANNING/10-fase-3-avancadas.md`](../../../../PLANNING/10-fase-3-avancadas.md) §WF-001..WF-010 — tickets que originaram o pacote.
+- [`PLANNING/05-api-php.md`](../../../../PLANNING/05-api-php.md) §Workflow — referência da API pública.
+- [`PLANNING/03-adrs.md`](../../../../PLANNING/03-adrs.md) ADR-017 — Authorization UX-only no client.
 - [`spatie/laravel-model-states`](https://spatie.be/docs/laravel-model-states) — integração canônica opcional (suggest-only).

@@ -82,6 +82,6 @@ apps/docs/
 
 ## Related
 
-- Ticket: [`PLANNING/08-fase-1-mvp.md`](../../PLANNING/08-fase-1-mvp.md) §DOCS-001
+- Ticket: [`PLANNING/08-fase-1-mvp.md`](../../../PLANNING/08-fase-1-mvp.md) §DOCS-001
 - VitePress docs: <https://vitepress.dev/>
 - Decisões: docs site é P1 (não P0) — bloqueante para o launch público mas não para o MVP funcional

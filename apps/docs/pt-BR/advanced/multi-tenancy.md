@@ -1,6 +1,6 @@
 # Multi-tenancy
 
-> Pacote: [`arqel-dev/tenant`](../../packages/tenant/) · Tickets: TENANT-001..015
+> Pacote: [`arqel-dev/tenant`](../../../packages/tenant/) · Tickets: TENANT-001..015
 
 ## Purpose
 
@@ -161,6 +161,6 @@ Tenant sem `analytics` em `features` array → 402 `{error: 'feature_not_availab
 
 ## Related
 
-- [`packages/tenant/SKILL.md`](../../packages/tenant/SKILL.md) — fonte canónica
-- [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §TENANT-001..015
+- [`packages/tenant/SKILL.md`](../../../packages/tenant/SKILL.md) — fonte canónica
+- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §TENANT-001..015
 - [`stancl/tenancy`](https://tenancyforlaravel.com), [`spatie/laravel-multitenancy`](https://spatie.be/docs/laravel-multitenancy)

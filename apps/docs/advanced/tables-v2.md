@@ -1,6 +1,6 @@
 # Tables V2
 
-> Package: [`arqel-dev/table`](../../packages/table/) · Tickets: TABLE-V2-002..010
+> Package: [`arqel-dev/table`](../../../packages/table/) · Tickets: TABLE-V2-002..010
 
 ## Purpose
 
@@ -141,5 +141,5 @@ The reorder operation runs against the visible subset, but the rule **block reor
 
 ## Related
 
-- [`packages/table/SKILL.md`](../../packages/table/SKILL.md)
-- [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §TABLE-V2-002..010
+- [`packages/table/SKILL.md`](../../../packages/table/SKILL.md)
+- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §TABLE-V2-002..010

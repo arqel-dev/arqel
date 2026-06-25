@@ -53,8 +53,8 @@ Usa estos ejemplos como punto de partida cuando diseñes tu propio Workflow: cop
 
 ## Ver también
 
-- [`packages/workflow/SKILL.md`](../../../packages/workflow/SKILL.md) — el contexto canónico del paquete.
-- [`PLANNING/10-fase-3-avancadas.md`](../../../PLANNING/10-fase-3-avancadas.md) §WF-001..WF-010 — tickets que originaron el paquete.
-- [`PLANNING/05-api-php.md`](../../../PLANNING/05-api-php.md) §Workflow — referencia de API pública.
-- [`PLANNING/03-adrs.md`](../../../PLANNING/03-adrs.md) ADR-017 — La autorización es solo UX en el cliente.
+- [`packages/workflow/SKILL.md`](../../../../packages/workflow/SKILL.md) — el contexto canónico del paquete.
+- [`PLANNING/10-fase-3-avancadas.md`](../../../../PLANNING/10-fase-3-avancadas.md) §WF-001..WF-010 — tickets que originaron el paquete.
+- [`PLANNING/05-api-php.md`](../../../../PLANNING/05-api-php.md) §Workflow — referencia de API pública.
+- [`PLANNING/03-adrs.md`](../../../../PLANNING/03-adrs.md) ADR-017 — La autorización es solo UX en el cliente.
 - [`spatie/laravel-model-states`](https://spatie.be/docs/laravel-model-states) — integración canónica opcional (solo sugerida).

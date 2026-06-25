@@ -8,27 +8,18 @@
 
 ## Status
 
-**Setup (FIELDS-ADV-018, scoped):**
+**Implementado (FIELDS-ADV-010..018):**
 
 - Esqueleto do pacote `@arqel-dev/fields-advanced` com 10 entry points subpath (`./`, `./register`, `./rich-text`, `./markdown`, `./code`, `./repeater`, `./builder`, `./key-value`, `./tags`, `./wizard`)
 - `src/register.ts` registra os 8 slots no `FieldRegistry` de `@arqel-dev/ui` envolvendo cada `import()` dinâmico em `React.lazy`, garantindo code-splitting on-demand sem alterar `@arqel-dev/ui`
-- 8 stubs `<Name>Input.tsx` renderizam um placeholder `<div class="rounded border border-dashed ...">{name} not yet implemented (TICKET)</div>` + `<input type="hidden" id={inputId} value={JSON.stringify(value ?? null)} />` para preservar o round-trip do valor no submit do form enquanto o componente real não chegou
-- `src/shared/PlaceholderInput.tsx` centraliza a UI do stub; cada componente é um wrapper trivial
+- Os 8 inputs avançados estão totalmente implementados: `RichTextInput` (Tiptap + extensões), `MarkdownInput` (CodeMirror + remark/rehype preview), `CodeInput` (CodeMirror + Shiki highlight), `RepeaterInput` / `BuilderInput` (dnd-kit reorder), `KeyValueInput`, `TagsInput`, `WizardInput` (multi-step + `<Activity>`)
+- `src/shared/PlaceholderInput.tsx` permanece apenas como fallback genérico para slots ainda não resolvidos
 - `src/shared/types.ts` re-exporta `FieldRendererProps` de `@arqel-dev/ui/form` para imports ergonômicos
 - 1 teste Vitest valida que `import('../src/register.js')` não lança e que os 8 nomes ficam disponíveis em `getFieldComponent()`
 
 ### Coverage
 
 - Total: 81 testes Vitest passando (smoke do `register.ts` cobre os 8 slots + dynamic-import individual de cada módulo lazy)
-
-**Por chegar (FIELDS-ADV-010..017):**
-
-- `RichTextInput` real (Tiptap + extensões)
-- `MarkdownInput` (CodeMirror + remark/rehype preview)
-- `CodeInput` (CodeMirror + Shiki highlight)
-- `RepeaterInput` / `BuilderInput` (dnd-kit reorder)
-- `KeyValueInput`, `TagsInput`
-- `WizardInput` (multi-step + `<Activity>`)
 
 ## Key Contracts
 
@@ -59,7 +50,7 @@ registerField('RichTextInput', MyTiptapInput);
 - **Lazy registration** via `React.lazy(() => import(...).then(m => ({ default: m.X })))` — preserva tree-shaking e gera um chunk por field type
 - **Props canônicas** vêm de `FieldRendererProps` (re-exportado de `./shared/types.js`)
 - **Side-effect entry**: `register.ts` é o único arquivo com `sideEffects: true` no `package.json`
-- **Stubs** sempre emitem `<input type="hidden" id={inputId}>` com o valor serializado para não quebrar submits durante o período de transição
+- **Round-trip do valor**: cada input mantém o valor sincronizado no submit do form (via `<input type="hidden" id={inputId}>` ou binding equivalente do componente)
 
 ## Examples
 

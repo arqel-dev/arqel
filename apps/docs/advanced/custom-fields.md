@@ -1,6 +1,6 @@
 # Advanced fields
 
-> Package: [`arqel-dev/fields-advanced`](../../packages/fields-advanced/) · Tickets: FIELDS-ADV-001..020
+> Package: [`arqel-dev/fields-advanced`](../../../packages/fields-advanced/) · Tickets: FIELDS-ADV-001..020
 
 ## Purpose
 
@@ -157,6 +157,6 @@ Resource lifecycle hooks (`afterCreate`/`afterUpdate`) — cross-package deliver
 
 ## Related
 
-- [`packages/fields-advanced/SKILL.md`](../../packages/fields-advanced/SKILL.md)
-- [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §FIELDS-ADV-001..020
+- [`packages/fields-advanced/SKILL.md`](../../../packages/fields-advanced/SKILL.md)
+- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §FIELDS-ADV-001..020
 - [Tiptap](https://tiptap.dev), [CodeMirror](https://codemirror.net), [Shiki](https://shiki.style)

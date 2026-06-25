@@ -43,8 +43,6 @@ A separação core × advanced existe porque estes types arrastam dependências 
 
 **Por chegar:**
 
-- React components `RichTextInput`/`MarkdownInput`/`CodeInput`/`RepeaterInput`/`BuilderInput`/`KeyValueInput`/`TagsInput`/`WizardInput` (FIELDS-ADV-010..017)
-- Registry boot client-side (FIELDS-ADV-018)
 - Spatie/laravel-tags integration em `TagsField::fromRelationship(...)`
 - Sanitizer trait + FormRequest helper para HTML purification em RichText/Markdown
 - Repeater hidratação/persistência (HasMany binding via Resource lifecycle hooks `afterCreate`/`afterUpdate`)

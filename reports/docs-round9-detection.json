@@ -1,0 +1,92 @@
+{
+  "total": 7,
+  "confirmed_count": 7,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "DateColumn::displayFormat() does not exist",
+      "file": "apps/docs/reference/php/table.md",
+      "line": 33,
+      "kind": "factual-drift",
+      "severity": "high",
+      "dimension": "factual-drift",
+      "suggested_fix": "Replace DateColumn `displayFormat(string)` with the real setters `date(string)` / `dateTime(string)` (plus `since()`, `timezone(string)`) in reference/php/table.md:33 and fix every runnable example (e.g. tutorial-first-crud.md:179 -> ->dateTime('d/m/Y H:i'), from-nova/from-filament -> ->date('d/m/Y')) across en/es/pt-BR.",
+      "detail": "The table reference lists DateColumn's setters as `displayFormat(string)`, `timezone(string)`. The actual class packages/table/src/Columns/DateColumn.php has NO displayFormat() method (and no __call magic, and no inherited displayFormat on the base Column). Its real formatting setters are date(string $format='Y-m-d'), dateTime(string $format='Y-m-d H:i:s'), since(), and timezone(string). A call to DateColumn::make('x')->displayFormat(...) would fatal. This same non-existent method appears in runnable code examples across the corpus: guide/tutorial-first-crud.md:179, guide/resources.md:130, guide/tables-forms.md:30, guide/migration/from-nova.md:149, guide/migration/from-filament.md:153 \u2014 and their es/ and pt-BR/ mirrors. (Note: DateField in the fields package DOES have displayFormat(), so the fields.md rows are correct \u2014 only the DateColumn/table usages are wrong.)",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. apps/docs/reference/php/table.md:33 lists DateColumn's extra setters as `displayFormat(string)`, `timezone(string)`. The real class packages/table/src/Columns/DateColumn.php (final, extends Column) defines its formatting setters as date(string='Y-m-d'), dateTime(string='Y-m-d H:i:s'), since(), and timezone(string) \u2014 there is NO displayFormat() method. The base packages/table/src/Column.php has no displayFormat() and no __call magic (only make() and standard setters), so DateColumn::make('x')->displayFormat(...) would fatal with an undefined-method error. The `timezone(string)` part of the doc row is correct, but `displayFormat(string)` is objectively false/misleading. The doc is in-scope (apps/docs/, not PLANNING/tickets/CHANGELOG/generated) and the finding is not in reports/docs-fixed-ledger.json (no displayFormat entry; the prior table.md ledger entries concern column/filter counts, not this row)."
+    },
+    {
+      "title": "BadgeColumn setter is icons(array), not icon(string)",
+      "file": "apps/docs/reference/php/table.md",
+      "line": 31,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "factual-drift",
+      "suggested_fix": "Change `icon(string)` to `icons(array)` in the BadgeColumn row of reference/php/table.md:31 (and the es/pt-BR mirrors).",
+      "detail": "The reference table lists BadgeColumn's extra setters as `colors(array)`, `icon(string)`. packages/table/src/Columns/BadgeColumn.php only defines colors(array $map) and icons(array $map) \u2014 there is no singular icon(string) method (nor one on the base Column). The icon setter takes a value->icon map (plural).",
+      "confidence": "high",
+      "why_real": "Verified both sides. Doc apps/docs/reference/php/table.md:31 lists BadgeColumn extra setters as `colors(array)`, `icon(string)`. The source packages/table/src/Columns/BadgeColumn.php (final class, extends TextColumn) defines exactly two setters: `colors(array $map): static` (line 23) and `icons(array $map): static` (line 33) \u2014 both take a value->X map array. There is NO singular `icon(string)` method on BadgeColumn, nor on TextColumn, nor on the base Column.php (grep `public function icon(` across packages/table/src returns zero hits). The class docblock itself describes \"value->colour and value->icon maps\". So the doc's `icon(string)` is objectively false on two counts: the method name is plural `icons` and its parameter is an array map, not a string. In-scope (apps/docs, not PLANNING/tickets/CHANGELOG/generated), checkable, and not present in reports/docs-fixed-ledger.json (no badge entry)."
+    },
+    {
+      "title": "IconColumn setters icon()/color() do not exist",
+      "file": "apps/docs/reference/php/table.md",
+      "line": 35,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "factual-drift",
+      "suggested_fix": "Replace the IconColumn setters in reference/php/table.md:35 with the real ones: `options(array)`, `size(string)` (and update es/pt-BR mirrors).",
+      "detail": "The reference lists IconColumn's setters as `icon(string|Closure)`, `color(string|Closure)`. packages/table/src/Columns/IconColumn.php defines neither \u2014 its actual setters are options(array $map) and size(string). Calling ->icon() or ->color() on an IconColumn would fatal.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. apps/docs/reference/php/table.md:35 lists IconColumn extra setters as `icon(string|Closure)`, `color(string|Closure)`. The source packages/table/src/Columns/IconColumn.php (final class extends Column) defines ONLY options(array $map): static and size(string): static \u2014 no icon() and no color(). The Column abstract (Column.php) has no __call magic method and no inherited icon()/color() (grep for __call/function icon/function color returned empty). Therefore calling ->icon() or ->color() on an IconColumn would fatal with an undefined-method error. The doc is in-scope (apps/docs/reference, not PLANNING/tickets/CHANGELOG/generated), the claim is objectively checkable, and it genuinely contradicts current code. Not present in reports/docs-fixed-ledger.json (no IconColumn or table.md:35 entry)."
+    },
+    {
+      "title": "RelationshipColumn has no 3-arg make(name, relation, attribute) factory",
+      "file": "apps/docs/reference/php/table.md",
+      "line": 37,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "factual-drift",
+      "suggested_fix": "In reference/php/table.md:37 replace `factory make(name, relation, attribute)` with `make(name)` + `->display(attribute)` (and update es/pt-BR mirrors).",
+      "detail": "The reference describes RelationshipColumn as `factory make(name, relation, attribute)`. The base Column::make is `make(string $name)` (single arg) and the constructor is `final public function __construct(string $name)`, so no subclass can add a 3-arg make. packages/table/src/Columns/RelationshipColumn.php configures the displayed attribute via the instance method display(string $attribute) \u2014 i.e. usage is RelationshipColumn::make('name')->display('attribute'), not a 3-argument factory.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. Doc apps/docs/reference/php/table.md:37 lists `RelationshipColumn | Eager-loaded relation | factory make(name, relation, attribute)`. The base `Arqel\\Table\\Column` (packages/table/src/Column.php) defines `final public function __construct(string $name)` (line 74) and `public static function make(string $name): static` (line 80) \u2014 single-arg only, and the constructor is final so no subclass can introduce a 3-arg make. packages/table/src/Columns/RelationshipColumn.php has NO make() override; it sets the displayed attribute via the instance method `display(string $attribute)` (line 29) and walks the relation by the column's own `name`. There is no separate `relation` argument. Actual usage is `RelationshipColumn::make('name')->display('attribute')`. The doc's claim of a 3-arg factory make(name, relation, attribute) is objectively false. Doc is in-scope (apps/docs reference, not PLANNING/tickets/changelog/generated), claim is checkable, and no ledger match exists."
+    },
+    {
+      "title": "core README lists non-existent Artisan command arqel:action",
+      "file": "packages/core/README.md",
+      "line": 19,
+      "kind": "broken-ref",
+      "severity": "med",
+      "dimension": "broken-refs",
+      "suggested_fix": "Remove `, `arqel:action`` from the list (keep arqel:install, arqel:resource, arqel:field), or replace it with a command that actually ships, e.g. `arqel:widget`.",
+      "detail": "The line reads `Comandos Artisan: `arqel:install`, `arqel:resource`, `arqel:field`, `arqel:action``. The first three are real commands on disk (packages/core/src/Commands/InstallCommand.php = arqel:install, MakeResourceCommand.php = arqel:resource, packages/fields/src/Commands/MakeFieldCommand.php = arqel:field), but there is NO arqel:action command anywhere. A repo-wide grep for the signature string 'arqel:action' across all packages/* and packages-js/* PHP and TS sources returns zero matches (exit 1); no Console/Command class registers it, and the actions package (packages/actions/src) ships no Console commands at all. The doc claims a command that does not exist. (Distinct from the already-swept 'no Resource::actions() method' item \u2014 this is an Artisan generator command name, not a Resource method.)",
+      "confidence": "high",
+      "why_real": "Verified both sides on disk. packages/core/README.md:19 reads: \"Comandos Artisan: `arqel:install`, `arqel:resource`, `arqel:field`, `arqel:action`\". The first three are real: packages/core/src/Commands/InstallCommand.php (arqel:install), MakeResourceCommand.php (arqel:resource), and packages/fields ships MakeFieldCommand.php (arqel:field). But arqel:action does not exist: a repo-wide PHP grep for \"arqel:action\" across packages/* and packages-js/* returns zero matches (exit 1). The actions package (packages/actions/src) contains Action.php, Actions.php, ActionsServiceProvider.php, Concerns, Http, Types \u2014 no Console/Commands directory and no command class. The only \"arqel:action\" string in the whole repo is in packages-js/mcp-server/planning/05-api-php.md, a forward-looking PLANNING doc, not a registered command. The README is in-scope (a package README, not PLANNING/tickets/superpowers/CHANGELOG/generated), the claim is concretely checkable, and it genuinely contradicts the code. Not in reports/docs-fixed-ledger.json (no arqel:action or core/README entry). Distinct from the already-swept Resource::actions() method finding \u2014 that is an Eloquent/Resource method, this is an Artisan generator command name."
+    },
+    {
+      "title": "core README lists Artisan commands arqel:field and arqel:action that do not exist",
+      "file": "packages/core/README.md",
+      "line": 19,
+      "kind": "broken-ref",
+      "severity": "med",
+      "dimension": "stale-status",
+      "suggested_fix": "Replace the command list with the commands core actually registers, e.g. '`arqel:install`, `arqel:resource`, `arqel:make-user`, `arqel:doctor`, `arqel:audit`, `arqel:introspect`' (drop arqel:field and arqel:action).",
+      "detail": "The 'Posi\u00e7\u00e3o no ecossistema' section claims core provides 'Comandos Artisan: `arqel:install`, `arqel:resource`, `arqel:field`, `arqel:action`'. On disk, packages/core/src/Commands/ contains only InstallCommand (arqel:install), MakeResourceCommand (arqel:resource), and MakeUserCommand (arqel:make-user); ArqelServiceProvider.php registers InstallCommand, MakeResourceCommand, MakeUserCommand, DoctorCommand, IntrospectCommand, AuditCommand, CloudInfoCommand, PulseInfoCommand. There is no MakeFieldCommand/MakeActionCommand and no 'arqel:field' or 'arqel:action' signature anywhere in src/ (grep returns nothing). The two named commands are nonexistent.",
+      "confidence": "high",
+      "why_real": "packages/core/README.md:19 (in-scope: a package README, not PLANNING/tickets/CHANGELOG/generated) claims core provides Artisan commands `arqel:install`, `arqel:resource`, `arqel:field`, `arqel:action`. Verified the contradicting reality on disk: packages/core/src/Commands/ contains only InstallCommand, MakeResourceCommand, MakeUserCommand. ArqelServiceProvider.php registers 8 commands (Install, MakeResource, MakeUser, Doctor, Introspect, Audit, CloudInfo, PulseInfo) \u2014 none named MakeField/MakeAction. grep for 'arqel:field', 'arqel:action', 'MakeFieldCommand', 'MakeActionCommand' across src/ returns nothing. So while arqel:install and arqel:resource are real, arqel:field and arqel:action are nonexistent, making the documented list objectively false/misleading. Not present in docs-fixed-ledger.json (grep exit 1)."
+    },
+    {
+      "title": "core README lists a 'Renderable' contract that does not exist in the package",
+      "file": "packages/core/README.md",
+      "line": 15,
+      "kind": "broken-ref",
+      "severity": "low",
+      "dimension": "stale-status",
+      "suggested_fix": "Remove 'Renderable' from the contracts list so it reads 'Contracts (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`)'.",
+      "detail": "The section lists 'Contracts (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`, `Renderable`)'. packages/core/src/Contracts/ contains only HasActions.php, HasFields.php, HasPolicies.php, HasResource.php \u2014 there is no Renderable contract, and grep -rn 'Renderable' over packages/core/src/ returns no match. The 'Renderable' entry is a phantom contract.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. packages/core/README.md:15 lists contracts \"(HasResource, HasFields, HasActions, HasPolicies, Renderable)\". On disk, packages/core/src/Contracts/ contains only HasActions.php, HasFields.php, HasPolicies.php, HasResource.php \u2014 the four named-and-existing match, but there is NO Renderable contract. grep -rn 'Renderable' over packages/core/src/ returns zero matches, so it is not defined elsewhere in the package either. The README is in-scope (not PLANNING/tickets/changelog/generated) and the claim is checkable. Not present in reports/docs-fixed-ledger.json (grep exit 1). The 'Renderable' entry is a phantom/broken reference \u2014 the doc statement is objectively false."
+    }
+  ]
+}

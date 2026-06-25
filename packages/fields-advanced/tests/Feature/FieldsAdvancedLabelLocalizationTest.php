@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Arqel\FieldsAdvanced\Blocks\Block;
 use Arqel\FieldsAdvanced\Steps\Step;
 use Arqel\FieldsAdvanced\Types\KeyValueField;
+use Arqel\FieldsAdvanced\Types\RepeaterField;
 use Illuminate\Support\Facades\Lang;
 
 it('localizes KeyValueField default column labels per request locale', function (): void {
@@ -83,6 +84,33 @@ it('localizes an explicit Step label that is a translation key', function (): vo
 
     app()->setLocale('pt_BR');
     expect($step->toArray()['label'])->toBe('Perfil');
+});
+
+it('localizes a RepeaterField itemLabel template that is a translation key', function (): void {
+    Lang::addLines(['fields.addresses.item' => 'Address {{label}}'], 'en', 'app');
+    Lang::addLines(['fields.addresses.item' => 'Endereço {{label}}'], 'pt_BR', 'app');
+
+    $field = RepeaterField::make('addresses')->itemLabel('app::fields.addresses.item');
+
+    app()->setLocale('en');
+    expect($field->getTypeSpecificProps()['itemLabel'])->toBe('Address {{label}}');
+
+    app()->setLocale('pt_BR');
+    expect($field->getTypeSpecificProps()['itemLabel'])->toBe('Endereço {{label}}');
+});
+
+it('passes a literal RepeaterField itemLabel through untranslated with {{label}} intact', function (): void {
+    $field = RepeaterField::make('addresses')->itemLabel('Address {{label}}');
+
+    app()->setLocale('pt_BR');
+    expect($field->getTypeSpecificProps()['itemLabel'])->toBe('Address {{label}}');
+});
+
+it('keeps a null RepeaterField itemLabel null', function (): void {
+    $field = RepeaterField::make('addresses');
+
+    app()->setLocale('pt_BR');
+    expect($field->getTypeSpecificProps()['itemLabel'])->toBeNull();
 });
 
 it('passes the humanized Step label fallback through untranslated', function (): void {

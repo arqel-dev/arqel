@@ -201,6 +201,8 @@ return [
         'source' => 'Source: :field',
         'select_placeholder' => 'Select...',
         'image_file' => 'Image file',
+        'image_dropzone' => 'Click or drop image (:accept)',
+        'image_accept_any' => 'any',
         // User-facing error banners (HTTP failure + network error).
         'error_http' => 'Generation failed (HTTP :status).',
         'error_network' => 'Generation failed: network error.',

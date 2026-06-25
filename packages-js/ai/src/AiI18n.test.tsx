@@ -30,6 +30,8 @@ const aiDict = {
       source: 'Fonte: :field',
       select_placeholder: 'Selecionar...',
       image_file: 'Arquivo de imagem',
+      image_dropzone: 'Clique ou solte a imagem (:accept)',
+      image_accept_any: 'qualquer',
       missing_translation: 'Tradução ausente',
       error_http: 'Falha na geração (HTTP :status).',
       error_network: 'Falha na geração: erro de rede.',
@@ -220,6 +222,77 @@ describe('@arqel-dev/ai i18n', () => {
     );
     expect(screen.getByRole('button', { name: 'Analisar com IA' })).toBeInTheDocument();
     expect(screen.getByLabelText('Arquivo de imagem')).toBeInTheDocument();
+  });
+
+  it('AiImageInput localizes the dropzone prompt with the accept hint (pt_BR)', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiImageInput
+        name="img"
+        value={null}
+        props={{
+          analyses: [],
+          populateFields: {},
+          provider: null,
+          acceptedMimes: ['image/png', 'image/webp'],
+          maxFileSize: 0,
+          buttonLabel: '',
+        }}
+        resource="media"
+        field="img"
+      />,
+    );
+    expect(screen.getByText('Clique ou solte a imagem (image/png,image/webp)')).toBeInTheDocument();
+  });
+
+  it('AiImageInput dropzone falls back to the localized "any" hint when accept is empty', () => {
+    setMockTranslations(aiDict);
+    render(
+      <AiImageInput
+        name="img"
+        value={null}
+        props={{
+          analyses: [],
+          populateFields: {},
+          provider: null,
+          acceptedMimes: [],
+          maxFileSize: 0,
+          buttonLabel: '',
+        }}
+        resource="media"
+        field="img"
+      />,
+    );
+    expect(screen.getByText('Clique ou solte a imagem (qualquer)')).toBeInTheDocument();
+  });
+
+  it('AiImageInput dropzone shows the file name once a file is selected', () => {
+    setMockTranslations(aiDict);
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn(() => 'blob:fake-preview'),
+      revokeObjectURL: vi.fn(),
+    });
+    render(
+      <AiImageInput
+        name="img"
+        value={null}
+        props={{
+          analyses: [],
+          populateFields: {},
+          provider: null,
+          acceptedMimes: ['image/png'],
+          maxFileSize: 0,
+          buttonLabel: '',
+        }}
+        resource="media"
+        field="img"
+      />,
+    );
+    const input = screen.getByLabelText('Arquivo de imagem') as HTMLInputElement;
+    const file = new File(['x'], 'holiday-photo.png', { type: 'image/png' });
+    fireEvent.change(input, { target: { files: [file] } });
+    expect(screen.getByText('holiday-photo.png')).toBeInTheDocument();
+    expect(screen.queryByText('Clique ou solte a imagem (image/png)')).not.toBeInTheDocument();
   });
 
   it('AiTranslateInput localizes translate-all-missing and translate-from labels', () => {

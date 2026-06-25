@@ -8,7 +8,7 @@ Advanced React input components for [Arqel](https://arqel.dev) — RichText, Mar
 
 ## Status
 
-🚧 **Pre-alpha** — FIELDS-ADV-018 (scoped) entregue: skeleton do pacote + lazy registry para 8 component slots. Cada slot ainda renderiza um placeholder; as implementações concretas chegam em FIELDS-ADV-010..017.
+🚧 **Pre-alpha** — FIELDS-ADV-010..018 entregues: skeleton do pacote + lazy registry para 8 component slots, com os 8 inputs (RichText, Markdown, Code, Repeater, Builder, KeyValue, Tags, Wizard) totalmente implementados.
 
 ## Install
 

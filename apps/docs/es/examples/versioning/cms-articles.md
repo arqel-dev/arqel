@@ -115,9 +115,8 @@ Para ~5,000 artículos con 50 versiones cada uno, el prune corre en segundos.
 ## Componente React `<VersionTimeline>`
 
 ```tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react';
-import { useArqelEndpoint } from '@arqel-dev/core/hooks';
 
 type VersionItem = {
   id: number;
@@ -135,12 +134,24 @@ export function VersionTimeline({
   resource: string;
   recordId: number;
 }) {
-  const { data, isLoading } = useArqelEndpoint<{
+  type HistoryResponse = {
     versions: { data: VersionItem[]; total: number };
     meta: { keep_versions: number };
-  }>('arqel.versioning.history', { resource, id: recordId });
+  };
 
+  const [data, setData] = useState<HistoryResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [pendingRestore, setPendingRestore] = useState<VersionItem | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(route('arqel.versioning.history', { resource, id: recordId }), {
+      headers: { Accept: 'application/json' },
+    })
+      .then((res) => res.json() as Promise<HistoryResponse>)
+      .then(setData)
+      .finally(() => setIsLoading(false));
+  }, [resource, recordId]);
 
   if (isLoading) return <div>Loading history…</div>;
 

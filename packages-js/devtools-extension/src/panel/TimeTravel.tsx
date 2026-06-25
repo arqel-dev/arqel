@@ -32,24 +32,19 @@ export interface TimeTravelProps {
 
 const SLOW_THRESHOLD_MS = 100;
 
-// The devtools panel is an internal, English-only developer tool and has no
-// translator wired (no useArqelTranslations / trans imports anywhere in this
-// package). Until i18n is introduced here, use Intl.PluralRules instead of a
-// naive `+ 's'` so the plural category is selected by locale rules rather than
-// hardcoded. English ('en') is intentional for this tooling surface.
-const SNAPSHOT_PLURAL_RULES = new Intl.PluralRules('en');
-const SNAPSHOT_LABELS: Readonly<Record<Intl.LDMLPluralRule, string>> = {
-  zero: 'snapshots',
-  one: 'snapshot',
-  two: 'snapshots',
-  few: 'snapshots',
-  many: 'snapshots',
-  other: 'snapshots',
-};
-
+// The snapshot-count noun is localized through the panel's self-contained
+// i18n: the plural category is selected by the active locale's CLDR rules
+// (via localeBcp47()), and the singular/other noun comes from the keyed
+// dictionary, with :count interpolated. The 'one' category maps to the
+// *_one key; everything else to *_other.
 function snapshotCountLabel(count: number): string {
-  const category = SNAPSHOT_PLURAL_RULES.select(count);
-  return `${count} ${SNAPSHOT_LABELS[category]}`;
+  const category = new Intl.PluralRules(localeBcp47()).select(count);
+  const key =
+    category === 'one'
+      ? 'devtools.time_travel.snapshot_count_one'
+      : 'devtools.time_travel.snapshot_count_other';
+  const fallback = category === 'one' ? ':count snapshot' : ':count snapshots';
+  return t(key, fallback, { count });
 }
 
 export function TimeTravel({ snapshots, onReplay }: TimeTravelProps) {

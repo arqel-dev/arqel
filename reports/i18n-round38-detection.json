@@ -1,0 +1,20 @@
+{
+  "total": 2,
+  "confirmed_count": 1,
+  "dupe_count": 1,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "TimeTravel snapshot-count noun hardcoded English + Intl.PluralRules('en') bypasses the wired devtools translator/localeBcp47()",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+      "line": 40,
+      "kind": "locale-format",
+      "severity": "low",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "devtools.time_travel.snapshot_count",
+      "detail": "snapshotCountLabel() (defined lines 40-52, rendered at line 80 in the panel header as `${count} ${SNAPSHOT_LABELS[category]}`) hardcodes `new Intl.PluralRules('en')` and an English-only SNAPSHOT_LABELS map ('snapshot'/'snapshots'). The leading comment (lines 34-39) asserts 'the devtools panel ... has no translator wired (no useArqelTranslations / trans imports anywhere in this package)' \u2014 but this is now FALSE: line 15 imports `{ localeBcp47, t } from './i18n.js'`, and sibling panels already localize via that infra (FieldsInspector.tsx:58 uses `new Intl.NumberFormat(localeBcp47())`, InertiaInspector.tsx:148 uses `toLocaleTimeString(localeBcp47())`, and TimeTravel itself uses `t()` for its empty-state at line 62). The self-contained i18n `t()` supports `:placeholder` interpolation, so the count line should route through it (e.g. `t('devtools.time_travel.snapshot_count', '{count} snapshots', { count })` with a localized noun, selecting plural via `localeBcp47()` rather than 'en'). NOTE FOR LEDGER-DEDUP: ledger line 56 ('snapshot count uses naive English ternary pluralization') recorded the prior fix that replaced the ternary with this Intl.PluralRules block \u2014 but the residual hardcoded 'en' locale + untranslated English noun + the now-stale/false 'no translator wired' comment were NOT themselves enumerated and remain a live locale-format/i18n inconsistency vs. the file's own siblings. Visible text (panel header), not aria.",
+      "confidence": "high",
+      "why_real": "Verified at /home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/TimeTravel.tsx:40-52. snapshotCountLabel() hardcodes `new Intl.PluralRules('en')` and an English-only SNAPSHOT_LABELS map ('snapshot'/'snapshots'), rendered in the panel header at line 80 (data-testid=\"time-travel-counter\"). This is visible UI text, not aria, and not a vendored shadcn primitive.\n\nThe leading comment (lines 35-39) asserting \"no translator wired (no useArqelTranslations / trans imports anywhere in this package)\" is now demonstrably FALSE: line 15 imports `{ localeBcp47, t } from './i18n.js'`. Siblings localize through it \u2014 FieldsInspector.tsx:58 uses `new Intl.NumberFormat(localeBcp47())`, InertiaInspector localizes timestamps, and TimeTravel's OWN empty-state at line 62 uses `t(...)`. The self-contained i18n.ts supports `:placeholder` interpolation (lines 13, 180-184), so the count line should route through `t()` with the noun localized and plural category selected via `localeBcp47()` rather than the literal 'en'. Result: a non-English devtools locale renders an English noun and English plural rules in the header, inconsistent with the file's own neighbors.\n\nLedger dedup: ledger line 1565 (round 12) is the ONLY snapshot-count entry and reads \"DevTools TimeTravel snapshot count uses naive English ternary pluralization\" \u2014 that was the prior fix which REPLACED a `+ 's'`/ternary with this very Intl.PluralRules('en') block. The residual hardcoded 'en' locale, the untranslated English noun, and the now-stale false comment were not themselves enumerated. Other TimeTravel ledger entries (lines 1299 timestamp, 1875 replay aria-label, 1935 empty-state, 2127 timestamp) are unrelated defects. So this is novel, not a duplicate of R1-R37."
+    }
+  ]
+}

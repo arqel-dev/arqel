@@ -17,7 +17,7 @@ Esta página describe cómo habilitar **edición colaborativa multi-usuario** en
 ## Requisitos previos
 
 - Laravel 12+ (testeado en 12.x y 13.x).
-- `arqel-dev/realtime` instalado y booteado (ya incluido en cualquier proyecto que instaló el meta-paquete `arqel-dev/framework`).
+- `arqel-dev/realtime` instalado y booteado — es una instalación aparte (`composer require arqel-dev/realtime`), no incluida por el meta-paquete `arqel-dev/framework`.
 - Setup mínimo de auth y policies — el canal aplica la ability `view` sobre el registro, honrando tanto un Gate `view` como una Policy registrada (#92).
 
 ## Instalación

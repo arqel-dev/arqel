@@ -29,7 +29,7 @@ composer require arqel-dev/framework
 php artisan arqel:install
 ```
 
-O `composer require arqel-dev/framework` puxa o stack completo via meta-package: core, auth, fields, form, actions, nav, table + `inertiajs/inertia-laravel`.
+O `composer require arqel-dev/framework` puxa o stack completo via meta-package: core, auth, fields, form, actions, nav, table, widgets + `inertiajs/inertia-laravel`.
 
 O `arqel:install` faz **tudo o resto**: scaffold PHP + middleware + Vite config + instalação dos pacotes JS + auth pages prontas. Quando perguntar pelo gestor de pacotes JS, escolhe `pnpm` (ou `npm`/`yarn`).
 

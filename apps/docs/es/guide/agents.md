@@ -15,71 +15,64 @@ Con `AGENTS.md`, el agente lo lee una vez al inicio de la sesión y se mantiene 
 
 ## Lo que Arqel genera
 
-`php artisan arqel:install` crea un `AGENTS.md` en la raíz del proyecto del usuario con 7 secciones:
+`php artisan arqel:install` crea un `AGENTS.md` en la raíz del proyecto del usuario con 5 secciones:
 
-### 1. Proyecto
+### 1. Project overview
+
+Nombra la app, su versión de Arqel y el stack (PHP, Laravel, Inertia 3 + React 19 + Tailwind v4), y señala dónde viven los Resources y las páginas Inertia:
 
 ```markdown
-**Name:** Acme Admin
-**Description:** Admin panel for system X
-**Stack:** Laravel 12 + Inertia 3 + React 19 + Arqel
+Esta aplicação usa **Arqel** — admin panels declarativos em PHP, renderizados
+em React via Inertia.
+
+- Arqel Resources vivem em `app/Arqel/Resources/`
+- Pages Inertia geradas em `resources/js/Pages/Arqel/`
 ```
 
-### 2. Stack
+### 2. Key conventions
 
-Lista las versiones mínimas (PHP 8.3+, Node 20.9+, etc.) y las libs principales. **Crítico:** menciona explícitamente que **Inertia es el único bridge PHP↔React permitido** ([ADR-001](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md)) — evitando que el agente sugiera TanStack Query.
+- **Inertia-only:** nunca añadir TanStack Query, SWR, u otras fetch libs para el CRUD de Resources ([ADR-016](https://github.com/arqel-dev/arqel/blob/main/PLANNING/03-adrs.md))
+- Los Resources son la fuente de la verdad — la UI deriva de la definición en PHP
+- Tests-first (Pest para PHP + Vitest para JS)
+- Clases `final` por defecto
+- `declare(strict_types=1)` en cada archivo PHP nuevo
 
-### 3. Comandos frecuentes
+### 3. Commands
 
 ```bash
-composer install && pnpm install
-php artisan serve
-pnpm dev
+# Scaffold de un nuevo Resource
+php artisan arqel:resource <Model>
+
+# Correr tests
 vendor/bin/pest
-pnpm test
-vendor/bin/pint
-pnpm lint
+npm run test
+
+# Build / dev
+npm run build
+npm run dev
+php artisan serve
 ```
 
-### 4. Convenciones obligatorias
+### 4. Architecture
 
-- Idioma: inglés para código, PT-BR para docs/comunicación
-- `declare(strict_types=1)` en cada archivo PHP
-- Clases `final` por defecto
-- Conventional Commits + DCO sign-off
-- Tests-first (sin PR sin tests)
-
-### 5. Estructura
+Un árbol del layout del proyecto — `app/Arqel/Resources` y `Widgets`, el `ArqelServiceProvider`, `config/arqel.php` y `resources/js/Pages/Arqel/`:
 
 ```
 app/
-  Arqel/
-    Resources/   # Resources de Arqel
-    Widgets/     # Widgets del dashboard
-  Models/        # Eloquent
-  Policies/      # Policies de Laravel
-resources/
-  js/
-    Pages/Arqel/   # Páginas Inertia (sobrescriben los defaults de Arqel)
-    Arqel/Fields/  # Fields React personalizados
-  css/app.css      # @import 'tailwindcss' + @arqel-dev/ui
+├── Arqel/
+│   ├── Resources/      ← Definiciones de Resource (CRUD declarativo)
+│   └── Widgets/        ← Widgets del dashboard
+config/
+└── arqel.php           ← Path, guard, namespaces
+resources/js/
+└── Pages/Arqel/        ← Páginas Inertia (auto-resueltas)
 ```
 
-### 6. Resumen de arquitectura
-
-Resume los principales RF/RNF y apunta al `docs/` interno y a los SKILLs de los paquetes Arqel:
-
-- `vendor/arqel-dev/core/SKILL.md`
-- `vendor/arqel-dev/fields/SKILL.md`
-- `vendor/arqel-dev/table/SKILL.md`
-- ...
-
-### 7. Enlaces
+### 5. Recursos adicionais
 
 - Sitio de documentación de Arqel
-- Source en GitHub
-- ADRs canónicos
-- Slack/Discord de la comunidad
+- Issues en GitHub
+- El SKILL.md de cada paquete Arqel en `vendor/arqel-dev/*/SKILL.md`
 
 ## Cómo personalizar
 
@@ -107,27 +100,33 @@ O mira el propio `AGENTS.md` del monorepo de Arqel como referencia:
 
 - [`AGENTS.md` en GitHub](https://github.com/arqel-dev/arqel/blob/main/AGENTS.md)
 
-## MCP — Model Context Protocol (stub)
+## MCP — Model Context Protocol
 
-Junto con `AGENTS.md`, Arqel expone un **servidor MCP** (stub en Fase 1, completo en Fase 2) que permite a los LLMs **explorar el panel en runtime**:
+Junto con `AGENTS.md`, Arqel entrega un **servidor MCP** que permite a los LLMs explorar el framework y el panel. Corre vía stdio y se publica en npm como `@arqel-dev/mcp-server`:
 
-```ts
-// Preview Fase 2
-import { ArqelMcpServer } from '@arqel-dev/mcp';
-
-const server = new ArqelMcpServer({ panel: 'admin' });
-// Tools: list-resources, get-resource-fields, list-actions, ...
+```jsonc
+// .mcp.json / config de Claude Desktop
+{
+  "mcpServers": {
+    "arqel": {
+      "command": "npx",
+      "args": ["-y", "@arqel-dev/mcp-server"]
+    }
+  }
+}
 ```
 
-Tools planificadas:
+Expone 7 tools:
 
-- `list-resources` — devuelve `[{ slug, label, model }]`
-- `get-resource-fields(slug)` — schema de los fields del Resource
-- `list-actions(slug)` — actions disponibles
-- `query-resource(slug, filters?, sort?, perPage?)` — preview del payload del index
-- `inspect-policy(slug)` — métodos de Policy + sus checks
+- `search_docs` — búsqueda full-text en la documentación
+- `get_adr` — obtiene un ADR canónico por número
+- `get_api_reference` — consulta un símbolo de la API PHP/React
+- `list_resources` — lista los Resources registrados en el proyecto
+- `describe_resource` — fields, table y form schema de un Resource
+- `generate_resource` — genera el scaffold de un nuevo Resource
+- `generate_field` — genera el scaffold de un field personalizado
 
-Hoy el agente lee `AGENTS.md` + SKILL.md estáticamente. En Fase 2, el servidor MCP habilita queries dinámicas — `"qué fields expone PostResource ahora mismo?"` devuelve el schema en vivo vía stdio JSON-RPC.
+El lado PHP (composer `arqel-dev/mcp`) implementa el core JSON-RPC del `McpServer` más los registries de tool/resource/prompt. El único follow-up pendiente es el comando Artisan `arqel:mcp:serve`; hasta que llegue, los integradores pueden llamar a `McpServer::serve()` desde un script personalizado. Mira la [guía del servidor MCP](/es/guide/mcp-server) para el setup completo.
 
 ## Enlaces relacionados
 

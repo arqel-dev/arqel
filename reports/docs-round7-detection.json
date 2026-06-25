@@ -1,0 +1,68 @@
+{
+  "total": 5,
+  "confirmed_count": 5,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "export SKILL Purpose calls the package 's\u00f3 o esqueleto (stubs)' with simple-excel/dompdf behind suggest: \u2014 both are now real and in require",
+      "file": "packages/export/SKILL.md",
+      "line": 7,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "factual-drift",
+      "suggested_fix": "Rewrite the Purpose line to state that the three exporters (CSV/XLSX/PDF) are fully implemented and that spatie/simple-excel and dompdf/dompdf are hard 'require' dependencies (no longer suggest:). Drop 's\u00f3 o esqueleto (stubs)'.",
+      "detail": "The Purpose line states: 'O pacote \u00e9 s\u00f3 o esqueleto (interfaces + enum + stubs); as implementa\u00e7\u00f5es reais ficam atr\u00e1s de `suggest:` em `composer.json` para que panels que n\u00e3o exportam nada n\u00e3o precisem instalar `spatie/simple-excel` nem `dompdf/dompdf`.' This is false on disk now. packages/export/composer.json 'require' includes both 'dompdf/dompdf': '^3.0' and 'spatie/simple-excel': '^3.0' (and 'suggest' is absent entirely). The package's own Status sections immediately below (EXPORT-002/003/004) document CsvExporter, XlsxExporter and PdfExporter as 'implementa\u00e7\u00e3o real' \u2014 not stubs. So the Purpose summary contradicts both composer.json and the rest of the same file.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides on disk. SKILL.md:7 Purpose claims the package is 's\u00f3 o esqueleto (interfaces + enum + stubs)' with real impls behind `suggest:` in composer.json so panels need not install spatie/simple-excel nor dompdf/dompdf. But packages/export/composer.json has NO `suggest` section and lists both 'dompdf/dompdf': '^3.0' (line 25) and 'spatie/simple-excel': '^3.0' (line 28) directly in `require`. The same SKILL.md's Status sections (EXPORT-002/003/004) describe CsvExporter, XlsxExporter, and PdfExporter as 'implementa\u00e7\u00e3o real' \u2014 not stubs. The Purpose summary is objectively false/misleading vs both composer.json and the rest of the file. In-scope (packages/export/SKILL.md), checkable, not in the ledger (ledger only has hooks/useTheme and workflow/WorkflowVisualizer entries)."
+    },
+    {
+      "title": "export SKILL Anti-patterns claims simple-excel & dompdf stay in suggest: until needed \u2014 they are now hard require deps",
+      "file": "packages/export/SKILL.md",
+      "line": 78,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "factual-drift",
+      "suggested_fix": "Update the bullet to reflect that simple-excel and dompdf are now unconditional 'require' deps; if the suggest:-posture guidance is meant as forward advice, reword it as an aspirational note rather than a description of current composer.json state.",
+      "detail": "The Anti-patterns bullet states: 'Hard deps em libs de export (simple-excel, dompdf) ficam em `suggest:` at\u00e9 serem efetivamente exigidas pelo exporter correspondente \u2014 apps que s\u00f3 usam CSV n\u00e3o pagam o custo de instalar dompdf'. This is no longer true: packages/export/composer.json places both 'spatie/simple-excel': '^3.0' and 'dompdf/dompdf': '^3.0' in 'require' (there is no 'suggest' section). The file's own EXPORT-002/004 Status entries explicitly note each was 'promovido de suggest para require'. So a CSV-only app DOES install dompdf, contradicting this bullet.",
+      "confidence": "high",
+      "why_real": "Verified both sides on disk. packages/export/composer.json places BOTH dompdf/dompdf:^3.0 (line 25) and spatie/simple-excel:^3.0 (line 28) in the 'require' block, with NO 'suggest' section. SKILL.md:78 (Anti-patterns) claims these hard deps stay in 'suggest:' until needed so a CSV-only app does not install dompdf \u2014 objectively false vs current code. The same SKILL.md corroborates the drift: lines 25 and 41 explicitly state each lib was 'promovido de suggest para require'. So line 78 is internally contradicted and contradicts the real composer.json. In-scope (package SKILL.md, not PLANNING/tickets/CHANGELOG), checkable, and not present in the ledger (existing entries are about hooks/useTheme and workflow exports)."
+    },
+    {
+      "title": "CLAUDE.md names ESLint as the JS linter, but the project uses Biome (no ESLint anywhere)",
+      "file": "CLAUDE.md",
+      "line": 211,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "broken-refs",
+      "suggested_fix": "Replace `ESLint` with `Biome` on line 211 (`pnpm lint  # Biome`) and line 247 (`Lint limpo (Pint + Biome)`).",
+      "detail": "CLAUDE.md line 211 documents `pnpm lint  # ESLint` and line 247's commit checklist says `Lint limpo (Pint + ESLint)`. The repo has no ESLint: there is no `.eslintrc*`/`eslint.config*` and no `eslint` dependency in any package.json. `pnpm lint` is defined in the root package.json as `biome check .` (biome.json is present). The root READMEs were already corrected to read `pnpm lint # biome + pint`; CLAUDE.md is the remaining doc with the stale tool name, in two places (lines 211 and 247). This is an objectively-checkable renamed-tool reference, not a wording preference.",
+      "confidence": "high",
+      "why_real": "Verified both sides on disk. CLAUDE.md line 211 documents `pnpm lint  # ESLint` and line 247's commit checklist says `Lint limpo (Pint + ESLint)`. Reality: root package.json defines `\"lint\": \"biome check .\"`, biome.json exists, and there is no ESLint anywhere (no .eslintrc*/eslint.config* files, no eslint dependency in any package.json \u2014 grep for the eslint dependency returned nothing). CLAUDE.md is in-scope (project doc, not PLANNING/tickets/CHANGELOG/generated). The ledger (reports/docs-fixed-ledger.json) has no eslint or CLAUDE.md entry. This is an objectively-checkable renamed-tool reference (ESLint vs Biome), not a wording nit, and it genuinely contradicts the current code."
+    },
+    {
+      "title": "release-checklist-v0.8.md invokes setup-test-app.sh with a --version flag the script does not accept",
+      "file": "docs/release-checklist-v0.8.md",
+      "line": 169,
+      "kind": "broken-ref",
+      "severity": "low",
+      "dimension": "broken-refs",
+      "suggested_fix": "Drop the nonexistent flag \u2014 the script takes a path, not a version. Either `./scripts/setup-test-app.sh ~/PhpstormProjects/arqel-test` (then `composer require` the pinned version manually, as the following checklist bullets already do), or remove the `--version=...` argument.",
+      "detail": "Line 169 calls `./scripts/setup-test-app.sh --version=0.8.0-rc.1`. scripts/setup-test-app.sh parses no flags: its only argument is a positional target-app path (`TARGET_APP=\"${1:-${ARQEL_ROOT%/*}/arqel-test}\"`, header docs line 9-11 confirm 'Override with the first positional argument'). There is no getopts/`--version` handling. Passing `--version=0.8.0-rc.1` would be silently treated as the target-app path, not a version selector, so the documented step does not do what it claims.",
+      "confidence": "high",
+      "why_real": "Verified both sides on disk. docs/release-checklist-v0.8.md:169 calls `./scripts/setup-test-app.sh --version=0.8.0-rc.1`. The script scripts/setup-test-app.sh parses no flags: its only argument is the positional `TARGET_APP=\"${1:-${ARQEL_ROOT%/*}/arqel-test}\"` (line 38), and the header comment (lines 9-11) explicitly documents that the first positional argument overrides the target-app path. grep for `--version`/`getopts`/`case`/`shift` finds no argument-parsing logic. Thus `--version=0.8.0-rc.1` would be consumed as the target-app path, not a version selector, so the documented step is objectively misleading. File is in-scope (docs/, not PLANNING/tickets/superpowers/CHANGELOG/generated) and not in the ledger (which has no docs/release-checklist-v0.8.md entry). Claim is checkable and confirmed false."
+    },
+    {
+      "title": "README phase-status claims 'Phase 3 closed' but the linked source-of-truth (docs/tickets/current.md) marks only Phases 1+2 as delivered and groups Phase 3 with Phase 4 as merely 'functional packages'",
+      "file": "README.md",
+      "line": 14,
+      "kind": "stale-status",
+      "severity": "med",
+      "dimension": "stale-status",
+      "suggested_fix": "Align the three READMEs with current.md: change to 'Phases 1 and 2 closed. Phases 3 and 4 in progress (functional packages on disk).' and update the pt-BR roadmap table row 'Fase 3 \u2014 Avan\u00e7adas' from '\u2705 Fechada' to '\ud83d\udea7 Em progresso' (or reconcile current.md instead if Phase 3 is in fact considered closed).",
+      "detail": "README.md:14 (EN) states \"Phases 1, 2 and 3 closed. Phase 4 in progress\". README.pt-BR.md:14 mirrors this (\"Fases 1, 2 e 3 fechadas. Fase 4 em andamento\") and its roadmap table at README.pt-BR.md:108-111 explicitly marks Fase 3 \u2014 Avan\u00e7adas as '\u2705 Fechada'. README.es.md:14 mirrors it (\"Phases 1, 2 y 3 cerradas\"). The README's own explicitly-linked source-of-truth, docs/tickets/current.md:13-15, says the opposite: \"Fase 1 (MVP) e Fase 2 (essenciais) est\u00e3o entregues; Fases 3 e 4 t\u00eam pacotes funcionais n\u00e3o rastreados neste arquivo\" \u2014 i.e. only Phases 1 and 2 are delivered/closed, and Phase 3 is grouped together with Phase 4 as partial ('t\u00eam pacotes funcionais'), NOT closed. current.md:45-46 likewise lists Phase 3 packages (ai/realtime/versioning/workflow) and Phase 4 packages (marketplace/devtools/i18n/a11y/theme) together as 'n\u00e3o logados como conclu\u00eddos'. So the READMEs promote Phase 3 to 'closed', contradicting the live snapshot they point readers to.",
+      "confidence": "med",
+      "why_real": "Confirmed both sides on disk. README.md:14 (EN) states \"Phases 1, 2 and 3 closed. Phase 4 in progress\" and explicitly directs readers to docs/tickets/current.md as the \"live snapshot.\" README.pt-BR.md:14 mirrors it (\"Fases 1, 2 e 3 fechadas\"), and its roadmap table at README.pt-BR.md:110 marks \"Fase 3 \u2014 Avan\u00e7adas\" as \"\u2705 Fechada.\" README.es.md:14 (\"Phases 1, 2 y 3 cerradas\") and README.es.md:110 (\"Phase 3 \u2014 Advanced ... \u2705 Cerrada\") mirror it.\n\nThe cited source-of-truth contradicts this: current.md:13-15 says \"Fase 1 (MVP) e Fase 2 (essenciais) est\u00e3o entregues; Fases 3 e 4 t\u00eam pacotes funcionais n\u00e3o rastreados neste arquivo\" \u2014 i.e. only Phases 1 and 2 are delivered, and Phase 3 is grouped with the in-progress Phase 4. current.md:43-46 lists Phase 3 packages (ai/realtime/versioning/workflow) alongside Phase 4 packages as \"n\u00e3o logados como conclu\u00eddos.\" So the README definitively promotes Phase 3 to \"closed\" while the document it explicitly cites as authoritative groups Phase 3 with the unfinished Phase 4 as partial/untracked.\n\nIn-scope: README.md/README.pt-BR.md/README.es.md are not PLANNING, not docs/tickets, not generated, not CHANGELOG. Not in ledger (grep for phase/closed/stale-status found no matching entry). Checkable claim, genuine objective status contradiction between a doc and its own cited source-of-truth.\n\nMinor caveat lowering confidence to med: current.md frames Phase 3 as \"untracked/not logged\" rather than positively asserting the features are unbuilt (it notes the packages exist on disk and pass tests). So the contradiction is one of declared *status* (closed vs. not-logged-as-complete/grouped-with-in-progress) rather than of feature existence. But the README's \"closed\" claim is still objectively at odds with the snapshot it points to."
+    }
+  ]
+}

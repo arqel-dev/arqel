@@ -127,7 +127,7 @@ abstract class Filter
             'name' => $this->name,
             'type' => $this->type,
             'component' => $this->component,
-            'label' => $this->label,
+            'label' => self::localizeLabel($this->label),
             'default' => $this->resolveDefault(),
         ], $this->getTypeSpecificProps());
     }
@@ -140,5 +140,23 @@ abstract class Filter
     protected function resolveDefault(): mixed
     {
         return $this->default;
+    }
+
+    /**
+     * Resolve a label through Laravel translation lazily so the active request
+     * locale applies at serialization time. A label that is a translation key
+     * renders in the current locale; a plain literal passes through unchanged
+     * (Laravel __() returns the key when no translation exists). Falls back to
+     * the raw literal when no translator is bound (e.g. unit context).
+     */
+    protected static function localizeLabel(string $label): string
+    {
+        if (! app()->bound('translator')) {
+            return $label;
+        }
+
+        $translated = trans($label);
+
+        return is_string($translated) ? $translated : $label;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Widgets\Filters\DateRangeFilter;
 use Arqel\Widgets\Filters\SelectFilter;
+use Illuminate\Support\Facades\Lang;
 
 it('DateRangeFilter::make + label + defaultRange produces canonical toArray shape', function (): void {
     $from = new DateTimeImmutable('2026-01-01T00:00:00+00:00');
@@ -95,4 +96,23 @@ it('Filter::default stores arbitrary values', function (): void {
     $payload = SelectFilter::make('s')->default('all')->toArray();
 
     expect($payload['default'])->toBe('all');
+});
+
+it('localizes the filter label + select option labels by the active locale', function (): void {
+    Lang::addLines(['filters.status' => 'Status'], 'en', 'app');
+    Lang::addLines(['filters.status' => 'Situação'], 'pt_BR', 'app');
+    Lang::addLines(['filters.active' => 'Active'], 'en', 'app');
+    Lang::addLines(['filters.active' => 'Ativo'], 'pt_BR', 'app');
+
+    $filter = SelectFilter::make('status')
+        ->label('app::filters.status')
+        ->options(['active' => 'app::filters.active', 'raw' => 'Raw label']);
+
+    app()->setLocale('pt_BR');
+    $payload = $filter->toArray();
+
+    // A translation-key label/option resolves in the active locale;
+    // a plain literal ('Raw label') passes through unchanged.
+    expect($payload['label'])->toBe('Situação')
+        ->and($payload['options'])->toBe(['active' => 'Ativo', 'raw' => 'Raw label']);
 });

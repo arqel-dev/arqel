@@ -28,7 +28,7 @@ const versions: Version[] = [
 
 export default function VersionsDemo(): JSX.Element {
   return (
-    <main id="arqel-main" className="p-6">
+    <main id="arqel-main">
       <h1 className="mb-4 text-xl font-semibold">Version History Demo</h1>
       <VersionHistoryDrawer resource="posts" id={1} versions={versions} />
     </main>

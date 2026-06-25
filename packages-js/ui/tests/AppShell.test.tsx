@@ -43,7 +43,18 @@ describe('AppShell', () => {
     expect(container.querySelector('aside')).toBeNull();
   });
 
-  it('renders bare children in full-width', () => {
+  it('pads the content main below the topbar (so content does not hug the chrome)', () => {
+    const { container } = render(
+      <AppShell variant="topbar-only" topbar={<header />}>
+        <div>x</div>
+      </AppShell>,
+    );
+    const main = container.querySelector('main');
+    expect(main?.className).toMatch(/\bp-4\b/);
+    expect(main?.className).toMatch(/\bmd:p-6\b/);
+  });
+
+  it('renders bare children in full-width (no content padding — full-bleed)', () => {
     const { container } = render(
       <AppShell variant="full-width" topbar={<header data-testid="tb" />}>
         <div data-testid="main">x</div>
@@ -54,5 +65,7 @@ describe('AppShell', () => {
     );
     expect(screen.queryByTestId('tb')).toBeNull();
     expect(screen.getByTestId('main')).toBeInTheDocument();
+    // full-width is intentionally padding-free: no <main> wrapper at all.
+    expect(container.querySelector('main')).toBeNull();
   });
 });

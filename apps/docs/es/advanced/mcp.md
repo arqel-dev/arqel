@@ -1,6 +1,6 @@
 # Servidor MCP
 
-> Paquete: [`arqel-dev/mcp`](../../packages/mcp/) · Tickets: MCP-001..010
+> Paquete: [`arqel-dev/mcp`](../../../packages/mcp/) · Tickets: MCP-001..010
 
 ## Propósito
 
@@ -112,6 +112,6 @@ Notifications (sin `id`) → respuesta vacía `[]`. El wrapping del result es au
 
 ## Relacionado
 
-- [`packages/mcp/SKILL.md`](../../packages/mcp/SKILL.md)
-- [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §MCP-001..010
+- [`packages/mcp/SKILL.md`](../../../packages/mcp/SKILL.md)
+- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §MCP-001..010
 - [Spec del Model Context Protocol](https://modelcontextprotocol.io)

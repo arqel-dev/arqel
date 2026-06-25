@@ -1,6 +1,6 @@
 # MCP server
 
-> Package: [`arqel-dev/mcp`](../../packages/mcp/) · Tickets: MCP-001..010
+> Package: [`arqel-dev/mcp`](../../../packages/mcp/) · Tickets: MCP-001..010
 
 ## Purpose
 
@@ -112,6 +112,6 @@ Notifications (no `id`) → empty response `[]`. Result wrapping is automatic:
 
 ## Related
 
-- [`packages/mcp/SKILL.md`](../../packages/mcp/SKILL.md)
-- [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §MCP-001..010
+- [`packages/mcp/SKILL.md`](../../../packages/mcp/SKILL.md)
+- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §MCP-001..010
 - [Model Context Protocol spec](https://modelcontextprotocol.io)

@@ -1,6 +1,6 @@
 # Dashboards e widgets
 
-> Pacote: [`arqel-dev/widgets`](../../packages/widgets/) · Tickets: WIDGETS-001..015
+> Pacote: [`arqel-dev/widgets`](../../../packages/widgets/) · Tickets: WIDGETS-001..015
 
 ## Purpose
 
@@ -153,5 +153,5 @@ Não — clamp em 1..12. Strings aceitam `'full'`, `'1/2'`, etc.
 
 ## Related
 
-- [`packages/widgets/SKILL.md`](../../packages/widgets/SKILL.md)
-- [`PLANNING/09-fase-2-essenciais.md`](../../PLANNING/09-fase-2-essenciais.md) §WIDGETS-001..015
+- [`packages/widgets/SKILL.md`](../../../packages/widgets/SKILL.md)
+- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §WIDGETS-001..015

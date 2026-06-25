@@ -166,7 +166,7 @@ pnpm -r --filter "./packages-js/*" publish --tag rc --access public
 
 ```bash
 cd ~/PhpstormProjects/arqel-test
-./scripts/setup-test-app.sh --version=0.8.0-rc.1
+./scripts/setup-test-app.sh ~/PhpstormProjects/arqel-test
 ```
 
 - [ ] `composer require arqel-dev/core:0.8.0-rc.1 --dev-master=false` — sem conflitos.

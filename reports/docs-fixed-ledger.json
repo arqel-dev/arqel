@@ -664,5 +664,35 @@
     "line": 56,
     "title": "theme JS SKILL.md shows preventFlashScript() as a PHP/Blade call \\Arqel\\Theme\\preventFlashScript(); no such PHP namespace/function exists",
     "round": 6
+  },
+  {
+    "file": "packages/export/SKILL.md",
+    "line": 7,
+    "title": "export SKILL Purpose calls the package 's\u00f3 o esqueleto (stubs)' with simple-excel/dompdf behind suggest: \u2014 both are now real and in require",
+    "round": 7
+  },
+  {
+    "file": "packages/export/SKILL.md",
+    "line": 78,
+    "title": "export SKILL Anti-patterns claims simple-excel & dompdf stay in suggest: until needed \u2014 they are now hard require deps",
+    "round": 7
+  },
+  {
+    "file": "CLAUDE.md",
+    "line": 211,
+    "title": "CLAUDE.md names ESLint as the JS linter, but the project uses Biome (no ESLint anywhere)",
+    "round": 7
+  },
+  {
+    "file": "docs/release-checklist-v0.8.md",
+    "line": 169,
+    "title": "release-checklist-v0.8.md invokes setup-test-app.sh with a --version flag the script does not accept",
+    "round": 7
+  },
+  {
+    "file": "README.md",
+    "line": 14,
+    "title": "README phase-status claims 'Phase 3 closed' but the linked source-of-truth (docs/tickets/current.md) marks only Phases 1+2 as delivered and groups Phase 3 with Phase 4 as merely 'functional packages'",
+    "round": 7
   }
 ]

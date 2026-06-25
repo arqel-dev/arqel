@@ -11,7 +11,7 @@
 
 🚧 **Em desenvolvimento.** Não pronto para produção.
 
-Fases 1, 2 e 3 fechadas. Fase 4 em andamento (DevTools extension, CLI, marketplace, Laravel Cloud). Ver `docs/tickets/current.md` para o snapshot atual.
+Fases 1 e 2 fechadas. Fases 3 e 4 em andamento (pacotes funcionais em disco: AI, realtime, versioning, workflow, marketplace, devtools, …). Ver `docs/tickets/current.md` para o snapshot atual.
 
 ## O que é Arqel
 
@@ -107,7 +107,7 @@ Detalhes em `PLANNING/04-repo-structure.md`.
 |---|---|---|---|
 | Fase 1 — MVP | v0.5-beta | 4-7 meses | ✅ Fechada |
 | Fase 2 — Essenciais | v0.8-rc | 4-7 meses | ✅ Fechada |
-| Fase 3 — Avançadas | v1.0 LTS | 7-10 meses | ✅ Fechada |
+| Fase 3 — Avançadas | v1.0 LTS | 7-10 meses | 🚧 Em progresso |
 | Fase 4 — Ecossistema | v1.x+ | 12+ meses | 🚧 Em progresso |
 
 Total: **328 tickets detalhados** em `PLANNING/08-*.md` a `PLANNING/11-*.md`.

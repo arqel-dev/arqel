@@ -73,6 +73,8 @@ const EN: Dictionary = {
   'devtools.performance.server.memory': 'Memory',
   'devtools.time_travel.replay': 'Replay',
   'devtools.time_travel.replay_aria': 'Replay :url',
+  'devtools.time_travel.snapshot_count_one': ':count snapshot',
+  'devtools.time_travel.snapshot_count_other': ':count snapshots',
   'devtools.time_travel.empty.no_snapshots':
     'No navigation snapshots captured yet. Navigate within the app to record state.',
 };
@@ -135,6 +137,8 @@ const PT_BR: Dictionary = {
   'devtools.performance.server.memory': 'Memória',
   'devtools.time_travel.replay': 'Reproduzir',
   'devtools.time_travel.replay_aria': 'Reproduzir :url',
+  'devtools.time_travel.snapshot_count_one': ':count snapshot',
+  'devtools.time_travel.snapshot_count_other': ':count snapshots',
   'devtools.time_travel.empty.no_snapshots':
     'Nenhum snapshot de navegação capturado ainda. Navegue pelo aplicativo para registrar o estado.',
 };

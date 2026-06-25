@@ -255,7 +255,7 @@ omitido — payloads podem conter PII e segredos do model.
 
 Ver `../../apps/docs/examples/versioning/`:
 
-- [`README.md`](../../apps/docs/examples/versioning/README.md) — comparativo
+- [`index.md`](../../apps/docs/examples/versioning/index.md) — comparativo
   versioning vs `arqel-dev/audit`, decision tree e anti-patterns.
 - [`cms-articles.md`](../../apps/docs/examples/versioning/cms-articles.md) —
   CMS com restore de artigos, schedule de prune e UI React.

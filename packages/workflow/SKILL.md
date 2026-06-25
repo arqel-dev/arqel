@@ -77,7 +77,7 @@ A direção da dep é `realtime → workflow`: este pacote nunca importa nada de
 
 ### Exemplos completos (WF-010)
 
-Três workflows reais, com diagrama Mermaid, model Eloquent, Resource, transitions, Gate/`authorizeFor`, `StateFilter` e listeners — em [`apps/docs/examples/workflows/`](../../apps/docs/examples/workflows/README.md):
+Três workflows reais, com diagrama Mermaid, model Eloquent, Resource, transitions, Gate/`authorizeFor`, `StateFilter` e listeners — em [`apps/docs/examples/workflows/`](../../apps/docs/examples/workflows/index.md):
 
 - [`order-states.md`](../../apps/docs/examples/workflows/order-states.md) — pedidos e-commerce: autorização por papel, webhook de transportadora, "any-to-Cancelled".
 - [`article-states.md`](../../apps/docs/examples/workflows/article-states.md) — CMS editorial: rejeição com feedback, autorização 100% via Gate, integração com `arqel-dev/versioning`.

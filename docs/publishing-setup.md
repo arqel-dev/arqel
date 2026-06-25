@@ -24,7 +24,7 @@ Antes de fazer `git tag v0.8.0 && git push --tags`:
 2. **Criar conta npm `arqel-dev`** + criar org `arqel-dev` (free para públicos). Gerar token "Automation" → guardar como secret `NPM_TOKEN` no repo.
 3. **Criar conta Packagist** com user `arqel-dev` (login via GitHub OAuth). Não submeter pacotes ainda — o webhook em cada sub-repo cuida disso quando o split-php job criar os repos.
 4. **Criar PAT (`ARQEL_BOT_TOKEN`)** com scopes `repo` + `admin:org` + `workflow` (recomendado: GitHub App ou fine-grained PAT com permissões mínimas em `arqel-dev/*`). Guardar como secret no repo.
-5. **Dry-run primeiro:** `gh workflow run release.yml -f tag=v0.8.0 -f dry_run=true` — confirma que o split SHA é computado para todos os 19 pacotes e que `pnpm publish --dry-run` lista os 16 pacotes npm sem erros.
+5. **Dry-run primeiro:** `gh workflow run release.yml -f tag=v0.8.0 -f dry_run=true` — confirma que o split SHA é computado para todos os 20 pacotes PHP e que `pnpm publish --dry-run` lista os 18 pacotes npm sem erros.
 6. **Push da tag:** `git tag -s v0.8.0 -m "Release 0.8.0" && git push origin v0.8.0`. O workflow dispara automaticamente.
 7. **Pós-publish:** registar cada sub-repo no Packagist (Submit Package → URL `https://github.com/arqel-dev/<pkg>`). A partir daí, o webhook do GitHub atualiza Packagist em cada split push.
 
@@ -167,7 +167,7 @@ Quando submeteres cada package, Packagist oferece colar um webhook URL no GitHub
 
 Alternativa: gerar API token Packagist em [packagist.org/profile](https://packagist.org/profile) e usar `composer global require packagist/api` no workflow de release para fazer update programaticamente. Anota o token como `PACKAGIST_API_TOKEN` (passo 6).
 
-### 3.4 Submeter os 18 packages
+### 3.4 Submeter os 20 packages PHP
 
 Faz após o primeiro splitsh push (§7). Repete o submit para cada sub-repo. Demorado (~20 min) mas é uma vez só.
 
@@ -330,8 +330,8 @@ No `release.yml`, antes do step de splitsh:
 set -e
 TAG="$1"  # ex: v0.1.0
 
-PACKAGES_PHP=(core panel fields table form actions auth nav tenant widgets fields-advanced audit export mcp testing)
-PACKAGES_JS=(react ui hooks types)
+PACKAGES_PHP=(actions ai audit auth cli core export fields fields-advanced form marketplace mcp nav realtime table tenant versioning widgets workflow arqel)
+PACKAGES_JS=(a11y ai auth cli-ink devtools-extension fields-advanced fields-js hooks i18n mcp-server react realtime realtime-collab theme types ui versioning workflow)
 
 split_and_push() {
   local prefix="$1"   # packages/core
@@ -446,12 +446,12 @@ Checklist sequencial. Não saltar steps.
    ```
 2. **GitHub Actions** despara `release.yml` automaticamente. Acompanha em `arqel-dev/arqel-dev/actions`.
 3. Workflow vai:
-   - Correr `splitsh-lite` e push para os 18 sub-repos com a tag `v0.1.0`.
+   - Correr `splitsh-lite` e push para os 38 sub-repos (20 PHP + 18 JS) com a tag `v0.1.0`.
    - Notificar Packagist via webhook (sub-repos publicam-se sozinhos com a tag).
    - `pnpm publish --recursive --access public --no-git-checks` para publicar todos os JS no npm.
 4. **Verifica:**
-   - [packagist.org/packages/arqel](https://packagist.org/packages/arqel) — todos os 15 PHP packages a 0.1.0.
-   - [npmjs.com/org/arqel](https://www.npmjs.com/org/arqel) — 4 JS packages a 0.1.0.
+   - [packagist.org/packages/arqel](https://packagist.org/packages/arqel) — todos os 20 PHP packages a 0.1.0.
+   - [npmjs.com/org/arqel](https://www.npmjs.com/org/arqel) — 18 JS packages a 0.1.0.
 5. **Smoke test em projeto fresh:**
    ```bash
    composer create-project laravel/laravel test-arqel

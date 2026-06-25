@@ -70,13 +70,13 @@ Cada página usa `useForm()` do `@inertiajs/react` para state, submit e errors. 
 O contrapartida PHP vive em `packages/auth/`:
 
 - `Arqel\Auth\Http\Controllers\LoginController` → `Inertia::render('arqel-dev/auth/Login', [...])`
-- `RegisterController`, `ForgotPasswordController`, `ResetPasswordController`, `VerifyEmailController`
+- `RegisterController`, `ForgotPasswordController`, `ResetPasswordController`, `EmailVerificationController`
 
 O page registry do app deve incluir as auth pages — `createArqelApp({ pages })` aceita o glob de auth (ver `@arqel-dev/react`).
 
 ## Conventions
 
-- TypeScript strict; peer deps: `react ^19.0.0`, `@inertiajs/react ^2.0.0`, `@arqel-dev/ui` (workspace:*)
+- TypeScript strict; peer deps: `react ^19.2.0`, `@inertiajs/react ^3.0.0`, `@arqel-dev/ui` (workspace:*)
 - Sem dependências runtime próprias além de peers — toda a estética vem de `@arqel-dev/ui`
 - Estado via `useForm()` Inertia; nunca state local para campos de auth
 - Acessibilidade: cada `<Field>` agrupa label + input + error com IDs corretos

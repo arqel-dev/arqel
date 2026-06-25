@@ -30,8 +30,8 @@ Tipos públicos exportados:
 - `EchoConfig` — shape aceito por `setupEcho`.
 - `EchoLike` — subset da instância Echo consumida pelos hooks.
 - `EchoChannelLike`, `PresenceChannelLike`, `PresenceMember` — formas
-  de canal que hooks (`useResourceUpdates`, `useResourcePresence`,
-  `useActionProgress`, `useWidgetRealtime`) podem assumir.
+  de canal que o hook `useResourceUpdates` (em `@arqel-dev/hooks`) e
+  `useConnectionStatus`/`useFallbackPolling` podem assumir.
 - `EchoEventListener`, `EchoConnectorLike` — auxiliares.
 
 ## Conventions

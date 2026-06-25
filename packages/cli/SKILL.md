@@ -139,7 +139,7 @@ arqel cloud:deploy-link owner/meu-painel --region=us-east --name=meu-painel
 ### Por chegar
 
 - **CLI-TUI-002** — Resource generator interactivo. Reside em `arqel-dev/core`
-  como `php artisan arqel:resource:make` (Artisan command, não comando
+  como `php artisan arqel:resource` (Artisan command, não comando
   do binário global). **Não confundir com este pacote.**
 - **CLI-TUI-003** — Camada Ink-equivalente (rich UI com TUI completa,
   provavelmente via `chewie` ou wrapper próprio sobre Prompts).

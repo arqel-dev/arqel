@@ -129,10 +129,10 @@ config()->set('arqel-realtime.workflow.broadcast_state_transitions', false);
 ### Entregue (RT-001 → RT-012)
 
 - **RT-003** — React hook `useResourceUpdates` + Inertia `router.reload` em `@arqel-dev/realtime`.
-- **RT-004** — hook `useResourcePresence` bindando Echo presence channels via `PresenceChannelResolver`.
+- **RT-004** — `PresenceChannelResolver` (PHP) resolvendo Echo presence channels; o hook React de presence ainda não foi entregue no lado JS.
 - **RT-005** — `<CollabRichTextField />` + Yjs sync sobre canal Reverb dedicado; integração Yjs-aware no `<RichTextField />`.
 - **RT-007** — progress streaming (`arqel.action.{jobId}` payload + React subscriber).
-- **RT-008** — connection resilience banner (`<RealtimeStatus />` no Panel chrome com states `connecting`/`reconnecting`).
+- **RT-008** — connection resilience banner (`<ConnectionStatusBanner />` no Panel chrome com states `connecting`/`reconnecting`).
 
 ### Pendente
 
@@ -244,7 +244,7 @@ Gate::define('view-resource-presence', fn ($user, string $resource, string|int $
 
 ```tsx
 // Pseudo-API — virá com RT-008. Echo emite 'connecting'/'reconnecting'/'connected'.
-<RealtimeStatus
+<ConnectionStatusBanner
     onDisconnected={() => toast('Real-time updates paused — reconnecting…')}
 />
 ```

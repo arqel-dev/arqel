@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`arqel-dev/framework` é o **único requirement** que uma app Laravel precisa para entrar no ecossistema Arqel. Em vez do utilizador final ter de fazer `composer require` de 7 pacotes individuais + `inertiajs/inertia-laravel`, basta:
+`arqel-dev/framework` é o **único requirement** que uma app Laravel precisa para entrar no ecossistema Arqel. Em vez do utilizador final ter de fazer `composer require` de 8 pacotes individuais + `inertiajs/inertia-laravel`, basta:
 
 ```bash
 composer require arqel-dev/framework
@@ -21,6 +21,7 @@ composer require arqel-dev/framework
 - `arqel-dev/actions` — contratos e invokers de actions (bulk, table, header)
 - `arqel-dev/nav` — navigation builder
 - `arqel-dev/table` — table query/sort/filter/paginate
+- `arqel-dev/widgets` — dashboard widgets (Stat/Chart/Table/Custom)
 - `inertiajs/inertia-laravel` — peer obrigatório (única bridge PHP↔React, ADR-001)
 
 ## Key Contracts

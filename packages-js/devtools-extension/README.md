@@ -17,5 +17,7 @@ Os artefatos vão para `dist/chrome/` e `dist/firefox/`.
 
 ## Estado atual
 
-Scaffold (DEVTOOLS-001). Veja `SKILL.md` para o que está entregue e o que está
-por vir nos tickets DEVTOOLS-002..004.
+Entregue (DEVTOOLS-001..008). O painel inclui os inspetores de Inertia, Fields,
+Policy, Time Travel e Performance (`InertiaInspector`, `FieldsInspector`,
+`PolicyDebugger`, `TimeTravel`, `PerformanceMetrics`). Veja a seção Status do
+`SKILL.md` para o detalhe.

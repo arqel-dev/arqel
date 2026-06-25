@@ -4,7 +4,7 @@ Model Context Protocol server for Arqel — exposes panel resources, fields, tab
 
 ## Status
 
-Phase 2 scaffold (MCP-001). The JSON-RPC handler, `serve` Artisan command, tool/resource/prompt registries, and panel autoloading land in MCP-002..010. See [`SKILL.md`](./SKILL.md) for the full contract surface and roadmap.
+Shipped. The JSON-RPC 2.0 handler (`McpServer`), the tool/resource/prompt registries, and panel autoloading (4 tools, 1 resource, 2 prompts via `McpServiceProvider`) are implemented. The only remaining work is the `arqel:mcp:serve` Artisan command wrapper — for now, instantiate `McpServer` and call `serve()` from a custom script. See [`SKILL.md`](./SKILL.md) for the full contract surface.
 
 ## Install
 

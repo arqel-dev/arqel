@@ -138,7 +138,7 @@ Section::make('Admin only')
 
 ### Form requests gerados
 
-`php artisan arqel:form-request PostResource` gera `app/Http/Requests/StorePostRequest.php` e `UpdatePostRequest.php`:
+`php artisan arqel:resource Post --with-form-requests` gera `app/Http/Requests/StorePostRequest.php` e `UpdatePostRequest.php`:
 
 ```php
 final class StorePostRequest extends FormRequest

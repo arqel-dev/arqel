@@ -65,7 +65,7 @@ Routes auto-registered by `WidgetsServiceProvider`:
 
 ### `StatWidget` (KPI card)
 
-Setters: `value/description/icon/color/trend`. Good for single metrics — total users, MRR, conversions.
+Setters: `value/descriptionIcon/icon/color` (plus `heading/description` inherited from `Widget`). The `trend` value is supplied inside the `data()` array, not via a setter. Good for single metrics — total users, MRR, conversions.
 
 ### `ChartWidget`
 
@@ -142,7 +142,7 @@ Yes — instantiate `Dashboard` in your own controller and pass it to the Inerti
 No — clamped to 1..12. Strings accept `'full'`, `'1/2'`, etc.
 
 **Where do React components live?**
-`@arqel-dev/ui/widgets` — delivered in WIDGETS-010..012 (currently in development; the PHP side and Inertia payload are already stable).
+`@arqel-dev/ui/widgets` — shipped and exported via the `./widgets` subpath: `StatCard`, `ChartCard`, `TableCard` plus `WidgetRenderer`, `DashboardGrid`, `DashboardFilters`, `WidgetWrapper` and the chart set (Line/Area/Donut/Pie/Bar/Radar). The PHP side and Inertia payload are stable too.
 
 ## Anti-patterns
 

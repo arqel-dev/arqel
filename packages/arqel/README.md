@@ -9,6 +9,7 @@ Meta-package that requires the full Arqel stack:
 - `arqel-dev/actions` — action contracts + invokers
 - `arqel-dev/nav` — navigation builder
 - `arqel-dev/table` — table query/sort/filter/paginate
+- `arqel-dev/widgets` — dashboard widgets (Stat/Chart/Table/Custom)
 - `inertiajs/inertia-laravel` — required peer
 
 ## Install

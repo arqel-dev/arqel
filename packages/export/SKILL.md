@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`arqel-dev/export` entrega a pipeline de exportação do Arqel — converte a seleção de uma `Table` (ou um dataset arbitrário) em arquivos CSV, XLSX ou PDF. Cobre RF-T-14. O pacote é só o esqueleto (interfaces + enum + stubs); as implementações reais ficam atrás de `suggest:` em `composer.json` para que panels que não exportam nada não precisem instalar `spatie/simple-excel` nem `dompdf/dompdf`.
+`arqel-dev/export` entrega a pipeline de exportação do Arqel — converte a seleção de uma `Table` (ou um dataset arbitrário) em arquivos CSV, XLSX ou PDF. Cobre RF-T-14. Os três exporters (CSV/XLSX/PDF) estão totalmente implementados; `spatie/simple-excel` e `dompdf/dompdf` são dependências hard `require` em `composer.json` (não `suggest:`).
 
 ## Status
 
@@ -75,7 +75,7 @@
 ## Conventions
 
 - `declare(strict_types=1)` obrigatório
-- Hard deps em libs de export (simple-excel, dompdf) ficam em `suggest:` até serem efetivamente exigidas pelo exporter correspondente — apps que só usam CSV não pagam o custo de instalar dompdf
+- As libs de export (simple-excel, dompdf) foram promovidas de `suggest:` para `require` à medida que cada exporter foi implementado — hoje as três são dependências unconditional do pacote. Apps que não exportam um formato podem excluí-lo manualmente via `replace`/`exclude-from-classmap`
 - `Exporter::export()` recebe `$destination` absoluto (já resolvido pelo caller via `storage_path()` ou disk-aware path); o exporter só escreve, não decide localização
 - `ExportFormat::extension()` devolve sem ponto inicial (`'csv'`, não `'.csv'`); o ponto é responsabilidade do construtor de filename
 - **Células de data honram o `mode`/`format` da `DateColumn`** (#217) via o trait compartilhado `FormatsDateCells::formatDateCell()`, usado pelos três exporters nos branches plano e `state_resolver`: `props.mode` (`date`|`datetime`|`since`) + `props.format` decidem o output, espelhando o que a tabela renderiza — `->dateTime()` retém a hora, `->date('d/m/Y')` aplica o formato custom, e `since` emite a string relativa (`diffForHumans()`). Default sem props continua `Y-m-d`. O XLSX mantém a data como **string** (não serial Excel, #106), só com o formato correto

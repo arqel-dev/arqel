@@ -208,7 +208,7 @@ vendor/bin/phpstan analyse      # Static analysis
 
 # JS
 pnpm test                       # Rodar testes JS
-pnpm lint                       # ESLint
+pnpm lint                       # Biome
 pnpm typecheck                  # tsc --noEmit
 pnpm build                      # Build todos pacotes
 
@@ -244,7 +244,7 @@ Custom commands disponíveis em `.claude/commands/`:
 - [ ] Todos critérios de aceite do ticket ✅
 - [ ] Testes escritos e passando
 - [ ] Coverage target atingido
-- [ ] Lint limpo (Pint + ESLint)
+- [ ] Lint limpo (Pint + Biome)
 - [ ] Typecheck limpo (PHPStan + tsc)
 - [ ] Sem `console.log`, `dd()`, `dump()`, `var_dump` deixados
 - [ ] Documentação atualizada (SKILL.md se mudou API)

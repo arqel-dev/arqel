@@ -11,7 +11,7 @@
 
 🚧 **Early development.** Not production-ready.
 
-Phases 1, 2 and 3 closed. Phase 4 in progress (DevTools extension, CLI, marketplace, Laravel Cloud). See `docs/tickets/current.md` for the live snapshot.
+Phases 1 and 2 closed. Phases 3 and 4 in progress (functional packages on disk: AI, realtime, versioning, workflow, marketplace, devtools, …). See `docs/tickets/current.md` for the live snapshot.
 
 ## What is Arqel
 

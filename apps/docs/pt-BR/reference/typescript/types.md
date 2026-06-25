@@ -13,22 +13,24 @@ import type { SharedProps, AuthPayload } from '@arqel-dev/types/inertia';
 
 ## Fields
 
-`FieldType` é uma **discriminated union** sobre `type`:
+`FieldType` é uma **union de literais string** de 21 tags de tipo:
 
 ```ts
 type FieldType =
-  | { type: 'text'; props: TextFieldProps }
-  | { type: 'textarea'; props: TextareaFieldProps }
-  | { type: 'email'; props: EmailFieldProps }
-  | ... 18 more
+  | 'text' | 'textarea' | 'email' | 'url' | 'password' | 'slug'
+  | 'number' | 'currency' | 'boolean' | 'toggle' | 'select' | 'multiSelect'
+  | 'radio' | 'belongsTo' | 'hasMany' | 'date' | 'dateTime' | 'file'
+  | 'image' | 'color' | 'hidden';
 ```
 
-`FieldSchema` é o shape canónico do payload Inertia (alinha com `Arqel\Core\Support\FieldSchemaSerializer`):
+`FieldSchema` é a **discriminated union** (não-genérica) sobre `type` — uma union de membros `FieldBase<TType, TProps>` (ex.: `FieldBase<'text', TextFieldProps>`) — e o shape canônico do payload Inertia (alinha com `Arqel\Core\Support\FieldSchemaSerializer`):
 
 ```ts
-type FieldSchema<T extends FieldType = FieldType> = {
+interface FieldBase<TType extends FieldType, TProps> {
+  type: TType;
+  props: TProps;
   name: string;
-  label: string;
+  label: string | null;
   component: string | null;
   required: boolean;
   readonly: boolean;
@@ -36,22 +38,22 @@ type FieldSchema<T extends FieldType = FieldType> = {
   placeholder: string | null;
   helperText: string | null;
   defaultValue: unknown;
-  columnSpan: number;
+  columnSpan: number | string;
   live: boolean;
   liveDebounce: number | null;
   validation: { rules: string[]; messages: Record<string, string>; attribute: string | null };
   visibility: { create: boolean; edit: boolean; detail: boolean; table: boolean; canSee: boolean };
   dependsOn: string[];
-} & T;
+}
 ```
 
 ### Type guards
 
 ```ts
-isFieldType<T extends FieldType['type']>(field: FieldSchema, type: T): field is FieldSchema<Extract<FieldType, { type: T }>>
+isFieldType<T extends FieldType>(field: FieldSchema, type: T): field is Extract<FieldSchema, { type: T }>
 isFieldEntry(entry: SchemaEntry): entry is FieldEntry
 isLayoutEntry(entry: SchemaEntry): entry is LayoutEntry
-resolveFieldEntry(entry: FieldEntry, fields: FieldSchema[]): FieldSchema | undefined
+resolveFieldEntry(entry: FieldEntry, fields: FieldSchema[]): FieldSchema | null
 ```
 
 ## Resources

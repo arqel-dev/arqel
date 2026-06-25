@@ -262,5 +262,131 @@
     "line": 11,
     "title": "nav.md documents a label(string) setter on NavigationItem and NavigationGroup that does not exist",
     "round": 2
+  },
+  {
+    "file": "apps/docs/reference/typescript/hooks.md",
+    "line": 3,
+    "title": "hooks.md says '10 reusable hooks' but 11 exist; import list omits useResourceUpdates",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/reference/php/actions.md",
+    "line": 13,
+    "title": "actions.md lists constant VARIANT_FILLED which does not exist (actual is VARIANT_DEFAULT)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/reference/php/auth.md",
+    "line": 83,
+    "title": "auth.md uses wrong Inertia page name 'arqel-dev/auth/VerifyEmail' (actual: VerifyEmailNotice)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/reference/php/auth.md",
+    "line": 85,
+    "title": "auth.md references nonexistent VerifyEmailController (actual: EmailVerificationController)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/reference/typescript/types.md",
+    "line": 19,
+    "title": "types.md mischaracterizes FieldType as a discriminated object union with props",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/reference/typescript/types.md",
+    "line": 51,
+    "title": "types.md isFieldType / resolveFieldEntry signatures do not match source",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/es/advanced/command-palette.md",
+    "line": 3,
+    "title": "es/advanced/command-palette.md relative links use EN depth (../../../) but file is one level deeper \u2014 resolves to apps/packages",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/es/advanced/custom-fields.md",
+    "line": 3,
+    "title": "es/advanced/custom-fields.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/es/advanced/dashboards.md",
+    "line": 3,
+    "title": "es/advanced/dashboards.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/es/advanced/mcp.md",
+    "line": 3,
+    "title": "es/advanced/mcp.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/es/advanced/multi-tenancy.md",
+    "line": 3,
+    "title": "es/advanced/multi-tenancy.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/es/advanced/tables-v2.md",
+    "line": 3,
+    "title": "es/advanced/tables-v2.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/pt-BR/advanced/command-palette.md",
+    "line": 3,
+    "title": "pt-BR/advanced/command-palette.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/pt-BR/advanced/custom-fields.md",
+    "line": 3,
+    "title": "pt-BR/advanced/custom-fields.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/pt-BR/advanced/dashboards.md",
+    "line": 3,
+    "title": "pt-BR/advanced/dashboards.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/pt-BR/advanced/mcp.md",
+    "line": 3,
+    "title": "pt-BR/advanced/mcp.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/pt-BR/advanced/multi-tenancy.md",
+    "line": 3,
+    "title": "pt-BR/advanced/multi-tenancy.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/pt-BR/advanced/tables-v2.md",
+    "line": 3,
+    "title": "pt-BR/advanced/tables-v2.md package links use wrong relative depth (../../../ \u2192 apps/packages)",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/es/examples/workflows/index.md",
+    "line": 56,
+    "title": "es/examples/workflows/index.md Related links use EN depth (../../../../) but file is one level deeper \u2014 resolves to apps/, not repo root",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/pt-BR/examples/workflows/index.md",
+    "line": 56,
+    "title": "pt-BR/examples/workflows/index.md Related links use EN depth (../../../../) \u2014 resolves to apps/, not repo root",
+    "round": 3
+  },
+  {
+    "file": "apps/docs/reference/typescript/hooks.md",
+    "line": 104,
+    "title": "hooks API reference documents useTheme() as a @arqel-dev/hooks export, but the package has no such (re-)export",
+    "round": 3
   }
 ]

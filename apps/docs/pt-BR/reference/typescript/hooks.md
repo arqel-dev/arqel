@@ -1,11 +1,11 @@
 # `@arqel-dev/hooks` — API Reference
 
-10 hooks reusáveis. 11 entry points subpath tree-shakeable.
+11 hooks reusáveis. 11 entry points subpath tree-shakeable.
 
 ```ts
 import { useResource, useArqelForm, useCanAccess, useFlash, useTable,
          useAction, useFieldDependencies, useNavigation, useBreakpoint,
-         useArqelOptimistic } from '@arqel-dev/hooks';
+         useArqelOptimistic, useResourceUpdates } from '@arqel-dev/hooks';
 ```
 
 ## `useResource<T>()`
@@ -101,13 +101,9 @@ type NavigationItemPayload = {
 
 Consumido por `<Sidebar>` (block shadcn `sidebar-07`) — items são agrupados por `group` no render.
 
-## `useTheme()`
+## Estado de tema
 
-Re-exportado de `@arqel-dev/theme`. **Requer** `<ThemeProvider>` na árvore (incluído automaticamente em `<ArqelProvider>` / `createArqelApp`). Sem provider, lança erro descritivo.
-
-```ts
-const { theme, resolved, setTheme, toggle } = useTheme();
-```
+Para estado de tema use `useTheme()` de `@arqel-dev/react` (ou `@arqel-dev/theme`) — ele não faz parte de `@arqel-dev/hooks`.
 
 ## `useBreakpoint()`
 

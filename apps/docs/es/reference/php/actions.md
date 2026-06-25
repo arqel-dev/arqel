@@ -10,7 +10,7 @@ Namespace `Arqel\Actions\`. Action base + 4 variantes + concerns + factory.
 
 ```php
 COLOR_PRIMARY / SECONDARY / SUCCESS / WARNING / DESTRUCTIVE / INFO
-VARIANT_FILLED / OUTLINE / GHOST
+VARIANT_DEFAULT / OUTLINE / GHOST / DESTRUCTIVE
 METHOD_GET / POST / PUT / PATCH / DELETE
 ```
 

@@ -17,18 +17,17 @@ Base class for user Resources. Subclasses only need to declare `protected static
 | `fields()` | `array<Field>` | List of fields (abstract — declare it) |
 | `table()` | `mixed` | Optional. Return `Arqel\Table\Table` when you need custom behavior |
 | `form()` | `mixed` | Optional. Return `Arqel\Form\Form` when you need custom behavior |
-| `actions()` | `array<Action>` | Optional. Empty default |
 | `recordTitle(Model)` / `recordSubtitle(Model)` | `string` / `?string` | Identifier shown in breadcrumbs/modals |
 | `indexQuery(Builder)` | `Builder` | Hook to scope the listing |
 
 **Lifecycle hooks** (all `protected`, override on the subclass):
 
 ```php
-beforeCreate(Model $record, array $data): void
+beforeCreate(array $data): array                // mutate-and-return $data
 afterCreate(Model $record): void
-beforeUpdate(Model $record, array $data): void
+beforeUpdate(Model $record, array $data): array // mutate-and-return $data
 afterUpdate(Model $record): void
-beforeSave(Model $record, array $data): void   // create OR update
+beforeSave(Model $record, array $data): array   // create OR update; mutate-and-return $data
 afterSave(Model $record): void
 beforeDelete(Model $record): void
 afterDelete(Model $record): void                // only fires if delete() returned truthy

@@ -17,18 +17,17 @@ Base para Resources do utilizador. Subclasses só precisam declarar `protected s
 | `fields()` | `array<Field>` | Lista de fields (abstract — declarar) |
 | `table()` | `mixed` | Opcional. Retornar `Arqel\Table\Table` quando precisar custom |
 | `form()` | `mixed` | Opcional. Retornar `Arqel\Form\Form` quando precisar custom |
-| `actions()` | `array<Action>` | Opcional. Default vazio |
 | `recordTitle(Model)` / `recordSubtitle(Model)` | `string` / `?string` | Identificador exibido em breadcrumbs/modais |
 | `indexQuery(Builder)` | `Builder` | Hook para escopar listagem |
 
 **Lifecycle hooks** (todos `protected`, override na subclass):
 
 ```php
-beforeCreate(Model $record, array $data): void
+beforeCreate(array $data): array                // muta-e-retorna $data
 afterCreate(Model $record): void
-beforeUpdate(Model $record, array $data): void
+beforeUpdate(Model $record, array $data): array // muta-e-retorna $data
 afterUpdate(Model $record): void
-beforeSave(Model $record, array $data): void   // create OR update
+beforeSave(Model $record, array $data): array   // create OR update; muta-e-retorna $data
 afterSave(Model $record): void
 beforeDelete(Model $record): void
 afterDelete(Model $record): void                // só dispara se delete() retornou truthy

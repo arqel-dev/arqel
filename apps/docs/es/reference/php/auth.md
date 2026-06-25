@@ -80,9 +80,9 @@ Las páginas Inertia viven en el paquete `@arqel-dev/auth` y se resuelven vía e
 | `arqel-dev/auth/Register` | Formulario de registro |
 | `arqel-dev/auth/ForgotPassword` | Solicitud de reset |
 | `arqel-dev/auth/ResetPassword` | Envío de nueva contraseña |
-| `arqel-dev/auth/VerifyEmail` | Aviso + reenvío |
+| `arqel-dev/auth/VerifyEmailNotice` | Aviso + reenvío |
 
-Acompañantes: `RegisterController`, `ForgotPasswordController`, `ResetPasswordController`, `VerifyEmailController`. Todos siguen el mismo patrón de pasar URLs como props de Inertia para evitar que React pegue contra rutas hardcodeadas.
+Acompañantes: `RegisterController`, `ForgotPasswordController`, `ResetPasswordController`, `EmailVerificationController`. Todos siguen el mismo patrón de pasar URLs como props de Inertia para evitar que React pegue contra rutas hardcodeadas.
 
 ## Helper global
 

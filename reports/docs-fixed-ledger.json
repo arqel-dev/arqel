@@ -694,5 +694,41 @@
     "line": 14,
     "title": "README phase-status claims 'Phase 3 closed' but the linked source-of-truth (docs/tickets/current.md) marks only Phases 1+2 as delivered and groups Phase 3 with Phase 4 as merely 'functional packages'",
     "round": 7
+  },
+  {
+    "file": "apps/docs/laravel-cloud/deploy-guide.md",
+    "line": 142,
+    "title": "deploy-guide env-var table lists ARQEL_AI_OPENAI_KEY, but the AI config reads OPENAI_API_KEY",
+    "round": 8
+  },
+  {
+    "file": "apps/docs/laravel-cloud/deploy-guide.md",
+    "line": 141,
+    "title": "deploy-guide recommends ARQEL_PANEL_PATH env var, but core config hardcodes path with no env() read",
+    "round": 8
+  },
+  {
+    "file": "packages/workflow/SKILL.md",
+    "line": 17,
+    "title": "workflow SKILL claims config exposes a 'user_model' block, but the published config file has no such key",
+    "round": 8
+  },
+  {
+    "file": "docs/publishing-setup.md",
+    "line": 320,
+    "title": "publishing-setup.md installs splitsh/lite v2.0.0, but v2.0.0 ships no binaries (release.yml uses v1.0.1)",
+    "round": 8
+  },
+  {
+    "file": "apps/docs/reference/typescript/types.md",
+    "line": 3,
+    "title": "types.md (EN) says '7 subpath entry points' but @arqel-dev/types has 8 (omits ./tenant)",
+    "round": 8
+  },
+  {
+    "file": "packages-js/types/SKILL.md",
+    "line": 18,
+    "title": "types/SKILL.md says '7 entry points' and lists them, omitting ./tenant (8 exist)",
+    "round": 8
   }
 ]

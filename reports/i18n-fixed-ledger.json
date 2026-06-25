@@ -2182,5 +2182,17 @@
     "line": 40,
     "title": "TimeTravel snapshot-count noun hardcoded English + Intl.PluralRules('en') bypasses the wired devtools translator/localeBcp47()",
     "round": 38
+  },
+  {
+    "file": "packages-js/ai/src/AiImageInput.tsx",
+    "line": 338,
+    "title": "AiImageInput dropzone prompt label hardcoded English (not localized)",
+    "round": 39
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages/fields-advanced/src/Types/RepeaterField.php",
+    "line": 187,
+    "title": "RepeaterField itemLabel template serialized verbatim \u2014 never passed through trans()/localizeLabel()",
+    "round": 39
   }
 ]

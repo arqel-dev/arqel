@@ -1,0 +1,32 @@
+{
+  "total": 3,
+  "confirmed_count": 2,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "AiImageInput dropzone prompt label hardcoded English (not localized)",
+      "file": "packages-js/ai/src/AiImageInput.tsx",
+      "line": 338,
+      "kind": "missing-i18n",
+      "severity": "high",
+      "dimension": "sweep-aria-text-js",
+      "suggested_key": "arqel.ai.image_dropzone (+ arqel.ai.image_accept_any for the 'any' fallback)",
+      "detail": "The file-dropzone <span> renders a raw English template literal `Click or drop image (${accept !== '' ? accept : 'any'})` with no t() wrapper, even though the translator `t = useArqelTranslations()` is in scope and used everywhere else in this same component (e.g. line 178 'Analyze with AI', line 204 'File too large', line 267 analyze_error_http). This is the primary visible call-to-action of the image field before a file is chosen, so non-EN admins see English. The accept-hint fallback word 'any' (when accept is empty) is also English. The ledger covers this file's 'File too large' validation, file-size MB/KB/B units, and preview img alt \u2014 but NOT this dropzone prompt. Suggest: t('arqel.ai.image_dropzone', 'Click or drop image (:accept)', { accept: accept !== '' ? accept : t('arqel.ai.image_accept_any', 'any') }).",
+      "confidence": "high",
+      "why_real": "Confirmed at packages-js/ai/src/AiImageInput.tsx:338. The file-dropzone <span> renders `file !== null ? file.name : \\`Click or drop image (${accept !== '' ? accept : 'any'})\\`` \u2014 a raw English template literal with no t() wrapper. The translator `t = useArqelTranslations()` is in scope and used immediately adjacent (line 346 aria-label 'Image file', line 355 'Selected preview' alt), so this is a genuine missed localization, not an out-of-scope context. It is the primary visible call-to-action of the image field before a file is selected, so non-EN admins see English; the 'any' accept-hint fallback is also hardcoded English. Not vendored (packages-js/ai, not ui/src/shadcn). Ledger has 5 AiImageInput entries \u2014 line 193 'File too large' (R5), file-size MB/KB/B units (R5), line 230 'Missing analyze URL' (R7), line 350 preview img alt (R7) \u2014 but NONE covers the line-338 dropzone prompt. Genuinely novel, user-facing, reproduces."
+    },
+    {
+      "title": "RepeaterField itemLabel template serialized verbatim \u2014 never passed through trans()/localizeLabel()",
+      "file": "/home/diogo/PhpstormProjects/arqel/packages/fields-advanced/src/Types/RepeaterField.php",
+      "line": 187,
+      "kind": "php-label-gap",
+      "severity": "low",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "(app-must-key: localize the static portion of the itemLabel template via trans() before the {{label}} substitution)",
+      "detail": "RepeaterField::getTypeSpecificProps() serializes the user-supplied itemLabel template ('itemLabel' => $this->itemLabel) verbatim. itemLabel is a developer-set, user-facing per-row heading template (e.g. 'Address {{label}}') rendered in the admin panel above each repeater item. Unlike Field::$label (ledger-localized via localizeLabel) and Field::$placeholder/$helperText (ledger entry packages/fields/src/Field.php:206, flagged & fixed), this label is shipped to the frontend with no localization hook, so a translation-key itemLabel cannot resolve and an English literal cannot be translated. App-must-key consistency gap analogous to the placeholder/helperText fix. Weaker than the StateFilter finding because the value carries {{label}} interpolation, making a naive trans() of the whole string awkward \u2014 a localize-then-interpolate pattern (or localizing only the static prefix) is the appropriate fix.",
+      "confidence": "med",
+      "why_real": "Confirmed at /home/diogo/PhpstormProjects/arqel/packages/fields-advanced/src/Types/RepeaterField.php:187. getTypeSpecificProps() serializes the developer-set, user-facing itemLabel template ('itemLabel' => $this->itemLabel) verbatim, with no localizeLabel()/trans() pass-through. itemLabel (set via itemLabel() at line 139) is the collapsed-item header template rendered in the admin panel (e.g. \"Address {{label}}\"). The base Field class applies localizeLabel() to label (line 185), placeholder (getPlaceholder, line 210) and helperText (getHelperText, line 217) so the active-request locale applies at serialization time \u2014 but RepeaterField's subclass-specific itemLabel prop bypasses that entirely. A translation-key itemLabel cannot resolve and an English literal cannot be translated. The {{...}} interpolation tokens do not block a fix: localizeLabel() uses trans() which returns the key unchanged when no translation exists, and the {{label}} tokens are interpolated client-side AFTER serialization, so a localize-then-interpolate pattern works cleanly.\n\nNot a duplicate: grep of the R1-R38 ledger for \"itemLabel\" and \"RepeaterField\" returned zero hits. The analogous ledger entry (packages/fields/src/Field.php:206, round 8) covers only base-Field placeholder/helperText; itemLabel has its own independent serialization path in getTypeSpecificProps() and is not reached by that base fix. Not vendored (fields-advanced, not packages-js/ui/src/shadcn/*). First-party user-facing PHP label = in scope.\n\nConfidence med, not high: the value is an interpolation template, making it a weaker/more nuanced case than a plain label (the finding acknowledges this), and a localize-then-interpolate fix is slightly more involved than a straight localizeLabel() wrap. But the framework convention of localizing user-facing labels at serialization time is genuinely and inconsistently skipped here."
+    }
+  ]
+}

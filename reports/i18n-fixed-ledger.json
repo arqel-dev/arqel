@@ -2164,5 +2164,17 @@
     "line": 18,
     "title": "Built-in Actions::view()/edit()/restore()/create() factories serialize hardcoded English labels \u2014 never reference the arqel::actions.* keys (unlike deleteBulk)",
     "round": 36
+  },
+  {
+    "file": "packages/widgets/src/Filters/Filter.php",
+    "line": 130,
+    "title": "Dashboard Filter base label serialized without localization",
+    "round": 37
+  },
+  {
+    "file": "packages/widgets/src/Filters/SelectFilter.php",
+    "line": 55,
+    "title": "Dashboard SelectFilter option labels passed through un-localized",
+    "round": 37
   }
 ]

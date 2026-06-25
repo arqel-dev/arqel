@@ -14,20 +14,16 @@ integrado en un único proyecto: un blog admin con **Posts**, **Tags** y
 
 ## Setup rápido
 
-La demo se **recrea desde cero** en cada ejecución — no hay scaffolding versionado
-bajo `apps/demo/`. El flujo es el mismo que tendría cualquier usuario final
-al integrar Arqel en una app Laravel fresca:
+La demo es una **app Laravel + Inertia + React versionada** en `apps/demo/`.
+Para ejecutarla desde un checkout nuevo:
 
 ```bash
 git clone https://github.com/arqel-dev/arqel.git
 cd arqel
 pnpm install
 
-# Recreate the demo from zero using the one-line installer.
-./apps/demo/scripts/recreate.sh
-# under the hood:
-#   composer create-project laravel/laravel apps/demo
-#   composer -d apps/demo require arqel-dev/framework
+# Instala las dependencias y puebla la app demo versionada.
+composer -d apps/demo install
 #   php artisan arqel:install   # publishes configs, shadcn (new-york) theme, sidebar and login
 #   php artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
 

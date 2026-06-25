@@ -3,13 +3,13 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![PHP](https://img.shields.io/badge/php-%5E8.3-777bb4.svg)](https://www.php.net)
 [![Laravel](https://img.shields.io/badge/laravel-%5E12.0%20%7C%20%5E13.0-ff2d20.svg)](https://laravel.com)
-[![Status](https://img.shields.io/badge/status-pre--alpha-orange.svg)](#)
+[![Status](https://img.shields.io/badge/status-alpha-yellow.svg)](#)
 
 Pacote de **Auth** para o ecossistema [Arqel](https://arqel.dev) — wraps Laravel Policies + Gate com conveniences para Resources e panels.
 
 ## Status
 
-🚧 **Pre-alpha** — `AbilityRegistry`, `PolicyDiscovery`, `ArqelGate` entregues em `AUTH-001..003`. `<CanAccess>` middleware helpers chegam em `AUTH-004`.
+**Alpha** — `AbilityRegistry`, `PolicyDiscovery`, `ArqelGate`, o componente React `<CanAccess>` (em `@arqel-dev/ui`) e o middleware `EnsureUserCanAccessPanel` entregues.
 
 ## Convenções
 

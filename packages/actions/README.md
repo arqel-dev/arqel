@@ -3,13 +3,13 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![PHP](https://img.shields.io/badge/php-%5E8.3-777bb4.svg)](https://www.php.net)
 [![Laravel](https://img.shields.io/badge/laravel-%5E12.0%20%7C%20%5E13.0-ff2d20.svg)](https://laravel.com)
-[![Status](https://img.shields.io/badge/status-pre--alpha-orange.svg)](#)
+[![Status](https://img.shields.io/badge/status-alpha-yellow.svg)](#)
 
 Pacote de **Actions** para o ecossistema [Arqel](https://arqel.dev) — row, bulk, toolbar e header actions com confirmação, formulário inline e authorization.
 
 ## Status
 
-🚧 **Pre-alpha** — esqueleto criado em `ACTIONS-001`. A classe base `Action`, os tipos concretos, concerns, executor e controller chegam em `ACTIONS-002+`.
+**Alpha** — a classe base `Action`, os tipos concretos em `src/Types/` (`RowAction`, `BulkAction`, `ToolbarAction`, `HeaderAction`), os concerns e o `ActionController` entregues.
 
 ## Convenções
 

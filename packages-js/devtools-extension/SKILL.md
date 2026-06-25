@@ -140,11 +140,12 @@ window.__ARQEL_DEVTOOLS_HOOK__
 // => undefined em produção (DCE removeu o código)
 ```
 
-### Inspecionar Inertia state (futuro DEVTOOLS-003+)
+### Inspecionar Inertia state
 
-Atualmente o painel mostra apenas `Connected (vX.Y.Z)`. A inspeção de
-props/page object chega em DEVTOOLS-003 quando `@arqel-dev/react` começar
-a postar `arqel.inertia.update` para o background.
+O `InertiaInspector` (`src/panel/InertiaInspector.tsx`) renderiza as abas
+`pageProps` / `sharedProps` / `navigation` via `JsonNode`, lendo
+`state.pageProps` / `state.sharedProps` postados por `@arqel-dev/react` em
+`arqel.inertia.update`. A inspeção de props/page object já funciona.
 
 ## Related
 

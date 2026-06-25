@@ -4,7 +4,7 @@ Dashboard widgets for Arqel — Stat/Chart/Table/Custom widgets with deferred lo
 
 ## Status
 
-Phase 2 scaffold (WIDGETS-001). Concrete widget types (StatWidget, ChartWidget, TableWidget, CustomWidget) and the dashboard controllers land in WIDGETS-002..006. See [`SKILL.md`](./SKILL.md).
+Shipped (WIDGETS-001..009). The four concrete widget types (`StatWidget`, `ChartWidget`, `TableWidget`, `CustomWidget`) and the dashboard/widget-data controllers (`DashboardController`, `WidgetDataController`) are implemented. See [`SKILL.md`](./SKILL.md).
 
 ## Install
 

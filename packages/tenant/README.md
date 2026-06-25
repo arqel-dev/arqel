@@ -4,7 +4,7 @@ Multi-tenancy primitives for Arqel — `TenantManager`, resolver, scoped Eloquen
 
 ## Status
 
-Phase 2 scaffold (TENANT-001). Public API entries land in TENANT-002..015. See [`SKILL.md`](./SKILL.md) for the full contract surface and roadmap.
+Shipped. The public API is implemented: `TenantManager` singleton, 5 concrete resolvers (subdomain, path, header, session, auth-user), `BelongsToTenant` trait + global scope, `ScopedUnique` rule, adapters for `stancl/tenancy` + `spatie/laravel-multitenancy`, scaffolders, white-labeling theme, and feature gates. See [`SKILL.md`](./SKILL.md) for the full contract surface.
 
 ## Install
 

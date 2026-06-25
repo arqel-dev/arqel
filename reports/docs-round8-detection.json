@@ -1,0 +1,80 @@
+{
+  "total": 8,
+  "confirmed_count": 6,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "deploy-guide env-var table lists ARQEL_AI_OPENAI_KEY, but the AI config reads OPENAI_API_KEY",
+      "file": "apps/docs/laravel-cloud/deploy-guide.md",
+      "line": 142,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "factual-drift",
+      "suggested_fix": "Change `ARQEL_AI_OPENAI_KEY` to `OPENAI_API_KEY` in all three deploy-guide.md mirrors (EN/pt-BR/es line 142). Optionally also document `ANTHROPIC_API_KEY` (the Claude provider key, config line 23).",
+      "detail": "The Laravel Cloud env-var recommendation table tells users to set `ARQEL_AI_OPENAI_KEY` to use @arqel-dev/ai with OpenAI. The actual config in packages/ai/config/arqel-ai.php line 29 reads the OpenAI key from `env('OPENAI_API_KEY')`, not ARQEL_AI_OPENAI_KEY. Setting ARQEL_AI_OPENAI_KEY has no effect, so the OpenAI provider would have a null api_key. This same wrong var appears in all 3 locale mirrors (EN line 142, pt-BR line 142, es line 142).",
+      "confidence": "high",
+      "why_real": "Verified both sides on disk. The deploy-guide env-var table (apps/docs/laravel-cloud/deploy-guide.md:142, EN) recommends setting `ARQEL_AI_OPENAI_KEY` \"If using @arqel-dev/ai with OpenAI\". The actual AI config at packages/ai/config/arqel-ai.php:29 reads the OpenAI provider's api_key from env('OPENAI_API_KEY'), and a grep across packages shows no code reads ARQEL_AI_OPENAI_KEY (only ARQEL_AI_OPENAI_MODEL exists, line 30). Thus setting the documented variable has no effect \u2014 the OpenAI provider would get a null api_key. The wrong var is mirrored at line 142 in all 3 source markdown locales (EN, pt-BR, es); the generated dist/ copies are out of scope. The doc is in-scope (apps/docs, not PLANNING/tickets/CHANGELOG/generated), the claim is objectively checkable and false vs current code, and grep of reports/docs-fixed-ledger.json shows no deploy-guide/OPENAI entry, so it is not a duplicate."
+    },
+    {
+      "title": "deploy-guide recommends ARQEL_PANEL_PATH env var, but core config hardcodes path with no env() read",
+      "file": "apps/docs/laravel-cloud/deploy-guide.md",
+      "line": 141,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "factual-drift",
+      "suggested_fix": "Either wrap the core config value as `env('ARQEL_PANEL_PATH', '/admin')`, or remove the ARQEL_PANEL_PATH row from the deploy-guide env table (all 3 mirrors) since it is non-functional.",
+      "detail": "The env-var table recommends `ARQEL_PANEL_PATH=/admin` as the 'Prefix for the panel routes'. But packages/core/config/arqel.php line 6 sets `'path' => '/admin'` as a hardcoded literal with no `env('ARQEL_PANEL_PATH', ...)` wrapper, and grepping the packages tree finds ARQEL_PANEL_PATH only in the cli cloud.env.example template, never read by any config. Setting this env var therefore does not change the panel path. Present in all 3 locale mirrors.",
+      "confidence": "high",
+      "why_real": "Verified both sides on disk. Doc apps/docs/laravel-cloud/deploy-guide.md:141 lists `ARQEL_PANEL_PATH` = `/admin` with \"Why\" = \"Prefix for the panel routes\", implying setting this env var configures the panel path. But packages/core/config/arqel.php:6 sets `'path' => '/admin'` as a hardcoded string literal with NO `env('ARQEL_PANEL_PATH', ...)` wrapper. The panel path is read everywhere via `config('arqel.path', 'admin')` (ArqelServiceProvider.php:312, InertiaDataBuilder.php:382, NavigationCommandProvider.php:143). A grep of packages/ finds ARQEL_PANEL_PATH only in packages/cli/templates/laravel-cloud/cloud.env.example:33 \u2014 it is never read by any config. Therefore setting ARQEL_PANEL_PATH does not change the panel path; the doc's recommendation is factually false/misleading. In-scope (apps/docs, not PLANNING/tickets/CHANGELOG), checkable, and not present in reports/docs-fixed-ledger.json."
+    },
+    {
+      "title": "workflow SKILL claims config exposes a 'user_model' block, but the published config file has no such key",
+      "file": "packages/workflow/SKILL.md",
+      "line": 17,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "factual-drift",
+      "suggested_fix": "Either add a `'user_model' => env('...', 'App\\\\Models\\\\User')` key to packages/workflow/config/arqel-workflow.php, or correct the SKILL to say user_model is read with a code default and is not a published config key.",
+      "detail": "SKILL line 17 states `config/arqel-workflow.php` 'exp\u00f5e blocos audit, authorization, history, user_model', and line 23 describes StateTransition::user() reading `arqel-workflow.user_model`. The shipped config packages/workflow/config/arqel-workflow.php contains no `user_model` key anywhere (only default_color, default_icon, audit, authorization, history). The code at src/Models/StateTransition.php line 77 reads `config('arqel-workflow.user_model', 'App\\Models\\User')` with a hardcoded fallback, so it works, but the published config does NOT expose user_model as the SKILL claims.",
+      "confidence": "high",
+      "why_real": "In-scope package doc (packages/workflow/SKILL.md, not PLANNING/docs/CHANGELOG). SKILL line 17 explicitly lists the config blocks the published config exposes: \"config/arqel-workflow.php exp\u00f5e blocos audit, authorization, history, user_model\". I read the entire shipped config file (packages/workflow/config/arqel-workflow.php, 85 lines): its only top-level keys are default_color, default_icon, audit, broadcast_transitions, authorization, history. There is NO user_model key. StateTransition::user() at line 77 reads config('arqel-workflow.user_model', 'App\\\\Models\\\\User') relying on the hardcoded second-arg fallback precisely because the config does not ship the key. So the doc's claim that the config \"exposes\" a user_model block is objectively false/misleading \u2014 the key is consumed via a code fallback, never published. Not in the ledger: the two ledger entries for this file concern a non-existent README link (line 80) and a JS-SKILL export claim \u2014 both different claims."
+    },
+    {
+      "title": "publishing-setup.md installs splitsh/lite v2.0.0, but v2.0.0 ships no binaries (release.yml uses v1.0.1)",
+      "file": "docs/publishing-setup.md",
+      "line": 320,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "broken-refs",
+      "suggested_fix": "Change the doc URL from v2.0.0 to v1.0.1 (https://github.com/splitsh/lite/releases/download/v1.0.1/lite_linux_amd64.tar.gz), matching release.yml, and optionally note that v2.0.0 ships no prebuilt binaries.",
+      "detail": "\u00a77.1 'Instalar splitsh/lite no runner' instructs: `curl -L https://github.com/splitsh/lite/releases/download/v2.0.0/lite_linux_amd64.tar.gz | tar xz`. The actual production workflow .github/workflows/release.yml (lines 106-114) installs v1.0.1 and carries an explicit inline comment: 'v2.0.0 ships no binaries \u2014 last release with prebuilt binaries is v1.0.1.' The documented v2.0.0 download URL returns no binary tarball, so following this doc step verbatim would fail. The version in the doc contradicts the real, working install step in release.yml.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides on disk. docs/publishing-setup.md:320 (\u00a77.1) instructs installing splitsh/lite via `curl -L https://github.com/splitsh/lite/releases/download/v2.0.0/lite_linux_amd64.tar.gz | tar xz`. The production workflow .github/workflows/release.yml lines 106-114 actually installs v1.0.1 and carries the explicit inline comment \"v2.0.0 ships no binaries \u2014 last release with prebuilt binaries is v1.0.1.\" Since v2.0.0 ships no binary tarball, following the doc step verbatim fails, directly contradicting the real working install step. Doc is in-scope (not PLANNING/tickets/superpowers/CHANGELOG/generated). Not in the ledger \u2014 the three existing publishing-setup.md ledger entries cover package counts and split-script member lists, not the splitsh version. Objective, checkable factual drift."
+    },
+    {
+      "title": "types.md (EN) says '7 subpath entry points' but @arqel-dev/types has 8 (omits ./tenant)",
+      "file": "apps/docs/reference/typescript/types.md",
+      "line": 3,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "stale-status",
+      "suggested_fix": "Change '7 subpath entry points' to '8 subpath entry points' and add the line: import type { TenantMeta } from '@arqel-dev/types/tenant';",
+      "detail": "Line 3 states 'TypeScript-only package (zero runtime). 7 subpath entry points:' and the code block enumerates exactly 7 (./fields, ./resources, ./tables, ./forms, ./actions, ./inertia plus the bare barrel). But packages-js/types/package.json declares 8 subpath exports: ./actions, ./fields, ./forms, ./inertia, ./resources, ./tables, AND ./tenant. The ./tenant subpath is real: packages-js/types/src/tenant.ts exists, index.ts re-exports it (export type * from './tenant.js'), and the same docs file imports TenantMeta at line 125. The count and import list are stale by one entry point.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides on disk. apps/docs/reference/typescript/types.md line 3 reads \"TypeScript-only package (zero runtime). 7 subpath entry points:\" and the code block (lines 6-11) enumerates 6 named subpaths (./fields, ./resources, ./tables, ./forms, ./actions, ./inertia) plus the bare barrel = 7. But packages-js/types/package.json declares 8 subpath exports: ./fields, ./resources, ./tables, ./forms, ./actions, ./inertia AND ./tenant (lines 50-53), plus the bare \".\" barrel. ./tenant is real: src/tenant.ts exists, index.ts re-exports it (line 18: export type * from './tenant.js'), and the doc itself uses TenantMeta at line 125 (tenant: TenantMeta | null). The doc's count and import list are stale by one entry point. In-scope (apps/docs, not PLANNING/tickets/changelog/generated). Not in ledger \u2014 the only tenant entries there are for packages/tenant/README.md and panels.md, different files/claims."
+    },
+    {
+      "title": "types/SKILL.md says '7 entry points' and lists them, omitting ./tenant (8 exist)",
+      "file": "packages-js/types/SKILL.md",
+      "line": 18,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "stale-status",
+      "suggested_fix": "Update to '8 entry points (./, ./fields, ./resources, ./tables, ./forms, ./actions, ./inertia, ./tenant)' (or '9' if counting the bare barrel, to match the package.json export map).",
+      "detail": "Line 18 says 'Pacote npm @arqel-dev/types com 7 entry points (./, ./fields, ./resources, ./tables, ./forms, ./actions, ./inertia)'. This explicit enumeration omits ./tenant. package.json declares the bare barrel '.' plus 8 subpaths (./actions, ./fields, ./forms, ./inertia, ./resources, ./tables, ./tenant). src/tenant.ts exists and index.ts does 'export type * from './tenant.js''. The Status section is one entry point short.",
+      "confidence": "high",
+      "why_real": "Confirmed against disk. packages-js/types/SKILL.md:18 states the package has \"7 entry points\" and enumerates exactly seven (./, ./fields, ./resources, ./tables, ./forms, ./actions, ./inertia), explicitly omitting ./tenant. package.json exports (lines 21-54) declare the bare barrel \".\" plus 8 named subpaths including \"./tenant\" (lines 50-53). src/tenant.ts exists and src/index.ts line 18 re-exports it via 'export type * from ./tenant.js'. The doc's explicit count and enumeration objectively contradict the current code \u2014 it is one entry point short. In-scope (a package SKILL.md, not PLANNING/tickets/CHANGELOG/generated). Not in the ledger (the two ledger hits concern packages/tenant/README.md and panels.md, unrelated files). This is a checkable, false factual claim, not a wording nit or missing-doc."
+    }
+  ]
+}

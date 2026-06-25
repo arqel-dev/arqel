@@ -317,7 +317,8 @@ No `release.yml`, antes do step de splitsh:
 ```yaml
 - name: Install splitsh/lite
   run: |
-    curl -L https://github.com/splitsh/lite/releases/download/v2.0.0/lite_linux_amd64.tar.gz | tar xz
+    # v2.0.0 ships no binaries — last release with prebuilt binaries is v1.0.1.
+    curl -L https://github.com/splitsh/lite/releases/download/v1.0.1/lite_linux_amd64.tar.gz | tar xz
     sudo mv splitsh-lite /usr/local/bin/
 ```
 

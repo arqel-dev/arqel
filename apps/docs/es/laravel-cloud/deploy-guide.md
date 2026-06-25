@@ -138,8 +138,7 @@ Laravel Cloud inyecta automáticamente:
 | `MAIL_MAILER` | `resend` o `postmark` | Para password reset / invites. |
 | `MAIL_FROM_ADDRESS` | `noreply@seu-dominio.com` | Header `From:` en emails transaccionales. |
 | `REVERB_APP_ID` / `REVERB_APP_KEY` / `REVERB_APP_SECRET` | (genera con `php artisan reverb:install`) | Auth de broadcasting. |
-| `ARQEL_PANEL_PATH` | `/admin` | Prefijo para las rutas del panel. |
-| `ARQEL_AI_OPENAI_KEY` | (opcional) | Si usas `@arqel-dev/ai` con OpenAI. |
+| `OPENAI_API_KEY` | (opcional) | Si usas `@arqel-dev/ai` con OpenAI. |
 
 > `cloud:export` ya produce un `.env.example` con todos los placeholders.
 > Pégalo en el dashboard, rellena los valores y haz click en **Save**.

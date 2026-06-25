@@ -127,7 +127,7 @@ public function table(): Table
                 'draft' => 'gray',
                 'published' => 'green',
             ]),
-            DateColumn::make('created_at')->displayFormat('d/m/Y H:i'),
+            DateColumn::make('created_at')->dateTime('d/m/Y H:i'),
         ])
         ->filters([
             SelectFilter::make('status')->options([...]),

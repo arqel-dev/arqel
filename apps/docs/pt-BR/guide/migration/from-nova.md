@@ -146,7 +146,7 @@ public function table(): Table
     return Table::make()->columns([
         TextColumn::make('title')->sortable()->searchable()->limit(60),
         BadgeColumn::make('status')->colors(['draft' => 'gray', 'published' => 'green']),
-        DateColumn::make('published_at')->displayFormat('d/m/Y'),
+        DateColumn::make('published_at')->date('d/m/Y'),
     ]);
 }
 ```

@@ -28,13 +28,13 @@ Builder principal.
 | Clase | Caso de uso | Setters extra |
 |---|---|---|
 | `TextColumn` | String/text por defecto | `limit(int)`, `wrap(bool)` |
-| `BadgeColumn` | Estado con colores | `colors(array)`, `icon(string)` |
+| `BadgeColumn` | Estado con colores | `colors(array)`, `icons(array)` |
 | `BooleanColumn` | Checkmark | `trueIcon`, `falseIcon`, `trueColor`, `falseColor` |
-| `DateColumn` | Fechas formateadas | `displayFormat(string)`, `timezone(string)` |
+| `DateColumn` | Fechas formateadas | `date(string)`, `dateTime(string)`, `since()`, `timezone(string)` |
 | `NumberColumn` | Numérico alineado a la derecha | `decimals(int)`, `prefix`, `suffix` |
-| `IconColumn` | Icono único | `icon(string\|Closure)`, `color(string\|Closure)` |
+| `IconColumn` | Icono único | `options(array)`, `size(string)` |
 | `ImageColumn` | Thumbnail | `disk(string)`, `circular(bool)`, `size(int)` |
-| `RelationshipColumn` | Relación con eager-load | factory `make(name, relation, attribute)` |
+| `RelationshipColumn` | Relación con eager-load | `make(name)` + `->display(attribute)` |
 | `ComputedColumn` | Derivado por Closure | factory `make(name, Closure)` |
 | `SelectColumn` | Celda select editable | `options(array\|Closure)`, `rules(array)`, `debounce(int)` |
 | `TextInputColumn` | Celda text-input inline editable | `rules(array)`, `debounce(int)`, `readonly(bool)` |

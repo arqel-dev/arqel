@@ -27,7 +27,7 @@ public function table(): Table
 | `TextColumn` | String/text default |
 | `BadgeColumn` | Status com cores |
 | `BooleanColumn` | Checkmark |
-| `DateColumn` | `displayFormat('d/m/Y')` |
+| `DateColumn` | `date('d/m/Y')` |
 | `NumberColumn` | Right-aligned numeric |
 | `IconColumn` | Single ícone |
 | `ImageColumn` | Thumbnail |

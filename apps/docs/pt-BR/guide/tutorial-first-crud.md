@@ -176,7 +176,7 @@ final class PostResource extends Resource
                     'published' => 'green',
                     'archived' => 'red',
                 ])->sortable(),
-                DateColumn::make('published_at')->displayFormat('d/m/Y H:i')->sortable(),
+                DateColumn::make('published_at')->dateTime('d/m/Y H:i')->sortable(),
             ])
             ->filters([
                 SelectFilter::make('status')->options([

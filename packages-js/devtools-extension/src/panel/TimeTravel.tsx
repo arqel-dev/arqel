@@ -39,7 +39,10 @@ const SLOW_THRESHOLD_MS = 100;
 // *_one key; everything else to *_other.
 function snapshotCountLabel(count: number): string {
   const category = new Intl.PluralRules(localeBcp47()).select(count);
-  const key = category === 'one' ? 'devtools.time_travel.snapshot_count_one' : 'devtools.time_travel.snapshot_count_other';
+  const key =
+    category === 'one'
+      ? 'devtools.time_travel.snapshot_count_one'
+      : 'devtools.time_travel.snapshot_count_other';
   const fallback = category === 'one' ? ':count snapshot' : ':count snapshots';
   return t(key, fallback, { count });
 }

@@ -60,7 +60,7 @@ export function AppShell({
       >
         <CommandPalette />
         {topbar}
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
         {footer}
       </div>
     );
@@ -83,7 +83,7 @@ export function AppShell({
         {sidebar}
         <SidebarInset>
           {topbar}
-          <main className="min-w-0 flex-1">{children}</main>
+          <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
           {footer}
         </SidebarInset>
       </div>

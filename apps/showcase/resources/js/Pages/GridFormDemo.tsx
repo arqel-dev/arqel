@@ -60,7 +60,7 @@ const schema: FormSchema = {
 
 export default function GridFormDemo(): JSX.Element {
   return (
-    <main id="arqel-main" className="p-6" data-testid="grid-form-demo">
+    <main id="arqel-main" data-testid="grid-form-demo">
       <h1 className="mb-4 text-xl font-semibold">Grid Form Demo</h1>
       <FormRenderer schema={schema} fields={fields} values={{}} onChange={() => {}} />
     </main>

@@ -224,6 +224,6 @@ Plan de recovery:
 
 ## Relacionado
 
-- [README — comparación general](./README.md)
+- [Índice — comparación general](./index.md)
 - [CMS Articles — uso clásico de versioning](./cms-articles.md)
 - [Legal Contracts — cuándo ambos tienen sentido](./legal-contracts.md)

@@ -304,7 +304,7 @@ caracteriza la aplicación legal-tech.
 
 ## Relacionado
 
-- [README — comparación general](./README.md)
+- [Índice — comparación general](./index.md)
 - [CMS Articles — versioning standalone](./cms-articles.md)
 - [E-commerce Orders — audit standalone](./ecommerce-orders.md)
 - `packages/versioning/SKILL.md`

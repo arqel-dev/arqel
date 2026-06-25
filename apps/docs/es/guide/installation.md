@@ -40,6 +40,7 @@ El meta-paquete `arqel-dev/framework` arrastra todo el stack de Arqel + `inertia
 - `arqel-dev/actions` — contratos + invokers
 - `arqel-dev/nav` — navigation builder
 - `arqel-dev/table` — query / sort / filter / paginate
+- `arqel-dev/widgets` — widgets de dashboard (Stat / Chart / Table / Custom)
 - `inertiajs/inertia-laravel` — peer requerido
 
 ## Paso 3 — Ejecutar el instalador

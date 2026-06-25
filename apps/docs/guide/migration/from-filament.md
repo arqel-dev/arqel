@@ -1,7 +1,6 @@
 # Migrating from Filament v3 to Arqel
 
-> Migration guide with 12 side-by-side mappings. For the general index
-> and the decision tree, see [`README.md`](./README.md).
+> Migration guide with 12 side-by-side mappings.
 
 ## Why migrate
 

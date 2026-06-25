@@ -14,18 +14,19 @@ integrados num único projeto: blog admin com **Posts**, **Tags** e
 
 ## Setup rápido
 
-O demo é um **app Laravel + Inertia + React versionado** em `apps/demo/`.
-Para executá-lo a partir de um checkout novo:
+O demo é versionado em `apps/demo/`. Configure-o com o script
+`composer setup` incluído e popule os dados de exemplo do blog:
 
 ```bash
 git clone https://github.com/arqel-dev/arqel.git
 cd arqel
 pnpm install
 
-# Instala as dependências e popula o app demo versionado.
-composer -d apps/demo install
-#   php artisan arqel:install   # publica configs, tema shadcn (new-york), sidebar e login
-#   php artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
+# Instala deps, copia .env, gera key, roda migrate e builda assets.
+composer -d apps/demo setup
+
+# Popula o blog de exemplo (3 usuários, 5 categorias, 20 tags, 50 posts).
+php -d apps/demo artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
 
 php -d apps/demo artisan serve
 ```
@@ -51,7 +52,7 @@ sobre Radix UI (`radix-ui`) afeta o demo de duas formas visíveis:
 O demo carrega uma suíte Playwright que cobre o fluxo crítico de auth e
 o CRUD básico do blog. O ponto de entrada do smoke set fica em:
 
-- `apps/demo/tests-e2e/auth.spec.ts` — login → dashboard → logout.
+- `apps/demo/tests/e2e/01-login.spec.ts` — login → dashboard → logout.
 
 Rodar localmente:
 
@@ -74,4 +75,3 @@ garantindo que a sequência one-line funciona end-to-end.
 
 - Código: [`apps/demo/`](https://github.com/arqel-dev/arqel/tree/main/apps/demo)
 - README: [`apps/demo/README.md`](https://github.com/arqel-dev/arqel/tree/main/apps/demo/README.md)
-- SKILL: [`apps/demo/SKILL.md`](https://github.com/arqel-dev/arqel/tree/main/apps/demo/SKILL.md)

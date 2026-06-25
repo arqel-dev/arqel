@@ -290,6 +290,6 @@ A divisão é limpa:
 
 ## Related
 
-- [README — comparativo geral](./README.md)
+- [Índice — comparativo geral](./index.md)
 - [E-commerce Orders — quando NÃO usar versioning](./ecommerce-orders.md)
 - [Legal Contracts — versioning + audit combinados](./legal-contracts.md)

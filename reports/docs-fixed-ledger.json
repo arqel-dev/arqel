@@ -1,0 +1,128 @@
+[
+  {
+    "file": "apps/docs/reference/php/core.md",
+    "line": 27,
+    "title": "core.md lifecycle hook signatures wrong: before* hooks return array, beforeCreate has no $record",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 3,
+    "title": "table reference claims '9 column types' but 12 exist on disk",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 3,
+    "title": "table reference claims '6 filter types' but 8 exist on disk",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/reference/php/core.md",
+    "line": 20,
+    "title": "core.md lists Resource::actions() as an existing method, but it is not defined",
+    "round": 1
+  },
+  {
+    "file": "README.md",
+    "line": 34,
+    "title": "README says 'Vite 5' but apps use Vite 7 (devtools-extension uses 6)",
+    "round": 1
+  },
+  {
+    "file": "README.md",
+    "line": 96,
+    "title": "README says PLANNING has '13 docs' but there are 14",
+    "round": 1
+  },
+  {
+    "file": "docs/publishing-setup.md",
+    "line": 27,
+    "title": "publishing-setup.md package counts are stale/contradictory vs 20 PHP + 18 JS on disk",
+    "round": 1
+  },
+  {
+    "file": "packages/marketplace/SKILL.md",
+    "line": 420,
+    "title": "marketplace SKILL links to non-existent apps/docs/marketplace/README.md",
+    "round": 1
+  },
+  {
+    "file": "packages/versioning/SKILL.md",
+    "line": 258,
+    "title": "versioning SKILL links to non-existent apps/docs/examples/versioning/README.md",
+    "round": 1
+  },
+  {
+    "file": "packages/workflow/SKILL.md",
+    "line": 80,
+    "title": "workflow SKILL links to non-existent apps/docs/examples/workflows/README.md",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/guide/migration/from-nova.md",
+    "line": 4,
+    "title": "Migration guides link to a non-existent ./README.md overview (EN/PT-BR/ES)",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/examples/versioning/ecommerce-orders.md",
+    "line": 227,
+    "title": "Versioning example pages link to non-existent ./README.md (should be ./index.md, EN/PT-BR/ES)",
+    "round": 1
+  },
+  {
+    "file": "README.md",
+    "line": 96,
+    "title": "README states PLANNING has '13 docs' but there are 14",
+    "round": 1
+  },
+  {
+    "file": "README.md",
+    "line": 93,
+    "title": "README monorepo layout omits 3 of 5 apps/ subdirectories",
+    "round": 1
+  },
+  {
+    "file": "README.md",
+    "line": 95,
+    "title": "README claims 'recreated via arqel:install' for apps/demo but it is versioned scaffolding",
+    "round": 1
+  },
+  {
+    "file": "README.md",
+    "line": 96,
+    "title": "README says PLANNING has '13 docs' but there are 14",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/guide/installation.md",
+    "line": 36,
+    "title": "installation.md meta-package list omits arqel-dev/widgets",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/examples/demo-app.md",
+    "line": 27,
+    "title": "demo-app.md references nonexistent recreate.sh script",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/examples/demo-app.md",
+    "line": 58,
+    "title": "demo-app.md points E2E suite to wrong path tests-e2e/auth.spec.ts",
+    "round": 1
+  },
+  {
+    "file": "apps/docs/examples/demo-app.md",
+    "line": 81,
+    "title": "demo-app.md links a SKILL.md that does not exist",
+    "round": 1
+  },
+  {
+    "file": "docs/publishing-setup.md",
+    "line": 333,
+    "title": "publishing-setup.md split script lists nonexistent 'panel' and 'testing' PHP packages",
+    "round": 1
+  }
+]

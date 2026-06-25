@@ -17,18 +17,17 @@ Clase base para los Resources del usuario. Las subclases solo necesitan declarar
 | `fields()` | `array<Field>` | Lista de fields (abstract — debes declararlo) |
 | `table()` | `mixed` | Opcional. Retorna `Arqel\Table\Table` cuando necesitas comportamiento personalizado |
 | `form()` | `mixed` | Opcional. Retorna `Arqel\Form\Form` cuando necesitas comportamiento personalizado |
-| `actions()` | `array<Action>` | Opcional. Vacío por defecto |
 | `recordTitle(Model)` / `recordSubtitle(Model)` | `string` / `?string` | Identificador mostrado en breadcrumbs/modales |
 | `indexQuery(Builder)` | `Builder` | Hook para acotar el listado |
 
 **Lifecycle hooks** (todos `protected`, sobrescribe en la subclase):
 
 ```php
-beforeCreate(Model $record, array $data): void
+beforeCreate(array $data): array                // muta-y-retorna $data
 afterCreate(Model $record): void
-beforeUpdate(Model $record, array $data): void
+beforeUpdate(Model $record, array $data): array // muta-y-retorna $data
 afterUpdate(Model $record): void
-beforeSave(Model $record, array $data): void   // create OR update
+beforeSave(Model $record, array $data): array   // create OR update; muta-y-retorna $data
 afterSave(Model $record): void
 beforeDelete(Model $record): void
 afterDelete(Model $record): void                // only fires if delete() returned truthy

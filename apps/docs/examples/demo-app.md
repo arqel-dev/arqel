@@ -14,22 +14,19 @@ integrated in a single project: a blog admin with **Posts**, **Tags**, and
 
 ## Quick setup
 
-The demo is **recreated from scratch** on every run — there is no versioned
-scaffolding under `apps/demo/`. The flow is the same any end user would have
-when integrating Arqel into a fresh Laravel app:
+The demo is committed under `apps/demo/`. Set it up with its bundled
+`composer setup` script and seed the sample blog data:
 
 ```bash
 git clone https://github.com/arqel-dev/arqel.git
 cd arqel
 pnpm install
 
-# Recreate the demo from zero using the one-line installer.
-./apps/demo/scripts/recreate.sh
-# under the hood:
-#   composer create-project laravel/laravel apps/demo
-#   composer -d apps/demo require arqel-dev/framework
-#   php artisan arqel:install   # publishes configs, shadcn (new-york) theme, sidebar and login
-#   php artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
+# Install deps, copy .env, generate key, migrate and build assets.
+composer -d apps/demo setup
+
+# Seed the sample blog (3 users, 5 categories, 20 tags, 50 posts).
+php -d apps/demo artisan migrate --seed --seeder=Database\\Seeders\\DemoSeeder
 
 php -d apps/demo artisan serve
 ```
@@ -55,7 +52,7 @@ Radix UI (`radix-ui`) affects the demo in two visible ways:
 The demo carries a Playwright suite covering the critical auth flow and
 the basic blog CRUD. The smoke set entry point is at:
 
-- `apps/demo/tests-e2e/auth.spec.ts` — login → dashboard → logout.
+- `apps/demo/tests/e2e/01-login.spec.ts` — login → dashboard → logout.
 
 Run locally:
 
@@ -78,4 +75,3 @@ guaranteeing the one-line sequence works end-to-end.
 
 - Code: [`apps/demo/`](https://github.com/arqel-dev/arqel/tree/main/apps/demo)
 - README: [`apps/demo/README.md`](https://github.com/arqel-dev/arqel/tree/main/apps/demo/README.md)
-- SKILL: [`apps/demo/SKILL.md`](https://github.com/arqel-dev/arqel/tree/main/apps/demo/SKILL.md)

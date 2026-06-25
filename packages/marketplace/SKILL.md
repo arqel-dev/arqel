@@ -417,7 +417,7 @@ $response = Http::withToken($token)
 
 Docs PT-BR para usuários e publishers em `apps/docs/marketplace/`:
 
-- [Visão geral](../../apps/docs/marketplace/README.md) — index com decision tree e comparação Composer/npm vs marketplace.
+- [Visão geral](../../apps/docs/marketplace/index.md) — index com decision tree e comparação Composer/npm vs marketplace.
 - [Encontrando plugins](../../apps/docs/marketplace/finding-plugins.md) — busca, filtros, badges de segurança, instalação.
 - [Publicando plugins](../../apps/docs/marketplace/publishing.md) — submission, auto-checks, security scan, manual review, releases.
 - [Tutorial de desenvolvimento](../../apps/docs/marketplace/development-tutorial.md) — passo a passo do field-pack `acme/stripe-card`.

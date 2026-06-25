@@ -290,6 +290,6 @@ The split is clean:
 
 ## Related
 
-- [README — overall comparison](./README.md)
+- [Index — overall comparison](./index.md)
 - [E-commerce Orders — when NOT to use versioning](./ecommerce-orders.md)
 - [Legal Contracts — versioning + audit combined](./legal-contracts.md)

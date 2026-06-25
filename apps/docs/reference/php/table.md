@@ -1,6 +1,6 @@
 # `arqel-dev/table` — API Reference
 
-Namespace `Arqel\Table\`. Fluent builder, 9 column types, 6 filter types, query builder.
+Namespace `Arqel\Table\`. Fluent builder, 12 column types, 8 filter types, query builder.
 
 ## `Arqel\Table\Table` (final)
 
@@ -36,6 +36,9 @@ Main builder.
 | `ImageColumn` | Thumbnail | `disk(string)`, `circular(bool)`, `size(int)` |
 | `RelationshipColumn` | Eager-loaded relation | factory `make(name, relation, attribute)` |
 | `ComputedColumn` | Closure-derived | factory `make(name, Closure)` |
+| `SelectColumn` | Editable select cell | `options(array\|Closure)`, `rules(array)`, `debounce(int)` |
+| `TextInputColumn` | Editable inline text-input cell | `rules(array)`, `debounce(int)`, `readonly(bool)` |
+| `ToggleColumn` | Editable toggle cell | `onValue(mixed)`, `offValue(mixed)`, `debounce(int)` |
 
 **Common setters** (on all): `label`, `sortable(bool)`, `searchable(bool)`, `hidden(bool)`, `hiddenOnMobile(bool)`, `align(string)`, `width(string)`, `tooltip(string\|Closure)`.
 
@@ -51,6 +54,8 @@ Main builder.
 | `TextFilter` | Like search | `column(string)` |
 | `TernaryFilter` | true/false/all | `trueLabel`, `falseLabel`, `allLabel` |
 | `ScopeFilter` | Eloquent scope | factory `make($name, $scopeName)` |
+| `QueryBuilderFilter` | Visual condition tree (AND/OR groups) | `constraints(array<Constraint>)` |
+| `TrashedFilter` | Soft-delete three-state (`without`/`with`/`only`) | (no extra setters) |
 
 **Common setters**: `label`, `apply(Closure)` (query override), `default(mixed)`, `placeholder(string)`.
 

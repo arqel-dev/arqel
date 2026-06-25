@@ -1,7 +1,6 @@
 # Migrando de Laravel Nova para Arqel
 
-> Guia de migração com 12 mapeamentos side-by-side. Para o índice geral
-> e a árvore de decisão, veja [`README.md`](./README.md).
+> Guia de migração com 12 mapeamentos side-by-side.
 
 ## Por que migrar
 

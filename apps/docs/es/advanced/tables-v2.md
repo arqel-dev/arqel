@@ -1,6 +1,6 @@
 # Tables V2
 
-> Paquete: [`arqel-dev/table`](../../../packages/table/) · Tickets: TABLE-V2-002..010
+> Paquete: [`arqel-dev/table`](../../../../packages/table/) · Tickets: TABLE-V2-002..010
 
 ## Propósito
 
@@ -141,5 +141,5 @@ La operación de reorder corre contra el subset visible, pero la regla **bloquea
 
 ## Relacionado
 
-- [`packages/table/SKILL.md`](../../../packages/table/SKILL.md)
-- [`PLANNING/09-fase-2-essenciais.md`](../../../PLANNING/09-fase-2-essenciais.md) §TABLE-V2-002..010
+- [`packages/table/SKILL.md`](../../../../packages/table/SKILL.md)
+- [`PLANNING/09-fase-2-essenciais.md`](../../../../PLANNING/09-fase-2-essenciais.md) §TABLE-V2-002..010

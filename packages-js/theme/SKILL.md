@@ -52,8 +52,8 @@ Lança erro se chamado fora de `<ThemeProvider>` (fail-fast).
 
 Retorna string IIFE para inserir antes dos bundles React:
 
-```blade
-<script>{!! \Arqel\Theme\preventFlashScript() !!}</script>
+```tsx
+<script dangerouslySetInnerHTML={{ __html: preventFlashScript() }} />
 ```
 
 ## Conventions

@@ -2,10 +2,9 @@
 
 ## Purpose
 
-Pacote React que entrega os componentes UI do Arqel Workflow. Por
-enquanto exporta apenas `<StateTransition>`, espelhando o PHP
-`Arqel\Workflow\Fields\StateTransitionField` (component string
-`arqel-dev/workflow/StateTransition`).
+Pacote React que entrega os componentes UI do Arqel Workflow. Exporta
+`<StateTransition>` (espelhando o PHP `Arqel\Workflow\Fields\StateTransitionField`,
+component string `arqel-dev/workflow/StateTransition`) e `<WorkflowVisualizer>`.
 
 O componente é **puramente apresentacional** — não faz fetch, não
 conhece Inertia. Disparos de transição saem como `CustomEvent`

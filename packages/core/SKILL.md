@@ -473,7 +473,7 @@ app(\Arqel\Core\Telemetry\MetricsCollector::class)
     ->counter('arqel_custom_total', 1.0, ['tenant' => $tenantId]);
 ```
 
-`arqel:doctor` inclui o check `telemetry.enabled`. Integrações com Prometheus/Grafana/Datadog/Sentry documentadas em `apps/docs/guide/telemetry.md`.
+`arqel:doctor` inclui o check `telemetry.enabled`. Integrações com Prometheus/Grafana/Datadog/Sentry configuradas via o bloco `telemetry` em `packages/core/config/arqel.php`.
 
 ## Anti-patterns
 

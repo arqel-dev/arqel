@@ -18,6 +18,7 @@ final class Actions
     public static function view(): RowAction
     {
         return RowAction::make('view')
+            ->label('arqel::actions.view')
             ->icon('eye')
             ->color(Action::COLOR_SECONDARY)
             ->variant(Action::VARIANT_GHOST);
@@ -26,6 +27,7 @@ final class Actions
     public static function edit(): RowAction
     {
         return RowAction::make('edit')
+            ->label('arqel::actions.edit')
             ->icon('pencil')
             ->color(Action::COLOR_PRIMARY)
             ->variant(Action::VARIANT_GHOST);
@@ -47,6 +49,7 @@ final class Actions
     public static function restore(): RowAction
     {
         return RowAction::make('restore')
+            ->label('arqel::actions.restore')
             ->icon('arrow-uturn-left')
             ->color(Action::COLOR_SUCCESS)
             ->variant(Action::VARIANT_GHOST);
@@ -55,6 +58,7 @@ final class Actions
     public static function create(): ToolbarAction
     {
         return ToolbarAction::make('create')
+            ->label('arqel::actions.create')
             ->icon('plus')
             ->color(Action::COLOR_PRIMARY)
             ->variant(Action::VARIANT_DEFAULT);

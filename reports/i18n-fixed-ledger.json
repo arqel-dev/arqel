@@ -2158,5 +2158,11 @@
     "line": 24,
     "title": "Marketplace Checkout document title hardcoded English 'Checkout' while page + sibling pages are pt-BR",
     "round": 35
+  },
+  {
+    "file": "packages/actions/src/Actions.php",
+    "line": 18,
+    "title": "Built-in Actions::view()/edit()/restore()/create() factories serialize hardcoded English labels \u2014 never reference the arqel::actions.* keys (unlike deleteBulk)",
+    "round": 36
   }
 ]

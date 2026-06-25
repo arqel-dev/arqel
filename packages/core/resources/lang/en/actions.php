@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'create' => 'Create',
     'view' => 'View',
     'edit' => 'Edit',
     'delete' => 'Delete',

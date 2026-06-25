@@ -2176,5 +2176,11 @@
     "line": 55,
     "title": "Dashboard SelectFilter option labels passed through un-localized",
     "round": 37
+  },
+  {
+    "file": "/home/diogo/PhpstormProjects/arqel/packages-js/devtools-extension/src/panel/TimeTravel.tsx",
+    "line": 40,
+    "title": "TimeTravel snapshot-count noun hardcoded English + Intl.PluralRules('en') bypasses the wired devtools translator/localeBcp47()",
+    "round": 38
   }
 ]

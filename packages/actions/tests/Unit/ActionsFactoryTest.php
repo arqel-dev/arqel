@@ -45,9 +45,26 @@ it('Actions::deleteBulk returns a BulkAction with confirmation', function (): vo
 
     expect($action)->toBeInstanceOf(BulkAction::class)
         ->and($action->isRequiringConfirmation())->toBeTrue()
-        ->and($action->getLabel())->toBe('Delete selected');
+        // getLabel() returns the raw stored key; toArray() localizes it (en default).
+        ->and($action->toArray()['label'])->toBe('Delete selected');
 });
 
 it('Actions::restore returns a success-coloured RowAction', function (): void {
     expect(Actions::restore()->getColor())->toBe('success');
+});
+
+it('localizes the built-in factory labels by the active locale', function (): void {
+    // English (default) keeps the original literals for accessible-name stability.
+    expect(Actions::view()->toArray()['label'])->toBe('View')
+        ->and(Actions::edit()->toArray()['label'])->toBe('Edit')
+        ->and(Actions::restore()->toArray()['label'])->toBe('Restore')
+        ->and(Actions::create()->toArray()['label'])->toBe('Create');
+
+    app()->setLocale('pt_BR');
+
+    // pt_BR resolves the arqel::actions.* keys the factories now seed.
+    expect(Actions::view()->toArray()['label'])->toBe('Visualizar')
+        ->and(Actions::edit()->toArray()['label'])->toBe('Editar')
+        ->and(Actions::restore()->toArray()['label'])->toBe('Restaurar')
+        ->and(Actions::create()->toArray()['label'])->toBe('Criar');
 });

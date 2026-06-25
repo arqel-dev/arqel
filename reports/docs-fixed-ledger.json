@@ -388,5 +388,137 @@
     "line": 104,
     "title": "hooks API reference documents useTheme() as a @arqel-dev/hooks export, but the package has no such (re-)export",
     "round": 3
+  },
+  {
+    "file": "packages/widgets/README.md",
+    "line": 7,
+    "title": "widgets README still calls package a 'Phase 2 scaffold' with concrete widget types unimplemented",
+    "round": 4
+  },
+  {
+    "file": "packages/fields-advanced/README.md",
+    "line": 7,
+    "title": "PHP fields-advanced README claims only RichTextField shipped; all 8 advanced types exist",
+    "round": 4
+  },
+  {
+    "file": "packages/mcp/README.md",
+    "line": 7,
+    "title": "mcp README says JSON-RPC handler and tool/resource/prompt registries are still to be delivered",
+    "round": 4
+  },
+  {
+    "file": "packages-js/devtools-extension/README.md",
+    "line": 20,
+    "title": "devtools-extension README labels package a scaffold with DEVTOOLS-002..004 not yet built",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/advanced/dashboards.md",
+    "line": 145,
+    "title": "dashboards guide says React widget components are still in development",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/advanced/command-palette.md",
+    "line": 15,
+    "title": "command-palette guide references a non-existent CommandPaletteServiceProvider class (EN)",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/pt-BR/advanced/command-palette.md",
+    "line": 15,
+    "title": "command-palette guide references non-existent CommandPaletteServiceProvider (pt-BR mirror)",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/es/advanced/command-palette.md",
+    "line": 15,
+    "title": "command-palette guide references non-existent CommandPaletteServiceProvider (es mirror)",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/advanced/dashboards.md",
+    "line": 68,
+    "title": "dashboards guide lists 'trend' as a StatWidget setter",
+    "round": 4
+  },
+  {
+    "file": "packages-js/devtools-extension/SKILL.md",
+    "line": 143,
+    "title": "devtools SKILL Examples claim Inertia prop inspection is a future ticket and panel shows only 'Connected'",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/guide/fields.md",
+    "line": 81,
+    "title": "Docs reference nonexistent artisan command `arqel:form-request`",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/es/guide/fields.md",
+    "line": 81,
+    "title": "ES mirror references nonexistent `arqel:form-request` command",
+    "round": 4
+  },
+  {
+    "file": "apps/docs/pt-BR/guide/fields.md",
+    "line": 81,
+    "title": "PT-BR mirror references nonexistent `arqel:form-request` command",
+    "round": 4
+  },
+  {
+    "file": "packages-js/auth/SKILL.md",
+    "line": 73,
+    "title": "auth JS SKILL.md names nonexistent `VerifyEmailController`",
+    "round": 4
+  },
+  {
+    "file": "packages-js/auth/SKILL.md",
+    "line": 79,
+    "title": "auth JS SKILL.md states Inertia peer `^2.0.0`; package requires `^3.0.0`",
+    "round": 4
+  },
+  {
+    "file": "packages-js/realtime/SKILL.md",
+    "line": 33,
+    "title": "realtime JS SKILL.md lists three nonexistent hooks",
+    "round": 4
+  },
+  {
+    "file": "packages/realtime/SKILL.md",
+    "line": 132,
+    "title": "realtime PHP SKILL.md claims delivered hook `useResourcePresence` that does not exist",
+    "round": 4
+  },
+  {
+    "file": "packages/realtime/SKILL.md",
+    "line": 135,
+    "title": "realtime PHP SKILL.md claims delivered `<RealtimeStatus />`; actual component is `ConnectionStatusBanner`",
+    "round": 4
+  },
+  {
+    "file": "packages/cli/SKILL.md",
+    "line": 142,
+    "title": "cli SKILL.md names artisan command `arqel:resource:make`; actual is `arqel:resource`",
+    "round": 4
+  },
+  {
+    "file": "packages/arqel/SKILL.md",
+    "line": 17,
+    "title": "arqel meta-package SKILL.md omits arqel-dev/widgets from its included-packages list and undercounts (\"7 pacotes\")",
+    "round": 4
+  },
+  {
+    "file": "packages/arqel/README.md",
+    "line": 5,
+    "title": "arqel meta-package README.md omits arqel-dev/widgets from its included-packages list",
+    "round": 4
+  },
+  {
+    "file": "packages/tenant/README.md",
+    "line": 7,
+    "title": "tenant README.md still labels the package a 'Phase 2 scaffold' with public API 'land in TENANT-002..015'",
+    "round": 4
   }
 ]

@@ -9,6 +9,7 @@ import type { ColumnType, FilterType } from '@arqel-dev/types/tables';
 import type { FormSchema, SchemaEntry } from '@arqel-dev/types/forms';
 import type { ActionSchema, ActionFormField } from '@arqel-dev/types/actions';
 import type { SharedProps, AuthPayload } from '@arqel-dev/types/inertia';
+import type { TenantMeta } from '@arqel-dev/types/tenant';
 ```
 
 ## Fields

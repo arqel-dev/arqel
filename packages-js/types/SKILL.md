@@ -15,7 +15,7 @@
 
 **Entregue (TYPES-001..002, 004 parcial):**
 
-- Pacote npm `@arqel-dev/types` com 7 entry points (`./`, `./fields`, `./resources`, `./tables`, `./forms`, `./actions`, `./inertia`)
+- Pacote npm `@arqel-dev/types` com 8 entry points (`./`, `./fields`, `./resources`, `./tables`, `./forms`, `./actions`, `./inertia`, `./tenant`)
 - `tsup` build com `dts: true`, ESM, sourcemaps, tree-shake friendly (`sideEffects: false`)
 - 21 Field types em discriminated union sobre `type`
 - 9 Column types + 6 Filter types em discriminated unions

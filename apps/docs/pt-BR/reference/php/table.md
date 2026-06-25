@@ -28,13 +28,13 @@ Builder principal.
 | Class | Use case | Setters extra |
 |---|---|---|
 | `TextColumn` | String/text default | `limit(int)`, `wrap(bool)` |
-| `BadgeColumn` | Status com cores | `colors(array)`, `icon(string)` |
+| `BadgeColumn` | Status com cores | `colors(array)`, `icons(array)` |
 | `BooleanColumn` | Checkmark | `trueIcon`, `falseIcon`, `trueColor`, `falseColor` |
-| `DateColumn` | Datas formatadas | `displayFormat(string)`, `timezone(string)` |
+| `DateColumn` | Datas formatadas | `date(string)`, `dateTime(string)`, `since()`, `timezone(string)` |
 | `NumberColumn` | Numérico right-align | `decimals(int)`, `prefix`, `suffix` |
-| `IconColumn` | Single ícone | `icon(string\|Closure)`, `color(string\|Closure)` |
+| `IconColumn` | Single ícone | `options(array)`, `size(string)` |
 | `ImageColumn` | Thumbnail | `disk(string)`, `circular(bool)`, `size(int)` |
-| `RelationshipColumn` | Eager-loaded relation | factory `make(name, relation, attribute)` |
+| `RelationshipColumn` | Eager-loaded relation | `make(name)` + `->display(attribute)` |
 | `ComputedColumn` | Closure derivada | factory `make(name, Closure)` |
 | `SelectColumn` | Célula select editável | `options(array\|Closure)`, `rules(array)`, `debounce(int)` |
 | `TextInputColumn` | Célula text-input inline editável | `rules(array)`, `debounce(int)`, `readonly(bool)` |

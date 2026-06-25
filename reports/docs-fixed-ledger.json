@@ -730,5 +730,47 @@
     "line": 18,
     "title": "types/SKILL.md says '7 entry points' and lists them, omitting ./tenant (8 exist)",
     "round": 8
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 33,
+    "title": "DateColumn::displayFormat() does not exist",
+    "round": 9
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 31,
+    "title": "BadgeColumn setter is icons(array), not icon(string)",
+    "round": 9
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 35,
+    "title": "IconColumn setters icon()/color() do not exist",
+    "round": 9
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 37,
+    "title": "RelationshipColumn has no 3-arg make(name, relation, attribute) factory",
+    "round": 9
+  },
+  {
+    "file": "packages/core/README.md",
+    "line": 19,
+    "title": "core README lists non-existent Artisan command arqel:action",
+    "round": 9
+  },
+  {
+    "file": "packages/core/README.md",
+    "line": 19,
+    "title": "core README lists Artisan commands arqel:field and arqel:action that do not exist",
+    "round": 9
+  },
+  {
+    "file": "packages/core/README.md",
+    "line": 15,
+    "title": "core README lists a 'Renderable' contract that does not exist in the package",
+    "round": 9
   }
 ]

@@ -12,11 +12,11 @@
 Este pacote é a **fundação** de todos os pacotes `arqel-dev/*`. É onde vivem:
 
 - O `ArqelServiceProvider` que faz auto-discovery na app Laravel consumidora
-- Contracts (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`, `Renderable`)
+- Contracts (`HasResource`, `HasFields`, `HasActions`, `HasPolicies`)
 - Classe abstracta base `Resource` e `ResourceRegistry`
 - Sistema de `Panel` e `PanelRegistry`
 - Middleware Inertia (`HandleArqelInertia`)
-- Comandos Artisan: `arqel:install`, `arqel:resource`, `arqel:field`, `arqel:action`
+- Comandos Artisan: `arqel:install`, `arqel:resource`, `arqel:make-user`
 - Facade `Arqel`
 - Suporte para serialização de schemas de Fields para Inertia props
 

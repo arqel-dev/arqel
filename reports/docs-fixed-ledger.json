@@ -520,5 +520,113 @@
     "line": 7,
     "title": "tenant README.md still labels the package a 'Phase 2 scaffold' with public API 'land in TENANT-002..015'",
     "round": 4
+  },
+  {
+    "file": "apps/docs/guide/resources.md",
+    "line": 106,
+    "title": "resources.md: Resource::indexQuery() documented with a $query Builder parameter it does not accept",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/resources.md",
+    "line": 66,
+    "title": "resources.md: beforeSave() shown returning void; actual contract returns array<string,mixed>",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/resources.md",
+    "line": 116,
+    "title": "resources.md: presents Resource::actions() as an overridable method; no such method exists",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/tables-forms.md",
+    "line": 119,
+    "title": "tables-forms.md: Tab::make()->id()->label() chained API does not exist",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/agents.md",
+    "line": 112,
+    "title": "agents.md: MCP section claims the server is a 'stub in Phase 1, full in Phase 2' and imports a nonexistent ArqelMcpServer from @arqel-dev/mcp",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/agents.md",
+    "line": 18,
+    "title": "agents.md: claims arqel:install generates AGENTS.md 'with 7 sections' and lists section names that don't match the actual stub (5 sections)",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/realtime-collab.md",
+    "line": 20,
+    "title": "realtime-collab.md: claims arqel-dev/realtime ships with the arqel-dev/framework meta-package",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/getting-started.md",
+    "line": 32,
+    "title": "getting-started.md: meta-package contents list omits arqel-dev/widgets",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/guide/panels.md",
+    "line": 47,
+    "title": "panels.md: tenant() fluent method labeled '(Phase 2)' though the method and the tenant package are shipped",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/marketplace/security-best-practices.md",
+    "line": 226,
+    "title": "Docs reference a nonexistent `arqel:install --update` flag",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/examples/versioning/cms-articles.md",
+    "line": 120,
+    "title": "Versioning example imports a hook `useArqelEndpoint` and package `@arqel-dev/core/hooks` that do not exist",
+    "round": 5
+  },
+  {
+    "file": "apps/docs/laravel-cloud/cost-estimation.md",
+    "line": 96,
+    "title": "cost-estimation.md claims `@arqel-dev/table` caches `getRecords()` with `cache()->remember()` \u2014 no such caching or method exists",
+    "round": 5
+  },
+  {
+    "file": "packages/fields/README.md",
+    "line": 16,
+    "title": "fields README claims Field/FieldFactory/concrete types 'chegam em FIELDS-002+' (future tense) but all exist",
+    "round": 5
+  },
+  {
+    "file": "packages/table/README.md",
+    "line": 12,
+    "title": "table README claims Table/Column/Filter/TableQueryBuilder/TablePaginator 'chegam em TABLE-002+' but they exist",
+    "round": 5
+  },
+  {
+    "file": "packages/form/README.md",
+    "line": 12,
+    "title": "form README claims Form/layout components/FormRequestGenerator 'chegam em FORM-002+' but they exist",
+    "round": 5
+  },
+  {
+    "file": "packages/actions/README.md",
+    "line": 12,
+    "title": "actions README claims base Action/types/concerns/executor/controller 'chegam em ACTIONS-002+' but they exist",
+    "round": 5
+  },
+  {
+    "file": "packages/auth/README.md",
+    "line": 12,
+    "title": "auth README says '<CanAccess> middleware helpers chegam em AUTH-004' (future) but both ship",
+    "round": 5
+  },
+  {
+    "file": "packages-js/fields-js/README.md",
+    "line": 11,
+    "title": "fields-js README says only '9 components b\u00e1sicos' shipped but 21 field components are registered",
+    "round": 5
   }
 ]

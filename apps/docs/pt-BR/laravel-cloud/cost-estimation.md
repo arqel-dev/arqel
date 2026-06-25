@@ -93,9 +93,10 @@ Add-ons fora do Cloud:
 
 ## Otimizações de custo específicas do Arqel
 
-1. **Cache table queries.** O `@arqel-dev/table` usa `cache()->remember()` por
-   padrão para queries de `getRecords()`. Aumente o TTL para 60s em tabelas
-   de baixa volatilidade — derruba 70% das queries Postgres.
+1. **Cache table queries.** O `arqel-dev/table` não faz cache de queries por
+   padrão. Envolva a query Eloquent do seu resource em `Cache::remember(...)`
+   com TTL de 60s em tabelas de baixa volatilidade — derruba 70% das queries
+   Postgres.
 2. **AI prompt caching.** Use Anthropic prompt caching (5 min TTL) para
    reduzir 90% do custo de tokens entrada em conversas longas. Já default
    no `ClaudeProvider`.

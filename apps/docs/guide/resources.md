@@ -63,9 +63,11 @@ final class PostResource extends Resource
 {
     protected static string $model = Post::class;
 
-    protected function beforeSave(Model $record, array $data): void
+    protected function beforeSave(Model $record, array $data): array
     {
         $record->user_id = auth()->id();
+
+        return $data;
     }
 
     protected function afterCreate(Model $record): void
@@ -103,9 +105,9 @@ Default: uses `$recordTitleAttribute` (`'title'`/`'name'`).
 ## `indexQuery` — scoping the listing
 
 ```php
-public function indexQuery(Builder $query): Builder
+public function indexQuery(): Builder
 {
-    return $query->where('user_id', auth()->id())->latest();
+    return Post::query()->where('user_id', auth()->id())->latest();
 }
 ```
 
@@ -113,7 +115,7 @@ Applies only to the index. Edit/show stay unscoped (use Policies for real auth).
 
 ## Table and Actions
 
-The `table()` and `actions()` methods are optional — Arqel falls back to automatic derivation when absent:
+The `table()` method is optional — Arqel falls back to automatic derivation when absent. Row and bulk actions are declared inside `table()` via `->actions([...])`:
 
 ```php
 public function table(): Table
@@ -130,15 +132,10 @@ public function table(): Table
         ->filters([
             SelectFilter::make('status')->options([...]),
         ])
-        ->actions([Actions::edit(), Actions::delete()]);
-}
-
-public function actions(): array
-{
-    return [
-        Actions::edit(),
-        Actions::delete()->visible(fn ($record) => $record->status !== 'published'),
-    ];
+        ->actions([
+            Actions::edit(),
+            Actions::delete()->visible(fn ($record) => $record->status !== 'published'),
+        ]);
 }
 ```
 

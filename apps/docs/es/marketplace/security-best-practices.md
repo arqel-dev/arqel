@@ -223,7 +223,7 @@ Un plugin que llama `Http::post('https://my-tracker.com/...')` en background sin
 
 ### Auto-update agresivo
 
-Un plugin no debe llamar `composer update` ni modificar `composer.json` en runtime. Las actualizaciones son responsabilidad del usuario vía `arqel:install --update` o `composer update`.
+Un plugin no debe llamar `composer update` ni modificar `composer.json` en runtime. Las actualizaciones son responsabilidad del usuario vía `composer update`.
 
 ### Backdoors administrativos
 

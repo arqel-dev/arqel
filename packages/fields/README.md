@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![PHP](https://img.shields.io/badge/php-%5E8.3-777bb4.svg)](https://www.php.net)
 [![Laravel](https://img.shields.io/badge/laravel-%5E12.0%20%7C%20%5E13.0-ff2d20.svg)](https://laravel.com)
-[![Status](https://img.shields.io/badge/status-pre--alpha-orange.svg)](#)
+[![Status](https://img.shields.io/badge/status-alpha-yellow.svg)](#)
 
 Pacote de **Fields** declarativos para o ecossistema [Arqel](https://arqel.dev) — admin panels para Laravel forjados em PHP, renderizados em React via Inertia.
 
@@ -13,7 +13,7 @@ Pacote de **Fields** declarativos para o ecossistema [Arqel](https://arqel.dev) 
 
 ## Status
 
-🚧 **Pre-alpha** — esqueleto criado em `FIELDS-001`. As classes `Field`, `FieldFactory` e os tipos concretos (`TextField`, `SelectField`, `BelongsToField`, etc.) chegam em `FIELDS-002+`.
+**Alpha** — `Field`, `FieldFactory` e os tipos concretos em `src/Types/` (`TextField`, `SelectField`, `BelongsToField`, etc.) entregues.
 
 ## Convenções
 

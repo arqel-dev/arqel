@@ -116,9 +116,9 @@ public function form(): Form
 
 ```php
 Tabs::make()->tabs([
-    Tab::make()->id('content')->label('Content')->schema([...]),
-    Tab::make()->id('seo')->label('SEO')->schema([...]),
-    Tab::make()->id('comments')->label('Comments')
+    Tab::make('content', 'Content')->schema([...]),
+    Tab::make('seo', 'SEO')->schema([...]),
+    Tab::make('comments', 'Comments')
         ->badge(fn ($record) => $record?->comments_count ?? 0)
         ->schema([...]),
 ])->defaultTab('content');

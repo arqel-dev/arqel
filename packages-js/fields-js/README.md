@@ -2,13 +2,13 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 [![React](https://img.shields.io/badge/react-%5E19-61dafb.svg)](https://react.dev)
-[![Status](https://img.shields.io/badge/status-pre--alpha-orange.svg)](#)
+[![Status](https://img.shields.io/badge/status-alpha-yellow.svg)](#)
 
 Rich React input components for [Arqel](https://arqel.dev), registered into `@arqel-dev/ui`'s FieldRegistry.
 
 ## Status
 
-🚧 **Pre-alpha** — FIELDS-JS-001 + FIELDS-JS-002 entregues (9 components básicos: TextInput, TextareaInput, EmailInput, UrlInput, PasswordInput, NumberInput, CurrencyInput, Checkbox, Toggle).
+**Alpha** — 21 field components entregues: text (TextInput, TextareaInput, EmailInput, UrlInput, PasswordInput), number (NumberInput, CurrencyInput), boolean (Checkbox, Toggle), select (SelectInput, MultiSelectInput, RadioGroup), relationship (BelongsToInput, HasManyReadonly), date (DateInput, DateTimeInput), file (FileInput, ImageInput), slug (SlugInput), color (ColorInput) e hidden (HiddenInput).
 
 ## Install
 

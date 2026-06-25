@@ -44,7 +44,7 @@ This registers an `admin` panel at `/admin` with 1 Resource and auth enabled.
 | `widgets(array)` | `array<class-string>` | Widgets shown on the dashboard |
 | `navigationGroups(array)` | `array<NavigationGroup>` | Customizes the sidebar |
 | `authGuard(string)` | `string` | Alternative guard (default `web`) |
-| `tenant(class-string)` | `class-string` | Tenant resolver (Phase 2) |
+| `tenant(?string $scope = null)` | `?string` | Sets the panel's tenant scope |
 
 `authGuard()` is honored end-to-end by the bundled `arqel-dev/auth` flow: login, logout, register, email verification, the password-reset routes, the `EnsureUserCanAccessPanel` middleware and the emitted `auth:{guard}` / `guest:{guard}` route middleware all resolve against this guard (falling back to `config('arqel.auth.guard', 'web')`, then `web`). A panel set to `->authGuard('admin')` therefore authenticates and gates entirely on the `admin` guard.
 

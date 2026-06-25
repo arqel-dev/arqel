@@ -12,7 +12,7 @@ A ranking é fuzzy — `FuzzyMatcher` aplica scoring estável: exact match > sub
 
 ## Setup
 
-O `CommandPaletteServiceProvider` está incluso em `arqel-dev/core` e registra automaticamente os providers built-in. Apenas inclua o `<CommandPalette />` no React shell:
+O `ArqelServiceProvider` está incluso em `arqel-dev/core` e registra automaticamente os providers built-in. Apenas inclua o `<CommandPalette />` no React shell:
 
 ```tsx
 import { CommandPalette } from '@arqel-dev/ui/palette';

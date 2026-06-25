@@ -78,7 +78,7 @@ Field::text('email')
     ->validationMessage('That email is already registered.');
 ```
 
-Cada Field expone `getValidationRules()`, usado por el `FormRequestGenerator` (`php artisan arqel:form-request`) para generar `Store{Model}Request`/`Update{Model}Request`. En el cliente, `ValidationBridge` traduce las reglas a un schema Zod (`z.string().email().min(1).max(255).nullable()`) — útil para validación en tiempo real si la quieres.
+Cada Field expone `getValidationRules()`, usado por el `FormRequestGenerator` (`php artisan arqel:resource <Model> --with-form-requests`) para generar `Store{Model}Request`/`Update{Model}Request`. En el cliente, `ValidationBridge` traduce las reglas a un schema Zod (`z.string().email().min(1).max(255).nullable()`) — útil para validación en tiempo real si la quieres.
 
 ## Visibilidad
 

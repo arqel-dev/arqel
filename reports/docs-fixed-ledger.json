@@ -628,5 +628,41 @@
     "line": 11,
     "title": "fields-js README says only '9 components b\u00e1sicos' shipped but 21 field components are registered",
     "round": 5
+  },
+  {
+    "file": "docs/publishing-setup.md",
+    "line": 36,
+    "title": "publishing-setup.md meta-package member list omits arqel-dev/widgets",
+    "round": 6
+  },
+  {
+    "file": "packages/realtime/SKILL.md",
+    "line": 23,
+    "title": "realtime SKILL.md 'tr\u00eas blocos' undercounts config blocks (omits workflow block)",
+    "round": 6
+  },
+  {
+    "file": "packages/core/SKILL.md",
+    "line": 476,
+    "title": "core SKILL.md cross-refs a non-existent guide apps/docs/guide/telemetry.md",
+    "round": 6
+  },
+  {
+    "file": "packages/cli/SKILL.md",
+    "line": 126,
+    "title": "cli SKILL.md references apps/docs/laravel-cloud/README.md but the index file is index.md",
+    "round": 6
+  },
+  {
+    "file": "packages-js/workflow/SKILL.md",
+    "line": 6,
+    "title": "workflow JS SKILL.md claims package exports 'only <StateTransition>' but WorkflowVisualizer is also exported",
+    "round": 6
+  },
+  {
+    "file": "packages-js/theme/SKILL.md",
+    "line": 56,
+    "title": "theme JS SKILL.md shows preventFlashScript() as a PHP/Blade call \\Arqel\\Theme\\preventFlashScript(); no such PHP namespace/function exists",
+    "round": 6
   }
 ]

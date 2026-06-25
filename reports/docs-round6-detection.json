@@ -1,0 +1,80 @@
+{
+  "total": 6,
+  "confirmed_count": 6,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "publishing-setup.md meta-package member list omits arqel-dev/widgets",
+      "file": "docs/publishing-setup.md",
+      "line": 36,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "factual-drift",
+      "suggested_fix": "Change the list to '... core + auth + fields + form + actions + nav + table + widgets + inertia.' to match packages/arqel/composer.json require keys.",
+      "detail": "Line 36 states `composer require arqel-dev/framework` puxa 'core + auth + fields + form + actions + nav + table + inertia' \u2014 eight members. The actual meta-package require block in packages/arqel/composer.json lists arqel-dev/core, auth, fields, form, actions, nav, table AND arqel-dev/widgets (plus inertiajs/inertia-laravel). 'widgets' is a real require of the framework metapackage but is missing from this enumeration. (Note: the sibling installation.md omission was already fixed in a prior round, but this docs/publishing-setup.md instance is a separate, untouched surface.)",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. docs/publishing-setup.md:36 states `composer require arqel-dev/framework` puxa \"core + auth + fields + form + actions + nav + table + inertia\" \u2014 enumerating 7 Arqel packages plus inertia, omitting widgets. The actual meta-package require block in packages/arqel/composer.json (lines 29-39) lists arqel-dev/core, auth, fields, form, actions, nav, table, AND arqel-dev/widgets, plus inertiajs/inertia-laravel. The package's own description (line 4) also names \"(core, auth, fields, form, actions, nav, table, widgets)\". So widgets is a genuine, current require of the framework metapackage that is missing from this doc's enumeration \u2014 an objectively false/incomplete factual claim. In-scope: docs/publishing-setup.md is a real human-maintained doc (not PLANNING, not docs/tickets, not superpowers, not CHANGELOG, not generated). Not in ledger: the ledger contains docs/publishing-setup.md entries at line 27 and line 333, and an installation.md widgets-omission at apps/docs/guide/installation.md:36 \u2014 but NOT this docs/publishing-setup.md:36 widgets-omission, which is a separate untouched surface."
+    },
+    {
+      "title": "realtime SKILL.md 'tr\u00eas blocos' undercounts config blocks (omits workflow block)",
+      "file": "packages/realtime/SKILL.md",
+      "line": 23,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "factual-drift",
+      "suggested_fix": "Change 'exp\u00f5e tr\u00eas blocos' to 'exp\u00f5e cinco blocos' and append the missing block: '... e `workflow.broadcast_state_transitions` (env `ARQEL_REALTIME_WORKFLOW_BROADCAST`, default `true`, rebroadcast de transi\u00e7\u00f5es de state quando arqel-dev/workflow est\u00e1 instalado).'",
+      "detail": "Line 23 says config/arqel-realtime.php 'exp\u00f5e tr\u00eas blocos' (exposes three blocks), then inline enumerates four (connection, channel_prefix, auto_dispatch, presence). The real config file packages/realtime/config/arqel-realtime.php has FIVE top-level keys: connection, channel_prefix, auto_dispatch, presence, AND workflow (workflow.broadcast_state_transitions, env ARQEL_REALTIME_WORKFLOW_BROADCAST). The 'workflow' block is entirely absent from this 'Config public\u00e1vel' summary, and the 'tr\u00eas' count is wrong even against the four it lists inline.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. packages/realtime/SKILL.md:23 states config/arqel-realtime.php \"exp\u00f5e tr\u00eas blocos\" (exposes three blocks). The actual config file packages/realtime/config/arqel-realtime.php has FIVE top-level keys: connection, channel_prefix, auto_dispatch, presence, and workflow (workflow.broadcast_state_transitions, env ARQEL_REALTIME_WORKFLOW_BROADCAST). The doc's inline enumeration lists only four and entirely omits the workflow block, so the \"Config public\u00e1vel\" summary is both numerically wrong (\"tr\u00eas\" vs four listed/five real) and materially incomplete. In-scope (package SKILL.md). Ledger entries for this file concern other claims (nonexistent hooks/ConnectionStatusBanner), not this block-count claim, so not a duplicate."
+    },
+    {
+      "title": "core SKILL.md cross-refs a non-existent guide apps/docs/guide/telemetry.md",
+      "file": "packages/core/SKILL.md",
+      "line": 476,
+      "kind": "broken-ref",
+      "severity": "med",
+      "dimension": "broken-refs",
+      "suggested_fix": "Remove the dangling '`apps/docs/guide/telemetry.md`' reference, or create the telemetry guide. Telemetry config (`telemetry.enabled`, `metrics_endpoint_*`) does live in packages/core/config/arqel.php, so the simplest fix is to drop the doc pointer or point it at the config block / SKILL section instead.",
+      "detail": "Line 476 states: 'Integra\u00e7\u00f5es com Prometheus/Grafana/Datadog/Sentry documentadas em `apps/docs/guide/telemetry.md`.' That file does not exist. `ls apps/docs/guide/` shows no telemetry.md (and `find apps/docs -iname '*telemetry*' -o -iname '*observ*' -o -iname '*metric*'` returns nothing). The guide dir has a11y.md, actions.md, agents.md, auth.md, authentication.md, contributing.md, fields.md, getting-started.md, installation.md, mcp-server.md, panels.md, realtime-collab.md, release-checklist.md, resources.md, tables-forms.md, theming.md, tutorial-first-crud.md, what-is-arqel.md \u2014 no telemetry guide anywhere in the corpus. This is the only doc reference to telemetry.md (the only other repo hit is inside packages/marketplace/vendor/, out of scope).",
+      "confidence": "high",
+      "why_real": "Verified both sides. packages/core/SKILL.md:476 states: 'Integra\u00e7\u00f5es com Prometheus/Grafana/Datadog/Sentry documentadas em `apps/docs/guide/telemetry.md`.' This presents the file as existing documentation (a broken cross-reference, not a forward-looking/PLANNING statement). On disk, `ls apps/docs/guide/` lists 18 .md files plus a migration/ dir but NO telemetry.md, and `find apps/docs -iname '*telemetry*'` returns nothing. The doc is in-scope (a package SKILL.md, not PLANNING/docs-tickets/CHANGELOG/generated), the claim is objectively checkable, and it genuinely contradicts current disk state. Not present in reports/docs-fixed-ledger.json."
+    },
+    {
+      "title": "cli SKILL.md references apps/docs/laravel-cloud/README.md but the index file is index.md",
+      "file": "packages/cli/SKILL.md",
+      "line": 126,
+      "kind": "broken-ref",
+      "severity": "low",
+      "dimension": "broken-refs",
+      "suggested_fix": "Change '`README.md` (\u00edndice)' to '`index.md` (\u00edndice)' in packages/cli/SKILL.md line 126.",
+      "detail": "Line 126 lists the Laravel Cloud case-study docs as: '`README.md` (\u00edndice), `deploy-guide.md` ..., `auto-scaling.md` ..., `cost-estimation.md` ..., `comparison-other-hosts.md`'. The directory apps/docs/laravel-cloud/ actually contains index.md (not README.md), deploy-guide.md, auto-scaling.md, cost-estimation.md, comparison-other-hosts.md. `ls apps/docs/laravel-cloud/README.md` => no such file. The VitePress config (apps/docs/.vitepress/config.ts) correctly links the overview as `/laravel-cloud/` (i.e. index.md), confirming index.md is the real index file; only this SKILL line names it README.md.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. packages/cli/SKILL.md:126 lists the Laravel Cloud case-study docs as \"`README.md` (\u00edndice), `deploy-guide.md` ..., `auto-scaling.md` ..., `cost-estimation.md` ..., `comparison-other-hosts.md`\". The actual directory apps/docs/laravel-cloud/ contains index.md (not README.md), plus deploy-guide.md, auto-scaling.md, cost-estimation.md, comparison-other-hosts.md; `ls .../README.md` returns \"No such file or directory\". The VitePress config (apps/docs/.vitepress/config.ts:553) links the overview as `/laravel-cloud/`, which resolves to index.md, confirming index.md is the true index. The SKILL line naming it README.md is objectively false. In-scope (packages/cli/SKILL.md, not PLANNING/tickets/CHANGELOG/generated). Not in the ledger: the only cli/SKILL.md ledger entry is line 142 about the artisan command name `arqel:resource:make`, a different claim."
+    },
+    {
+      "title": "workflow JS SKILL.md claims package exports 'only <StateTransition>' but WorkflowVisualizer is also exported",
+      "file": "packages-js/workflow/SKILL.md",
+      "line": 6,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "stale-status",
+      "suggested_fix": "Update line 6 to state the package exports both <StateTransition> and <WorkflowVisualizer> (e.g. 'exporta <StateTransition> e <WorkflowVisualizer>'), removing the 'apenas'. Optionally align packages-js/workflow/README.md line 5, which lists only StateTransition and omits WorkflowVisualizer.",
+      "detail": "The Purpose section states: 'Por enquanto exporta apenas <StateTransition>, espelhando o PHP Arqel\\Workflow\\Fields\\StateTransitionField'. This 'apenas' (only) claim is false. packages-js/workflow/src/index.ts exports a second top-level component, WorkflowVisualizer (plus buildMermaidSource, slugifyStateId and several WorkflowVisualizer* types), and the very same SKILL.md documents <WorkflowVisualizer> at line 91+ with usage examples. So the package no longer exports only StateTransition.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides. packages-js/workflow/SKILL.md lines 5-6 state \"Por enquanto exporta apenas `<StateTransition>`\" (for now exports ONLY StateTransition). This is objectively false: packages-js/workflow/src/index.ts contains a second export block re-exporting WorkflowVisualizer, buildMermaidSource, slugifyStateId and several WorkflowVisualizer* types from './WorkflowVisualizer.js', alongside the StateTransition exports. The contradiction is self-evident within the same file, which documents <WorkflowVisualizer> with full usage examples at lines 89-139. The doc is in-scope (a package SKILL.md, not PLANNING/tickets/superpowers/CHANGELOG/generated), the claim is checkable, and it genuinely contradicts the code on disk. Not present in reports/docs-fixed-ledger.json (grep for 'apenas', the file path, and the claim returned nothing relevant)."
+    },
+    {
+      "title": "theme JS SKILL.md shows preventFlashScript() as a PHP/Blade call \\Arqel\\Theme\\preventFlashScript(); no such PHP namespace/function exists",
+      "file": "packages-js/theme/SKILL.md",
+      "line": 56,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "stale-status",
+      "suggested_fix": "Replace the misleading PHP-FQCN Blade snippet with the real React usage `<script dangerouslySetInnerHTML={{ __html: preventFlashScript() }} />` (the alternate form already shown in src/preventFlash.ts's doc comment), or otherwise make clear preventFlashScript() is JS-side and its returned string must be embedded, not invoked as a PHP function.",
+      "detail": "Under the preventFlashScript(options?) contract, the Blade example is `<script>{!! \\Arqel\\Theme\\preventFlashScript() !!}</script>`. preventFlashScript is a TypeScript export of @arqel-dev/theme (re-exported from @arqel-dev/react/providers, see packages-js/theme/src/index.ts and src/preventFlash.ts) \u2014 a JS function returning an IIFE string. There is no `Arqel\\Theme` PHP namespace anywhere in packages/ (grep for `namespace Arqel\\Theme` returns nothing; there is no packages/theme PHP package). A Blade template cannot call this TS function via a PHP FQCN, so the example is invalid.",
+      "confidence": "high",
+      "why_real": "Confirmed both sides on disk. SKILL.md:56 documents the preventFlashScript() contract with a Blade example `<script>{!! \\Arqel\\Theme\\preventFlashScript() !!}</script>`, presenting it as a PHP/Blade-callable function via FQCN \\Arqel\\Theme\\. In reality preventFlashScript is a TypeScript export of @arqel-dev/theme: src/index.ts:2 exports it from ./preventFlash, which re-exports from @arqel-dev/react/providers (src/preventFlash.ts:12). It returns an IIFE string for dangerouslySetInnerHTML. grep for `namespace Arqel\\Theme` across packages/ returns nothing and there is no packages/theme PHP package (ls confirms absent). A Blade template cannot call this JS function via a nonexistent PHP namespace, so the example is objectively invalid/misleading. In-scope (package SKILL.md, not PLANNING/tickets/CHANGELOG/generated), checkable, and not present in reports/docs-fixed-ledger.json."
+    }
+  ]
+}

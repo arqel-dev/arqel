@@ -33,7 +33,7 @@ Antes de fazer `git tag v0.8.0 && git push --tags`:
 - Manifests bumped: `0.8.0-rc.1` → `0.8.0` (36 ficheiros). `realtime-collab` saiu de `0.10.0-rc.1` para `0.8.0` para uniformizar.
 - `CHANGELOG.md` ganhou seção `[0.8.0]` documentando o rename + nota da primeira release pública.
 - `.github/workflows/release.yml` reescrito (splitsh-lite + pnpm publish + release notes).
-- Meta-package `arqel-dev/framework` criado em repo separado (`github.com/arqel-dev/framework`) — `composer require arqel-dev/framework` puxa core + auth + fields + form + actions + nav + table + inertia.
+- Meta-package `arqel-dev/framework` criado em repo separado (`github.com/arqel-dev/framework`) — `composer require arqel-dev/framework` puxa core + auth + fields + form + actions + nav + table + widgets + inertia.
 
 ### Auto-update Packagist (lessons learned)
 

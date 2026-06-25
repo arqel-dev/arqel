@@ -123,7 +123,7 @@ sendo o caminho canônico para gerar a estrutura.
   Laravel Cloud API + GitHub OAuth, mas a API pública estável ainda
   não existe (abr/2026). A entrega aqui é o link "one-click" que o
   Laravel Cloud já reconhece + docs explicando o fluxo manual.
-- Docs case study em `apps/docs/laravel-cloud/`: `README.md` (índice),
+- Docs case study em `apps/docs/laravel-cloud/`: `index.md` (índice),
   `deploy-guide.md` (passo-a-passo end-to-end), `auto-scaling.md`
   (recomendações por tamanho), `cost-estimation.md` (calculadora
   e tiers), `comparison-other-hosts.md` (Fly/Render/DO/AWS).

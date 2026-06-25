@@ -31,7 +31,7 @@ Ver `PLANNING/01-spec-tecnica.md` para la spec completa.
 - PHP 8.3+ · Laravel 12+ · Pest 3
 - React 19.2+ · TypeScript 5.6+ strict · Inertia 3
 - Tailwind v4 · Radix UI · shadcn CLI v4 (new-york)
-- Vite 5 · pnpm workspaces · Composer path repositories
+- Vite 7 · pnpm workspaces · Composer path repositories
 - GitHub Actions · splitsh/lite para split del monorepo
 
 ## Inicio rápido
@@ -92,8 +92,11 @@ arqel/
 │   └── a11y/             # SkipLink, VisuallyHidden, LiveRegion
 ├── apps/
 │   ├── docs/             # sitio VitePress (i18n)
-│   └── demo/             # showcase app end-to-end (recreado vía arqel:install)
-└── PLANNING/             # planificación interna (13 docs, 328 tickets)
+│   ├── demo/             # app demo end-to-end versionada (Laravel + Inertia + React)
+│   ├── marketplace/      # frontend público del marketplace de plugins (dogfood)
+│   ├── showcase/         # app de dogfood completa que ejercita todos los paquetes
+│   └── tenant-demo/      # app de referencia multi-tenancy (arqel-dev/tenant)
+└── PLANNING/             # planificación interna (14 docs, 328 tickets)
 ```
 
 Detalles en `PLANNING/04-repo-structure.md`.
@@ -133,7 +136,7 @@ pnpm typecheck                  # tsc --noEmit + phpstan
 pnpm dev                        # watch mode
 ```
 
-El demo end-to-end (recreado desde `arqel:install`) vive en `apps/demo/`.
+La app demo end-to-end versionada vive en `apps/demo/`.
 
 ## Contribuir
 
@@ -149,7 +152,7 @@ Contribuciones bienvenidas — ver [`CONTRIBUTING.md`](CONTRIBUTING.md) y [`CODE
 
 ## Documentación
 
-- **Planning:** `PLANNING/` (13 docs, fuente canónica)
+- **Planning:** `PLANNING/` (14 docs, fuente canónica)
 - **Para AI agents:** `AGENTS.md`, `CLAUDE.md`
 - **Sitio público:** https://arqel.dev (próximamente — `apps/docs/` hace build del sitio VitePress, disponible en EN / PT-BR / ES)
 

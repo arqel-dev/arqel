@@ -335,7 +335,11 @@ export function AiImageInput(props: AiImageInputProps): ReactElement {
         className="flex items-center justify-center w-full min-h-[6rem] rounded-sm border-2 border-dashed border-border bg-muted/40 px-4 py-6 text-sm text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
       >
         <span>
-          {file !== null ? file.name : `Click or drop image (${accept !== '' ? accept : 'any'})`}
+          {file !== null
+            ? file.name
+            : t('arqel.ai.image_dropzone', 'Click or drop image (:accept)', {
+                accept: accept !== '' ? accept : t('arqel.ai.image_accept_any', 'any'),
+              })}
         </span>
         <input
           id={inputId}

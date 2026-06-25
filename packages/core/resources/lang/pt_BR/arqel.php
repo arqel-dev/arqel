@@ -200,6 +200,8 @@ return [
         'source' => 'Fonte: :field',
         'select_placeholder' => 'Selecionar...',
         'image_file' => 'Arquivo de imagem',
+        'image_dropzone' => 'Clique ou solte a imagem (:accept)',
+        'image_accept_any' => 'qualquer',
         // Banners de erro voltados ao usuário (falha HTTP + erro de rede).
         'error_http' => 'Falha na geração (HTTP :status).',
         'error_network' => 'Falha na geração: erro de rede.',

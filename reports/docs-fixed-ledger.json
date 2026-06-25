@@ -124,5 +124,143 @@
     "line": 333,
     "title": "publishing-setup.md split script lists nonexistent 'panel' and 'testing' PHP packages",
     "round": 1
+  },
+  {
+    "file": "apps/docs/reference/php-overview.md",
+    "line": 21,
+    "title": "php-overview.md claims 9 column / 6 filter types; actual is 12 / 8 (EN)",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/pt-BR/reference/php-overview.md",
+    "line": 21,
+    "title": "php-overview.md (pt-BR mirror) claims 9 column / 6 filter types; actual 12 / 8",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/es/reference/php-overview.md",
+    "line": 21,
+    "title": "php-overview.md (es mirror) claims 9 column / 6 filter types; actual 12 / 8",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/reference/php/fields.md",
+    "line": 75,
+    "title": "fields.md claims ValidationBridge has 19 built-in translators; actual is 21 (EN)",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/pt-BR/reference/php/fields.md",
+    "line": 75,
+    "title": "fields.md (pt-BR mirror) claims 19 built-in translators; actual 21",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/es/reference/php/fields.md",
+    "line": 75,
+    "title": "fields.md (es mirror) claims 19 built-in translators; actual 21",
+    "round": 2
+  },
+  {
+    "file": "packages-js/fields-advanced/SKILL.md",
+    "line": 15,
+    "title": "fields-advanced JS SKILL.md describes 8 inputs as unimplemented placeholders; all are fully built",
+    "round": 2
+  },
+  {
+    "file": "packages-js/fields-advanced/README.md",
+    "line": 11,
+    "title": "fields-advanced JS README.md says each slot still renders a placeholder; all 8 are implemented",
+    "round": 2
+  },
+  {
+    "file": "packages/fields-advanced/SKILL.md",
+    "line": 46,
+    "title": "fields-advanced PHP SKILL.md 'Por chegar' lists React components + client registry as not yet done",
+    "round": 2
+  },
+  {
+    "file": "README.pt-BR.md",
+    "line": 34,
+    "title": "README.pt-BR.md says 'Vite 5'; project uses Vite 7",
+    "round": 2
+  },
+  {
+    "file": "README.es.md",
+    "line": 34,
+    "title": "README.es.md says 'Vite 5'; project uses Vite 7",
+    "round": 2
+  },
+  {
+    "file": "README.pt-BR.md",
+    "line": 96,
+    "title": "README.pt-BR.md says PLANNING has 13 docs; there are 14",
+    "round": 2
+  },
+  {
+    "file": "README.es.md",
+    "line": 96,
+    "title": "README.es.md says PLANNING has 13 docs; there are 14",
+    "round": 2
+  },
+  {
+    "file": "README.pt-BR.md",
+    "line": 95,
+    "title": "README.pt-BR.md apps/ layout omits 3 of 5 app dirs and mislabels apps/demo as recreated via arqel:install",
+    "round": 2
+  },
+  {
+    "file": "README.es.md",
+    "line": 95,
+    "title": "README.es.md apps/ layout omits 3 of 5 app dirs and mislabels apps/demo as recreated via arqel:install",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/advanced/command-palette.md",
+    "line": 161,
+    "title": "advanced/*.md 'Related' links to packages/*/SKILL.md use wrong relative depth (../../ \u2192 resolves to apps/packages, must be ../../../)",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/advanced/dashboards.md",
+    "line": 3,
+    "title": "advanced/*.md header package-dir link uses wrong relative depth (../../packages \u2192 apps/packages)",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/examples/workflows/index.md",
+    "line": 56,
+    "title": "examples/workflows/index.md 'Related' links use wrong relative depth (../../../ \u2192 resolves to apps/, must be ../../../../)",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/es/SKILL.md",
+    "line": 85,
+    "title": "es/SKILL.md and pt-BR/SKILL.md ticket link uses wrong relative depth (../../PLANNING \u2192 apps/PLANNING)",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/reference/php/php-overview.md",
+    "line": 21,
+    "title": "php-overview.md states table has '9 column types, 6 filter types' but disk has 12 columns and 8 filters",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/reference/php-overview.md",
+    "line": 21,
+    "title": "php-overview.md table row claims '9 column types, 6 filter types' but disk has 12 and 8",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/reference/typescript-overview.md",
+    "line": 25,
+    "title": "typescript-overview.md / typescript/react.md state Inertia peer '@inertiajs/react 2+' but packages require ^3.0.0",
+    "round": 2
+  },
+  {
+    "file": "apps/docs/reference/php/nav.md",
+    "line": 11,
+    "title": "nav.md documents a label(string) setter on NavigationItem and NavigationGroup that does not exist",
+    "round": 2
   }
 ]

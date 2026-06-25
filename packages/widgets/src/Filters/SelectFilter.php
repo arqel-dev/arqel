@@ -51,6 +51,14 @@ final class SelectFilter extends Filter
             $options = is_array($resolved) ? $resolved : [];
         }
 
+        // Localize each option label lazily: a translation-key label renders in
+        // the active locale; a plain literal passes through unchanged (mirrors
+        // the table SelectField + base Filter::localizeLabel() contract).
+        $options = array_map(
+            static fn (mixed $label): mixed => is_string($label) ? self::localizeLabel($label) : $label,
+            $options,
+        );
+
         return [
             'options' => $options,
             'multiple' => $this->multiple,

@@ -1,0 +1,32 @@
+{
+  "total": 4,
+  "confirmed_count": 2,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "Dashboard Filter base label serialized without localization",
+      "file": "packages/widgets/src/Filters/Filter.php",
+      "line": 130,
+      "kind": "php-label-gap",
+      "severity": "med",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "arqel::filters.<field>.label (via localizeLabel pattern)",
+      "detail": "Filter::toArray() emits 'label' => $this->label verbatim to the frontend. The label is auto-derived from the field name via Str::title() in the constructor (line 46-50) or set raw by the developer via ->label(). Unlike the table package's Filter (fixed in ledger at packages/table/src/Filter.php:191) and workflow's StateFilter (ledger packages/workflow/src/Filters/StateFilter.php:76) \u2014 both of which route their serialized label through localizeLabel()/trans() \u2014 the widgets dashboard Filter has NO localize step anywhere in the class. The value is rendered verbatim by DashboardFilters.tsx:118 (`const label = filter.label ?? filter.name`). This is the entire un-localized branch for dashboard filters: an auto-derived English title-case label (e.g. a 'status' field -> 'Status') can never be translated, and a developer-supplied label is emitted raw. Framework-hardcoded gap: should mirror table Filter's localizeLabel() pattern so a translation key/lookup applies at toArray() time.",
+      "confidence": "high",
+      "why_real": "Verified against source. packages/widgets/src/Filters/Filter.php:124-133 (toArray) emits 'label' => $this->label verbatim. The label is auto-derived to English title-case in the constructor (lines 46-50 via Str::snake->replace->title) or set raw via ->label() (line 58). There is no trans()/localizeLabel() call anywhere in the class. The frontend DashboardFilters.tsx renders this label verbatim (line 112: const label = filter.label ?? filter.name; line 169 same), so an auto-derived English label (e.g. 'status' -> 'Status') can never be translated and a developer-supplied label is rendered raw.\n\nThis mirrors two already-fixed precedents in the ledger that establish the canonical pattern: packages/table/src/Filter.php:191 (round 8, 'Base table Filter::getLabel() serialized verbatim \u2014 never through __()', fixed by routing through localizeLabel()/trans(), confirmed present at table/src/Filter.php:100,110-116) and packages/workflow/src/Filters/StateFilter.php:76 (round 9, fixed via trans()). The widgets dashboard Filter is a distinct package/file with the identical structural gap and is NOT covered by any ledger entry.\n\nNot a duplicate: the three DashboardFilters.tsx ledger entries (rounds 1-2) address different concerns \u2014 the hardcoded 'All' select option and the date-range 'from'/'to' aria-labels \u2014 not the PHP-side base-label serialization. No ledger entry references packages/widgets/src/Filters/Filter.php at all. Not a vendored shadcn primitive (it's a PHP class, not under packages-js/ui/src/shadcn/*). Not deliberately out of scope \u2014 same user-facing localization concern the loop has been fixing for filter labels across other packages."
+    },
+    {
+      "title": "Dashboard SelectFilter option labels passed through un-localized",
+      "file": "packages/widgets/src/Filters/SelectFilter.php",
+      "line": 55,
+      "kind": "php-label-gap",
+      "severity": "low",
+      "dimension": "sweep-php-userfacing",
+      "suggested_key": "developer-supplied option labels via localizeLabel hook",
+      "detail": "SelectFilter::getTypeSpecificProps() returns 'options' => $options straight through (array<value,label> or resolved Closure) with no per-option label localization. These option labels are serialized to the frontend and rendered verbatim by DashboardFilters.tsx (buildOptions, lines 93-98). This is the same family as the SelectField option-label localization the ledger already fixed for table fields (packages/fields/src/Types/SelectField.php:177), but the dashboard-filter equivalent was never localized. Secondary surface of the base Filter::label gap. App-must-key for explicit option labels, but the framework provides no localize hook so even keyed labels are not resolved.",
+      "confidence": "med",
+      "why_real": "Confirmed reproducible and novel. SelectFilter::getTypeSpecificProps() (packages/widgets/src/Filters/SelectFilter.php:54-57) returns 'options' => $options straight through, resolving Closures but never passing per-option labels through __(). The base Filter::toArray() (Filter.php:124-133) likewise emits 'label' => $this->label verbatim. DashboardFilters.tsx normaliseOptions (lines 92-98) renders String(v)/o.label verbatim, so there is no frontend fallback. This is the dashboard-widget twin of the table-field fix the ledger recorded in Round 6 (packages/fields/src/Types/SelectField.php:177, 'Select/MultiSelect static & closure option LABELS serialized verbatim') \u2014 that fix added SelectField::localizeOptionLabels() which runs labels through __(). The widgets SelectFilter has no equivalent hook, so an app-keyed option label that resolves in a table SelectField will NOT resolve on a dashboard SelectFilter \u2014 a genuine, user-facing localization inconsistency with the framework's own established contract. Ledger scan: the related entries are all different files/surfaces \u2014 fields SelectField (R6), table TrashedFilter (R8, packages/table not widgets), and DashboardFilters.tsx 'All'/aria-label items (different JS defects). None cover widgets SelectFilter option-label localization. Not vendored (packages/widgets/, not packages-js/ui/src/shadcn/*). Not duplicate. Confidence reduced to med because the secondary base Filter::label gap is a known framework-default pattern and explicit app labels are partly app-keyed; but the primary option-label hook gap is a concrete, verifiable framework omission consistent with an already-accepted prior fix."
+    }
+  ]
+}

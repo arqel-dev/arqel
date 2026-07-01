@@ -37,7 +37,7 @@ A escolha é **integrar, não reinventar**: ActivityLog do Spatie é maduro, bem
 **Entregue (AUDIT-003 — escopo reduzido / "scoped"):**
 
 - **`Arqel\Audit\Http\Controllers\GlobalActivityLogController`** (final) — endpoint global filtrável `index(Request): JsonResponse`. Constrói `Activity::query()->with('causer')->latest('created_at')` e aplica filtros opcionais via `when()`. Devolve mesmo shape do `RecordActivityController` para o React poder reaproveitar o renderer.
-  - Query params suportados (8):
+  - Query params suportados (7):
     - `log_name` — string filter exato
     - `event` — string em whitelist `['created','updated','deleted','restored']`. Valor fora da lista → HTTP 400 `{error: 'invalid_event'}`
     - `causer_type` — FQCN do model causador

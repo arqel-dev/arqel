@@ -31,6 +31,7 @@ pnpm add @inertiajs/react react react-dom
 | `useNavigation()` | Lê `panel.navigation` dos shared props |
 | `useBreakpoint()` | Tailwind v4 breakpoint atual via `matchMedia` |
 | `useArqelOptimistic()` | Wrap de `useOptimistic` React 19 |
+| `useResourceUpdates()` | Subscribe to Inertia partial-reload updates per resource |
 
 ## Subpath imports
 

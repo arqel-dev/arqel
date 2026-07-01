@@ -21,7 +21,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **Concrete widget types (WIDGETS-002..005):**
 
-- `StatWidget` (extensível) — KPI card; setters value/description/icon/color/trend. **Não-final**: o gerador `arqel:widget --type=stat` cria uma subclasse desta base.
+- `StatWidget` (extensível) — KPI card; setters value/statDescription/descriptionIcon/icon/color. **Não-final**: o gerador `arqel:widget --type=stat` cria uma subclasse desta base.
 - `ChartWidget` (extensível) — config Recharts serializada (sem hard dep em libs JS). **Não-final** (subclassada pelo gerador `--type=chart`).
 - `TableWidget` (extensível) — mini-tabela; sem hard dep em `arqel-dev/table` (duck-typing). **Não-final** (subclassada pelo gerador `--type=table`).
 - `CustomWidget` (final) — escape-hatch para componentes React arbitrários. Permanece `final`; o gerador `--type=custom` **compõe** via `CustomWidget::make()` em vez de subclassar.

@@ -772,5 +772,17 @@
     "line": 15,
     "title": "core README lists a 'Renderable' contract that does not exist in the package",
     "round": 9
+  },
+  {
+    "file": "packages/widgets/SKILL.md",
+    "line": 24,
+    "title": "widgets SKILL.md lists nonexistent 'trend' and wrong 'description' setter for StatWidget",
+    "round": 10
+  },
+  {
+    "file": "packages-js/hooks/README.md",
+    "line": 33,
+    "title": "packages-js/hooks/README.md 'Hooks' table omits the real export useResourceUpdates",
+    "round": 10
   }
 ]

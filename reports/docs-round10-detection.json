@@ -1,0 +1,32 @@
+{
+  "total": 2,
+  "confirmed_count": 2,
+  "dupe_count": 0,
+  "converging": false,
+  "confirmed": [
+    {
+      "title": "widgets SKILL.md lists nonexistent 'trend' and wrong 'description' setter for StatWidget",
+      "file": "packages/widgets/SKILL.md",
+      "line": 24,
+      "kind": "factual-drift",
+      "severity": "med",
+      "dimension": "factual-drift",
+      "suggested_fix": "Change \"setters value/description/icon/color/trend\" to \"setters value/statDescription/descriptionIcon/icon/color\" to match the real public methods on StatWidget.",
+      "detail": "SKILL.md line 24 states StatWidget has \"setters value/description/icon/color/trend\". Verified against packages/widgets/src/StatWidget.php: the actual public setters are value() (line 95), statDescription() (line 108), descriptionIcon() (line 115), color() (line 126), and icon() (line 135). There is NO description() setter (it is named statDescription) and NO trend() setter at all (grep for 'public function trend' / 'public function description' returns nothing). The 'trend' inaccuracy is the same fact that was fixed in apps/docs/advanced/dashboards.md:68 in Round 4 (per docs-fixed-ledger.json), but the sibling claim in this PHP package SKILL.md was never corrected. This is a genuinely untouched surface.",
+      "confidence": "high",
+      "why_real": "Verified both sides on disk. packages/widgets/SKILL.md line 24 states StatWidget has \"setters value/description/icon/color/trend\". The actual source packages/widgets/src/StatWidget.php declares value() (95), statDescription() (108), descriptionIcon() (115), color() (126), icon() (135), chart(), url(), data(). There is NO description() setter (it is statDescription) and NO trend() setter (grep for 'public function trend'/'public function description' returns nothing). So the doc lists two setters that do not exist by those names \u2014 objectively false/misleading. Scope: it's an in-scope package SKILL.md (not PLANNING, tickets, superpowers, CHANGELOG, or generated). Ledger check: the only 'trend' entry (reports/docs-fixed-ledger.json:443) targets apps/docs/advanced/dashboards.md:68 (Round 4), a different file; no entry exists for packages/widgets/SKILL.md. Genuinely untouched surface, checkable claim, contradiction confirmed on both sides."
+    },
+    {
+      "title": "packages-js/hooks/README.md 'Hooks' table omits the real export useResourceUpdates",
+      "file": "packages-js/hooks/README.md",
+      "line": 33,
+      "kind": "factual-drift",
+      "severity": "low",
+      "dimension": "stale-status",
+      "suggested_fix": "Add a row to the table: | `useResourceUpdates()` | Subscribe to Inertia partial-reload updates per resource | \u2014 so the README lists all 11 exported hooks, matching index.ts and SKILL.md.",
+      "detail": "The 'Hooks' table (lines 22-33) presents itself as the complete list of hooks the package exports, listing exactly 10: useResource, useArqelForm, useCanAccess, useFlash, useTable, useAction, useFieldDependencies, useNavigation, useBreakpoint, useArqelOptimistic. It omits useResourceUpdates, which IS a real export: packages-js/hooks/src/index.ts has `export { useResourceUpdates } from ...` (and the file packages-js/hooks/src/useResourceUpdates.ts exists), and the sibling SKILL.md line 24 already documents it ('useResourceUpdates() \u2014 assinatura a updates Inertia partial reload por resource'). The previously-fixed ledger entry only corrected the reference doc apps/docs/reference/typescript/hooks.md ('10 reusable hooks but 11 exist; import list omits useResourceUpdates'); this package README is a distinct, untouched file with the same omission.",
+      "confidence": "med",
+      "why_real": "Verified on disk: packages-js/hooks/README.md lines 22-33 enumerate exactly 10 hooks (useResource, useArqelForm, useCanAccess, useFlash, useTable, useAction, useFieldDependencies, useNavigation, useBreakpoint, useArqelOptimistic) and omit useResourceUpdates. useResourceUpdates IS a real export (packages-js/hooks/src/index.ts:31 `export { useResourceUpdates } from './useResourceUpdates.js';`) and the source file packages-js/hooks/src/useResourceUpdates.ts exists. The README table serves as the package's enumeration of the hooks it provides (the sibling SKILL.md documents useResourceUpdates), so the list under-represents the real API. The ledger entry at line 269 covers a distinct file (apps/docs reference hooks.md), not this README, so this is not a duplicate. The doc is in-scope (package README, not PLANNING/tickets/CHANGELOG/generated). This is a factual omission in an enumerative API table rather than an explicit false numeric claim, so confidence is medium."
+    }
+  ]
+}

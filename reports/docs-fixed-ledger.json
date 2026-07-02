@@ -1018,5 +1018,17 @@
     "line": 64,
     "title": "theme SKILL claims 'no extra runtime deps, only react (peer)' but the package depends on @arqel-dev/react at runtime",
     "round": 23
+  },
+  {
+    "file": "packages/workflow/SKILL.md",
+    "line": 54,
+    "title": "PHP workflow SKILL lists WorkflowVisualizer React component as pending, but it is fully shipped",
+    "round": 25
+  },
+  {
+    "file": "apps/docs/pt-BR/guide/tutorial-first-crud.md",
+    "line": 5,
+    "title": "PT-BR page cross-links to English locale (missing /pt-BR/ prefix) \u2014 3 broken locale references",
+    "round": 25
   }
 ]

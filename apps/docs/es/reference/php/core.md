@@ -49,7 +49,7 @@ Singleton. Vinculado automáticamente en `ArqelServiceProvider`.
 |---|---|
 | `register(class-string)` | Registra un Resource. Valida `is_subclass_of HasResource` |
 | `registerMany(array<class-string>)` | En lote |
-| `discover(string $namespace, string $path)` | Auto-descubrir vía PSR-4 + Symfony Finder |
+| `discover(string $path, string $namespace)` | Auto-descubrir vía PSR-4 + Symfony Finder |
 | `findByModel(class-string<Model>)` | `?class-string<Resource>` |
 | `findBySlug(string)` | `?class-string<Resource>` |
 | `has(class-string)` / `clear()` / `all()` | Utilidades |

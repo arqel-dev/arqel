@@ -1,8 +1,8 @@
 # Authentication in Arqel
 
-> **TL;DR:** Arqel **does not currently publish** login/register pages. You need to install a Laravel starter kit (Breeze, Jetstream, or Fortify), or roll your own. An **opt-in** Inertia-React flow inside `arqel-dev/auth` is planned in tickets **AUTH-006/007/008** — once shipped, it will be equivalent to what Filament/Nova offer natively.
+> **TL;DR:** Arqel ships an **opt-in** bundled Inertia-React auth flow inside `arqel-dev/auth` — login, register, forgot/reset-password and email verification — enabled via `Panel::login()`/`registration()`/`passwordReset()` (tickets **AUTH-006/007/008** delivered), equivalent to what Filament/Nova offer natively. As an alternative, you can still install a Laravel starter kit (Breeze, Jetstream, or Fortify), or roll your own.
 
-## Why Arqel does not ship authentication today
+## Why Arqel keeps authentication opt-in
 
 The original decision rested on two of the project's golden rules:
 
@@ -78,11 +78,11 @@ You implement the React/Inertia views manually. Useful for onboarding-heavy SaaS
 
 ## Quick comparison
 
-| Aspect | Breeze + React | Jetstream Inertia | Fortify | Arqel-native (TBD) |
+| Aspect | Breeze + React | Jetstream Inertia | Fortify | Arqel-native |
 |---|---|---|---|---|
 | Login | Yes | Yes | Yes (backend) | Yes (AUTH-006) |
 | Register | Yes | Yes | Yes (backend) | Yes opt-in (AUTH-007) |
-| Forgot password | Yes | Yes | Yes (backend) | Yes opt-in (planned) |
+| Forgot password | Yes | Yes | Yes (backend) | Yes opt-in (AUTH-008) |
 | Email verification | opt-in | Yes | opt-in | opt-in (AUTH-007) |
 | 2FA | No | Yes | Yes | No (future) |
 | Teams | No | Yes | No | No |
@@ -125,10 +125,10 @@ Run:
 php artisan arqel:doctor
 ```
 
-Starting with AUTH-005-doctor (planned), the command will detect:
+The command detects:
 
+- Whether a starter kit is installed (Breeze, Jetstream, or Fortify) — warns when absent (`checkAuthStarterKit()`).
 - Whether `App\Models\User` exists and uses the `Authenticatable` trait.
-- Whether a starter kit is installed (Breeze, Jetstream, or Fortify) — warns when absent.
 - Whether the `/login` and `/admin` routes are registered.
 
 ## Enabling registration (AUTH-007)

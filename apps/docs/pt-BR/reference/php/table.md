@@ -33,7 +33,7 @@ Builder principal.
 | `DateColumn` | Datas formatadas | `date(string)`, `dateTime(string)`, `since()`, `timezone(string)` |
 | `NumberColumn` | Numérico right-align | `decimals(int)`, `prefix`, `suffix` |
 | `IconColumn` | Single ícone | `options(array)`, `size(string)` |
-| `ImageColumn` | Thumbnail | `disk(string)`, `circular(bool)`, `size(int)` |
+| `ImageColumn` | Thumbnail | `disk(string)`, `circular()`, `square()`, `size(int)` |
 | `RelationshipColumn` | Eager-loaded relation | `make(name)` + `->display(attribute)` |
 | `ComputedColumn` | Closure derivada | factory `make(name, Closure)` |
 | `SelectColumn` | Célula select editável | `options(array\|Closure)`, `rules(array)`, `debounce(int)` |

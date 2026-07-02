@@ -928,5 +928,17 @@
     "line": 260,
     "title": "\"Planned next steps\" section lists only delivered auth tickets and treats shipped work as future",
     "round": 15
+  },
+  {
+    "file": "apps/docs/reference/php/form.md",
+    "line": 51,
+    "title": "FormRequestGenerator::generate() example passes invalid action 'create' and wrong default namespace",
+    "round": 16
+  },
+  {
+    "file": "packages-js/versioning/SKILL.md",
+    "line": 23,
+    "title": "@arqel-dev/versioning SKILL Status section states stale current version 0.10.0-rc.1 (real package.json is 0.15.0)",
+    "round": 16
   }
 ]

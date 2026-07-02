@@ -1006,5 +1006,11 @@
     "line": 147,
     "title": "CLI-TUI-004 doctor command listed as \"Por chegar\" but arqel:doctor is shipped and registered",
     "round": 20
+  },
+  {
+    "file": "packages/versioning/SKILL.md",
+    "line": 142,
+    "title": "Versioning SKILL lists reusable React diff component as 'Por chegar' but <VersionDiff> already ships",
+    "round": 22
   }
 ]

@@ -20,7 +20,7 @@ mas os componentes **não** sabem disso — recebem props prontas.
 
 ## Status
 
-- **Versão atual**: `0.10.0-rc.1` (Fase 3, VERS-003 + VERS-004).
+- **Versão atual**: `0.15.0`.
 - Sem dependências runtime — só peer `react` (e `@inertiajs/react`
   declarado opcional, reservado para uso futuro num adapter).
 - DevDeps de teste: `@testing-library/react`, `vitest`, `jsdom`.

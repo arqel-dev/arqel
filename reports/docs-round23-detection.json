@@ -1,0 +1,17 @@
+{
+  "round": 23,
+  "confirmed": [
+    {
+      "file": "packages-js/theme/SKILL.md",
+      "line": 64,
+      "title": "theme SKILL claims 'no extra runtime deps, only react (peer)' but the package depends on @arqel-dev/react at runtime",
+      "evidence": "SKILL.md convention #4 states: \"4. **Sem depend\u00eancias runtime extras** \u2014 apenas `react` (peer).\" This is false. packages-js/theme/package.json declares a runtime `\"dependencies\": { \"@arqel-dev/react\": \"workspace:*\" }`, and the package's core runtime modules import from it: src/useTheme.ts line 7 `export { useTheme } from '@arqel-dev/react/providers';`, src/ThemeProvider.tsx lines 14-17 `export { ThemeContext, ThemeProvider } from '@arqel-dev/react/providers';`, and src/ThemeToggle.tsx line 1 `import { useArqelTranslations } from '@arqel-dev/react/utils';`. So @arqel-dev/react is a real (non-peer, non-dev) runtime dependency, contradicting the claim.",
+      "fix": "Update SKILL.md convention #4 to reflect that the package depends on @arqel-dev/react at runtime (the ThemeProvider/useTheme/ThemeContext are re-exported from @arqel-dev/react/providers per issue #236's single-context unification), with react itself as a peer dependency.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED. packages-js/theme/SKILL.md:64 states convention \"4. Sem depend\u00eancias runtime extras \u2014 apenas `react` (peer).\" This is contradicted by the code. packages-js/theme/package.json (lines 44-46) declares a real runtime dependency: \"dependencies\": { \"@arqel-dev/react\": \"workspace:*\" } \u2014 non-peer, non-dev. The package's core runtime modules import from it: src/useTheme.ts re-exports useTheme from '@arqel-dev/react/providers'; src/ThemeProvider.tsx re-exports ThemeContext and ThemeProvider from '@arqel-dev/react/providers'; src/ThemeToggle.tsx imports useArqelTranslations from '@arqel-dev/react/utils'. So @arqel-dev/react is a genuine runtime dependency, not a peer, and it is NOT the only runtime dep besides react. This is a NEW contradiction: the theme package is listed as STILL-UNSWEPT, and no prior SWEPT family covers this SKILL convention line. It is not a pending item nor a stylistic nitpick \u2014 it is an actionable factual error. Proposed fix: rewrite convention #4 to state the package depends on @arqel-dev/react at runtime (ThemeProvider/useTheme/ThemeContext re-exported from @arqel-dev/react/providers per issue #236's single-context unification) with react itself as the peer."
+      }
+    }
+  ]
+}

@@ -1012,5 +1012,11 @@
     "line": 142,
     "title": "Versioning SKILL lists reusable React diff component as 'Por chegar' but <VersionDiff> already ships",
     "round": 22
+  },
+  {
+    "file": "packages-js/theme/SKILL.md",
+    "line": 64,
+    "title": "theme SKILL claims 'no extra runtime deps, only react (peer)' but the package depends on @arqel-dev/react at runtime",
+    "round": 23
   }
 ]

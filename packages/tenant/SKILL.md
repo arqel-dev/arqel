@@ -81,7 +81,7 @@ A escolha é **não reinventar**: oferece uma abstração leve que cobre 80% dos
 
 - ❌ **Setar `current` direto via singleton em userland** — `TenantManager::set` deve passar pelo middleware/resolver chain (audit trail + lifecycle hooks).
 - ❌ **Trait `BelongsToTenant` sem `tenant_id` na migration** — o trait assume coluna existente; sem ela o global scope quebra `where`.
-- ❌ **Bypass do `TenantScope` com `withoutGlobalScope` no controller** — para "admin override" use `TenantManager::runFor(null, fn () => ...)` que persiste auditoria.
+- ❌ **Bypass do `TenantScope` com `withoutGlobalScope` no controller** — para "admin override" use `TenantManager::forget()` (limpa o tenant atual, persistindo auditoria) ou `TenantManager::runFor($tenant, fn () => ...)` para rodar sob um tenant concreto. `runFor` exige um `Model` (não aceita `null`).
 - ❌ **Renderizar CSS vars de tema sem `CssVarsRenderer`** — concatenar atributos do tenant direto no HTML abre vetor de injeção; o renderer faz sanitização defensiva.
 
 ## Examples

@@ -52,7 +52,7 @@ Main builder.
 | `MultiSelectFilter` | Multi-value picker | `options(array\|Closure)` |
 | `DateRangeFilter` | start/end range | (no extra setters) |
 | `TextFilter` | Like search | `column(string)` |
-| `TernaryFilter` | true/false/all | `trueLabel`, `falseLabel`, `allLabel` |
+| `TernaryFilter` | true/false/all | `column(string)`, `trueLabel`, `falseLabel` |
 | `ScopeFilter` | Eloquent scope | factory `make($name, $scopeName)` |
 | `QueryBuilderFilter` | Visual condition tree (AND/OR groups) | `constraints(array<Constraint>)` |
 | `TrashedFilter` | Soft-delete three-state (`without`/`with`/`only`) | (no extra setters) |
@@ -65,8 +65,8 @@ Orchestrates request → Eloquent query.
 
 | Method | Description |
 |---|---|
-| `for(Table, Builder, Request)` | Factory |
-| `paginate(): LengthAwarePaginator` | Applies search/filter/sort/eager-load + paginate |
+| `__construct(Table $table, Builder $query, Request $request)` | Constructor (`new TableQueryBuilder(...)`) |
+| `build(): LengthAwarePaginator` | Applies search/filter/sort/eager-load + paginate (`paginate()` is private) |
 
 Sort whitelisted against sortable columns. `per_page` validated against `perPageOptions`. Eager loading inferred from `RelationshipColumn`.
 

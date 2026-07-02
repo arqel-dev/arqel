@@ -910,5 +910,23 @@
     "line": 128,
     "title": "Guide says starter-kit detection in arqel:doctor is '(planned)' via AUTH-005-doctor, but the shipped DoctorCommand already performs it",
     "round": 14
+  },
+  {
+    "file": "apps/docs/reference/php/auth.md",
+    "line": 66,
+    "title": "LoginController Inertia props block references nonexistent route names and wrong prop keys",
+    "round": 15
+  },
+  {
+    "file": "apps/docs/guide/migration/from-nova.md",
+    "line": 425,
+    "title": "Action form modal (\"confirmation modal with fields\") claimed unimplemented / Phase 2, but is shipped",
+    "round": 15
+  },
+  {
+    "file": "apps/docs/guide/authentication.md",
+    "line": 260,
+    "title": "\"Planned next steps\" section lists only delivered auth tickets and treats shipped work as future",
+    "round": 15
   }
 ]

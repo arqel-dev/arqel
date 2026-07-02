@@ -880,5 +880,35 @@
     "line": 36,
     "title": "SKILL.md 'Ainda por chegar' lists FIELDS-022 macros + field registry runtime as unshipped, but FieldFactory macros are implemented",
     "round": 13
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 36,
+    "title": "table.md documents ImageColumn::circular() as taking a bool argument, but it takes none",
+    "round": 14
+  },
+  {
+    "file": "apps/docs/reference/php/core.md",
+    "line": 52,
+    "title": "core.md documents ResourceRegistry::discover() parameters in the wrong order",
+    "round": 14
+  },
+  {
+    "file": "packages/auth/SKILL.md",
+    "line": 27,
+    "title": "auth SKILL header says login/register/forgot NOT included + AUTH-006/007/008 'TBD', but same file marks them 'Entregue' and code ships them",
+    "round": 14
+  },
+  {
+    "file": "apps/docs/guide/authentication.md",
+    "line": 3,
+    "title": "authentication guide TL;DR claims Arqel 'does not currently publish login/register pages' and calls AUTH-006/007/008 'planned' \u2014 they are delivered",
+    "round": 14
+  },
+  {
+    "file": "apps/docs/guide/authentication.md",
+    "line": 128,
+    "title": "Guide says starter-kit detection in arqel:doctor is '(planned)' via AUTH-005-doctor, but the shipped DoctorCommand already performs it",
+    "round": 14
   }
 ]

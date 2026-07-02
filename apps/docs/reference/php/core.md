@@ -18,7 +18,7 @@ Base class for user Resources. Subclasses only need to declare `protected static
 | `table()` | `mixed` | Optional. Return `Arqel\Table\Table` when you need custom behavior |
 | `form()` | `mixed` | Optional. Return `Arqel\Form\Form` when you need custom behavior |
 | `recordTitle(Model)` / `recordSubtitle(Model)` | `string` / `?string` | Identifier shown in breadcrumbs/modals |
-| `indexQuery(Builder)` | `Builder` | Hook to scope the listing |
+| `indexQuery(): mixed` | `?Builder` | Return a scoped query Builder, or null to fall back to `getModel()::query()` |
 
 **Lifecycle hooks** (all `protected`, override on the subclass):
 

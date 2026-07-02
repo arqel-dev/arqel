@@ -18,7 +18,7 @@ Base para Resources do utilizador. Subclasses só precisam declarar `protected s
 | `table()` | `mixed` | Opcional. Retornar `Arqel\Table\Table` quando precisar custom |
 | `form()` | `mixed` | Opcional. Retornar `Arqel\Form\Form` quando precisar custom |
 | `recordTitle(Model)` / `recordSubtitle(Model)` | `string` / `?string` | Identificador exibido em breadcrumbs/modais |
-| `indexQuery(Builder)` | `Builder` | Hook para escopar listagem |
+| `indexQuery(): mixed` | `?Builder` | Retorna um query Builder escopado, ou null para cair no `getModel()::query()` |
 
 **Lifecycle hooks** (todos `protected`, override na subclass):
 

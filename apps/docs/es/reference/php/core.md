@@ -18,7 +18,7 @@ Clase base para los Resources del usuario. Las subclases solo necesitan declarar
 | `table()` | `mixed` | Opcional. Retorna `Arqel\Table\Table` cuando necesitas comportamiento personalizado |
 | `form()` | `mixed` | Opcional. Retorna `Arqel\Form\Form` cuando necesitas comportamiento personalizado |
 | `recordTitle(Model)` / `recordSubtitle(Model)` | `string` / `?string` | Identificador mostrado en breadcrumbs/modales |
-| `indexQuery(Builder)` | `Builder` | Hook para acotar el listado |
+| `indexQuery(): mixed` | `?Builder` | Devuelve un query Builder acotado, o null para caer en `getModel()::query()` |
 
 **Lifecycle hooks** (todos `protected`, sobrescribe en la subclase):
 

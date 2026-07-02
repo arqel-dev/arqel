@@ -14,7 +14,7 @@ Structural React components for [Arqel](https://arqel.dev) admin panels.
 
 ```bash
 pnpm add @arqel-dev/ui @arqel-dev/react @arqel-dev/hooks @arqel-dev/types
-pnpm add @inertiajs/react react react-dom @base-ui-components/react @tanstack/react-table lucide-react
+pnpm add @inertiajs/react react react-dom @tanstack/react-table lucide-react recharts
 ```
 
 ## Usage

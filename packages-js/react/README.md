@@ -43,7 +43,7 @@ const { theme, toggle } = useTheme();
 ## Convenções
 
 - Subpath imports preferidos: `@arqel-dev/react/inertia`, `@arqel-dev/react/providers`, `@arqel-dev/react/context`, `@arqel-dev/react/utils`
-- `peerDependencies` para React 19 + Inertia 2 (não bundla)
+- `peerDependencies` para React 19 + Inertia 3 (não bundla)
 - SSR-safe: hydrateRoot quando há markup, createRoot caso contrário
 
 ## Links

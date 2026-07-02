@@ -784,5 +784,53 @@
     "line": 33,
     "title": "packages-js/hooks/README.md 'Hooks' table omits the real export useResourceUpdates",
     "round": 10
+  },
+  {
+    "file": "packages-js/react/README.md",
+    "line": 46,
+    "title": "react README claims Inertia 2 peerDependency, but package.json requires Inertia 3",
+    "round": 11
+  },
+  {
+    "file": "packages-js/ui/README.md",
+    "line": 17,
+    "title": "ui README install command lists @base-ui-components/react, which is no longer a runtime/peer dependency",
+    "round": 11
+  },
+  {
+    "file": "packages/ai/SKILL.md",
+    "line": 73,
+    "title": "SKILL lists AiTranslateInput/AiSelectInput/AiExtractInput React components as unbuilt 'follow-up' work, but all three exist, are registered, and are tested",
+    "round": 11
+  },
+  {
+    "file": "packages/ai/SKILL.md",
+    "line": 38,
+    "title": "Fields table marks AiTranslateField's React column as 'follow-up' though AiTranslateInput.tsx ships",
+    "round": 11
+  },
+  {
+    "file": "packages/ai/SKILL.md",
+    "line": 39,
+    "title": "Fields table marks AiSelectField's React column as 'follow-up' though AiSelectInput.tsx ships",
+    "round": 11
+  },
+  {
+    "file": "packages/ai/SKILL.md",
+    "line": 40,
+    "title": "Fields table marks AiExtractField's React column as 'follow-up' though AiExtractInput.tsx ships",
+    "round": 11
+  },
+  {
+    "file": "packages/ai/SKILL.md",
+    "line": 200,
+    "title": "AiTranslateField example calls the React front-end 'o React (follow-up)', implying it is not yet built",
+    "round": 11
+  },
+  {
+    "file": "packages/ai/SKILL.md",
+    "line": 231,
+    "title": "AiSelectField example calls the React front-end 'O React (follow-up)', implying it is not yet built",
+    "round": 11
   }
 ]

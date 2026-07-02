@@ -1,0 +1,101 @@
+{
+  "round": 11,
+  "confirmed": [
+    {
+      "file": "packages-js/react/README.md",
+      "line": 46,
+      "title": "react README claims Inertia 2 peerDependency, but package.json requires Inertia 3",
+      "evidence": "packages-js/react/package.json line 68-69 declares peerDependency \"@inertiajs/react\": \"^3.0.0\"; CLAUDE.md/ADR-001 also state Inertia 3 is the only PHP<->React bridge.",
+      "fix": "Change 'peerDependencies para React 19 + Inertia 2' to 'React 19 + Inertia 3'.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages-js/react/README.md:46 states \"peerDependencies para React 19 + Inertia 2 (n\u00e3o bundla)\", but packages-js/react/package.json lines 63-66 declare peerDependencies \"@inertiajs/react\": \"^3.0.0\" (Inertia 3), also matching devDependencies (line 69) and CLAUDE.md/ADR-001 which mandate Inertia 3 as the only PHP<->React bridge. The doc says Inertia 2, the code requires Inertia 3 \u2014 a genuine contradiction. This file+line is not covered by any swept family (swept families cover PHP reference docs, Artisan cmd lists, trilingual guides, cloud env vars, types subpath entry points, widgets SKILL.md, hooks README). Fix: change \"Inertia 2\" to \"Inertia 3\" on line 46."
+      }
+    },
+    {
+      "file": "packages-js/ui/README.md",
+      "line": 17,
+      "title": "ui README install command lists @base-ui-components/react, which is no longer a runtime/peer dependency",
+      "evidence": "packages-js/ui/package.json lists radix-ui (^1.4.3) as the real UI dependency and does NOT declare @base-ui-components/react as a peerDependency (it is only a leftover devDependency); no src file imports @base-ui-components/react, and ui/SKILL.md lines 16 & 97 state Base UI was replaced by radix-ui and must not be imported. The peerDependencies also include recharts, which the install line omits.",
+      "fix": "Remove @base-ui-components/react from the `pnpm add` line (Radix UI ships inside @arqel-dev/ui via the radix-ui dependency); add recharts to match the declared peerDependencies.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages-js/ui/README.md:17's `pnpm add` line tells users to install `@base-ui-components/react`, but that package is NOT a runtime dependency or peerDependency in package.json \u2014 it appears only as a leftover devDependency (line 120), the real UI primitive dep is `radix-ui ^1.4.3` (line 103, a true dependency), and no src file imports @base-ui-components/react (grep returned nothing). SKILL.md lines 16 & 97 explicitly state radix-ui replaced Base UI and it must not be imported, directly contradicting the install line. Additionally, package.json peerDependencies declares `recharts ^2.15.0` (line 114), which 5 src chart files actually import (LineChart/AreaChart/PieChart/RadarChart/BarChart), yet README.md:17 omits recharts from the install line \u2014 so a consumer following the README would install a dead/deprecated package while missing a required peer. This file+line is not covered by any SWEPT ledger family (those are PHP setter sigs, Artisan cmd lists, trilingual guide drift, cloud env vars/config, types subpath entries, widgets StatWidget setters, hooks README table). Actionable fix: drop @base-ui-components/react and add recharts to the install line."
+      }
+    },
+    {
+      "file": "packages/ai/SKILL.md",
+      "line": 73,
+      "title": "SKILL lists AiTranslateInput/AiSelectInput/AiExtractInput React components as unbuilt 'follow-up' work, but all three exist, are registered, and are tested",
+      "evidence": "packages-js/ai/src/AiTranslateInput.tsx, AiSelectInput.tsx and AiExtractInput.tsx all exist (with .test.tsx files), and packages-js/ai/src/register.tsx registers all three via registerField('AiTranslateInput'/'AiSelectInput'/'AiExtractInput', ...).",
+      "fix": "Remove the '**Fields React follow-up**: AiTranslateInput.tsx, AiSelectInput.tsx, AiExtractInput.tsx' bullet, or move these three to a shipped/delivered section alongside AiTextInput/AiImageInput.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED, NEW contradiction. packages/ai/SKILL.md line 73 sits under the \"### Por chegar\" (upcoming/unbuilt) section and lists \"**Fields React follow-up**: `AiTranslateInput.tsx`, `AiSelectInput.tsx`, `AiExtractInput.tsx`\" as work still to come. Source refutes this: all three components exist in packages-js/ai/src/ (AiTranslateInput.tsx, AiSelectInput.tsx, AiExtractInput.tsx), each has a companion .test.tsx, and packages-js/ai/src/register.tsx registers all three via registerField('AiTranslateInput', ...), registerField('AiSelectInput', ...), and registerField('AiExtractInput', ...) \u2014 alongside the already-shipped AiTextInput and AiImageInput. So the doc labels shipped, registered, tested components as unbuilt. Not covered by any swept family (not a php reference setter/method list, README Artisan commands, trilingual guide drift, cloud env-vars/config keys, types subpath entries, R10 StatWidget setter list, or R10 hooks README table). Actionable fix: remove that bullet or move the three components to a shipped/delivered section."
+      }
+    },
+    {
+      "file": "packages/ai/SKILL.md",
+      "line": 38,
+      "title": "Fields table marks AiTranslateField's React column as 'follow-up' though AiTranslateInput.tsx ships",
+      "evidence": "packages-js/ai/src/AiTranslateInput.tsx exists and is registered in register.tsx (registerField('AiTranslateInput', LazyAiTranslateInput)).",
+      "fix": "Change the React column for the AiTranslateField row from 'follow-up' to 'entregue (`AiTranslateInput.tsx`)'.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "Confirmed by opening both files. packages/ai/SKILL.md:38 marks the React column of the AiTranslateField row as \"follow-up\" (i.e., React component not yet delivered). But the source ships and registers it: packages-js/ai/src/AiTranslateInput.tsx exists (11590 bytes), and packages-js/ai/src/register.tsx lines 216-219 call registerField('AiTranslateInput', LazyAiTranslateInput) with a real lazy import of './AiTranslateInput.js' (lines 174-177). This directly contradicts the \"follow-up\" marker; parallel rows use \"entregue (`AiImageInput.tsx`)\" for delivered components. This is a NEW, distinct file+line contradiction: the AI SKILL.md Fields-table React-delivery column has never been in any swept family (swept families cover PHP setter signatures, Artisan command lists, trilingual guide drift, cloud env vars/config keys, types subpath entry points, StatWidget setters, and the Hooks table \u2014 none touch this table). Actionable fix: change the React column for the AiTranslateField row from \"follow-up\" to \"entregue (`AiTranslateInput.tsx`)\". (Note: the same table also understates AiSelectField and AiExtractField, which are likewise registered, but the finding is scoped to the AiTranslateField row and that row is genuinely wrong.)"
+      }
+    },
+    {
+      "file": "packages/ai/SKILL.md",
+      "line": 39,
+      "title": "Fields table marks AiSelectField's React column as 'follow-up' though AiSelectInput.tsx ships",
+      "evidence": "packages-js/ai/src/AiSelectInput.tsx exists and is registered in register.tsx (registerField('AiSelectInput', LazyAiSelectInput)).",
+      "fix": "Change the React column for the AiSelectField row from 'follow-up' to 'entregue (`AiSelectInput.tsx`)'.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "Confirmed genuine, new, code-verified contradiction, not in any SWEPT family. packages/ai/SKILL.md:39 marks AiSelectField's React column as \"follow-up\" (i.e., not yet delivered). But the source shows AiSelectInput.tsx exists at packages-js/ai/src/AiSelectInput.tsx (9183 bytes) and is registered in packages-js/ai/src/register.tsx via `registerField('AiSelectInput', LazyAiSelectInput as unknown as ...)`, with a full adaptToAiSelectInput adapter and a LazyAiSelectInput lazy import of './AiSelectInput.js'. So the React input is delivered, contradicting the \"follow-up\" marker. This SKILL.md ai Fields-table React column is not covered by any SWEPT family (SWEPT covers php reference docs, package READMEs/Artisan lists, trilingual guides, cloud/env, types subpaths, widgets StatWidget, hooks README \u2014 not the ai SKILL.md). Fix: change line 39's React column from 'follow-up' to 'entregue (`AiSelectInput.tsx`)'. (Note: lines 38 AiTranslateField and 40 AiExtractField share the same defect since AiTranslateInput.tsx and AiExtractInput.tsx also ship and register, but the finding as scoped to line 39 is itself real and actionable.)"
+      }
+    },
+    {
+      "file": "packages/ai/SKILL.md",
+      "line": 40,
+      "title": "Fields table marks AiExtractField's React column as 'follow-up' though AiExtractInput.tsx ships",
+      "evidence": "packages-js/ai/src/AiExtractInput.tsx exists and is registered in register.tsx (registerField('AiExtractInput', LazyAiExtractInput)).",
+      "fix": "Change the React column for the AiExtractField row from 'follow-up' to 'entregue (`AiExtractInput.tsx`)'.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/ai/SKILL.md:40 marks AiExtractField's React column as 'follow-up', but the referenced component packages-js/ai/src/AiExtractInput.tsx exists (10257 bytes, non-stub, exports `AiExtractInput` at line 132 with a full render contract) and is registered in register.tsx via `registerField('AiExtractInput', LazyAiExtractInput ...)`. The doc's own convention (line 41, AiImageField = 'entregue (`AiImageInput.tsx`)') proves 'follow-up' means not-yet-delivered, so the label is stale. This is a real code-vs-doc contradiction in packages/ai/SKILL.md \u2014 a file NOT in any SWEPT family (swept families cover apps/docs/reference/php/*.md, packages/*/README.md Artisan lists, trilingual guides, cloud env vars, types subpath entries, widgets/SKILL.md, hooks/README.md); packages/ai/SKILL.md has never been touched. Proposed fix (change the AiExtractField React column from 'follow-up' to 'entregue (`AiExtractInput.tsx`)') is correct and actionable. Note: the identical staleness also affects the two rows above (AiTranslateField line 38 -> AiTranslateInput.tsx exported+registered; AiSelectField line 39 -> AiSelectInput.tsx exported+registered), so the row-level fix should ideally cover all three, but the AiExtractField claim as stated is independently valid and real."
+      }
+    },
+    {
+      "file": "packages/ai/SKILL.md",
+      "line": 200,
+      "title": "AiTranslateField example calls the React front-end 'o React (follow-up)', implying it is not yet built",
+      "evidence": "The AiTranslate React front-end is shipped: packages-js/ai/src/AiTranslateInput.tsx exists and is registered/tested.",
+      "fix": "Drop the parenthetical '(follow-up)' so it reads 'o React dispara POST .../translate'.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/ai/SKILL.md:200 says \"o React (follow-up) dispara POST .../translate\", where \"(follow-up)\" implies the React front-end for AiTranslateField is not yet built. Code contradicts this: packages-js/ai/src/AiTranslateInput.tsx exists (11.5KB), is exported from packages-js/ai/src/index.ts (lines 33-37), is registered into the FieldRegistry via registerField('AiTranslateInput', LazyAiTranslateInput) in packages-js/ai/src/register.tsx:216-219, and has a test file AiTranslateInput.test.tsx. So the front-end is shipped, registered, and tested \u2014 the \"(follow-up)\" parenthetical is stale/inaccurate. This \"follow-up\" staleness family is NOT in any SWEPT family (SWEPT covers php reference setter signatures, Artisan command lists, trilingual reference-doc drift, cloud env vars/config keys, packages-js/types subpath entry points, StatWidget setters, and the hooks table \u2014 none touch packages/ai/SKILL.md's follow-up labels). No prior docs-audit round touched packages/ai/SKILL.md's follow-up markers. Actionable. NOTE: the same false \"(follow-up)\" label recurs at lines 38-40 (endpoint table), 73 (\"Fields React follow-up: AiTranslateInput.tsx, AiSelectInput.tsx, AiExtractInput.tsx\" \u2014 all three exist and are registered), and 231 (AiSelect classify prose); the proposed line-200-only fix is correct but under-scoped \u2014 the full fix should remove the stale follow-up markers across all these lines since AiSelectInput.tsx and AiExtractInput.tsx are likewise shipped, exported, and registered."
+      }
+    },
+    {
+      "file": "packages/ai/SKILL.md",
+      "line": 231,
+      "title": "AiSelectField example calls the React front-end 'O React (follow-up)', implying it is not yet built",
+      "evidence": "The AiSelect React front-end is shipped: packages-js/ai/src/AiSelectInput.tsx exists and is registered/tested.",
+      "fix": "Drop the parenthetical '(follow-up)' so it reads 'O React dispara POST .../classify'.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/ai/SKILL.md:231 reads \"O React (follow-up) dispara POST /admin/{slug}/fields/category/classify\", where the parenthetical \"(follow-up)\" implies the React front-end is not yet built / deferred. But the code contradicts this: packages-js/ai/src/AiSelectInput.tsx (9183 bytes) is fully shipped \u2014 it is exported from index.ts (lines 22-25), registered via registerField('AiSelectInput', LazyAiSelectInput) in register.tsx:220, dispatches the exact `fetch('/admin/${resource}/fields/${field}/classify', { method: 'POST' })` described (AiSelectInput.tsx:86,179-180), handles fallbackOption, and has a full test suite (AiSelectInput.test.tsx). The doc's \"(follow-up)\" annotation is a factual contradiction of shipped/tested code. This is not covered by any SWEPT family (not a setter signature, Artisan cmd, trilingual mirror, cloud env var, types entry point, StatWidget setters, or hooks table) \u2014 it is a distinct, never-touched file+line. Proposed fix (drop \"(follow-up)\") is correct and actionable."
+      }
+    }
+  ]
+}

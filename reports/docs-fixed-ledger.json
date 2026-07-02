@@ -850,5 +850,35 @@
     "line": 50,
     "title": "widgets SKILL.md 'Por chegar (WIDGETS-010..012, 014..015)' lists the React side, filter client, and E2E as still-to-come, but they are all delivered",
     "round": 12
+  },
+  {
+    "file": "apps/docs/reference/php/actions.md",
+    "line": 32,
+    "title": "Confirmable trait setters documented as modalSubmitLabel/modalCancelLabel but the real methods are modalSubmitButtonLabel/modalCancelButtonLabel",
+    "round": 13
+  },
+  {
+    "file": "apps/docs/reference/php/actions.md",
+    "line": 23,
+    "title": "Action base setters visible()/disabled() documented as accepting bool|Closure but source accepts only Closure",
+    "round": 13
+  },
+  {
+    "file": "packages/fields/SKILL.md",
+    "line": 33,
+    "title": "SKILL.md 'Ainda por chegar' lists FIELDS-015..018 validation/visibility/dependency/authorization concerns as unshipped, but all four are extracted and in use",
+    "round": 13
+  },
+  {
+    "file": "packages/fields/SKILL.md",
+    "line": 34,
+    "title": "SKILL.md 'Ainda por chegar' lists FIELDS-019 automatic eager loading as unshipped, but EagerLoadingResolver exists",
+    "round": 13
+  },
+  {
+    "file": "packages/fields/SKILL.md",
+    "line": 36,
+    "title": "SKILL.md 'Ainda por chegar' lists FIELDS-022 macros + field registry runtime as unshipped, but FieldFactory macros are implemented",
+    "round": 13
   }
 ]

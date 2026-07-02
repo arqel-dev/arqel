@@ -137,15 +137,20 @@ arqel cloud:deploy-link arqel-dev/laravel-cloud-template
 arqel cloud:deploy-link owner/meu-painel --region=us-east --name=meu-painel
 ```
 
+### Entregue em `arqel-dev/core` (Artisan, fora deste pacote)
+
+- **CLI-TUI-002** — Resource generator interactivo: `php artisan arqel:resource`
+  (`MakeResourceCommand` + `ResourceGenerator`, registrados no `ArqelServiceProvider`),
+  com forma CLI-direta (`arqel:resource App\Models\Post --label=Post`) e modo wizard.
+  **Não confundir com este pacote** (é Artisan command, não comando do binário global).
+- **CLI-TUI-004** — Doctor command: `php artisan arqel:doctor` (`DoctorCommand`,
+  registrado no `ArqelServiceProvider`) verificando versões de PHP/Laravel/Composer
+  e detecção de starter kit. Nome real é o Artisan `arqel:doctor`, não `arqel doctor`.
+
 ### Por chegar
 
-- **CLI-TUI-002** — Resource generator interactivo. Reside em `arqel-dev/core`
-  como `php artisan arqel:resource` (Artisan command, não comando
-  do binário global). **Não confundir com este pacote.**
 - **CLI-TUI-003** — Camada Ink-equivalente (rich UI com TUI completa,
   provavelmente via `chewie` ou wrapper próprio sobre Prompts).
-- **CLI-TUI-004** — Doctor command (`arqel doctor`) verificando versões
-  de PHP/Node/Composer.
 - Empacotamento final para Packagist (publicação 0.1.0).
 
 ## Conventions

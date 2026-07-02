@@ -976,5 +976,23 @@
     "line": 9,
     "title": "blog-admin says Filament/Nova migration guides \"will land in DOCS-007\" but they already exist",
     "round": 18
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 69,
+    "title": "TableQueryBuilder public entry point is build(), not paginate() (paginate() is private)",
+    "round": 19
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 68,
+    "title": "TableQueryBuilder has no static for() factory \u2014 it is a plain __construct(Table, Builder, Request)",
+    "round": 19
+  },
+  {
+    "file": "apps/docs/reference/php/table.md",
+    "line": 55,
+    "title": "TernaryFilter has no allLabel() setter",
+    "round": 19
   }
 ]

@@ -946,5 +946,35 @@
     "line": 21,
     "title": "core.md documents indexQuery(Builder): Builder but the method takes no parameter and returns mixed",
     "round": 17
+  },
+  {
+    "file": "packages/tenant/SKILL.md",
+    "line": 84,
+    "title": "Anti-patterns section recommends TenantManager::runFor(null, ...) but runFor requires a non-nullable Model",
+    "round": 18
+  },
+  {
+    "file": "packages/export/SKILL.md",
+    "line": 17,
+    "title": "ExportAction factory documented as make(string $name = 'export') but source make() has no default",
+    "round": 18
+  },
+  {
+    "file": "apps/docs/pt-BR/SKILL.md",
+    "line": 22,
+    "title": "SKILL lists DOCS-002..008 as \"Por chegar\" but all seven are shipped",
+    "round": 18
+  },
+  {
+    "file": "apps/docs/es/SKILL.md",
+    "line": 22,
+    "title": "ES mirror SKILL lists DOCS-002..008 as \"Por chegar\" but all seven are shipped",
+    "round": 18
+  },
+  {
+    "file": "apps/docs/examples/blog-admin.md",
+    "line": 9,
+    "title": "blog-admin says Filament/Nova migration guides \"will land in DOCS-007\" but they already exist",
+    "round": 18
   }
 ]

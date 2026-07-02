@@ -19,15 +19,18 @@
 - Edit-on-GitHub link na footer de cada página
 - Assets `public/` (favicon, logo, hero) em SVG inline
 
-**Por chegar (DOCS-002..008):**
+**Entregue (DOCS-002..008):**
 
-- DOCS-002: Getting Started completo (< 10 min walkthrough)
-- DOCS-003: Conceitos essenciais (Panels/Resources/Fields/Tables/Forms/Actions/Auth — preenche todos os stubs em `guide/`)
-- DOCS-004: Tutorial blog admin (preenche `examples/blog-admin.md`)
-- DOCS-005: API reference PHP auto-gerada (phpDocumentor + scripts)
-- DOCS-006: API reference TS auto-gerada (TypeDoc + scripts)
-- DOCS-007: Migration guides Filament/Nova
-- DOCS-008: AGENTS.md template + MCP docs stub
+- DOCS-002: Getting Started completo (`guide/getting-started.md`)
+- DOCS-003: Conceitos essenciais (Panels/Resources/Fields/Tables/Forms/Actions/Auth em `guide/`)
+- DOCS-004: Tutorial blog admin (`guide/tutorial-first-crud.md` + `examples/blog-admin.md`)
+- DOCS-005: API reference PHP (`reference/php/` — actions/auth/core/fields/form/nav/table)
+- DOCS-006: API reference TS (`reference/typescript/` — fields/hooks/react/types/ui)
+- DOCS-007: Migration guides Filament/Nova/react-admin (`guide/migration/`)
+- DOCS-008: MCP docs (`advanced/mcp.md` + `guide/mcp-server.md`)
+
+**Por chegar:**
+
 - Algolia DocSearch (substituir search local quando o site tiver tráfego)
 - Deploy preview no PR (Cloudflare Pages ou GitHub Pages — decisão em DOCS-001 follow-up)
 

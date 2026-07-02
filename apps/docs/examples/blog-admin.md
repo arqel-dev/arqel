@@ -6,4 +6,4 @@ Go straight to the [tutorial](/guide/tutorial-first-crud).
 
 ## Other examples
 
-More examples will land in DOCS-007 (Filament/Nova migration guides) and through community contribution PRs.
+See the [Filament](../guide/migration/from-filament.md) and [Nova](../guide/migration/from-nova.md) migration guides for more, and expect further examples through community contribution PRs.

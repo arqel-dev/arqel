@@ -28,12 +28,15 @@
 - **Hand-off do `searchRoute` (#203):** o `BelongsToField` emite só a metadata de busca (`searchable`/`searchColumns`/`relatedResource`); a URL concreta de `arqel.fields.search` é injetada em `props.searchRoute` pelo `FieldSchemaSerializer` (em `arqel-dev/core`), que recebe o slug da Resource dona via `InertiaDataBuilder` e resolve `route('arqel.fields.search', ['resource' => $slug, 'field' => $name])`. Sem essa injeção o `BelongsToInput.tsx` (que é async-only) ficava permanentemente vazio. Só fields BelongsTo com `searchable === true` recebem a URL.
 - `Arqel\Fields\Http\Controllers\FieldUploadController` — store/delete de uploads de `FileField`/`ImageField`, resolvendo o field via `effectiveFields()` (#94). **Autorização (#128):** o store autoriza `create` e o delete autoriza `delete` na Policy do model (via `authorize()`, mesmo gate-or-policy guard), mais `authorizeField()` para garantir que o field nomeado existe e é um `FileField`. **Contenção do path no delete (#128):** o handler de delete rejeita paths absolutos (`/`, `\`, `C:`) e normaliza `..` segments, exigindo que o path final fique contido no `directory` configurado do field (`str_starts_with($clean, $prefix)`) — sem isso um path traversal poderia apagar arquivos fora da área do field. **Visibilidade aplicada no upload (#142):** o arquivo é armazenado com a `visibility` configurada do field (`$field->getVisibility()`, ex.: `private`) em vez do default do disk — um upload para um field marcado `private` não fica publicamente acessível.
 
+**Entregue:**
+
+- `Arqel\Fields\Concerns\HasValidation`/`HasVisibility`/`HasDependencies`/`HasAuthorization` extraídos e aplicados na base `Field` (`use` em `Field.php`) (FIELDS-015..018).
+- `EagerLoadingResolver` — inspeciona `BelongsToField`/`HasManyField` e devolve relações deduplicadas para `Builder::with(...)` (FIELDS-019). Resta apenas o auto-wire no `index()` do controller (CORE-006).
+- `FieldFactory::macro()` + resolução via `__callStatic` (macros → registry) (FIELDS-022).
+
 **Ainda por chegar:**
 
-- `Arqel\Fields\Concerns\HasValidation`/`HasVisibility`/`HasDependencies`/`HasAuthorization` como concerns extraídos (FIELDS-015..018)
-- Eager loading automático (FIELDS-019)
-- Endpoint `createOption` (FIELDS-021 slice restante)
-- Macros + field registry runtime polish (FIELDS-022)
+- Endpoint `createOption` (FIELDS-021 slice restante) — ainda sem rota em `packages/fields/routes/arqel-fields.php`.
 
 ## Field types
 

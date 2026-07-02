@@ -1,0 +1,41 @@
+{
+  "round": 19,
+  "confirmed": [
+    {
+      "file": "apps/docs/reference/php/table.md",
+      "line": 69,
+      "title": "TableQueryBuilder public entry point is build(), not paginate() (paginate() is private)",
+      "evidence": "table.md line 69 documents `paginate(): LengthAwarePaginator` as the public method that applies search/filter/sort/eager-load. In source packages/table/src/TableQueryBuilder.php the public method is `build(): LengthAwarePaginator` (line 40); `paginate()` exists only as a `private function paginate()` (line 130) called internally by build(). Callers cannot invoke ->paginate(). Confirmed by the framework's own caller packages/core/src/Support/InertiaDataBuilder.php:466 which checks `method_exists($instance, 'build')` and calls `$instance->build()`.",
+      "fix": "Change the documented method from `paginate(): LengthAwarePaginator` to `build(): LengthAwarePaginator`.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/reference/php/table.md:69 documents `paginate(): LengthAwarePaginator` as the public method that \"Applies search/filter/sort/eager-load + paginate\". In source packages/table/src/TableQueryBuilder.php the public entry point is `build(): LengthAwarePaginator` (line 40), which internally calls `applySearch/applyFilters/applySort/applyEagerLoading` then `$this->paginate()`. `paginate()` is declared `private function paginate()` at line 130 and cannot be invoked by callers. The framework's own caller confirms this: packages/core/src/Support/InertiaDataBuilder.php:466 checks `method_exists($instance, 'build')` and line 470 calls `$instance->build()` \u2014 never `->paginate()`. This is not covered by any prior SWEPT family (SWEPT table entries cover column setter signatures like DateColumn/BadgeColumn/IconColumn/RelationshipColumn, not the TableQueryBuilder public method). Proposed fix is correct: change the documented method at table.md:69 from `paginate(): LengthAwarePaginator` to `build(): LengthAwarePaginator`. Note the factory on line 68 is `for(Table, Builder, Request)`, matching the constructor/usage, so only the paginate\u2192build line is wrong."
+      }
+    },
+    {
+      "file": "apps/docs/reference/php/table.md",
+      "line": 68,
+      "title": "TableQueryBuilder has no static for() factory \u2014 it is a plain __construct(Table, Builder, Request)",
+      "evidence": "table.md line 68 documents `for(Table, Builder, Request)` as a `Factory`. Source packages/table/src/TableQueryBuilder.php has no static `for()` method; instantiation is via `public function __construct(private readonly Table $table, private readonly Builder $query, private readonly Request $request)` (lines 31-35). Confirmed by caller packages/core/src/Support/InertiaDataBuilder.php:460 which uses `$reflection->newInstance($table, $query, $request)`, i.e. the constructor, not TableQueryBuilder::for().",
+      "fix": "Replace the `for(Table, Builder, Request)` row with the constructor signature `__construct(Table $table, Builder $query, Request $request)` (or `new TableQueryBuilder(Table, Builder, Request)`).",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/reference/php/table.md:68 documents `for(Table, Builder, Request)` as a \"Factory\", but packages/table/src/TableQueryBuilder.php has NO static for() method \u2014 instantiation is via the public constructor `__construct(private readonly Table $table, private readonly Builder $query, private readonly Request $request)` (lines 31-35). The caller packages/core/src/Support/InertiaDataBuilder.php:461 confirms this: it uses `$reflection->newInstance($table, $query, $request)` (the constructor), never TableQueryBuilder::for(). A doc consumer copying `TableQueryBuilder::for(...)` gets a fatal \"undefined method\" error. (Note: line 69's `paginate(): LengthAwarePaginator` is ALSO wrong \u2014 paginate() is private at line 130; the real public entry point is build() at line 40, which is what the caller checks via method_exists($instance,'build') and calls.) This file+line contradiction is not in any SWEPT family \u2014 prior table sweeps covered only column setter signatures (DateColumn/BadgeColumn/RelationshipColumn etc.), never the TableQueryBuilder factory/constructor. Proposed fix: replace the `for(Table, Builder, Request)` row with the actual constructor `__construct(Table, Builder, Request)` (or `new TableQueryBuilder(...)`), and correct the private paginate() row to the public build() method."
+      }
+    },
+    {
+      "file": "apps/docs/reference/php/table.md",
+      "line": 55,
+      "title": "TernaryFilter has no allLabel() setter",
+      "evidence": "table.md line 55 lists TernaryFilter extra setters as `trueLabel`, `falseLabel`, `allLabel`. Source packages/table/src/Filters/TernaryFilter.php defines only `trueLabel()` (line 45) and `falseLabel()` (line 52) as label setters (plus `column()`); there is no `allLabel()` method nor a `$allLabel` property (only properties `$column`, `$trueLabel`, `$falseLabel`). The STATE_ALL constant exists but no label setter for it.",
+      "fix": "Remove `allLabel` from the TernaryFilter setter list (or add the actual `column` setter it does expose); the documented `allLabel` does not exist.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/reference/php/table.md:55 lists TernaryFilter extra setters as `trueLabel`, `falseLabel`, `allLabel`. Source packages/table/src/Filters/TernaryFilter.php (final class) defines only `column()` (line 33), `trueLabel()` (line 45), and `falseLabel()` (line 52) as public setters; properties are `$column`, `$trueLabel`, `$falseLabel` only (lines 27-31) \u2014 no `$allLabel`. `getTypeSpecificProps()` (lines 97-104) emits solely `column`, `trueLabel`, `falseLabel`. The STATE_ALL constant (line 19) exists but has no corresponding label setter. Thus the documented `allLabel` setter does not exist \u2014 a genuine doc-vs-code contradiction. It is not covered by any prior SWEPT family (swept items covered DateColumn/BadgeColumn/IconColumn/RelationshipColumn/DateField/ImageColumn column setters and other signatures, never TernaryFilter's filter setters). Proposed fix: replace `allLabel` with the real `column(string)` setter TernaryFilter actually exposes (or simply drop `allLabel`)."
+      }
+    }
+  ]
+}

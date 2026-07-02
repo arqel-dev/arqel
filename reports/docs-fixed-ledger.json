@@ -940,5 +940,11 @@
     "line": 23,
     "title": "@arqel-dev/versioning SKILL Status section states stale current version 0.10.0-rc.1 (real package.json is 0.15.0)",
     "round": 16
+  },
+  {
+    "file": "apps/docs/reference/php/core.md",
+    "line": 21,
+    "title": "core.md documents indexQuery(Builder): Builder but the method takes no parameter and returns mixed",
+    "round": 17
   }
 ]

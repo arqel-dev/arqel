@@ -1,0 +1,29 @@
+{
+  "round": 25,
+  "confirmed": [
+    {
+      "file": "packages/workflow/SKILL.md",
+      "line": 54,
+      "title": "PHP workflow SKILL lists WorkflowVisualizer React component as pending, but it is fully shipped",
+      "evidence": "SKILL.md line 54 sits under the '### Pendente' header (line 51) and states: '- **WorkflowVisualizer React component** \u2014 diagrama interativo do workflow (states + transitions) consumindo WorkflowDefinition::toArray().' However, the component is fully implemented and exported: packages-js/workflow/src/index.ts exports `WorkflowVisualizer`, `buildMermaidSource`, `slugifyStateId` from './WorkflowVisualizer.js'; the implementation is packages-js/workflow/src/WorkflowVisualizer.tsx (205 lines) with a 115-line test file WorkflowVisualizer.test.tsx, delivered in commit a5c60e1 (feat(workflow): add WorkflowVisualizer Mermaid graph React component). The sibling packages-js/workflow/SKILL.md documents it as delivered under 'WorkflowVisualizer (WF-005)' (lines 88-138), and this same PHP SKILL's own Related section references it. The item is incorrectly marked as 'Por chegar'/pending.",
+      "fix": "Remove the WorkflowVisualizer bullet from the '### Pendente' section and record WF-005 as delivered (as the JS workflow SKILL already does), or move it to the delivered/status area noting it ships in @arqel-dev/workflow.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED. packages/workflow/SKILL.md line 54 sits under the '### Pendente' header (line 51) and lists '**WorkflowVisualizer React component** \u2014 diagrama interativo do workflow (states + transitions) consumindo WorkflowDefinition::toArray().' as unshipped. But the component is fully delivered: packages-js/workflow/src/index.ts exports `WorkflowVisualizer`, `buildMermaidSource`, `slugifyStateId` from './WorkflowVisualizer.js'; the implementation is packages-js/workflow/src/WorkflowVisualizer.tsx (205 lines) with a companion WorkflowVisualizer.test.tsx (115 lines). The sibling packages-js/workflow/SKILL.md documents it as delivered under '## WorkflowVisualizer (WF-005)' (line 88) with runnable usage examples (lines 97-123). This is a real, new, actionable contradiction: the PHP SKILL marks a fully-shipped component as pending. It is NOT a swept family \u2014 workflow is explicitly listed as still-unswept, and the only prior workflow SWEPT item was the versioning package's <VersionDiff>, a different component. The fix: remove the WorkflowVisualizer bullet from '### Pendente' and record WF-005 as delivered (shipping in @arqel-dev/workflow), matching the JS SKILL."
+      }
+    },
+    {
+      "file": "apps/docs/pt-BR/guide/tutorial-first-crud.md",
+      "line": 5,
+      "title": "PT-BR page cross-links to English locale (missing /pt-BR/ prefix) \u2014 3 broken locale references",
+      "evidence": "In apps/docs/pt-BR/guide/tutorial-first-crud.md three internal links drop the /pt-BR/ locale prefix and point at the English pages instead of their PT-BR mirrors: line 5 `[Getting Started](/guide/getting-started)`, line 80 `[Getting Started](/guide/getting-started)`, and line 310 `[PHP overview](/reference/php-overview)`. The PT-BR targets exist (apps/docs/pt-BR/guide/getting-started.md and apps/docs/pt-BR/reference/php-overview.md), and the ES mirror apps/docs/es/guide/tutorial-first-crud.md correctly uses /es/guide/getting-started (lines 5, 80) and /es/reference/php-overview (line 310). The same PT-BR file even links correctly elsewhere (lines 306-307 use /pt-BR/advanced/custom-fields and /pt-BR/advanced/macros), confirming the un-prefixed links are a defect, not a convention. Effect: a PT-BR reader following these links is silently dropped onto the English pages, breaking the localized navigation.",
+      "fix": "Change the three links to their PT-BR mirrors: line 5 and line 80 `(/guide/getting-started)` -> `(/pt-BR/guide/getting-started)`; line 310 `(/reference/php-overview)` -> `(/pt-BR/reference/php-overview)`, matching the ES mirror and the file's own /pt-BR/ links.",
+      "dimension": "broken-refs",
+      "verdict": {
+        "isReal": true,
+        "reason": "Independently confirmed by opening apps/docs/pt-BR/guide/tutorial-first-crud.md. Lines 5 and 80 both contain [Getting Started](/guide/getting-started) and line 310 contains [PHP overview](/reference/php-overview) \u2014 all three drop the /pt-BR/ locale prefix and silently route a PT-BR reader to the English pages. The PT-BR mirror targets exist (apps/docs/pt-BR/guide/getting-started.md and apps/docs/pt-BR/reference/php-overview.md). The ES mirror (apps/docs/es/guide/tutorial-first-crud.md) correctly prefixes the same three links (/es/guide/getting-started lines 5 & 80, /es/reference/php-overview line 310), and the same PT-BR file's own lines 308-309 correctly use /pt-BR/advanced/custom-fields and /pt-BR/advanced/macros \u2014 proving the un-prefixed links are a defect, not a convention. This is a NEW, distinct file+line contradiction: the SWEPT \"trilingual mirror drift\" family covers API/content drift (signatures, params, delivered features) between mirrors, not intra-page broken locale-prefix links. Fix: prefix the three links with /pt-BR/."
+      }
+    }
+  ]
+}

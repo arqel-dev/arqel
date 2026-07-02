@@ -65,10 +65,11 @@ Renders the login page via Inertia. Passes as props:
 
 ```php
 [
-  'loginUrl' => route('arqel.auth.login'),
-  'registerUrl' => route('arqel.auth.register'),     // null if registration disabled
-  'forgotPasswordUrl' => route('arqel.auth.password.request'),
-  'canResetPassword' => bool,
+  'canRegister' => bool,                 // Panel::registrationEnabled()
+  'canResetPassword' => bool,            // Panel::passwordResetEnabled()
+  'loginUrl' => string,                  // Panel::getLoginUrl() ?? '/admin/login'
+  'registerUrl' => string,               // Route::has('register') ? route('register') : '/admin/register'
+  'forgotPasswordUrl' => string,         // Panel::getForgotPasswordUrl() ?? '/admin/forgot-password'
 ]
 ```
 

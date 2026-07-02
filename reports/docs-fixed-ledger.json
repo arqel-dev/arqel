@@ -832,5 +832,23 @@
     "line": 231,
     "title": "AiSelectField example calls the React front-end 'O React (follow-up)', implying it is not yet built",
     "round": 11
+  },
+  {
+    "file": "packages/cli/SKILL.md",
+    "line": 26,
+    "title": "NewCommand signature documents --starter default as 'breeze' but the real default is 'react'",
+    "round": 12
+  },
+  {
+    "file": "packages/audit/SKILL.md",
+    "line": 40,
+    "title": "GlobalActivityLogController documented as having 8 query params but only 7 exist",
+    "round": 12
+  },
+  {
+    "file": "packages/widgets/SKILL.md",
+    "line": 50,
+    "title": "widgets SKILL.md 'Por chegar (WIDGETS-010..012, 014..015)' lists the React side, filter client, and E2E as still-to-come, but they are all delivered",
+    "round": 12
   }
 ]

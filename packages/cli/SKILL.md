@@ -23,8 +23,9 @@ e segue o mesmo idioma do Filament installer.
   (`symfony/console ^7.0`, `laravel/prompts ^0.3`).
 - `Arqel\Cli\Application` registrando os comandos.
 - `Arqel\Cli\Commands\NewCommand` com signature
-  `new {name} {--starter=breeze} {--tenancy=none} {--first-resource=}
-  {--dark-mode} {--mcp} {--no-prompts} {--platform=}`.
+  `new {name} {--starter=react} {--tenancy=none} {--first-resource=}
+  {--dark-mode} {--mcp} {--no-prompts} {--platform=}` (default `react`;
+  `breeze`/`jetstream` são aliases → `react`).
   Modo interactivo usa `Laravel\Prompts` (text/select/confirm); modo
   não-interactivo (`--no-prompts`) lê tudo das flags.
 - `Arqel\Cli\Generators\SetupScriptGenerator` (`final readonly`):

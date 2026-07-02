@@ -422,4 +422,4 @@ Route::get('/admin/analytics', AnalyticsController::class)->name('admin.analytic
 2. **`ID::make()` não existe.** A coluna primária é renderizada automaticamente; declare apenas se quiser ordenação custom ou hidden.
 3. **Lenses não têm conceito 1:1.** Avalie cada Lens: se é "vista alternativa do mesmo Resource", crie outro Resource com `indexQuery()` custom. Se é dashboard analítico, vira Widget.
 4. **Tools Vue → reescrita React.** Não há tradutor — Vue SFC com `<script setup>` precisa virar `.tsx`. Esse é tipicamente o trabalho mais demorado.
-5. **Action queueing é igual mas o input UI muda.** Arqel ainda não tem o "modal de confirmação com fields" do Nova builtin (planejado Phase 2); por enquanto, capture inputs via form custom no React e POST para action endpoint.
+5. **Action queueing é igual, e o modal de formulário da action já vem built-in.** Arqel suporta o "modal de confirmação com fields" do Nova nativamente: declare os inputs com `Action::form([...fields])` (e `modalSize()`), e o `ActionFormModal` do `@arqel-dev/ui` renderiza o form de fields dentro do modal da action — sem precisar de form custom no React.

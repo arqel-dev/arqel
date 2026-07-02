@@ -257,13 +257,13 @@ The Inertia-React auth pages (`LoginPage`, `RegisterPage`, `ForgotPasswordPage`,
 
 The `LoginController` (and the equivalents for register/forgot/reset) passes already-resolved props to the Inertia component: `loginUrl`, `registerUrl`, `forgotPasswordUrl` — you don't need to build the URLs manually in React. Just consume them via `usePage().props`.
 
-## Planned next steps
+## Auth tickets — delivered
 
 - **AUTH-006** — Login + logout opt-in Inertia-React pages via `Panel::configure()->login()` (delivered).
 - **AUTH-007** — Opt-in registration + opt-in email verification (delivered).
 - **AUTH-008** — Forgot-password + reset token flow (delivered).
 
-Once that ticket ships, `composer require arqel-dev/framework` + `php artisan arqel:install` will be enough — no required starter kit.
+With these shipped, `composer require arqel-dev/framework` + `php artisan arqel:install` plus enabling the opt-in flags on the `Panel` is enough — no required starter kit.
 
 ## References
 

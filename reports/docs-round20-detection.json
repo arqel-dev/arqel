@@ -1,0 +1,29 @@
+{
+  "round": 20,
+  "confirmed": [
+    {
+      "file": "packages/cli/SKILL.md",
+      "line": 142,
+      "title": "CLI-TUI-002 (arqel:resource generator) listed as \"Por chegar\" but is shipped and registered",
+      "evidence": "cli/SKILL.md lines 140-144 place CLI-TUI-002 \u2014 the interactive Resource generator `php artisan arqel:resource` in arqel-dev/core \u2014 under a \"### Por chegar\" (coming soon) section. In reality it is fully implemented and registered: packages/core/src/Commands/MakeResourceCommand.php declares `protected $signature = 'arqel:resource ...'` (line 37) with the CLI-direct form `arqel:resource App\\Models\\Post --label=Post`, backed by packages/core/src/Generators/ResourceGenerator.php, and is registered in packages/core/src/ArqelServiceProvider.php line 53 (`MakeResourceCommand::class`). The feature is not \"por chegar\"; it ships.",
+      "fix": "Move the CLI-TUI-002 bullet out of the \"### Por chegar\" section (it is DELIVERED). If kept for cross-reference, reword to state the `arqel:resource` Artisan command already exists in arqel-dev/core (MakeResourceCommand + ResourceGenerator, registered in ArqelServiceProvider), rather than framing it as an upcoming item.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/cli/SKILL.md lines 140-144 place CLI-TUI-002 \u2014 the `arqel:resource` Resource generator \u2014 under a \"### Por chegar\" (coming soon) section, describing it as an upcoming Artisan command that \"reside em arqel-dev/core\". In reality it is fully shipped: packages/core/src/Commands/MakeResourceCommand.php declares `protected $signature = 'arqel:resource ...'` (line 37), backed by Arqel\\Core\\Generators\\ResourceGenerator, with both the CLI-direct form (docblock line 29: `arqel:resource App\\Models\\Post --label=Post`) AND the interactive CLI-TUI-002 wizard implemented (runInteractive at line 54). It is registered in packages/core/src/ArqelServiceProvider.php line 53 (`MakeResourceCommand::class`) inside hasCommands([...]). The doc therefore contradicts the code by labeling a delivered, registered feature as \"por chegar\". This is NOT covered by any SWEPT family: the only SWEPT cli/SKILL entry is `--starter 'react'` (a different item), and the \"core README Artisan command lists\" sweep applies to a different file (core README), not packages/cli/SKILL.md's \"Por chegar\" mis-classification of CLI-TUI-002. Proposed fix: move the CLI-TUI-002 bullet out of \"### Por chegar\" and reword it to state that `arqel:resource` (MakeResourceCommand + ResourceGenerator, registered in ArqelServiceProvider) already ships in arqel-dev/core, including the interactive wizard mode."
+      }
+    },
+    {
+      "file": "packages/cli/SKILL.md",
+      "line": 147,
+      "title": "CLI-TUI-004 doctor command listed as \"Por chegar\" but arqel:doctor is shipped and registered",
+      "evidence": "cli/SKILL.md lines 147-148 list CLI-TUI-004 \u2014 a Doctor command \"(`arqel doctor`) verificando vers\u00f5es de PHP/Node/Composer\" \u2014 under \"### Por chegar\". But packages/core/src/Console/DoctorCommand.php exists with `protected $signature = 'arqel:doctor {--json} {--strict}'` (line 45) and is registered in packages/core/src/ArqelServiceProvider.php line 55 (`DoctorCommand::class`). The doctor command that verifies PHP/Laravel/Composer versions is delivered, contradicting the \"coming soon\" status (the ledger already records arqel:doctor / checkAuthStarterKit() as delivered elsewhere).",
+      "fix": "Remove the CLI-TUI-004 bullet from \"### Por chegar\" and mark it DELIVERED, referencing packages/core/src/Console/DoctorCommand.php (`arqel:doctor`, registered in ArqelServiceProvider). Note the shipped name is the Artisan `arqel:doctor`, not the global-binary `arqel doctor` phrasing used in the stale bullet.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "Confirmed and NEW. packages/cli/SKILL.md lines 147-148 list CLI-TUI-004 \u2014 the Doctor command \u2014 under \"### Por chegar\" (coming soon). But the command is fully delivered: packages/core/src/Console/DoctorCommand.php defines `final class DoctorCommand` with `protected $signature = 'arqel:doctor {--json} {--strict}'` (line 45), its docblock states \"Implements CLI-TUI-004\" (line 32), and it is registered in packages/core/src/ArqelServiceProvider.php line 55 (`DoctorCommand::class`). It runs checkPhpVersion() and checkLaravelVersion(), so the \"verifying PHP versions\" premise holds. This is a genuine documented-status vs. code contradiction. It is NOT a duplicate: the three prior cli/SKILL.md ledger fixes were at lines 142, 126, and 26 (resource cmd name, README path, --starter default) and never touched the CLI-TUI-004 \"Por chegar\" bullet; the prior doctor-related fix (round 14) was in apps/docs/guide/authentication.md about starter-kit detection, a different file and claim. Minor caveat: the finding's evidence over-states scope by saying doctor checks \"PHP/Node/Composer\" \u2014 it does not check Node \u2014 but that does not undercut the core contradiction that the command is shipped while marked coming-soon. Fix: move CLI-TUI-004 out of \"Por chegar\" and mark it delivered as the Artisan `arqel:doctor` (not the global-binary `arqel doctor` phrasing)."
+      }
+    }
+  ]
+}

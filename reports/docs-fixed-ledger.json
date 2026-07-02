@@ -994,5 +994,17 @@
     "line": 55,
     "title": "TernaryFilter has no allLabel() setter",
     "round": 19
+  },
+  {
+    "file": "packages/cli/SKILL.md",
+    "line": 142,
+    "title": "CLI-TUI-002 (arqel:resource generator) listed as \"Por chegar\" but is shipped and registered",
+    "round": 20
+  },
+  {
+    "file": "packages/cli/SKILL.md",
+    "line": 147,
+    "title": "CLI-TUI-004 doctor command listed as \"Por chegar\" but arqel:doctor is shipped and registered",
+    "round": 20
   }
 ]

@@ -2,7 +2,7 @@
 
 Esse tutorial declara um blog admin de ponta a ponta — model + migration + Resource + fields customizados + table + Policy. Tempo alvo: **< 30 minutos**.
 
-Pré-requisitos: você já completou o [Getting Started](/guide/getting-started) e tem um projeto Laravel rodando com Arqel instalado.
+Pré-requisitos: você já completou o [Getting Started](/pt-BR/guide/getting-started) e tem um projeto Laravel rodando com Arqel instalado.
 
 ## 1. Cenário
 
@@ -77,7 +77,7 @@ php artisan migrate
 
 ## 3. Gerar UserResource
 
-Já feito no [Getting Started](/guide/getting-started). Confirme que `app/Arqel/Resources/UserResource.php` existe.
+Já feito no [Getting Started](/pt-BR/guide/getting-started). Confirme que `app/Arqel/Resources/UserResource.php` existe.
 
 ## 4. Gerar PostResource e CategoryResource
 
@@ -307,4 +307,4 @@ Visite <http://127.0.0.1:8000/admin/posts>:
 
 - [Custom Fields](/pt-BR/advanced/custom-fields) — criar um RichTextField próprio para substituir o `textarea`
 - [Macros](/pt-BR/advanced/macros) — encurtar configs repetidas
-- API reference: [PHP overview](/reference/php-overview)
+- API reference: [PHP overview](/pt-BR/reference/php-overview)

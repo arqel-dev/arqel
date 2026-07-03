@@ -65,6 +65,8 @@ final class Panel
 
     private int $passwordResetExpirationMinutes = 60;
 
+    private bool $profileEnabled = false;
+
     private string $forgotPasswordUrl = '/admin/forgot-password';
 
     private bool $defaultAuth = true;
@@ -352,6 +354,21 @@ final class Panel
     public function passwordResetEnabled(): bool
     {
         return $this->passwordResetEnabled && $this->defaultAuth;
+    }
+
+    /**
+     * Habilita a página bundled de perfil do usuário (Auth UI).
+     */
+    public function profile(bool $enabled = true): self
+    {
+        $this->profileEnabled = $enabled;
+
+        return $this;
+    }
+
+    public function profileEnabled(): bool
+    {
+        return $this->profileEnabled && $this->defaultAuth;
     }
 
     /**

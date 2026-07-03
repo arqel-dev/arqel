@@ -11,14 +11,13 @@
 import { useThemeOptional } from '@arqel-dev/react/providers';
 import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Link, router } from '@inertiajs/react';
-import type { ReactElement } from 'react';
+import { ChevronDown, LogOut, Moon, Sun, SunMoon, User } from 'lucide-react';
+import type { ComponentType, ReactElement } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../shadcn/ui/dropdown-menu.js';
@@ -30,6 +29,19 @@ export interface UserMenuProps {
   profileUrl?: string;
   className?: string;
 }
+
+type ThemeValue = 'light' | 'dark' | 'system';
+
+const THEME_OPTIONS: ReadonlyArray<{
+  value: ThemeValue;
+  icon: ComponentType<{ className?: string }>;
+  labelKey: string;
+  fallback: string;
+}> = [
+  { value: 'light', icon: Sun, labelKey: 'arqel.auth.menu.theme_light', fallback: 'Light' },
+  { value: 'dark', icon: Moon, labelKey: 'arqel.auth.menu.theme_dark', fallback: 'Dark' },
+  { value: 'system', icon: SunMoon, labelKey: 'arqel.auth.menu.theme_system', fallback: 'System' },
+];
 
 export function UserMenu({ user, logoutUrl, profileUrl, className }: UserMenuProps): ReactElement {
   const t = useArqelTranslations();
@@ -58,54 +70,72 @@ export function UserMenu({ user, logoutUrl, profileUrl, className }: UserMenuPro
           {initial}
         </span>
         <span className="hidden max-w-[10rem] truncate md:inline">{label}</span>
-        <span aria-hidden="true" className="text-muted-foreground">
-          ▾
-        </span>
+        <ChevronDown aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="flex flex-col">
           {name && <span className="font-medium">{name}</span>}
           {email && <span className="truncate text-xs text-muted-foreground">{email}</span>}
           {!name && !email && <span className="font-medium">{label}</span>}
         </DropdownMenuLabel>
 
+        {setTheme && (
+          <>
+            <DropdownMenuSeparator />
+            {/*
+              Theme control as a horizontal segmented control: the "Theme" label
+              on the left, a grouped set of icon buttons on the right. Rendered
+              outside a menu item (a plain row) so the icon buttons don't dismiss
+              the dropdown on click — `onSelect={(e) => e.preventDefault()}` is
+              not needed because these are bare <button>s, not DropdownMenuItems.
+            */}
+            <div className="flex items-center justify-between px-2 py-1.5">
+              <span className="text-sm text-muted-foreground">
+                {t('arqel.auth.menu.theme', 'Theme')}
+              </span>
+              <div className="inline-flex items-center gap-0.5 rounded-md bg-muted p-0.5">
+                {THEME_OPTIONS.map(({ value, icon: Icon, labelKey, fallback }) => {
+                  const active = (theme ?? 'system') === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-label={t(labelKey, fallback)}
+                      aria-pressed={active}
+                      onClick={() => setTheme(value)}
+                      className={cn(
+                        'flex h-7 w-8 items-center justify-center rounded-sm text-muted-foreground transition-colors',
+                        'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        active && 'bg-background text-foreground shadow-sm',
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+
         {profileUrl && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={profileUrl}>{t('arqel.auth.menu.profile', 'Profile')}</Link>
+              <Link href={profileUrl} className="flex items-center gap-2">
+                <User aria-hidden="true" className="h-4 w-4" />
+                {t('arqel.auth.menu.profile', 'Profile')}
+              </Link>
             </DropdownMenuItem>
-          </>
-        )}
-
-        {setTheme && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
-              {t('arqel.auth.menu.theme', 'Theme')}
-            </DropdownMenuLabel>
-            <DropdownMenuRadioGroup
-              value={theme ?? 'system'}
-              onValueChange={(v) => setTheme(v as Parameters<typeof setTheme>[0])}
-            >
-              <DropdownMenuRadioItem value="light">
-                {t('arqel.auth.menu.theme_light', 'Light')}
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="dark">
-                {t('arqel.auth.menu.theme_dark', 'Dark')}
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="system">
-                {t('arqel.auth.menu.theme_system', 'System')}
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
           </>
         )}
 
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
+          className="flex items-center gap-2 text-destructive focus:text-destructive"
           onSelect={() => router.post(logoutUrl)}
         >
+          <LogOut aria-hidden="true" className="h-4 w-4" />
           {t('arqel.auth.menu.logout', 'Log out')}
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -47,10 +47,25 @@ describe('UserMenu', () => {
     expect(screen.getByText('ada@x.com')).toBeInTheDocument();
   });
 
-  it('calls setTheme when a theme radio item is chosen', async () => {
+  it('calls setTheme when a theme segmented-control button is chosen', async () => {
     render(<UserMenu user={{ name: 'Ada' }} logoutUrl="/admin/logout" />);
     await userEvent.click(screen.getByRole('button', { name: /open user menu/i }));
-    await userEvent.click(screen.getByText(/^dark$/i));
+    // The theme options are icon buttons labelled via aria-label (no text).
+    await userEvent.click(screen.getByRole('button', { name: /^dark$/i }));
     expect(setTheme).toHaveBeenCalledWith('dark');
+  });
+
+  it('marks the active theme button as pressed', async () => {
+    render(<UserMenu user={{ name: 'Ada' }} logoutUrl="/admin/logout" />);
+    await userEvent.click(screen.getByRole('button', { name: /open user menu/i }));
+    // useThemeOptional mock returns theme: 'system', so System is pressed.
+    expect(screen.getByRole('button', { name: /^system$/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /^light$/i })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 });

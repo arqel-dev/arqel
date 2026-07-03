@@ -19,7 +19,7 @@ vi.mock('@arqel-dev/react/utils', () => ({
   useArqelTranslations: () => (_key: string, fallback?: string) => fallback ?? _key,
 }));
 
-import { UserMenu } from './UserMenu.js';
+import { UserMenu } from '../src/shell/UserMenu.js';
 
 describe('UserMenu', () => {
   it('posts to logoutUrl when Log out is chosen', async () => {

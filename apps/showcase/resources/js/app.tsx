@@ -73,7 +73,11 @@ function UserMenuSlot(): JSX.Element {
   return (
     <>
       <LocaleSwitcher />
-      <UserMenu user={props.auth?.user ?? {}} logoutUrl="/admin/logout" profileUrl="/admin/profile" />
+      <UserMenu
+        user={props.auth?.user ?? {}}
+        logoutUrl="/admin/logout"
+        profileUrl="/admin/profile"
+      />
     </>
   );
 }

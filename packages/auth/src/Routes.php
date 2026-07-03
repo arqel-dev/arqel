@@ -8,6 +8,7 @@ use Arqel\Auth\Http\Controllers\EmailVerificationController;
 use Arqel\Auth\Http\Controllers\ForgotPasswordController;
 use Arqel\Auth\Http\Controllers\LoginController;
 use Arqel\Auth\Http\Controllers\LogoutController;
+use Arqel\Auth\Http\Controllers\ProfileController;
 use Arqel\Auth\Http\Controllers\RegisterController;
 use Arqel\Auth\Http\Controllers\ResetPasswordController;
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
@@ -33,12 +34,15 @@ final class Routes
 
     private static bool $passwordResetRegistered = false;
 
+    private static bool $profileRegistered = false;
+
     public static function register(?Panel $panel = null): void
     {
         self::registerLogin($panel);
         self::registerRegistration($panel);
         self::registerEmailVerification($panel);
         self::registerPasswordReset($panel);
+        self::registerProfile($panel);
     }
 
     /**
@@ -201,6 +205,45 @@ final class Routes
     }
 
     /**
+     * Regista as rotas bundled de perfil do usuário (idempotente).
+     */
+    public static function registerProfile(?Panel $panel = null): void
+    {
+        if (self::$profileRegistered) {
+            return;
+        }
+
+        if (! ($panel?->profileEnabled() ?? false)) {
+            return;
+        }
+
+        Route::getRoutes()->refreshNameLookups();
+        if (Route::has('arqel.auth.profile.show')) {
+            self::$profileRegistered = true;
+
+            return;
+        }
+
+        $profileUrl = self::deriveSiblingUrl($panel->getLoginUrl(), 'profile');
+        $guard = self::guardFor($panel);
+        $middleware = ['web', HandleArqelInertiaRequests::class, "auth:{$guard}"];
+
+        Route::get($profileUrl, [ProfileController::class, 'show'])
+            ->middleware($middleware)
+            ->name('arqel.auth.profile.show');
+
+        Route::put($profileUrl, [ProfileController::class, 'update'])
+            ->middleware($middleware)
+            ->name('arqel.auth.profile.update');
+
+        Route::put($profileUrl.'/password', [ProfileController::class, 'updatePassword'])
+            ->middleware($middleware)
+            ->name('arqel.auth.profile.password');
+
+        self::$profileRegistered = true;
+    }
+
+    /**
      * @internal Used by tests to reset the singleton flags.
      */
     public static function reset(): void
@@ -209,6 +252,7 @@ final class Routes
         self::$registrationRegistered = false;
         self::$verificationRegistered = false;
         self::$passwordResetRegistered = false;
+        self::$profileRegistered = false;
     }
 
     public static function isRegistered(): bool
@@ -229,6 +273,11 @@ final class Routes
     public static function isPasswordResetRegistered(): bool
     {
         return self::$passwordResetRegistered;
+    }
+
+    public static function isProfileRegistered(): bool
+    {
+        return self::$profileRegistered;
     }
 
     private static function deriveLogoutUrl(string $loginUrl): string

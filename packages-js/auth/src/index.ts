@@ -2,6 +2,8 @@ export type { ForgotPasswordPageProps } from './ForgotPasswordPage';
 export { ForgotPasswordPage } from './ForgotPasswordPage';
 export type { LoginPageProps } from './LoginPage';
 export { LoginPage } from './LoginPage';
+export type { ProfilePageProps } from './ProfilePage';
+export { ProfilePage } from './ProfilePage';
 export type { RegisterPageProps } from './RegisterPage';
 export { RegisterPage } from './RegisterPage';
 export type { ResetPasswordPageProps } from './ResetPasswordPage';

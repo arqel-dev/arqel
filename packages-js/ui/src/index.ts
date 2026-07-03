@@ -85,6 +85,8 @@ export type { SidebarProps } from './shell/Sidebar.js';
 export { Sidebar } from './shell/Sidebar.js';
 export type { TopbarProps } from './shell/Topbar.js';
 export { Topbar } from './shell/Topbar.js';
+export type { UserMenuProps } from './shell/UserMenu.js';
+export { UserMenu } from './shell/UserMenu.js';
 export type { DataTableProps, DataTableRecord } from './table/DataTable.js';
 export { DataTable } from './table/DataTable.js';
 export type { TableFiltersProps } from './table/TableFilters.js';

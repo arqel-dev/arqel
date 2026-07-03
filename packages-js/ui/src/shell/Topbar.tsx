@@ -1,16 +1,13 @@
 /**
  * `<Topbar>` — header strip above the main content.
  *
- * Phase 1 wires the brand slot, theme toggle, and a mobile menu trigger.
- * Search and tenant switcher are reserved slots for Phase 2 (command
- * palette + multi-tenancy). The user menu is exposed as a slot so apps
- * can plug in any dropdown impl (Base UI Menu, ShadCN-generated, etc.).
+ * Phase 1 wires the brand slot and a mobile menu trigger. Search and
+ * tenant switcher are reserved slots for Phase 2 (command palette +
+ * multi-tenancy). The user menu (including theme control) is exposed as
+ * a slot so apps can plug in any dropdown impl — see `<UserMenu>`.
  */
 
-import { useTheme } from '@arqel-dev/react/providers';
-import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { ReactNode } from 'react';
-import { Button } from '../action/Button.js';
 import { SidebarTrigger } from '../shadcn/ui/sidebar.js';
 import { cn } from '../utils/cn.js';
 
@@ -31,9 +28,6 @@ export function Topbar({
   onMobileMenuClick,
   className,
 }: TopbarProps) {
-  const { resolved, toggle } = useTheme();
-  const t = useArqelTranslations();
-
   return (
     <header
       data-arqel-topbar=""
@@ -53,18 +47,6 @@ export function Topbar({
       <div className="hidden min-w-0 flex-1 md:block">{search}</div>
       <div className="ml-auto flex min-w-0 items-center gap-2 md:ml-0">
         {tenantSwitcher}
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={
-            resolved === 'dark'
-              ? t('arqel.aria.theme_toggle_light', 'Switch to light theme')
-              : t('arqel.aria.theme_toggle_dark', 'Switch to dark theme')
-          }
-          onClick={toggle}
-        >
-          <span aria-hidden="true">{resolved === 'dark' ? '☀' : '☾'}</span>
-        </Button>
         {userMenu}
       </div>
     </header>

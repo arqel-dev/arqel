@@ -12,7 +12,7 @@ vi.mock('@inertiajs/react', () => ({
 
 const setTheme = vi.fn();
 vi.mock('@arqel-dev/react/providers', () => ({
-  useTheme: () => ({ theme: 'system', setTheme }),
+  useThemeOptional: () => ({ theme: 'system', setTheme }),
 }));
 
 vi.mock('@arqel-dev/react/utils', () => ({

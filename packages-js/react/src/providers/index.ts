@@ -7,4 +7,5 @@ export {
   type ThemeContextValue,
   ThemeProvider,
   useTheme,
+  useThemeOptional,
 } from './ThemeProvider.js';

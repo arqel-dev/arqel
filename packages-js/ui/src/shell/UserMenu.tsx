@@ -8,7 +8,7 @@
  * the theme group are each conditional.
  */
 
-import { useTheme } from '@arqel-dev/react/providers';
+import { useThemeOptional } from '@arqel-dev/react/providers';
 import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { Link, router } from '@inertiajs/react';
 import type { ReactElement } from 'react';
@@ -31,17 +31,11 @@ export interface UserMenuProps {
   className?: string;
 }
 
-function useThemeSafe(): { theme?: string; setTheme?: (t: string) => void } {
-  try {
-    return useTheme() as { theme?: string; setTheme?: (t: string) => void };
-  } catch {
-    return {};
-  }
-}
-
 export function UserMenu({ user, logoutUrl, profileUrl, className }: UserMenuProps): ReactElement {
   const t = useArqelTranslations();
-  const { theme, setTheme } = useThemeSafe();
+  const themeCtx = useThemeOptional();
+  const theme = themeCtx?.theme;
+  const setTheme = themeCtx?.setTheme;
 
   const name = user.name ?? undefined;
   const email = user.email ?? undefined;
@@ -90,7 +84,10 @@ export function UserMenu({ user, logoutUrl, profileUrl, className }: UserMenuPro
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               {t('arqel.auth.menu.theme', 'Theme')}
             </DropdownMenuLabel>
-            <DropdownMenuRadioGroup value={theme ?? 'system'} onValueChange={(v) => setTheme(v)}>
+            <DropdownMenuRadioGroup
+              value={theme ?? 'system'}
+              onValueChange={(v) => setTheme(v as Parameters<typeof setTheme>[0])}
+            >
               <DropdownMenuRadioItem value="light">
                 {t('arqel.auth.menu.theme_light', 'Light')}
               </DropdownMenuRadioItem>

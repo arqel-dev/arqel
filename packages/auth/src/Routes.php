@@ -237,7 +237,7 @@ final class Routes
             ->name('arqel.auth.profile.update');
 
         Route::put($profileUrl.'/password', [ProfileController::class, 'updatePassword'])
-            ->middleware($middleware)
+            ->middleware([...$middleware, 'throttle:6,1'])
             ->name('arqel.auth.profile.password');
 
         self::$profileRegistered = true;

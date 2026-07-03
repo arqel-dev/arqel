@@ -3,9 +3,12 @@
 declare(strict_types=1);
 
 use Arqel\Auth\Routes;
+use Arqel\Core\Panel\Panel;
 use Arqel\Core\Panel\PanelRegistry;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
 class ProfileUser extends Authenticatable
@@ -34,11 +37,26 @@ beforeEach(function (): void {
 
     $registry = app(PanelRegistry::class);
     $registry->clear();
+
+    // NOTE: profile routes are NOT registered here (see Change C). Each
+    // route-exercising test calls registerProfileRoutes() itself, so the
+    // gating test below can assert against a genuinely clean Router.
+});
+
+/**
+ * Registers an admin panel WITH profile() enabled and wires the bundled
+ * routes. Called explicitly by every test that exercises a profile route.
+ */
+function registerProfileRoutes(): Panel
+{
+    $registry = app(PanelRegistry::class);
+    $registry->clear();
     $panel = $registry->panel('admin')->login()->profile();
     $registry->setCurrent('admin');
-
     Routes::register($panel);
-});
+
+    return $panel;
+}
 
 function makeProfileUser(): ProfileUser
 {
@@ -50,6 +68,7 @@ function makeProfileUser(): ProfileUser
 }
 
 it('renders the Inertia profile page on GET /admin/profile', function (): void {
+    registerProfileRoutes();
     $user = makeProfileUser();
 
     $response = $this->actingAs($user)
@@ -63,11 +82,14 @@ it('renders the Inertia profile page on GET /admin/profile', function (): void {
 });
 
 it('redirects a guest away from GET /admin/profile', function (): void {
+    registerProfileRoutes();
+
     $response = $this->get('/admin/profile');
     expect($response->getStatusCode())->toBe(302);
 });
 
 it('updates name and email', function (): void {
+    registerProfileRoutes();
     $user = makeProfileUser();
 
     $response = $this->actingAs($user)->put('/admin/profile', [
@@ -82,6 +104,7 @@ it('updates name and email', function (): void {
 });
 
 it('rejects a blank name', function (): void {
+    registerProfileRoutes();
     $user = makeProfileUser();
 
     $response = $this->actingAs($user)->put('/admin/profile', [
@@ -93,6 +116,7 @@ it('rejects a blank name', function (): void {
 });
 
 it('rejects a duplicate email', function (): void {
+    registerProfileRoutes();
     $user = makeProfileUser();
     ProfileUser::create([
         'name' => 'Other',
@@ -109,6 +133,7 @@ it('rejects a duplicate email', function (): void {
 });
 
 it('allows keeping your own email (unique ignore self)', function (): void {
+    registerProfileRoutes();
     $user = makeProfileUser();
 
     $response = $this->actingAs($user)->put('/admin/profile', [
@@ -121,6 +146,7 @@ it('allows keeping your own email (unique ignore self)', function (): void {
 });
 
 it('updates the password when current_password is correct', function (): void {
+    registerProfileRoutes();
     $user = makeProfileUser();
 
     $response = $this->actingAs($user)->put('/admin/profile/password', [
@@ -135,6 +161,7 @@ it('updates the password when current_password is correct', function (): void {
 });
 
 it('rejects a wrong current_password', function (): void {
+    registerProfileRoutes();
     $user = makeProfileUser();
 
     $response = $this->actingAs($user)->put('/admin/profile/password', [
@@ -146,25 +173,53 @@ it('rejects a wrong current_password', function (): void {
     $response->assertSessionHasErrors('current_password');
 });
 
-it('does NOT register profile routes when profileEnabled() is false', function (): void {
-    // The shared beforeEach() above already registers profile routes (via
-    // ->profile()) into this test's Router, so a plain Route::has() check
-    // here would find that pre-existing route regardless of this test's
-    // own registration call. Laravel's RouteCollection has no public API
-    // to remove a registered route, so we instead assert that a *second*
-    // registration attempt with profile() disabled does not add any new
-    // routes to the collection (mirrors the idempotency-style assertions
-    // used in RoutesTest.php / RegistrationFlagTest.php).
-    $countBefore = count(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes());
+it('throttles repeated password-change attempts', function (): void {
+    registerProfileRoutes();
+    $user = makeProfileUser();
+    RateLimiter::clear('');
 
-    Routes::reset();
+    $last = null;
+    for ($i = 0; $i < 7; $i++) {
+        $last = $this->actingAs($user)->put('/admin/profile/password', [
+            'current_password' => 'wrong-password',
+            'password' => 'new-secret-password',
+            'password_confirmation' => 'new-secret-password',
+        ]);
+    }
+
+    expect($last->getStatusCode())->toBe(429);
+});
+
+it('regenerates the session id after a successful password change', function (): void {
+    registerProfileRoutes();
+    $user = makeProfileUser();
+
+    // Prime a session by hitting a route first, capturing its id.
+    $this->actingAs($user)->get('/admin/profile');
+    $idBefore = $this->app['session']->getId();
+
+    $response = $this->actingAs($user)->put('/admin/profile/password', [
+        'current_password' => 'secret-password',
+        'password' => 'new-secret-password',
+        'password_confirmation' => 'new-secret-password',
+    ]);
+
+    $idAfter = $this->app['session']->getId();
+
+    $response->assertRedirect();
+    expect($idAfter)->not->toBe($idBefore);
+});
+
+it('does NOT register profile routes when profileEnabled() is false', function (): void {
+    // beforeEach did NOT register profile routes, so the Router is clean
+    // here: this is a genuine assertion about the profileEnabled() gate,
+    // not a tautology (see Change C in the fix brief).
     $registry = app(PanelRegistry::class);
     $registry->clear();
-    $panel = $registry->panel('admin')->login(); // no ->profile()
+    $panel = $registry->panel('admin')->login(); // NO ->profile()
     $registry->setCurrent('admin');
     Routes::register($panel);
 
-    $countAfter = count(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes());
-
-    expect($countAfter)->toBe($countBefore);
+    expect(Route::has('arqel.auth.profile.show'))->toBeFalse();
+    expect(Routes::isProfileRegistered())->toBeFalse();
 });

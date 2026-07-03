@@ -59,6 +59,8 @@ final class ProfileController
         $user->password = Hash::make((string) $validated['password']);
         $user->save();
 
+        $request->session()->regenerate();
+
         return back()->with('success', __('arqel::messages.flash.profile.password_updated'));
     }
 

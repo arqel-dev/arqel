@@ -213,3 +213,12 @@ export function useTheme(): ThemeContextValue {
 
   return context;
 }
+
+/**
+ * Like {@link useTheme} but returns `null` instead of throwing when there is
+ * no `ThemeProvider` in the tree. Lets a component render a theme control only
+ * when a provider is present (e.g. UserMenu used standalone).
+ */
+export function useThemeOptional(): ThemeContextValue | null {
+  return useContext(ThemeContext);
+}

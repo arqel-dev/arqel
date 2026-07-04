@@ -19,7 +19,13 @@ export interface UseYjsCollabResult {
   doc: Y.Doc;
   text: Y.Text;
   status: CollabStatus;
-  applyRemote: (update: Uint8Array | string) => void;
+  /**
+   * Apply a remote update (raw bytes or a base64 string) onto the local doc.
+   * Never throws: a malformed base64 string or non-Yjs byte payload is
+   * swallowed and the doc left untouched. Returns `true` when the update was
+   * applied, `false` when it was rejected as malformed.
+   */
+  applyRemote: (update: Uint8Array | string) => boolean;
 }
 
 /**
@@ -38,9 +44,16 @@ export function useYjsCollab(options: UseYjsCollabOptions): UseYjsCollabResult {
   const mountedRef = useRef(true);
 
   const applyRemote = useCallback(
-    (update: Uint8Array | string): void => {
-      const bytes = typeof update === 'string' ? decodeUpdate(update) : update;
-      Y.applyUpdate(doc, bytes);
+    (update: Uint8Array | string): boolean => {
+      try {
+        const bytes = typeof update === 'string' ? decodeUpdate(update) : update;
+        Y.applyUpdate(doc, bytes);
+        return true;
+      } catch {
+        // Malformed base64 or non-Yjs bytes — ignore rather than crash the
+        // caller. Remote/persisted payloads are untrusted by construction.
+        return false;
+      }
     },
     [doc],
   );
@@ -67,11 +80,8 @@ export function useYjsCollab(options: UseYjsCollabOptions): UseYjsCollabResult {
           }
           const state = (payload as { state?: unknown }).state;
           if (typeof state === 'string' && state !== '') {
-            try {
-              applyRemote(state);
-            } catch {
-              // ignore malformed snapshot
-            }
+            // applyRemote is defensive; a malformed snapshot is ignored.
+            applyRemote(state);
           }
         })
         .catch(() => {
@@ -86,15 +96,8 @@ export function useYjsCollab(options: UseYjsCollabOptions): UseYjsCollabResult {
 
     const channel = echoLike.private(channelName);
     const listener = (payload: { state?: string }): void => {
-      if (typeof payload?.state === 'string') {
-        try {
-          applyRemote(payload.state);
-          if (mountedRef.current) {
-            setStatus('synced');
-          }
-        } catch {
-          // ignore malformed
-        }
+      if (typeof payload?.state === 'string' && applyRemote(payload.state) && mountedRef.current) {
+        setStatus('synced');
       }
     };
 

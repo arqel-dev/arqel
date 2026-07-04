@@ -16,18 +16,10 @@ export interface TopbarProps {
   search?: ReactNode;
   userMenu?: ReactNode;
   tenantSwitcher?: ReactNode;
-  onMobileMenuClick?: () => void;
   className?: string;
 }
 
-export function Topbar({
-  brand,
-  search,
-  userMenu,
-  tenantSwitcher,
-  onMobileMenuClick,
-  className,
-}: TopbarProps) {
+export function Topbar({ brand, search, userMenu, tenantSwitcher, className }: TopbarProps) {
   return (
     <header
       data-arqel-topbar=""

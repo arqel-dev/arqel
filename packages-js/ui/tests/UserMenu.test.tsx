@@ -30,9 +30,7 @@ describe('UserMenu', () => {
   });
 
   it('shows Profile only when profileUrl is present', async () => {
-    const { rerender } = render(
-      <UserMenu user={{ name: 'Ada' }} logoutUrl="/admin/logout" />,
-    );
+    const { rerender } = render(<UserMenu user={{ name: 'Ada' }} logoutUrl="/admin/logout" />);
     await userEvent.click(screen.getByRole('button', { name: /open user menu/i }));
     expect(screen.queryByText(/^profile$/i)).toBeNull();
 

@@ -3,11 +3,30 @@
 declare(strict_types=1);
 
 use Arqel\Import\Contracts\ImportLogger;
+use Arqel\Import\ImportColumn;
+use Arqel\Import\Importer;
 use Arqel\Import\ImportFormat;
 use Arqel\Import\Jobs\ProcessImportJob;
 use Arqel\Import\Logging\NullImportLogger;
 use Arqel\Import\Tests\Fixtures\Importers\StubUserImporter;
 use Arqel\Import\Tests\Fixtures\Models\ImportUser;
+
+/**
+ * Importer whose `email` column is a required mapping — used to exercise the
+ * ProcessImportJob header guard.
+ */
+final class RequiredHeaderImporter extends Importer
+{
+    public static string $model = ImportUser::class;
+
+    public function columns(): array
+    {
+        return [
+            ImportColumn::make('name')->rules(['required', 'string']),
+            ImportColumn::make('email')->rules(['required', 'email'])->requiredMapping(),
+        ];
+    }
+}
 
 it('imports valid rows and skips invalid ones into a failed-rows CSV', function (): void {
     $dir = sys_get_temp_dir().'/imp-'.uniqid();
@@ -96,4 +115,36 @@ it('reports progress and completion counts to the logger', function (): void {
         ->and($spy->completed[1])->toBe(1) // skipped
         ->and($spy->completed[2])->not->toBeNull();
     expect($spy->progressCalls)->not->toBeEmpty();
+});
+
+it('imports every data row when a required header is present (guard does not eat the first row)', function (): void {
+    // Regression guard: the header check peeks the first row of the reader's
+    // generator; the chunk loop must then still see ALL data rows, including
+    // the first — a naive peek that advances the generator would silently drop
+    // row 1. users-valid.csv has exactly 2 data rows (Ada, Alan).
+    (new ProcessImportJob(
+        importId: 'test-import-req-ok',
+        format: ImportFormat::CSV,
+        importerClass: RequiredHeaderImporter::class,
+        sourcePath: __DIR__.'/../Fixtures/users-valid.csv',
+        failedRowsDir: sys_get_temp_dir().'/imp-'.uniqid(),
+    ))->handle(new NullImportLogger);
+
+    expect(ImportUser::count())->toBe(2)
+        ->and(ImportUser::where('email', 'ada@example.com')->exists())->toBeTrue()
+        ->and(ImportUser::where('email', 'alan@example.com')->exists())->toBeTrue();
+});
+
+it('fails fast and persists nothing when a required header is missing', function (): void {
+    $job = new ProcessImportJob(
+        importId: 'test-import-req-missing',
+        format: ImportFormat::CSV,
+        importerClass: RequiredHeaderImporter::class,
+        sourcePath: __DIR__.'/../Fixtures/users-missing-header.csv',
+        failedRowsDir: sys_get_temp_dir().'/imp-'.uniqid(),
+    );
+
+    expect(fn () => $job->handle(new NullImportLogger))
+        ->toThrow(InvalidArgumentException::class);
+    expect(ImportUser::count())->toBe(0);
 });

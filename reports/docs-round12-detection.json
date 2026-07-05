@@ -1,0 +1,41 @@
+{
+  "round": 12,
+  "confirmed": [
+    {
+      "file": "packages/cli/SKILL.md",
+      "line": 26,
+      "title": "NewCommand signature documents --starter default as 'breeze' but the real default is 'react'",
+      "evidence": "packages/cli/src/Commands/NewCommand.php:32 declares ->addOption('starter', null, InputOption::VALUE_REQUIRED, '... Aliases: breeze, jetstream \u2192 react.', 'react') \u2014 the default value is 'react', and 'breeze' is only an alias that maps to 'react'.",
+      "fix": "Change the documented signature from {--starter=breeze} to {--starter=react} (and note breeze/jetstream are aliases \u2192 react).",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "Confirmed by reading both files. packages/cli/SKILL.md:26 documents the NewCommand signature as `{--starter=breeze}`, but packages/cli/src/Commands/NewCommand.php:32 declares `->addOption('starter', null, InputOption::VALUE_REQUIRED, '... Aliases: breeze, jetstream \u2192 react.', 'react')` \u2014 the actual default (8th arg) is 'react', and 'breeze' is only an alias that maps to 'react'. The doc states a wrong default, contradicting the code. This is NEW and DISTINCT: no SWEPT family covers packages/cli/SKILL.md (swept SKILL.md items were widgets StatWidget and ai inputs only). Proposed fix (document {--starter=react}, note breeze/jetstream are aliases \u2192 react) is correct and actionable."
+      }
+    },
+    {
+      "file": "packages/audit/SKILL.md",
+      "line": 40,
+      "title": "GlobalActivityLogController documented as having 8 query params but only 7 exist",
+      "evidence": "GlobalActivityLogController::buildResponse (packages/audit/src/Http/Controllers/GlobalActivityLogController.php:83-121) reads exactly 7 params: log_name, event, causer_type, causer_id, from, to, per_page. The SKILL list itself enumerates only these 7 bullets.",
+      "fix": "Change 'Query params suportados (8):' to 'Query params suportados (7):'.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "Confirmed genuine, new contradiction. packages/audit/SKILL.md:40 reads \"Query params suportados (8):\" but its own bullet list (lines 41-47) enumerates exactly 7 params: log_name, event, causer_type, causer_id, from, to, per_page. The source GlobalActivityLogController::buildResponse (lines 83-88, 121) reads exactly those same 7 params and no eighth. The count \"(8)\" is wrong; it should be \"(7)\". This file+line is not covered by any swept family (audit/SKILL.md was never touched; swept families cover widgets/StatWidget, hooks README, react/ui README, ai/SKILL.md, reference php docs, README artisan lists, packages-js/types subpaths \u2014 not audit query-param counts)."
+      }
+    },
+    {
+      "file": "packages/widgets/SKILL.md",
+      "line": 50,
+      "title": "widgets SKILL.md 'Por chegar (WIDGETS-010..012, 014..015)' lists the React side, filter client, and E2E as still-to-come, but they are all delivered",
+      "evidence": "packages-js/ui/src/widgets/ contains StatCard.tsx, ChartCard.tsx, TableCard.tsx, WidgetRenderer.tsx and DashboardFilters.tsx; index.ts exports SelectFilterPayload + DateRangeFilterPayload; WidgetRenderer.tsx implements polling (setInterval), deferred loading, and refetch-on-filter-change (forwards filters[k]=v query params). E2E dashboard specs exist at apps/demo/tests/e2e/10-dashboard.spec.ts and apps/showcase/tests/e2e/02-dashboard.spec.ts. So lines 52 (React Stat/Chart/Table/Custom + DateRangeFilter/SelectFilter + polling/deferred client, WIDGETS-010..012), 53 (filters refetch on change), and 54 (E2E + dashboard demo) are all shipped.",
+      "fix": "Remove the WIDGETS-010..012 (React components, DateRangeFilter/SelectFilter, polling/deferred client) and WIDGETS-014..015 E2E/dashboard-demo bullets from the 'Por chegar' section since @arqel-dev/ui/widgets ships them and dashboard E2E specs exist; keep only any genuinely-unshipped items (e.g. filters URL sync, if still absent) or drop the section entirely.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED, NEW, and actionable. packages/widgets/SKILL.md lines 50-54 label the React side, filter client, polling/deferred, E2E and dashboard-demo as \"Por chegar (WIDGETS-010..012, 014..015)\" (still-to-come), but the code has shipped all of them: (1) packages-js/ui/src/widgets/ contains StatCard.tsx, ChartCard.tsx, TableCard.tsx, WidgetRenderer.tsx and DashboardFilters.tsx; (2) index.ts exports DashboardFilters plus the SelectFilterPayload and DateRangeFilterPayload types; (3) WidgetRenderer.tsx implements polling (setInterval, line 98), deferred loading (line 93), and refetch-on-filter-change forwarding live filters as `filters[k]=v`/bracket notation (lines 70-73, 132-146); (4) E2E specs exist at apps/demo/tests/e2e/10-dashboard.spec.ts and apps/showcase/tests/e2e/02-dashboard.spec.ts. So the WIDGETS-010..012 (React Stat/Chart/Table/Custom, DateRangeFilter/SelectFilter, polling/deferred client) and WIDGETS-014..015 (E2E + dashboard demo) bullets are false. This is a DISTINCT file+line contradiction from the R10 sweep, which only fixed the StatWidget *setter list* in this same file; the \"Por chegar\" section (lines 50-54) was never touched. It falls in no other SWEPT family. Only \"Filters URL sync\" (line 53) appears genuinely unshipped (no searchParams/pushState/useSearchParams in the widgets dir), so the fix should remove the shipped bullets while optionally keeping URL sync as the sole remaining unshipped item."
+      }
+    }
+  ]
+}

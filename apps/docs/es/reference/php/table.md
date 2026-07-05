@@ -33,7 +33,7 @@ Builder principal.
 | `DateColumn` | Fechas formateadas | `date(string)`, `dateTime(string)`, `since()`, `timezone(string)` |
 | `NumberColumn` | Numérico alineado a la derecha | `decimals(int)`, `prefix`, `suffix` |
 | `IconColumn` | Icono único | `options(array)`, `size(string)` |
-| `ImageColumn` | Thumbnail | `disk(string)`, `circular(bool)`, `size(int)` |
+| `ImageColumn` | Thumbnail | `disk(string)`, `circular()`, `square()`, `size(int)` |
 | `RelationshipColumn` | Relación con eager-load | `make(name)` + `->display(attribute)` |
 | `ComputedColumn` | Derivado por Closure | factory `make(name, Closure)` |
 | `SelectColumn` | Celda select editable | `options(array\|Closure)`, `rules(array)`, `debounce(int)` |
@@ -52,7 +52,7 @@ Builder principal.
 | `MultiSelectFilter` | Picker multi-valor | `options(array\|Closure)` |
 | `DateRangeFilter` | rango start/end | (sin setters extra) |
 | `TextFilter` | Búsqueda Like | `column(string)` |
-| `TernaryFilter` | true/false/all | `trueLabel`, `falseLabel`, `allLabel` |
+| `TernaryFilter` | true/false/all | `column(string)`, `trueLabel`, `falseLabel` |
 | `ScopeFilter` | scope Eloquent | factory `make($name, $scopeName)` |
 | `QueryBuilderFilter` | Árbol visual de condiciones (grupos AND/OR) | `constraints(array<Constraint>)` |
 | `TrashedFilter` | Soft-delete tres estados (`without`/`with`/`only`) | (sin setters extra) |
@@ -65,8 +65,8 @@ Orquesta request → query Eloquent.
 
 | Método | Descripción |
 |---|---|
-| `for(Table, Builder, Request)` | Factory |
-| `paginate(): LengthAwarePaginator` | Aplica search/filter/sort/eager-load + paginate |
+| `__construct(Table $table, Builder $query, Request $request)` | Constructor (`new TableQueryBuilder(...)`) |
+| `build(): LengthAwarePaginator` | Aplica search/filter/sort/eager-load + paginate (`paginate()` es privado) |
 
 Sort whitelisted contra columnas sortable. `per_page` validado contra `perPageOptions`. Eager loading inferido desde `RelationshipColumn`.
 

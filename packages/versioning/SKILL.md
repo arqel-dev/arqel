@@ -138,8 +138,8 @@ serialização do `PruneOldVersionsJob`.
 - Time-based prune **strategy** dentro do trait (atualmente só o
   Artisan command suporta `--days`).
 - Version **comparison API** (diff entre duas versions arbitrárias,
-  além do diff incremental `[old, new]` por save).
-- React `DiffViewer` component reutilizável (slice futura).
+  além do diff incremental `[old, new]` por save) — lado PHP ainda não
+  implementado.
 
 ## Conventions
 

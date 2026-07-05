@@ -21,7 +21,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **Concrete widget types (WIDGETS-002..005):**
 
-- `StatWidget` (extensível) — KPI card; setters value/description/icon/color/trend. **Não-final**: o gerador `arqel:widget --type=stat` cria uma subclasse desta base.
+- `StatWidget` (extensível) — KPI card; setters value/statDescription/descriptionIcon/icon/color. **Não-final**: o gerador `arqel:widget --type=stat` cria uma subclasse desta base.
 - `ChartWidget` (extensível) — config Recharts serializada (sem hard dep em libs JS). **Não-final** (subclassada pelo gerador `--type=chart`).
 - `TableWidget` (extensível) — mini-tabela; sem hard dep em `arqel-dev/table` (duck-typing). **Não-final** (subclassada pelo gerador `--type=table`).
 - `CustomWidget` (final) — escape-hatch para componentes React arbitrários. Permanece `final`; o gerador `--type=custom` **compõe** via `CustomWidget::make()` em vez de subclassar.
@@ -47,11 +47,14 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 
 **Coverage:** ~154 testes Pest passando. Fixture `EchoFiltersWidget` usada em WIDGETS-008/009 e nos testes de enforcement do gate de dashboard + seeding de defaults no fetch.
 
-**Por chegar (WIDGETS-010..012, 014..015):**
+**Entregue (WIDGETS-010..012, 014..015):**
 
-- React side em `@arqel-dev/ui/widgets` — components Stat/Chart/Table/Custom, `DateRangeFilter`/`SelectFilter` JS, polling/deferred client (WIDGETS-010..012).
-- Filters URL sync + refetch on filter change (WIDGETS-011..012).
-- E2E + dashboard demo + 90% coverage target (WIDGETS-014..015).
+- React side em `@arqel-dev/ui/widgets` — components Stat/Chart/Table/Custom (`StatCard`/`ChartCard`/`TableCard`/`WidgetRenderer`), `DashboardFilters` (`DateRangeFilter`/`SelectFilter`), polling/deferred client em `WidgetRenderer` (`setInterval` + deferred fetch, refetch on filter change forwardando `filters[k]=v`).
+- E2E + dashboard demo: `apps/demo/tests/e2e/10-dashboard.spec.ts`, `apps/showcase/tests/e2e/02-dashboard.spec.ts`.
+
+**Por chegar:**
+
+- Filters URL sync (sincronizar a seleção de `DashboardFilters` com a query string do browser via `searchParams`/`history`) — ainda não implementado na dir `widgets`.
 
 ## Conventions
 

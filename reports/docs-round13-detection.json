@@ -1,0 +1,65 @@
+{
+  "round": 13,
+  "confirmed": [
+    {
+      "file": "apps/docs/reference/php/actions.md",
+      "line": 32,
+      "title": "Confirmable trait setters documented as modalSubmitLabel/modalCancelLabel but the real methods are modalSubmitButtonLabel/modalCancelButtonLabel",
+      "evidence": "The API reference lists the Confirmable trait setters as `modalSubmitLabel` and `modalCancelLabel`. In the source, packages/actions/src/Concerns/Confirmable.php defines the fluent setters as `public function modalSubmitButtonLabel(string $label): static` (line 97) and `public function modalCancelButtonLabel(string $label): static` (line 104). No `modalSubmitLabel` or `modalCancelLabel` method exists anywhere in packages/actions/src (grep confirms only the internal properties $modalSubmitButtonLabel/$modalCancelButtonLabel and the toArray keys 'submitLabel'/'cancelLabel'). Calling the documented `->modalSubmitLabel(...)` would raise an undefined-method fatal error. The same wrong names are mirrored in pt-BR/reference/php/actions.md and es/reference/php/actions.md.",
+      "fix": "Rename the two setters in the doc table (all three language mirrors) from `modalSubmitLabel`, `modalCancelLabel` to `modalSubmitButtonLabel`, `modalCancelButtonLabel` to match Confirmable.php.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/reference/php/actions.md:32 lists the Confirmable trait setters as `modalSubmitLabel`, `modalCancelLabel`. The source packages/actions/src/Concerns/Confirmable.php defines the real fluent setters as `public function modalSubmitButtonLabel(string $label): static` (line 97) and `public function modalCancelButtonLabel(string $label): static` (line 104); grep confirms NO `modalSubmitLabel`/`modalCancelLabel` methods exist anywhere in packages/actions/src (only internal props $modalSubmitButtonLabel/$modalCancelButtonLabel and toArray keys 'submitLabel'/'cancelLabel'). Calling `->modalSubmitLabel(...)` would raise an undefined-method fatal error. The same wrong names are mirrored at pt-BR/reference/php/actions.md:32 and es/reference/php/actions.md:32. The `actions` package is explicitly listed as previously-unswept; no SWEPT family covers this file+line. Fix: rename to `modalSubmitButtonLabel`/`modalCancelButtonLabel` in all three language mirrors."
+      }
+    },
+    {
+      "file": "apps/docs/reference/php/actions.md",
+      "line": 23,
+      "title": "Action base setters visible()/disabled() documented as accepting bool|Closure but source accepts only Closure",
+      "evidence": "The reference documents `visible(bool|Closure), disabled(bool|Closure), hidden(bool|Closure)`. In packages/actions/src/Action.php the signatures are `public function visible(Closure $callback): static` (line 148) and `public function disabled(Closure $callback): static` (line 155) \u2014 they accept ONLY a Closure, not a bool. (Only `hidden(bool $hidden = true)` at line 162 actually takes a bool.) Passing a bool to `visible()`/`disabled()` as the doc suggests would throw a TypeError.",
+      "fix": "Change the doc to `visible(Closure), disabled(Closure), hidden(bool|Closure)` to reflect that only hidden() accepts a bool; visible/disabled require a Closure.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED NEW contradiction in the previously-unswept `actions` package. apps/docs/reference/php/actions.md:23 documents the base setters as `visible(bool|Closure), disabled(bool|Closure), hidden(bool|Closure)`. But packages/actions/src/Action.php declares `public function visible(Closure $callback): static` (line 148) and `public function disabled(Closure $callback): static` (line 155) \u2014 both accept ONLY a Closure, not a bool. Passing a bool (as the doc advertises) throws a TypeError. Conversely `hidden(bool $hidden = true)` (line 162) accepts ONLY a bool, so the doc's `hidden(bool|Closure)` is also wrong (no Closure). The SWEPT ledger's action-setter entries (R1-R12) cover different, specific methods (DateColumn/BadgeColumn/etc. and column signatures), not this Action base visible/disabled/hidden line \u2014 this is a distinct, never-touched file+line. Recommended fix: `visible(Closure), disabled(Closure), hidden(bool)` \u2014 note the proposed fix in the finding is slightly off (it keeps `hidden(bool|Closure)`), but the documented contradiction is real and actionable."
+      }
+    },
+    {
+      "file": "packages/fields/SKILL.md",
+      "line": 33,
+      "title": "SKILL.md 'Ainda por chegar' lists FIELDS-015..018 validation/visibility/dependency/authorization concerns as unshipped, but all four are extracted and in use",
+      "evidence": "Line 33 declares '`Arqel\\Fields\\Concerns\\HasValidation`/`HasVisibility`/`HasDependencies`/`HasAuthorization` como concerns extra\u00eddos (FIELDS-015..018)' as still 'Ainda por chegar' (not yet arrived). Reality: all four trait files exist in packages/fields/src/Concerns/ (HasValidation.php, HasVisibility.php, HasDependencies.php, HasAuthorization.php) AND are imported + `use`d in packages/fields/src/Field.php (lines 7-10 import, 34-37 `use HasAuthorization; use HasDependencies; use HasValidation; use HasVisibility;`). The extraction is complete and wired.",
+      "fix": "Remove the FIELDS-015..018 concerns bullet (line 33) from the 'Ainda por chegar' section, or move it to a 'Delivered'/Status list; the four concerns are shipped and consumed by Field.php.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/fields/SKILL.md line 33 lists `Arqel\\Fields\\Concerns\\HasValidation`/`HasVisibility`/`HasDependencies`/`HasAuthorization` (FIELDS-015..018) under the \"Ainda por chegar\" (still to arrive / unshipped) section. This directly contradicts packages/fields/src/Field.php: lines 7-10 import all four concerns, and lines 34-37 apply them via `use HasAuthorization; use HasDependencies; use HasValidation; use HasVisibility;` inside the base `Field` class. All four trait files exist in packages/fields/src/Concerns/ (HasAuthorization.php, HasDependencies.php, HasValidation.php, HasVisibility.php). The extraction is complete and consumed by every field subclass. This is a distinct file+line (packages/fields/SKILL.md:33) not covered by any SWEPT family \u2014 the R10/R12 \"Por chegar\"/\"Ainda por chegar\" sweeps were for packages/widgets/SKILL.md and packages/ai/SKILL.md, not the fields package. Actionable fix: remove/relocate the FIELDS-015..018 concerns bullet out of the \"Ainda por chegar\" section. (Note: the Field.php docblock at lines 24-27 also carries the same stale \"deliberately NOT applied here yet\" claim, but the reported actionable contradiction is the SKILL.md status list.)"
+      }
+    },
+    {
+      "file": "packages/fields/SKILL.md",
+      "line": 34,
+      "title": "SKILL.md 'Ainda por chegar' lists FIELDS-019 automatic eager loading as unshipped, but EagerLoadingResolver exists",
+      "evidence": "Line 34 declares 'Eager loading autom\u00e1tico (FIELDS-019)' as still 'Ainda por chegar'. Reality: packages/fields/src/EagerLoadingResolver.php exists as a `final class EagerLoadingResolver` that inspects BelongsToField/HasManyField and returns deduplicated relation names for Builder::with(...). The resolver is delivered (only the CORE-006 auto-wire into index() is noted as a separate follow-up inside the class docblock).",
+      "fix": "Update line 34 to reflect that EagerLoadingResolver is shipped; if anything remains pending it is only the controller auto-wiring (CORE-006), not the resolver itself.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/fields/SKILL.md:34 lists \"Eager loading autom\u00e1tico (FIELDS-019)\" under the \"Ainda por chegar\" (still-unshipped) heading. But packages/fields/src/EagerLoadingResolver.php is a fully-implemented `final class EagerLoadingResolver` with a working, tested public static `resolve()` method that inspects BelongsToField/HasManyField and returns a deduplicated list of relation names for Builder::with(...). It is covered by a dedicated tests/Unit/EagerLoadingResolverTest.php. The class docblock explicitly states only the CORE-006 controller auto-wire into index() remains (\"for now apps can call it manually inside indexQuery()\"), so the resolver itself is delivered \u2014 contradicting the flat \"Ainda por chegar\" claim. Not covered by any swept family: the swept fields items are apps/docs reference setter signatures and the FIELDS-020/021 search/upload endpoints, not FIELDS-019 eager loading or the SKILL.md \"Ainda por chegar\" list. Proposed fix stands: move FIELDS-019 out of \"Ainda por chegar\" and note only the CORE-006 controller auto-wiring remains pending. File: /home/diogo/PhpstormProjects/arqel/packages/fields/SKILL.md:34; source: /home/diogo/PhpstormProjects/arqel/packages/fields/src/EagerLoadingResolver.php."
+      }
+    },
+    {
+      "file": "packages/fields/SKILL.md",
+      "line": 36,
+      "title": "SKILL.md 'Ainda por chegar' lists FIELDS-022 macros + field registry runtime as unshipped, but FieldFactory macros are implemented",
+      "evidence": "Line 36 declares 'Macros + field registry runtime polish (FIELDS-022)' as still 'Ainda por chegar'. Reality: packages/fields/src/FieldFactory.php implements `macro(string $name, Closure)` (private static array $macros at line 37; __callStatic looks up macros first, line 44 `if (isset(self::$macros[$name]))`), and packages/fields/src/ArqelFields.php exposes `macros()` via `FieldFactory::getRegisteredMacros()`. The macro/registry capability is delivered.",
+      "fix": "Remove or reword the FIELDS-022 macros bullet on line 36; macros are implemented in FieldFactory. (Note: the FIELDS-021 `createOption` endpoint on line 35 IS still genuinely pending \u2014 no route exists in packages/fields/routes/arqel-fields.php \u2014 so leave that item.)",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED \u2014 code-verified, NEW contradiction at packages/fields/SKILL.md:36. Line 36 lists \"Macros + field registry runtime polish (FIELDS-022)\" under the \"Ainda por chegar\" (still to come / unshipped) heading, but the entire FIELDS-022 scope is delivered:\n\n1. Macro/registry runtime \u2014 packages/fields/src/FieldFactory.php implements `macro(string $name, Closure)` (private static array $macros, line 37; __callStatic checks macros first at line 44 `if (isset(self::$macros[$name]))`), plus `register()`, `hasMacro()`, `getRegisteredMacros()`, `flush()`.\n2. The \"skill helper\" criterion \u2014 packages/fields/src/ArqelFields.php exposes `macros()` (line 44) delegating to `FieldFactory::getRegisteredMacros()`, and surfaces it via 'macros' => self::macros() (line 29).\n3. The `arqel:field` scaffolder \u2014 packages/fields/src/Commands/MakeFieldCommand.php exists (signature 'arqel:field', line 20), generates the PHP Field class + TSX Input stub, and prints the FieldFactory::register() registration hint; it is registered in FieldServiceProvider.php (line 48). All FIELDS-022 acceptance criteria are met.\n\nThe qualifier \"polish\" does not rescue the doc: there is no unshipped remainder of FIELDS-022. \n\nThis is a NEW file+line not covered by any prior SWEPT family \u2014 prior \"Por chegar\"/\"Ainda por chegar\" sweeps touched packages/widgets/SKILL.md (R12) and packages/ai/SKILL.md, never packages/fields/SKILL.md line 36.\n\nScope note (matches the proposed fix): the sibling line 35 \"Endpoint createOption (FIELDS-021 slice restante)\" IS genuinely still pending \u2014 grep of packages/fields/routes and src shows only a `createOptionUsing` closure setter on SelectField (SelectField.php:122), no HTTP endpoint/route. So the fix must remove/reword only line 36 and leave line 35 intact.\n\nProposed fix: remove or reword the \"Macros + field registry runtime polish (FIELDS-022)\" bullet on line 36 and move it to an \"entregue/delivered\" section, since macros, registry runtime, and the arqel:field scaffolder are all implemented."
+      }
+    }
+  ]
+}

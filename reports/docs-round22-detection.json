@@ -1,0 +1,17 @@
+{
+  "round": 22,
+  "confirmed": [
+    {
+      "file": "packages/versioning/SKILL.md",
+      "line": 142,
+      "title": "Versioning SKILL lists reusable React diff component as 'Por chegar' but <VersionDiff> already ships",
+      "evidence": "The PHP versioning SKILL 'Por chegar' (coming/future) section states: line 142 '- React `DiffViewer` component reutiliz\u00e1vel (slice futura).' However, @arqel-dev/versioning already implements and publicly exports exactly this: packages-js/versioning/src/VersionDiff.tsx defines `<VersionDiff>` \u2014 a reusable, purely presentational side-by-side snapshot comparator (JSDoc: 'comparador side-by-side de duas snapshots', accepts arbitrary before/after objects, exported from src/index.ts alongside VersionDiffProps, DiffEntry, DiffStatus, getDiffEntries). The package index.ts explicitly documents 'Exporta <VersionTimeline> ... e <VersionDiff> (comparador side-by-side). Componentes puramente apresentacionais'. A reusable React diff component is shipped, not future. (Note: the separate line-140 bullet 'Version comparison API (diff entre duas versions arbitr\u00e1rias)' is a PHP-side API and DOES remain unimplemented \u2014 no diff/compare method exists in packages/versioning/src \u2014 so only the line-142 DiffViewer bullet is stale.)",
+      "fix": "Remove the 'React `DiffViewer` component reutiliz\u00e1vel (slice futura).' bullet from the 'Por chegar' section, or replace it with an accurate statement that `<VersionDiff>` is already delivered in @arqel-dev/versioning (exported from src/index.ts) and only a differently-scoped enhancement remains, if any.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/versioning/SKILL.md:142 lists \"React `DiffViewer` component reutiliz\u00e1vel (slice futura).\" under the \"Por chegar\" (future) section, but @arqel-dev/versioning already ships this component. packages-js/versioning/src/VersionDiff.tsx implements `<VersionDiff>` \u2014 a reusable, purely presentational side-by-side snapshot comparator (JSDoc line 2: \"comparador side-by-side de duas snapshots\"; props accept arbitrary before/after Record<string,unknown> objects). packages-js/versioning/src/index.ts publicly exports VersionDiff, VersionDiffProps, DiffEntry, DiffStatus, getDiffEntries, and its module docstring states it \"Exporta ... <VersionDiff> (comparador side-by-side). Componentes puramente apresentacionais\". So a reusable React diff component is shipped, not future. The finding correctly narrows scope: the neighboring line-140 bullet (PHP-side comparison API) does remain unimplemented (no diff/compare method in packages/versioning/src), so only line 142 is stale. Not covered by any SWEPT family \u2014 the swept \"versioning JS SKILL 0.15.0\" item concerned a version-line in a different file (packages-js SKILL), whereas this is a distinct \"Por chegar\" contradiction in the PHP-package SKILL.md never touched in rounds 1-20. Proposed fix: remove or correct the line-142 bullet. Actionable and verified against source."
+      }
+    }
+  ]
+}

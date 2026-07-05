@@ -1,0 +1,17 @@
+{
+  "round": 17,
+  "confirmed": [
+    {
+      "file": "apps/docs/reference/php/core.md",
+      "line": 21,
+      "title": "core.md documents indexQuery(Builder): Builder but the method takes no parameter and returns mixed",
+      "evidence": "core.md line 21: `| \\`indexQuery(Builder)\\` | \\`Builder\\` | Hook to scope the listing |` \u2014 claims indexQuery accepts a Builder argument and returns Builder. Source packages/core/src/Resources/Resource.php line 167 declares `public function indexQuery(): mixed` with NO parameter, returning null by default (the controller falls back to `getModel()::query()`). Overrides build their own query inside; there is no injected $query Builder param and the return type is mixed, not Builder.",
+      "fix": "Change the doc row to reflect the real signature: `indexQuery(): mixed` \u2014 no parameter; return a query Builder (or null to fall back to the model's default query). e.g. `| \\`indexQuery(): mixed\\` | `?Builder` | Return a scoped query Builder, or null to fall back to `getModel()::query()` |.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW (not a duplicate). Verified both sides on disk. Doc apps/docs/reference/php/core.md:21 documents the row `| indexQuery(Builder) | Builder | Hook to scope the listing |`, claiming the method accepts a Builder argument and returns Builder. Source packages/core/src/Resources/Resource.php:167 declares `public function indexQuery(): mixed` \u2014 NO parameter, returning null by default (docblock at 160-166 confirms: \"Returning null lets the controller fall back to static::getModel()::query()\"). It is invoked with zero args (InertiaDataBuilder). So the doc signature is objectively wrong on both the parameter and the return type.\n\nNot a swept duplicate: the docs-fixed-ledger.json has exactly one indexQuery entry (line 526/527) and it targets apps/docs/guide/resources.md line 106 (round 5) \u2014 a DIFFERENT file. Round 5's detection detail mentioned reference/php/core.md:21 as also needing the fix, but only the guide file was recorded in the ledger and fixed; core.md:21 on disk STILL reads `indexQuery(Builder) | Builder` (unfixed). The three ledger entries for reference/php/core.md cover lines 27 (lifecycle hooks), 20 (phantom actions()), and 52 (ResourceRegistry::discover param order) \u2014 none touch line 21 / indexQuery. The \"SWEPT: reference/php/*.md setter/method signatures\" family enumerates specific unrelated members and does not include indexQuery.\n\nProposed fix is sound: change the row to `| indexQuery(): mixed | ?Builder | Return a scoped query Builder, or null to fall back to getModel()::query() |`."
+      }
+    }
+  ]
+}

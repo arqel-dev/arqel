@@ -56,6 +56,7 @@ final class ArqelServiceProvider extends ServiceProvider
             ->path('admin')
             ->brand(config('app.name', 'Arqel'))
             ->login()
+            ->profile()
             ->afterLoginRedirectTo('/admin')
             ->resources([
                 PostResource::class,

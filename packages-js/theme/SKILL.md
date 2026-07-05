@@ -61,7 +61,7 @@ Retorna string IIFE para inserir antes dos bundles React:
 1. **Tokens semânticos, nunca cores cruas** — componentes Arqel usam `var(--arqel-color-bg)`, nunca `#ffffff`.
 2. **localStorage opt-out** — falhas de `localStorage.setItem/getItem` são silenciadas (Safari private mode, iframes).
 3. **SSR-safe** — todas funções verificam `typeof window === 'undefined'`.
-4. **Sem dependências runtime extras** — apenas `react` (peer).
+4. **Depende de `@arqel-dev/react` em runtime** — `ThemeProvider`/`useTheme`/`ThemeContext` são re-exportados de `@arqel-dev/react/providers` (contexto único, issue #236) e `ThemeToggle` usa `useArqelTranslations` de `@arqel-dev/react/utils`. `react` é peer dependency.
 5. **Class-based dark mode** (Tailwind v4 syntax: `@variant dark (&:where(.dark, .dark *))`).
 
 ## Examples

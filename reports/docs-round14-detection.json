@@ -1,0 +1,65 @@
+{
+  "round": 14,
+  "confirmed": [
+    {
+      "file": "apps/docs/reference/php/table.md",
+      "line": 36,
+      "title": "table.md documents ImageColumn::circular() as taking a bool argument, but it takes none",
+      "evidence": "apps/docs/reference/php/table.md:36 lists the ImageColumn extra setter as `circular(bool)`. The source method in packages/table/src/Columns/ImageColumn.php:43 is `public function circular(): static` \u2014 it takes NO parameter (it is a no-arg toggle that sets shape to SHAPE_CIRCULAR; the opposite is the separate no-arg `square(): static` at line 50). A caller following the doc would write `->circular(true)` / `->circular(false)`, which is a TypeError against the real signature and there is no way to un-set circular via a bool. This same wrong signature `circular(bool)` is mirrored verbatim in the trilingual copies: apps/docs/pt-BR/reference/php/table.md:36 and apps/docs/es/reference/php/table.md:36.",
+      "fix": "Change `circular(bool)` to `circular()` (and optionally document `square()` as the inverse) in apps/docs/reference/php/table.md:36 and the pt-BR + es mirrors at the same line.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. Source packages/table/src/Columns/ImageColumn.php:43 declares `public function circular(): static` \u2014 it takes NO parameter; it is a no-arg toggle setting shape to SHAPE_CIRCULAR, with the separate no-arg `square(): static` (line 50) as the inverse. The docs at apps/docs/reference/php/table.md:36 (and the trilingual mirrors pt-BR/reference/php/table.md:36 and es/reference/php/table.md:36, all verified verbatim) document the setter as `circular(bool)`. This misleads a caller into writing `->circular(true)`/`->circular(false)`, implying a boolean can un-set the shape, which the API does not support (you must call `square()` instead). This is a genuine doc-vs-code contradiction. It is NOT covered by any SWEPT family: the R1-13 column-signature sweep explicitly enumerated only DateColumn/BadgeColumn/IconColumn/RelationshipColumn (and DateField displayFormat) \u2014 ImageColumn and its `circular()` method were never touched. Proposed fix: change `circular(bool)` to `circular()` (optionally note `square()` as inverse) at line 36 in all three locale files."
+      }
+    },
+    {
+      "file": "apps/docs/reference/php/core.md",
+      "line": 52,
+      "title": "core.md documents ResourceRegistry::discover() parameters in the wrong order",
+      "evidence": "apps/docs/reference/php/core.md:52 documents the method as `discover(string $namespace, string $path)`. The source in packages/core/src/Resources/ResourceRegistry.php:64 is `public function discover(string $path, string $namespace): void` \u2014 the parameters are in the REVERSED order ($path first, $namespace second). A caller following the doc would pass the namespace where the path is expected and vice-versa, breaking PSR-4 auto-discovery. The reversed-order doc is mirrored in apps/docs/pt-BR/reference/php/core.md:52 and apps/docs/es/reference/php/core.md:52.",
+      "fix": "Change the documented signature to `discover(string $path, string $namespace)` in apps/docs/reference/php/core.md:52 and the pt-BR + es mirrors at the same line.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. Source packages/core/src/Resources/ResourceRegistry.php:64 declares `public function discover(string $path, string $namespace): void` \u2014 $path is first (used by is_dir($path) at line 66 and Finder->in($path) at line 72), $namespace is second (used for FQCN construction at line 76-81). The docs at apps/docs/reference/php/core.md:52 document the REVERSED order `discover(string $namespace, string $path)`, and this reversal is mirrored verbatim in apps/docs/pt-BR/reference/php/core.md:52 and apps/docs/es/reference/php/core.md:52. A caller following the doc passes the namespace where the path is expected and vice-versa, breaking PSR-4 auto-discovery (is_dir() gets the namespace and returns early). This contradiction is NOT covered by any swept family (setters, Artisan lists, env vars, entry points, hooks, action/field methods); ResourceRegistry::discover() parameter order has never been touched. Fix: change the documented signature to `discover(string $path, string $namespace)` in all three mirrors at line 52."
+      }
+    },
+    {
+      "file": "packages/auth/SKILL.md",
+      "line": 27,
+      "title": "auth SKILL header says login/register/forgot NOT included + AUTH-006/007/008 'TBD', but same file marks them 'Entregue' and code ships them",
+      "evidence": "Line 27 blurb: \"Authentication (login/registro/forgot-password) n\u00e3o est\u00e1 inclu\u00edda neste pacote... Tickets AUTH-006/007/008 (TBD) preveem shipar p\u00e1ginas Inertia-React opt-in\". This directly contradicts the same file's own Status section: line 42 \"Entregue (AUTH-008)\" (ForgotPasswordController/ResetPasswordController + <ForgotPasswordPage/>/<ResetPasswordPage/>), line 60 \"Entregue (AUTH-006)\" (LoginController/LogoutController + <LoginPage/>), line 70 \"Entregue (AUTH-007)\" (RegisterController/EmailVerificationController + <RegisterPage/>). Code confirms delivery: packages/auth/src/Http/Controllers/{Login,Register,ForgotPassword,ResetPassword,EmailVerification}Controller.php and packages-js/auth/src/{Login,Register,ForgotPassword,ResetPassword,VerifyEmailNotice}Page.tsx all exist. AUTH-006/007/008 are no longer 'TBD'.",
+      "fix": "Rewrite the line 27 blurb to state that arqel-dev/auth now ships opt-in Inertia-React login/register/forgot-reset/verify pages (AUTH-006/007/008 delivered), enabled via Panel::login()/registration()/passwordReset(); drop the 'n\u00e3o est\u00e1 inclu\u00edda' / 'TBD' framing (keep only the note that a starter kit remains an alternative).",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/auth/SKILL.md:27 asserts \"Authentication (login/registro/forgot-password) n\u00e3o est\u00e1 inclu\u00edda neste pacote\" and calls \"Tickets AUTH-006/007/008 (TBD)\" future work. This directly contradicts (a) the same file's own Status section \u2014 line 42 \"Entregue (AUTH-008)\" (ForgotPasswordController/ResetPasswordController + ForgotPasswordPage/ResetPasswordPage), line 60 \"Entregue (AUTH-006)\" (LoginController/LogoutController + LoginPage), line 70 \"Entregue (AUTH-007)\" (RegisterController/EmailVerificationController + RegisterPage/VerifyEmailNoticePage); (b) the file's own table at lines 15-25 documenting all five shipped Inertia controllers/components; and (c) the code, which I verified on disk: packages/auth/src/Http/Controllers/{Login,Logout,Register,ForgotPassword,ResetPassword,EmailVerification}Controller.php and packages-js/auth/src/{LoginPage,RegisterPage,ForgotPasswordPage,ResetPasswordPage,VerifyEmailNoticePage}.tsx all exist. AUTH-006/007/008 are delivered, not TBD, and auth is not included in any swept family (R11 ai/react/ui, R12 cli/audit/widgets, R13 fields/actions) \u2014 this line was never touched. Fix: rewrite the line 27 blurb to state arqel-dev/auth now ships opt-in Inertia-React login/register/forgot-reset/verify pages (AUTH-006/007/008 delivered) enabled via Panel::login()/registration()/passwordReset(), dropping the \"n\u00e3o est\u00e1 inclu\u00edda\"/\"TBD\" framing while keeping the note that a Laravel starter kit remains an alternative."
+      }
+    },
+    {
+      "file": "apps/docs/guide/authentication.md",
+      "line": 3,
+      "title": "authentication guide TL;DR claims Arqel 'does not currently publish login/register pages' and calls AUTH-006/007/008 'planned' \u2014 they are delivered",
+      "evidence": "Line 3 TL;DR (present tense): \"Arqel does not currently publish login/register pages... An opt-in Inertia-React flow inside arqel-dev/auth is planned in tickets AUTH-006/007/008 \u2014 once shipped...\". Also line 25 \"(under review)\", and the comparison table lines 82-90 label the column \"Arqel-native (TBD)\" with \"Yes opt-in (planned)\" for Forgot password and \"Yes (planned)\" for Profile page. But the arqel-dev/auth package ships all these controllers + npm pages (see packages/auth/SKILL.md 'Entregue AUTH-006/007/008' and packages/auth/src + packages-js/auth/src). Forgot/Reset password (AUTH-008) is delivered, not 'planned'.",
+      "fix": "Update the TL;DR to say Arqel now publishes opt-in bundled login/register/forgot-reset/verify Inertia-React pages via arqel-dev/auth (AUTH-006/007/008 shipped), with the starter-kit path as an alternative; change table cells from 'planned'/'TBD' to reflect delivered features (forgot-password delivered).",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/guide/authentication.md:3 TL;DR states in present tense that \"Arqel does not currently publish login/register pages\" and that the Inertia-React auth flow in arqel-dev/auth \"is planned in tickets AUTH-006/007/008 \u2014 once shipped...\". This directly contradicts the shipped code: packages/auth/SKILL.md marks AUTH-006, AUTH-007, and AUTH-008 as \"Entregue\" (Delivered), and the source confirms it \u2014 packages/auth/src/Http/Controllers/ contains LoginController.php, RegisterController.php, ForgotPasswordController.php, ResetPasswordController.php, EmailVerificationController.php, LogoutController.php, and packages-js/auth/src/ ships LoginPage.tsx, RegisterPage.tsx, ForgotPasswordPage.tsx, ResetPasswordPage.tsx, VerifyEmailNoticePage.tsx. Line 20 (\"under review\") and the comparison table (lines 83-90) further mislabel the delivered features as \"TBD\"/\"planned\" (e.g. Forgot password \"Yes opt-in (planned)\" though AUTH-008 is explicitly delivered per SKILL.md; Profile page \"Yes (planned)\"). This is a guide file (apps/docs/guide/authentication.md) never touched by any prior swept family (which covered reference/php setters, README Artisan lists, trilingual reference drift, cloud env-vars, and unrelated SKILL.md status lists). The fix should update the TL;DR to state Arqel now publishes opt-in bundled login/register/forgot-reset/verify Inertia-React pages via arqel-dev/auth (AUTH-006/007/008 shipped), with the starter-kit path as an alternative, and change the table cells from planned/TBD to delivered."
+      }
+    },
+    {
+      "file": "apps/docs/guide/authentication.md",
+      "line": 128,
+      "title": "Guide says starter-kit detection in arqel:doctor is '(planned)' via AUTH-005-doctor, but the shipped DoctorCommand already performs it",
+      "evidence": "Line 128: \"Starting with AUTH-005-doctor (planned), the command will detect: - Whether a starter kit is installed (Breeze, Jetstream, or Fortify) \u2014 warns when absent.\" But packages/core/src/Console/DoctorCommand.php (signature 'arqel:doctor', registered in ArqelServiceProvider) already implements checkAuthStarterKit() (lines 454-486) which probes Breeze/Jetstream/Fortify service providers and emits the exact 'No Laravel auth starter kit detected' warning. The starter-kit detection is delivered, not planned.",
+      "fix": "Drop the '(planned)' framing for starter-kit detection; state that arqel:doctor already checks for an installed starter kit and warns when absent. Keep only the genuinely-pending bullets (e.g., /login and /admin route registration detection, which DoctorCommand does not yet implement).",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/guide/authentication.md:128 says \"Starting with AUTH-005-doctor (planned), the command will detect: ... Whether a starter kit is installed (Breeze, Jetstream, or Fortify) \u2014 warns when absent.\" But packages/core/src/Console/DoctorCommand.php already ships this: signature 'arqel:doctor' (line 45), registered in ArqelServiceProvider (line 55), the checks array invokes checkAuthStarterKit() (line 67), and the method (lines 454-486) probes Breeze/Jetstream/Fortify service providers via class_exists and emits the exact WARN message \"No Laravel auth starter kit detected. Arqel does not ship login/register pages...\". The starter-kit detection is delivered, not planned \u2014 the doc's \"(planned)/will detect\" framing contradicts the code. This is a distinct file+line contradiction in a previously-unswept file (authentication.md doctor framing); it is not covered by any of the R1-R13 swept families (setter signatures, README command lists, trilingual drift, cloud/env vars, subpath entries, or the SKILL.md items). Proposed fix: state that arqel:doctor already checks for an installed starter kit and warns when absent; keep '(planned)' only for genuinely-pending bullets like /login and /admin route registration, which DoctorCommand does not implement."
+      }
+    }
+  ]
+}

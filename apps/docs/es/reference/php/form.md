@@ -48,7 +48,7 @@ Las entradas que no son Field se descartan en silencio.
 Genera `Store{Model}Request`/`Update{Model}Request` desde un class-string de Resource.
 
 ```php
-$generator->generate(PostResource::class, 'create', 'App\\Http\\Requests'): string  // PHP source
+$generator->generate(PostResource::class, 'store', 'App\\Http\\Requests\\Arqel'): string  // PHP source
 $generator->write(PostResource::class, base_path('app/Http/Requests'), force: false): array<string>
 ```
 

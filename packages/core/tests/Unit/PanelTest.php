@@ -83,3 +83,14 @@ it('writes the reset expiration to the panel-guard broker, not users (#191)', fu
     expect(config('auth.passwords.admins.expire'))->toBe(15)
         ->and(config('auth.passwords.users.expire'))->toBe(60);
 });
+
+it('is profile-disabled by default and enables via profile()', function (): void {
+    $panel = new Panel('admin');
+    expect($panel->profileEnabled())->toBeFalse();
+
+    $panel->profile();
+    expect($panel->profileEnabled())->toBeTrue();
+
+    $panel->profile(false);
+    expect($panel->profileEnabled())->toBeFalse();
+});

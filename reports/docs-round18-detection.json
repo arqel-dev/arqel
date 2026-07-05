@@ -1,0 +1,65 @@
+{
+  "round": 18,
+  "confirmed": [
+    {
+      "file": "packages/tenant/SKILL.md",
+      "line": 84,
+      "title": "Anti-patterns section recommends TenantManager::runFor(null, ...) but runFor requires a non-nullable Model",
+      "evidence": "SKILL line 84 tells consumers to do admin overrides with `TenantManager::runFor(null, fn () => ...)`. Source packages/tenant/src/TenantManager.php:108 declares `public function runFor(Model $tenant, Closure $callback): mixed` \u2014 the first parameter is a non-nullable `Illuminate\\Database\\Eloquent\\Model`. Passing `null` throws a TypeError; the null-drop behavior lives in the separate `forget()` method (TenantManager.php:129), not in runFor.",
+      "fix": "Change the documented call to pass a concrete tenant model (e.g. `TenantManager::runFor($tenant, fn () => ...)`), or point the 'admin override' guidance at `forget()` / `withoutGlobalScope(TenantScope::class)` since runFor cannot accept null.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/tenant/SKILL.md:84 tells consumers to do the \"admin override\" via `TenantManager::runFor(null, fn () => ...)`. But packages/tenant/src/TenantManager.php:108 declares `public function runFor(Model $tenant, Closure $callback): mixed` \u2014 the first parameter is a non-nullable `Illuminate\\Database\\Eloquent\\Model` (imported at line 14). Passing `null` throws a TypeError at runtime; `runFor` never nulls the tenant, it sets it to `$tenant` (line 113). The null-accepting/null-dropping behavior lives in `set(?Model $tenant)` (line 81, \"Passing null is equivalent to forget()\") and `forget()` (line 129), not in `runFor`. So the documented \"admin override\" recipe is broken code. This is in the tenant package (a prioritized previously-unswept package) and belongs to no SWEPT family \u2014 it is not a reference/php signature file, not a version-line mismatch, not a trilingual mirror. Proposed fix stands: pass a concrete tenant to runFor, or point the admin-override guidance at forget()/withoutGlobalScope. File: /home/diogo/PhpstormProjects/arqel/packages/tenant/SKILL.md line 84; source /home/diogo/PhpstormProjects/arqel/packages/tenant/src/TenantManager.php line 108."
+      }
+    },
+    {
+      "file": "packages/export/SKILL.md",
+      "line": 17,
+      "title": "ExportAction factory documented as make(string $name = 'export') but source make() has no default",
+      "evidence": "SKILL line 17 states `Factory \\`make(string $name = 'export')\\``. Source packages/export/src/Actions/ExportAction.php:61 declares `public static function make(string $name): static` with no default value, so `ExportAction::make()` (no argument) is a fatal ArgumentCountError; a name must always be passed.",
+      "fix": "Update the SKILL to `make(string $name): static` (name is required, no default), matching ExportAction.php:61.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages/export/src/Actions/ExportAction.php:61 declares `public static function make(string $name): static` with NO default value, so `ExportAction::make()` with no argument throws a fatal ArgumentCountError \u2014 the name is mandatory. packages/export/SKILL.md:17 documents the factory as `make(string $name = 'export')`, which falsely implies the argument is optional. This is a genuine doc-vs-code contradiction. It is not covered by any SWEPT family: the R17 export sweep concerned export dependencies (composer require), and the SWEPT signature family targets apps/docs/reference/php/*.md, not packages/export/SKILL.md. Proposed fix (change SKILL to `make(string $name): static`, name required) is correct and actionable."
+      }
+    },
+    {
+      "file": "apps/docs/pt-BR/SKILL.md",
+      "line": 22,
+      "title": "SKILL lists DOCS-002..008 as \"Por chegar\" but all seven are shipped",
+      "evidence": "Line 22 header \"**Por chegar (DOCS-002..008):**\" lists as not-yet-done: DOCS-002 Getting Started, DOCS-003 conceitos guide pages, DOCS-004 blog admin tutorial, DOCS-005 PHP reference, DOCS-006 TS reference, DOCS-007 Filament/Nova migration guides, DOCS-008 MCP docs. Every deliverable exists on disk: apps/docs/guide/getting-started.md (228 lines), apps/docs/guide/tutorial-first-crud.md (310 lines), apps/docs/reference/php/ (actions/auth/core/fields/form/nav/table.md), apps/docs/reference/typescript/ (fields/hooks/react/types/ui.md), apps/docs/guide/migration/from-filament.md + from-nova.md + from-react-admin.md, apps/docs/advanced/mcp.md + apps/docs/guide/mcp-server.md.",
+      "fix": "Move the DOCS-002..008 bullets out of the \"Por chegar\" section into the \"Entregue\" section (leaving only genuinely-pending items like Algolia DocSearch and PR deploy preview under \"Por chegar\").",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/pt-BR/SKILL.md:22 header \"**Por chegar (DOCS-002..008):**\" lists DOCS-002..008 as not-yet-delivered (lines 24-30), but every deliverable exists on disk under apps/docs/: DOCS-002 guide/getting-started.md (228 lines); DOCS-003 guide/ conceitos populated; DOCS-004 guide/tutorial-first-crud.md (310 lines); DOCS-005 reference/php/ (actions, auth, core, fields, form, nav, table \u2014 7 files); DOCS-006 reference/typescript/ (fields, hooks, react, types, ui \u2014 5 files); DOCS-007 guide/migration/from-filament.md + from-nova.md + from-react-admin.md; DOCS-008 advanced/mcp.md + guide/mcp-server.md. This file+line is NOT covered by any SWEPT family \u2014 prior rounds swept reference/php signatures, README Artisan lists, trilingual guide drift, cloud env-vars, and specific package-SKILL 'DELIVERED' claims (ai/cli/audit/widgets/fields/auth/versioning), none of which is the docs-app SKILL's DOCS-002..008 status block. Proposed fix (move DOCS-002..008 bullets from 'Por chegar' to 'Entregue', leaving only Algolia DocSearch + PR deploy preview as genuinely pending) is correct and actionable. Note: the same stale block also exists at apps/docs/es/SKILL.md:22, so the fix should be mirrored trilingually."
+      }
+    },
+    {
+      "file": "apps/docs/es/SKILL.md",
+      "line": 22,
+      "title": "ES mirror SKILL lists DOCS-002..008 as \"Por chegar\" but all seven are shipped",
+      "evidence": "Line 22 \"**Por chegar (DOCS-002..008):**\" mirrors the pt-BR stale list; the same seven deliverables (getting-started, guide pages, blog tutorial, PHP reference, TS reference, Filament/Nova migration guides, MCP docs) all exist under apps/docs/. Note this file also retains the pt-BR header text \"Por chegar\" untranslated, but the substantive defect is the stale not-yet-done status for shipped docs.",
+      "fix": "Relocate DOCS-002..008 to the delivered section, matching the corrected pt-BR/SKILL.md.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/es/SKILL.md:22 reads \"**Por chegar (DOCS-002..008):**\" and lists all seven deliverables (getting-started, concept guides, blog tutorial, PHP reference, TS reference, Filament/Nova migration guides, MCP docs) as not-yet-done. I verified on disk that every one of these is shipped under apps/docs/: guide/getting-started.md; guide/{panels,resources,fields,tables-forms,actions,auth}.md; examples/blog-admin.md; reference/php/*.md (7 files); reference/ts/*.md (fields,hooks,react,types,ui); guide/migration/{from-filament,from-nova}.md; guide/mcp-server.md + advanced/mcp.md. So the \"Por chegar\" status genuinely contradicts the shipped state.\n\nNot a duplicate of any SWEPT family: the ledger sweeps cover reference/php/*.md method signatures, README Artisan lists, and trilingual guide/migration/reference *content* drift \u2014 none touch the SKILL.md \"Status / Por chegar\" ticket-status block. Notably, the finding's own premise that this \"mirrors the corrected pt-BR/SKILL.md\" is inaccurate: apps/docs/pt-BR/SKILL.md:22 STILL says \"Por chegar (DOCS-002..008)\" and was never corrected, so this is a live, untouched, distinct file+line contradiction. Actionable fix: move DOCS-002..008 from \"Por chegar\" to the \"Entregue\" section (and the pt-BR mirror likewise)."
+      }
+    },
+    {
+      "file": "apps/docs/examples/blog-admin.md",
+      "line": 9,
+      "title": "blog-admin says Filament/Nova migration guides \"will land in DOCS-007\" but they already exist",
+      "evidence": "Line 9: \"More examples will land in DOCS-007 (Filament/Nova migration guides) and through community contribution PRs.\" The migration guides are already present: apps/docs/guide/migration/from-filament.md and from-nova.md. The pt-BR (apps/docs/pt-BR/examples/blog-admin.md:9) and es (apps/docs/es/examples/blog-admin.md:9) mirrors carry the identical stale claim.",
+      "fix": "Reword to link to the already-shipped migration guides (e.g. \"See the Filament and Nova migration guides under guide/migration/\") instead of framing them as future DOCS-007 work, and apply the same fix to the pt-BR and es mirrors.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. apps/docs/examples/blog-admin.md:9 says \"More examples will land in DOCS-007 (Filament/Nova migration guides) and through community contribution PRs.\" \u2014 framing the Filament/Nova migration guides as future work. But both guides already exist on disk: apps/docs/guide/migration/from-filament.md (14KB) and from-nova.md (15KB), plus from-react-admin.md. The pt-BR mirror (apps/docs/pt-BR/examples/blog-admin.md:9) and es mirror (apps/docs/es/examples/blog-admin.md:9) carry the identical stale future-tense claim. This is a genuine doc-vs-reality contradiction on a never-before-touched file+line, not covered by any SWEPT family (signatures, Artisan lists, config/env, version lines, or migration-guide-content drift). Fix: reword all three to link to the already-shipped guides under guide/migration/ instead of framing them as pending DOCS-007 work."
+      }
+    }
+  ]
+}

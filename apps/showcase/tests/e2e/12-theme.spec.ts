@@ -1,38 +1,37 @@
 import { expect, test } from './fixtures';
 
 /**
- * The shell Topbar (@arqel-dev/ui shell) ships its own theme toggle button
- * with aria-label "Switch to dark theme" / "Switch to light theme" and a
- * ☾/☀ glyph. This toggle is the one that drives the `dark` class on the
- * <html> element (the standalone @arqel-dev/theme ThemeToggle does not).
+ * The shell UserMenu (@arqel-dev/ui shell) owns the theme control: opening the
+ * user menu reveals a horizontal segmented control with "Light" / "Dark" /
+ * "System" icon buttons (each an `aria-pressed` toggle). Picking "Dark" /
+ * "Light" is what drives the `dark` class on the <html> element (the
+ * standalone @arqel-dev/theme ThemeToggle does not).
  */
-test.describe('Theme toggle', () => {
-  test('the topbar theme toggle flips the dark class on <html>', async ({ loggedInPage }) => {
+test.describe('Theme control', () => {
+  test('the user-menu theme segmented control flips the dark class on <html>', async ({
+    loggedInPage,
+  }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts');
     await page.waitForLoadState('networkidle');
 
     const html = page.locator('html');
-    const toggle = page.getByRole('button', { name: /switch to (dark|light) theme/i });
-    await expect(toggle).toBeVisible();
+    const openMenu = () => page.getByRole('button', { name: /open user menu/i }).click();
 
-    const before = (await html.getAttribute('class')) ?? '';
-    const wasDark = /\bdark\b/.test(before);
+    // The segmented control lives inside the dropdown; open it, then pick Dark.
+    await openMenu();
+    const dark = page.getByRole('button', { name: /^dark$/i });
+    await expect(dark).toBeVisible();
+    await dark.click();
+    await expect(html).toHaveClass(/\bdark\b/);
 
-    await toggle.click();
-
-    if (wasDark) {
-      await expect(html).not.toHaveClass(/\bdark\b/);
-    } else {
-      await expect(html).toHaveClass(/\bdark\b/);
+    // Reopen the menu before switching back — the segment buttons are plain
+    // <button>s so the dropdown is expected to stay open, but reopening keeps
+    // the test resilient regardless of dismiss behavior.
+    if (!(await page.getByRole('button', { name: /^light$/i }).isVisible())) {
+      await openMenu();
     }
-
-    // Toggling back restores the original mode.
-    await page.getByRole('button', { name: /switch to (dark|light) theme/i }).click();
-    if (wasDark) {
-      await expect(html).toHaveClass(/\bdark\b/);
-    } else {
-      await expect(html).not.toHaveClass(/\bdark\b/);
-    }
+    await page.getByRole('button', { name: /^light$/i }).click();
+    await expect(html).not.toHaveClass(/\bdark\b/);
   });
 });

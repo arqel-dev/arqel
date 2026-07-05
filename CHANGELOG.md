@@ -7,6 +7,18 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.15.1] - 2026-07-03
+
+### Summary
+
+Release de patch que publica o resultado do **loop autônomo de i18n** — 41 rounds, 366 bugs de localização corrigidos até convergência (2 rounds limpos consecutivos, PRs #272–#306) — mais um ajuste de layout do shell. Todo o chrome do framework (fields, tables, forms, actions, auth pages, widgets, AI inputs, marketplace, versioning, workflow, realtime, devtools) agora resolve seus rótulos, aria-labels, mensagens de validação, datas/números e page titles pelo tradutor do painel, com paridade EN/pt-BR. Não há mudanças de API pública nem breaking changes desde 0.15.0 — apenas correções.
+
+### Fixed
+
+- **i18n (loop, 41 rounds):** localização exaustiva do chrome do framework até convergência — field labels/chrome/aria + plumbing de locale (#272); datas/números locale-aware, mensagens de validação de CRUD, títulos de página PHP (#273); páginas de auth, labels de resource/nav, parse de moeda, regras de plural (#274); AI fields, inputs fields-js/advanced, chrome de versioning, página de reset (#275); banner de realtime, erros de AI, mensagens de tenant/audit (#276); labels de validação de action/select, chrome de versioning/workflow, locale de audit/export, plural do useTranslator (#277); editores fields-advanced, form/AI/marketplace, theme/a11y (#278); providers da palette, cards do Pulse, labels de table, mensagens de abort, hints do footer (#279); mensagens PHP de ai/marketplace/versioning, toolbar do RichText, categorias da palette (#280); texto visível de markdown/code, aborts/summary de versioning, labels de workflow (#281); actions/versioning/realtime/marketplace/fields (#282); fields-advanced/ai/marketplace/actions + hardening de exception-flash (#283); export boolean sistêmico/fields/ai (#284); richtext/versioning/marketplace (#285); família aria do BuilderInput / ai / marketplace / tenant (#286); labels de action built-in + pluralização de review (#287); erros de validação inline por-campo do marketplace, 5 controllers sistêmico (#288); painel devtools-extension self-contained (#289, #290, #291, #299, #304); number formatting locale-aware de chart widgets (#295); grouping de contagem em TablePagination + SecurityScanner (#294); cli-ink TUI i18n self-contained + number grouping do marketplace (#293); verified-badge/meta PT-BR + pagination indicator (#297); Landing PT-BR + StatWidget + cli-ink number grouping (#298); SubFieldInput unsupported-note + showcase heading + timestamps devtools (#299); AiTextInput/FieldsInspector counters + CheckoutSuccess PT-BR (#300); document title do Checkout do marketplace PT-BR (#301); labels de view/edit/restore/create built-in (#302); dashboard Filter + SelectFilter option labels dos widgets (#303); AiImageInput dropzone prompt + RepeaterField itemLabel (#305). Total: **366 bugs de localização** corrigidos, loop convergido (relatório final #306).
+- **table:** localiza o label sintético 'All' do grupo ungrouped (#292); células boolean do TableCard via `table.boolean.*` (#296).
+- **ui:** padding de conteúdo default no main do AppShell (topbar-only + sidebar) (#307).
+
 ## [0.15.0] - 2026-06-22
 
 ### Summary

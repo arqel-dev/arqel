@@ -35,9 +35,9 @@ O pacote é provider-agnóstico por design: o consumidor escolhe `claude`, `open
 | Field | Action principal | Rota | React |
 |---|---|---|---|
 | `AiTextField` (estende `TextField`) | `generate(formData): string` — placeholders `{name}` resolvidos server-side, trunca por `maxLength` | `POST /admin/{r}/fields/{f}/generate` | entregue |
-| `AiTranslateField` | `translate(text, target, ?source)`, `translateAll(translations, source)` — só preenche idiomas vazios, nunca sobrescreve traduções manuais | `POST .../translate` | follow-up |
-| `AiSelectField` | `classify(formData): ?string` — normaliza output (trim/lower/strip) e valida contra `options` de forma case-insensitive (retorna a chave na grafia original), cai em `fallbackOption` quando inválido | `POST .../classify` | follow-up |
-| `AiExtractField` | `extract(sourceText): array` — JSON mode opcional, fallback regex `\{[\s\S]*\}` para prosa misturada, filtra keys extras, injeta `null` para keys ausentes | `POST .../extract` | follow-up |
+| `AiTranslateField` | `translate(text, target, ?source)`, `translateAll(translations, source)` — só preenche idiomas vazios, nunca sobrescreve traduções manuais | `POST .../translate` | entregue (`AiTranslateInput.tsx`) |
+| `AiSelectField` | `classify(formData): ?string` — normaliza output (trim/lower/strip) e valida contra `options` de forma case-insensitive (retorna a chave na grafia original), cai em `fallbackOption` quando inválido | `POST .../classify` | entregue (`AiSelectInput.tsx`) |
+| `AiExtractField` | `extract(sourceText): array` — JSON mode opcional, fallback regex `\{[\s\S]*\}` para prosa misturada, filtra keys extras, injeta `null` para keys ausentes | `POST .../extract` | entregue (`AiExtractInput.tsx`) |
 | `AiImageField` | `analyze(imageUrlOrBase64): array<key,string>` — uma chamada por análise declarada via `aiAnalysis`, `populateFields` mapeia para form fields | `POST .../analyze-image` | entregue (`AiImageInput.tsx`) |
 
 Convenções compartilhadas dos fields:
@@ -67,10 +67,12 @@ Convenções compartilhadas dos fields:
 - Ollama agora suporta vision nativa via modelos `llava` / `bakllava` / `llama3.2-vision`. `chat()` envia `messages[].images: [base64,...]` (base64 puro, sem prefixo `data:image/...;base64,`) para `/api/chat`. URLs são baixadas defensivamente via `Http::timeout(5)->get($url)` e convertidas para base64 — falha de download lança `AiException`. Quando há image option mas o `model` configurado é não-vision, o provider faz fallback automático para `visionModel` (default `llava`, override via `ARQEL_AI_OLLAMA_VISION_MODEL` ou parâmetro construtor).
 - **`AiProvider::supportsVision(): bool`** adicionado ao contrato. Claude/OpenAi/Ollama retornam `true`; fakes default `false`. Caller usa o flag para gated UI antes de injectar `imageUrl`/`imageBase64` em `options`.
 
+**Fields React entregues**
+- `AiTextInput.tsx`, `AiTranslateInput.tsx`, `AiSelectInput.tsx`, `AiExtractInput.tsx`, `AiImageInput.tsx` — componentes shadcn-styled com botão "Generate" + populate cross-field, todos registrados via `registerField()` em `packages-js/ai/src/register.tsx` e cobertos por `.test.tsx`.
+
 ### Por chegar
 - **AI-015 follow-up — Docs site**: capítulo "AI fields" em `arqel.dev/docs/ai` cobrindo cada field + anti-patterns. Hoje a doc vive aqui em SKILL.md e nos exemplos PT-BR abaixo.
 - **AI-016+ — Streaming SSE end-to-end**: providers já implementam `stream()` (Anthropic SSE, OpenAI SSE, Ollama NDJSON). Falta a ponte React/Inertia para receber chunks num `AiTextField` (provavelmente via endpoint dedicado fora do ciclo Inertia, exposto como rota tipo `text/event-stream`).
-- **Fields React follow-up**: `AiTranslateInput.tsx`, `AiSelectInput.tsx`, `AiExtractInput.tsx` (componentes shadcn-styled com botão "Generate" + populate cross-field).
 
 ## Conventions
 
@@ -197,7 +199,7 @@ protected function casts(): array
 }
 ```
 
-Quando `autoTranslate()` está ativo, o React (follow-up) dispara
+Quando `autoTranslate()` está ativo, o React dispara
 `POST /admin/{slug}/fields/description/translate` com o texto do
 `defaultLanguage` e os idiomas restantes; o backend chama `translate()`
 para cada idioma alvo. Traduções manuais já preenchidas **não são
@@ -228,7 +230,7 @@ public function fields(): array
 }
 ```
 
-O React (follow-up) dispara `POST /admin/{slug}/fields/category/classify`
+O React dispara `POST /admin/{slug}/fields/category/classify`
 com o `formData` atual; o backend chama `classify()` e devolve
 `{key, label}`. Quando a AI retorna uma key fora do set declarado, o
 resultado cai em `fallbackOption` — sem `fallbackOption()`, o response

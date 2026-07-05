@@ -11,6 +11,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
@@ -105,7 +106,7 @@ final class ActionController
         $user = $request->user();
         $authUser = $user instanceof Authenticatable ? $user : null;
 
-        if (! $action->canBeExecutedBy($authUser, $target)) {
+        if (! $this->isAuthorized($action, $authUser, $target)) {
             abort(HttpResponse::HTTP_FORBIDDEN);
         }
 
@@ -155,6 +156,36 @@ final class ActionController
         return $message !== null
             ? $redirect->with('success', $message)
             : $redirect;
+    }
+
+    /**
+     * Authorize the action against its target.
+     *
+     * For a bulk selection the target is a Collection of records; each record
+     * is authorized individually and the whole batch is denied if ANY record
+     * fails — a per-record gate/closure (the documented `(?User, $record)`
+     * signature) must never receive the raw Collection, which would either
+     * TypeError against a `Model`-typed Policy or silently bypass the check.
+     * An empty collection has nothing to authorize, so it defers to a single
+     * record-less check (preserving the default-permissive baseline).
+     */
+    private function isAuthorized(Action $action, ?Authenticatable $user, mixed $target): bool
+    {
+        if ($target instanceof Collection) {
+            if ($target->isEmpty()) {
+                return $action->canBeExecutedBy($user, null);
+            }
+
+            foreach ($target as $record) {
+                if (! $action->canBeExecutedBy($user, $record)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return $action->canBeExecutedBy($user, $target);
     }
 
     private function resolveOrFail(string $slug): Resource

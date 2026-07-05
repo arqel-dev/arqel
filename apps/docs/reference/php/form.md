@@ -48,7 +48,7 @@ Non-Field entries are silently dropped.
 Generates `Store{Model}Request`/`Update{Model}Request` from a Resource class-string.
 
 ```php
-$generator->generate(PostResource::class, 'create', 'App\\Http\\Requests'): string  // PHP source
+$generator->generate(PostResource::class, 'store', 'App\\Http\\Requests\\Arqel'): string  // PHP source
 $generator->write(PostResource::class, base_path('app/Http/Requests'), force: false): array<string>
 ```
 

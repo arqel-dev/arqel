@@ -107,3 +107,40 @@ it('emits an empty placeholder when no fields are declared', function (): void {
 
     expect($php)->toContain("// Field::text('name')->required(),");
 });
+
+it('imports the FieldFactory alias so generated `Field::` references resolve', function (): void {
+    // Regression: the generator emitted `Field::text(...)` but never imported the
+    // symbol, so the generated Resource fatal-errored on load (class `Field` not
+    // found). token_get_all() cannot catch this — it is a name-resolution bug, not
+    // a syntax one — so assert the `use` alias is present whenever `Field::` is used.
+    $php = makeGenerator([
+        'fields' => [['name' => 'title', 'type' => 'text']],
+    ])->generateResourceFile();
+
+    expect($php)
+        ->toContain('use Arqel\Fields\FieldFactory as Field;')
+        ->toContain("Field::text('title'),");
+});
+
+it('imports the FieldFactory alias even for the commented placeholder', function (): void {
+    // The empty-fields template still shows `// Field::text('name')...` as the
+    // hint a user will uncomment, so the import must be there unconditionally.
+    $php = makeGenerator()->generateResourceFile();
+
+    expect($php)->toContain('use Arqel\Fields\FieldFactory as Field;');
+});
+
+it('every `Field::` reference in the generated Resource has a matching use-alias', function (): void {
+    // Structural guarantee: any short-name static call in the generated file
+    // must be backed by an import, otherwise it will not resolve at runtime.
+    $php = makeGenerator([
+        'fields' => [
+            ['name' => 'title', 'type' => 'text'],
+            ['name' => 'published_at', 'type' => 'dateTime'],
+        ],
+    ])->generateResourceFile();
+
+    if (str_contains($php, 'Field::')) {
+        expect($php)->toMatch('/^use .*\bas Field;$/m');
+    }
+});

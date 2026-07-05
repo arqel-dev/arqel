@@ -20,7 +20,7 @@ METHOD_GET / POST / PUT / PATCH / DELETE
 label(string), icon(string), color(string), variant(string)
 action(Closure)         // executes logic
 url(string|Closure, string $method = 'GET')   // XOR with action()
-visible(bool|Closure), disabled(bool|Closure), hidden(bool|Closure)
+visible(Closure), disabled(Closure), hidden(bool)
 tooltip(string|Closure)
 successNotification(string), failureNotification(string)
 ```
@@ -29,7 +29,7 @@ successNotification(string), failureNotification(string)
 
 | Trait | Setters |
 |---|---|
-| `Confirmable` | `requiresConfirmation`, `modalHeading`, `modalDescription`, `modalIcon`, `modalColor`, `modalConfirmationRequiresText`, `modalSubmitLabel`, `modalCancelLabel` |
+| `Confirmable` | `requiresConfirmation`, `modalHeading`, `modalDescription`, `modalIcon`, `modalColor`, `modalConfirmationRequiresText`, `modalSubmitButtonLabel`, `modalCancelButtonLabel` |
 | `HasForm` | `form(array<Field>)`, `modalSize`, `modalWide` |
 | `HasAuthorization` | `authorize(Closure)` |
 

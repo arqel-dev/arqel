@@ -1,0 +1,29 @@
+{
+  "round": 16,
+  "confirmed": [
+    {
+      "file": "apps/docs/reference/php/form.md",
+      "line": 51,
+      "title": "FormRequestGenerator::generate() example passes invalid action 'create' and wrong default namespace",
+      "evidence": "Doc shows `$generator->generate(PostResource::class, 'create', 'App\\\\Http\\\\Requests')`. In packages/form/src/FormRequestGenerator.php the `generate(string $resourceClass, string $action = self::ACTION_STORE, string $namespace = 'App\\\\Http\\\\Requests\\\\Arqel')` method only recognizes the actions `'store'` (ACTION_STORE) and `'update'` (ACTION_UPDATE): line 45 coerces `$action = $action === self::ACTION_UPDATE ? self::ACTION_UPDATE : self::ACTION_STORE`. Passing `'create'` therefore silently produces a `StorePostRequest`, not the create-flavoured request the reader expects. Additionally the default namespace is `App\\Http\\Requests\\Arqel`, not the doc's `App\\Http\\Requests`.",
+      "fix": "Change the example to `$generator->generate(PostResource::class, 'store', 'App\\\\Http\\\\Requests\\\\Arqel'): string` (valid action values are 'store' and 'update'), and mirror the same fix in the pt-BR and es form.md line 51 copies.",
+      "dimension": "factual-drift",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. Verified against source packages/form/src/FormRequestGenerator.php. The doc example at apps/docs/reference/php/form.md:51 reads `$generator->generate(PostResource::class, 'create', 'App\\\\Http\\\\Requests')`. Two genuine contradictions:\n\n1) Invalid action 'create': The generate() signature (line 39) declares only two recognized actions via constants ACTION_STORE='store' (line 25) and ACTION_UPDATE='update' (line 27). Line 45 coerces `$action = $action === self::ACTION_UPDATE ? self::ACTION_UPDATE : self::ACTION_STORE` \u2014 so passing 'create' silently falls through to ACTION_STORE, producing `StorePostRequest` (className = ucfirst('store').'Post'.'Request'), NOT any 'create'-flavoured request. The valid documentable values are 'store' and 'update'. Passing 'create' is misleading (it happens to work only by silent coercion and does not reflect an actual action name).\n\n2) Wrong namespace: The generate() default namespace (line 39) is `App\\Http\\Requests\\Arqel`, and the class docblock (line 19) documents the path convention `app/Http/Requests/Arqel/`. The doc's `App\\Http\\Requests` omits the `\\Arqel` segment, contradicting the documented convention.\n\nThis is in form.md, an explicitly-prioritized UNSWEPT file; the SWEPT signature families covered column/field setters (DateColumn/BadgeColumn/etc.) and ResourceRegistry::discover, not FormRequestGenerator \u2014 so this is a distinct, never-touched contradiction. The identical defective line 51 also appears in the pt-BR and es mirror copies (both verified present), so the fix must be mirrored trilingually. Proposed fix: change the example to `$generator->generate(PostResource::class, 'store', 'App\\\\Http\\\\Requests\\\\Arqel'): string` in all three copies."
+      }
+    },
+    {
+      "file": "packages-js/versioning/SKILL.md",
+      "line": 23,
+      "title": "@arqel-dev/versioning SKILL Status section states stale current version 0.10.0-rc.1 (real package.json is 0.15.0)",
+      "evidence": "packages-js/versioning/SKILL.md:23 is an explicit status claim: '- **Vers\u00e3o atual**: `0.10.0-rc.1` (Fase 3, VERS-003 + VERS-004).' under a '## Status' heading. The real published version in packages-js/versioning/package.json is `\"version\": \"0.15.0\"` \u2014 five minor releases ahead, and no longer an rc. The whole monorepo (packages/core composer.json, packages-js/react, packages-js/devtools-extension, packages-js/types) is at 0.15.0. The SKILL still advertises the package as a Fase-3 release candidate. git log on this file (last touch 7e2ac31, the 0.8.0 rename) shows the version line was never updated through the 0.9\u21920.15 bumps. Not in any docs-fixed ledger and not covered by the swept families (setter signatures, Artisan lists, trilingual drift, hooks, StatWidget, etc.).",
+      "fix": "Update line 23 to `- **Vers\u00e3o atual**: `0.15.0`.` (drop the rc/Fase-3 qualifier, or restate it to match the current release), keeping it in sync with packages-js/versioning/package.json.",
+      "dimension": "stale-status",
+      "verdict": {
+        "isReal": true,
+        "reason": "CONFIRMED and NEW. packages-js/versioning/SKILL.md:23 states under \"## Status\": \"- **Vers\u00e3o atual**: `0.10.0-rc.1` (Fase 3, VERS-003 + VERS-004).\" The real published version in packages-js/versioning/package.json:3 is \"version\": \"0.15.0\" \u2014 five minors ahead and no longer a release candidate. This is a genuine, objective doc\u2194code contradiction: the SKILL advertises the package as a Fase-3 rc while the package is a stable 0.15.0. Not covered by any swept family (swept families are setter/method signatures, Artisan command lists, trilingual mirror drift, cloud/deploy env-vars/config keys/entry points, StatWidget/hooks setters, and DELIVERED-ticket claims \u2014 none of which is \"stale version string in a JS SKILL Status section\"). Not a duplicate: the ledger and round1-detection entries for versioning reference the DIFFERENT file packages/versioning/SKILL.md (the PHP package under packages/, not packages-js/) and concern a dead README.md link, not a version string. git log confirms the last touch to this file was 7e2ac31 (the 0.8.0 rename), so the version line was never bumped through 0.9\u21920.15. Fix: update line 23 to reflect 0.15.0 and drop the rc/Fase-3 qualifier."
+      }
+    }
+  ]
+}

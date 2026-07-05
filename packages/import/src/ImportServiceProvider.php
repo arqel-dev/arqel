@@ -11,6 +11,9 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 /**
  * Auto-discovered provider for `arqel-dev/import`.
+ *
+ * Translations are namespaced `arqel-import::import.*` (derived from
+ * `name('arqel-import')`, mirroring `arqel-audit::messages.*`).
  */
 final class ImportServiceProvider extends PackageServiceProvider
 {
@@ -18,6 +21,7 @@ final class ImportServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('arqel-import')
+            ->hasTranslations()
             ->hasRoute('admin');
     }
 

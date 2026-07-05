@@ -103,3 +103,42 @@ it('rejects a missing importer class', function (): void {
 
     Queue::assertNothingPushed();
 });
+
+it('stores the uploaded file at the exact path the dispatched job receives (round-trip)', function (): void {
+    Queue::fake();
+    Gate::define('import', fn (): bool => true);
+
+    $content = "name,email\nAda,ada@example.com\n";
+    $file = UploadedFile::fake()->createWithContent('users.csv', $content);
+
+    $response = $this->actingAs(importTestUser())->post(route('arqel.imports.upload'), [
+        'file' => $file,
+        'importer' => StubUserImporter::class,
+    ]);
+
+    $response->assertRedirect();
+
+    Queue::assertPushed(ProcessImportJob::class, function (ProcessImportJob $job) use ($content): bool {
+        expect(file_exists($job->sourcePath))->toBeTrue();
+        expect(file_get_contents($job->sourcePath))->toBe($content);
+
+        return true;
+    });
+});
+
+it('rejects an unsupported .txt extension with a 422 validation error instead of a 500', function (): void {
+    Queue::fake();
+    Gate::define('import', fn (): bool => true);
+
+    $file = UploadedFile::fake()->createWithContent('users.txt', "name,email\nAda,ada@example.com\n");
+
+    $response = $this->actingAs(importTestUser())->post(route('arqel.imports.upload'), [
+        'file' => $file,
+        'importer' => StubUserImporter::class,
+    ]);
+
+    $response->assertStatus(302);
+    $response->assertSessionHasErrors('file');
+
+    Queue::assertNothingPushed();
+});

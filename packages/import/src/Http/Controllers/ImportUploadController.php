@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
@@ -33,7 +34,7 @@ final class ImportUploadController
         $this->authorize($request);
 
         $validated = $request->validate([
-            'file' => ['required', 'file', 'mimes:csv,txt,xlsx'],
+            'file' => ['required', 'file', 'mimes:csv,xlsx'],
             'importer' => ['required', 'string'],
         ]);
 
@@ -42,8 +43,13 @@ final class ImportUploadController
         $format = ImportFormat::fromExtension($file->getClientOriginalExtension());
 
         $importId = (string) Str::uuid();
-        $stored = $file->storeAs('arqel-imports', $importId.'.'.$format->extension());
-        $sourcePath = storage_path('app/'.$stored);
+        $dir = storage_path('app/arqel-imports');
+        if (! is_dir($dir) && ! @mkdir($dir, 0o755, true) && ! is_dir($dir)) {
+            throw new RuntimeException(sprintf('Unable to create import upload directory [%s].', $dir));
+        }
+
+        $file->move($dir, $importId.'.'.$format->extension());
+        $sourcePath = $dir.'/'.$importId.'.'.$format->extension();
 
         ProcessImportJob::dispatch($importId, $format, $validated['importer'], $sourcePath);
 

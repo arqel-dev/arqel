@@ -1,7 +1,7 @@
 # AGENTS.md — {{app_name}}
 
 > Contexto operacional para agentes de IA (Claude Code, Copilot, Cursor, etc.)
-> trabalhando neste projeto. Este ficheiro é **lido automaticamente** no início
+> trabalhando neste projeto. Este arquivo é **lido automaticamente** no início
 > de cada sessão.
 
 ## Project overview
@@ -22,7 +22,7 @@ PHP, renderizados em React via Inertia. Stack:
 - **Tests first:** features novas exigem Pest (PHP) + Vitest (JS)
 - **Final by default:** classes PHP são `final` exceto onde extensibilidade
   é design intent
-- `declare(strict_types=1)` em todos os ficheiros PHP novos
+- `declare(strict_types=1)` em todos os arquivos PHP novos
 
 ## Commands
 

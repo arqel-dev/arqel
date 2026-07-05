@@ -93,7 +93,9 @@ it('renders AGENTS.md with all required sections and no unsubstituted tokens', f
         ->toContain('## Key conventions')
         ->toContain('## Commands')
         ->toContain('## Architecture')
-        ->not->toContain('{{');
+        ->not->toContain('{{')
+        // Docs must be pt-BR, never pt-PT (CLAUDE.md golden rule #8).
+        ->not->toContain('ficheiro');
 });
 
 it('overwrites existing files when --force is passed', function (): void {

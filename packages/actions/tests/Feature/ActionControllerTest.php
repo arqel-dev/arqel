@@ -8,7 +8,11 @@ use Arqel\Actions\Types\ToolbarAction;
 use Arqel\Core\Resources\Resource;
 use Arqel\Core\Resources\ResourceRegistry;
 use Arqel\Fields\Types\TextField;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -38,7 +42,7 @@ final class StubResourceWithToolbarAction extends Resource
 
     public static bool $callbackInvoked = false;
 
-    public static string $model = Illuminate\Foundation\Auth\User::class;
+    public static string $model = User::class;
 
     public static ?string $slug = 'controller-stub';
 
@@ -261,10 +265,93 @@ it('validates the action form using the field label as :attribute and custom mes
         ->and(StubResourceWithToolbarAction::$callbackInvoked)->toBeFalse();
 });
 
+it('authorizes bulk actions per-record: denies the whole batch if any record fails', function (): void {
+    // Build a tiny in-memory table + model to select over.
+    Schema::create('bulk_widgets', function ($table): void {
+        $table->increments('id');
+        $table->boolean('locked')->default(false);
+    });
+
+    $model = new class extends Model
+    {
+        protected $table = 'bulk_widgets';
+
+        public $timestamps = false;
+
+        protected $guarded = [];
+    };
+    $modelClass = $model::class;
+
+    $modelClass::query()->insert([
+        ['id' => 1, 'locked' => false],
+        ['id' => 2, 'locked' => true],
+    ]);
+
+    $resource = new class extends Resource
+    {
+        public static string $model = '';
+
+        public static ?string $slug = 'bulk-authz-stub';
+
+        /** @var list<BulkAction> */
+        public static array $bulkActions = [];
+
+        public function fields(): array
+        {
+            return [];
+        }
+
+        public function bulkActions(): array
+        {
+            return self::$bulkActions;
+        }
+    };
+    $resource::$model = $modelClass;
+
+    $seen = [];
+    $resource::$bulkActions = [
+        BulkAction::make('archive')
+            // A per-record predicate: only unlocked widgets may be archived.
+            // Each record is inspected individually; a locked one denies.
+            ->authorize(function (?Authenticatable $user, mixed $record) use (&$seen): bool {
+                $seen[] = $record;
+
+                return $record instanceof Model
+                    && $record->getAttribute('locked') === false;
+            })
+            ->action(fn () => null),
+    ];
+
+    /** @var ResourceRegistry $registry */
+    $registry = $this->app->make(ResourceRegistry::class);
+    $registry->clear();
+    $registry->register($resource::class);
+
+    /** @var ActionController $controller */
+    $controller = $this->app->make(ActionController::class);
+
+    $request = Request::create('/', 'POST', ['ids' => [1, 2]]);
+
+    try {
+        $controller->invokeBulk($request, 'bulk-authz-stub', 'archive');
+        $code = null;
+    } catch (HttpException $e) {
+        $code = $e->getStatusCode();
+    }
+
+    // Record 2 is locked → the batch is forbidden. And the predicate must have
+    // received individual Models, never the whole Collection.
+    expect($code)->toBe(403)
+        ->and($seen)->not->toBeEmpty();
+    foreach ($seen as $record) {
+        expect($record)->toBeInstanceOf(Model::class);
+    }
+});
+
 it('keeps the action collection resolution duck-typed (no method_exists hard fail)', function (): void {
     $resource = new class extends Resource
     {
-        public static string $model = Illuminate\Foundation\Auth\User::class;
+        public static string $model = User::class;
 
         public static ?string $slug = 'no-collections';
 

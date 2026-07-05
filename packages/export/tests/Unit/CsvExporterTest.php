@@ -300,7 +300,7 @@ it('neutralizes formula-injection cells by prefixing a leading apostrophe', func
         ['note' => '+SUM(A1:A9)'],
         ['note' => '-2+3'],
         ['note' => '@cmd'],
-        ['note' => "=HYPERLINK(\"http://evil\")"],
+        ['note' => '=HYPERLINK("http://evil")'],
         ['note' => 'safe value'],
     ];
 

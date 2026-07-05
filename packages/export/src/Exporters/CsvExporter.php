@@ -27,8 +27,8 @@ final class CsvExporter implements Exporter
     use FormatsDateCells;
 
     /**
-     * @param iterable<int, mixed> $rows
-     * @param array<int, array<string, mixed>> $columns
+     * @param  iterable<int, mixed>  $rows
+     * @param  array<int, array<string, mixed>>  $columns
      */
     public function export(iterable $rows, array $columns, string $destination): string
     {
@@ -49,8 +49,8 @@ final class CsvExporter implements Exporter
      * to disk first. Use only for small/sync exports — large datasets
      * should go through the async `ExportAction` pipeline (EXPORT-005+).
      *
-     * @param iterable<int, mixed> $rows
-     * @param array<int, array<string, mixed>> $columns
+     * @param  iterable<int, mixed>  $rows
+     * @param  array<int, array<string, mixed>>  $columns
      */
     public static function streamDownload(iterable $rows, array $columns, string $filename): StreamedResponse
     {
@@ -88,8 +88,7 @@ final class CsvExporter implements Exporter
     }
 
     /**
-     * @param array<int, array<string, mixed>> $columns
-     *
+     * @param  array<int, array<string, mixed>>  $columns
      * @return array<int, string>
      */
     private function headerLabels(array $columns): array
@@ -101,8 +100,7 @@ final class CsvExporter implements Exporter
     }
 
     /**
-     * @param array<int, array<string, mixed>> $columns
-     *
+     * @param  array<int, array<string, mixed>>  $columns
      * @return array<int, string>
      */
     private function buildRow(mixed $record, array $columns): array
@@ -116,7 +114,7 @@ final class CsvExporter implements Exporter
     }
 
     /**
-     * @param array<string, mixed> $column
+     * @param  array<string, mixed>  $column
      */
     private function formatCell(mixed $record, array $column): string
     {
@@ -124,7 +122,7 @@ final class CsvExporter implements Exporter
     }
 
     /**
-     * @param array<string, mixed> $column
+     * @param  array<string, mixed>  $column
      */
     private function resolveCellValue(mixed $record, array $column): string
     {

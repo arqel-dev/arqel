@@ -18,12 +18,28 @@ it('yields one associative array per data row keyed by header', function (): voi
         ->addRow(['name' => 'Alan Turing', 'email' => 'alan@example.com'])
         ->close();
 
-    $rows = iterator_to_array((function () use ($path) {
-        yield from (new XlsxReader)->read($path);
-    })());
+    try {
+        $rows = iterator_to_array((function () use ($path) {
+            yield from (new XlsxReader)->read($path);
+        })());
 
-    expect($rows)->toHaveCount(2)
-        ->and($rows[0])->toBe(['name' => 'Ada Lovelace', 'email' => 'ada@example.com']);
+        expect($rows)->toHaveCount(2)
+            ->and($rows[0])->toBe(['name' => 'Ada Lovelace', 'email' => 'ada@example.com']);
+    } finally {
+        @unlink($path);
+    }
+});
 
-    @unlink($path);
+it('reads lazily (returns a Generator, not a materialised array)', function (): void {
+    $path = tempnam(sys_get_temp_dir(), 'imp').'.xlsx';
+    SimpleExcelWriter::create($path)
+        ->addRow(['name' => 'Ada Lovelace', 'email' => 'ada@example.com'])
+        ->close();
+
+    try {
+        // Generator (not merely Traversable) proves streaming — mirrors CsvReaderTest.
+        expect((new XlsxReader)->read($path))->toBeInstanceOf(Generator::class);
+    } finally {
+        @unlink($path);
+    }
 });

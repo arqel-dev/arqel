@@ -10,3 +10,5 @@ export type { TenantSwitcherProps } from './TenantSwitcher.js';
 export { TenantSwitcher } from './TenantSwitcher.js';
 export type { TopbarProps } from './Topbar.js';
 export { Topbar } from './Topbar.js';
+export type { UserMenuProps } from './UserMenu.js';
+export { UserMenu } from './UserMenu.js';

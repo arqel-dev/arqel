@@ -111,4 +111,39 @@ describe('useYjsCollab', () => {
 
     expect(result.current.text.toString()).toBe('world');
   });
+
+  // `applyRemote` is part of the public hook result, so a consumer may feed it
+  // an arbitrary/untrusted update (e.g. a snapshot fetched from an outdated
+  // endpoint). It must never throw on malformed input — it swallows the bad
+  // update and leaves the local doc untouched, exactly as the internal
+  // snapshot/broadcast call-sites already expect.
+  it('applyRemote does not throw on a malformed base64 string', () => {
+    const { result } = renderHook(() =>
+      useYjsCollab({ modelType: 'posts', modelId: 1, field: 'body' }),
+    );
+    result.current.text.insert(0, 'keep');
+
+    expect(() => {
+      act(() => {
+        result.current.applyRemote('not valid base64 !!!');
+      });
+    }).not.toThrow();
+    // The bad update is ignored; existing content survives.
+    expect(result.current.text.toString()).toBe('keep');
+  });
+
+  it('applyRemote does not throw on base64 that decodes to non-Yjs bytes', () => {
+    const { result } = renderHook(() =>
+      useYjsCollab({ modelType: 'posts', modelId: 1, field: 'body' }),
+    );
+
+    // Valid base64 charset, but the decoded bytes are not a Yjs update.
+    const garbage = encodeUpdate(new Uint8Array([255, 254, 253, 252, 251]));
+
+    expect(() => {
+      act(() => {
+        result.current.applyRemote(garbage);
+      });
+    }).not.toThrow();
+  });
 });

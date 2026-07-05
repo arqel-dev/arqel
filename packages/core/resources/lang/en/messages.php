@@ -25,6 +25,10 @@ return [
         'no_selection' => 'No records selected.',
         'bulk_completed' => 'Bulk action completed.',
         'bulk_action_no_callback' => "Bulk action ':action' has no callback.",
+        'profile' => [
+            'updated' => 'Profile updated.',
+            'password_updated' => 'Password updated.',
+        ],
     ],
     'errors' => [
         'forbidden' => 'You are not authorized to perform this action.',
@@ -141,5 +145,13 @@ return [
     ],
     'filter' => [
         'trashed' => 'Trashed',
+    ],
+    'profile' => [
+        'attributes' => [
+            'name' => 'name',
+            'email' => 'email',
+            'current_password' => 'current password',
+            'password' => 'password',
+        ],
     ],
 ];

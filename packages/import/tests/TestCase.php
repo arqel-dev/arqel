@@ -36,4 +36,17 @@ abstract class TestCase extends Orchestra
             'prefix' => '',
         ]);
     }
+
+    /**
+     * Schema for the `import_users` fixture table used by feature tests
+     * that persist rows through {@see \Arqel\Import\Jobs\ProcessImportJob}.
+     */
+    protected function defineDatabaseMigrations(): void
+    {
+        \Illuminate\Support\Facades\Schema::create('import_users', function (\Illuminate\Database\Schema\Blueprint $table): void {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email');
+        });
+    }
 }

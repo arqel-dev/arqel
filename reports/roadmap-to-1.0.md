@@ -2,7 +2,11 @@
 
 > **Documento vivo.** Gap analysis acionável rumo à v1.0.0 estável.
 > Base: v0.15.1 (publicado 2026-07-04). Atualizado por rodadas do loop de qualidade.
-> Última atualização: 2026-07-04 (rodada 1).
+> Última atualização: 2026-07-05 (rodada 2).
+
+> **Changelog do documento**
+> - **Rodada 2 (2026-07-05):** Perfil de usuário fechado (PR #333 mergeado → HAVE); bug do gerador §2.3 corrigido (PR #342 mergeado); spec de Imports em revisão (PR #343). Milestone 0.16 concluído. Foco movido para 0.17 (Imports).
+> - **Rodada 1 (2026-07-04):** primeira passada de gap analysis.
 
 ## Nota de contexto crítica
 
@@ -17,7 +21,7 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 | Área | Status | Evidência | Nota |
 |------|--------|-----------|------|
 | Auth (login/logout/guards/painel protegido) | ✅ HAVE | `packages/auth/src/Routes.php:38`; `Panel.php:255` `authGuard()`; `EnsureUserCanAccessPanel.php` | Login, register, verify-email, reset-password, guard configurável. Skipa se host já tem rota `login` (Breeze/Fortify). |
-| **Perfil/Conta de usuário** | ❌ MISSING | Nenhum `*profile*`/`*account*` em `src` (só scaffold de tenant) | Table-stakes. **Coberto pelo PR #333** (UserMenu + Profile page). |
+| **Perfil/Conta de usuário** | ✅ HAVE | `Panel::profile()`/`profileEnabled()` gate; `ProfileController`; `Routes::registerProfile`; `UserMenu` dropdown (tema movido do Topbar); FormRequests name/email + password; i18n en+pt_BR | **Fechado no PR #333** (mergeado `61e0a11`, 2026-07-04). Opt-in via `Panel::profile()`. |
 | Resources CRUD | ✅ HAVE | `ResourceController.php:49-115`; `Resource.php:307/332/393` | list/create/edit/view/delete com authz por ação. |
 | **Relations na UI** | 🟡 PARTIAL | `HasManyField.php:14` (inline); `BelongsToField.php`; **sem** RelationManager; **sem** BelongsToMany/MorphTo | Só HasMany inline + BelongsTo. Falta Relation Manager dedicado + BelongsToMany/MorphTo/HasManyThrough. |
 | RBAC / Policies | ✅ HAVE | `ArqelGate.php:43`; `PolicyDiscovery.php`; `ResourceController.php:62/71/101/111` | Gate/Policy por Resource e por Action. Falta só UI de gestão de roles (Filament também delega a plugin). |
@@ -37,9 +41,9 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 
 | # | Lacuna | Status | Peso p/ paridade | Nota |
 |---|--------|--------|------------------|------|
-| 1 | **Imports (CSV/Excel)** | MISSING | Alto | Assimetria gritante com Export. Filament tem Importer 1ª classe (mapeamento de colunas + validação + jobs). |
+| 1 | **Imports (CSV/Excel)** | MISSING → **spec em revisão (PR #343)** | Alto | Assimetria gritante com Export. Filament tem Importer 1ª classe (mapeamento de colunas + validação + jobs). Design spec de `arqel/import` aberta como PR #343 (milestone 0.17). |
 | 2 | **Relation Managers** | PARTIAL | Alto | Central para editar entidades relacionadas. Falta aba dedicada + BelongsToMany/MorphTo. |
-| 3 | **Perfil/Conta de usuário** | MISSING | Médio-alto | **PR #333 resolve.** |
+| 3 | ~~**Perfil/Conta de usuário**~~ | ✅ **FECHADO (PR #333)** | Médio-alto | Mergeado 2026-07-04. |
 | 4 | **Database Notifications UI** | PARTIAL | Médio | Sino read/unread. |
 | 5 | **Plugin API no Panel** | PARTIAL | Médio-alto | Diferencial-chave do Filament (extensibilidade in-code). |
 | 6 | **Global Search de registros** | PARTIAL | Médio | Spotlight cross-resource. |
@@ -56,7 +60,7 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 
 | # | Contrato | Doc diz | Código faz | Severidade |
 |---|----------|---------|------------|------------|
-| **A** | **Factory de Field** | `Field::text('name')` (`05-api-php.md:266`; gerador `ResourceGenerator.php:241`) | `Field` é `abstract` sem factory/`__callStatic`; factories vivem em `FieldFactory` (`__callStatic` em `FieldFactory.php:42`); **nenhum `class_alias` publica `Field`→`FieldFactory`** | 🔴 **Release-blocker** (ver §2.3) |
+| **A** | **Factory de Field** | `Field::text('name')` (`05-api-php.md:266`; gerador `ResourceGenerator.php:241`) | ✅ **RESOLVIDO (PR #342).** O gerador agora emite `use Arqel\Fields\FieldFactory as Field;`; testes de resolução de nome adicionados (`ResourceGeneratorTest.php:111-146`). | ✅ Fechado (era 🔴 release-blocker) |
 | B | Factory de Column | `Column::text('name')` (`05-api-php.md:108`) | Só `Column::make()`; testes usam `TextColumn::make()` | 🟠 Alta |
 | C | Factory de Action | `Action::view()/delete()` (`05-api-php.md:120`) | `Action::make()` + variants em classe separada `Actions::view()` (`Actions.php:18`) | 🟠 Alta |
 | D | Convenção BelongsToField | `belongsTo('role', RoleResource::class)` (nome da relação) | `make($name,…)` deriva relação removendo `_id`; testes usam `make('author_id',…)` | 🟠 Alta |
@@ -65,9 +69,15 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 | G | `SharedProps.tenant` | `Tenant \| null` (`06-api-react.md:35`) | `unknown` (`types/src/inertia.ts:50`) | 🟡 Média |
 | H | API de auth do Panel | não documentada | `login()/registration()/passwordReset()/emailVerification()` (`Panel.php:77-414`) | 🟡 Média (documentar antes de congelar) |
 
-### 2.3 Bug confirmado (verificação adversarial) — Divergência A
+### 2.3 Bug confirmado (verificação adversarial) — Divergência A ✅ RESOLVIDO
 
-`arqel:resource` (gerador) emite código que **não roda**:
+> **Status (rodada 2):** corrigido no **PR #342** (`923f21b`, mergeado). O template do gerador
+> passou a emitir `use Arqel\Fields\FieldFactory as Field;` e ganhou testes de resolução de
+> nome (não só de string) — `ResourceGeneratorTest.php:111-146` — cobrindo o caso com fields,
+> o placeholder comentado, e a garantia estrutural "todo `Field::` tem `use ... as Field`".
+> O relato original permanece abaixo como registro.
+
+`arqel:resource` (gerador) emitia código que **não rodava**:
 - `ResourceGenerator.php:93` só emite `use Arqel\Core\Resources\Resource;` — **não importa `Field` nem `FieldFactory`**.
 - `ResourceGenerator.php:241` emite `Field::{$type}('name')`.
 - `Arqel\Fields\Field` é `abstract` sem `text()`/`__callStatic`; nenhum alias publica `Field`.
@@ -122,8 +132,8 @@ Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, 
 
 | Milestone | Escopo | Destrava |
 |-----------|--------|----------|
-| **0.16 — Perfil + gerador** | Merge PR #333 (perfil); **corrigir bug do gerador (Divergência A)** decidindo a convenção de factory | Table-stakes + release-blocker de API |
-| **0.17 — Imports** | Importer 1ª classe (CSV/Excel, mapeamento, jobs async) | Lacuna competitiva #1 |
+| **0.16 — Perfil + gerador** ✅ **CONCLUÍDO** | ✅ PR #333 mergeado (perfil); ✅ bug do gerador corrigido (PR #342, `FieldFactory as Field` no template) | Table-stakes + release-blocker de API |
+| **0.17 — Imports** 🔜 spec em revisão (PR #343) | Importer 1ª classe (CSV/Excel, mapeamento, jobs async) | Lacuna competitiva #1 |
 | **0.18 — Relations** | Relation Manager + BelongsToMany/MorphTo | Lacuna competitiva #2 |
 | **0.19 — Extensibilidade + Notifications** | Plugin API no Panel (`->plugin()`) + Database Notifications UI + Global Search de registros | Lacunas #4/#5/#6 |
 | **0.20 — API-freeze prep** | ADR-019 + resolver divergências B–H + doc `resources/*` + fechar tipos TS | Pré-requisito duro de 1.0 |
@@ -132,16 +142,22 @@ Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, 
 
 ---
 
-## 5. Decisões de escopo (rodada 1 — resolvidas)
+## 5. Decisões de escopo
 
+### Rodada 1 — resolvidas
 1. ✅ **Merge do PR #333** — MERGEADO na main (`61e0a11`, 2026-07-04). Lacuna #3 (Perfil de usuário) fechada.
-2. ✅ **Convenção de factory** — decisão: **investigar mais** → investigação concluída (§2.3). A convenção de facto do showcase (`FieldFactory as Field` + classes concretas de Column/Action) **funciona e é consistente**; o bug é só o gerador esquecer o `use`. Recomendação: alinhar gerador+docs à convenção do showcase (sem aliases globais). Fix localizado, não-breaking.
+2. ✅ **Convenção de factory** — decisão: **investigar mais** → investigação concluída (§2.3). A convenção de facto do showcase (`FieldFactory as Field` + classes concretas de Column/Action) **funciona e é consistente**; o bug era só o gerador esquecer o `use`. Alinhado gerador à convenção do showcase (sem aliases globais). Fix localizado, não-breaking.
 3. ✅ **Must-haves para 1.0** — decisão: **TODAS as 4 lacunas são must-have**: Imports (CSV/Excel), Relation Managers, Plugin API no Panel, Database Notifications + Global Search. (Milestones 0.17–0.19.)
 4. ⏳ **ADR-019** (freeze + SemVer) + reescrita do critério de versionamento — pendente, milestone 0.20.
 
+### Rodada 2 — estado de execução
+- ✅ **Milestone 0.16 concluído:** decisão #1 (Perfil) e decisão #2 (gerador) ambas entregues (PR #333 + PR #342).
+- 🔜 **0.17 iniciado:** design spec de `arqel/import` aberta como **PR #343** (docs). Aguarda revisão/aprovação antes da implementação.
+- ⏳ **ADR-019** segue pendente (0.20).
+
 ### Fila de trabalho derivada (prioridade por destravar 1.0)
-- **Imediato (0.16):** corrigir bug do gerador (§2.3) — não-breaking, alto valor (Eixo B).
-- **0.17:** Imports 1ª classe.
+- ~~**0.16:** bug do gerador~~ ✅ / ~~Perfil~~ ✅ — **concluído**.
+- **0.17 (em andamento):** Imports 1ª classe — spec em revisão (PR #343) → implementação após aprovação.
 - **0.18:** Relation Managers + BelongsToMany/MorphTo.
 - **0.19:** Plugin API no Panel + Database Notifications + Global Search de registros.
 - **Contínuo:** cobertura de testes fields-js/ui/react; docs `resources/*` (DOCS-005); Layout/UX (Eixo C).

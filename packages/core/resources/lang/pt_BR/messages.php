@@ -25,6 +25,10 @@ return [
         'no_selection' => 'Nenhum registro selecionado.',
         'bulk_completed' => 'Ação em massa concluída.',
         'bulk_action_no_callback' => "A ação em massa ':action' não tem callback.",
+        'profile' => [
+            'updated' => 'Perfil atualizado.',
+            'password_updated' => 'Senha atualizada.',
+        ],
     ],
     'errors' => [
         'forbidden' => 'Você não tem permissão para executar esta ação.',
@@ -141,5 +145,13 @@ return [
     ],
     'filter' => [
         'trashed' => 'Excluídos',
+    ],
+    'profile' => [
+        'attributes' => [
+            'name' => 'nome',
+            'email' => 'e-mail',
+            'current_password' => 'senha atual',
+            'password' => 'senha',
+        ],
     ],
 ];

@@ -2,6 +2,7 @@ import { SkipLink } from '@arqel-dev/a11y';
 import {
   ForgotPasswordPage,
   LoginPage,
+  ProfilePage,
   RegisterPage,
   ResetPasswordPage,
   VerifyEmailNoticePage,
@@ -13,7 +14,7 @@ import { ThemeProvider } from '@arqel-dev/theme';
 import '@arqel-dev/theme/tokens.css';
 import type { TenantContextProps } from '@arqel-dev/types/tenant';
 import { arqelPages } from '@arqel-dev/ui/pages';
-import { AppShell, Sidebar, TenantSwitcher, Topbar } from '@arqel-dev/ui/shell';
+import { AppShell, Sidebar, TenantSwitcher, Topbar, UserMenu } from '@arqel-dev/ui/shell';
 import '@arqel-dev/fields/register';
 import '@arqel-dev/fields-advanced/register';
 import { usePage } from '@inertiajs/react';
@@ -59,6 +60,28 @@ function TenantSwitcherSlot(): JSX.Element | null {
   return <TenantSwitcher current={tenant.current} available={tenant.available} />;
 }
 
+interface SharedAuthProps {
+  auth?: { user?: { name?: string | null; email?: string | null } };
+}
+
+/**
+ * Reads the shared `auth.user` prop and renders both the locale switcher
+ * and the account UserMenu (profile link + logout) in the Topbar slot.
+ */
+function UserMenuSlot(): JSX.Element {
+  const { props } = usePage<SharedAuthProps>();
+  return (
+    <>
+      <LocaleSwitcher />
+      <UserMenu
+        user={props.auth?.user ?? {}}
+        logoutUrl="/admin/logout"
+        profileUrl="/admin/profile"
+      />
+    </>
+  );
+}
+
 /**
  * Layout persistente para páginas de Resources do painel admin.
  * Páginas de auth (Login, Register, etc.) renderizam standalone sem
@@ -75,7 +98,7 @@ const adminLayout: LayoutFn = (page) => (
           <Topbar
             brand={<span className="font-medium">{'Arqel Showcase'}</span>}
             tenantSwitcher={<TenantSwitcherSlot />}
-            userMenu={<LocaleSwitcher />}
+            userMenu={<UserMenuSlot />}
           />
         }
       >
@@ -123,10 +146,23 @@ const authPages: Record<string, LazyPage> = {
 
 const userPages = import.meta.glob<{ default: ComponentType<unknown> }>('./Pages/**/*.tsx');
 
+/**
+ * The Profile page is a panel page (renders inside the admin shell), unlike
+ * Login/Register/etc. which render standalone. `arqelPages` is external
+ * (from `@arqel-dev/ui/pages`) so it can't be edited inline — wrap this one
+ * separately and merge it alongside `wrappedArqelPages`.
+ */
+const profilePages: Record<string, LazyPage> = {
+  'arqel-dev/auth/Profile': withAdminLayout(async () => ({
+    default: ProfilePage as ComponentType<unknown>,
+  })),
+};
+
 void createArqelApp({
   appName: import.meta.env.VITE_APP_NAME ?? 'Laravel',
   pages: {
     ...wrappedArqelPages,
+    ...profilePages,
     ...authPages,
     ...(userPages as unknown as Record<string, LazyPage>),
   },

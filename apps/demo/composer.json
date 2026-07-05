@@ -9,7 +9,7 @@
     "php": "^8.3",
     "laravel/framework": "^13.7",
     "laravel/tinker": "^3.0",
-    "arqel-dev/framework": "0.10.1"
+    "arqel-dev/framework": "^0.15.0"
   },
   "repositories": [
     { "type": "path", "url": "../../packages/arqel", "options": { "symlink": true } },

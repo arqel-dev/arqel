@@ -17,5 +17,7 @@ it('yields one associative array per data row keyed by header', function (): voi
 it('reads lazily (returns a Generator, not a materialised array)', function (): void {
     $result = (new CsvReader)->read(__DIR__.'/../../Fixtures/users-valid.csv');
 
-    expect($result)->toBeInstanceOf(Traversable::class);
+    // Generator (not merely Traversable) proves streaming: an eager array
+    // cast to ArrayIterator would satisfy Traversable but not Generator.
+    expect($result)->toBeInstanceOf(Generator::class);
 });

@@ -31,17 +31,24 @@ abstract class TestCase extends Orchestra
     protected function defineEnvironment($app): void
     {
         /** @var Application $app */
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
         ]);
+        $app['config']->set('auth.providers.users', [
+            'driver' => 'eloquent',
+            'model' => Fixtures\Models\TestUser::class,
+        ]);
     }
 
     /**
      * Schema for the `import_users` fixture table used by feature tests
-     * that persist imported rows (see `Tests\Fixtures\Models\ImportUser`).
+     * that persist imported rows (see `Tests\Fixtures\Models\ImportUser`),
+     * plus `import_test_users` so Feature/HTTP tests can `actingAs()` a
+     * real Authenticatable through the `web + auth` route middleware.
      */
     protected function defineDatabaseMigrations(): void
     {
@@ -49,6 +56,12 @@ abstract class TestCase extends Orchestra
             $table->increments('id');
             $table->string('name');
             $table->string('email')->unique();
+        });
+
+        Schema::create('import_test_users', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('name')->default('user');
+            $table->timestamps();
         });
     }
 }

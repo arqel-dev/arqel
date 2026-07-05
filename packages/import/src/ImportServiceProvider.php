@@ -19,7 +19,9 @@ final class ImportServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $package->name('arqel-import');
+        $package
+            ->name('arqel-import')
+            ->hasRoute('admin');
     }
 
     public function packageRegistered(): void

@@ -21,6 +21,7 @@ final class ImportServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('arqel-import')
+            ->hasTranslations()
             ->hasRoute('admin');
     }
 

@@ -47,7 +47,7 @@ final class ImportUploadController
 
         ProcessImportJob::dispatch($importId, $format, $validated['importer'], $sourcePath);
 
-        return back()->with('success', 'arqel::import.queued');
+        return back()->with('success', __('arqel-import::import.queued'));
     }
 
     /**

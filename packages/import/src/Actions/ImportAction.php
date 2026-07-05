@@ -27,7 +27,7 @@ final class ImportAction extends Action
     public static function make(string $name): static
     {
         $action = new self($name);
-        $action->label('arqel::import.action');
+        $action->label('arqel-import::import.action');
         $action->icon('upload');
 
         return $action;

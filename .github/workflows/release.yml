@@ -86,6 +86,7 @@ jobs:
           - { name: fields, path: packages/fields }
           - { name: fields-advanced, path: packages/fields-advanced }
           - { name: form, path: packages/form }
+          - { name: import, path: packages/import }
           - { name: marketplace, path: packages/marketplace }
           - { name: mcp, path: packages/mcp }
           - { name: nav, path: packages/nav }

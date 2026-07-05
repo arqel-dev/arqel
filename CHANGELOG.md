@@ -7,6 +7,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Added
+
+- **import (novo pacote):** pipeline de importação CSV/XLSX 1ª classe — `Importer` com `ImportColumn` declarativo, validação por-linha, `ProcessImportJob` async com transação por-chunk, CSV de linhas falhadas para download, e `ImportAction`. Fecha a lacuna competitiva vs Filament/Nova (Export já existia).
+
 ## [0.15.1] - 2026-07-03
 
 ### Summary

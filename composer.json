@@ -26,6 +26,7 @@
         "arqel-dev/fields": "@dev",
         "arqel-dev/fields-advanced": "@dev",
         "arqel-dev/form": "@dev",
+        "arqel-dev/import": "@dev",
         "arqel-dev/marketplace": "@dev",
         "arqel-dev/mcp": "@dev",
         "arqel-dev/nav": "@dev",

@@ -51,13 +51,15 @@ final class ProcessImportJob implements ShouldQueue
             $columns = $importer->columns();
             $rules = $importer->rules();
             $reader = $this->makeReader();
+            $rows = $reader->read($this->sourcePath);
+            $this->assertRequiredHeadersPresent($columns, $rows);
 
             $imported = 0;
             $skipped = 0;
             /** @var list<array<string, mixed>> $failedRows */
             $failedRows = [];
 
-            foreach ($this->chunk($reader->read($this->sourcePath), self::CHUNK_SIZE) as $chunk) {
+            foreach ($this->chunk($rows, self::CHUNK_SIZE) as $chunk) {
                 DB::transaction(function () use ($chunk, $columns, $rules, $importer, &$imported, &$skipped, &$failedRows): void {
                     foreach ($chunk as $raw) {
                         $data = [];
@@ -87,6 +89,42 @@ final class ProcessImportJob implements ShouldQueue
             $logger->logFailed($this->importId, $this->format, $exception);
 
             throw $exception;
+        }
+    }
+
+    /**
+     * Guard against a missing required-mapping header. Reads only the first
+     * row's keys (the reader yields rows keyed by header) so this stays a
+     * cheap, streaming-friendly check — an empty file (no rows at all) cannot
+     * be validated this way and is left to per-row rules.
+     *
+     * @param array<int, \Arqel\Import\ImportColumn> $columns
+     * @param iterable<int, array<string, mixed>> $rows
+     */
+    private function assertRequiredHeadersPresent(array $columns, iterable $rows): void
+    {
+        $requiredNames = [];
+        foreach ($columns as $column) {
+            if ($column->isMappingRequired()) {
+                $requiredNames[] = $column->getName();
+            }
+        }
+
+        if ($requiredNames === []) {
+            return;
+        }
+
+        foreach ($rows as $row) {
+            $missing = array_values(array_diff($requiredNames, array_keys($row)));
+            if ($missing !== []) {
+                throw new InvalidArgumentException(sprintf(
+                    'Source file [%s] is missing required header(s): %s.',
+                    $this->sourcePath,
+                    implode(', ', $missing),
+                ));
+            }
+
+            break;
         }
     }
 

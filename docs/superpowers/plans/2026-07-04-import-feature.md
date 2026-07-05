@@ -1085,9 +1085,14 @@ it('imports valid rows and skips invalid ones into a failed-rows CSV', function 
 });
 
 it('reports progress and completion counts to the logger', function (): void {
-    $spy = new class extends NullImportLogger {
+    // NOTE: implement the interface directly — NullImportLogger is `final`
+    // (Task 7) and cannot be extended. The two irrelevant lifecycle methods
+    // are no-ops here.
+    $spy = new class implements ImportLogger {
         public array $progressCalls = [];
         public array $completed = [];
+        public function logQueued(string $importId, ImportFormat $format): void {}
+        public function logFailed(string $importId, ImportFormat $format, Throwable $exception): void {}
         public function progress(string $importId, int $imported, int $skipped): void
         {
             $this->progressCalls[] = [$imported, $skipped];

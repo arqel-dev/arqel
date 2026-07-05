@@ -2,9 +2,10 @@
 
 > **Documento vivo.** Gap analysis acionável rumo à v1.0.0 estável.
 > Base: v0.15.1 (publicado 2026-07-04). Atualizado por rodadas do loop de qualidade.
-> Última atualização: 2026-07-05 (rodada 2).
+> Última atualização: 2026-07-05 (rodada 3).
 
 > **Changelog do documento**
+> - **Rodada 3 (2026-07-05):** Imports (CSV/XLSX) **entregue** — pacote `arqel/import` mergeado (PR #346 → HAVE). Milestone 0.17 concluído. Foco movido para 0.18 (Relation Managers). Lacuna competitiva #1 fechada.
 > - **Rodada 2 (2026-07-05):** Perfil de usuário fechado (PR #333 mergeado → HAVE); bug do gerador §2.3 corrigido (PR #342 mergeado); spec de Imports em revisão (PR #343). Milestone 0.16 concluído. Foco movido para 0.17 (Imports).
 > - **Rodada 1 (2026-07-04):** primeira passada de gap analysis.
 
@@ -28,7 +29,7 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 | **Notifications (database)** | 🟡 PARTIAL | Flash: `useFlash.ts:12`. **Database notifications: MISSING** (0 hits `DatabaseNotification`/`markAsRead`) | Flash OK. Falta o sino de notificações persistidas (read/unread). |
 | **Global search (registros cross-resource)** | 🟡 PARTIAL | `NavigationCommandProvider.php:19` (navega p/ resources); `ArqelIndexPage.tsx:15` (search intra-tabela) | Command palette navega para resources; busca é intra-tabela. Falta spotlight de *registros* cross-resource (`getGloballySearchableAttributes`). |
 | Bulk actions | ✅ HAVE | `BulkAction.php:16/26/33`; `Table.php:62` | Chunking + deselect. |
-| **Imports** | ❌ MISSING | 0 hits `Importer`/`ImportAction`/`make:import` | Export existe (CSV/XLSX/PDF async), Import não. Lacuna funcional mais visível. |
+| **Imports** | ✅ HAVE | `import/src/{Importer,ImportColumn,ImportAction}.php`; `Jobs/ProcessImportJob.php`; `Readers/{Csv,Xlsx}Reader.php` | **Fechado no PR #346** (pacote `arqel/import`, mergeado 2026-07-05). CSV/XLSX streaming, validação por-linha, transação por-chunk, failed-rows CSV, `ImportAction`. Sanitização anti-CSV-injection. |
 | Exports | ✅ HAVE | `ExportAction.php:48`; `Exporters/{Csv,Xlsx,Pdf}`; `Jobs/ProcessExportJob.php` | Robusto, async. |
 | Dashboards / Widgets | ✅ HAVE | `StatWidget.php`, `ChartWidget.php`, `TableWidget.php`, `CustomWidget.php`; `Dashboard.php`; filtros | Stats/charts/table/custom + dashboards com filtros. |
 | Multi-tenancy | ✅ HAVE | `TenantManager.php`; `TenantScope.php:25`; resolvers Subdomain/Path/Header/Session/AuthUser; `Panel.php:262` | Forte: múltiplos resolvers, scope automático, switching, features por tenant. |
@@ -41,7 +42,7 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 
 | # | Lacuna | Status | Peso p/ paridade | Nota |
 |---|--------|--------|------------------|------|
-| 1 | **Imports (CSV/Excel)** | MISSING → **spec em revisão (PR #343)** | Alto | Assimetria gritante com Export. Filament tem Importer 1ª classe (mapeamento de colunas + validação + jobs). Design spec de `arqel/import` aberta como PR #343 (milestone 0.17). |
+| 1 | ~~**Imports (CSV/Excel)**~~ | ✅ **FECHADO (PR #346)** | Alto | Mergeado 2026-07-05. Pacote `arqel/import` 1ª classe: CSV/XLSX, mapeamento por `ImportColumn`, validação, jobs async, failed-rows CSV. Paridade com Export atingida. |
 | 2 | **Relation Managers** | PARTIAL | Alto | Central para editar entidades relacionadas. Falta aba dedicada + BelongsToMany/MorphTo. |
 | 3 | ~~**Perfil/Conta de usuário**~~ | ✅ **FECHADO (PR #333)** | Médio-alto | Mergeado 2026-07-04. |
 | 4 | **Database Notifications UI** | PARTIAL | Médio | Sino read/unread. |
@@ -133,8 +134,8 @@ Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, 
 | Milestone | Escopo | Destrava |
 |-----------|--------|----------|
 | **0.16 — Perfil + gerador** ✅ **CONCLUÍDO** | ✅ PR #333 mergeado (perfil); ✅ bug do gerador corrigido (PR #342, `FieldFactory as Field` no template) | Table-stakes + release-blocker de API |
-| **0.17 — Imports** 🔜 spec em revisão (PR #343) | Importer 1ª classe (CSV/Excel, mapeamento, jobs async) | Lacuna competitiva #1 |
-| **0.18 — Relations** | Relation Manager + BelongsToMany/MorphTo | Lacuna competitiva #2 |
+| **0.17 — Imports** ✅ **CONCLUÍDO** | ✅ PR #346 mergeado — pacote `arqel/import` 1ª classe (CSV/XLSX, `ImportColumn`, jobs async, failed-rows CSV, anti-CSV-injection) | Lacuna competitiva #1 |
+| **0.18 — Relations** 🔜 **EM ANDAMENTO** | Relation Manager + BelongsToMany/MorphTo | Lacuna competitiva #2 |
 | **0.19 — Extensibilidade + Notifications** | Plugin API no Panel (`->plugin()`) + Database Notifications UI + Global Search de registros | Lacunas #4/#5/#6 |
 | **0.20 — API-freeze prep** | ADR-019 + resolver divergências B–H + doc `resources/*` + fechar tipos TS | Pré-requisito duro de 1.0 |
 | **0.9x — Hardening** | Cobertura fields-js/ui/react ao target; E2E auth/export/marketplace; piloto de produção | Confiança de estabilidade |
@@ -155,10 +156,15 @@ Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, 
 - 🔜 **0.17 iniciado:** design spec de `arqel/import` aberta como **PR #343** (docs). Aguarda revisão/aprovação antes da implementação.
 - ⏳ **ADR-019** segue pendente (0.20).
 
+### Rodada 3 — estado de execução
+- ✅ **Milestone 0.17 concluído:** pacote `arqel/import` implementado via subagent-driven-development (11 tasks TDD) e mergeado no **PR #346**. Review de branch inteira corrigiu 3 achados de segurança (CSV formula-injection nas failed-rows, instanciação de classe arbitrária via input, docblock IDOR). Lacuna competitiva #1 fechada — paridade Import/Export.
+- 🔜 **0.18 iniciado:** Relation Managers (lacuna competitiva #2).
+- ⏳ **ADR-019** segue pendente (0.20).
+
 ### Fila de trabalho derivada (prioridade por destravar 1.0)
 - ~~**0.16:** bug do gerador~~ ✅ / ~~Perfil~~ ✅ — **concluído**.
-- **0.17 (em andamento):** Imports 1ª classe — spec em revisão (PR #343) → implementação após aprovação.
-- **0.18:** Relation Managers + BelongsToMany/MorphTo.
+- ~~**0.17:** Imports 1ª classe~~ ✅ **concluído (PR #346)**.
+- **0.18 (em andamento):** Relation Managers + BelongsToMany/MorphTo.
 - **0.19:** Plugin API no Panel + Database Notifications + Global Search de registros.
 - **Contínuo:** cobertura de testes fields-js/ui/react; docs `resources/*` (DOCS-005); Layout/UX (Eixo C).
 - **0.20:** ADR-019 + resolver divergências B–H + fechar tipos TS.

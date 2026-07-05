@@ -55,9 +55,10 @@ final class CsvExporter implements Exporter
     public static function streamDownload(iterable $rows, array $columns, string $filename): StreamedResponse
     {
         $exporter = new self;
+        $safeName = self::sanitizeFilename($filename);
 
-        return new StreamedResponse(function () use ($exporter, $rows, $columns, $filename): void {
-            $writer = SimpleExcelWriter::streamDownload($filename)
+        return new StreamedResponse(function () use ($exporter, $rows, $columns, $safeName): void {
+            $writer = SimpleExcelWriter::streamDownload($safeName)
                 ->addHeader($exporter->headerLabels($columns));
 
             foreach ($rows as $record) {
@@ -67,8 +68,23 @@ final class CsvExporter implements Exporter
             $writer->close();
         }, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $safeName),
         ]);
+    }
+
+    /**
+     * Strip characters that could break out of the quoted `filename="..."`
+     * header value — double quotes and CR/LF (header injection / response
+     * splitting) — plus path separators, so an attacker-influenced export
+     * name cannot forge headers. Falls back to a safe default if nothing
+     * usable remains.
+     */
+    private static function sanitizeFilename(string $filename): string
+    {
+        $clean = preg_replace('/[\x00-\x1f"\\\\\/]+/', '', $filename) ?? '';
+        $clean = trim($clean);
+
+        return $clean === '' ? 'export.csv' : $clean;
     }
 
     /**
@@ -103,6 +119,14 @@ final class CsvExporter implements Exporter
      * @param array<string, mixed> $column
      */
     private function formatCell(mixed $record, array $column): string
+    {
+        return $this->sanitizeForCsv($this->resolveCellValue($record, $column));
+    }
+
+    /**
+     * @param array<string, mixed> $column
+     */
+    private function resolveCellValue(mixed $record, array $column): string
     {
         $type = $column['type'] ?? null;
         $name = (string) ($column['name'] ?? '');
@@ -141,6 +165,26 @@ final class CsvExporter implements Exporter
                 : ($value === null ? '' : (string) $value),
             'boolean' => $this->formatBooleanCell($value),
             default => $value === null ? '' : (string) $value,
+        };
+    }
+
+    /**
+     * Neutralize CSV formula injection: a cell whose first character is one of
+     * `= + - @` or a control char (tab, CR, LF) is interpreted as a formula by
+     * Excel/Sheets. Prefixing an apostrophe forces the spreadsheet to treat the
+     * value as literal text. Erring toward over-escaping (e.g. a bare "-5")
+     * is deliberate — leaking a live formula is the worse failure. See OWASP
+     * "CSV Injection".
+     */
+    private function sanitizeForCsv(string $value): string
+    {
+        if ($value === '') {
+            return $value;
+        }
+
+        return match ($value[0]) {
+            '=', '+', '-', '@', "\t", "\r", "\n" => "'".$value,
+            default => $value,
         };
     }
 }

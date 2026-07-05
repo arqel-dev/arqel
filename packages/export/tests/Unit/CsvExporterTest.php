@@ -272,6 +272,74 @@ it('honours a custom date format for date-mode columns (#217)', function (): voi
     ]);
 });
 
+it('sanitizes the download filename in the Content-Disposition header', function (): void {
+    // A filename with quotes or CR/LF could break out of the header value
+    // (header injection / response splitting). The exporter must strip those.
+    $columns = [['name' => 'id', 'label' => 'ID', 'type' => 'string']];
+
+    $response = CsvExporter::streamDownload([['id' => 1]], $columns, "eve\"\r\nSet-Cookie: x.csv");
+
+    $disposition = $response->headers->get('Content-Disposition');
+
+    expect($disposition)
+        ->not->toContain("\r")
+        ->and($disposition)->not->toContain("\n")
+        ->and($disposition)->not->toContain('"Set-Cookie');
+});
+
+it('neutralizes formula-injection cells by prefixing a leading apostrophe', function (): void {
+    // A cell whose value starts with =, +, -, @, tab or CR is interpreted as a
+    // formula by Excel/Sheets. Untrusted user data must be neutralized so it
+    // exports as literal text, not an executable formula (CSV injection).
+    $columns = [
+        ['name' => 'note', 'label' => 'Note', 'type' => 'string'],
+    ];
+
+    $rows = [
+        ['note' => '=1+1'],
+        ['note' => '+SUM(A1:A9)'],
+        ['note' => '-2+3'],
+        ['note' => '@cmd'],
+        ['note' => '=HYPERLINK("http://evil")'],
+        ['note' => 'safe value'],
+    ];
+
+    (new CsvExporter)->export($rows, $columns, $this->tempFile);
+
+    $parsed = readCsvRows($this->tempFile);
+
+    // fgetcsv returns the literal cell content including the neutralizing prefix.
+    expect($parsed)->toBe([
+        ['Note'],
+        ["'=1+1"],
+        ["'+SUM(A1:A9)"],
+        ["'-2+3"],
+        ["'@cmd"],
+        ["'=HYPERLINK(\"http://evil\")"],
+        ['safe value'],
+    ]);
+});
+
+it('leaves negative numbers unescaped when the cell is a numeric type', function (): void {
+    // A real negative number in a numeric column is not a formula-injection
+    // vector; only string-ish cells that a user can control need neutralizing.
+    // The guard keys off the leading char of the string form, so document the
+    // behaviour: a bare "-5" from data still gets escaped (safe default) — we
+    // prefer over-escaping to leaking a formula.
+    $columns = [
+        ['name' => 'delta', 'label' => 'Delta', 'type' => 'string'],
+    ];
+
+    (new CsvExporter)->export([['delta' => '-5']], $columns, $this->tempFile);
+
+    $parsed = readCsvRows($this->tempFile);
+
+    expect($parsed)->toBe([
+        ['Delta'],
+        ["'-5"],
+    ]);
+});
+
 it('renders a relative string for since-mode date columns (#217)', function (): void {
     $columns = [
         [

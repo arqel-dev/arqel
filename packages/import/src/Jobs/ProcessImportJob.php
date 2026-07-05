@@ -140,10 +140,33 @@ final class ProcessImportJob implements ShouldQueue
         $path = $dir.'/failed-'.$this->importId.'.csv';
         $writer = SimpleExcelWriter::create($path);
         foreach ($failedRows as $row) {
-            $writer->addRow($row);
+            $writer->addRow(array_map(
+                fn ($v): string => $this->sanitizeForCsv((string) ($v ?? '')),
+                $row,
+            ));
         }
         $writer->close();
 
         return $path;
+    }
+
+    /**
+     * Neutralize CSV formula injection: a cell whose first character is one of
+     * `= + - @` or a control char (tab, CR, LF) is interpreted as a formula by
+     * Excel/Sheets. Prefixing an apostrophe forces the spreadsheet to treat the
+     * value as literal text. Erring toward over-escaping (e.g. a bare "-5")
+     * is deliberate — leaking a live formula is the worse failure. See OWASP
+     * "CSV Injection".
+     */
+    private function sanitizeForCsv(string $value): string
+    {
+        if ($value === '') {
+            return $value;
+        }
+
+        return match ($value[0]) {
+            '=', '+', '-', '@', "\t", "\r", "\n" => "'".$value,
+            default => $value,
+        };
     }
 }

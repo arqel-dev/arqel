@@ -36,6 +36,19 @@ it('accepts a CSV upload and dispatches the import job', function (): void {
     Queue::assertPushed(ProcessImportJob::class);
 });
 
+it('rejects an importer class that does not extend Importer without instantiating or dispatching', function (): void {
+    Queue::fake();
+    $file = UploadedFile::fake()->createWithContent('users.csv', "name,email\nAda,ada@example.com\n");
+
+    $response = $this->actingAs(authedImportUser())->post(route('arqel.imports.upload'), [
+        'file' => $file,
+        'importer' => stdClass::class,
+    ]);
+
+    $response->assertStatus(422);
+    Queue::assertNothingPushed();
+});
+
 it('rejects an unsupported file extension', function (): void {
     Queue::fake();
     $file = UploadedFile::fake()->create('data.pdf', 10);

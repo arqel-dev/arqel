@@ -10,8 +10,12 @@ use Symfony\Component\HttpFoundation\Response;
  * Serves the failed-rows CSV produced by ProcessImportJob.
  *
  * Authorization: registered under `web + auth`; the `importId` route
- * constraint (`[a-f0-9-]+`) prevents path traversal. Consumer apps
- * SHOULD gate this with the same ability as the upload.
+ * constraint (`[a-f0-9-]+`) prevents path traversal. The failed-rows CSV
+ * may contain PII from the imported data and is NOT ownership-bound — any
+ * authenticated user who knows the (unguessable UUIDv4) importId can fetch
+ * it. Consumer apps MUST wrap this route with their own authorization
+ * (e.g. a `can:` middleware keyed to the import's owner), because the
+ * package has no knowledge of your ownership model.
  */
 final class FailedRowsDownloadController
 {

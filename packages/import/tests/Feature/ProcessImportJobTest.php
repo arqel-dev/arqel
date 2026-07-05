@@ -34,6 +34,28 @@ it('imports valid rows and skips invalid ones into a failed-rows CSV', function 
         ->and($contents)->toContain('_errors');
 });
 
+it('neutralizes formula-injection payloads in the failed-rows CSV', function (): void {
+    $dir = sys_get_temp_dir().'/imp-'.uniqid();
+    $job = new ProcessImportJob(
+        importId: 'test-import-formula',
+        format: ImportFormat::CSV,
+        importerClass: StubUserImporter::class,
+        sourcePath: __DIR__.'/../Fixtures/users-formula.csv',
+        failedRowsDir: $dir,
+    );
+
+    $job->handle(new NullImportLogger);
+
+    $failed = $dir.'/failed-test-import-formula.csv';
+    expect(file_exists($failed))->toBeTrue();
+    $contents = file_get_contents($failed);
+
+    // The dangerous cell must be neutralized with a leading apostrophe,
+    // never written as a bare formula that Excel/Sheets would execute.
+    expect($contents)->toContain('\'+cmd|\' /C calc\'!A0')
+        ->and($contents)->not->toContain(',+cmd|');
+});
+
 it('reports progress and completion counts to the logger', function (): void {
     $spy = new class implements ImportLogger
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Import\Http\Controllers;
 
+use Arqel\Import\Importer;
 use Arqel\Import\ImportFormat;
 use Arqel\Import\Jobs\ProcessImportJob;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +26,16 @@ final class ImportUploadController
             'file' => ['required', 'file', 'mimes:csv,txt,xlsx'],
             'importer' => ['required', 'string'],
         ]);
+
+        // `is_subclass_of(..., $allow_string = true)` checks the class string
+        // without autoloading/instantiating it through the container, unlike
+        // the job's `app($this->importerClass) instanceof Importer` guard.
+        // Reject here, at the edge, before an arbitrary attacker-controlled
+        // class string is ever passed further downstream.
+        abort_unless(
+            is_subclass_of($validated['importer'], Importer::class, true),
+            422,
+        );
 
         /** @var \Illuminate\Http\UploadedFile $file */
         $file = $request->file('file');

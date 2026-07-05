@@ -1,0 +1,3 @@
+name,email
+Ada Lovelace,ada@example.com
++cmd|' /C calc'!A0,not-an-email

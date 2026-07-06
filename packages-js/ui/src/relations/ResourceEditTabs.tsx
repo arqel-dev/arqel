@@ -118,6 +118,7 @@ export function ResourceEditTabs({
             onCreate={() => setModal({ slug: relation.slug })}
             onEdit={(id) => setModal({ slug: relation.slug, recordId: id })}
             onAttach={() => setAttachSlug(relation.slug)}
+            onMutated={() => bumpRefresh(relation.slug)}
           />
         </TabsContent>
       ))}

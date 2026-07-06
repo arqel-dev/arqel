@@ -93,7 +93,7 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     }).toPass();
 
     // Edit.
-    let editRow = commentsPanel.locator('table tbody tr', { hasText: newBody });
+    const editRow = commentsPanel.locator('table tbody tr', { hasText: newBody });
     await editRow.getByRole('button', { name: 'Edit' }).click();
     const editDialog = page.getByRole('dialog');
     await expect(editDialog).toBeVisible();
@@ -163,12 +163,15 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     // guaranteed). Read the currently-attached ids straight from the
     // relation's own fetch response rather than the rendered table (which
     // only exposes `name`, not `id`).
-    const currentRecords = await page.evaluate(async (args) => {
-      const res = await fetch(`/admin/posts/${args.postId}/relations/categories`, {
-        headers: { Accept: 'application/json' },
-      });
-      return (await res.json()) as { records: Array<{ id: number; name: string }> };
-    }, { postId });
+    const currentRecords = await page.evaluate(
+      async (args) => {
+        const res = await fetch(`/admin/posts/${args.postId}/relations/categories`, {
+          headers: { Accept: 'application/json' },
+        });
+        return (await res.json()) as { records: Array<{ id: number; name: string }> };
+      },
+      { postId },
+    );
     const attachedIds = new Set(currentRecords.records.map((r) => r.id));
     const candidateIds = Array.from({ length: 10 }, (_, i) => i + 1);
     const unattachedId = candidateIds.find((id) => !attachedIds.has(id));
@@ -192,12 +195,15 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     // it's a real persisted DB row and not a client-only optimistic artifact.
     await page.reload();
     await page.getByRole('tab', { name: 'Categories' }).click();
-    const reloadedRecords = await page.evaluate(async (args) => {
-      const res = await fetch(`/admin/posts/${args.postId}/relations/categories`, {
-        headers: { Accept: 'application/json' },
-      });
-      return (await res.json()) as { records: Array<{ id: number; name: string }> };
-    }, { postId });
+    const reloadedRecords = await page.evaluate(
+      async (args) => {
+        const res = await fetch(`/admin/posts/${args.postId}/relations/categories`, {
+          headers: { Accept: 'application/json' },
+        });
+        return (await res.json()) as { records: Array<{ id: number; name: string }> };
+      },
+      { postId },
+    );
     expect(reloadedRecords.records.some((r) => r.id === unattachedId)).toBe(true);
     expect(reloadedRecords.records.length).toBe(before + 1);
   });

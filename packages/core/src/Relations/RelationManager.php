@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Relations;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -87,5 +89,57 @@ abstract class RelationManager
     public function supportsAttach(Model $parent): bool
     {
         return $this->relationType($parent) === 'belongsToMany';
+    }
+
+    public function label(): string
+    {
+        return Str::headline($this->slug());
+    }
+
+    /**
+     * Compute the current user's abilities on the related model, gated by
+     * the related model's Policy. Fails open (true) when no Policy exists,
+     * matching ResourceController::authorize() semantics.
+     *
+     * @return array<string, bool>
+     */
+    public function abilities(Model $parent, ?Authenticatable $user): array
+    {
+        $related = $parent->{static::$relationship}()->getRelated();
+        $relatedClass = $related::class;
+        $canAttach = $this->supportsAttach($parent);
+
+        $check = function (string $ability) use ($user, $relatedClass): bool {
+            if (Gate::getPolicyFor($relatedClass) === null) {
+                return true; // fail-open: no policy registered
+            }
+
+            return Gate::forUser($user)->allows($ability, $relatedClass);
+        };
+
+        return [
+            'create' => $check('create'),
+            'update' => $check('update'),
+            'delete' => $check('delete'),
+            'attach' => $canAttach && $check('attach'),
+            'detach' => $canAttach && $check('detach'),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(Model $parent, ?Authenticatable $user = null): array
+    {
+        $table = $this->table();
+
+        return [
+            'slug' => $this->slug(),
+            'label' => $this->label(),
+            'type' => $this->relationType($parent),
+            'table' => method_exists($table, 'toArray') ? $table->toArray() : [],
+            'fields' => app(\Arqel\Core\Support\FieldSchemaSerializer::class)->serialize($this->fields(), null, $user),
+            'abilities' => $this->abilities($parent, $user),
+        ];
     }
 }

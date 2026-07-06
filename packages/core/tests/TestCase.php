@@ -41,4 +41,31 @@ abstract class TestCase extends Orchestra
         // requiring a `.env` file.
         $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
     }
+
+    /**
+     * Relation-manager fixtures (Task 4+): `rel_posts` (hasMany `comments`,
+     * belongsToMany `tags`), `rel_comments`, `rel_tags`, and the `rel_post_tag`
+     * pivot. Shared across `Relations/*` feature tests so each test does not
+     * have to redeclare the same four tables.
+     */
+    protected function defineDatabaseMigrations(): void
+    {
+        \Illuminate\Support\Facades\Schema::create('rel_posts', function ($t): void {
+            $t->increments('id');
+            $t->string('title')->nullable();
+        });
+        \Illuminate\Support\Facades\Schema::create('rel_comments', function ($t): void {
+            $t->increments('id');
+            $t->unsignedInteger('post_id');
+            $t->string('body')->nullable();
+        });
+        \Illuminate\Support\Facades\Schema::create('rel_tags', function ($t): void {
+            $t->increments('id');
+            $t->string('name')->nullable();
+        });
+        \Illuminate\Support\Facades\Schema::create('rel_post_tag', function ($t): void {
+            $t->unsignedInteger('post_id');
+            $t->unsignedInteger('tag_id');
+        });
+    }
 }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\Http\Controllers\RelationController;
 use Arqel\Core\Http\Controllers\ResourceController;
 use Illuminate\Support\Facades\Route;
 
@@ -107,4 +108,14 @@ Route::name('arqel.resources.')->group(function () use ($resourceSlugPattern): v
         ->where('resource', $resourceSlugPattern)
         ->where('action', '[a-z][a-z0-9_-]*')
         ->where('id', '[0-9a-zA-Z\-_]+');
+
+    // Relation manager: list a parent's related records, scoped to the
+    // parent (anti-IDOR) and authorized against the related model
+    // (Task 4 of docs/superpowers/plans/2026-07-06-relation-manager.md).
+    // `{relation}` is validated against the resource's declared
+    // RelationManager allowlist INSIDE the controller (404 otherwise) —
+    // the route itself imposes no allowlist on this segment.
+    Route::get('{resource}/{parent}/relations/{relation}', [RelationController::class, 'index'])
+        ->name('relations.index')
+        ->where('resource', $resourceSlugPattern);
 });

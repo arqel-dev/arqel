@@ -14,6 +14,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ### Security
 
 - **marketplace:** o `SecurityScanner` normaliza a severity dos advisories antes do rollup. Antes, uma severity fora do conjunto exato `low|medium|high|critical` (ex.: `HIGH` em maiúsculas ou `moderate` do GitHub Advisory DB) era ranqueada como 0 e descartada silenciosamente — um plugin com vulnerabilidade real de severity não-canônica passava a varredura como `passed` (e nunca disparava o auto-delist de `critical`). Agora a normalização é case-insensitive, reconhece aliases (`moderate→medium`, `severe/important/unknown→high`) e é fail-safe: uma severity não-reconhecida é tratada como `high` (flagada), nunca ignorada.
+- **ai:** os 5 endpoints de campo AI (`generate`/`translate`/`classify`/`extract`/`analyze-image`) agora autorizam por-resource. Antes só consultavam a Gate global `use-ai` (opt-in, allow-by-default) e nunca checavam a Policy do Resource — um usuário autenticado de baixo privilégio podia invocar AI em qualquer Resource restrito quando a Gate `use-ai` não estava registrada (o cenário default). Passaram a exigir a ability `viewAny` do Resource, no mesmo modo scaffold-safe do `ResourceController::authorize()` do core (só nega quando há gate/Policy registrada; apps sem nenhuma seguem permissivas).
 
 ### Fixed
 

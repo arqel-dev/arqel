@@ -1,6 +1,6 @@
 {
     "type": "hasMany",
-    "component": "HasManyTable",
+    "component": "HasManyReadonly",
     "name": "posts",
     "label": "Posts",
     "readonly": false,

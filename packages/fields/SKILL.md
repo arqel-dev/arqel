@@ -58,7 +58,7 @@ Todos registados no `FieldServiceProvider::packageBooted()` para que `FieldFacto
 | `multiSelect` | `MultiSelectField` | `MultiSelectInput` | `multiple=true`, `native=false` defaults |
 | `radio` | `RadioField` | `RadioInput` | `native=false` default |
 | `belongsTo` | `BelongsToField` | `BelongsToInput` | Factory `make($name, $resource)`. `searchable`/`preload`/`searchColumns` |
-| `hasMany` | `HasManyField` | `HasManyTable` | Readonly Phase 1; `canAdd`/`canEdit` forward-compat |
+| `hasMany` | `HasManyField` | `HasManyReadonly` | Readonly Phase 1; `canAdd`/`canEdit` forward-compat |
 | `date` | `DateField` | `DateInput` | `minDate`/`maxDate` (`string|Closure`), `format`/`displayFormat`/`timezone` |
 | `dateTime` | `DateTimeField` | `DateTimeInput` | Herda Date + `seconds(bool)` |
 | `file` | `FileField` | `FileInput` | `disk`/`directory`/`visibility`/`maxSize`/`acceptedFileTypes`/`multiple`/`reorderable`/`using(strategy)` |

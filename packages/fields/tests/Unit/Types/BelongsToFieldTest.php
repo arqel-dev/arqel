@@ -70,7 +70,7 @@ it('builds HasManyField via factory', function (): void {
     $field = HasManyField::make('posts', OtherStubResource::class);
 
     expect($field->getType())->toBe('hasMany')
-        ->and($field->getComponent())->toBe('HasManyTable')
+        ->and($field->getComponent())->toBe('HasManyReadonly')
         ->and($field->getRelatedResource())->toBe(OtherStubResource::class)
         ->and($field->getRelationshipName())->toBe('posts');
 });

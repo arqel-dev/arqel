@@ -6,6 +6,7 @@ namespace Arqel\Core\Support;
 
 use ArgumentCountError;
 use Arqel\Core\Panel\PanelRegistry;
+use Arqel\Core\Relations\RelationManager;
 use Arqel\Core\Resources\Resource;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -272,6 +273,7 @@ final class InertiaDataBuilder
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
             'fields' => $this->serializer->serialize($fields, $record, $user, $record, $resource::getSlug()),
+            'relations' => $this->serializeRelations($resource, $record, $user),
         ];
 
         if ($form !== null) {
@@ -279,6 +281,23 @@ final class InertiaDataBuilder
         }
 
         return $payload;
+    }
+
+    /**
+     * Serialise each declared RelationManager for `$resource` via its own
+     * `toArray($record, $user)` (Task 3), so the React edit page can render
+     * the relation-manager tabs (Task 8). `Resource::getRelations()` (Task 2)
+     * returns `[]` for a Resource without relation managers, so this is a
+     * purely additive prop: existing Resources get `relations => []`.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeRelations(Resource $resource, Model $record, ?Authenticatable $user): array
+    {
+        return collect($resource->getRelations())
+            ->map(fn (RelationManager $manager): array => $manager->toArray($record, $user))
+            ->values()
+            ->all();
     }
 
     /**

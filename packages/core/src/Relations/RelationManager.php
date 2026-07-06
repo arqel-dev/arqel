@@ -91,6 +91,18 @@ abstract class RelationManager
         return $this->relationType($parent) === 'belongsToMany';
     }
 
+    /**
+     * Pivot columns a client may set when attaching a belongsToMany record.
+     * Empty (default) = no client-supplied pivot data is accepted. This is
+     * an allowlist — anything not listed is dropped before attach().
+     *
+     * @return array<int, string>
+     */
+    public function pivotFields(): array
+    {
+        return [];
+    }
+
     public function label(): string
     {
         return Str::headline($this->slug());

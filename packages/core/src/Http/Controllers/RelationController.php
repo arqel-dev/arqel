@@ -60,7 +60,7 @@ final class RelationController
 
         $parentModel->{$manager::$relationship}()->create($validated);
 
-        return back()->with('success', 'arqel::relations.created');
+        return back()->with('success', (string) __('arqel::relations.created'));
     }
 
     public function edit(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
@@ -84,7 +84,7 @@ final class RelationController
         $validated = $request->validate($this->rulesFromFields($manager));
         $record->update($validated);
 
-        return back()->with('success', 'arqel::relations.updated');
+        return back()->with('success', (string) __('arqel::relations.updated'));
     }
 
     public function destroy(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
@@ -95,31 +95,50 @@ final class RelationController
 
         $record->delete();
 
-        return back()->with('success', 'arqel::relations.deleted');
+        return back()->with('success', (string) __('arqel::relations.deleted'));
     }
 
     public function attach(Request $request, string $resource, string|int $parent, string $relation): mixed
     {
         [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
         abort_unless($manager->supportsAttach($parentModel), Response::HTTP_METHOD_NOT_ALLOWED);
+        // Class-level authz is intentional here: the related record does not
+        // yet exist in this relation (that's the whole point of attach), so
+        // there is no specific record to pass to the Gate.
         $this->authorizeAttach('attach', 'create', $parentModel, $manager);
 
         $validated = $request->validate(['related' => ['required']]);
-        $pivot = $request->input('pivot', []);
-        $parentModel->{$manager::$relationship}()->attach($validated['related'], is_array($pivot) ? $pivot : []);
 
-        return back()->with('success', 'arqel::relations.attached');
+        // Mass-assignment guard: only pivot columns explicitly allowlisted
+        // via RelationManager::pivotFields() may be set by the client.
+        // Anything else is silently dropped rather than reaching attach().
+        $allowed = $manager->pivotFields();
+        $rawPivot = $request->input('pivot');
+        $pivot = $allowed === []
+            ? []
+            : array_intersect_key(
+                is_array($rawPivot) ? $rawPivot : [],
+                array_flip($allowed),
+            );
+
+        $parentModel->{$manager::$relationship}()->attach($validated['related'], $pivot);
+
+        return back()->with('success', (string) __('arqel::relations.attached'));
     }
 
     public function detach(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
     {
         [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
         abort_unless($manager->supportsAttach($parentModel), Response::HTTP_METHOD_NOT_ALLOWED);
-        $this->authorizeAttach('detach', 'delete', $parentModel, $manager);
+        // Record-level authz: unlike attach(), the related record IS already
+        // known here, so it is resolved (scoped to the parent — anti-IDOR)
+        // and passed to the Gate so record-level policies are enforceable.
+        $record = $this->findRelated($parentModel, $manager, $related);
+        $this->authorizeAttach('detach', 'delete', $parentModel, $manager, $record);
 
-        $parentModel->{$manager::$relationship}()->detach($related);
+        $parentModel->{$manager::$relationship}()->detach($record->getKey());
 
-        return back()->with('success', 'arqel::relations.detached');
+        return back()->with('success', (string) __('arqel::relations.detached'));
     }
 
     /**
@@ -224,8 +243,12 @@ final class RelationController
      * Attach/detach authz: try the bespoke ability first, fall back to the
      * CRUD ability, fail-open when neither a Gate rule nor a Policy exists
      * for either ability — matches `authorize()`'s two-tier semantics.
+     *
+     * `$record`, when given, is passed to the Gate INSTEAD of the related
+     * class so record-level Policies/rules are actually reachable (detach
+     * always has a record; attach never does — see call site comments).
      */
-    private function authorizeAttach(string $ability, string $fallback, Model $parentModel, RelationManager $manager): void
+    private function authorizeAttach(string $ability, string $fallback, Model $parentModel, RelationManager $manager, ?Model $record = null): void
     {
         $relatedClass = $parentModel->{$manager::$relationship}()->getRelated()::class;
 
@@ -234,7 +257,8 @@ final class RelationController
             return; // fail-open: no gate rule AND no policy registered
         }
 
-        $allowed = Gate::allows($ability, $relatedClass) || Gate::allows($fallback, $relatedClass);
+        $target = $record ?? $relatedClass;
+        $allowed = Gate::allows($ability, $target) || Gate::allows($fallback, $target);
         abort_unless($allowed, Response::HTTP_FORBIDDEN);
     }
 }

@@ -51,6 +51,19 @@ it('loads the widgets and palette chrome namespaces', function (): void {
         ->and($ptBr['palette']['placeholder'])->toBe('Digite um comando…');
 });
 
+it('loads the relations namespace so RelationController flashes are localized', function (): void {
+    $loader = app(TranslationLoader::class);
+
+    $en = $loader->loadForLocale('en');
+    $ptBr = $loader->loadForLocale('pt_BR');
+
+    expect($en)->toHaveKey('relations')
+        ->and($en['relations']['created'])->toBe('Related record created.')
+        ->and($en['relations']['attached'])->toBe('Record attached.')
+        ->and($ptBr['relations']['created'])->toBe('Registro relacionado criado.')
+        ->and($ptBr['relations']['attached'])->toBe('Registro anexado.');
+});
+
 it('falls back to the default locale when target locale is missing', function (): void {
     config()->set('arqel.i18n.default', 'en');
     $loader = app(TranslationLoader::class);

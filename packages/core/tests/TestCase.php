@@ -66,6 +66,13 @@ abstract class TestCase extends Orchestra
         \Illuminate\Support\Facades\Schema::create('rel_post_tag', function ($t): void {
             $t->unsignedInteger('post_id');
             $t->unsignedInteger('tag_id');
+            // Extra pivot columns used to prove the pivotFields() allowlist:
+            // `role`/`approved`/`anything` are NEVER declared allowed by any
+            // fixture manager (mass-assignment injection targets), while
+            // `note` IS declared allowed by NotableTagsRelationManager.
+            $t->string('role')->nullable();
+            $t->boolean('approved')->nullable();
+            $t->string('note')->nullable();
         });
     }
 }

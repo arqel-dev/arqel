@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arqel\Core\Tests\Fixtures\Models\RelPost;
 use Arqel\Core\Tests\Fixtures\Relations\CommentsRelationManager;
+use Illuminate\Support\Facades\Gate;
 
 it('serializes slug, label, type, table schema and abilities', function (): void {
     $array = (new CommentsRelationManager)->toArray(new RelPost, null);
@@ -28,4 +29,12 @@ it('never grants attach/detach for a non-belongsToMany relation', function (): v
 
     expect($abilities['attach'])->toBeFalse()
         ->and($abilities['detach'])->toBeFalse();
+});
+
+it('denies abilities when a closure gate (no Policy) rejects, matching ResourceController two-tier semantics', function (): void {
+    Gate::define('delete', fn (): bool => false);
+
+    $abilities = (new CommentsRelationManager)->abilities(new RelPost, null);
+
+    expect($abilities['delete'])->toBeFalse();
 });

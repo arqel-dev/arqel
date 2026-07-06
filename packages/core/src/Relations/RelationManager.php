@@ -98,8 +98,9 @@ abstract class RelationManager
 
     /**
      * Compute the current user's abilities on the related model, gated by
-     * the related model's Policy. Fails open (true) when no Policy exists,
-     * matching ResourceController::authorize() semantics.
+     * the related model's Gate rule and/or Policy. Fails open (true) only
+     * when neither a Gate rule nor a Policy exists, matching
+     * ResourceController::authorize()'s two-tier semantics.
      *
      * @return array<string, bool>
      */
@@ -110,8 +111,8 @@ abstract class RelationManager
         $canAttach = $this->supportsAttach($parent);
 
         $check = function (string $ability) use ($user, $relatedClass): bool {
-            if (Gate::getPolicyFor($relatedClass) === null) {
-                return true; // fail-open: no policy registered
+            if (! Gate::has($ability) && Gate::getPolicyFor($relatedClass) === null) {
+                return true; // fail-open: no gate rule AND no policy registered
             }
 
             return Gate::forUser($user)->allows($ability, $relatedClass);

@@ -19,6 +19,7 @@ use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Testing\TestResponse;
 
 function authedUser(): AuthUser
@@ -169,4 +170,51 @@ it('returns 422 (not 500) when the daily cost limit is exceeded (#205)', functio
 
     $response->assertStatus(422)
         ->assertJsonStructure(['message']);
+});
+
+it('denies the request with 403 when the resource viewAny ability forbids access', function (): void {
+    // Security regression: the AI endpoints only checked the global `use-ai`
+    // gate (opt-in, allow-by-default) and never authorized against the
+    // Resource's `viewAny` ability — a low-privilege authenticated user could
+    // invoke AI on any restricted Resource. Must mirror the core's
+    // per-resource authorization.
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FakeAiResource::class);
+    app()->instance(AiManager::class, new AiManager(['fake' => new FakeProvider('fake')]));
+
+    Gate::define('viewAny', static fn (mixed $user, mixed $subject = null): bool => false);
+
+    /** @var TestCase $this */
+    $response = postGenerate($this, 'ai-articles', 'summary', ['formData' => ['title' => 'Hello world']]);
+
+    $response->assertStatus(403);
+});
+
+it('allows the request when the resource viewAny ability grants access', function (): void {
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FakeAiResource::class);
+    app()->instance(AiManager::class, new AiManager(['fake' => new FakeProvider('fake')]));
+
+    Gate::define('viewAny', static fn (mixed $user, mixed $subject = null): bool => true);
+
+    /** @var TestCase $this */
+    $response = postGenerate($this, 'ai-articles', 'summary', ['formData' => ['title' => 'Hello world']]);
+
+    $response->assertOk();
+});
+
+it('allows the request in scaffold mode when no gate or policy exists', function (): void {
+    // "Hello World" usage must not break: with no gate and no Policy for the
+    // model, the request is permitted (mirrors ResourceController::authorize).
+    /** @var ResourceRegistry $registry */
+    $registry = app(ResourceRegistry::class);
+    $registry->register(FakeAiResource::class);
+    app()->instance(AiManager::class, new AiManager(['fake' => new FakeProvider('fake')]));
+
+    /** @var TestCase $this */
+    $response = postGenerate($this, 'ai-articles', 'summary', ['formData' => ['title' => 'Hello world']]);
+
+    $response->assertOk();
 });

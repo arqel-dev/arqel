@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arqel\Tenant\Resolvers;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
@@ -86,6 +87,42 @@ class AuthUserResolver extends AbstractTenantResolver
 
     protected function switchTargetColumn(): string
     {
+        return $this->foreignKeyColumn;
+    }
+
+    /**
+     * Persist the chosen tenant into the SAME column `resolve()` reads
+     * from. `resolve()` reads via the `currentTeam` relation, so a switch
+     * must write that relation's foreign key — otherwise the inherited
+     * {@see AbstractTenantResolver::switchTo()} wrote `current_tenant_id`,
+     * a column the relation never reads, and the switch was silently lost
+     * on the next request (mirrors the #81 fix in SessionResolver).
+     *
+     * When `currentTeam` is a `BelongsTo` its real foreign key is used
+     * (Jetstream's `current_team_id`, or any custom key); otherwise we
+     * fall back to the configured `foreignKeyColumn`.
+     */
+    public function switchTo(Authenticatable $user, Model $tenant): void
+    {
+        if (! $user instanceof Model) {
+            return;
+        }
+
+        $column = $this->resolveForeignKeyColumn($user);
+        $user->{$column} = $tenant->getKey();
+        $user->save();
+    }
+
+    private function resolveForeignKeyColumn(Model $user): string
+    {
+        if (method_exists($user, $this->relation)) {
+            $relation = $user->{$this->relation}();
+
+            if ($relation instanceof BelongsTo) {
+                return $relation->getForeignKeyName();
+            }
+        }
+
         return $this->foreignKeyColumn;
     }
 }

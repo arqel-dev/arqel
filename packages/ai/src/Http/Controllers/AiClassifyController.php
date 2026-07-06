@@ -8,10 +8,10 @@ use Arqel\Ai\Exceptions\AiException;
 use Arqel\Ai\Exceptions\DailyLimitExceeded;
 use Arqel\Ai\Exceptions\UserLimitExceeded;
 use Arqel\Ai\Fields\AiSelectField;
+use Arqel\Ai\Http\Controllers\Concerns\AuthorizesAiRequest;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Throwable;
 
 /**
@@ -24,11 +24,13 @@ use Throwable;
  */
 final class AiClassifyController
 {
+    use AuthorizesAiRequest;
+
     private const RESOURCE_REGISTRY = 'Arqel\\Core\\Resources\\ResourceRegistry';
 
     public function __invoke(Request $request, string $resource, string $field): JsonResponse
     {
-        if (Gate::has('use-ai') && ! Gate::allows('use-ai')) {
+        if (! $this->passesUseAiGate()) {
             return new JsonResponse(['message' => __('arqel::messages.ai.forbidden')], 403);
         }
 
@@ -62,6 +64,10 @@ final class AiClassifyController
             report($e);
 
             return new JsonResponse(['message' => __('arqel::messages.ai.field_resolution_failed')], 500);
+        }
+
+        if (method_exists($instance, 'getModel') && ! $this->authorizesResource($instance::getModel())) {
+            return new JsonResponse(['message' => __('arqel::messages.ai.forbidden')], 403);
         }
 
         $selectField = null;

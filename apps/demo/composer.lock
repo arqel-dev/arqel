@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "65f9f0a86cfd65823fb3bc37f709ddbb",
+    "content-hash": "a68f51ffb25bd34c2a4356e3944c90cb",
     "packages": [
         {
             "name": "arqel-dev/actions",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/actions",
-                "reference": "8731438d692f39b965f868eae302e4c89edd66cf"
+                "reference": "970c4875556bad4b065df2dd92c4ea08ba8f9b7b"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -84,11 +84,11 @@
         },
         {
             "name": "arqel-dev/auth",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/auth",
-                "reference": "9e08d3d80fcc55ef9ff772bc7d1bc3ddcccb6007"
+                "reference": "4216a652e8b9d63db8a3768a95a92fc1150c40e4"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -163,11 +163,11 @@
         },
         {
             "name": "arqel-dev/core",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/core",
-                "reference": "3cbac0c1587d67688950ecf5a91d3927aa9d5e14"
+                "reference": "3c62829cf892cfb4f0d570b37e3ba9d5f913f5d7"
             },
             "require": {
                 "inertiajs/inertia-laravel": "^3.0",
@@ -242,11 +242,11 @@
         },
         {
             "name": "arqel-dev/fields",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/fields",
-                "reference": "992b53945bbf970899b2abc3a45b6dfba372f309"
+                "reference": "21a38909a0269e454638c65c081803cf95a54a6c"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -317,11 +317,11 @@
         },
         {
             "name": "arqel-dev/form",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/form",
-                "reference": "9d19350685a9e036598679a2c30603106d930061"
+                "reference": "091b5989affaa68259c7aeda4b14c270cc5df8d2"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -392,11 +392,11 @@
         },
         {
             "name": "arqel-dev/framework",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/arqel",
-                "reference": "f476c4f9e2c50b6b69b596e4dab249db08b852da"
+                "reference": "933d0e87cc33d6fc96c87d552bd7db31bef2ce33"
             },
             "require": {
                 "arqel-dev/actions": "self.version",
@@ -444,11 +444,11 @@
         },
         {
             "name": "arqel-dev/nav",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/nav",
-                "reference": "e8d231123bf5684eb21aaa30d3bc6c5828dd39ac"
+                "reference": "9819347c0bf4acbe32506d09748684ae6d70e771"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -520,11 +520,11 @@
         },
         {
             "name": "arqel-dev/table",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/table",
-                "reference": "a44c64da144a626e3e39d7a955e187a27d48fd1e"
+                "reference": "68e94e2c9404918e82dfaea0bbd8d87410212fbb"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -595,11 +595,11 @@
         },
         {
             "name": "arqel-dev/widgets",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/widgets",
-                "reference": "054a80819c5ea87dcfff655df285b88e8020f400"
+                "reference": "e16aa93a0d99c703b4c94221b1f328cb662d1c87"
             },
             "require": {
                 "arqel-dev/core": "@dev",
@@ -9086,5 +9086,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

@@ -2,9 +2,10 @@
 
 > **Documento vivo.** Gap analysis acionável rumo à v1.0.0 estável.
 > Base: v0.15.1 (publicado 2026-07-04). Atualizado por rodadas do loop de qualidade.
-> Última atualização: 2026-07-05 (rodada 3).
+> Última atualização: 2026-07-06 (rodada 4).
 
 > **Changelog do documento**
+> - **Rodada 4 (2026-07-06):** **Relation Managers ENTREGUE** (milestone 0.18) — `RelationManager` + `Resource::relations()` + `RelationController` (8 endpoints) + React (`ResourceEditTabs`/`RelationManagerPanel`/modais) + dogfood + E2E. CRUD para HasMany/MorphMany, attach/detach para BelongsToMany; MorphTo/HasManyThrough deferidos a 0.18b. Lacuna competitiva #2 fechada → HAVE. Foco movido para 0.19 (Extensibilidade + Notifications).
 > - **Rodada 3 (2026-07-05):** **Imports ENTREGUE** (`arqel/import`, PR #346 feature + PR #349 hardening de 3 bugs). Lacuna competitiva #1 fechada → HAVE. Milestone 0.17 concluído. Foco movido para 0.18 (Relation Managers).
 > - **Rodada 2 (2026-07-05):** Perfil de usuário fechado (PR #333 mergeado → HAVE); bug do gerador §2.3 corrigido (PR #342 mergeado); spec de Imports em revisão (PR #343). Milestone 0.16 concluído. Foco movido para 0.17 (Imports).
 > - **Rodada 1 (2026-07-04):** primeira passada de gap analysis.
@@ -24,7 +25,7 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 | Auth (login/logout/guards/painel protegido) | ✅ HAVE | `packages/auth/src/Routes.php:38`; `Panel.php:255` `authGuard()`; `EnsureUserCanAccessPanel.php` | Login, register, verify-email, reset-password, guard configurável. Skipa se host já tem rota `login` (Breeze/Fortify). |
 | **Perfil/Conta de usuário** | ✅ HAVE | `Panel::profile()`/`profileEnabled()` gate; `ProfileController`; `Routes::registerProfile`; `UserMenu` dropdown (tema movido do Topbar); FormRequests name/email + password; i18n en+pt_BR | **Fechado no PR #333** (mergeado `61e0a11`, 2026-07-04). Opt-in via `Panel::profile()`. |
 | Resources CRUD | ✅ HAVE | `ResourceController.php:49-115`; `Resource.php:307/332/393` | list/create/edit/view/delete com authz por ação. |
-| **Relations na UI** | 🟡 PARTIAL | `HasManyField.php:14` (inline); `BelongsToField.php`; **sem** RelationManager; **sem** BelongsToMany/MorphTo | Só HasMany inline + BelongsTo. Falta Relation Manager dedicado + BelongsToMany/MorphTo/HasManyThrough. |
+| **Relations na UI** | ✅ HAVE | `packages/core/src/Relations/RelationManager.php`; `RelationController.php` (8 endpoints); `packages-js/ui/src/relations/` (`ResourceEditTabs`, `RelationManagerPanel`, `RelationFormModal`, `AttachModal`) | **Fechado (milestone 0.18).** CRUD dedicado para HasMany/MorphMany + attach/detach para BelongsToMany, aba na página de edição, autz por Policy do model relacionado. `MorphTo`/`HasManyThrough` como RelationManager e os novos relation-*fields* ficam para 0.18b. |
 | RBAC / Policies | ✅ HAVE | `ArqelGate.php:43`; `PolicyDiscovery.php`; `ResourceController.php:62/71/101/111` | Gate/Policy por Resource e por Action. Falta só UI de gestão de roles (Filament também delega a plugin). |
 | **Notifications (database)** | 🟡 PARTIAL | Flash: `useFlash.ts:12`. **Database notifications: MISSING** (0 hits `DatabaseNotification`/`markAsRead`) | Flash OK. Falta o sino de notificações persistidas (read/unread). |
 | **Global search (registros cross-resource)** | 🟡 PARTIAL | `NavigationCommandProvider.php:19` (navega p/ resources); `ArqelIndexPage.tsx:15` (search intra-tabela) | Command palette navega para resources; busca é intra-tabela. Falta spotlight de *registros* cross-resource (`getGloballySearchableAttributes`). |
@@ -43,7 +44,7 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 | # | Lacuna | Status | Peso p/ paridade | Nota |
 |---|--------|--------|------------------|------|
 | 1 | ~~**Imports (CSV/Excel)**~~ | ✅ **FECHADO (PR #346 + #349)** | Alto | Pacote `arqel/import` entregue: Importer/ImportColumn/ProcessImportJob/ImportAction + controllers. Follow-ups (0.18+): ownership do download, `max:` filesize, serialização do ImportAction. |
-| 2 | **Relation Managers** | PARTIAL | Alto | Central para editar entidades relacionadas. Falta aba dedicada + BelongsToMany/MorphTo. |
+| 2 | ~~**Relation Managers**~~ | ✅ **FECHADO (milestone 0.18)** | Alto | Aba dedicada + CRUD HasMany/MorphMany + attach/detach BelongsToMany entregues. Follow-ups (0.18b): MorphTo/HasManyThrough como RelationManager, relation-*fields*, combobox pesquisável no AttachModal, UI de pivot fields. |
 | 3 | ~~**Perfil/Conta de usuário**~~ | ✅ **FECHADO (PR #333)** | Médio-alto | Mergeado 2026-07-04. |
 | 4 | **Database Notifications UI** | PARTIAL | Médio | Sino read/unread. |
 | 5 | **Plugin API no Panel** | PARTIAL | Médio-alto | Diferencial-chave do Filament (extensibilidade in-code). |
@@ -135,7 +136,7 @@ Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, 
 |-----------|--------|----------|
 | **0.16 — Perfil + gerador** ✅ **CONCLUÍDO** | ✅ PR #333 mergeado (perfil); ✅ bug do gerador corrigido (PR #342, `FieldFactory as Field` no template) | Table-stakes + release-blocker de API |
 | **0.17 — Imports** ✅ **CONCLUÍDO** | ✅ Pacote `arqel/import` (PR #346) + hardening de 3 bugs (PR #349) | Lacuna competitiva #1 |
-| **0.18 — Relations** | Relation Manager + BelongsToMany/MorphTo | Lacuna competitiva #2 |
+| **0.18 — Relations** ✅ **CONCLUÍDO** | ✅ `RelationManager` + `Resource::relations()` + `RelationController` (8 endpoints) + UI React em abas; CRUD HasMany/MorphMany + attach/detach BelongsToMany | Lacuna competitiva #2 |
 | **0.19 — Extensibilidade + Notifications** | Plugin API no Panel (`->plugin()`) + Database Notifications UI + Global Search de registros | Lacunas #4/#5/#6 |
 | **0.20 — API-freeze prep** | ADR-019 + resolver divergências B–H + doc `resources/*` + fechar tipos TS | Pré-requisito duro de 1.0 |
 | **0.9x — Hardening** | Cobertura fields-js/ui/react ao target; E2E auth/export/marketplace; piloto de produção | Confiança de estabilidade |
@@ -151,6 +152,10 @@ Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, 
 3. ✅ **Must-haves para 1.0** — decisão: **TODAS as 4 lacunas são must-have**: Imports (CSV/Excel), Relation Managers, Plugin API no Panel, Database Notifications + Global Search. (Milestones 0.17–0.19.)
 4. ⏳ **ADR-019** (freeze + SemVer) + reescrita do critério de versionamento — pendente, milestone 0.20.
 
+### Rodada 4 — estado de execução
+- ✅ **Milestone 0.18 CONCLUÍDO:** Relation Managers entregues — `RelationManager` abstract (detecção de tipo hasMany/morphMany/belongsToMany, `pivotFields()` allowlist, `abilities()` fail-open de duas camadas) + `Resource::relations()` (default `[]`, zero regressão) + `RelationController` genérico com os 8 endpoints (index/create/store/edit/update/destroy/attach/detach), `{relation}` allowlisted (404) e `{related}` sempre escopado ao pai (anti-IDOR), attach/detach só em BelongsToMany (405 caso contrário). React: `ResourceEditTabs` (abas + `?tab=` na URL) + `RelationManagerPanel` + `RelationFormModal`/`AttachModal`. Dogfood no showcase + E2E Playwright. Follow-ups explícitos para 0.18b: MorphTo/HasManyThrough como RelationManager, novos relation-*fields*, combobox pesquisável no AttachModal (hoje input de id simples — `BelongsToInput` não é reusável sem dep circular `fields→ui`), UI de pivot fields (hoje `AttachModal` sempre envia `pivot: {}`), gate de fetch por tab-ativa (hoje eager no mount via Radix `TabsContent`), toast de erro em refetch silencioso pós-mutação.
+- **Próximo:** 0.19 (Plugin API no Panel + Database Notifications UI + Global Search de registros).
+
 ### Rodada 3 — estado de execução
 - ✅ **Milestone 0.17 CONCLUÍDO:** pacote `arqel/import` entregue (PR #346) + hardening de 3 bugs vivos na main (PR #349: upload disk-root path, `.txt`→500, guard de header requiredMapping). Nota: o pacote foi implementado em paralelo por duas sessões do loop (#346 mergeado, #347 duplicado fechado); só os 3 fixes reais do review de #347 foram portados via #349.
 - ⏳ **ADR-019** segue pendente (0.20).
@@ -163,7 +168,7 @@ Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, 
 ### Fila de trabalho derivada (prioridade por destravar 1.0)
 - ~~**0.16:** gerador ✅ / Perfil ✅~~ — **concluído**.
 - ~~**0.17:** Imports 1ª classe~~ ✅ **CONCLUÍDO** (PR #346 + #349). Follow-ups: ownership do download, `max:` filesize, serialização do ImportAction.
-- **0.18 (próximo):** Relation Managers + BelongsToMany/MorphTo.
-- **0.19:** Plugin API no Panel + Database Notifications + Global Search de registros.
+- ~~**0.18:** Relation Managers~~ ✅ **CONCLUÍDO**. Follow-ups (0.18b): MorphTo/HasManyThrough, relation-*fields*, combobox pesquisável no AttachModal, UI de pivot fields, gate de fetch por tab-ativa, toast de erro em refetch.
+- **0.19 (próximo):** Plugin API no Panel + Database Notifications + Global Search de registros.
 - **Contínuo:** cobertura de testes fields-js/ui/react; docs `resources/*` (DOCS-005); Layout/UX (Eixo C).
 - **0.20:** ADR-019 + resolver divergências B–H + fechar tipos TS.

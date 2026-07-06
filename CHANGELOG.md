@@ -7,18 +7,34 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-07-06
+
+### Summary
+
+Release minor que entrega **Imports de 1ª classe** (o novo pacote `arqel/import`, fechando a lacuna competitiva #1 vs Filament/Nova), a **UI de conta de usuário** (dropdown `UserMenu` + página de Perfil opt-in), e uma safra de **correções de segurança** (marketplace scanner, endpoints AI, export CSV-injection, bulk actions). Sem breaking changes de API pública desde 0.15.1.
+
 ### Added
 
-- **import (novo pacote):** pipeline de importação CSV/XLSX 1ª classe — `Importer` com `ImportColumn` declarativo, validação por-linha, `ProcessImportJob` async com transação por-chunk, CSV de linhas falhadas para download, e `ImportAction`. Fecha a lacuna competitiva vs Filament/Nova (Export já existia).
+- **import (novo pacote):** pipeline de importação CSV/XLSX 1ª classe — `Importer` com `ImportColumn` declarativo, validação por-linha, `ProcessImportJob` async com transação por-chunk, CSV de linhas falhadas para download, e `ImportAction`. Fecha a lacuna competitiva vs Filament/Nova (Export já existia) (#346, #349).
+- **auth (UI de conta):** dropdown `UserMenu` no shell + página de Perfil opt-in (`Panel::profile()`) com edição de nome/e-mail e troca de senha (FormRequests dedicados), i18n en+pt_BR; o controle de tema migrou do Topbar para o `UserMenu` (#333).
 
 ### Security
 
-- **marketplace:** o `SecurityScanner` normaliza a severity dos advisories antes do rollup. Antes, uma severity fora do conjunto exato `low|medium|high|critical` (ex.: `HIGH` em maiúsculas ou `moderate` do GitHub Advisory DB) era ranqueada como 0 e descartada silenciosamente — um plugin com vulnerabilidade real de severity não-canônica passava a varredura como `passed` (e nunca disparava o auto-delist de `critical`). Agora a normalização é case-insensitive, reconhece aliases (`moderate→medium`, `severe/important/unknown→high`) e é fail-safe: uma severity não-reconhecida é tratada como `high` (flagada), nunca ignorada.
-- **ai:** os 5 endpoints de campo AI (`generate`/`translate`/`classify`/`extract`/`analyze-image`) agora autorizam por-resource. Antes só consultavam a Gate global `use-ai` (opt-in, allow-by-default) e nunca checavam a Policy do Resource — um usuário autenticado de baixo privilégio podia invocar AI em qualquer Resource restrito quando a Gate `use-ai` não estava registrada (o cenário default). Passaram a exigir a ability `viewAny` do Resource, no mesmo modo scaffold-safe do `ResourceController::authorize()` do core (só nega quando há gate/Policy registrada; apps sem nenhuma seguem permissivas).
+- **marketplace:** o `SecurityScanner` normaliza a severity dos advisories antes do rollup. Antes, uma severity fora do conjunto exato `low|medium|high|critical` (ex.: `HIGH` em maiúsculas ou `moderate` do GitHub Advisory DB) era ranqueada como 0 e descartada silenciosamente — um plugin com vulnerabilidade real de severity não-canônica passava a varredura como `passed` (e nunca disparava o auto-delist de `critical`). Agora a normalização é case-insensitive, reconhece aliases (`moderate→medium`, `severe/important/unknown→high`) e é fail-safe: uma severity não-reconhecida é tratada como `high` (flagada), nunca ignorada (#352).
+- **ai:** os 5 endpoints de campo AI (`generate`/`translate`/`classify`/`extract`/`analyze-image`) agora autorizam por-resource. Antes só consultavam a Gate global `use-ai` (opt-in, allow-by-default) e nunca checavam a Policy do Resource — um usuário autenticado de baixo privilégio podia invocar AI em qualquer Resource restrito quando a Gate `use-ai` não estava registrada (o cenário default). Passaram a exigir a ability `viewAny` do Resource, no mesmo modo scaffold-safe do `ResourceController::authorize()` do core (só nega quando há gate/Policy registrada; apps sem nenhuma seguem permissivas) (#354).
+- **export:** neutraliza CSV formula-injection (células iniciadas por `= + - @` ou caracteres de controle recebem prefixo de apóstrofo, OWASP) e sanitiza o nome do arquivo no `Content-Disposition` (#340).
+- **actions:** bulk actions passam a autorizar **por registro** em vez de sobre a seleção inteira — evita um `TypeError`/bypass quando o gate por-ação recebia a Collection no lugar de um Model (#341).
+- **deps:** limpeza de todos os 27 alertas do Dependabot (npm via `pnpm.overrides`, composer via bump dos pins das apps demo/tenant) (#337).
 
 ### Fixed
 
-- **tenant:** a troca de tenant com o `AuthUserResolver` (convenção Jetstream/Spark) agora persiste de verdade. O `resolve()` lê o tenant pela relação `currentTeam` (FK `current_team_id`), mas o `switchTo()` herdado gravava a coluna default `current_tenant_id` — que a relação nunca lê —, então a troca era perdida na próxima requisição. O `switchTo()` do `AuthUserResolver` passou a gravar a FK real da relação `currentTeam` (espelha a correção #81 do `SessionResolver`).
+- **core:** o gerador `arqel:resource` emite `use Arqel\Fields\FieldFactory as Field;` — antes o Resource gerado referenciava `Field::` sem o import e dava erro de classe indefinida ao carregar (#342).
+- **tenant:** a troca de tenant com o `AuthUserResolver` (convenção Jetstream/Spark) agora persiste de verdade. O `resolve()` lê o tenant pela relação `currentTeam` (FK `current_team_id`), mas o `switchTo()` herdado gravava a coluna default `current_tenant_id` — que a relação nunca lê —, então a troca era perdida na próxima requisição. O `switchTo()` do `AuthUserResolver` passou a gravar a FK real da relação `currentTeam` (espelha a correção #81 do `SessionResolver`) (#353).
+- **realtime:** `useYjsCollab().applyRemote` deixou de lançar em input malformado — o guard foi movido para dentro do método (retorna boolean) em vez de só nos call-sites internos (#338).
+
+### CI
+
+- bump de `actions/cache` 5 → 6 no grupo github-actions (#317).
 
 ## [0.15.1] - 2026-07-03
 
@@ -583,7 +599,9 @@ Primeiro release pós-MVP. Bump coordenado de todos os pacotes (`packages-js/*` 
 
 - _Sem entradas — primeira release tagueada._
 
-[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/arqel-dev/arqel/compare/v0.15.1...v0.16.0
+[0.15.1]: https://github.com/arqel-dev/arqel/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/arqel-dev/arqel/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/arqel-dev/arqel/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/arqel-dev/arqel/compare/v0.12.0...v0.13.0

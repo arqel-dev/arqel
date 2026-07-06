@@ -36,8 +36,9 @@ Introduz o contrato central. Deliverable: uma classe abstrata que declara a rela
 **Interfaces:**
 - Produces: `abstract class Arqel\Core\Relations\RelationManager` with:
   - `public static string $relationship;`
-  - `abstract public function table(): \Arqel\Table\Table;`
-  - `public function form(): ?\Arqel\Form\Form { return null; }`
+  - `abstract public function table(): mixed;` — returns a `Arqel\Table\Table`-shaped object. **Return type is `mixed`, NOT `Table`** — `arqel-dev/core` deliberately does not depend on `arqel-dev/table`/`arqel-dev/form` (would be a circular dep: table/form require core). This mirrors `Resource::table()`/`form()` which are `mixed` for the identical documented reason. The controller/serializer duck-types the result (calls `->toArray()`).
+  - `public function fields(): array { return []; }` — the field list for create/edit, **exactly like `Resource::fields()`**. This is the validation source: the `RelationController` extracts validation rules from these via the same `Arqel\Form\FieldRulesExtractor` (referenced by string + `class_exists` guard) that `ResourceController::extractRules()` uses on `Resource::effectiveFields()`. Returning `array` (not a concrete `Form`) keeps `core` dependency-free.
+  - `public function form(): mixed { return null; }` — optional Form-shaped object for richer layout; duck-typed. `fields()` remains the validation source even when `form()` is null.
   - `public function relatedResource(): ?string { return null; }`
   - `public function slug(): string` — derived from `$relationship` (snake, e.g. `comments`).
   - `public function relationType(\Illuminate\Database\Eloquent\Model $parent): string` — returns one of `'hasMany'|'morphMany'|'belongsToMany'` by inspecting `$parent->{$relationship}()` instanceof `HasMany`/`MorphMany`/`BelongsToMany`; throws `InvalidArgumentException` for unsupported types (MorphTo/HasManyThrough are out of scope).
@@ -132,15 +133,40 @@ declare(strict_types=1);
 namespace Arqel\Core\Tests\Fixtures\Relations;
 
 use Arqel\Core\Relations\RelationManager;
-use Arqel\Table\Table;
+use Arqel\Core\Tests\Fixtures\Relations\StubRelationTable;
 
 final class CommentsRelationManager extends RelationManager
 {
     public static string $relationship = 'comments';
 
-    public function table(): Table
+    public function table(): mixed
     {
-        return new Table;
+        return new StubRelationTable;
+    }
+}
+```
+
+Also create the duck-typed table stub `packages/core/tests/Fixtures/Relations/StubRelationTable.php` — `core` must NOT depend on `arqel-dev/table`, so tests use a stub that mirrors the Table shape (exactly the pattern `RowActionDispatchTest.php` already uses with its `StubTableWithActions`):
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Arqel\Core\Tests\Fixtures\Relations;
+
+/**
+ * Duck-typed stand-in for Arqel\Table\Table — mirrors the shape the
+ * RelationManager serializer relies on (`toArray()`), without a hard dep
+ * on arqel-dev/table (core stays dependency-free). Mirrors the existing
+ * StubTableWithActions pattern in RowActionDispatchTest.php.
+ */
+final class StubRelationTable
+{
+    /** @return array<string, mixed> */
+    public function toArray(): array
+    {
+        return ['columns' => []];
     }
 }
 ```
@@ -168,10 +194,13 @@ it('detects hasMany relation type from the parent', function (): void {
         ->and((new CommentsRelationManager)->supportsAttach(new RelPost))->toBeFalse();
 });
 
-it('exposes a Table and a null form by default', function (): void {
+it('exposes a table object and a null form by default', function (): void {
     $manager = new CommentsRelationManager;
 
-    expect($manager->table())->toBeInstanceOf(\Arqel\Table\Table::class)
+    // Duck-typed: core does not depend on arqel-dev/table, so we assert the
+    // shape (a toArray()-able object), not an instanceof Table.
+    expect($manager->table())->toBeObject()
+        ->and(method_exists($manager->table(), 'toArray'))->toBeTrue()
         ->and($manager->form())->toBeNull();
 });
 ```
@@ -192,8 +221,6 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Relations;
 
-use Arqel\Form\Form;
-use Arqel\Table\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -209,15 +236,35 @@ use InvalidArgumentException;
  * `form()`), and the relation type (hasMany/morphMany/belongsToMany) is
  * detected at runtime from the parent's relation instance. MorphTo and
  * HasManyThrough are intentionally out of scope for 0.18.
+ *
+ * `table()`/`form()` return `mixed` (a Table-/Form-shaped object) rather
+ * than concrete `Arqel\Table\Table`/`Arqel\Form\Form` types: `arqel-dev/core`
+ * deliberately does not depend on `arqel-dev/table`/`arqel-dev/form` (they
+ * depend on core — a hard type-hint would be a circular dependency). This
+ * mirrors `Resource::table()`/`form()`, which are `mixed` for the same
+ * documented reason. Consumers/serializers duck-type via `->toArray()`.
  */
 abstract class RelationManager
 {
     /** @var string Eloquent relation method name on the parent model. */
     public static string $relationship;
 
-    abstract public function table(): Table;
+    abstract public function table(): mixed;
 
-    public function form(): ?Form
+    /**
+     * Field list for create/edit — the validation source, exactly like
+     * `Resource::fields()`. The RelationController extracts rules from these
+     * via the same string-referenced FieldRulesExtractor the ResourceController
+     * uses, so `core` stays free of a hard dependency on arqel-dev/form.
+     *
+     * @return array<int, mixed>
+     */
+    public function fields(): array
+    {
+        return [];
+    }
+
+    public function form(): mixed
     {
         return null;
     }
@@ -440,7 +487,7 @@ Serializes a manager (slug, label, type, table/form schema, per-user abilities) 
 - Produces:
   - `public function label(): string` — defaults to a title-cased slug.
   - `public function abilities(Model $parent, ?Authenticatable $user): array` — `['create'=>bool,'update'=>bool,'delete'=>bool,'attach'=>bool,'detach'=>bool]`, each via `Gate::forUser($user)->allows($ability, $relatedModelClass)`; **fail-open** (true) when no Policy is registered for the related model, matching `ResourceController::authorize()`. `attach`/`detach` only ever true for belongsToMany.
-  - `public function toArray(Model $parent, ?Authenticatable $user = null): array` — `['slug','label','type','table','form','abilities']` where `table`=`$this->table()->toArray()`, `form`=`$this->form()?->toArray()`.
+  - `public function toArray(Model $parent, ?Authenticatable $user = null): array` — `['slug','label','type','table','fields','abilities']` where `table`=`$this->table()->toArray()` (duck-typed), and `fields`=serialized field schema for the create/edit modal via `Arqel\Core\Support\FieldSchemaSerializer::serialize($this->fields(), ...)` (the same serializer `ResourceController` uses — lives in `core`, no external dep). `fields` is `[]` when the manager declares none.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -461,7 +508,7 @@ it('serializes slug, label, type, table schema and abilities', function (): void
         ->and($array['label'])->toBe('Comments')
         ->and($array['type'])->toBe('hasMany')
         ->and($array['table'])->toBeArray()
-        ->and($array['form'])->toBeNull()
+        ->and($array['fields'])->toBeArray()
         ->and($array['abilities'])->toHaveKeys(['create', 'update', 'delete', 'attach', 'detach']);
 });
 
@@ -530,16 +577,20 @@ Add to `packages/core/src/Relations/RelationManager.php` (with imports `use Illu
      */
     public function toArray(Model $parent, ?Authenticatable $user = null): array
     {
+        $table = $this->table();
+
         return [
             'slug' => $this->slug(),
             'label' => $this->label(),
             'type' => $this->relationType($parent),
-            'table' => $this->table()->toArray(),
-            'form' => $this->form()?->toArray(),
+            'table' => method_exists($table, 'toArray') ? $table->toArray() : [],
+            'fields' => app(\Arqel\Core\Support\FieldSchemaSerializer::class)->serialize($this->fields(), null, $user),
             'abilities' => $this->abilities($parent, $user),
         ];
     }
 ```
+
+Note: confirm `FieldSchemaSerializer::serialize()`'s exact signature — it is `serialize(array $fields, ?Model $record = null, ?Authenticatable $user = null, ?Model $owner = null, ?string $resourceSlug = null)`. Pass `$this->fields()` and the user; the record is null for a create schema (edit passes the related record in Task 6). When `fields()` is empty, `serialize([])` returns `[]`. This is the SAME serializer the Resource edit page uses, so the React `FormRenderer` consumes an identical schema shape.
 
 Note: verify `Gate::getPolicyFor()` exists in the Laravel version (it does, on the Gate contract). If `attach`/`detach` abilities are not defined on a Policy but the Policy exists, `allows('attach', ...)` returns false — the plan's fallback to `create`/`delete` (spec §4) is applied at the controller layer (Task 6/7), not here; `abilities()` reports the literal `attach`/`detach` gate result for the UI.
 
@@ -753,27 +804,18 @@ Adds create (form schema for the modal) and store (persist a child, FK/morph inj
 **Files:**
 - Modify: `packages/core/src/Http/Controllers/RelationController.php` (add `create`, `store`)
 - Modify: `packages/core/routes/arqel.php` (create + store routes)
-- Modify: `packages/core/tests/Fixtures/Relations/CommentsRelationManager.php` (add a `form()` returning a Form with a `body` field)
+- Modify: `packages/core/tests/Fixtures/Relations/CommentsRelationManager.php` (add a `fields()` returning a field with a `body` text field, `required`)
 - Test: `packages/core/tests/Feature/Relations/RelationStoreTest.php`
 
 **Interfaces:**
-- Consumes: `resolve()`/`authorize()` (Task 4), `Form` (existing).
-- Produces: `create(...)` → route `arqel.resources.relations.create` (GET), returns form schema; `store(...)` → route `arqel.resources.relations.store` (POST), creates via `$parent->{relation}()->create($validated)`, returns redirect/JSON. Authorizes `create`.
+- Consumes: `resolve()`/`authorize()` (Task 4), `RelationManager::fields()` (Task 1).
+- Produces: `create(...)` → route `arqel.resources.relations.create` (GET), returns serialized field schema; `store(...)` → route `arqel.resources.relations.store` (POST), validates via the field-derived rules, creates via `$parent->{relation}()->create($validated)`, returns redirect. Authorizes `create`. Adds `private rulesFromFields(RelationManager $manager): array` mirroring `ResourceController::extractRules()` exactly (string-referenced `Arqel\Form\FieldRulesExtractor` + `class_exists` guard, over `$manager->fields()`).
 
-- [ ] **Step 1: Add a form to the fixture manager**
+- [ ] **Step 1: Add fields to the fixture manager**
 
-Modify `packages/core/tests/Fixtures/Relations/CommentsRelationManager.php` to add:
+Modify `packages/core/tests/Fixtures/Relations/CommentsRelationManager.php` to add a `fields()` returning a `body` text field marked required. **Mirror an existing Resource's `fields()` exactly** — read a real Resource fixture (or showcase Resource) to copy the field-builder API verbatim (the codebase convention is `use Arqel\Fields\FieldFactory as Field;` then `Field::text('body')->required()`). The fixture lives in `tests/`, so it MAY use `arqel-dev/fields`/`arqel-dev/form` if they are available to the core test suite; **confirm whether core's tests can resolve `Arqel\Fields\FieldFactory`** — if NOT (core stays dependency-free even in tests), instead return a minimal duck-typed field stub that the real `FieldRulesExtractor` can consume, OR (simpler) have the fixture's `fields()` return the already-extracted rule shape the test needs. Read how existing core feature tests that touch fields/validation set this up (e.g. any test asserting `assertSessionHasErrors`) and mirror that exact approach. Do NOT invent a field-builder API that core tests can't load.
 
-```php
-    public function form(): \Arqel\Form\Form
-    {
-        return \Arqel\Form\Form::make()->schema([
-            \Arqel\Fields\FieldFactory::text('body')->required(),
-        ]);
-    }
-```
-
-Note: confirm the exact Form schema + text-field API from an existing Resource's `form()` in the codebase (e.g. a showcase Resource) and mirror it — do not invent field-builder calls.
+Note: the goal of this fixture is only to make `store` validation testable. Whatever minimal, real mechanism the core test suite already uses to get a `required` rule onto a field is the one to copy.
 
 - [ ] **Step 2: Write the failing store test**
 
@@ -823,7 +865,9 @@ Add to `RelationController`:
         [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
         $this->authorize('create', $parentModel, $manager, null);
 
-        return response()->json(['form' => $manager->form()?->toArray()]);
+        return response()->json([
+            'fields' => app(\Arqel\Core\Support\FieldSchemaSerializer::class)->serialize($manager->fields(), null, $request->user()),
+        ]);
     }
 
     public function store(Request $request, string $resource, string|int $parent, string $relation): mixed
@@ -831,30 +875,49 @@ Add to `RelationController`:
         [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
         $this->authorize('create', $parentModel, $manager, null);
 
-        $rules = $this->rulesFromForm($manager);
-        $validated = $request->validate($rules);
+        $validated = $request->validate($this->rulesFromFields($manager));
 
         $parentModel->{$manager::$relationship}()->create($validated);
 
         return back()->with('success', 'arqel::relations.created');
     }
 
-    /** @return array<string, mixed> */
-    private function rulesFromForm(RelationManager $manager): array
+    /**
+     * Extract validation rules from the manager's fields via the SAME
+     * string-referenced FieldRulesExtractor that ResourceController::extractRules()
+     * uses — keeps `core` free of a hard dependency on arqel-dev/form.
+     *
+     * @return array<string, mixed>
+     */
+    private function rulesFromFields(RelationManager $manager): array
     {
-        $form = $manager->form();
-        if ($form === null) {
+        $extractorClass = 'Arqel\\Form\\FieldRulesExtractor';
+        if (! class_exists($extractorClass)) {
             return [];
         }
 
-        // Reuse the form's field validation-rule extraction. Mirror how
-        // ResourceController derives rules from a Form/fields (see its
-        // store()); use the same helper rather than re-deriving here.
-        return \Arqel\Core\Support\FieldRulesExtractor::fromForm($form); // confirm exact API
+        $extractor = (new \ReflectionClass($extractorClass))->newInstance();
+        if (! method_exists($extractor, 'extract')) {
+            return [];
+        }
+
+        $rules = $extractor->extract($manager->fields());
+        if (! is_array($rules)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach ($rules as $name => $set) {
+            if (is_string($name) && is_array($set)) {
+                $clean[$name] = $set;
+            }
+        }
+
+        return $clean;
     }
 ```
 
-Note: **critical** — do NOT invent rule extraction. Read `ResourceController::store()` to see exactly how it turns a Resource's form/fields into validation rules (the spec references `FieldRulesExtractor` / `effectiveFields`). Reuse that exact mechanism. If it operates on a Resource rather than a bare Form, adapt: the RelationManager's form fields must flow through the same extractor the Resource uses. Match reality.
+Note: this `rulesFromFields()` is a faithful copy of `ResourceController::extractRules()` (packages/core/src/Http/Controllers/ResourceController.php:1039) minus the fail-closed logging (a relation form is optional, so an absent extractor → no rules is acceptable here, matching a manager that declares no fields). Read `extractRules()` and keep the two consistent. Do NOT invent a `FieldRulesExtractor::fromForm()` — the real API is an instance `->extract(array $fields)`.
 
 - [ ] **Step 5: Register create + store routes**
 
@@ -896,7 +959,7 @@ Completes CRUD for the child record, all scoped to the parent.
 - Test: `packages/core/tests/Feature/Relations/RelationUpdateDestroyTest.php`
 
 **Interfaces:**
-- Consumes: `resolve()`/`authorize()`/`rulesFromForm()` (Tasks 4-5).
+- Consumes: `resolve()`/`authorize()`/`rulesFromFields()` (Tasks 4-5).
 - Produces: `edit`/`update`/`destroy`, routes `arqel.resources.relations.{edit,update,destroy}`. Each resolves the related record via `$parent->{relation}()->findOrFail($related)` (anti-IDOR). Authorizes `update`/`update`/`delete`.
 
 - [ ] **Step 1: Write the failing test**
@@ -960,7 +1023,10 @@ Add to `RelationController` (add a private helper to resolve the related record 
         $record = $this->findRelated($parentModel, $manager, $related);
         $this->authorize('update', $parentModel, $manager, $record);
 
-        return response()->json(['form' => $manager->form()?->toArray(), 'record' => $record->toArray()]);
+        return response()->json([
+            'fields' => app(\Arqel\Core\Support\FieldSchemaSerializer::class)->serialize($manager->fields(), $record, $request->user()),
+            'record' => $record->toArray(),
+        ]);
     }
 
     public function update(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
@@ -969,7 +1035,7 @@ Add to `RelationController` (add a private helper to resolve the related record 
         $record = $this->findRelated($parentModel, $manager, $related);
         $this->authorize('update', $parentModel, $manager, $record);
 
-        $validated = $request->validate($this->rulesFromForm($manager));
+        $validated = $request->validate($this->rulesFromFields($manager));
         $record->update($validated);
 
         return back()->with('success', 'arqel::relations.updated');
@@ -1049,15 +1115,15 @@ declare(strict_types=1);
 namespace Arqel\Core\Tests\Fixtures\Relations;
 
 use Arqel\Core\Relations\RelationManager;
-use Arqel\Table\Table;
+use Arqel\Core\Tests\Fixtures\Relations\StubRelationTable;
 
 final class TagsRelationManager extends RelationManager
 {
     public static string $relationship = 'tags';
 
-    public function table(): Table
+    public function table(): mixed
     {
-        return new Table;
+        return new StubRelationTable;
     }
 }
 ```
@@ -1317,7 +1383,7 @@ The first React unit: types for the serialized relation + a panel rendering the 
 
 **Interfaces:**
 - Consumes: existing `DataTable`, `TableToolbar` from `packages-js/ui/src/table/*`; `router` from `@inertiajs/react`.
-- Produces: `interface RelationManagerProps { slug: string; label: string; type: 'hasMany'|'morphMany'|'belongsToMany'; table: unknown; form: unknown|null; abilities: { create: boolean; update: boolean; delete: boolean; attach: boolean; detach: boolean } }`; `export function RelationManagerPanel(props: { relation: RelationManagerProps; parentSlug: string; parentId: string|number; records: unknown[]; onEdit(id): void; onCreate(): void; onAttach(): void })`.
+- Produces: `interface RelationManagerProps { slug: string; label: string; type: 'hasMany'|'morphMany'|'belongsToMany'; table: unknown; fields: unknown[]; abilities: { create: boolean; update: boolean; delete: boolean; attach: boolean; detach: boolean } }`; `export function RelationManagerPanel(props: { relation: RelationManagerProps; parentSlug: string; parentId: string|number; records: unknown[]; onEdit(id): void; onCreate(): void; onAttach(): void })`.
 
 - [ ] **Step 1: Add the type**
 
@@ -1337,7 +1403,7 @@ export interface RelationManagerProps {
   label: string;
   type: 'hasMany' | 'morphMany' | 'belongsToMany';
   table: unknown;
-  form: unknown | null;
+  fields: unknown[];
   abilities: RelationManagerAbilities;
 }
 ```
@@ -1361,7 +1427,7 @@ import { RelationManagerPanel } from '../../src/relations/RelationManagerPanel.j
 
 const base = {
   slug: 'comments', label: 'Comments', type: 'hasMany' as const,
-  table: {}, form: {}, abilities: { create: true, update: true, delete: true, attach: false, detach: false },
+  table: {}, fields: [], abilities: { create: true, update: true, delete: true, attach: false, detach: false },
 };
 
 describe('RelationManagerPanel', () => {
@@ -1492,7 +1558,7 @@ vi.mock('../../src/form/FormRenderer.js', () => ({
 
 import { RelationFormModal } from '../../src/relations/RelationFormModal.js';
 
-const relation = { slug: 'comments', label: 'Comments', type: 'hasMany' as const, table: {}, form: {}, abilities: { create: true, update: true, delete: true, attach: false, detach: false } };
+const relation = { slug: 'comments', label: 'Comments', type: 'hasMany' as const, table: {}, fields: [], abilities: { create: true, update: true, delete: true, attach: false, detach: false } };
 
 describe('RelationFormModal', () => {
   it('posts to the relation store route and reloads only relations on success', async () => {
@@ -1554,7 +1620,7 @@ export function RelationFormModal({ open, onClose, relation, parentSlug, parentI
 
   return (
     <Modal open={open} onClose={onClose} title={relation.label}>
-      <FormRenderer schema={relation.form} onSubmit={submit} />
+      <FormRenderer schema={relation.fields} onSubmit={submit} />
     </Modal>
   );
 }
@@ -1621,7 +1687,7 @@ describe('ResourceEditTabs', () => {
 
   it('renders a Data tab plus one tab per relation', () => {
     const relations = [
-      { slug: 'comments', label: 'Comments', type: 'hasMany' as const, table: {}, form: {}, abilities: { create: true, update: true, delete: true, attach: false, detach: false } },
+      { slug: 'comments', label: 'Comments', type: 'hasMany' as const, table: {}, fields: [], abilities: { create: true, update: true, delete: true, attach: false, detach: false } },
     ];
     render(<ResourceEditTabs relations={relations} parentSlug="rel-posts" parentId={1}><div>the-form</div></ResourceEditTabs>);
     expect(screen.getByRole('tab', { name: /dados|data/i })).toBeInTheDocument();

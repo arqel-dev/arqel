@@ -19,10 +19,12 @@
  * live behind `RelationController::index()`
  * (`GET {resource}/{parent}/relations/{relation}`), a plain JSON endpoint
  * (not an Inertia partial reload — it returns `{ records, table, abilities
- * }` directly), so each panel fetches its own records on mount via `fetch`.
- * This keeps `ResourceEditTabs` from needing to own a records cache itself;
- * a follow-up ticket can hoist this into a shared hook if multiple
- * consumers need the same relation's records.
+ * }` directly), so each `RelationManagerPanel` is self-fetching (mirrors
+ * `WidgetRenderer`'s `useEffect` + native `fetch()` pattern — see that
+ * panel's own docblock). This keeps `ResourceEditTabs` from needing to own
+ * a records cache itself; it only tracks a per-relation `refreshKey`
+ * counter, bumped after a modal's mutation succeeds, so the panel's effect
+ * re-runs and reloads the table without a full Inertia visit.
  *
  * Labels are a literal English fallback ("Data") rather than routed
  * through `useArqelTranslations`: that hook resolves its dictionary via
@@ -68,6 +70,14 @@ export function ResourceEditTabs({
   const [tab, setTab] = useState(() => initialTab(relations));
   const [modal, setModal] = useState<{ slug: string; recordId?: string | number } | null>(null);
   const [attachSlug, setAttachSlug] = useState<string | null>(null);
+  // Bumped per-slug after a create/edit/attach mutation succeeds, so the
+  // matching `RelationManagerPanel`'s fetch effect re-runs (see that
+  // component's docblock — records no longer arrive via an Inertia
+  // `relations` prop, so there is nothing left for a partial reload to
+  // refresh).
+  const [refreshKeys, setRefreshKeys] = useState<Record<string, number>>({});
+  const bumpRefresh = (slug: string) =>
+    setRefreshKeys((prev) => ({ ...prev, [slug]: (prev[slug] ?? 0) + 1 }));
 
   if (relations.length === 0) return <>{children}</>;
 
@@ -102,7 +112,9 @@ export function ResourceEditTabs({
             relation={relation}
             parentSlug={parentSlug}
             parentId={parentId}
+            basePath={basePath}
             records={[]}
+            refreshKey={refreshKeys[relation.slug] ?? 0}
             onCreate={() => setModal({ slug: relation.slug })}
             onEdit={(id) => setModal({ slug: relation.slug, recordId: id })}
             onAttach={() => setAttachSlug(relation.slug)}
@@ -117,6 +129,7 @@ export function ResourceEditTabs({
           parentSlug={parentSlug}
           parentId={parentId}
           basePath={basePath}
+          onSuccess={() => bumpRefresh(activeRelation.slug)}
           {...(modal.recordId !== undefined ? { recordId: modal.recordId } : {})}
         />
       )}
@@ -128,6 +141,7 @@ export function ResourceEditTabs({
           parentSlug={parentSlug}
           parentId={parentId}
           basePath={basePath}
+          onSuccess={() => bumpRefresh(attachRelation.slug)}
         />
       )}
     </Tabs>

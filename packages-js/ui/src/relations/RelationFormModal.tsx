@@ -5,9 +5,12 @@
  * `<ActionFormModal>` derives a `FormSchema` from a flat `ActionFormField[]`)
  * and submits via Inertia `router.post`/`router.put`.
  *
- * On success the parent's relation table is refreshed with a partial
- * reload (`only: ['relations']`) rather than a full page visit, and the
- * modal closes.
+ * On success the modal closes and calls `onSuccess` (if given) so the
+ * caller can refresh the relation's table — records now come from
+ * `RelationManagerPanel`'s own `fetch()` to `RelationController::index()`
+ * (Task 13a), not from an Inertia `relations` prop, so a partial reload
+ * would no longer do anything useful here; `ResourceEditTabs` uses
+ * `onSuccess` to bump that panel's `refreshKey`.
  */
 
 import { useArqelTranslations } from '@arqel-dev/react/utils';
@@ -29,6 +32,7 @@ export interface RelationFormModalProps {
   basePath?: string;
   recordId?: string | number;
   initialValues?: Record<string, unknown>;
+  onSuccess?: () => void;
 }
 
 export function RelationFormModal({
@@ -40,6 +44,7 @@ export function RelationFormModal({
   basePath = '/admin',
   recordId,
   initialValues = {},
+  onSuccess,
 }: RelationFormModalProps) {
   const t = useArqelTranslations();
   const [values, setValues] = useState<Record<string, unknown>>(initialValues);
@@ -75,7 +80,7 @@ export function RelationFormModal({
       preserveScroll: true,
       onSuccess: () => {
         setProcessing(false);
-        router.reload({ only: ['relations'] });
+        onSuccess?.();
         onClose();
       },
       onError: (formErrors: Record<string, string>) => {

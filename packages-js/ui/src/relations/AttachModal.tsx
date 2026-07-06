@@ -11,6 +11,10 @@
  * `{ related, pivot }` contract), so there's nothing to debounce-search
  * against yet. A follow-up ticket can upgrade this to a search combobox
  * once the server side emits `relation.attachSearchRoute` (or similar).
+ *
+ * On success the modal closes and calls `onSuccess` (if given) so the
+ * caller can refresh the relation's table — see `RelationFormModal`'s
+ * docblock for why a partial Inertia reload no longer applies (Task 13a).
  */
 
 import { useArqelTranslations } from '@arqel-dev/react/utils';
@@ -27,6 +31,7 @@ export interface AttachModalProps {
   parentSlug: string;
   parentId: string | number;
   basePath?: string;
+  onSuccess?: () => void;
 }
 
 export function AttachModal({
@@ -36,6 +41,7 @@ export function AttachModal({
   parentSlug,
   parentId,
   basePath = '/admin',
+  onSuccess,
 }: AttachModalProps) {
   const t = useArqelTranslations();
   const inputId = useId();
@@ -56,7 +62,7 @@ export function AttachModal({
         preserveScroll: true,
         onSuccess: () => {
           setProcessing(false);
-          router.reload({ only: ['relations'] });
+          onSuccess?.();
           onClose();
         },
         onError: (formErrors: Record<string, string>) => {

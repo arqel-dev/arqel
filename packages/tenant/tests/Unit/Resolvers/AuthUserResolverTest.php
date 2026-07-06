@@ -80,3 +80,45 @@ it('returns null when the resolved value is not an instance of the configured mo
     // Same class — works.
     expect($resolver->resolve(authUserRequestFor($user)))->toBeInstanceOf(Tenant::class);
 });
+
+/**
+ * Test user whose `currentTeam` is a real BelongsTo (Jetstream shape):
+ * the relation reads its foreign key `current_team_id` from the user row.
+ * `save()` is stubbed so the switch path never touches the database.
+ */
+class TestUserWithTeamRelation extends User
+{
+    protected $guarded = [];
+
+    public $timestamps = false;
+
+    public bool $saved = false;
+
+    public function currentTeam(): Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'current_team_id');
+    }
+
+    public function save(array $options = []): bool
+    {
+        $this->saved = true;
+
+        return true;
+    }
+}
+
+it('switchTo writes the foreign key that currentTeam actually reads, so the switch persists', function (): void {
+    // Regression: AuthUserResolver::resolve() reads via the `currentTeam`
+    // BelongsTo (fk `current_team_id`), but the inherited switchTo() wrote
+    // the default `current_tenant_id` column the relation never reads — the
+    // switch was lost on the next request. switchTo must write the SAME
+    // column the relation resolves from.
+    $tenantB = new Tenant(['id' => 42]);
+    $user = new TestUserWithTeamRelation;
+
+    $resolver = new AuthUserResolver(Tenant::class, 'id', 'currentTeam');
+    $resolver->switchTo($user, $tenantB);
+
+    expect($user->getAttribute('current_team_id'))->toBe(42)
+        ->and($user->saved)->toBeTrue();
+});

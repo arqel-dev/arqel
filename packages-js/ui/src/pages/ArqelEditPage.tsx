@@ -9,11 +9,13 @@ import { useArqelForm } from '@arqel-dev/hooks';
 import { useArqelTranslations } from '@arqel-dev/react/utils';
 import type { FieldSchema } from '@arqel-dev/types/fields';
 import type { FormSchema } from '@arqel-dev/types/forms';
+import type { RelationManagerProps } from '@arqel-dev/types/relations';
 import type { RecordType, ResourceEditProps } from '@arqel-dev/types/resources';
 import { router, usePage } from '@inertiajs/react';
 import type { FormEvent, JSX } from 'react';
 import { FormActions } from '../form/FormActions.js';
 import { FormRenderer } from '../form/FormRenderer.js';
+import { ResourceEditTabs } from '../relations/ResourceEditTabs.js';
 import { PageHeader } from '../utility/PageHeader.js';
 
 const FALLBACK_SCHEMA: FormSchema = {
@@ -38,6 +40,7 @@ export default function ArqelEditPage<TRecord extends RecordType = RecordType>()
   const fields = (props.fields ?? []) as FieldSchema[];
   const record = props.record;
   const schema = (props as unknown as { form?: FormSchema }).form ?? FALLBACK_SCHEMA;
+  const relations = (props.relations ?? []) as RelationManagerProps[];
 
   const form = useArqelForm({ fields, record }) as unknown as ArqelFormShape;
 
@@ -57,19 +60,30 @@ export default function ArqelEditPage<TRecord extends RecordType = RecordType>()
   const label = props.resource?.label ?? t('arqel.pages.fallback', 'record');
   const editTitle = props.recordTitle ?? t('arqel.pages.edit', `Edit ${label}`, { label });
 
+  const formContent = (
+    <form onSubmit={submit} className="space-y-6">
+      <FormRenderer
+        schema={schema}
+        fields={fields}
+        values={form.data}
+        onChange={(name, value) => form.setData(name, value)}
+        errors={form.errors}
+      />
+      <FormActions processing={form.processing} onCancel={() => window.history.back()} />
+    </form>
+  );
+
   return (
     <div className="space-y-6">
       <PageHeader title={editTitle} description={props.recordSubtitle ?? null} />
-      <form onSubmit={submit} className="space-y-6">
-        <FormRenderer
-          schema={schema}
-          fields={fields}
-          values={form.data}
-          onChange={(name, value) => form.setData(name, value)}
-          errors={form.errors}
-        />
-        <FormActions processing={form.processing} onCancel={() => window.history.back()} />
-      </form>
+      <ResourceEditTabs
+        relations={relations}
+        parentSlug={props.resource?.slug ?? ''}
+        parentId={(record as { id?: string | number } | undefined)?.id ?? ''}
+        basePath={props.resource?.panelPath ?? '/admin'}
+      >
+        {formContent}
+      </ResourceEditTabs>
     </div>
   );
 }

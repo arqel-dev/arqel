@@ -1,13 +1,14 @@
 import { expect, test } from './fixtures';
 
 /**
- * RelationManager (0.18) — PostResource declares two relation managers
+ * RelationManager (0.18 onwards) — PostResource declares two relation managers
  * (`App\Arqel\Relations\CommentsRelationManager` / `CategoriesRelationManager`),
  * both on real, seeded Eloquent relations:
  *   - `Post::comments()` is hasMany (1-3 seeded `Comment`s per post) — covers
- *     the create/edit/delete flow via `RelationFormModal`.
+ *     the create/edit/delete flow via `RelationFormModal` + per-row Delete button.
  *   - `Post::categories()` is belongsToMany (1-3 seeded `Category`s per post,
- *     pivot `category_post`) — covers the attach flow via `AttachModal`.
+ *     pivot `category_post`) — covers the attach flow via `AttachModal` + per-row
+ *     Detach button.
  *
  * UI notes (verified against source, not the running dogfood stack):
  *  - `ResourceEditTabs` renders a `role="tablist"` with a "Data" tab plus one
@@ -19,8 +20,14 @@ import { expect, test } from './fixtures';
  *    rather than assume a synchronous re-render.
  *  - Toolbar buttons are ability-gated plain `<Button>`s with literal text:
  *    "New" (create, both relations) and "Attach" (belongsToMany only,
- *    i.e. only on the Categories tab). Per-row "Edit" (ghost button) shows
- *    when `abilities.update` is true.
+ *    i.e. only on the Categories tab).
+ *  - Per-row actions (Edit/Delete/Detach) are ghost `<Button>`s rendered directly
+ *    in the table row (not in an Actions dropdown like the resource index) — Edit
+ *    shows when `abilities.update` is true; Delete shows for hasMany/morphMany
+ *    with `abilities.delete`; Detach shows for belongsToMany with `abilities.detach`.
+ *    Clicking Delete or Detach opens a `ConfirmDialog` — the mutation only fires
+ *    after the user clicks the confirm button (Delete for Delete action, Detach
+ *    for Detach action).
  *  - `RelationFormModal` is a shadcn `Dialog` (`role="dialog"`) whose title
  *    is the relation label ("Comments"); its single field renders as
  *    `[data-arqel-field="body"] textarea` (see `CommentsRelationManager`,
@@ -31,11 +38,6 @@ import { expect, test } from './fixtures';
  *    — NOT a search combobox (documented Phase-1 limitation in the
  *    component's own docblock) — so this spec looks up a real Category id
  *    via the API response before typing it in. Submit button reads "Attach".
- *  - There is currently NO visible "Detach" control in `RelationManagerPanel`
- *    (only the server-side `RelationController::detach()` endpoint exists;
- *    the React panel doesn't wire a per-row Detach action yet). Detach
- *    E2E coverage is therefore DEFERRED until that control ships — see the
- *    task report for details. This spec only covers attach.
  */
 test.describe('RelationManager (Post → Comments/Categories)', () => {
   test('opens a Post edit page and lists relation tabs', async ({ loggedInPage }) => {
@@ -91,8 +93,8 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     }).toPass();
 
     // Edit.
-    const newRow = commentsPanel.locator('table tbody tr', { hasText: newBody });
-    await newRow.getByRole('button', { name: 'Edit' }).click();
+    let editRow = commentsPanel.locator('table tbody tr', { hasText: newBody });
+    await editRow.getByRole('button', { name: 'Edit' }).click();
     const editDialog = page.getByRole('dialog');
     await expect(editDialog).toBeVisible();
 
@@ -105,51 +107,25 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
       await expect(commentsPanel.locator('table tbody tr', { hasText: editedBody })).toBeVisible();
     }).toPass();
 
-    // Delete via the RelationController DELETE endpoint. The panel does not
-    // (yet) render a per-row Delete button, so this exercises the server
-    // contract directly via an authenticated fetch from the page context,
-    // then confirms the panel reflects the removal on its next refetch
-    // (triggered here by reloading the tab).
-    const postIdMatch = page.url().match(/\/admin\/posts\/(\d+)\/edit/);
-    const postId = postIdMatch?.[1];
-    expect(postId).toBeTruthy();
+    // Delete via the per-row Delete button (Task 13c). The button is a ghost
+    // <Button> directly in the row (not in an Actions dropdown).
+    const newRow = commentsPanel.locator('table tbody tr', { hasText: editedBody });
+    await newRow.getByRole('button', { name: 'Delete' }).click();
 
-    const rowCells = await commentsPanel
-      .locator('table tbody tr', { hasText: editedBody })
-      .locator('td')
-      .allInnerTexts();
-    expect(rowCells.length).toBeGreaterThan(0);
+    // The ConfirmDialog appears with the delete action gated behind user
+    // confirmation. Assert the dialog is visible before confirming.
+    const confirmDialog = page.getByRole('dialog');
+    await expect(confirmDialog).toBeVisible();
+    await expect(confirmDialog.getByRole('button', { name: 'Delete' })).toBeVisible();
 
-    // Fetch the relation's current records to resolve the created comment's id.
-    const records = await page.evaluate(async (args) => {
-      const res = await fetch(`/admin/posts/${args.postId}/relations/comments`, {
-        headers: { Accept: 'application/json' },
-      });
-      return (await res.json()) as { records: Array<{ id: number; body: string }> };
-    }, { postId });
-    const target = records.records.find((r) => r.body === editedBody);
-    expect(target).toBeTruthy();
+    // Confirm the delete via the dialog's Delete button. The Inertia
+    // router.delete() fires, the row is removed from the relation table,
+    // and the panel refetches (bumped via onMutated callback).
+    await confirmDialog.getByRole('button', { name: 'Delete' }).click();
+    await expect(confirmDialog).not.toBeVisible();
 
-    await page.evaluate(
-      async (args) => {
-        const token = document
-          .querySelector('meta[name="csrf-token"]')
-          ?.getAttribute('content');
-        await fetch(`/admin/posts/${args.postId}/relations/comments/${args.id}`, {
-          method: 'DELETE',
-          headers: {
-            Accept: 'application/json',
-            'X-CSRF-TOKEN': token ?? '',
-          },
-        });
-      },
-      { postId, id: target?.id },
-    );
-
-    // Force the panel to refetch by switching tabs away and back.
-    await page.getByRole('tab', { name: 'Data' }).click();
-    await page.getByRole('tab', { name: 'Comments' }).click();
-
+    // The panel refetches after the delete succeeds; the deleted row should
+    // disappear and the count returns to the original 'before' count.
     await expect(async () => {
       await expect(commentsPanel.locator('table tbody tr', { hasText: editedBody })).toHaveCount(0);
       expect(await commentsPanel.locator('table tbody tr').count()).toBe(before);
@@ -224,5 +200,62 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     }, { postId });
     expect(reloadedRecords.records.some((r) => r.id === unattachedId)).toBe(true);
     expect(reloadedRecords.records.length).toBe(before + 1);
+  });
+
+  test('Categories tab: detach an attached category via per-row Detach button, row disappears', async ({
+    loggedInPage,
+  }) => {
+    const page = loggedInPage;
+    await page.goto('/admin/posts');
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+
+    await page.locator('table tbody tr').first().getByRole('button', { name: 'Actions' }).click();
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
+    await page.waitForURL(/\/admin\/posts\/\d+\/edit/);
+
+    const postIdMatch = page.url().match(/\/admin\/posts\/(\d+)\/edit/);
+    const postId = postIdMatch?.[1];
+    expect(postId).toBeTruthy();
+
+    await page.getByRole('tab', { name: 'Categories' }).click();
+    const categoriesPanel = page.getByRole('tabpanel', { name: 'Categories' });
+
+    await expect(async () => {
+      expect(await categoriesPanel.locator('table tbody tr').count()).toBeGreaterThan(0);
+    }).toPass();
+
+    const before = await categoriesPanel.locator('table tbody tr').count();
+
+    // Pick the first already-attached category row for detaching
+    // (the seeded post has 1-3 categories pre-attached).
+    const firstRow = categoriesPanel.locator('table tbody tr').first();
+    const firstCategoryName = await firstRow.locator('td:nth-child(2)').innerText();
+
+    // Click the per-row Detach button (Task 13c). The button is a ghost <Button>
+    // directly in the row.
+    await firstRow.getByRole('button', { name: 'Detach' }).click();
+
+    // The ConfirmDialog appears with the detach action gated behind user
+    // confirmation.
+    const confirmDialog = page.getByRole('dialog');
+    await expect(confirmDialog).toBeVisible();
+    await expect(confirmDialog.getByRole('button', { name: 'Detach' })).toBeVisible();
+
+    // Confirm the detach via the dialog's Detach button. The Inertia
+    // router.delete() fires to the `/detach` endpoint, the pivot row is removed,
+    // and the panel refetches.
+    await confirmDialog.getByRole('button', { name: 'Detach' }).click();
+    await expect(confirmDialog).not.toBeVisible();
+
+    // The panel refetches after the detach succeeds; the detached row should
+    // disappear from the relation table (the pivot is removed, though the
+    // Category record itself survives in the database).
+    await expect(async () => {
+      const afterCount = await categoriesPanel.locator('table tbody tr').count();
+      expect(afterCount).toBe(before - 1);
+      await expect(
+        categoriesPanel.locator('table tbody tr', { hasText: firstCategoryName }),
+      ).toHaveCount(0);
+    }).toPass();
   });
 });

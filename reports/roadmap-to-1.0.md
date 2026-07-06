@@ -1,17 +1,18 @@
 # Arqel — Roadmap to 1.0
 
 > **Documento vivo.** Gap analysis acionável rumo à v1.0.0 estável.
-> Base: v0.15.1 (publicado 2026-07-04). Atualizado por rodadas do loop de qualidade.
-> Última atualização: 2026-07-05 (rodada 3).
+> Base: **v0.16.0** (publicado 2026-07-06 — npm + Packagist). Atualizado por rodadas do loop de qualidade.
+> Última atualização: 2026-07-06 (rodada 4).
 
 > **Changelog do documento**
+> - **Rodada 4 (2026-07-06):** **v0.16.0 PUBLICADO** — minor release entregando Imports (`arqel/import`), UI de conta (UserMenu + Perfil, #333), e 4 fixes de segurança (marketplace SecurityScanner #352, autz por-resource dos endpoints AI #354, export CSV-injection #340, bulk-action authz #341). Milestones 0.16 (Perfil+gerador) e 0.17 (Imports) ambos entregues e publicados. 0.18 (Relation Managers) PAUSADO por coordenação de sessões paralelas (2 branches com spec/plano/código parcial preservadas). Próximo: continuar loop de qualidade (bug-hunt PHP em pacotes menos exercitados) + retomar 0.18 quando consolidado.
 > - **Rodada 3 (2026-07-05):** **Imports ENTREGUE** (`arqel/import`, PR #346 feature + PR #349 hardening de 3 bugs). Lacuna competitiva #1 fechada → HAVE. Milestone 0.17 concluído. Foco movido para 0.18 (Relation Managers).
 > - **Rodada 2 (2026-07-05):** Perfil de usuário fechado (PR #333 mergeado → HAVE); bug do gerador §2.3 corrigido (PR #342 mergeado); spec de Imports em revisão (PR #343). Milestone 0.16 concluído. Foco movido para 0.17 (Imports).
 > - **Rodada 1 (2026-07-04):** primeira passada de gap analysis.
 
 ## Nota de contexto crítica
 
-O roadmap canônico (`PLANNING/07-roadmap-fases.md:33`) define **v1.0.0 = fim da Fase 3**. Mas o código real já está em **v0.15.1** e **já embarca pacotes inteiros de Fase 2 e 3**: `tenant`, `audit`, `mcp`, `versioning`, `workflow`, `realtime`, `ai`, `marketplace`. O planejamento documentado está **dessincronizado do estado real** — o produto está bem além do que os docs de fase descrevem como pré-1.0.
+O roadmap canônico (`PLANNING/07-roadmap-fases.md:33`) define **v1.0.0 = fim da Fase 3**. Mas o código real já está em **v0.16.0** e **já embarca pacotes inteiros de Fase 2 e 3**: `tenant`, `audit`, `mcp`, `versioning`, `workflow`, `realtime`, `ai`, `marketplace`. O planejamento documentado está **dessincronizado do estado real** — o produto está bem além do que os docs de fase descrevem como pré-1.0.
 
 Implicação: o critério de versionamento precisa ser reescrito antes de comunicar 1.0, senão a promessa de SemVer nasce inconsistente. **O bloqueio para 1.0 não é arquitetura nem features de fase — é ergonomia de API pública + um ADR de freeze.**
 

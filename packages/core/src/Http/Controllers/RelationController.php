@@ -57,9 +57,20 @@ final class RelationController
             ? $records->toArray()
             : $records->map(fn (Model $record): array => $this->dataBuilder->applyColumnSerialization($record, $columns))->all();
 
+        // NOT a raw $table->toArray(): its 'columns' are unserialized Column
+        // objects, which JSON-encode to `{}` (no name/label) and crash the
+        // React DataTable (col.name undefined -> "Columns require an id
+        // when using an accessorFn"). serializeTableSchema() reuses the
+        // same callTableArray/serializeMany pipeline
+        // RelationManager::toArray() and the resource index use, so all
+        // three surfaces stay consistent.
+        $tableSchema = is_object($table) && method_exists($table, 'toArray')
+            ? $this->dataBuilder->serializeTableSchema($table, $request->user())
+            : [];
+
         return response()->json([
             'records' => $serializedRecords,
-            'table' => $manager->table()->toArray(),
+            'table' => $tableSchema,
             'abilities' => $manager->abilities($parentModel, $request->user()),
         ]);
     }

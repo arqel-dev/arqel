@@ -150,7 +150,17 @@ abstract class RelationManager
             'slug' => $this->slug(),
             'label' => $this->label(),
             'type' => $this->relationType($parent),
-            'table' => method_exists($table, 'toArray') ? $table->toArray() : [],
+            // NOT a raw $table->toArray(): Table::toArray()'s 'columns' are
+            // unserialized Column objects, which JSON-encode to `{}` (no
+            // name/label) and crash the React DataTable (col.name is
+            // undefined -> "Columns require an id when using an
+            // accessorFn"). serializeTableSchema() reuses the same
+            // callTableArray/serializeMany pipeline the resource index uses
+            // so each column/filter/action is run through its own
+            // toArray().
+            'table' => is_object($table) && method_exists($table, 'toArray')
+                ? app(\Arqel\Core\Support\InertiaDataBuilder::class)->serializeTableSchema($table, $user)
+                : [],
             'fields' => app(\Arqel\Core\Support\FieldSchemaSerializer::class)->serialize($this->fields(), null, $user),
             'abilities' => $this->abilities($parent, $user),
         ];

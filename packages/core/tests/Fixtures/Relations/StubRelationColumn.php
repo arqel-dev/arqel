@@ -34,4 +34,24 @@ final class StubRelationColumn
     {
         return $this->visible;
     }
+
+    /**
+     * Mirrors the shape of `Arqel\Table\Column::toArray()` (name/label at
+     * minimum) so tests exercising `InertiaDataBuilder::serializeTableSchema()`
+     * can assert the React `<DataTable>`'s required `col.name` survives
+     * serialization — the very thing a raw `$table->toArray()` (unserialized
+     * Column objects) fails to produce.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'label' => ucfirst($this->name),
+            'type' => 'text',
+            'sortable' => false,
+            'searchable' => false,
+        ];
+    }
 }

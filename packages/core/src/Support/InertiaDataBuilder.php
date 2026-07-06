@@ -235,6 +235,69 @@ final class InertiaDataBuilder
     }
 
     /**
+     * Serialize a Table-shaped object's SCHEMA (columns, filters, config,
+     * etc.) with each column/filter run through its own toArray() — the same
+     * pipeline the resource index uses. Use this instead of a raw
+     * $table->toArray(), whose 'columns' are unserialized Column objects
+     * (they JSON-encode to {} and crash the React DataTable, which needs
+     * col.name for the react-table column id).
+     *
+     * Reuses `callTableArray()` + `serializeMany()` — the exact private
+     * helpers `buildTableIndexData()` already uses for the resource index's
+     * `columns`/`filters`/`actions` keys — so both surfaces share one
+     * serialization pipeline rather than diverging. Unlike
+     * `buildTableIndexData()`, this method takes no `Resource` and emits no
+     * `records`/`pagination`: those helpers only thread a `Resource` through
+     * for action-shaped `toArray($user, $record, $resource)` calls
+     * (`callToArray()`), which gracefully accepts a null `$resource` (see
+     * that method's ArgumentCountError fallback), so the schema still
+     * serializes correctly without one. Relation managers have no
+     * `Resource` of their own, so callers here are not forced to construct
+     * a fake one.
+     *
+     * @return array<string, mixed>
+     */
+    public function serializeTableSchema(object $table, ?Authenticatable $user = null): array
+    {
+        return [
+            'columns' => $this->serializeMany($this->callTableArray($table, 'getColumns')),
+            'filters' => $this->serializeMany($this->callTableArray($table, 'getFilters')),
+            'actions' => [
+                'row' => $this->serializeMany($this->callTableArray($table, 'getActions'), $user),
+                'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions'), $user),
+                'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions'), $user),
+            ],
+            'config' => $this->callTableConfig($table),
+        ];
+    }
+
+    /**
+     * Extract the `config` sub-array a real `Arqel\Table\Table::toArray()`
+     * emits (defaultPerPage/perPageOptions/searchable/etc.), when the table
+     * exposes it via `toArray()`. Duck-typed and best-effort: a table
+     * without a `config` key (e.g. a bare stub in tests) contributes an
+     * empty array rather than failing, matching this class's existing
+     * fail-soft conventions for optional table facets.
+     *
+     * @return array<string, mixed>
+     */
+    private function callTableConfig(object $table): array
+    {
+        if (! method_exists($table, 'toArray')) {
+            return [];
+        }
+
+        $raw = $table->toArray();
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $config = $raw['config'] ?? [];
+
+        return is_array($config) ? $config : [];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function buildCreateData(Resource $resource, Request $request): array

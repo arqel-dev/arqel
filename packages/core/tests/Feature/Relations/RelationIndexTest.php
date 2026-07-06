@@ -90,6 +90,39 @@ it('redacts a canSee(fn => false)-gated column from the relation index payload',
         ->and($record['body'])->toBe('mine');
 });
 
+it('serializes the relation table columns with a name key, not empty {} objects', function (): void {
+    // Regression test for the E2E-diagnosed bug: RelationController::index()
+    // used to return $manager->table()->toArray()['columns'] raw —
+    // unserialized Column objects that JSON-encode to `{}` (no name/label)
+    // and crash the React <DataTable> (col.name undefined). Fixed via
+    // InertiaDataBuilder::serializeTableSchema(), the same pipeline
+    // RelationManager::toArray() now uses.
+    $post = RelPost::create(['title' => 'A']);
+    RelComment::create(['post_id' => $post->id, 'body' => 'mine', 'secret' => 'top-secret']);
+
+    $controller = app(RelationController::class);
+
+    $request = Request::create(route('arqel.resources.relations.index', [
+        'resource' => 'rel-posts', 'parent' => $post->id, 'relation' => 'comments',
+    ]));
+
+    $response = $controller->index($request, 'rel-posts', $post->id, 'comments');
+    $payload = $response->getData(true);
+
+    $columns = $payload['table']['columns'];
+
+    expect($columns)->toBeArray()->not->toBeEmpty();
+
+    foreach ($columns as $column) {
+        expect($column)->toBeArray()
+            ->and($column)->toHaveKey('name')
+            ->and($column['name'])->not->toBeNull()
+            ->and($column['name'])->not->toBe('');
+    }
+
+    expect(array_column($columns, 'name'))->toContain('body')->toContain('secret');
+});
+
 it('404s for a relation not in the resource allowlist', function (): void {
     $post = RelPost::create(['title' => 'A']);
 

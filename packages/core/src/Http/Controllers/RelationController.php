@@ -98,6 +98,30 @@ final class RelationController
         return back()->with('success', 'arqel::relations.deleted');
     }
 
+    public function attach(Request $request, string $resource, string|int $parent, string $relation): mixed
+    {
+        [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
+        abort_unless($manager->supportsAttach($parentModel), Response::HTTP_METHOD_NOT_ALLOWED);
+        $this->authorizeAttach('attach', 'create', $parentModel, $manager);
+
+        $validated = $request->validate(['related' => ['required']]);
+        $pivot = $request->input('pivot', []);
+        $parentModel->{$manager::$relationship}()->attach($validated['related'], is_array($pivot) ? $pivot : []);
+
+        return back()->with('success', 'arqel::relations.attached');
+    }
+
+    public function detach(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
+    {
+        [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
+        abort_unless($manager->supportsAttach($parentModel), Response::HTTP_METHOD_NOT_ALLOWED);
+        $this->authorizeAttach('detach', 'delete', $parentModel, $manager);
+
+        $parentModel->{$manager::$relationship}()->detach($related);
+
+        return back()->with('success', 'arqel::relations.detached');
+    }
+
     /**
      * Extract validation rules from the manager's fields via the SAME
      * string-referenced FieldRulesExtractor that ResourceController::extractRules()
@@ -194,5 +218,23 @@ final class RelationController
 
         $target = $related ?? $relatedClass;
         abort_if(Gate::denies($ability, $target), Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Attach/detach authz: try the bespoke ability first, fall back to the
+     * CRUD ability, fail-open when neither a Gate rule nor a Policy exists
+     * for either ability — matches `authorize()`'s two-tier semantics.
+     */
+    private function authorizeAttach(string $ability, string $fallback, Model $parentModel, RelationManager $manager): void
+    {
+        $relatedClass = $parentModel->{$manager::$relationship}()->getRelated()::class;
+
+        $hasRule = Gate::has($ability) || Gate::has($fallback) || Gate::getPolicyFor($relatedClass) !== null;
+        if (! $hasRule) {
+            return; // fail-open: no gate rule AND no policy registered
+        }
+
+        $allowed = Gate::allows($ability, $relatedClass) || Gate::allows($fallback, $relatedClass);
+        abort_unless($allowed, Response::HTTP_FORBIDDEN);
     }
 }

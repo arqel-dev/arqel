@@ -140,4 +140,25 @@ Route::name('arqel.resources.')->group(function () use ($resourceSlugPattern): v
     Route::delete('{resource}/{parent}/relations/{relation}/{related}', [RelationController::class, 'destroy'])
         ->name('relations.destroy')
         ->where('resource', $resourceSlugPattern);
+
+    // Relation manager: attach/detach a BelongsToMany pivot without
+    // creating/deleting the related record itself (Task 7 of
+    // docs/superpowers/plans/2026-07-06-relation-manager.md). 405 on a
+    // non-belongsToMany relation is enforced inside the controller via
+    // `RelationManager::supportsAttach()`.
+    //
+    // Route-ordering note: `attach`/`detach` add a literal trailing path
+    // segment (`/attach`, `/detach`) beyond `relations.store`'s
+    // `{resource}/{parent}/relations/{relation}` and
+    // `relations.update`/`destroy`'s `.../{relation}/{related}` shapes, so
+    // there is no wildcard-vs-literal ambiguity between them — but they are
+    // still registered here, after the other relation routes, so a literal
+    // segment never has a chance to be swallowed by an earlier `{related}`
+    // wildcard route of the same HTTP verb + path length.
+    Route::post('{resource}/{parent}/relations/{relation}/attach', [RelationController::class, 'attach'])
+        ->name('relations.attach')
+        ->where('resource', $resourceSlugPattern);
+    Route::delete('{resource}/{parent}/relations/{relation}/{related}/detach', [RelationController::class, 'detach'])
+        ->name('relations.detach')
+        ->where('resource', $resourceSlugPattern);
 });

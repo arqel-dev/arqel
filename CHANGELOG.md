@@ -11,6 +11,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 - **import (novo pacote):** pipeline de importação CSV/XLSX 1ª classe — `Importer` com `ImportColumn` declarativo, validação por-linha, `ProcessImportJob` async com transação por-chunk, CSV de linhas falhadas para download, e `ImportAction`. Fecha a lacuna competitiva vs Filament/Nova (Export já existia).
 
+### Security
+
+- **marketplace:** o `SecurityScanner` normaliza a severity dos advisories antes do rollup. Antes, uma severity fora do conjunto exato `low|medium|high|critical` (ex.: `HIGH` em maiúsculas ou `moderate` do GitHub Advisory DB) era ranqueada como 0 e descartada silenciosamente — um plugin com vulnerabilidade real de severity não-canônica passava a varredura como `passed` (e nunca disparava o auto-delist de `critical`). Agora a normalização é case-insensitive, reconhece aliases (`moderate→medium`, `severe/important/unknown→high`) e é fail-safe: uma severity não-reconhecida é tratada como `high` (flagada), nunca ignorada.
+
 ## [0.15.1] - 2026-07-03
 
 ### Summary

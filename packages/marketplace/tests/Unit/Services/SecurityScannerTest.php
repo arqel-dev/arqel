@@ -183,3 +183,43 @@ it('localizes the license allow-list warning summary with placeholder under pt_B
     $findings = $scan->findings ?? [];
     expect($findings[0]['summary'] ?? null)->toBe('A licença Proprietary não está na lista de permissões recomendada.');
 });
+
+it('normalizes case and vocabulary variants so advisories are not silently dropped', function (): void {
+    // Real sources (GitHub Advisory DB) emit UPPERCASE severities and use
+    // `moderate` for what the scanner calls `medium`. Before normalization
+    // these fell through `SEVERITY_RANK[$s] ?? 0`, were ranked 0, and were
+    // silently ignored — a security bypass.
+    $vulnDb = new FakeVulnerabilityDatabase([
+        'composer:acme/variants' => [
+            new Advisory('GHSA-up', 'HIGH', 'Uppercase high', '>=2.0.0'),
+            new Advisory('GHSA-mod', 'moderate', 'Moderate alias for medium', '>=1.5.0'),
+        ],
+    ]);
+    $scanner = new SecurityScanner($vulnDb);
+    $plugin = makeScanPlugin(['composer_package' => 'acme/variants']);
+
+    $scan = $scanner->scan($plugin);
+
+    // HIGH (rank 3) must win over moderate/medium (rank 2), and the rolled-up
+    // label must be the canonical lowercase form.
+    expect($scan->severity)->toBe('high');
+    expect($scan->status)->toBe('flagged');
+});
+
+it('fails safe on an unknown severity instead of silently passing', function (): void {
+    // A severity the scanner does not recognize must NOT be ranked 0 and
+    // dropped (which would report `passed` on a real vulnerability). It is
+    // treated conservatively as `high` so the plugin is flagged for review.
+    $vulnDb = new FakeVulnerabilityDatabase([
+        'composer:acme/unknown-sev' => [
+            new Advisory('GHSA-x', 'severe', 'Severity label the scanner has never seen', '>=1.0.0'),
+        ],
+    ]);
+    $scanner = new SecurityScanner($vulnDb);
+    $plugin = makeScanPlugin(['composer_package' => 'acme/unknown-sev']);
+
+    $scan = $scanner->scan($plugin);
+
+    expect($scan->status)->not->toBe('passed');
+    expect($scan->severity)->toBe('high');
+});

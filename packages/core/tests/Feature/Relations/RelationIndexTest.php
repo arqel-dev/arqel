@@ -56,6 +56,40 @@ it('lists only the parent record\'s related records', function (): void {
         ->and($bodies)->not->toContain('theirs');
 });
 
+it('redacts a canSee(fn => false)-gated column from the relation index payload', function (): void {
+    // Review finding I1: RelationController::index() used to return raw
+    // $related->get()->toArray(), bypassing InertiaDataBuilder's per-record
+    // canSee redaction (#182) entirely — a column that would be stripped on
+    // the equivalent resource index leaked through on the relation index.
+    // CommentsRelationManager::table() declares a `secret` column whose
+    // duck-typed `isVisibleFor()` always returns false (the `canSee(fn () =>
+    // false)` equivalent) and a `body` column that stays visible.
+    $post = RelPost::create(['title' => 'A']);
+    RelComment::create(['post_id' => $post->id, 'body' => 'mine', 'secret' => 'top-secret']);
+
+    $controller = app(RelationController::class);
+
+    $request = Request::create(route('arqel.resources.relations.index', [
+        'resource' => 'rel-posts', 'parent' => $post->id, 'relation' => 'comments',
+    ]));
+
+    $response = $controller->index($request, 'rel-posts', $post->id, 'comments');
+    $payload = $response->getData(true);
+
+    expect($payload['records'])->not->toBeEmpty();
+
+    $record = $payload['records'][0];
+
+    // The redacted column's key must be entirely absent from the payload —
+    // not merely null — so the value never reaches the client.
+    expect($record)->not->toHaveKey('secret');
+
+    // A normal (non-redacted) column's value must still come through, so
+    // this isn't over-redaction / a regression on plain attributes.
+    expect($record)->toHaveKey('body')
+        ->and($record['body'])->toBe('mine');
+});
+
 it('404s for a relation not in the resource allowlist', function (): void {
     $post = RelPost::create(['title' => 'A']);
 

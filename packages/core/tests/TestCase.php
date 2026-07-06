@@ -58,6 +58,11 @@ abstract class TestCase extends Orchestra
             $t->increments('id');
             $t->unsignedInteger('post_id');
             $t->string('body')->nullable();
+            // Backs the `canSee(fn () => false)`-equivalent redaction test
+            // in RelationIndexTest — needs a real column so the pre-fix raw
+            // `toArray()` payload actually contains the value to strip
+            // (review finding I1).
+            $t->string('secret')->nullable();
         });
         \Illuminate\Support\Facades\Schema::create('rel_tags', function ($t): void {
             $t->increments('id');

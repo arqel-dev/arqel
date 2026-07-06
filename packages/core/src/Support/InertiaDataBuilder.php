@@ -563,40 +563,23 @@ final class InertiaDataBuilder
     }
 
     /**
-     * Render a single record for index payloads. Adds Arqel-side
-     * meta (recordTitle/recordSubtitle) on top of the model's
-     * default `toArray`, plus the per-row visible-actions list
-     * (resolved against `Action::isVisibleFor` + `canBeExecutedBy`)
-     * and per-row action overrides (`url`/`disabled`) for actions that
-     * are record-dependent (closure URL or closure disabled, #140).
+     * Apply state-column resolution (#206) + per-record canSee redaction
+     * (#182) to a record's array payload, given the table's columns. Shared
+     * by the resource index (`serializeRecord`) and the relation index
+     * (`RelationController::index`), so both surfaces enforce the exact
+     * same disclosure/computed-column semantics — no divergent
+     * reimplementation on the relation side (review finding I1).
      *
-     * Per-record column redaction (#182): a column gated by
-     * `->canSee(fn ($record) => …)` whose predicate returns false for
-     * this row has its cell removed from the payload, so the value
-     * never reaches the client. Duck-typed against `Arqel\Table\Column`
-     * (`getName()` + `isVisibleFor(?Model)`); columns without a
-     * `canSee` predicate stay visible, so the default never regresses.
+     * Resolves ComputedColumn/`formatStateUsing` state BEFORE redaction so a
+     * `canSee()`-gated computed cell is still stripped, matching
+     * `serializeRecord()`'s existing ordering.
      *
-     * @param array<int, mixed> $rowActions Row actions declared on Resource::table
-     * @param array<int, mixed> $columns Columns declared on Resource::table
+     * @param array<int, mixed> $columns
      *
      * @return array<string, mixed>
      */
-    private function serializeRecord(mixed $record, Resource $resource, array $rowActions = [], ?Authenticatable $user = null, array $columns = []): array
+    public function applyColumnSerialization(Model $record, array $columns): array
     {
-        if (! $record instanceof Model) {
-            if (! is_array($record)) {
-                return [];
-            }
-
-            $clean = [];
-            foreach ($record as $key => $value) {
-                $clean[(string) $key] = $value;
-            }
-
-            return $clean;
-        }
-
         $payload = [];
         foreach ($record->toArray() as $key => $value) {
             $payload[(string) $key] = $value;
@@ -618,6 +601,44 @@ final class InertiaDataBuilder
         foreach ($this->resolveRedactedColumnNames($columns, $record) as $name) {
             unset($payload[$name]);
         }
+
+        return $payload;
+    }
+
+    /**
+     * Render a single record for index payloads. Adds Arqel-side
+     * meta (recordTitle/recordSubtitle) on top of the model's
+     * default `toArray`, plus the per-row visible-actions list
+     * (resolved against `Action::isVisibleFor` + `canBeExecutedBy`)
+     * and per-row action overrides (`url`/`disabled`) for actions that
+     * are record-dependent (closure URL or closure disabled, #140).
+     *
+     * Per-record column redaction (#182) and computed-column state
+     * resolution (#206) are delegated to `applyColumnSerialization()` — see
+     * that method's doc block for the duck-typed `Arqel\Table\Column`
+     * contract shared with the relation index.
+     *
+     * @param array<int, mixed> $rowActions Row actions declared on Resource::table
+     * @param array<int, mixed> $columns Columns declared on Resource::table
+     *
+     * @return array<string, mixed>
+     */
+    private function serializeRecord(mixed $record, Resource $resource, array $rowActions = [], ?Authenticatable $user = null, array $columns = []): array
+    {
+        if (! $record instanceof Model) {
+            if (! is_array($record)) {
+                return [];
+            }
+
+            $clean = [];
+            foreach ($record as $key => $value) {
+                $clean[(string) $key] = $value;
+            }
+
+            return $clean;
+        }
+
+        $payload = $this->applyColumnSerialization($record, $columns);
 
         $payload['arqel'] = [
             'title' => $resource->recordTitle($record),

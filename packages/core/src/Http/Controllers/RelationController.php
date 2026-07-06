@@ -6,6 +6,7 @@ namespace Arqel\Core\Http\Controllers;
 
 use Arqel\Core\Relations\RelationManager;
 use Arqel\Core\Resources\ResourceRegistry;
+use Arqel\Core\Support\InertiaDataBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -22,7 +23,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class RelationController
 {
-    public function __construct(private readonly ResourceRegistry $registry) {}
+    public function __construct(
+        private readonly ResourceRegistry $registry,
+        private readonly InertiaDataBuilder $dataBuilder,
+    ) {}
 
     public function index(Request $request, string $resource, string|int $parent, string $relation): mixed
     {
@@ -34,8 +38,27 @@ final class RelationController
         // Reuse the existing table query pipeline against the relation query.
         $records = $related->get(); // MVP: full list; wire TableQueryBuilder pagination in Task 5.
 
+        // Serialize each related record through the same column pipeline the
+        // main resource index uses (computed/state columns + per-record
+        // canSee redaction, #206/#182) — review finding I1. Without this, a
+        // relation table showed blank ComputedColumn cells and leaked
+        // canSee(fn => false)-gated values that the equivalent resource
+        // index column would strip. Duck-typed `getColumns()` access mirrors
+        // `InertiaDataBuilder::callTableArray($table, 'getColumns')`; a
+        // table without columns (or without `getColumns()` at all) falls
+        // back to the raw `toArray()` payload, so behavior is unchanged.
+        $table = $manager->table();
+        $columns = is_object($table) && method_exists($table, 'getColumns')
+            ? $table->getColumns()
+            : [];
+        $columns = is_array($columns) ? array_values($columns) : [];
+
+        $serializedRecords = $columns === []
+            ? $records->toArray()
+            : $records->map(fn (Model $record): array => $this->dataBuilder->applyColumnSerialization($record, $columns))->all();
+
         return response()->json([
-            'records' => $records->toArray(),
+            'records' => $serializedRecords,
             'table' => $manager->table()->toArray(),
             'abilities' => $manager->abilities($parentModel, $request->user()),
         ]);

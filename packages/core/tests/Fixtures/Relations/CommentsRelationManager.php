@@ -10,9 +10,22 @@ final class CommentsRelationManager extends RelationManager
 {
     public static string $relationship = 'comments';
 
+    /**
+     * Declares one always-visible column (`body`) and one always-redacted
+     * column (`secret`, the `canSee(fn () => false)` equivalent) so
+     * `RelationIndexTest` can prove `RelationController::index()` runs
+     * related records through `InertiaDataBuilder::applyColumnSerialization()`
+     * — review finding I1. Neither column being declared here changes what
+     * `$related->get()` returns (redaction only strips the *payload* key),
+     * so this fixture change is additive and doesn't affect any other test
+     * in this suite.
+     */
     public function table(): mixed
     {
-        return new StubRelationTable;
+        return new StubRelationTable([
+            new StubRelationColumn('body', visible: true),
+            new StubRelationColumn('secret', visible: false),
+        ]);
     }
 
     /**

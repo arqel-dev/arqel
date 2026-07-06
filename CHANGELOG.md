@@ -15,6 +15,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 - **marketplace:** o `SecurityScanner` normaliza a severity dos advisories antes do rollup. Antes, uma severity fora do conjunto exato `low|medium|high|critical` (ex.: `HIGH` em maiúsculas ou `moderate` do GitHub Advisory DB) era ranqueada como 0 e descartada silenciosamente — um plugin com vulnerabilidade real de severity não-canônica passava a varredura como `passed` (e nunca disparava o auto-delist de `critical`). Agora a normalização é case-insensitive, reconhece aliases (`moderate→medium`, `severe/important/unknown→high`) e é fail-safe: uma severity não-reconhecida é tratada como `high` (flagada), nunca ignorada.
 
+### Fixed
+
+- **tenant:** a troca de tenant com o `AuthUserResolver` (convenção Jetstream/Spark) agora persiste de verdade. O `resolve()` lê o tenant pela relação `currentTeam` (FK `current_team_id`), mas o `switchTo()` herdado gravava a coluna default `current_tenant_id` — que a relação nunca lê —, então a troca era perdida na próxima requisição. O `switchTo()` do `AuthUserResolver` passou a gravar a FK real da relação `currentTeam` (espelha a correção #81 do `SessionResolver`).
+
 ## [0.15.1] - 2026-07-03
 
 ### Summary

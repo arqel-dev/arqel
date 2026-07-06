@@ -63,6 +63,41 @@ final class RelationController
         return back()->with('success', 'arqel::relations.created');
     }
 
+    public function edit(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
+    {
+        [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
+        $record = $this->findRelated($parentModel, $manager, $related);
+        $this->authorize('update', $parentModel, $manager, $record);
+
+        return response()->json([
+            'fields' => app(\Arqel\Core\Support\FieldSchemaSerializer::class)->serialize($manager->fields(), $record, $request->user()),
+            'record' => $record->toArray(),
+        ]);
+    }
+
+    public function update(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
+    {
+        [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
+        $record = $this->findRelated($parentModel, $manager, $related);
+        $this->authorize('update', $parentModel, $manager, $record);
+
+        $validated = $request->validate($this->rulesFromFields($manager));
+        $record->update($validated);
+
+        return back()->with('success', 'arqel::relations.updated');
+    }
+
+    public function destroy(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
+    {
+        [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
+        $record = $this->findRelated($parentModel, $manager, $related);
+        $this->authorize('delete', $parentModel, $manager, $record);
+
+        $record->delete();
+
+        return back()->with('success', 'arqel::relations.deleted');
+    }
+
     /**
      * Extract validation rules from the manager's fields via the SAME
      * string-referenced FieldRulesExtractor that ResourceController::extractRules()
@@ -118,9 +153,29 @@ final class RelationController
 
         $manager = $managers[$relation];
         $model = $resourceClass::$model;
-        $parentModel = $model::query()->findOrFail($parent);
+        $parentModel = $model::query()->find($parent);
+        abort_if($parentModel === null, Response::HTTP_NOT_FOUND);
 
         return [$resourceInstance, $manager, $parentModel];
+    }
+
+    /**
+     * Resolve the related record scoped to the parent's relation query
+     * (anti-IDOR): a related id belonging to a DIFFERENT parent is absent
+     * from this scoped query. We use `find()` + an explicit `abort_if(...,
+     * Response::HTTP_NOT_FOUND)` rather than `findOrFail()`: `findOrFail()`
+     * throws `Illuminate\Database\Eloquent\ModelNotFoundException`, which
+     * only becomes an HTTP 404 once it passes through Laravel's exception
+     * handler — under direct controller invocation (this package's test
+     * convention, no HTTP kernel involved) it would surface as a raw,
+     * untyped exception instead of a testable 404.
+     */
+    private function findRelated(Model $parentModel, RelationManager $manager, string|int $related): Model
+    {
+        $record = $parentModel->{$manager::$relationship}()->find($related);
+        abort_if($record === null, Response::HTTP_NOT_FOUND);
+
+        return $record;
     }
 
     /**

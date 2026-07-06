@@ -127,4 +127,17 @@ Route::name('arqel.resources.')->group(function () use ($resourceSlugPattern): v
     Route::post('{resource}/{parent}/relations/{relation}', [RelationController::class, 'store'])
         ->name('relations.store')
         ->where('resource', $resourceSlugPattern);
+
+    // Relation manager: edit + update + destroy a child record, scoped to
+    // the parent via `findRelated()` (anti-IDOR) (Task 6 of
+    // docs/superpowers/plans/2026-07-06-relation-manager.md).
+    Route::get('{resource}/{parent}/relations/{relation}/{related}/edit', [RelationController::class, 'edit'])
+        ->name('relations.edit')
+        ->where('resource', $resourceSlugPattern);
+    Route::put('{resource}/{parent}/relations/{relation}/{related}', [RelationController::class, 'update'])
+        ->name('relations.update')
+        ->where('resource', $resourceSlugPattern);
+    Route::delete('{resource}/{parent}/relations/{relation}/{related}', [RelationController::class, 'destroy'])
+        ->name('relations.destroy')
+        ->where('resource', $resourceSlugPattern);
 });

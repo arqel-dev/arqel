@@ -38,6 +38,20 @@ final readonly class SecurityScanner
         'critical' => 4,
     ];
 
+    /**
+     * Aliases from external vocabularies (GitHub Advisory DB, OSV, CVSS bands)
+     * onto the scanner's canonical `low|medium|high|critical`. Keys are
+     * lowercased before lookup, so only the alias spellings live here.
+     *
+     * @var array<string, string>
+     */
+    private const SEVERITY_ALIASES = [
+        'moderate' => 'medium',
+        'important' => 'high',
+        'severe' => 'high',
+        'unknown' => 'high',
+    ];
+
     public function __construct(
         private VulnerabilityDatabase $vulnDb,
     ) {}
@@ -159,18 +173,37 @@ final readonly class SecurityScanner
 
         foreach ($findings as $finding) {
             $severity = $finding['severity'] ?? null;
-            if (! is_string($severity)) {
+            if (! is_string($severity) || $severity === '') {
                 continue;
             }
 
-            $rank = self::SEVERITY_RANK[$severity] ?? 0;
+            $canonical = $this->normalizeSeverity($severity);
+            $rank = self::SEVERITY_RANK[$canonical];
             if ($rank > $max) {
                 $max = $rank;
-                $label = $severity;
+                $label = $canonical;
             }
         }
 
         return $label;
+    }
+
+    /**
+     * Map an externally-sourced severity onto the canonical vocabulary.
+     * Case-insensitive; known aliases are translated. A non-empty severity
+     * the scanner does not recognize is treated as `high` (fail-safe) rather
+     * than silently dropped — an unclassified vulnerability must still flag
+     * the plugin for review, never report `passed`.
+     */
+    private function normalizeSeverity(string $severity): string
+    {
+        $key = strtolower(trim($severity));
+
+        if (isset(self::SEVERITY_RANK[$key])) {
+            return $key;
+        }
+
+        return self::SEVERITY_ALIASES[$key] ?? 'high';
     }
 
     private function statusFor(?string $severity): string

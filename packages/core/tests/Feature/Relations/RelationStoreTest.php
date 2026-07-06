@@ -80,6 +80,16 @@ beforeEach(function (): void {
         ->name('arqel.resources.relations.create');
     Illuminate\Support\Facades\Route::post('/{resource}/{parent}/relations/{relation}', fn () => 'ok')
         ->name('arqel.resources.relations.store');
+
+    // store() now redirects explicitly to the parent's edit page (rather
+    // than the ambiguous back(), which resolved to the dashboard in the
+    // real app — see RelationController). That requires `arqel.resources.edit`
+    // to be a resolvable route name; the polymorphic {resource} routes
+    // aren't wired in this isolated suite (see class docblock), so a bare
+    // closure route is registered here, mirroring the other relation route
+    // names above.
+    Illuminate\Support\Facades\Route::get('/{resource}/{id}/edit', fn () => 'ok')
+        ->name('arqel.resources.edit');
 });
 
 it('confirms Arqel\Form\FieldRulesExtractor is not loadable in core\'s own test suite', function (): void {

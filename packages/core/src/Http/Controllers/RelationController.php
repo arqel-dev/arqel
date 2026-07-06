@@ -94,7 +94,9 @@ final class RelationController
 
         $parentModel->{$manager::$relationship}()->create($validated);
 
-        return back()->with('success', (string) __('arqel::relations.created'));
+        return redirect()
+            ->route('arqel.resources.edit', ['resource' => $resource, 'id' => $parent])
+            ->with('success', (string) __('arqel::relations.created'));
     }
 
     public function edit(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
@@ -118,7 +120,9 @@ final class RelationController
         $validated = $request->validate($this->rulesFromFields($manager));
         $record->update($validated);
 
-        return back()->with('success', (string) __('arqel::relations.updated'));
+        return redirect()
+            ->route('arqel.resources.edit', ['resource' => $resource, 'id' => $parent])
+            ->with('success', (string) __('arqel::relations.updated'));
     }
 
     public function destroy(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
@@ -129,7 +133,9 @@ final class RelationController
 
         $record->delete();
 
-        return back()->with('success', (string) __('arqel::relations.deleted'));
+        return redirect()
+            ->route('arqel.resources.edit', ['resource' => $resource, 'id' => $parent])
+            ->with('success', (string) __('arqel::relations.deleted'));
     }
 
     public function attach(Request $request, string $resource, string|int $parent, string $relation): mixed
@@ -157,7 +163,9 @@ final class RelationController
 
         $parentModel->{$manager::$relationship}()->attach($validated['related'], $pivot);
 
-        return back()->with('success', (string) __('arqel::relations.attached'));
+        return redirect()
+            ->route('arqel.resources.edit', ['resource' => $resource, 'id' => $parent])
+            ->with('success', (string) __('arqel::relations.attached'));
     }
 
     public function detach(Request $request, string $resource, string|int $parent, string $relation, string|int $related): mixed
@@ -172,7 +180,9 @@ final class RelationController
 
         $parentModel->{$manager::$relationship}()->detach($record->getKey());
 
-        return back()->with('success', (string) __('arqel::relations.detached'));
+        return redirect()
+            ->route('arqel.resources.edit', ['resource' => $resource, 'id' => $parent])
+            ->with('success', (string) __('arqel::relations.detached'));
     }
 
     /**

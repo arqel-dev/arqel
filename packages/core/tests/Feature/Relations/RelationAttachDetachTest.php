@@ -38,6 +38,14 @@ beforeEach(function (): void {
         ->name('arqel.resources.relations.attach');
     Illuminate\Support\Facades\Route::delete('/{resource}/{parent}/relations/{relation}/{related}/detach', fn () => 'ok')
         ->name('arqel.resources.relations.detach');
+
+    // attach()/detach() now redirect explicitly to the parent's edit page
+    // (rather than the ambiguous back(), which resolved to the dashboard in
+    // the real app — see RelationController). That requires
+    // `arqel.resources.edit` to be a resolvable route name; register a bare
+    // closure route mirroring the other relation route names above.
+    Illuminate\Support\Facades\Route::get('/{resource}/{id}/edit', fn () => 'ok')
+        ->name('arqel.resources.edit');
 });
 
 it('attaches an existing tag to the post via the pivot', function (): void {

@@ -9,6 +9,7 @@ use Arqel\Core\Resources\ResourceRegistry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -38,6 +39,67 @@ final class RelationController
             'table' => $manager->table()->toArray(),
             'abilities' => $manager->abilities($parentModel, $request->user()),
         ]);
+    }
+
+    public function create(Request $request, string $resource, string|int $parent, string $relation): mixed
+    {
+        [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
+        $this->authorize('create', $parentModel, $manager, null);
+
+        return response()->json([
+            'fields' => app(\Arqel\Core\Support\FieldSchemaSerializer::class)->serialize($manager->fields(), null, $request->user()),
+        ]);
+    }
+
+    public function store(Request $request, string $resource, string|int $parent, string $relation): mixed
+    {
+        [, $manager, $parentModel] = $this->resolve($resource, $parent, $relation);
+        $this->authorize('create', $parentModel, $manager, null);
+
+        $validated = $request->validate($this->rulesFromFields($manager));
+
+        $parentModel->{$manager::$relationship}()->create($validated);
+
+        return back()->with('success', 'arqel::relations.created');
+    }
+
+    /**
+     * Extract validation rules from the manager's fields via the SAME
+     * string-referenced FieldRulesExtractor that ResourceController::extractRules()
+     * uses — keeps `core` free of a hard dependency on arqel-dev/form.
+     *
+     * Unlike `ResourceController::extractRules()`, this returns `[]` (not
+     * an error) when the extractor is unavailable: a relation form is
+     * optional, so an absent extractor behaves like a manager that
+     * declares no fields rather than a hard failure.
+     *
+     * @return array<string, mixed>
+     */
+    private function rulesFromFields(RelationManager $manager): array
+    {
+        $extractorClass = 'Arqel\\Form\\FieldRulesExtractor';
+        if (! class_exists($extractorClass)) {
+            return [];
+        }
+
+        $extractor = (new ReflectionClass($extractorClass))->newInstance();
+        if (! method_exists($extractor, 'extract')) {
+            return [];
+        }
+
+        $rules = $extractor->extract($manager->fields());
+        if (! is_array($rules)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach ($rules as $name => $set) {
+            if (is_string($name) && is_array($set)) {
+                $clean[$name] = $set;
+            }
+        }
+
+        return $clean;
     }
 
     /**

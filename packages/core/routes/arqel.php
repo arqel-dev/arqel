@@ -118,4 +118,13 @@ Route::name('arqel.resources.')->group(function () use ($resourceSlugPattern): v
     Route::get('{resource}/{parent}/relations/{relation}', [RelationController::class, 'index'])
         ->name('relations.index')
         ->where('resource', $resourceSlugPattern);
+
+    // Relation manager: create + store a child record, FK/morph injected
+    // by Eloquent (Task 5 of docs/superpowers/plans/2026-07-06-relation-manager.md).
+    Route::get('{resource}/{parent}/relations/{relation}/create', [RelationController::class, 'create'])
+        ->name('relations.create')
+        ->where('resource', $resourceSlugPattern);
+    Route::post('{resource}/{parent}/relations/{relation}', [RelationController::class, 'store'])
+        ->name('relations.store')
+        ->where('resource', $resourceSlugPattern);
 });

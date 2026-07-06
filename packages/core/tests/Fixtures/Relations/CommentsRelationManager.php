@@ -14,4 +14,30 @@ final class CommentsRelationManager extends RelationManager
     {
         return new StubRelationTable;
     }
+
+    /**
+     * A single required `body` field, used to prove `create()` serialises
+     * the manager's field schema and `store()` builds validation rules
+     * from it.
+     *
+     * `arqel-dev/core` does not depend on `arqel-dev/fields`/`arqel-dev/form`
+     * (see `RelationManager::fields()` doc block), and neither package is
+     * installed in `core`'s own test suite — so this can't be a real
+     * `Arqel\Fields\FieldFactory` field. It's also not consumable by the
+     * real `Arqel\Form\FieldRulesExtractor::extract()`, which hard
+     * `instanceof Field`-checks each entry rather than duck-typing: a stub
+     * here is filtered out, not converted into a rule. `StubField` exists
+     * only to prove `FieldSchemaSerializer::serialize()` (duck-typed) picks
+     * up its shape for `create()`; see `RelationStoreTest.php`'s top-of-file
+     * doc block for why the `store()` validation-rejection path is proven
+     * by code review rather than a live HTTP test in this package.
+     *
+     * @return array<int, mixed>
+     */
+    public function fields(): array
+    {
+        return [
+            new StubField('body', required: true),
+        ];
+    }
 }

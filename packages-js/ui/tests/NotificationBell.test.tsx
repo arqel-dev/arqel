@@ -214,4 +214,67 @@ describe('NotificationBell', () => {
     render(<NotificationBell />);
     expect(screen.queryByText(/\d+/)).not.toBeInTheDocument();
   });
+
+  it('does not render the item as a Link when action_url points off-site', async () => {
+    mockProps = {
+      notifications: {
+        unread_count: 1,
+        recent: [
+          {
+            id: 'evil',
+            type: 'Welcome',
+            data: { title: 'Suspicious', action_url: 'https://evil.com' },
+            read_at: null,
+            created_at: '2026-07-07T00:00:00Z',
+          },
+        ],
+      },
+    };
+    render(<NotificationBell />);
+    await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
+    expect(screen.queryByRole('link', { name: /suspicious/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /suspicious/i })).toBeInTheDocument();
+  });
+
+  it('renders the item as a Link when action_url is same-origin relative', async () => {
+    mockProps = {
+      notifications: {
+        unread_count: 1,
+        recent: [
+          {
+            id: 'safe',
+            type: 'Welcome',
+            data: { title: 'Go admin', action_url: '/admin/x' },
+            read_at: null,
+            created_at: '2026-07-07T00:00:00Z',
+          },
+        ],
+      },
+    };
+    render(<NotificationBell />);
+    await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
+    const link = screen.getByRole('link', { name: /go admin/i });
+    expect(link).toHaveAttribute('href', '/admin/x');
+  });
+
+  it('reads unread_count/recent from the shared notifications prop even when a different history page-prop is present', () => {
+    mockProps = {
+      notifications: { unread_count: 2, recent: [] },
+      history: {
+        data: [
+          {
+            id: 'h1',
+            type: 'Welcome',
+            data: { title: 'From history' },
+            read_at: null,
+            created_at: '2026-07-07T00:00:00Z',
+          },
+        ],
+        links: [],
+        meta: {},
+      },
+    };
+    render(<NotificationBell />);
+    expect(screen.getByText('2')).toBeInTheDocument();
+  });
 });

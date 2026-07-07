@@ -35,7 +35,7 @@ final class NotificationController
             ]);
 
         return Inertia::render('arqel::notifications', [
-            'notifications' => $paginator,
+            'history' => $paginator,
             'filter' => $filter === 'unread' ? 'unread' : 'all',
         ]);
     }

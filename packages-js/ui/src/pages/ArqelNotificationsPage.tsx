@@ -3,14 +3,21 @@
  *
  * Renders the paginated notification history emitted by
  * `Arqel\Notifications\Http\Controllers\NotificationController::index`
- * (`{ notifications: paginator, filter: 'all' | 'unread' }`). The
- * paginator serializes each item as `{id, type, data, read_at,
+ * (`{ history: paginator, filter: 'all' | 'unread' }`). The page-prop
+ * is named `history` — *not* `notifications` — because `notifications`
+ * is already a shared Inertia prop (`{unread_count, recent}`, see
+ * `HandleArqelInertiaRequests`) consumed by the `<NotificationBell>`
+ * mounted on every page's topbar. Reusing that key here would let this
+ * page's paginator silently overwrite the shared prop and break the
+ * bell (see branch review, milestone 0.19).
+ *
+ * The paginator serializes each item as `{id, type, data, read_at,
  * created_at}` — same shape as the `notifications.recent` array the
  * `<NotificationBell>` dropdown consumes, so titles/bodies follow the
  * same `data.title` / `data.body` convention.
  *
- * Per-item actions do scoped Inertia visits (`only: ['notifications']`
- * for mark-as-read, a plain reload for delete) so the list refreshes
+ * Per-item actions do scoped Inertia visits (`only: ['history']` for
+ * mark-as-read, a plain reload for delete) so the list refreshes
  * without a full page navigation.
  */
 
@@ -35,7 +42,7 @@ interface NotificationsPaginator {
 }
 
 interface ArqelNotificationsPageProps {
-  notifications: NotificationsPaginator;
+  history: NotificationsPaginator;
   filter: 'all' | 'unread';
   [key: string]: unknown;
 }
@@ -55,7 +62,7 @@ function markRead(id: string): void {
   router.post(
     `/admin/notifications/${id}/read`,
     {},
-    { preserveScroll: true, only: ['notifications'] },
+    { preserveScroll: true, only: ['history', 'notifications'] },
   );
 }
 
@@ -63,7 +70,7 @@ function markAllRead(): void {
   router.post(
     '/admin/notifications/read-all',
     {},
-    { preserveScroll: true, only: ['notifications'] },
+    { preserveScroll: true, only: ['history', 'notifications'] },
   );
 }
 
@@ -84,9 +91,9 @@ function decodePaginationLabel(label: string): string {
 
 export default function ArqelNotificationsPage(): JSX.Element {
   const t = useArqelTranslations();
-  const { notifications, filter } = usePage<ArqelNotificationsPageProps>().props;
+  const { history, filter } = usePage<ArqelNotificationsPageProps>().props;
 
-  const items = notifications.data;
+  const items = history.data;
   const hasUnread = items.some((item) => item.read_at === null);
 
   return (
@@ -172,12 +179,12 @@ export default function ArqelNotificationsPage(): JSX.Element {
         </div>
       )}
 
-      {notifications.links.length > 0 && (
+      {history.links.length > 0 && (
         <nav
           className="flex flex-wrap items-center gap-1 text-sm"
           aria-label={t('table.pagination.label', 'Pagination')}
         >
-          {notifications.links.map((link, index) =>
+          {history.links.map((link, index) =>
             link.url ? (
               <Link
                 key={`${link.label}-${index}`}

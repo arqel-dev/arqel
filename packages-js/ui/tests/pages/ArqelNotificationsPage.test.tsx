@@ -36,7 +36,7 @@ import ArqelNotificationsPage from '../../src/pages/ArqelNotificationsPage.js';
 describe('ArqelNotificationsPage', () => {
   it('lists notifications and offers per-item actions', () => {
     mockProps = {
-      notifications: {
+      history: {
         data: [
           {
             id: 'a',
@@ -56,14 +56,14 @@ describe('ArqelNotificationsPage', () => {
   });
 
   it('shows an empty state when there are no notifications', () => {
-    mockProps = { notifications: { data: [], links: [], meta: {} }, filter: 'all' };
+    mockProps = { history: { data: [], links: [], meta: {} }, filter: 'all' };
     render(<ArqelNotificationsPage />);
     expect(screen.getByText(/No notifications|Nenhuma/)).toBeInTheDocument();
   });
 
   it('marks an unread notification as read', async () => {
     mockProps = {
-      notifications: {
+      history: {
         data: [
           {
             id: 'a',
@@ -83,13 +83,13 @@ describe('ArqelNotificationsPage', () => {
     expect(post).toHaveBeenCalledWith(
       '/admin/notifications/a/read',
       {},
-      { preserveScroll: true, only: ['notifications'] },
+      { preserveScroll: true, only: ['history', 'notifications'] },
     );
   });
 
   it('does not offer "mark as read" for an already-read notification', () => {
     mockProps = {
-      notifications: {
+      history: {
         data: [
           {
             id: 'a',
@@ -112,7 +112,7 @@ describe('ArqelNotificationsPage', () => {
 
   it('deletes a notification', async () => {
     mockProps = {
-      notifications: {
+      history: {
         data: [
           {
             id: 'a',
@@ -134,7 +134,7 @@ describe('ArqelNotificationsPage', () => {
 
   it('shows "mark all as read" only when there are unread notifications', () => {
     mockProps = {
-      notifications: {
+      history: {
         data: [
           {
             id: 'a',
@@ -156,7 +156,7 @@ describe('ArqelNotificationsPage', () => {
   });
 
   it('renders filter links for all and unread', () => {
-    mockProps = { notifications: { data: [], links: [], meta: {} }, filter: 'unread' };
+    mockProps = { history: { data: [], links: [], meta: {} }, filter: 'unread' };
     render(<ArqelNotificationsPage />);
     expect(screen.getByRole('link', { name: /all/i })).toHaveAttribute(
       'href',

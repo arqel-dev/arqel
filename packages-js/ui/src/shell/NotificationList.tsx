@@ -12,6 +12,7 @@ import { Link } from '@inertiajs/react';
 import { AlertTriangle, Bell, Check, Info, type LucideIcon, Mail, User } from 'lucide-react';
 import type { JSX } from 'react';
 import { cn } from '../utils/cn.js';
+import { isSameOriginRelativeUrl } from '../utils/url.js';
 
 export interface NotificationListProps {
   items: ReadonlyArray<NotificationItem>;
@@ -48,9 +49,16 @@ function readBody(item: NotificationItem): string | undefined {
   return typeof body === 'string' && body.trim() ? body : undefined;
 }
 
+/**
+ * Only same-origin relative URLs (`/foo`, never `//evil.com`,
+ * `https://…`, or `javascript:…`) unlock a navigable `Link` — mirrors
+ * the `data.icon` allowlist below: server-controlled notification
+ * payloads get a narrow, safe subset of behavior, never arbitrary
+ * navigation. Anything else renders the item as a non-navigable button.
+ */
 function readActionUrl(item: NotificationItem): string | undefined {
   const url = item.data['action_url'];
-  return typeof url === 'string' && url ? url : undefined;
+  return typeof url === 'string' && isSameOriginRelativeUrl(url) ? url : undefined;
 }
 
 function readIcon(item: NotificationItem): LucideIcon {

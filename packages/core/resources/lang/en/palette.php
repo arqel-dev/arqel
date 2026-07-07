@@ -13,6 +13,7 @@ return [
     'category' => [
         'navigation' => 'Navigation',
         'settings' => 'Settings',
+        'records' => 'Records',
     ],
 
     // NavigationCommandProvider — "Go to {plural label}" command label.

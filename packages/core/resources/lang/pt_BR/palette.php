@@ -13,6 +13,7 @@ return [
     'category' => [
         'navigation' => 'Navegação',
         'settings' => 'Configurações',
+        'records' => 'Registros',
     ],
 
     // NavigationCommandProvider — rótulo do comando "Ir para {rótulo plural}".

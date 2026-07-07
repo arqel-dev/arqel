@@ -219,7 +219,7 @@ Http::withToken($adminToken)
 - **Migration** `2026_05_05_000000_add_security_scans.php` cria `arqel_plugin_security_scans` (`plugin_id` FK cascade, `scan_started_at`, `scan_completed_at`, `status` enum string `pending|running|passed|flagged|failed`, `findings` JSON, `severity` string nullable, `scanner_version` string default `1.0`, timestamps + index `(plugin_id, scan_started_at)`).
 - **`SecurityScan` model** (`final`) — fillable + casts (`scan_started_at`/`scan_completed_at` datetime, `findings` array). Relation `plugin()`.
 - **`Contracts\VulnerabilityDatabase`** — interface com `lookup(string $package, string $ecosystem): array<int, Advisory>`. Bind default no service provider para `StaticVulnerabilityDatabase`.
-- **`Contracts\Advisory`** (`final readonly`) — value-object (`id`, `severity`, `summary`, `fixedIn`).
+- **`Contracts\Advisory`** (`final readonly`) — value-object (`id`, `severity`, `summary`, `affectedVersions`).
 - **`Services\StaticVulnerabilityDatabase`** (`final readonly`) — implementação default que retorna lista vazia. Integração concreta com GitHub Advisory Database é TBD; host apps podem rebindar via container.
 - **`Services\SecurityScanner`** (`final readonly`) — `scan(Plugin)`:
   1. Cria `SecurityScan` em `running`.

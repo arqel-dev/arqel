@@ -108,6 +108,10 @@ final readonly class SecurityScanner
 
         if (is_string($plugin->composer_package) && $plugin->composer_package !== '') {
             foreach ($this->vulnDb->lookup($plugin->composer_package, 'composer') as $advisory) {
+                if (! VersionMatcher::isAffected($plugin->latest_version, $advisory->affectedVersions)) {
+                    continue;
+                }
+
                 $findings[] = [
                     'type' => 'vulnerability',
                     'severity' => $advisory->severity,
@@ -121,6 +125,10 @@ final readonly class SecurityScanner
 
         if (is_string($plugin->npm_package) && $plugin->npm_package !== '') {
             foreach ($this->vulnDb->lookup($plugin->npm_package, 'npm') as $advisory) {
+                if (! VersionMatcher::isAffected($plugin->latest_version, $advisory->affectedVersions)) {
+                    continue;
+                }
+
                 $findings[] = [
                     'type' => 'vulnerability',
                     'severity' => $advisory->severity,

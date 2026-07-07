@@ -21,7 +21,7 @@ final class VersionMatcher
 {
     /**
      * @param string $affectedConstraint Composer constraint of affected
-     *                                    versions (e.g. '<2.0', '>=1.0.1,<1.5').
+     *                                   versions (e.g. '<2.0', '>=1.0.1,<1.5').
      */
     public static function isAffected(?string $installed, string $affectedConstraint): bool
     {
@@ -35,7 +35,7 @@ final class VersionMatcher
 
         try {
             return Semver::satisfies($installed, $affectedConstraint);
-        } catch (UnexpectedValueException | InvalidArgumentException) {
+        } catch (UnexpectedValueException|InvalidArgumentException) {
             return true;
         }
     }

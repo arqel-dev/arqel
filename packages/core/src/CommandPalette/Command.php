@@ -22,6 +22,9 @@ namespace Arqel\Core\CommandPalette;
  * Filtering happens in {@see CommandRegistry::resolveFor()} after
  * the static + provider merge and before fuzzy ranking.
  *
+ * The optional `$rankScore` is an internal ranking hint for providers
+ * (e.g. global-search records). It is not exposed in `toArray()`.
+ *
  * @phpstan-type CommandArray array{
  *     id: string,
  *     label: string,
@@ -42,6 +45,7 @@ final readonly class Command
         public ?string $icon = null,
         public ?bool $requiresAuth = null,
         public ?bool $hideForAuthenticated = null,
+        public ?int $rankScore = null,
     ) {}
 
     /**

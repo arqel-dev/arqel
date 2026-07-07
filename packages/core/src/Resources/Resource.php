@@ -8,6 +8,7 @@ use Arqel\Core\Contracts\HasActions;
 use Arqel\Core\Contracts\HasFields;
 use Arqel\Core\Contracts\HasResource;
 use Arqel\Core\Relations\RelationManager;
+use Arqel\Core\Resources\Concerns\HasGlobalSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
@@ -29,6 +30,8 @@ use LogicException;
  */
 abstract class Resource implements HasActions, HasFields, HasResource
 {
+    use HasGlobalSearch;
+
     /**
      * Fully-qualified Eloquent model class managed by this Resource.
      *

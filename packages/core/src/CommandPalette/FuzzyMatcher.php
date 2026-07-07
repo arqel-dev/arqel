@@ -72,6 +72,14 @@ final class FuzzyMatcher
         $scored = [];
 
         foreach ($commands as $index => $command) {
+            if ($command->rankScore !== null) {
+                // Fixed-score entry (e.g. a global-search record): trust the
+                // provider's score, never drop it for a zero fuzzy match.
+                $scored[] = ['score' => $command->rankScore, 'index' => $index, 'command' => $command];
+
+                continue;
+            }
+
             $labelScore = self::score($query, $command->label);
             $descriptionScore = $command->description !== null
                 ? self::score($query, $command->description)

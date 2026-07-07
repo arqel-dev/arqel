@@ -14,12 +14,20 @@ import { cn } from '../utils/cn.js';
 export interface TopbarProps {
   brand?: ReactNode;
   search?: ReactNode;
+  notifications?: ReactNode;
   userMenu?: ReactNode;
   tenantSwitcher?: ReactNode;
   className?: string;
 }
 
-export function Topbar({ brand, search, userMenu, tenantSwitcher, className }: TopbarProps) {
+export function Topbar({
+  brand,
+  search,
+  notifications,
+  userMenu,
+  tenantSwitcher,
+  className,
+}: TopbarProps) {
   return (
     <header
       data-arqel-topbar=""
@@ -39,6 +47,7 @@ export function Topbar({ brand, search, userMenu, tenantSwitcher, className }: T
       <div className="hidden min-w-0 flex-1 md:block">{search}</div>
       <div className="ml-auto flex min-w-0 items-center gap-2 md:ml-0">
         {tenantSwitcher}
+        {notifications}
         {userMenu}
       </div>
     </header>

@@ -2,7 +2,7 @@
  * Default Inertia page for `arqel::notifications`.
  *
  * Renders the paginated notification history emitted by
- * `Arqel\Notifications\Http\Controllers\NotificationController::index`
+ * `Arqel\Core\Http\Controllers\NotificationController::index`
  * (`{ history: paginator, filter: 'all' | 'unread' }`). The page-prop
  * is named `history` — *not* `notifications` — because `notifications`
  * is already a shared Inertia prop (`{unread_count, recent}`, see
@@ -147,7 +147,10 @@ export default function ArqelNotificationsPage(): JSX.Element {
             return (
               <Card
                 key={item.id}
-                className={cn('flex flex-row items-start justify-between gap-4 p-4', unread && 'bg-accent/50')}
+                className={cn(
+                  'flex flex-row items-start justify-between gap-4 p-4',
+                  unread && 'bg-accent/50',
+                )}
               >
                 <div className="flex min-w-0 flex-1 items-start gap-2">
                   <span
@@ -184,10 +187,10 @@ export default function ArqelNotificationsPage(): JSX.Element {
           className="flex flex-wrap items-center gap-1 text-sm"
           aria-label={t('table.pagination.label', 'Pagination')}
         >
-          {history.links.map((link, index) =>
+          {history.links.map((link) =>
             link.url ? (
               <Link
-                key={`${link.label}-${index}`}
+                key={link.url}
                 href={link.url}
                 className={cn(
                   'rounded-sm px-2 py-1',
@@ -199,10 +202,7 @@ export default function ArqelNotificationsPage(): JSX.Element {
                 {decodePaginationLabel(link.label)}
               </Link>
             ) : (
-              <span
-                key={`${link.label}-${index}`}
-                className="rounded-sm px-2 py-1 text-muted-foreground/50"
-              >
+              <span key={link.label} className="rounded-sm px-2 py-1 text-muted-foreground/50">
                 {decodePaginationLabel(link.label)}
               </span>
             ),

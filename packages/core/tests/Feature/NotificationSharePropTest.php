@@ -66,3 +66,18 @@ it('emits unread_count and recent items for an authenticated user', function ():
         ->and($payload['recent'][0])->toHaveKeys(['id', 'type', 'data', 'read_at', 'created_at'])
         ->and($payload['recent'][0]['type'])->toBe('Old'); // class_basename, latest first
 });
+
+it('emits null (does not throw) when the notifications table is missing', function (): void {
+    // Um app consumidor que ainda não publicou/rodou a migration não tem a
+    // tabela. A prop roda em toda request autenticada, então precisa degradar
+    // em silêncio em vez de derrubar o painel com "relation does not exist".
+    $user = NotifiableUserForShare::query()->create(['name' => 'Ada']);
+
+    Schema::dropIfExists('notifications');
+
+    $mw = new HandleArqelInertiaRequests;
+    $ref = new ReflectionMethod($mw, 'notificationsPayload');
+    $ref->setAccessible(true);
+
+    expect($ref->invoke($mw, $user))->toBeNull();
+});

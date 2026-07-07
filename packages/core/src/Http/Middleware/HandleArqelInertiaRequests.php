@@ -405,11 +405,20 @@ final class HandleArqelInertiaRequests extends Middleware
      * contagem de não-lidas + as N mais recentes (lidas e não-lidas).
      * Retorna null quando não há usuário — nada vaza.
      *
+     * Também retorna null quando a tabela `notifications` não existe: essa
+     * prop roda em TODA request Inertia autenticada, então um app que ainda
+     * não publicou/rodou a migration não pode ter o painel inteiro derrubado
+     * por um `relation "notifications" does not exist`. Degrada em silêncio.
+     *
      * @return array{unread_count: int, recent: array<int, array<string, mixed>>}|null
      */
     private function notificationsPayload(?Authenticatable $user): ?array
     {
         if ($user === null || ! method_exists($user, 'notifications')) {
+            return null;
+        }
+
+        if (! \Illuminate\Support\Facades\Schema::hasTable('notifications')) {
             return null;
         }
 

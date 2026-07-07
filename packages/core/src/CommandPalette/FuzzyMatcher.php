@@ -76,6 +76,7 @@ final class FuzzyMatcher
                 // Fixed-score entry (e.g. a global-search record): trust the
                 // provider's score, never drop it for a zero fuzzy match.
                 $scored[] = ['score' => $command->rankScore, 'index' => $index, 'command' => $command];
+
                 continue;
             }
 

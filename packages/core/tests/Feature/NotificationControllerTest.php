@@ -13,6 +13,7 @@ final class NotifiableUserForController extends AuthUser
     use Notifiable;
 
     protected $table = 'users';
+
     protected $guarded = [];
 }
 
@@ -26,7 +27,7 @@ beforeEach(function (): void {
     }
 });
 
-function makeNotification(NotifiableUserForController $user, ?\DateTimeInterface $readAt = null): string
+function makeNotification(NotifiableUserForController $user, ?DateTimeInterface $readAt = null): string
 {
     $id = (string) Str::uuid();
     $user->notifications()->create([

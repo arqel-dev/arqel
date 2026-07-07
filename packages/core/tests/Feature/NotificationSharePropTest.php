@@ -13,6 +13,7 @@ final class NotifiableUserForShare extends AuthUser
     use Notifiable;
 
     protected $table = 'users';
+
     protected $guarded = [];
 }
 
@@ -40,14 +41,14 @@ it('emits unread_count and recent items for an authenticated user', function ():
     // distintos (o teste pode rodar mais rápido que a resolução de
     // segundo do `now()`, o que empataria o `latest()`).
     $user->notifications()->create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Illuminate\Support\Str::uuid(),
         'type' => 'App\\Notifications\\Welcome',
         'data' => ['title' => 'Bem-vinda'],
         'read_at' => null,
         'created_at' => now()->subMinute(),
     ]);
     $user->notifications()->create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Illuminate\Support\Str::uuid(),
         'type' => 'App\\Notifications\\Old',
         'data' => ['title' => 'Antiga'],
         'read_at' => now(),

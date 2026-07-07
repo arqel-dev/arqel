@@ -21,9 +21,7 @@ use Illuminate\Notifications\Notification;
  */
 final class WelcomeNotification extends Notification
 {
-    public function __construct(private readonly string $message)
-    {
-    }
+    public function __construct(private readonly string $message) {}
 
     /**
      * @return list<string>

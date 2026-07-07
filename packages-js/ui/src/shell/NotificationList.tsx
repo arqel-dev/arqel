@@ -9,7 +9,7 @@
 
 import type { NotificationItem } from '@arqel-dev/types/inertia';
 import { Link } from '@inertiajs/react';
-import { Bell } from 'lucide-react';
+import { AlertTriangle, Bell, Check, Info, type LucideIcon, Mail, User } from 'lucide-react';
 import type { JSX } from 'react';
 import { cn } from '../utils/cn.js';
 
@@ -18,6 +18,24 @@ export interface NotificationListProps {
   emptyLabel: string;
   onItemClick: (item: NotificationItem) => void;
 }
+
+/**
+ * Allowlist of `data.icon` values accepted from notification payloads.
+ *
+ * Only these lucide-react icons may be rendered — no dynamic/arbitrary
+ * lookup into the lucide namespace, to keep the bundle small and avoid
+ * exposing an unbounded icon surface to server-controlled data.
+ *
+ * Supported keys: `bell` (default), `check`, `info`, `alert`, `mail`, `user`.
+ */
+const NOTIFICATION_ICONS: Record<string, LucideIcon> = {
+  bell: Bell,
+  check: Check,
+  info: Info,
+  alert: AlertTriangle,
+  mail: Mail,
+  user: User,
+};
 
 function readTitle(item: NotificationItem): string {
   const title = item.data['title'];
@@ -33,6 +51,14 @@ function readBody(item: NotificationItem): string | undefined {
 function readActionUrl(item: NotificationItem): string | undefined {
   const url = item.data['action_url'];
   return typeof url === 'string' && url ? url : undefined;
+}
+
+function readIcon(item: NotificationItem): LucideIcon {
+  const icon = item.data['icon'];
+  if (typeof icon === 'string' && icon in NOTIFICATION_ICONS) {
+    return NOTIFICATION_ICONS[icon] ?? Bell;
+  }
+  return Bell;
 }
 
 export function NotificationList({
@@ -51,14 +77,10 @@ export function NotificationList({
         const body = readBody(item);
         const actionUrl = readActionUrl(item);
         const unread = item.read_at === null;
+        const Icon = readIcon(item);
 
-        const content = (
-          <div
-            className={cn(
-              'flex w-full items-start gap-2 rounded-sm px-2 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground',
-              unread && 'bg-accent/50',
-            )}
-          >
+        const itemContent = (
+          <>
             <span
               aria-hidden="true"
               className={cn(
@@ -66,28 +88,38 @@ export function NotificationList({
                 unread ? 'bg-primary' : 'bg-transparent',
               )}
             />
-            <Bell aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+            <Icon aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             <span className="flex min-w-0 flex-col">
               <span className="truncate font-medium">{title}</span>
               {body && <span className="truncate text-xs text-muted-foreground">{body}</span>}
             </span>
-          </div>
+          </>
+        );
+        const itemClassName = cn(
+          'flex w-full items-start gap-2 rounded-sm px-2 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground',
+          unread && 'bg-accent/50',
         );
 
-        return (
+        // The item's root must be either a `Link` (navigable) or a
+        // `button` (action-only) — never one nested inside the other,
+        // which produces invalid `<a>`-inside-`<button>` HTML.
+        return actionUrl ? (
+          <Link
+            key={item.id}
+            href={actionUrl}
+            onClick={() => onItemClick(item)}
+            className={itemClassName}
+          >
+            {itemContent}
+          </Link>
+        ) : (
           <button
             key={item.id}
             type="button"
             onClick={() => onItemClick(item)}
-            className="w-full text-left"
+            className={itemClassName}
           >
-            {actionUrl ? (
-              <Link href={actionUrl} className="block">
-                {content}
-              </Link>
-            ) : (
-              content
-            )}
+            {itemContent}
           </button>
         );
       })}

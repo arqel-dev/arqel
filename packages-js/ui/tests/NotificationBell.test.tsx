@@ -7,8 +7,29 @@ let mockProps: unknown;
 vi.mock('@inertiajs/react', () => ({
   usePage: () => ({ props: mockProps }),
   router: { post: (...args: unknown[]) => post(...args) },
-  Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
-    <a href={href}>{children}</a>
+  Link: ({
+    href,
+    children,
+    className,
+    onClick,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+    onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+  }) => (
+    // Real Inertia `Link` intercepts the click and never lets the browser
+    // navigate; mimic that here so jsdom doesn't attempt a real navigation.
+    <a
+      href={href}
+      className={className}
+      onClick={(event) => {
+        event.preventDefault();
+        onClick?.(event);
+      }}
+    >
+      {children}
+    </a>
   ),
 }));
 
@@ -39,7 +60,7 @@ describe('NotificationBell', () => {
           {
             id: 'abc',
             type: 'Welcome',
-            data: { title: 'Olá', action_url: '/x' },
+            data: { title: 'Olá' },
             read_at: null,
             created_at: '2026-07-07T00:00:00Z',
           },
@@ -56,6 +77,84 @@ describe('NotificationBell', () => {
       {},
       { preserveScroll: true, only: ['notifications'] },
     );
+  });
+
+  it('renders the item as a navigable link when action_url is present, and still marks it read', async () => {
+    mockProps = {
+      notifications: {
+        unread_count: 1,
+        recent: [
+          {
+            id: 'lnk',
+            type: 'Welcome',
+            data: { title: 'Go somewhere', action_url: '/x' },
+            read_at: null,
+            created_at: '2026-07-07T00:00:00Z',
+          },
+        ],
+      },
+    };
+    render(<NotificationBell />);
+    await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
+
+    const link = screen.getByRole('link', { name: /go somewhere/i });
+    expect(link).toHaveAttribute('href', '/x');
+    // The link must not be nested inside a <button> (invalid HTML).
+    expect(link.closest('button')).toBeNull();
+
+    await userEvent.click(link);
+    expect(post).toHaveBeenCalledWith(
+      '/admin/notifications/lnk/read',
+      {},
+      { preserveScroll: true, only: ['notifications'] },
+    );
+  });
+
+  it('respects a known data.icon value instead of the default Bell icon', async () => {
+    mockProps = {
+      notifications: {
+        unread_count: 1,
+        recent: [
+          {
+            id: 'ic',
+            type: 'Welcome',
+            data: { title: 'Checked', icon: 'check' },
+            read_at: null,
+            created_at: '2026-07-07T00:00:00Z',
+          },
+        ],
+      },
+    };
+    render(<NotificationBell />);
+    await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
+    const itemText = screen.getByText('Checked');
+
+    // lucide-react icons render an <svg class="lucide-check ...">; scope the
+    // lookup to the notification item (the trigger also renders a Bell icon).
+    const item = itemText.closest('button, a');
+    expect(item?.querySelector('svg.lucide-check')).not.toBeNull();
+    expect(item?.querySelector('svg.lucide-bell')).toBeNull();
+  });
+
+  it('falls back to the Bell icon for an unknown data.icon value', async () => {
+    mockProps = {
+      notifications: {
+        unread_count: 1,
+        recent: [
+          {
+            id: 'ic2',
+            type: 'Welcome',
+            data: { title: 'Mystery', icon: 'not-a-real-icon' },
+            read_at: null,
+            created_at: '2026-07-07T00:00:00Z',
+          },
+        ],
+      },
+    };
+    render(<NotificationBell />);
+    await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
+    const item = screen.getByText('Mystery').closest('button, a');
+    expect(item?.querySelector('svg.lucide-bell')).not.toBeNull();
   });
 
   it('renders a graceful fallback when data has no convention keys', async () => {

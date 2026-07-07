@@ -26,6 +26,8 @@ use Inertia\Middleware;
  */
 final class HandleArqelInertiaRequests extends Middleware
 {
+    private const int RECENT_NOTIFICATIONS_LIMIT = 10;
+
     /**
      * The Blade root view. Defaults to `arqel::app` (the Inertia
      * root template published by `arqel-dev/core`) so apps don't need
@@ -82,6 +84,7 @@ final class HandleArqelInertiaRequests extends Middleware
             ],
             'panel' => fn () => $this->currentPanel($user),
             'tenant' => fn () => $this->currentTenant($request),
+            'notifications' => fn () => $this->notificationsPayload($user),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
@@ -394,6 +397,45 @@ final class HandleArqelInertiaRequests extends Middleware
             'name' => $tenant->getAttribute('name'),
             'slug' => $tenant->getAttribute('slug'),
             'logo' => $tenant->getAttribute('logo'),
+        ];
+    }
+
+    /**
+     * Payload de notificações persistidas do usuário autenticado:
+     * contagem de não-lidas + as N mais recentes (lidas e não-lidas).
+     * Retorna null quando não há usuário — nada vaza.
+     *
+     * Também retorna null quando a tabela `notifications` não existe: essa
+     * prop roda em TODA request Inertia autenticada, então um app que ainda
+     * não publicou/rodou a migration não pode ter o painel inteiro derrubado
+     * por um `relation "notifications" does not exist`. Degrada em silêncio.
+     *
+     * @return array{unread_count: int, recent: array<int, array<string, mixed>>}|null
+     */
+    private function notificationsPayload(?Authenticatable $user): ?array
+    {
+        if ($user === null || ! method_exists($user, 'notifications')) {
+            return null;
+        }
+
+        if (! \Illuminate\Support\Facades\Schema::hasTable('notifications')) {
+            return null;
+        }
+
+        return [
+            'unread_count' => $user->unreadNotifications()->count(),
+            'recent' => $user->notifications()
+                ->latest()
+                ->limit(self::RECENT_NOTIFICATIONS_LIMIT)
+                ->get()
+                ->map(static fn ($n): array => [
+                    'id' => $n->id,
+                    'type' => class_basename($n->type),
+                    'data' => $n->data,
+                    'read_at' => $n->read_at?->toIso8601String(),
+                    'created_at' => $n->created_at->toIso8601String(),
+                ])
+                ->all(),
         ];
     }
 

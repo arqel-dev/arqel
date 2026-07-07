@@ -36,6 +36,19 @@ export interface FlashPayload {
   warning: string | null;
 }
 
+export interface NotificationItem {
+  id: string;
+  type: string;
+  data: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface NotificationPayload {
+  unread_count: number;
+  recent: NotificationItem[];
+}
+
 export interface ArqelMeta {
   version: string;
 }
@@ -52,6 +65,7 @@ export interface SharedProps {
   /** Translation map under the `arqel::*` namespace. */
   translations: Record<string, unknown>;
   arqel: ArqelMeta;
+  notifications: NotificationPayload | null;
 }
 
 /**

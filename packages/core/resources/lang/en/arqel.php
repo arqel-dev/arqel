@@ -185,6 +185,18 @@ return [
         // Visible + announced fallback name for a tenant with no `name`.
         'unnamed' => 'Tenant :id',
     ],
+    // Client-side chrome for the database notifications UI (Milestone 0.19).
+    // Resolved via useArqelTranslations() with the English literal as fallback.
+    'notifications' => [
+        'title' => 'Notifications',
+        'mark_read' => 'Mark as read',
+        'mark_all_read' => 'Mark all as read',
+        'empty' => 'No notifications',
+        'view_all' => 'View all',
+        'filter_all' => 'All',
+        'filter_unread' => 'Unread',
+        'delete' => 'Delete',
+    ],
     // aria-label + title tooltip for @arqel-dev/theme's <ThemeToggle>, which
     // cycles system → light → dark. Each value describes the CURRENT theme and
     // the theme reached on the next click. Resolved client-side via

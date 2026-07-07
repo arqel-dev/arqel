@@ -71,6 +71,16 @@ final class PostResource extends Resource
     public static ?string $recordTitleAttribute = 'title';
 
     /**
+     * Enable global record search across title and slug columns.
+     *
+     * @return array<int, string>
+     */
+    public static function globallySearchable(): array
+    {
+        return ['title', 'slug'];
+    }
+
+    /**
      * Authors keyed by id for the belongsTo select.
      *
      * @return array<int, string>

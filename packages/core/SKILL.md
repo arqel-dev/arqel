@@ -270,6 +270,44 @@ em vez de obter erros opacos no controller.
 - `Arqel\Core\Contracts\HasActions` — marker interface; assinaturas concretas chegam com `arqel-dev/actions`
 - `Arqel\Core\Contracts\HasPolicies` — `getPolicy(): ?string` opcional; integra com Laravel Policies (ADR-017)
 
+### Plugin API (in-code)
+
+Um pacote pode injetar conteúdo num Panel implementando `Arqel\Core\Contracts\Plugin`:
+
+```php
+use Arqel\Core\Contracts\Plugin;
+use Arqel\Core\Panel\Concerns\CreatesPlugin;
+use Arqel\Core\Panel\Panel;
+
+final class BlogPlugin implements Plugin
+{
+    use CreatesPlugin; // provê ::make()
+
+    public function getId(): string { return 'blog'; }
+
+    public function register(Panel $panel): void
+    {
+        $panel->resources([...$panel->getResources(), PostResource::class]);
+    }
+
+    public function boot(Panel $panel): void
+    {
+        // efeitos após todos os plugins registrarem — bind de serviços, listeners
+    }
+}
+```
+
+Registro na cadeia fluente do Panel:
+
+```php
+Arqel::panel('admin')->plugin(BlogPlugin::make());
+```
+
+- `register()` roda eager (no `->plugin()`); `boot()` roda antes do sync de resources, então plugins podem registrar resources em `boot()` e eles ainda viram rota.
+- Plugins são keyed por `getId()` — registrar o mesmo id substitui (permite override). **Atenção:** sobrescrever um id não reverte os resources que o `register()` do plugin anterior (do mesmo id) já tinha adicionado ao Panel — o último-vence aplica-se apenas à entrada em `getPlugins()`, não aos side-effects já aplicados via `resources()`/`widgets()` etc.
+- `resources()` **substitui** o array; para acrescentar, use o spread `[...$panel->getResources(), X]`.
+- Prefira adicionar resources em `register()` (roda 1x, eager). `boot()` é para efeitos colaterais; append de resources em `boot()` não é idempotente.
+
 ## Policy debugger (DEVTOOLS-004)
 
 Em ambiente `local`, o `ArqelServiceProvider` regista um listener

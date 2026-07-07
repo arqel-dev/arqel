@@ -47,6 +47,10 @@
       "types": "./dist/inertia.d.ts",
       "import": "./dist/inertia.js"
     },
+    "./relations": {
+      "types": "./dist/relations.d.ts",
+      "import": "./dist/relations.js"
+    },
     "./tenant": {
       "types": "./dist/tenant.d.ts",
       "import": "./dist/tenant.js"

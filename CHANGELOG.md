@@ -7,6 +7,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Added
+
+- **core (Relation Managers):** aba na página de edição de um Resource que gerencia uma relação Eloquent do registro-pai — CRUD para HasMany/MorphMany e attach/detach para BelongsToMany, cada operação autorizada pela Policy do model relacionado. Declarado via classe `RelationManager` registrada em `Resource::relations()`; controller genérico `RelationController` expõe 8 endpoints (index/create/store/edit/update/destroy/attach/detach) com `{relation}` validado contra allowlist (404) e `{related}` sempre escopado ao pai (anti-IDOR). Attach de BelongsToMany aceita pivot data somente via a allowlist `RelationManager::pivotFields()`. No React, `ResourceEditTabs` + `RelationManagerPanel` + `RelationFormModal`/`AttachModal` renderizam a UI em abas na página de edição, sem regressão para Resources sem relações. Fecha a lacuna competitiva #2 vs Filament/Nova (Imports fechou a #1). MorphTo/HasManyThrough e relation-*fields* ficam para 0.18b.
+
 ## [0.16.0] - 2026-07-06
 
 ### Summary

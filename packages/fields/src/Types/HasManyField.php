@@ -21,7 +21,7 @@ final class HasManyField extends Field
 {
     protected string $type = 'hasMany';
 
-    protected string $component = 'HasManyTable';
+    protected string $component = 'HasManyReadonly';
 
     /** @var class-string<HasResource> */
     protected string $relatedResource;

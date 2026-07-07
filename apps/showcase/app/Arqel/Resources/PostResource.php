@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Arqel\Resources;
 
+use App\Arqel\Relations\CategoriesRelationManager;
+use App\Arqel\Relations\CommentsRelationManager;
 use App\Models\Author;
 use App\Models\Post;
 use Arqel\Actions\Action;
@@ -98,6 +100,22 @@ final class PostResource extends Resource
             new BooleanField('featured'),
             new DateTimeField('published_at'),
             Field::keyValue('meta'),
+        ];
+    }
+
+    /**
+     * Dogfoods the RelationManager feature (0.18): `comments` exercises the
+     * hasMany path, `categories` the belongsToMany/attach path. Both relations
+     * are real and seeded by `DatabaseSeeder` (1-3 comments + 1-3 categories
+     * per post), so the tabs render populated tables out of the box.
+     *
+     * @return array<int, class-string<\Arqel\Core\Relations\RelationManager>>
+     */
+    public function relations(): array
+    {
+        return [
+            CommentsRelationManager::class,
+            CategoriesRelationManager::class,
         ];
     }
 

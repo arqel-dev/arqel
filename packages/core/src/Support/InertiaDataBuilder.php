@@ -6,6 +6,7 @@ namespace Arqel\Core\Support;
 
 use ArgumentCountError;
 use Arqel\Core\Panel\PanelRegistry;
+use Arqel\Core\Relations\RelationManager;
 use Arqel\Core\Resources\Resource;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -234,6 +235,69 @@ final class InertiaDataBuilder
     }
 
     /**
+     * Serialize a Table-shaped object's SCHEMA (columns, filters, config,
+     * etc.) with each column/filter run through its own toArray() — the same
+     * pipeline the resource index uses. Use this instead of a raw
+     * $table->toArray(), whose 'columns' are unserialized Column objects
+     * (they JSON-encode to {} and crash the React DataTable, which needs
+     * col.name for the react-table column id).
+     *
+     * Reuses `callTableArray()` + `serializeMany()` — the exact private
+     * helpers `buildTableIndexData()` already uses for the resource index's
+     * `columns`/`filters`/`actions` keys — so both surfaces share one
+     * serialization pipeline rather than diverging. Unlike
+     * `buildTableIndexData()`, this method takes no `Resource` and emits no
+     * `records`/`pagination`: those helpers only thread a `Resource` through
+     * for action-shaped `toArray($user, $record, $resource)` calls
+     * (`callToArray()`), which gracefully accepts a null `$resource` (see
+     * that method's ArgumentCountError fallback), so the schema still
+     * serializes correctly without one. Relation managers have no
+     * `Resource` of their own, so callers here are not forced to construct
+     * a fake one.
+     *
+     * @return array<string, mixed>
+     */
+    public function serializeTableSchema(object $table, ?Authenticatable $user = null): array
+    {
+        return [
+            'columns' => $this->serializeMany($this->callTableArray($table, 'getColumns')),
+            'filters' => $this->serializeMany($this->callTableArray($table, 'getFilters')),
+            'actions' => [
+                'row' => $this->serializeMany($this->callTableArray($table, 'getActions'), $user),
+                'bulk' => $this->serializeMany($this->callTableArray($table, 'getBulkActions'), $user),
+                'toolbar' => $this->serializeMany($this->callTableArray($table, 'getToolbarActions'), $user),
+            ],
+            'config' => $this->callTableConfig($table),
+        ];
+    }
+
+    /**
+     * Extract the `config` sub-array a real `Arqel\Table\Table::toArray()`
+     * emits (defaultPerPage/perPageOptions/searchable/etc.), when the table
+     * exposes it via `toArray()`. Duck-typed and best-effort: a table
+     * without a `config` key (e.g. a bare stub in tests) contributes an
+     * empty array rather than failing, matching this class's existing
+     * fail-soft conventions for optional table facets.
+     *
+     * @return array<string, mixed>
+     */
+    private function callTableConfig(object $table): array
+    {
+        if (! method_exists($table, 'toArray')) {
+            return [];
+        }
+
+        $raw = $table->toArray();
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $config = $raw['config'] ?? [];
+
+        return is_array($config) ? $config : [];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function buildCreateData(Resource $resource, Request $request): array
@@ -272,6 +336,7 @@ final class InertiaDataBuilder
             'recordTitle' => $resource->recordTitle($record),
             'recordSubtitle' => $resource->recordSubtitle($record),
             'fields' => $this->serializer->serialize($fields, $record, $user, $record, $resource::getSlug()),
+            'relations' => $this->serializeRelations($resource, $record, $user),
         ];
 
         if ($form !== null) {
@@ -279,6 +344,23 @@ final class InertiaDataBuilder
         }
 
         return $payload;
+    }
+
+    /**
+     * Serialise each declared RelationManager for `$resource` via its own
+     * `toArray($record, $user)` (Task 3), so the React edit page can render
+     * the relation-manager tabs (Task 8). `Resource::getRelations()` (Task 2)
+     * returns `[]` for a Resource without relation managers, so this is a
+     * purely additive prop: existing Resources get `relations => []`.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeRelations(Resource $resource, Model $record, ?Authenticatable $user): array
+    {
+        return collect($resource->getRelations())
+            ->map(fn (RelationManager $manager): array => $manager->toArray($record, $user))
+            ->values()
+            ->all();
     }
 
     /**
@@ -544,40 +626,23 @@ final class InertiaDataBuilder
     }
 
     /**
-     * Render a single record for index payloads. Adds Arqel-side
-     * meta (recordTitle/recordSubtitle) on top of the model's
-     * default `toArray`, plus the per-row visible-actions list
-     * (resolved against `Action::isVisibleFor` + `canBeExecutedBy`)
-     * and per-row action overrides (`url`/`disabled`) for actions that
-     * are record-dependent (closure URL or closure disabled, #140).
+     * Apply state-column resolution (#206) + per-record canSee redaction
+     * (#182) to a record's array payload, given the table's columns. Shared
+     * by the resource index (`serializeRecord`) and the relation index
+     * (`RelationController::index`), so both surfaces enforce the exact
+     * same disclosure/computed-column semantics — no divergent
+     * reimplementation on the relation side (review finding I1).
      *
-     * Per-record column redaction (#182): a column gated by
-     * `->canSee(fn ($record) => …)` whose predicate returns false for
-     * this row has its cell removed from the payload, so the value
-     * never reaches the client. Duck-typed against `Arqel\Table\Column`
-     * (`getName()` + `isVisibleFor(?Model)`); columns without a
-     * `canSee` predicate stay visible, so the default never regresses.
+     * Resolves ComputedColumn/`formatStateUsing` state BEFORE redaction so a
+     * `canSee()`-gated computed cell is still stripped, matching
+     * `serializeRecord()`'s existing ordering.
      *
-     * @param array<int, mixed> $rowActions Row actions declared on Resource::table
-     * @param array<int, mixed> $columns Columns declared on Resource::table
+     * @param array<int, mixed> $columns
      *
      * @return array<string, mixed>
      */
-    private function serializeRecord(mixed $record, Resource $resource, array $rowActions = [], ?Authenticatable $user = null, array $columns = []): array
+    public function applyColumnSerialization(Model $record, array $columns): array
     {
-        if (! $record instanceof Model) {
-            if (! is_array($record)) {
-                return [];
-            }
-
-            $clean = [];
-            foreach ($record as $key => $value) {
-                $clean[(string) $key] = $value;
-            }
-
-            return $clean;
-        }
-
         $payload = [];
         foreach ($record->toArray() as $key => $value) {
             $payload[(string) $key] = $value;
@@ -599,6 +664,44 @@ final class InertiaDataBuilder
         foreach ($this->resolveRedactedColumnNames($columns, $record) as $name) {
             unset($payload[$name]);
         }
+
+        return $payload;
+    }
+
+    /**
+     * Render a single record for index payloads. Adds Arqel-side
+     * meta (recordTitle/recordSubtitle) on top of the model's
+     * default `toArray`, plus the per-row visible-actions list
+     * (resolved against `Action::isVisibleFor` + `canBeExecutedBy`)
+     * and per-row action overrides (`url`/`disabled`) for actions that
+     * are record-dependent (closure URL or closure disabled, #140).
+     *
+     * Per-record column redaction (#182) and computed-column state
+     * resolution (#206) are delegated to `applyColumnSerialization()` — see
+     * that method's doc block for the duck-typed `Arqel\Table\Column`
+     * contract shared with the relation index.
+     *
+     * @param array<int, mixed> $rowActions Row actions declared on Resource::table
+     * @param array<int, mixed> $columns Columns declared on Resource::table
+     *
+     * @return array<string, mixed>
+     */
+    private function serializeRecord(mixed $record, Resource $resource, array $rowActions = [], ?Authenticatable $user = null, array $columns = []): array
+    {
+        if (! $record instanceof Model) {
+            if (! is_array($record)) {
+                return [];
+            }
+
+            $clean = [];
+            foreach ($record as $key => $value) {
+                $clean[(string) $key] = $value;
+            }
+
+            return $clean;
+        }
+
+        $payload = $this->applyColumnSerialization($record, $columns);
 
         $payload['arqel'] = [
             'title' => $resource->recordTitle($record),

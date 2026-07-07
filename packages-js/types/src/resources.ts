@@ -5,6 +5,7 @@
 
 import type { ResourceActions } from './actions.js';
 import type { FieldSchema } from './fields.js';
+import type { RelationManagerProps } from './relations.js';
 import type { ColumnSchema, FilterSchema, TableSort } from './tables.js';
 
 /**
@@ -109,6 +110,12 @@ export interface ResourceEditProps<TRecord extends RecordType = RecordType> {
   recordTitle: string;
   recordSubtitle: string | null;
   fields: FieldSchema[];
+  /**
+   * One entry per `RelationManager` declared on the Resource
+   * (`InertiaDataBuilder::serializeRelations`) — `[]` for Resources
+   * without relation managers (the common case; purely additive prop).
+   */
+  relations?: RelationManagerProps[];
 }
 
 /**

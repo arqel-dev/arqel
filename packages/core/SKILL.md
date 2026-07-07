@@ -95,6 +95,99 @@
     ```
   - **Coverage:** +8 testes unit (`CommandRegistryStaticHelperTest`, `AuthAwareFilterTest`).
 
+## Relation Managers (milestone 0.18)
+
+Aba na página de edição de um Resource que gerencia uma relação Eloquent do registro-pai — estilo Filament. Fecha a lacuna competitiva #2 vs Filament/Nova (ver `reports/roadmap-to-1.0.md`).
+
+**Classe base** (`Arqel\Core\Relations\RelationManager`, `src/Relations/RelationManager.php`):
+
+```php
+abstract class RelationManager
+{
+    public static string $relationship;    // nome da relação Eloquent no model do pai (ex: 'comments', 'tags')
+
+    abstract public function table(): mixed;  // reusa Arqel\Table\Table — lista os relacionados
+    public function fields(): array;          // default []; fonte de validação, igual a Resource::fields()
+    public function form(): mixed;             // opcional; null = sem create/edit no modal
+    public function relatedResource(): ?string; // opcional: FQCN de Resource do relacionado
+    public function pivotFields(): array;      // default []; allowlist de colunas de pivot aceitas no attach
+
+    public function slug(): string;                          // Str::snake($relationship)
+    public function label(): string;                         // Str::headline(slug())
+    public function relationType(Model $parent): string;     // 'hasMany'|'morphMany'|'belongsToMany'
+    public function supportsAttach(Model $parent): bool;      // true só para belongsToMany
+    public function abilities(Model $parent, ?Authenticatable $user): array;  // {create,update,delete,attach,detach}
+    public function toArray(Model $parent, ?Authenticatable $user = null): array;
+}
+```
+
+`table()`/`form()` retornam `mixed` (não `Arqel\Table\Table`/`Arqel\Form\Form`) pela mesma razão de `Resource::table()`/`form()`: `core` não depende de `arqel-dev/table`/`arqel-dev/form` (inversão de dependência — eles dependem de `core`). Consumidores fazem duck-typing via `method_exists($table, 'toArray')`.
+
+**Detecção de tipo em runtime:** `relationType()` inspeciona a instância `$parent->{$relationship}()` — `MorphMany` (checado **antes** de `HasMany`, pois `MorphMany extends HasMany`) → `'morphMany'`; `BelongsToMany` → `'belongsToMany'`; `HasMany` → `'hasMany'`; qualquer outro tipo lança `InvalidArgumentException`. **`MorphTo` e `HasManyThrough` estão fora de escopo** do 0.18 (candidatos a 0.18b).
+
+**Ponto de extensão no `Resource`** (aditivo, não-breaking, default vazio → zero regressão):
+
+```php
+// Resource.php
+public function relations(): array { return []; }   // array<string RelationManager::class>
+public function getRelations(): array;               // resolve slugs → instâncias RelationManager
+```
+
+**`RelationController`** (`src/Http/Controllers/RelationController.php`) — controller genérico relation-scoped (segue o precedente de `ExportAction`/`ImportAction`: um controller por feature, não um por relação), 8 endpoints registados sob `arqel.resources.relations.*`:
+
+| Verbo | Rota | Nome | Ação |
+|---|---|---|---|
+| GET | `{resource}/{parent}/relations/{relation}` | `relations.index` | lista os relacionados |
+| GET | `{resource}/{parent}/relations/{relation}/create` | `relations.create` | schema do form p/ modal |
+| POST | `{resource}/{parent}/relations/{relation}` | `relations.store` | cria filho (FK/morph injetados pelo Eloquent) |
+| GET | `{resource}/{parent}/relations/{relation}/{related}/edit` | `relations.edit` | schema + dados p/ modal |
+| PUT | `{resource}/{parent}/relations/{relation}/{related}` | `relations.update` | atualiza filho |
+| DELETE | `{resource}/{parent}/relations/{relation}/{related}` | `relations.destroy` | remove filho |
+| POST | `{resource}/{parent}/relations/{relation}/attach` | `relations.attach` | BelongsToMany: associa registro existente via pivot |
+| DELETE | `{resource}/{parent}/relations/{relation}/{related}/detach` | `relations.detach` | BelongsToMany: desassocia (não deleta) |
+
+`{relation}` é validado contra a allowlist de `Resource::getRelations()` → **404** se ausente (mesma lição de segurança do Imports #I1 — nunca aceitar nome arbitrário de relação). `{related}` é **sempre escopado por `{parent}`** (`$parent->{relation}()->find($related)`) — um related de outro pai não aparece na query escopada → **404** (anti-IDOR). `attach`/`detach` chamados numa relação `hasMany`/`morphMany` → **405** (`Response::HTTP_METHOD_NOT_ALLOWED`), via `RelationManager::supportsAttach()`.
+
+**Autorização — modelo de duas camadas, fail-open, contra a Policy do model RELACIONADO (não do pai):**
+
+| Endpoint | Ability | Fallback | Alvo passado ao Gate |
+|---|---|---|---|
+| index | `viewAny` | — | related class |
+| create/store | `create` | — | related class |
+| edit/update | `update` | — | related record (escopado) |
+| destroy | `delete` | — | related record |
+| attach | `attach` | `create` | related class (registro ainda não existe na relação) |
+| detach | `detach` | `delete` | related record (já resolvido, escopado) |
+
+Fail-open (permite) **somente** quando **nenhum** Gate rule nomeado **e** **nenhuma** Policy estão registados para o model relacionado — espelha exatamente `ResourceController::authorize()`. Assim que qualquer um dos dois existe, a autorização é enforced normalmente (`Gate::denies`/`Gate::allows`). `attach`/`detach` têm abilities próprias (não mapeiam 1:1 nas abilities CRUD) com fallback para `create`/`delete` quando a app não define `attach`/`detach` explicitamente.
+
+**Pivot allowlist (segurança):** `attach` só persiste colunas de pivot que estejam em `RelationManager::pivotFields()`. Por default (`[]`), **nenhum** dado de pivot enviado pelo cliente é aceito — protege contra mass-assignment de colunas de pivot arbitrárias (ex.: um campo `is_admin` na tabela pivot que o cliente não deveria poder setar). `$request->input('pivot')` é filtrado via `array_intersect_key` contra a allowlist antes de chegar em `attach($id, $pivot)`.
+
+**Validação:** `fields()` é a fonte, extraída via o mesmo `Arqel\Form\FieldRulesExtractor` string-referenciado que `ResourceController` usa (Reflection — sem hard dep em `arqel-dev/form`). Diferente do `ResourceController::extractRules()`, a ausência do extrator aqui devolve `[]` (não erro) — um form de relação é opcional.
+
+**React (`packages-js/ui/src/relations/`):**
+
+- **`ResourceEditTabs`** — wrapper page-level em torno da página de edição. Sem `relations` → renderiza o form como hoje (zero regressão). Com `relations` → abas "Dados" (form) + uma por RelationManager, sobre o `Tabs` primitivo shadcn/Radix. Aba ativa persistida na URL (`?tab=slug`).
+- **`RelationManagerPanel`** — conteúdo de uma aba: `DataTable` alimentado por `relations.index`; toolbar com "Novo" (ability `create`) e — só BelongsToMany — "Anexar" (ability `attach`); por linha, Editar (`update`) e Excluir/Desanexar (`delete`/`detach` conforme o tipo).
+- **`RelationFormModal`** — reusa `Modal` + `FormRenderer` para create/edit; on-success recarrega só as props da relação.
+- **`AttachModal`** (só BelongsToMany) — formulário para anexar um registro existente via `relations.attach`.
+
+**Serialização de ponta a ponta:** `RelationManager::toArray($parent, $user)` → `{ slug, label, type, table, fields, abilities }`, onde `abilities` já vem computado server-side (o React nunca re-decide autorização, só lê o booleano). Vai nas props Inertia da página de edição do pai, sob a chave `relations`.
+
+**Fora de escopo (0.18b ou além):**
+
+- Novos relation-*fields* (BelongsToMany/MorphTo/MorphMany/HasManyThrough como campos de formulário, não como aba).
+- `MorphTo` e `HasManyThrough` como tipo de RelationManager.
+- Reescrita do `HasManyField` inline / Repeater.
+- Edição inline na célula; reordenação de relacionados; relation managers aninhados.
+
+**Limitações conhecidas (acumuladas na implementação — ver Anti-patterns):**
+
+- `AttachModal` usa um input de id simples, não um combobox pesquisável (o `BelongsToInput` de `arqel-dev/fields` não é reutilizável aqui sem criar um dep circular `fields → ui`); precisa de uma rota `attachSearchRoute` no servidor + um combobox local em `ui`.
+- UI de pivot fields não implementada — `AttachModal` sempre envia `pivot: {}`; a allowlist `pivotFields()` já existe no servidor mas não há UI para preenchê-la.
+- Os painéis de relação fazem fetch eager ao montar (Radix monta todo `TabsContent`, mesmo o inativo) — deveria gatear no `tab`-ativo.
+- Falha silenciosa de refetch após uma mutação deixa dados obsoletos sem erro visível ao usuário (falta um toast).
+
 ## Key Contracts
 
 As APIs principais que outros pacotes e apps consomem:
@@ -483,6 +576,7 @@ app(\Arqel\Core\Telemetry\MetricsCollector::class)
 - ❌ **Registrar rotas globais** fora do controlo do Panel. Rotas são sempre scoped para o `Panel` actual.
 - ❌ **Chamar `Auth::user()` directo em Resources**. Usa `request()->user()` ou injeção via controller — facilita testes com `actingAs()`.
 - ❌ **Macros em Eloquent em service provider** — quebra previsibilidade. Se precisares, documenta explicitamente.
+- ❌ **Aceitar `{relation}`/dados de pivot arbitrários num RelationManager**. `{relation}` é sempre validado contra a allowlist de `Resource::getRelations()` (404 caso contrário) e o pivot de `attach()` é sempre filtrado contra `RelationManager::pivotFields()` — nunca confiar em input direto do cliente para nome de relação ou colunas de pivot.
 
 ## Related
 
@@ -496,3 +590,4 @@ app(\Arqel\Core\Telemetry\MetricsCollector::class)
   - [ADR-003](../../PLANNING/03-adrs.md) — Eloquent-native
   - [ADR-017](../../PLANNING/03-adrs.md) — Policies como authorization canónica
   - [ADR-018](../../PLANNING/03-adrs.md) — Service Provider auto-discovery
+- Design spec Relation Managers: [`docs/superpowers/specs/2026-07-06-relation-manager-design.md`](../../docs/superpowers/specs/2026-07-06-relation-manager-design.md)

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\Http\Controllers\RelationController;
 use Arqel\Core\Http\Controllers\ResourceController;
 use Illuminate\Support\Facades\Route;
 
@@ -107,4 +108,57 @@ Route::name('arqel.resources.')->group(function () use ($resourceSlugPattern): v
         ->where('resource', $resourceSlugPattern)
         ->where('action', '[a-z][a-z0-9_-]*')
         ->where('id', '[0-9a-zA-Z\-_]+');
+
+    // Relation manager: list a parent's related records, scoped to the
+    // parent (anti-IDOR) and authorized against the related model
+    // (Task 4 of docs/superpowers/plans/2026-07-06-relation-manager.md).
+    // `{relation}` is validated against the resource's declared
+    // RelationManager allowlist INSIDE the controller (404 otherwise) —
+    // the route itself imposes no allowlist on this segment.
+    Route::get('{resource}/{parent}/relations/{relation}', [RelationController::class, 'index'])
+        ->name('relations.index')
+        ->where('resource', $resourceSlugPattern);
+
+    // Relation manager: create + store a child record, FK/morph injected
+    // by Eloquent (Task 5 of docs/superpowers/plans/2026-07-06-relation-manager.md).
+    Route::get('{resource}/{parent}/relations/{relation}/create', [RelationController::class, 'create'])
+        ->name('relations.create')
+        ->where('resource', $resourceSlugPattern);
+    Route::post('{resource}/{parent}/relations/{relation}', [RelationController::class, 'store'])
+        ->name('relations.store')
+        ->where('resource', $resourceSlugPattern);
+
+    // Relation manager: edit + update + destroy a child record, scoped to
+    // the parent via `findRelated()` (anti-IDOR) (Task 6 of
+    // docs/superpowers/plans/2026-07-06-relation-manager.md).
+    Route::get('{resource}/{parent}/relations/{relation}/{related}/edit', [RelationController::class, 'edit'])
+        ->name('relations.edit')
+        ->where('resource', $resourceSlugPattern);
+    Route::put('{resource}/{parent}/relations/{relation}/{related}', [RelationController::class, 'update'])
+        ->name('relations.update')
+        ->where('resource', $resourceSlugPattern);
+    Route::delete('{resource}/{parent}/relations/{relation}/{related}', [RelationController::class, 'destroy'])
+        ->name('relations.destroy')
+        ->where('resource', $resourceSlugPattern);
+
+    // Relation manager: attach/detach a BelongsToMany pivot without
+    // creating/deleting the related record itself (Task 7 of
+    // docs/superpowers/plans/2026-07-06-relation-manager.md). 405 on a
+    // non-belongsToMany relation is enforced inside the controller via
+    // `RelationManager::supportsAttach()`.
+    //
+    // Route-ordering note: `attach`/`detach` add a literal trailing path
+    // segment (`/attach`, `/detach`) beyond `relations.store`'s
+    // `{resource}/{parent}/relations/{relation}` and
+    // `relations.update`/`destroy`'s `.../{relation}/{related}` shapes, so
+    // there is no wildcard-vs-literal ambiguity between them — but they are
+    // still registered here, after the other relation routes, so a literal
+    // segment never has a chance to be swallowed by an earlier `{related}`
+    // wildcard route of the same HTTP verb + path length.
+    Route::post('{resource}/{parent}/relations/{relation}/attach', [RelationController::class, 'attach'])
+        ->name('relations.attach')
+        ->where('resource', $resourceSlugPattern);
+    Route::delete('{resource}/{parent}/relations/{relation}/{related}/detach', [RelationController::class, 'detach'])
+        ->name('relations.detach')
+        ->where('resource', $resourceSlugPattern);
 });

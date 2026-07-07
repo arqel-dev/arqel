@@ -7,9 +7,11 @@ namespace Arqel\Core\Resources;
 use Arqel\Core\Contracts\HasActions;
 use Arqel\Core\Contracts\HasFields;
 use Arqel\Core\Contracts\HasResource;
+use Arqel\Core\Relations\RelationManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use LogicException;
 
 /**
@@ -200,6 +202,35 @@ abstract class Resource implements HasActions, HasFields, HasResource
     public function form(): mixed
     {
         return null;
+    }
+
+    /**
+     * Relation managers declared for this Resource.
+     *
+     * @return array<int, class-string<RelationManager>>
+     */
+    public function relations(): array
+    {
+        return [];
+    }
+
+    /**
+     * Instantiate the declared relation managers, keyed by slug.
+     *
+     * @return array<string, RelationManager>
+     */
+    public function getRelations(): array
+    {
+        $managers = [];
+        foreach ($this->relations() as $class) {
+            $manager = new $class;
+            if (! $manager instanceof RelationManager) {
+                throw new InvalidArgumentException(sprintf('[%s] must extend %s.', $class, RelationManager::class));
+            }
+            $managers[$manager->slug()] = $manager;
+        }
+
+        return $managers;
     }
 
     /**

@@ -40,6 +40,7 @@ const scopes = [
   'gov',
   'docs',
   'demo',
+  'showcase',
   'qa',
   'tickets',
   'sprint',

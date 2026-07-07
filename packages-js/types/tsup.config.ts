@@ -9,6 +9,7 @@ export default defineConfig({
     forms: 'src/forms.ts',
     actions: 'src/actions.ts',
     inertia: 'src/inertia.ts',
+    relations: 'src/relations.ts',
     tenant: 'src/tenant.ts',
   },
   format: ['esm'],

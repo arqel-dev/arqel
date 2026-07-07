@@ -7,9 +7,15 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-07-07
+
+### Summary
+
+Release minor que entrega os **Relation Managers** (milestone 0.18, fechando a lacuna competitiva #2 vs Filament/Nova). Sem breaking changes de API pública desde 0.16.0.
+
 ### Added
 
-- **core (Relation Managers):** aba na página de edição de um Resource que gerencia uma relação Eloquent do registro-pai — CRUD para HasMany/MorphMany e attach/detach para BelongsToMany, cada operação autorizada pela Policy do model relacionado. Declarado via classe `RelationManager` registrada em `Resource::relations()`; controller genérico `RelationController` expõe 8 endpoints (index/create/store/edit/update/destroy/attach/detach) com `{relation}` validado contra allowlist (404) e `{related}` sempre escopado ao pai (anti-IDOR). Attach de BelongsToMany aceita pivot data somente via a allowlist `RelationManager::pivotFields()`. No React, `ResourceEditTabs` + `RelationManagerPanel` + `RelationFormModal`/`AttachModal` renderizam a UI em abas na página de edição, sem regressão para Resources sem relações. Fecha a lacuna competitiva #2 vs Filament/Nova (Imports fechou a #1). MorphTo/HasManyThrough e relation-*fields* ficam para 0.18b.
+- **core (Relation Managers):** aba na página de edição de um Resource que gerencia uma relação Eloquent do registro-pai — CRUD para HasMany/MorphMany e attach/detach para BelongsToMany, cada operação autorizada pela Policy do model relacionado. Declarado via classe `RelationManager` registrada em `Resource::relations()`; controller genérico `RelationController` expõe 8 endpoints (index/create/store/edit/update/destroy/attach/detach) com `{relation}` validado contra allowlist (404) e `{related}` sempre escopado ao pai (anti-IDOR). Attach de BelongsToMany aceita pivot data somente via a allowlist `RelationManager::pivotFields()`. No React, `ResourceEditTabs` + `RelationManagerPanel` + `RelationFormModal`/`AttachModal` renderizam a UI em abas na página de edição, sem regressão para Resources sem relações. Fecha a lacuna competitiva #2 vs Filament/Nova (Imports fechou a #1). MorphTo/HasManyThrough e relation-*fields* ficam para 0.18b (#356).
 
 ### Security
 
@@ -607,7 +613,8 @@ Primeiro release pós-MVP. Bump coordenado de todos os pacotes (`packages-js/*` 
 
 - _Sem entradas — primeira release tagueada._
 
-[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/arqel-dev/arqel/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/arqel-dev/arqel/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/arqel-dev/arqel/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/arqel-dev/arqel/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/arqel-dev/arqel/compare/v0.14.0...v0.15.0

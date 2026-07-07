@@ -8,11 +8,11 @@
     "packages": [
         {
             "name": "arqel-dev/core",
-            "version": "0.16.0",
+            "version": "0.17.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/core",
-                "reference": "3c62829cf892cfb4f0d570b37e3ba9d5f913f5d7"
+                "reference": "d6fe5422b9aa973786b7bbe1499fb33572947eb5"
             },
             "require": {
                 "inertiajs/inertia-laravel": "^3.0",
@@ -87,11 +87,11 @@
         },
         {
             "name": "arqel-dev/marketplace",
-            "version": "0.16.0",
+            "version": "0.17.0",
             "dist": {
                 "type": "path",
                 "url": "../../packages/marketplace",
-                "reference": "ad0168a62fed67aeefee82023b125723b722e71e"
+                "reference": "662b09a42a629d662da3d67dfd7425bdce3aa833"
             },
             "require": {
                 "arqel-dev/core": "@dev",

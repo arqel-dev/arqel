@@ -1,10 +1,11 @@
 # Arqel — Roadmap to 1.0
 
 > **Documento vivo.** Gap analysis acionável rumo à v1.0.0 estável.
-> Base: **v0.16.0** (publicado 2026-07-06 — npm + Packagist). Atualizado por rodadas do loop de qualidade.
-> Última atualização: 2026-07-06 (rodada 5).
+> Base: **v0.17.0** (publicado 2026-07-07 — npm + Packagist). Atualizado por rodadas do loop de qualidade.
+> Última atualização: 2026-07-07 (rodada 6).
 
 > **Changelog do documento**
+> - **Rodada 6 (2026-07-07):** **v0.17.0 PUBLICADO** — minor release entregando os Relation Managers (milestone 0.18, #356) + fixes de segurança (command-injection/RCE do `arqel new --first-resource` #360; cobertura de deny-path 403 da CRUD de relação #358). Milestone 0.18 publicado. 0.19 (Plugin API + Notifications + Global Search) em andamento por sessão paralela (`feat/plugin-api`).
 > - **Rodada 5 (2026-07-06):** **Relation Managers ENTREGUE** (milestone 0.18, PR #356) — `RelationManager` + `Resource::relations()` + `RelationController` (8 endpoints) + React (`ResourceEditTabs`/`RelationManagerPanel`/modais) + dogfood + E2E (validado ao vivo). CRUD para HasMany/MorphMany, attach/detach para BelongsToMany; MorphTo/HasManyThrough deferidos a 0.18b. Lacuna competitiva #2 fechada → HAVE. Foco movido para 0.19 (Extensibilidade + Notifications).
 > - **Rodada 4 (2026-07-06):** **v0.16.0 PUBLICADO** — minor release entregando Imports (`arqel/import`), UI de conta (UserMenu + Perfil, #333), e 4 fixes de segurança (marketplace SecurityScanner #352, autz por-resource dos endpoints AI #354, export CSV-injection #340, bulk-action authz #341). Milestones 0.16 (Perfil+gerador) e 0.17 (Imports) ambos entregues e publicados. 0.18 (Relation Managers) retomado nesta sessão (PR #356).
 > - **Rodada 3 (2026-07-05):** **Imports ENTREGUE** (`arqel/import`, PR #346 feature + PR #349 hardening de 3 bugs). Lacuna competitiva #1 fechada → HAVE. Milestone 0.17 concluído. Foco movido para 0.18 (Relation Managers).

@@ -44,8 +44,9 @@ it('marks a notification as read scoped to the owner', function (): void {
     $id = makeNotification($user);
 
     $this->actingAs($user)
+        ->from('/admin')
         ->post("/admin/notifications/{$id}/read")
-        ->assertRedirect(route('arqel.notifications.index'));
+        ->assertRedirect('/admin');
 
     expect($user->notifications()->find($id)->read_at)->not->toBeNull();
 });
@@ -68,8 +69,9 @@ it('marks all as read', function (): void {
     makeNotification($user);
 
     $this->actingAs($user)
+        ->from('/admin')
         ->post('/admin/notifications/read-all')
-        ->assertRedirect(route('arqel.notifications.index'));
+        ->assertRedirect('/admin');
 
     expect($user->unreadNotifications()->count())->toBe(0);
 });
@@ -79,8 +81,9 @@ it('destroys a notification scoped to the owner', function (): void {
     $id = makeNotification($user);
 
     $this->actingAs($user)
+        ->from('/admin/notifications')
         ->delete("/admin/notifications/{$id}")
-        ->assertRedirect(route('arqel.notifications.index'));
+        ->assertRedirect('/admin/notifications');
 
     expect($user->notifications()->find($id))->toBeNull();
 });

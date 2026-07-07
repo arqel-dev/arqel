@@ -44,21 +44,21 @@ final class NotificationController
     {
         $this->user($request)->notifications()->findOrFail($notification)->markAsRead();
 
-        return $this->back(__('arqel::notifications.marked_read'));
+        return redirect()->back()->with('success', __('arqel::notifications.marked_read'));
     }
 
     public function markAllAsRead(Request $request): RedirectResponse
     {
         $this->user($request)->unreadNotifications->markAsRead();
 
-        return $this->back(__('arqel::notifications.all_marked_read'));
+        return redirect()->back()->with('success', __('arqel::notifications.all_marked_read'));
     }
 
     public function destroy(Request $request, string $notification): RedirectResponse
     {
         $this->user($request)->notifications()->findOrFail($notification)->delete();
 
-        return $this->back(__('arqel::notifications.deleted'));
+        return redirect()->back()->with('success', __('arqel::notifications.deleted'));
     }
 
     private function user(Request $request): Authenticatable
@@ -67,10 +67,5 @@ final class NotificationController
         abort_if($user === null, 403);
 
         return $user;
-    }
-
-    private function back(string $message): RedirectResponse
-    {
-        return redirect()->route('arqel.notifications.index')->with('success', $message);
     }
 }

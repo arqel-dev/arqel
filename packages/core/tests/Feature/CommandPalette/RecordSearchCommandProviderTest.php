@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 use Arqel\Core\CommandPalette\Command;
 use Arqel\Core\CommandPalette\Providers\RecordSearchCommandProvider;
-use Arqel\Core\Resources\Resource;
 use Arqel\Core\Resources\ResourceRegistry;
-use Illuminate\Database\Eloquent\Model;
+use Arqel\Core\Tests\Fixtures\GlobalSearch\RsPerson;
+use Arqel\Core\Tests\Fixtures\GlobalSearch\RsPersonResource;
+use Arqel\Core\Tests\Fixtures\GlobalSearch\RsSilentResource;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
@@ -20,53 +21,6 @@ beforeEach(function () {
 });
 
 afterEach(fn () => Schema::dropIfExists('rs_people'));
-
-class RsPerson extends Model
-{
-    protected $table = 'rs_people';
-
-    protected $guarded = [];
-
-    public $timestamps = false;
-}
-
-class RsPersonResource extends Resource
-{
-    public static string $model = RsPerson::class;
-
-    public static function getSlug(): string
-    {
-        return 'people';
-    }
-
-    public static function globallySearchable(): array
-    {
-        return ['name', 'email'];
-    }
-
-    public function fields(): array
-    {
-        return [];
-    }
-}
-
-// Registered resource whose globallySearchable() is left at the trait
-// default ([]) — used to assert the provider skips resources that have
-// not opted in to global search (security-by-default).
-class RsSilentResource extends Resource
-{
-    public static string $model = RsPerson::class;
-
-    public static function getSlug(): string
-    {
-        return 'silent';
-    }
-
-    public function fields(): array
-    {
-        return [];
-    }
-}
 
 function makeProvider(): RecordSearchCommandProvider
 {
@@ -138,7 +92,7 @@ it('skips a resource when viewAny is denied', function () {
     RsPerson::create(['name' => 'Ana Lima']);
     Gate::define('viewAny', fn () => false);
 
-    $user = new class extends Model implements Illuminate\Contracts\Auth\Authenticatable
+    $user = new class extends Illuminate\Database\Eloquent\Model implements Illuminate\Contracts\Auth\Authenticatable
     {
         use Illuminate\Auth\Authenticatable;
     };

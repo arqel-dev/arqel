@@ -7,6 +7,22 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-07-07
+
+### Summary
+
+Release minor que entrega o **milestone 0.19** completo — as três lacunas competitivas restantes vs Filament/Nova: **Plugin API in-code**, **Global Search cross-resource** e **Database Notifications UI**. Sem breaking changes de API pública desde 0.17.0.
+
+### Added
+
+- **core (Plugin API in-code):** um contrato `Arqel\Core\Contracts\Plugin` (`getId`/`register`/`boot`) + o trait opcional `CreatesPlugin` (`::make()`) permitem a um pacote injetar resources num `Panel` programaticamente via `Panel::plugin(MyPlugin::make())`. Lifecycle two-phase: `register(Panel)` roda eager na cadeia fluente; `bootPanelPlugins()` roda no `app->booted()` **antes** do sync de resources, então um resource adicionado em `boot()` ainda vira rota. Plugins são keyed por `getId()` (último-vence, permite override). Fecha a lacuna competitiva #5 (extensibilidade in-code). Bridge `widgets()`→`DashboardRegistry` fica para 0.19b (#362).
+- **core (Global Search):** busca de registros cross-resource na command palette via `getGloballySearchableAttributes()` no Resource — o spotlight passa a encontrar registros de qualquer resource, não só navegar entre telas. Fecha a lacuna competitiva #6 (#364).
+- **core (Database Notifications UI):** sino read/unread no topbar (badge de não-lidas + dropdown das recentes) + página de histórico paginada (`/admin/notifications`), sobre as `DatabaseNotification` nativas do Laravel. O app dispara `$user->notify(new X)` (Laravel-native); o Arqel fornece a UI + a infra de leitura/gestão. Shared prop `notifications` (`{unread_count, recent}`) exposta lazy e escopada ao usuário autenticado; `NotificationController` (`@internal`) com index/markAsRead/markAllAsRead/destroy, todos escopados a `$user->notifications()->findOrFail()` (anti-IDOR → 404 para notificação de outro dono). No React, `NotificationBell` renderiza por convenção de chaves opcionais no `data` (`title`/`body`/`action_url`/`icon`, com `action_url` restrito a URLs de mesma-origem — anti open-redirect). Fecha a lacuna competitiva #4. Broadcast realtime fica para 0.19b (#366).
+
+### Fixed
+
+- **core (notifications):** a shared prop `notifications` degrada para `null` (em vez de lançar `relation "notifications" does not exist`) quando a tabela ainda não foi publicada/migrada — a prop roda em toda request autenticada, então um app consumidor sem a migration não pode ter o painel inteiro derrubado (#366).
+
 ## [0.17.0] - 2026-07-07
 
 ### Summary

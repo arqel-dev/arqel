@@ -45,6 +45,13 @@ abstract class TestCase extends Orchestra
     /**
      * Load package migrations and relation-manager fixtures.
      *
+     * The provider does NOT set spatie's `runsMigrations(true)` (see
+     * `ArqelServiceProvider::configurePackage()`), so its auto-load never
+     * fires here — this hook is the single source that creates the
+     * package tables (e.g. `notifications`) for the test DB. There is no
+     * double-load with the dated migration name registered via
+     * `hasMigration()`, matching the pattern used by `arqel-dev/versioning`.
+     *
      * Relation-manager fixtures (Task 4+): `rel_posts` (hasMany `comments`,
      * belongsToMany `tags`), `rel_comments`, `rel_tags`, and the `rel_post_tag`
      * pivot. Shared across `Relations/*` feature tests so each test does not
@@ -52,7 +59,6 @@ abstract class TestCase extends Orchestra
      */
     protected function defineDatabaseMigrations(): void
     {
-        // Load package migrations first (notifications, etc.)
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         \Illuminate\Support\Facades\Schema::create('rel_posts', function ($t): void {

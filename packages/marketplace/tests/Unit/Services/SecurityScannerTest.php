@@ -223,3 +223,67 @@ it('fails safe on an unknown severity instead of silently passing', function ():
     expect($scan->status)->not->toBe('passed');
     expect($scan->severity)->toBe('high');
 });
+
+it('does not flag a plugin whose version is above the affected range', function (): void {
+    Event::fake([PluginAutoDelistedEvent::class]);
+
+    $vulnDb = new FakeVulnerabilityDatabase([
+        'composer:acme/fixed' => [
+            new Advisory('GHSA-1', 'critical', 'RCE in old versions', '<2.0'),
+        ],
+    ]);
+    $scanner = new SecurityScanner($vulnDb);
+
+    $plugin = makeScanPlugin([
+        'composer_package' => 'acme/fixed',
+        'latest_version' => '2.5.0', // already patched — above the <2.0 range
+    ]);
+
+    $scan = $scanner->scan($plugin);
+
+    expect($scan->status)->toBe('passed');
+    expect($scan->severity)->toBeNull();
+    expect($scan->findings)->toBe([]);
+
+    $plugin->refresh();
+    expect($plugin->status)->toBe('published'); // NOT archived
+    Event::assertNotDispatched(PluginAutoDelistedEvent::class);
+});
+
+it('flags a plugin whose version is inside the affected range', function (): void {
+    $vulnDb = new FakeVulnerabilityDatabase([
+        'composer:acme/vuln' => [
+            new Advisory('GHSA-2', 'critical', 'RCE', '>=1.0,<1.5'),
+        ],
+    ]);
+    $scanner = new SecurityScanner($vulnDb);
+
+    $plugin = makeScanPlugin([
+        'composer_package' => 'acme/vuln',
+        'latest_version' => '1.3.0', // inside the range
+    ]);
+
+    $scan = $scanner->scan($plugin);
+
+    expect($scan->status)->toBe('failed');
+    expect($scan->severity)->toBe('critical');
+});
+
+it('fails safe: flags when the installed version is unknown', function (): void {
+    $vulnDb = new FakeVulnerabilityDatabase([
+        'composer:acme/noversion' => [
+            new Advisory('GHSA-3', 'high', 'serious', '<2.0'),
+        ],
+    ]);
+    $scanner = new SecurityScanner($vulnDb);
+
+    $plugin = makeScanPlugin([
+        'composer_package' => 'acme/noversion',
+        // latest_version not set → null → fail-safe affected
+    ]);
+
+    $scan = $scanner->scan($plugin);
+
+    expect($scan->severity)->toBe('high');
+    expect($scan->findings)->toHaveCount(1);
+});

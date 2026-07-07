@@ -208,6 +208,39 @@ Fail-open (permite) **somente** quando **nenhum** Gate rule nomeado **e** **nenh
 - Os painéis de relação fazem fetch eager ao montar (Radix monta todo `TabsContent`, mesmo o inativo) — deveria gatear no `tab`-ativo.
 - Falha silenciosa de refetch após uma mutação deixa dados obsoletos sem erro visível ao usuário (falta um toast).
 
+### Database Notifications
+
+Notificações de banco de dados (canal `database` nativo do Laravel), com uma UI pronta (sino no topbar + página de histórico) por cima da tabela `notifications` padrão do framework.
+
+**Como o app dispara uma notificação** — 100% Laravel-native, sem API própria do Arqel:
+
+```php
+$user->notify(new WelcomeNotification('Thanks for exploring the showcase.'));
+```
+
+Qualquer classe `Illuminate\Notifications\Notification` com `via()` retornando `['database']` funciona — o Arqel não introduz um contract próprio nem um facade de disparo. Ver `apps/showcase/app/Notifications/WelcomeNotification.php` para um exemplo mínimo (`final`, `declare(strict_types=1)`).
+
+**Convenção de chaves do `data`** (o array retornado por `toArray()`, persistido na coluna JSON `data`): todas as chaves são **opcionais**, mas quando presentes a UI renderiza rico; ausentes, cai em fallback:
+
+| Chave | Uso |
+|---|---|
+| `title` | Título em destaque no dropdown do sino e na página de histórico. Fallback: `class_basename($n->type)`. |
+| `body` (ou `message`) | Texto secundário/descrição, truncado no dropdown. Omitido se ausente. |
+| `action_url` | Se presente, a linha vira um `<Link>` clicável para essa URL (dropdown e histórico); senão é só um item não-navegável. |
+| `icon` | Um de `bell`/`check`/`info`/`alert`/`mail`/`user` — escolhe o ícone lucide no dropdown. Fallback: `bell`. |
+
+**UI pronta (não precisa construir nada no app):**
+
+- `NotificationBell` (`@arqel-dev/ui/shell`) — sino no topbar com badge de não-lidas (só renderiza quando `unread_count > 0`) e dropdown com as 10 mais recentes. Montagem: passar `notifications={<NotificationBell />}` no slot `notifications` do `<Topbar>` (ver `apps/showcase/resources/js/app.tsx`).
+- `ArqelNotificationsPage` — página de histórico completo em `/admin/notifications`, com filtro all/unread, paginação, marcar-uma/marcar-todas/excluir.
+- Marcar como lida usa partial reload do Inertia (`only: ['notifications']`) — não recarrega a página inteira; o badge decrementa reativamente.
+
+**Backend:**
+
+- Shared prop `notifications` (`NotificationPayload | null`) é **pública** — construída em `HandleArqelInertiaRequests::notificationsPayload()`, `null` quando não há usuário autenticado ou o model de usuário não expõe `notifications()` (trait `Notifiable`).
+- `Arqel\Core\Http\Controllers\NotificationController` é `@internal` — endpoints do sino/histórico (`index`/`markAsRead`/`markAllAsRead`/`destroy`), sempre escopados a `$user->notifications()` (anti-IDOR: id de outro dono resolve 404 via `findOrFail`).
+- Rotas: `GET /admin/notifications`, `POST /admin/notifications/read-all`, `POST /admin/notifications/{notification}/read`, `DELETE /admin/notifications/{notification}` (ver `packages/core/routes/admin.php`).
+
 ## Key Contracts
 
 As APIs principais que outros pacotes e apps consomem:

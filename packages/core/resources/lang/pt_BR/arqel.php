@@ -184,6 +184,19 @@ return [
         // Nome de fallback (visível + anunciado) para um tenant sem `name`.
         'unnamed' => 'Tenant :id',
     ],
+    // Chrome visível da UI de notificações em banco de dados (Milestone 0.19).
+    // Resolvido no cliente via useArqelTranslations() com o literal em inglês
+    // como fallback.
+    'notifications' => [
+        'title' => 'Notificações',
+        'mark_read' => 'Marcar como lida',
+        'mark_all_read' => 'Marcar todas como lidas',
+        'empty' => 'Nenhuma notificação',
+        'view_all' => 'Ver todas',
+        'filter_all' => 'Todas',
+        'filter_unread' => 'Não lidas',
+        'delete' => 'Excluir',
+    ],
     // aria-label + tooltip (title) do <ThemeToggle> de @arqel-dev/theme, que
     // alterna sistema → claro → escuro. Cada valor descreve o tema ATUAL e o
     // tema alcançado no próximo clique. Resolvido no cliente via

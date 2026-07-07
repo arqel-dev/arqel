@@ -14,6 +14,7 @@ use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -117,5 +118,23 @@ final class DatabaseSeeder extends Seeder
         ]);
 
         $admin->update(['current_tenant_id' => $acme->id]);
+
+        // Database notifications (0.19 dogfood): a mix of unread + read
+        // entries so the bell badge, dropdown list and /admin/notifications
+        // history page all have real content out of the box. Idempotent —
+        // only seeded once, keyed off the admin having zero notifications.
+        if ($admin->notifications()->count() === 0) {
+            $admin->notify(new WelcomeNotification(
+                'Thanks for exploring the Arqel showcase. This is a seeded notification.',
+            ));
+            $admin->notify(new WelcomeNotification(
+                'Your admin panel is ready — check the Resources in the sidebar.',
+            ));
+
+            $admin->notify(new WelcomeNotification(
+                'This one was marked as read during seeding.',
+            ));
+            $admin->notifications()->latest()->first()?->markAsRead();
+        }
     }
 }

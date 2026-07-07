@@ -8,6 +8,7 @@ use Arqel\Core\Cloud\CloudConfigurator;
 use Arqel\Core\Cloud\CloudDetector;
 use Arqel\Core\CommandPalette\CommandRegistry;
 use Arqel\Core\CommandPalette\Providers\NavigationCommandProvider;
+use Arqel\Core\CommandPalette\Providers\RecordSearchCommandProvider;
 use Arqel\Core\CommandPalette\Providers\ThemeCommandProvider;
 use Arqel\Core\Commands\InstallCommand;
 use Arqel\Core\Commands\MakeResourceCommand;
@@ -216,16 +217,19 @@ final class ArqelServiceProvider extends PackageServiceProvider
      *   `provide()`, so it picks up resources synced post-boot.
      * - {@see ThemeCommandProvider} — three static theme-switch
      *   commands.
+     * - {@see RecordSearchCommandProvider} — emits one Command per
+     *   matching record across globally-searchable Resources.
      *
-     * `CreateCommandProvider` and `RecordSearchProvider` are
-     * deferred: both need policy authorisation + Resource model
-     * traversal that lives in follow-up work.
+     * `CreateCommandProvider` is deferred: it needs policy
+     * authorisation + Resource model traversal that lives in
+     * follow-up work.
      */
     protected function registerBuiltInCommandProviders(): void
     {
         $registry = $this->app->make(CommandRegistry::class);
         $registry->registerProvider($this->app->make(NavigationCommandProvider::class));
         $registry->registerProvider($this->app->make(ThemeCommandProvider::class));
+        $registry->registerProvider($this->app->make(RecordSearchCommandProvider::class));
     }
 
     protected function registerResourceRegistry(): void

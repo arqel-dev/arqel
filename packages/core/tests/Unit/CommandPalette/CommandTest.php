@@ -40,3 +40,9 @@ it('toArray() preserves every optional field when populated', function (): void 
         'icon' => 'moon',
     ]);
 });
+
+it('does not expose rankScore in toArray (JSON contract stays frozen)', function () {
+    $command = new Command(id: 'record:users:1', label: 'Ana', url: '/x', rankScore: 60);
+
+    expect($command->toArray())->not->toHaveKey('rankScore');
+});

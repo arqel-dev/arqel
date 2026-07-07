@@ -56,8 +56,9 @@
 - **Command Palette built-in providers (CMDPAL-002):**
   - `Arqel\Core\CommandPalette\Providers\NavigationCommandProvider` — construtor toma `ResourceRegistry`; `provide()` itera `$registry->all()` e emite uma `Command` por Resource com id `nav:{slug}`, label `'Go to {pluralLabel}'`, url `{panelPath}/{slug}`, category `'Navigation'`, icon de `getNavigationIcon()` (ou `null`). **Panel path (#188):** a url honra o panel path configurável (`Panel::path()` / `config('arqel.path')`, fallback `admin`) em vez do literal `/admin` hardcoded — espelhando onde a rota de index é montada e `InertiaDataBuilder::resolvePanelPath()` (a fonte canônica); resolvido uma vez por `provide()`, não por command. Defensivo — Resources que rebentem em `getSlug()` ou `getPluralLabel()` são silenciosamente saltados; falha em `getNavigationIcon()` apenas downgrade para `icon=null`. **Autorização (#129):** o `$user` recebido é usado para pular qualquer Resource cuja Policy `viewAny` **nega** o usuário, via o guard compartilhado `Support\ResourceAuthorization::viewAnyDenied()` — a mesma checagem da sidebar (#118), mantendo as duas superfícies de navegação simétricas (um usuário negado não vê a Resource nem no menu nem no Cmd+K). Em scaffold mode (sem named gate **e** sem Policy) tudo segue listado.
   - `Arqel\Core\CommandPalette\Providers\ThemeCommandProvider` — 3 commands estáticos (`theme:light` / `theme:dark` / `theme:system`, category `'Settings'`, icons `sun`/`moon`/`monitor`). Sempre devolve os 3 independentemente de user/query — filtragem é responsabilidade do registry.
-  - Auto-registo em `ArqelServiceProvider::packageBooted()` via `$registry->registerProvider(...)`. `CreateCommandProvider` + `RecordSearchProvider` ainda deferidos (Policy + Resource model traversal).
-  - **Coverage:** 35 testes unit (`tests/Unit/CommandPalette/` — Registry, FuzzyMatcher, Command value-object, Navigation/Theme providers) + 2 feature (`tests/Feature/CommandPalette*Test.php`). Total core test count: **154** (suite completa, todos verdes).
+  - Auto-registo em `ArqelServiceProvider::packageBooted()` via `$registry->registerProvider(...)`. `CreateCommandProvider` ainda deferida (Policy); `RecordSearchCommandProvider` implementada em milestone 0.19.
+  - `Arqel\Core\CommandPalette\Providers\RecordSearchCommandProvider` — construtor toma `ResourceRegistry`; `provide()` itera `$registry->all()`, carrega records por busca LIKE escopada (min 2 chars, até 5 por resource) nas colunas declaradas por `Resource::globallySearchable(): array` (opt-in), emite uma `Command` por record com id `record:{slug}:{key}`, label `{globalSearchResultTitle($record)}` (method override quando presente, fallback `'#' . $record->getKey()`), url para a página de edição do record, category `'Records'`. **Autorização (#129):** cada *resource* é filtrado via a Policy `viewAny` — resultados só incluem records de resources que o `$user` pode ver. O valor da busca é sempre bound e os `%`/`_`/`\` do termo são escapados (`ESCAPE '\'`); nomes de coluna vêm do código do dono, não do request (nenhum SQL injection).
+  - **Coverage:** suite de command palette em `tests/Unit/CommandPalette/` (Registry, FuzzyMatcher, Command value-object, Navigation/Theme/RecordSearch providers) + feature em `tests/Feature/CommandPalette/` (incl. `RecordSearchCommandProviderTest` e `GlobalSearchEndpointTest`). Suite core completa: **468 testes**, todos verdes.
 - **Command Palette ergonomics (CMDPAL-004):**
   - `CommandRegistry::registerStatic(id, label, url, description?, category?, icon?)` — sugar que cria o `Command` e chama `register()`. Re-registar o mesmo `id` lança `InvalidArgumentException("Command id '{id}' already registered")` para fazer aflorar duplicados acidentais.
   - `CommandRegistry::registerClosureProvider(Closure)` — sugar explícito sobre `registerProvider(closure)`; mesmo comportamento, mas o nome lê melhor no call-site.
@@ -94,6 +95,25 @@
     }
     ```
   - **Coverage:** +8 testes unit (`CommandRegistryStaticHelperTest`, `AuthAwareFilterTest`).
+
+### Global Record Search (CMDPAL-005 / milestone 0.19)
+
+Um Resource pode optar por exposição de registros na paleta de comandos declarando o método estático:
+
+```php
+public static function globallySearchable(): array
+{
+    return ['title', 'slug'];  // nomes de coluna existentes no modelo
+}
+```
+
+A `RecordSearchCommandProvider` executa buscas full-text (LIKE escopada) nas colunas declaradas, retornando um Command por record com:
+- **label**: título do record via `globalSearchResultTitle(Model $record): string` (método opcional — fallback `'#' . $record->getKey()`)
+- **url**: link para a página de edição (`/admin/{slug}/{id}/edit`)
+- **category**: `'Records'`
+- **autorização**: resultados filtrados por `viewAny` Policy da Resource — usuários sem permissão não veem o record
+
+A busca é **opt-in** (Resources sem `globallySearchable()` não aparecem) e sempre SQL-bound (sem SQL injection via nome de coluna).
 
 ## Relation Managers (milestone 0.18)
 

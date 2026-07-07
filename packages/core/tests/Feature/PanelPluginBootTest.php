@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Arqel\Core\ArqelServiceProvider;
 use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Core\Resources\ResourceRegistry;
+use Arqel\Core\Tests\Fixtures\Plugins\AdditiveFixturePlugin;
 use Arqel\Core\Tests\Fixtures\Plugins\BootRegisteringPlugin;
 use Arqel\Core\Tests\Fixtures\Plugins\FixturePlugin;
 use Arqel\Core\Tests\Fixtures\Resources\PostResource;
@@ -69,4 +70,28 @@ it('registers a plugin resource end-to-end from register() into the registry', f
     $resources = app(ResourceRegistry::class);
 
     expect($resources->has(PostResource::class))->toBeTrue();
+});
+
+it('composes two distinct plugins on the same panel without one clobbering the other', function (): void {
+    /** @var PanelRegistry $panels */
+    $panels = app(PanelRegistry::class);
+    $panel = $panels->panel('admin');
+
+    // FixturePlugin::register() é o primeiro a rodar contra um Panel
+    // "vazio" — mesmo sendo substitutivo (`resources([PostResource::class])`),
+    // não há nada a perder ainda. AdditiveFixturePlugin::register() usa a
+    // forma aditiva (`[...$panel->getResources(), X]`), preservando o que
+    // FixturePlugin já tinha adicionado. Isto prova composição real de N
+    // plugins de ids distintos, cada um contribuindo o seu próprio resource.
+    $panel->plugin(FixturePlugin::make());
+    $panel->plugin(AdditiveFixturePlugin::make());
+
+    invokeProviderMethod('bootPanelPlugins');
+    invokeProviderMethod('syncPanelResourcesIntoRegistry');
+
+    /** @var ResourceRegistry $resources */
+    $resources = app(ResourceRegistry::class);
+
+    expect($resources->has(PostResource::class))->toBeTrue()
+        ->and($resources->has(UserResource::class))->toBeTrue();
 });

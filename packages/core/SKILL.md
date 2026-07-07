@@ -290,7 +290,10 @@ final class BlogPlugin implements Plugin
         $panel->resources([...$panel->getResources(), PostResource::class]);
     }
 
-    public function boot(Panel $panel): void { /* efeitos após todos registrarem */ }
+    public function boot(Panel $panel): void
+    {
+        // efeitos após todos os plugins registrarem — bind de serviços, listeners
+    }
 }
 ```
 
@@ -301,8 +304,9 @@ Arqel::panel('admin')->plugin(BlogPlugin::make());
 ```
 
 - `register()` roda eager (no `->plugin()`); `boot()` roda antes do sync de resources, então plugins podem registrar resources em `boot()` e eles ainda viram rota.
-- Plugins são keyed por `getId()` — registrar o mesmo id substitui (permite override).
+- Plugins são keyed por `getId()` — registrar o mesmo id substitui (permite override). **Atenção:** sobrescrever um id não reverte os resources que o `register()` do plugin anterior (do mesmo id) já tinha adicionado ao Panel — o último-vence aplica-se apenas à entrada em `getPlugins()`, não aos side-effects já aplicados via `resources()`/`widgets()` etc.
 - `resources()` **substitui** o array; para acrescentar, use o spread `[...$panel->getResources(), X]`.
+- Prefira adicionar resources em `register()` (roda 1x, eager). `boot()` é para efeitos colaterais; append de resources em `boot()` não é idempotente.
 
 ## Policy debugger (DEVTOOLS-004)
 

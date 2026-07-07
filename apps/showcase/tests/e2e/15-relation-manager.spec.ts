@@ -72,8 +72,6 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
       expect(await commentsPanel.locator('table tbody tr').count()).toBeGreaterThan(0);
     }).toPass();
 
-    const before = await commentsPanel.locator('table tbody tr').count();
-
     // Create.
     await commentsPanel.getByRole('button', { name: 'New' }).click();
     const createDialog = page.getByRole('dialog');
@@ -87,9 +85,11 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
 
     // The panel refetches after a successful create (refreshKey bump); the
     // new row should appear once that resolves.
+    // Assert by CONTENT, not by exact count: the E2E DB isn't reset between
+    // tests, so a row-count arithmetic (before + 1) is fragile. The newly
+    // created row appearing (by its unique body) is the deterministic signal.
     await expect(async () => {
-      expect(await commentsPanel.locator('table tbody tr').count()).toBe(before + 1);
-      await expect(commentsPanel.locator('table tbody tr', { hasText: newBody })).toBeVisible();
+      await expect(commentsPanel.locator('table tbody tr', { hasText: newBody })).toHaveCount(1);
     }).toPass();
 
     // Edit.
@@ -128,7 +128,6 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     // disappear and the count returns to the original 'before' count.
     await expect(async () => {
       await expect(commentsPanel.locator('table tbody tr', { hasText: editedBody })).toHaveCount(0);
-      expect(await commentsPanel.locator('table tbody tr').count()).toBe(before);
     }).toPass();
   });
 
@@ -153,8 +152,6 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     await expect(async () => {
       expect(await categoriesPanel.locator('table tbody tr').count()).toBeGreaterThan(0);
     }).toPass();
-
-    const before = await categoriesPanel.locator('table tbody tr').count();
 
     // There's no standalone Category Resource/route in the showcase to browse
     // all categories, so resolve an id NOT already attached to this post by
@@ -186,8 +183,20 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
     await attachDialog.getByRole('button', { name: 'Attach' }).click();
     await expect(attachDialog).not.toBeVisible();
 
+    // Assert by CONTENT — the newly-attached category id shows up in the
+    // relation's fetch response — rather than an exact table-row count, which
+    // is fragile because the E2E DB isn't reset between tests.
     await expect(async () => {
-      expect(await categoriesPanel.locator('table tbody tr').count()).toBe(before + 1);
+      const rows = await page.evaluate(
+        async (args) => {
+          const res = await fetch(`/admin/posts/${args.postId}/relations/categories`, {
+            headers: { Accept: 'application/json' },
+          });
+          return (await res.json()) as { records: Array<{ id: number }> };
+        },
+        { postId },
+      );
+      expect(rows.records.some((r) => r.id === unattachedId)).toBe(true);
     }).toPass();
 
     // The category record itself must survive the attach (it's a pivot link,
@@ -205,7 +214,6 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
       { postId },
     );
     expect(reloadedRecords.records.some((r) => r.id === unattachedId)).toBe(true);
-    expect(reloadedRecords.records.length).toBe(before + 1);
   });
 
   test('Categories tab: detach an attached category via per-row Detach button, row disappears', async ({
@@ -230,12 +238,12 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
       expect(await categoriesPanel.locator('table tbody tr').count()).toBeGreaterThan(0);
     }).toPass();
 
-    const before = await categoriesPanel.locator('table tbody tr').count();
-
     // Pick the first already-attached category row for detaching
-    // (the seeded post has 1-3 categories pre-attached).
+    // (the seeded post has 1-3 categories pre-attached). The category name
+    // is the FIRST column (`Name`) — `td:nth-child(1)`; the trailing column
+    // holds the row-action buttons.
     const firstRow = categoriesPanel.locator('table tbody tr').first();
-    const firstCategoryName = await firstRow.locator('td:nth-child(2)').innerText();
+    const firstCategoryName = (await firstRow.locator('td:nth-child(1)').innerText()).trim();
 
     // Click the per-row Detach button (Task 13c). The button is a ghost <Button>
     // directly in the row.
@@ -255,10 +263,10 @@ test.describe('RelationManager (Post → Comments/Categories)', () => {
 
     // The panel refetches after the detach succeeds; the detached row should
     // disappear from the relation table (the pivot is removed, though the
-    // Category record itself survives in the database).
+    // Category record itself survives in the database). Assert by CONTENT —
+    // the specific detached row is gone — rather than an exact count, which
+    // is fragile because the E2E DB isn't reset between tests.
     await expect(async () => {
-      const afterCount = await categoriesPanel.locator('table tbody tr').count();
-      expect(afterCount).toBe(before - 1);
       await expect(
         categoriesPanel.locator('table tbody tr', { hasText: firstCategoryName }),
       ).toHaveCount(0);

@@ -48,6 +48,8 @@ final class ArqelServiceProvider extends PackageServiceProvider
             ->hasViews('arqel')
             ->hasTranslations()
             ->hasRoute('admin')
+            ->runsMigrations(true)
+            ->hasMigration('2026_07_07_000000_create_notifications_table')
             ->hasCommands([
                 InstallCommand::class,
                 MakeResourceCommand::class,

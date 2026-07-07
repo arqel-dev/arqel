@@ -43,6 +43,8 @@ abstract class TestCase extends Orchestra
     }
 
     /**
+     * Load package migrations and relation-manager fixtures.
+     *
      * Relation-manager fixtures (Task 4+): `rel_posts` (hasMany `comments`,
      * belongsToMany `tags`), `rel_comments`, `rel_tags`, and the `rel_post_tag`
      * pivot. Shared across `Relations/*` feature tests so each test does not
@@ -50,6 +52,9 @@ abstract class TestCase extends Orchestra
      */
     protected function defineDatabaseMigrations(): void
     {
+        // Load package migrations first (notifications, etc.)
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
         \Illuminate\Support\Facades\Schema::create('rel_posts', function ($t): void {
             $t->increments('id');
             $t->string('title')->nullable();

@@ -14,7 +14,14 @@ import { ThemeProvider } from '@arqel-dev/theme';
 import '@arqel-dev/theme/tokens.css';
 import type { TenantContextProps } from '@arqel-dev/types/tenant';
 import { arqelPages } from '@arqel-dev/ui/pages';
-import { AppShell, Sidebar, TenantSwitcher, Topbar, UserMenu } from '@arqel-dev/ui/shell';
+import {
+  AppShell,
+  NotificationBell,
+  Sidebar,
+  TenantSwitcher,
+  Topbar,
+  UserMenu,
+} from '@arqel-dev/ui/shell';
 import '@arqel-dev/fields/register';
 import '@arqel-dev/fields-advanced/register';
 import { usePage } from '@inertiajs/react';
@@ -98,6 +105,7 @@ const adminLayout: LayoutFn = (page) => (
           <Topbar
             brand={<span className="font-medium">{'Arqel Showcase'}</span>}
             tenantSwitcher={<TenantSwitcherSlot />}
+            notifications={<NotificationBell />}
             userMenu={<UserMenuSlot />}
           />
         }

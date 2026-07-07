@@ -57,20 +57,20 @@ Implicação: o critério de versionamento precisa ser reescrito antes de comuni
 
 ### 2.1 Estado dos 18 ADRs
 
-15 estáveis. **Em risco: ADR-007 (Base UI vs Radix — já flip-flopped em 2026-05, `03-adrs.md:275`) e ADR-014 (Filament-compatible — fonte de todas as divergências de naming abaixo).** ADR-013 (MCP) estável na impl mas com risco externo (standard MCP evoluindo).
+15 estáveis + **ADR-007 (Base UI/Radix) e ADR-014 (Filament-compatible)** agora **congelados sob o ADR-019** (não mais "em risco"). ADR-013 (MCP) estável na impl mas com risco externo (standard MCP evoluindo). **ADR-019 (API Freeze & SemVer) adicionado** (2026-07).
 
 ### 2.2 Divergências doc↔código na superfície de API pública (a congelar)
 
 | # | Contrato | Doc diz | Código faz | Severidade |
 |---|----------|---------|------------|------------|
 | **A** | **Factory de Field** | `Field::text('name')` (`05-api-php.md:266`; gerador `ResourceGenerator.php:241`) | ✅ **RESOLVIDO (PR #342).** O gerador agora emite `use Arqel\Fields\FieldFactory as Field;`; testes de resolução de nome adicionados (`ResourceGeneratorTest.php:111-146`). | ✅ Fechado (era 🔴 release-blocker) |
-| B | Factory de Column | `Column::text('name')` (`05-api-php.md:108`) | Só `Column::make()`; testes usam `TextColumn::make()` | 🟠 Alta |
-| C | Factory de Action | `Action::view()/delete()` (`05-api-php.md:120`) | `Action::make()` + variants em classe separada `Actions::view()` (`Actions.php:18`) | 🟠 Alta |
-| D | Convenção BelongsToField | `belongsTo('role', RoleResource::class)` (nome da relação) | `make($name,…)` deriva relação removendo `_id`; testes usam `make('author_id',…)` | 🟠 Alta |
-| E | Widget extension | override `stat()/description()/chart()` (`05-api-php.md:628`) | setters fluent `statDescription()/color()/chart()` (`StatWidget.php:108`); `ChartWidget` usa `chartData()/chartType()` | 🟠 Alta |
-| F | `Resource::table/form/indexQuery` | tipado `Table`/`Form`/`Builder` (`05-api-php.md:104`) | retornam `mixed` (`Resource.php:167/184/200`) | 🟡 Média |
-| G | `SharedProps.tenant` | `Tenant \| null` (`06-api-react.md:35`) | `unknown` (`types/src/inertia.ts:50`) | 🟡 Média |
-| H | API de auth do Panel | não documentada | `login()/registration()/passwordReset()/emailVerification()` (`Panel.php:77-414`) | 🟡 Média (documentar antes de congelar) |
+| B | Factory de Column | doc alinhada: `TextColumn::make()` (`05-api-php.md`) | classes concretas `::make()` | ✅ **RESOLVIDO (ADR-019)** — doc alinhada ao código |
+| C | Factory de Action | doc alinhada: `Actions::view()/delete()` stock, `Action::make()` custom | idem | ✅ **RESOLVIDO (ADR-019)** |
+| D | Convenção BelongsToField | doc alinhada: `belongsTo('role_id', …)`, relação derivada removendo `_id` | idem | ✅ **RESOLVIDO (ADR-019)** |
+| E | Widget extension | doc alinhada: setters fluent `statDescription()/color()/chart()`, `chartData()/chartType()` | idem | ✅ **RESOLVIDO (ADR-019)** |
+| F | `Resource::table/form/indexQuery` | doc alinhada: `mixed` **por design** (desacoplamento core⊥table/form) | `mixed` intencional | ✅ **RESOLVIDO (ADR-019 §5)** — não é bug |
+| G | `SharedProps.tenant` | doc alinhada a `unknown`; decisão: tipar `Tenant\|null` em follow-up JS | `unknown` | 🔜 doc alinhada (ADR-019 §6); tipagem = follow-up |
+| H | API de auth do Panel | **documentada** (`05-api-php.md` §5.1: login/registration/passwordReset/emailVerification/profile) | idem | ✅ **RESOLVIDO (ADR-019)** |
 
 ### 2.3 Bug confirmado (verificação adversarial) — Divergência A ✅ RESOLVIDO
 
@@ -98,10 +98,10 @@ Resultado para o usuário: hoje o Resource gerado dá erro de classe indefinida 
 
 ### 2.4 Recomendação de freeze
 
-1. **Novo ADR-019 "API Freeze & SemVer commitment"**: define público vs `@internal`; compromisso SemVer estrito a partir de 1.0; decisão sobre `mixed` (Divergência F).
-2. **Resolver a camada de factory (bloqueante)**: escolher e implementar a convenção canônica `Field::`/`Column::`/`Action::` (alias/facade) **ou** reescrever docs+gerador para `FieldFactory`/`TextColumn::make`/`Actions::`. Alinhar doc + gerador + testes.
-3. Congelar convenção BelongsToField (D), contrato de Widget (E), tipos TS públicos (G), documentar auth do Panel (H).
-4. Marcar ADR-007 e ADR-014 como **Final**.
+1. ✅ **ADR-019 "API Freeze & SemVer commitment"** escrito (`03-adrs.md`): define público vs `@internal`; SemVer estrito a partir de 1.0; deprecation policy; decisão de manter `mixed` (F).
+2. ✅ **Camada de factory resolvida:** convenção canônica = a de facto do showcase (`FieldFactory as Field` + `TextColumn::make` + `Actions::`). Gerador já corrigido (#342); doc `05-api-php.md` alinhada (ADR-019).
+3. ✅ Congelados via doc alinhada: BelongsToField (D), Widget (E), auth do Panel documentada (H). Tipos TS (G) = follow-up JS.
+4. ✅ ADR-007 e ADR-014 declarados congelados sob o ADR-019 (deixam de estar "em risco").
 5. Deprecation policy escrita (≥1 minor com `@deprecated` + aviso runtime; nunca remover em patch).
 6. Sincronizar `07-roadmap-fases.md` com a realidade (v1.0 ≠ fim-Fase-3 hoje).
 

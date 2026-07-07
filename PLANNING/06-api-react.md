@@ -31,7 +31,9 @@ export interface SharedProps {
         can: Record<string, boolean>           // Global abilities
     }
     panel: Panel                                // Current panel config
-    tenant: Tenant | null                       // Current tenant (Fase 2+)
+    // Hoje `unknown` no código (`types/src/inertia.ts`); será tipado como
+    // `Tenant | null` num follow-up JS — ver ADR-019 §6 (divergência G).
+    tenant: unknown                             // Current tenant (Fase 2+)
     flash: Flash
     translations: Record<string, string>
     arqel: {

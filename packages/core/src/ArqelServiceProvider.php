@@ -102,6 +102,7 @@ final class ArqelServiceProvider extends PackageServiceProvider
         // registry must already be populated when routes are mounted.
         $this->app->booted(function (): void {
             $this->discoverResourcesIfEnabled();
+            $this->bootPanelPlugins();
             $this->syncPanelResourcesIntoRegistry();
             $this->electDefaultCurrentPanel();
             $this->registerResourceRoutes();
@@ -379,6 +380,25 @@ final class ArqelServiceProvider extends PackageServiceProvider
         }
 
         $this->app->make(ResourceRegistry::class)->discover($path, $namespace);
+    }
+
+    /**
+     * Dispara `boot()` de cada plugin registrado em cada panel.
+     *
+     * Roda no `$this->app->booted()` ANTES de
+     * `syncPanelResourcesIntoRegistry()`, de modo que qualquer
+     * `resources([...])` que um plugin adicione em `boot()` ainda seja
+     * copiado ao ResourceRegistry e vire rota.
+     */
+    protected function bootPanelPlugins(): void
+    {
+        $panelRegistry = $this->app->make(PanelRegistry::class);
+
+        foreach ($panelRegistry->all() as $panel) {
+            foreach ($panel->getPlugins() as $plugin) {
+                $plugin->boot($panel);
+            }
+        }
     }
 
     /**

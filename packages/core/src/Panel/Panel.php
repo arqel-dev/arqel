@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arqel\Core\Panel;
 
 use Arqel\Core\Contracts\HasResource;
+use Arqel\Core\Contracts\Plugin;
 use Closure;
 
 /**
@@ -41,6 +42,9 @@ final class Panel
 
     /** @var array<int, class-string> */
     private array $widgets = [];
+
+    /** @var array<string, Plugin> keyed por getId() */
+    private array $plugins = [];
 
     /** @var array<int, string> */
     private array $navigationGroups = [];
@@ -244,6 +248,28 @@ final class Panel
         return $this;
     }
 
+    public function plugin(Plugin $plugin): self
+    {
+        // Último-vence: registrar o mesmo id 2x substitui (permite um app
+        // sobrescrever um plugin de terceiros pelo mesmo id).
+        $this->plugins[$plugin->getId()] = $plugin;
+        $plugin->register($this);
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, Plugin> $plugins
+     */
+    public function plugins(array $plugins): self
+    {
+        foreach ($plugins as $plugin) {
+            $this->plugin($plugin);
+        }
+
+        return $this;
+    }
+
     /**
      * @param array<int, string> $groups
      */
@@ -313,6 +339,19 @@ final class Panel
     public function getResources(): array
     {
         return $this->resources;
+    }
+
+    /**
+     * @return array<string, Plugin>
+     */
+    public function getPlugins(): array
+    {
+        return $this->plugins;
+    }
+
+    public function getPlugin(string $id): ?Plugin
+    {
+        return $this->plugins[$id] ?? null;
     }
 
     /**

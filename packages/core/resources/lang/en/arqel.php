@@ -193,6 +193,9 @@ return [
         'mark_all_read' => 'Mark all as read',
         'empty' => 'No notifications',
         'view_all' => 'View all',
+        'filter_all' => 'All',
+        'filter_unread' => 'Unread',
+        'delete' => 'Delete',
     ],
     // aria-label + title tooltip for @arqel-dev/theme's <ThemeToggle>, which
     // cycles system → light → dark. Each value describes the CURRENT theme and

@@ -193,6 +193,9 @@ return [
         'mark_all_read' => 'Marcar todas como lidas',
         'empty' => 'Nenhuma notificação',
         'view_all' => 'Ver todas',
+        'filter_all' => 'Todas',
+        'filter_unread' => 'Não lidas',
+        'delete' => 'Excluir',
     ],
     // aria-label + tooltip (title) do <ThemeToggle> de @arqel-dev/theme, que
     // alterna sistema → claro → escuro. Cada valor descreve o tema ATUAL e o

@@ -83,12 +83,12 @@ describe('paranoia: real PLANNING/03-adrs.md', () => {
   const resolution = resolvePlanningFile('03-adrs.md', { noCache: true });
   const test = resolution ? it : it.skip;
 
-  test('parses all 18 canonical ADRs (001..018)', () => {
+  test('parses all 19 canonical ADRs (001..019)', () => {
     if (!resolution) return; // satisfies type narrowing for the skipped path
     const raw = readFileSync(resolution.path, 'utf-8');
     const adrs = parseAdrs(raw);
     const ids = Array.from(adrs.keys()).sort();
-    const expected = Array.from({ length: 18 }, (_, i) => String(i + 1).padStart(3, '0'));
+    const expected = Array.from({ length: 19 }, (_, i) => String(i + 1).padStart(3, '0'));
     expect(ids).toEqual(expected);
   });
 });

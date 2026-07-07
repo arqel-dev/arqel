@@ -732,6 +732,60 @@ Como registar Arqel numa Laravel app.
 
 ---
 
+## ADR-019: API Freeze & SemVer commitment
+
+**Estado:** Aceite • **Data:** 2026-07
+
+### Contexto
+
+Rumo a v1.0, o bloqueio real não é arquitetura nem features de fase — é **ergonomia de API pública + um compromisso de estabilidade** (ver `reports/roadmap-to-1.0.md` §2). Até aqui, minors podiam quebrar a API pública, e a doc de planejamento (`PLANNING/05-api-php.md`, `06-api-react.md`) divergia do código real em 8 pontos (§2.2, divergências A–H). Sem um contrato explícito de superfície pública + SemVer, a promessa de 1.0 nasce inconsistente.
+
+### Decisão
+
+**1. Superfície pública vs `@internal`.** A API pública — sob compromisso de estabilidade — é o que está documentado em `apps/docs/reference`: `Resource`, `FieldFactory`/`Field`, as classes concretas de Column (`TextColumn`, `BadgeColumn`, …), `Actions` + `Action`, `Panel`, os `*Widget`, os builders `Table`/`Form`, `RelationManager`, `Importer`/`ImportAction`, `ExportAction`. Tudo o mais — `Arqel\*\Support\*`, `Http\Controllers\*`, `*Serializer`, `*QueryBuilder`, `InertiaDataBuilder` — é **`@internal`**: pode mudar em qualquer minor sem aviso.
+
+**2. Compromisso SemVer a partir de v1.0.** Breaking change de API pública → **major**. Feature aditiva → **minor**. Correção → **patch**. (Antes de 1.0, minors podem quebrar — o regime atual.)
+
+**3. Política de deprecação.** Antes de remover qualquer API pública: **≥1 minor** com `@deprecated` no docblock (e aviso em runtime quando viável). **Nunca** remover em patch.
+
+**4. Convenção canônica de factory (resolve §2.2 A–E, H).** A fonte da verdade é o código que roda (evidência no `apps/showcase`), não a doc de planejamento:
+- **Fields:** `use Arqel\Fields\FieldFactory as Field;` → `Field::text('name')`.
+- **Columns:** classes concretas → `TextColumn::make('name')`.
+- **Actions:** `Actions::edit()` / `Actions::delete()` para stock; `Action::make()` para custom.
+- **Widgets:** setters fluent (`statDescription()`, `color()`, `chart()`, `chartData()`, `chartType()`), não overrides de `stat()`/`description()`.
+- **BelongsToField:** `belongsTo('role_id', RoleResource::class)` — o nome da relação é derivado removendo o sufixo `_id`.
+- **Auth do Panel:** `login()`/`registration()`/`passwordReset()`/`emailVerification()` são API pública (antes não documentada).
+A inconsistência Field (alias-factory) vs Column/Action (classes concretas) é **intencional e congelada**, não um defeito a uniformizar.
+
+**5. `Resource::table()`/`form()`/`indexQuery()` retornam `mixed` — por design (§2.2 F).** É desacoplamento deliberado: `arqel-dev/core` **não pode** depender de `arqel-dev/table`/`form` (que já dependem de `core`) sem criar dependência circular. O controller faz duck-typing do resultado. Congelado como está; **não** será tipado.
+
+**6. `SharedProps.tenant` (§2.2 G).** Hoje é `unknown` (`packages-js/types/src/inertia.ts`). Decisão: tipar como `Tenant | null` num follow-up (TypeScript; requer toolchain JS). Registrado, fora do escopo deste ADR.
+
+**7. ADR-007 (Base UI/Radix) e ADR-014 (Filament-compatible naming)** ficam **congelados sob este compromisso** — ambos `Aceite`, deixam de constar "em risco" no roadmap §2.1.
+
+### Rationale
+
+- **Zero mudança de runtime:** todas as divergências B–H eram "a doc estava errada, o código é a verdade" (incl. F, cujo `mixed` é design correto). Alinhar a doc ao código dá estabilidade sem risco.
+- **`@internal` explícito** dá liberdade de evoluir o interior (serializers, controllers, query builders) sem quebrar SemVer.
+- **Deprecation ≥1 minor** dá aos consumidores um caminho de migração previsível.
+
+### Consequências
+
+**Positivas:**
+- Contrato de estabilidade claro para comunicar 1.0.
+- Docs de planejamento passam a bater com o código (sem "API fantasma").
+
+**Negativas:**
+- Compromete o projeto a majors para qualquer breaking pós-1.0 (o custo desejado da estabilidade).
+- `07-roadmap-fases.md` (que define v1.0 = fim-Fase-3) fica dessincronizado do estado real e precisa ser reescrito — follow-up de doc.
+
+### Alternativas rejeitadas
+
+- **Uniformizar o código (factories `Column::text()`/`Action::view()` como o Field):** aditivo mas é mudança de API pública com mais superfície/testes; a convenção de facto já é consistente o suficiente. Adiado — pode ser um minor futuro, não um pré-requisito de freeze.
+- **Tipar `table()`/`form()` (Divergência F):** quebraria o desacoplamento `core`⊥`table`/`form` (dependência circular) ou forçaria mover as classes para o core. Rejeitado.
+
+---
+
 ## Processo de adicionar novos ADRs
 
 Quando uma decisão arquitectural significativa é tomada:

@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace App\Arqel\Resources;
 
 use Arqel\Core\Resources\Resource;
-use Arqel\Fields\Field;
+use Arqel\Fields\FieldFactory as Field;
 use Arqel\Table\Table;
+use Arqel\Table\Columns\{TextColumn, RelationshipColumn, BooleanColumn, DateColumn};
 use Arqel\Form\Form;
 use Arqel\Actions\Action;
+use Arqel\Actions\Actions;
 use App\Models\User;
 
 final class UserResource extends Resource
@@ -80,7 +82,9 @@ final class UserResource extends Resource
                 ->unique(ignorable: $this->record)
                 ->columnSpan(2),
 
-            Field::belongsTo('role', RoleResource::class)
+            // O 1º arg é a coluna FK (`role_id`); o nome da relação é
+            // derivado removendo o sufixo `_id` (`role`). Ver ADR-019 §4.
+            Field::belongsTo('role_id', RoleResource::class)
                 ->searchable()
                 ->preload(),
 
@@ -101,15 +105,18 @@ final class UserResource extends Resource
     /**
      * Table columns (used em index page).
      */
-    public function table(Table $table): Table
+    // `table()` retorna `mixed` (não `Table`) por design — ver ADR-019 §5:
+    // `arqel-dev/core` não pode depender de `arqel-dev/table` (dependência
+    // circular), então o controller faz duck-typing do resultado.
+    public function table(Table $table): mixed
     {
         return $table
             ->columns([
-                Column::text('name')->searchable()->sortable(),
-                Column::text('email')->searchable()->copyable(),
-                Column::relationship('role', 'name')->badge(),
-                Column::boolean('is_active')->label('Active'),
-                Column::date('created_at')->label('Joined')->sortable(),
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('email')->searchable()->copyable(),
+                RelationshipColumn::make('role')->display('name')->badge(),
+                BooleanColumn::make('is_active')->label('Active'),
+                DateColumn::make('created_at')->label('Joined')->sortable(),
             ])
             ->filters([
                 Filter::select('role_id')
@@ -118,16 +125,16 @@ final class UserResource extends Resource
                 Filter::dateRange('created_at'),
             ])
             ->actions([
-                Action::view(),
-                Action::edit(),
-                Action::delete()->requiresConfirmation(),
+                Actions::view(),
+                Actions::edit(),
+                Actions::delete()->requiresConfirmation(),
                 Action::make('impersonate')
                     ->icon('user-check')
                     ->authorize(fn ($user, $record) => $user->isSuper() && $record->id !== $user->id)
                     ->action(fn ($record) => auth()->loginUsingId($record->id)),
             ])
             ->bulkActions([
-                BulkAction::delete()->requiresConfirmation(),
+                Actions::deleteBulk()->requiresConfirmation(),
                 BulkAction::make('activate')
                     ->label('Activate selected')
                     ->action(fn ($records) => $records->each->update(['is_active' => true])),
@@ -137,8 +144,10 @@ final class UserResource extends Resource
 
     /**
      * Standalone form config (optional, overrides fields() shape).
+     * Retorna `mixed` pelo mesmo motivo de `table()` — ver ADR-019 §5
+     * (`arqel-dev/core` não pode depender de `arqel-dev/form`).
      */
-    public function form(Form $form): Form
+    public function form(Form $form): mixed
     {
         return $form->schema([
             Section::make('Profile')
@@ -160,8 +169,10 @@ final class UserResource extends Resource
 
     /**
      * Eager loading for index query (optional — auto-detected from fields).
+     * Retorna `mixed` (não `?Builder`) — mesma razão de `table()`/`form()`,
+     * ver ADR-019 §5.
      */
-    public function indexQuery(): ?Builder
+    public function indexQuery(): mixed
     {
         return static::$model::query()->with('role');
     }
@@ -351,7 +362,7 @@ Field::select('status')
 **BelongsToField:**
 
 ```php
-Field::belongsTo('author', UserResource::class)
+Field::belongsTo('author_id', UserResource::class)
     ->searchable()
     ->preload()
     ->searchColumns(['name', 'email'])
@@ -429,7 +440,7 @@ ToolbarAction::make('import')
 Action::make('transfer_ownership')
     ->icon('arrow-right-left')
     ->form([
-        Field::belongsTo('new_owner', UserResource::class)
+        Field::belongsTo('new_owner_id', UserResource::class)
             ->required()
             ->searchable(),
         Field::textarea('reason')
@@ -454,7 +465,7 @@ Action::make('export')
 ### 3.4 Confirmable variants
 
 ```php
-Action::delete()
+Actions::delete()
     ->requiresConfirmation()
     ->modalIcon('trash-2')
     ->modalColor('destructive')                // 'destructive' | 'warning' | 'info'
@@ -566,6 +577,26 @@ public function boot(): void
 }
 ```
 
+### 5.1 Auth & conta do Panel
+
+O `Panel` embarca as páginas de autenticação e a página de Perfil opt-in.
+Cada uma é um toggle booleano (default a partir das rotas de login do host —
+ver ADR-019 §4):
+
+```php
+Arqel::panel('admin')
+    ->path('/admin')
+    ->login()                  // página de login (default true se o host não tem rota `login`)
+    ->registration()           // registro de novos usuários
+    ->passwordReset()          // fluxo de esqueci-a-senha
+    ->emailVerification()      // verificação de e-mail
+    ->profile();               // página de Perfil opt-in (UserMenu + editar nome/e-mail + senha)
+```
+
+Todas aceitam `bool $enabled = true` (ex.: `->registration(false)` desliga o
+registro). Se o host já expõe uma rota `login` (Breeze/Fortify), Arqel não
+re-registra a sua — integra-se em vez de colidir.
+
 ## 6. Navigation
 
 ### 6.1 Automatic
@@ -621,74 +652,44 @@ namespace App\Arqel\Widgets;
 
 use Arqel\Widgets\StatWidget;
 
-final class TotalUsersStat extends StatWidget
-{
-    protected ?string $heading = 'Total Users';
-
-    protected function stat(): int|string
-    {
-        return User::count();
-    }
-
-    protected function description(): ?string
-    {
-        $diff = $this->percentChangeVsLastWeek();
-        return $diff > 0 ? "+{$diff}% vs last week" : "{$diff}% vs last week";
-    }
-
-    protected function descriptionIcon(): string
-    {
-        return $this->percentChangeVsLastWeek() > 0 ? 'trending-up' : 'trending-down';
-    }
-
-    protected function color(): string
-    {
-        return $this->percentChangeVsLastWeek() > 0 ? 'success' : 'danger';
-    }
-
-    protected function chart(): ?array
-    {
-        return User::selectRaw('DATE(created_at) as day, COUNT(*) as count')
-            ->where('created_at', '>', now()->subDays(30))
-            ->groupBy('day')
-            ->orderBy('day')
-            ->pluck('count')
-            ->toArray();
-    }
-}
+// StatWidget é construído por setters fluent (`StatWidget::make()->...`),
+// não por override de métodos protegidos. Ver ADR-019 §4. Declarado dentro
+// de `Dashboard::widgets([...])`:
+StatWidget::make('total_users')
+    ->heading('Total Users')
+    ->value(fn (): int => User::count())
+    ->statDescription(fn (): string => $this->percentLabel())
+    ->descriptionIcon(fn (): string => $this->trendUp() ? 'trending-up' : 'trending-down')
+    ->color(fn (): string => $this->trendUp() ? 'success' : 'danger')
+    ->chart(fn (): array => User::selectRaw('DATE(created_at) as day, COUNT(*) as count')
+        ->where('created_at', '>', now()->subDays(30))
+        ->groupBy('day')->orderBy('day')->pluck('count')->toArray());
 ```
 
 ### 7.2 Chart widget
 
 ```php
-final class UsersGrowthChart extends ChartWidget
-{
-    protected ?string $heading = 'Users over time';
-    protected string $chartType = 'line';              // line | bar | area | pie | donut
-
-    protected function data(): array
-    {
-        return [
-            'labels' => $this->getLabels(),
-            'datasets' => [
-                [
-                    'label' => 'New users',
-                    'data' => $this->getData(),
-                    'color' => 'primary',
-                ],
+// ChartWidget é fluent: `->chartType()` + `->chartData()`. As constantes
+// `ChartWidget::CHART_LINE|CHART_BAR|CHART_AREA|CHART_PIE|CHART_DONUT`
+// nomeiam os tipos. Ver ADR-019 §4.
+ChartWidget::make('users_growth')
+    ->heading('Users over time')
+    ->chartType(ChartWidget::CHART_LINE)
+    ->chartData(fn (): array => [
+        'labels' => $this->getLabels(),
+        'datasets' => [
+            [
+                'label' => 'New users',
+                'data' => $this->getData(),
+                'color' => 'primary',
             ],
-        ];
-    }
-
-    protected function filters(): ?array
-    {
-        return [
+        ],
+    ])
+    ->filters([
             'today' => 'Today',
             '7days' => 'Last 7 days',
             '30days' => 'Last 30 days',
-        ];
-    }
-}
+    ]);
 ```
 
 ### 7.3 Custom widget
@@ -835,14 +836,14 @@ Action::macro('softDelete', function () {
 // Table macros
 Table::macro('timestampColumns', function () {
     return [
-        Column::date('created_at')->sortable(),
-        Column::date('updated_at')->sortable()->hidden(),
+        DateColumn::make('created_at')->sortable(),
+        DateColumn::make('updated_at')->sortable()->hidden(),
     ];
 });
 
 // Column macros
 Column::macro('moneyColumn', function (string $name, string $currency = 'USD') {
-    return Column::text($name)
+    return TextColumn::make($name)
         ->formatStateUsing(fn ($state) => money_format($state, $currency));
 });
 ```

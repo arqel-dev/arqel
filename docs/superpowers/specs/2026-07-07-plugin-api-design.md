@@ -6,26 +6,26 @@
 
 ## Objetivo
 
-Entregar um **Plugin API in-code** no estilo Filament: um contrato `Plugin` (`getId`/`register(Panel)`/`boot(Panel)`) que um pacote implementa para injetar resources/widgets/nav/middleware num Panel programaticamente, registrado via `Panel::plugin(MyPlugin::make())`. Hoje só um `ServiceProvider` do app pode registrar conteúdo num Panel; não há indireção de plugin, e o marketplace `Plugin` (Eloquent) trata apenas de **distribuição** (catálogo/instalação), não de registro runtime.
+Entregar um **Plugin API in-code** no estilo Filament: um contrato `Plugin` (`getId`/`register(Panel)`/`boot(Panel)`) que um pacote implementa para injetar resources/nav/middleware num Panel programaticamente, registrado via `Panel::plugin(MyPlugin::make())`. Hoje só um `ServiceProvider` do app pode registrar conteúdo num Panel; não há indireção de plugin, e o marketplace `Plugin` (Eloquent) trata apenas de **distribuição** (catálogo/instalação), não de registro runtime.
 
 **Escopo decidido (brainstorming):**
-1. **Superfície existente** — o plugin reusa `resources()`/`widgets()`/`navigationGroups()`/`middleware()` que o `Panel` **já** expõe. Zero features novas de UI.
-2. Fechar o gap **`widgets()` → `DashboardRegistry`** (hoje desconectado — `Panel::widgets()` armazena mas nada sincroniza, diferente de `resources()`).
-3. Contrato em **`packages/core`** (marketplace não pode ser dependência de core; a seta é `marketplace → core`).
-4. Lifecycle **two-phase**: `register(Panel)` eager na cadeia fluente; `boot(Panel)` no `$this->app->booted()` **antes** do sync.
+1. **Superfície existente** — o plugin reusa `resources()`/`navigationGroups()`/`middleware()` que o `Panel` **já** expõe e que **já têm consumidor** no boot pipeline. Zero features novas de UI.
+2. Contrato em **`packages/core`** (marketplace não pode ser dependência de core; a seta é `marketplace → core`).
+3. Lifecycle **two-phase**: `register(Panel)` eager na cadeia fluente; `boot(Panel)` no `$this->app->booted()` **antes** do sync.
+
+> **Revisão de escopo (2026-07-07, pós-exploração do plano):** a Seção 3 original (bridge `widgets()`→`DashboardRegistry`) foi **removida**. A exploração revelou que `Panel::widgets()` guarda `class-string<Widget>` de widgets **individuais**, enquanto `DashboardRegistry::register()` só aceita um `Dashboard` (container), e as factories exigem argumentos (`Dashboard::make(id,label)`, `CustomWidget::make(name,component)`) — não o `$widget::make()` sem args assumido. Além disso, `Panel::getWidgets()` é hoje um **campo órfão** (sem consumidor em nenhum lugar do código). Reconciliar Panel↔Dashboard é uma feature de widgets por si só → **0.19b**. O Plugin API entrega completo o diferencial (extensibilidade in-code de resources/nav/middleware) sem o bridge.
 
 ## Contexto factual (exploração do código)
 
 Reutilizável como está:
-- `Arqel\Core\Panel\Panel` — builder fluente mutável; já tem `resources()`, `widgets()`, `navigationGroups()`, `middleware()`, `getResources()`, `getWidgets()`.
-- `Arqel\Core\Panel\PanelRegistry` — singleton keyed por id; `all()` itera todos os panels.
-- `Arqel\Core\ArqelServiceProvider::packageBooted()` — difere sync/rotas para `$this->app->booted()` (roda após todos os providers): `discoverResourcesIfEnabled` → `syncPanelResourcesIntoRegistry` → `electDefaultCurrentPanel` → `registerResourceRoutes`.
-- `Arqel\Core\Resources\ResourceRegistry` — sink de resources (sync via `syncPanelResourcesIntoRegistry`).
-- `Arqel\Widgets\DashboardRegistry` (pacote opcional `arqel-dev/widgets`) — sink de widgets; `register()` recebe uma **instância** (`MainDashboard::make()`), idempotente.
-- Precedente de teste: `PanelToRegistrySyncTest` invoca métodos privados do provider via `ReflectionMethod::setAccessible(true)` e assere contra os registries.
-- Precedente de desacoplamento: `core` não depende de `table`/`form` (circular) → duck-typing + `class_exists`/string. Mesmo padrão vale p/ `widgets`.
+- `Arqel\Core\Panel\Panel` — builder fluente mutável **`final`**; já tem `resources(array)`, `navigationGroups(array)`, `middleware(array)`, `getResources()`. `resources()` faz `array_values($resources)`.
+- `Arqel\Core\Panel\PanelRegistry` — singleton keyed por id; `all()` itera todos os panels; `clear()` reseta (usado em testes).
+- `Arqel\Core\ArqelServiceProvider` — em `packageBooted()` difere sync/rotas para `$this->app->booted()` (roda após todos os providers), com métodos `protected`: `discoverResourcesIfEnabled()` → `syncPanelResourcesIntoRegistry()` → `electDefaultCurrentPanel()` → `registerResourceRoutes()`.
+- `Arqel\Core\Resources\ResourceRegistry` — sink de resources; `register(class-string)`, `has(class-string)`, `clear()`. Sync via `syncPanelResourcesIntoRegistry` (skip de não-string/classe-inexistente/já-registrado).
+- Precedente de teste: `PanelToRegistrySyncTest` (`packages/core/tests/Feature/`) invoca métodos do provider via `app()->getProvider(ArqelServiceProvider::class)` + `ReflectionClass::getMethod(...)->setAccessible(true)->invoke($provider)`, com `beforeEach` limpando ambos os registries.
+- Precedente de desacoplamento: `core` não depende de `table`/`form` (circular) → duck-typing + `class_exists`/string.
 
-A construir (gaps): o contrato `Plugin`, `Panel::plugin()/plugins()/getPlugins()/getPlugin()`, os métodos `bootPanelPlugins()` e `syncPanelWidgetsIntoRegistry()` no provider, e 1 plugin de dogfood no showcase.
+A construir (gaps): o contrato `Plugin`, o trait opcional `make()`, `Panel::plugin()/plugins()/getPlugins()/getPlugin()`, o método `bootPanelPlugins()` no provider (invocado no `booted()` **antes** do sync), e 1 plugin de dogfood no showcase. **Sem** bridge de widgets (ver revisão de escopo acima).
 
 ---
 
@@ -80,7 +80,7 @@ public function getPlugin(string $id): ?Plugin { return $this->plugins[$id] ?? n
 ```
 
 - Map keyed por `getId()` → registrar o mesmo id 2x **substitui** (permite app sobrescrever plugin de terceiros pelo mesmo id; padrão legítimo).
-- `register()` dispara na **ordem de inserção**; `boot()` (Seção 3) na mesma ordem.
+- `register()` dispara na **ordem de inserção**; `boot()` (Seção 3) na mesma ordem. Nota: PHP preserva a ordem de inserção de arrays associativos mesmo com keys string, então iterar `$this->plugins` respeita a ordem de `->plugin()`.
 - `getPlugins()`/`getPlugin()` expõem o estado para teste e para o passo de boot no provider.
 
 **Fase boot no ServiceProvider** — novo método privado, invocado no início do `booted()`, **antes** do sync:
@@ -96,66 +96,35 @@ private function bootPanelPlugins(): void
 }
 ```
 
-Ordem no `booted()`: `discoverResourcesIfEnabled` → **`bootPanelPlugins`** → `syncPanelResourcesIntoRegistry` → `syncPanelWidgetsIntoRegistry` (Seção 3) → `electDefaultCurrentPanel` → `registerResourceRoutes`.
+**Ordem final no `booted()`:** `discoverResourcesIfEnabled` → **`bootPanelPlugins`** → `syncPanelResourcesIntoRegistry` → `electDefaultCurrentPanel` → `registerResourceRoutes`. O `bootPanelPlugins` roda **antes** de `syncPanelResourcesIntoRegistry` justamente para que qualquer `resources([...])` que um plugin adicione em `boot()` ainda seja copiado ao `ResourceRegistry` e vire rota.
 
 ---
 
-## Seção 3 — Bridge widgets() → DashboardRegistry (o gap desconectado)
-
-Hoje `Panel::widgets()` **armazena** as classes mas nada as sincroniza com o `DashboardRegistry` (diferente de `resources()`, que é sincronizado por `syncPanelResourcesIntoRegistry`). Para um Plugin registrar widgets e eles realmente aparecerem no dashboard, esse gap precisa fechar.
-
-**Correção:** novo passo de sync no `booted()`, análogo ao de resources:
-
-```php
-private function syncPanelWidgetsIntoRegistry(): void
-{
-    if (!class_exists(\Arqel\Widgets\DashboardRegistry::class)) {
-        return; // arqel-dev/widgets é pacote opcional → no-op se ausente
-    }
-    $registry = $this->app->make(\Arqel\Widgets\DashboardRegistry::class);
-    foreach ($this->panelRegistry->all() as $panel) {
-        foreach ($panel->getWidgets() as $widget) {
-            // $widget é class-string; DashboardRegistry::register() espera instância
-            $registry->register($widget::make());  // idempotente (mesmo widget 2x = 1)
-        }
-    }
-}
-```
-
-Cuidados factuais:
-- **`core` NÃO pode depender de `widgets`** (mesmo padrão de table/form) → o bridge é **guard-ed por `class_exists`** e resolvido via container/string (`\Arqel\Widgets\DashboardRegistry::class` referenciado como string FQCN, nunca `use` no topo). Se `arqel-dev/widgets` não estiver instalado, o passo é no-op silencioso.
-- `DashboardRegistry::register()` recebe uma **instância** (`MainDashboard::make()`), não a classe — o bridge instancia via `$widget::make()` (convenção de factory dos widgets). Idempotente.
-- Assumir a existência de `Widget::make()` é uma dependência de convenção verificável no plano; se a factory divergir, o plano ajusta a instanciação (via container `$this->app->make($widget)`).
-
-Ordem final no `booted()`: `discover` → `bootPanelPlugins` → `syncPanelResources` → **`syncPanelWidgets`** → `electDefault` → `registerRoutes`.
-
----
-
-## Seção 4 — Testes, escopo & autorização
+## Seção 3 — Testes, escopo & autorização
 
 **Testes** (ADR-008; ≥90% PHP):
 
 *PHP (Pest, `core`):*
 - Unit `Panel`:
-  - `plugin()` chama `register()` eager (spy/fake plugin) e muta o Panel — resource do plugin aparece em `getResources()`, widget em `getWidgets()`;
+  - `plugin()` chama `register()` eager (fake plugin) e muta o Panel — resource do plugin aparece em `getResources()`;
   - id duplicado (dois plugins mesmo `getId()`) → **último vence** (`getPlugins()` tem 1 entrada, a segunda);
-  - `plugins([...])` itera e registra todos, na ordem;
-  - `getPlugin(id)` retorna o plugin / `null` se ausente.
-- Feature (reflection-invoke dos métodos privados do provider, padrão `PanelToRegistrySyncTest`):
-  - `bootPanelPlugins` chama `boot()` de cada plugin, **na ordem de inserção**, e roda **antes** do sync;
-  - resource adicionado **dentro de `boot()`** de um plugin **vira rota** (assert em `ResourceRegistry`/route-slugs após a sequência completa) — prova da ordem correta;
-  - `syncPanelWidgetsIntoRegistry` registra os widgets do panel no `DashboardRegistry`; **no-op** quando `class_exists` é falso (guard);
-  - end-to-end: um `FixturePlugin` que em `register()` faz `$panel->resources([X])->widgets([Y])` → após o `booted()` completo, `X` está no `ResourceRegistry` e `Y` no `DashboardRegistry`.
+  - `plugins([...])` itera e registra todos, na ordem de inserção;
+  - `getPlugin(id)` retorna o plugin / `null` se ausente; `getPlugins()` keyed por id.
+- Feature (reflection-invoke dos métodos do provider, padrão `PanelToRegistrySyncTest`):
+  - `bootPanelPlugins` chama `boot()` de cada plugin do panel, **na ordem de inserção**;
+  - resource adicionado **dentro de `boot()`** de um plugin **vira rota** — chamar `bootPanelPlugins` e depois `syncPanelResourcesIntoRegistry` (a ordem real do `booted()`) e assertar que o resource está no `ResourceRegistry` — prova da ordem correta;
+  - end-to-end: um `FixturePlugin` que em `register()` faz `$panel->resources([X])` → após `bootPanelPlugins` + `syncPanelResourcesIntoRegistry`, `X` está no `ResourceRegistry`.
 
-*JS (Vitest):* **nenhum componente React novo** (superfície existente) → sem testes novos. Widgets já renderizam via `DashboardRegistry` no dashboard existente.
+*JS (Vitest):* **nenhum componente React novo** (superfície existente) → sem testes novos.
 
-*E2E (Playwright, dogfood 8090):* leve/opcional — empacotar 1 resource já existente do showcase como um `ShowcasePlugin` e validar no dogfood que o resource aparece na navegação. **Decisão de custo-benefício na fase de plano**: a prova server-side ("resource adicionado em boot vira rota" + "widget chega ao registry") já é forte; o E2E só confirma que o registro via plugin é indistinguível do registro direto na UI. Se incluído, assere por **conteúdo** (item de nav específico aparece), não count.
+*E2E (Playwright, dogfood 8090):* leve/opcional — empacotar 1 resource já existente do showcase como um `ShowcasePlugin` e validar no dogfood que o resource aparece na navegação. **Decisão de custo-benefício na fase de plano**: a prova server-side ("resource adicionado em boot vira rota") já é forte; o E2E só confirma que o registro via plugin é indistinguível do registro direto na UI. Se incluído, assere por **conteúdo** (item de nav específico aparece), não count.
 
-**Autorização:** nenhuma superfície de autorização nova. Resources/widgets registrados via plugin passam pela **mesma** autorização já existente (Policies via `ResourceController`, `HasAuthorization`) — o plugin é só um canal de registro, não um bypass. Nota no plano: um plugin de terceiros pode registrar um resource cujo model o app não pretendia expor — isso é responsabilidade do app que instala o plugin (mesmo modelo de confiança de qualquer pacote Composer), não um novo vetor introduzido aqui.
+**Autorização:** nenhuma superfície de autorização nova. Resources registrados via plugin passam pela **mesma** autorização já existente (Policies via `ResourceController`, `HasAuthorization`) — o plugin é só um canal de registro, não um bypass. Nota no plano: um plugin de terceiros pode registrar um resource cujo model o app não pretendia expor — isso é responsabilidade do app que instala o plugin (mesmo modelo de confiança de qualquer pacote Composer), não um novo vetor introduzido aqui.
 
-**Escopo — pacotes afetados:** só **`core`** (contrato `Plugin` + trait opcional `make()` + `Panel::plugin/plugins/getPlugins/getPlugin` + `bootPanelPlugins` + `syncPanelWidgetsIntoRegistry` no provider) e, no **showcase**, 1 plugin de dogfood. **Não é pacote novo** → sem os 4 pontos de registro de pacote. Bridge de widgets guard-ed por `class_exists` → **zero dependência nova** (não adiciona `arqel-dev/widgets` como require de `core`).
+**Escopo — pacotes afetados:** só **`core`** (contrato `Plugin` + trait opcional `make()` + `Panel::plugin/plugins/getPlugins/getPlugin` + `bootPanelPlugins` no provider) e, no **showcase**, 1 plugin de dogfood. **Não é pacote novo** → sem os 4 pontos de registro de pacote. **Zero dependência nova.**
 
 **Fora de escopo (YAGNI → 0.19b ou depois):**
+- **Bridge `Panel` → widgets/dashboards** — requer reconciliar `Panel::widgets()` (class-strings de Widget) com `DashboardRegistry` (aceita `Dashboard`), hoje incompatíveis; `Panel::getWidgets()` é campo órfão. Feature de widgets por si só (ver revisão de escopo no topo).
 - Panel **Pages** standalone (rota + componente custom fora do CRUD) — conceito não existe hoje.
 - **Render hooks / slots** no layout React (Filament `renderHook()`).
 - **Nav-items ricos** (route/icon/label) — hoje `navigationGroups` é só labels de grupo.
@@ -174,7 +143,6 @@ Ordem final no `booted()`: `discover` → `bootPanelPlugins` → `syncPanelResou
 | `Concerns\CreatesPlugin` (trait, opcional) | Provê `make(): static` | — |
 | `Panel::plugin/plugins/getPlugins/getPlugin` | Registra plugins (map por id, register eager) | Plugin |
 | `ArqelServiceProvider::bootPanelPlugins` | Dispara `boot()` de cada plugin antes do sync | PanelRegistry, Plugin |
-| `ArqelServiceProvider::syncPanelWidgetsIntoRegistry` | Sincroniza `Panel::getWidgets()` → DashboardRegistry (guard-ed) | PanelRegistry, DashboardRegistry (opcional, via string+class_exists) |
 | `ShowcasePlugin` (dogfood) | Empacota 1 resource como plugin | Plugin, showcase resource |
 
-Cada unidade tem propósito único e interface bem definida; testável isoladamente. O bridge de widgets é a única com dependência opcional (guard-ed), preservando o desacoplamento de `core`.
+Cada unidade tem propósito único e interface bem definida; testável isoladamente. `core` não ganha nenhuma dependência nova — o Plugin API reusa só a superfície de registro de resources/nav/middleware que já existe e já tem consumidor no boot pipeline.

@@ -12,10 +12,16 @@ namespace Arqel\Marketplace\Contracts;
  */
 final readonly class Advisory
 {
+    /**
+     * @param string $affectedVersions Composer constraint of the versions this
+     *                                 advisory affects (e.g. '<2.0', '>=1.0.1,<1.5').
+     *                                 A plugin is vulnerable when its installed
+     *                                 version satisfies this constraint.
+     */
     public function __construct(
         public string $id,
         public string $severity,
         public string $summary,
-        public string $fixedIn,
+        public string $affectedVersions,
     ) {}
 }

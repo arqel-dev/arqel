@@ -22,6 +22,7 @@ Release minor que entrega o **milestone 0.19** completo — as três lacunas com
 ### Fixed
 
 - **core (notifications):** a shared prop `notifications` degrada para `null` (em vez de lançar `relation "notifications" does not exist`) quando a tabela ainda não foi publicada/migrada — a prop roda em toda request autenticada, então um app consumidor sem a migration não pode ter o painel inteiro derrubado (#366).
+- **marketplace (security scanner):** o `SecurityScanner` agora compara a versão instalada do plugin (`latest_version`) contra o range de versões afetadas do advisory antes de sinalizar — um plugin já numa versão corrigida deixa de ser marcado vulnerável e (se o advisory era `critical`) auto-delistado indevidamente. O campo `Advisory::fixedIn` deixa de ser dead data (#367).
 
 ## [0.17.0] - 2026-07-07
 

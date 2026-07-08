@@ -1,5 +1,5 @@
 import { render } from 'ink-testing-library';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { classifyLine, LogTailer } from '../LogTailer.js';
 
 const sample = [
@@ -29,9 +29,10 @@ describe('LogTailer', () => {
         follow={false}
       />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    // Poll until the async initial load has rendered — a fixed delay is
+    // flaky under parallel CI load (the frame is still the loading header).
+    await vi.waitFor(() => expect(lastFrame() ?? '').toContain('Application booted'));
     const frame = lastFrame() ?? '';
-    expect(frame).toContain('Application booted');
     expect(frame).toContain('Cache warmup');
     expect(frame).toContain('Slow query');
     expect(frame).toContain('Failed to send notification');
@@ -49,9 +50,8 @@ describe('LogTailer', () => {
         follow={false}
       />,
     );
-    await new Promise((r) => setTimeout(r, 10));
+    await vi.waitFor(() => expect(lastFrame() ?? '').toContain('line 49'));
     const frame = lastFrame() ?? '';
-    expect(frame).toContain('line 49');
     expect(frame).toContain('line 45');
     expect(frame).not.toContain('line 0\n');
     unmount();
@@ -61,8 +61,7 @@ describe('LogTailer', () => {
     const { lastFrame, unmount } = render(
       <LogTailer filePath="/missing" readFile={() => ''} fileExists={() => false} />,
     );
-    await new Promise((r) => setTimeout(r, 10));
-    expect(lastFrame() ?? '').toMatch(/Error:.*not found/);
+    await vi.waitFor(() => expect(lastFrame() ?? '').toMatch(/Error:.*not found/));
     unmount();
   });
 

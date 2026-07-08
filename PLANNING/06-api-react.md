@@ -430,21 +430,15 @@ import { ResourceIndex } from '@arqel-dev/ui'
 import type { ResourceIndexProps } from '@arqel-dev/types'
 
 export default function UsersIndex(props: ResourceIndexProps<User>) {
-    return <ResourceIndex {...props} />
+    return (
+        <ResourceIndex
+            {...props}
+            toolbarActions={<CustomToolbar />}
+            emptyState={<CustomEmpty />}
+            rowActions={(record) => <ActionMenu actions={props.actions.row} onInvoke={handleAction} />}
+        />
+    )
 }
-```
-
-Declarative — todo o rendering é handled internamente pelo component a partir dos props Inertia. Customização via slots:
-
-```tsx
-<ResourceIndex 
-    {...props}
-    toolbar={<CustomToolbar />}
-    emptyState={<CustomEmpty />}
-    renderRow={(record, defaultRenderer) => (
-        record.is_vip ? <VipRow record={record} /> : defaultRenderer(record)
-    )}
-/>
 ```
 
 ### 8.3 DataTable (lower-level)
@@ -453,47 +447,45 @@ Declarative — todo o rendering é handled internamente pelo component a partir
 import { DataTable } from '@arqel-dev/ui'
 
 <DataTable
-    data={records.data}
     columns={columns}
-    filters={filters}
-    sort={sort}
-    onSortChange={handleSort}
-    onFilterChange={handleFilter}
-    onSelectionChange={setSelectedIds}
+    records={records.data}
+    enableSelection
     selectedIds={selectedIds}
-    actions={actions.row}
-    bulkActions={actions.bulk}
-    searchable
-    virtualScrolling={false}               // Fase 2
+    onSelectionChange={setSelectedIds}
+    sort={sort}
+    onSortChange={(column, direction) => handleSort(column, direction)}
+    rowActions={(record) => <ActionMenu actions={actions.row} onInvoke={handleAction} />}
 />
 ```
+
+Note: search/filters/bulk actions are NOT DataTable props — use `<ResourceIndex>` (which composes `TableToolbar` + `TableFilters` + `DataTable`) for that behaviour, or wire `TableFilters`/`TableToolbar` directly.
 
 ### 8.4 FormRenderer
 
 ```tsx
-import { FormRenderer, useArqelForm } from '@arqel-dev/ui'
-import type { ResourceCreateProps } from '@arqel-dev/types'
+import { FormRenderer } from '@arqel-dev/ui'
+import { useArqelForm } from '@arqel-dev/hooks'
 
-export default function UsersCreate({ resource, fields, form, defaults }: ResourceCreateProps<User>) {
-    const inertiaForm = useArqelForm(defaults, fields)
+export default function UsersCreate({ resource, fields, schema }: ResourceCreateProps<User>) {
+    const form = useArqelForm({ fields })
 
     return (
         <form onSubmit={(e) => {
             e.preventDefault()
-            inertiaForm.post(resource.urls.index)
+            form.post(resource.urls.index)
         }}>
-            <FormRenderer 
-                form={form}
+            <FormRenderer
+                schema={schema}
                 fields={fields}
-                data={inertiaForm.data}
-                errors={inertiaForm.errors}
-                onChange={inertiaForm.setData}
-                processing={inertiaForm.processing}
+                values={form.data}
+                errors={form.errors}
+                onChange={(name, value) => form.setData(name, value)}
+                disabled={form.processing}
             />
-            <FormActions 
+            <FormActions
                 submitLabel="Create"
                 onCancel={() => router.visit(resource.urls.index)}
-                processing={inertiaForm.processing}
+                processing={form.processing}
             />
         </form>
     )
@@ -511,15 +503,15 @@ import { FieldRenderer } from '@arqel-dev/ui'
     field={field}
     value={data[field.name]}
     onChange={(value) => setData(field.name, value)}
-    error={errors[field.name]}
-    record={record}                        // For context-aware fields
+    errors={errors[field.name]}
+    disabled={processing}
 />
 ```
 
 Internamente resolve via FieldRegistry:
 
 ```typescript
-import { getFieldComponent } from '@arqel-dev/fields'
+import { getFieldComponent } from '@arqel-dev/ui'
 
 const Component = getFieldComponent(field.component)  // 'EmailInput' → EmailInput
 ```

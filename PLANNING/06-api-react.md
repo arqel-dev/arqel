@@ -537,12 +537,14 @@ import { CanAccess } from '@arqel-dev/ui'
 
 ```tsx
 import { ActionButton, ActionMenu } from '@arqel-dev/ui'
+import { useAction } from '@arqel-dev/hooks'
 
 // Single action
-<ActionButton action={actionSchema} record={record} />
+const { invoke, processing } = useAction(actionSchema)
+<ActionButton action={actionSchema} onInvoke={(values) => invoke(record, values)} processing={processing} />
 
 // Dropdown menu
-<ActionMenu actions={actions.row} record={record} />
+<ActionMenu actions={actions.row} onInvoke={(action, values) => useAction(action).invoke(record, values)} />
 ```
 
 ### 8.8 ConfirmDialog
@@ -556,11 +558,14 @@ const [open, setOpen] = useState(false)
 <ConfirmDialog
     open={open}
     onOpenChange={setOpen}
-    heading="Delete user?"
-    description="This action cannot be undone."
-    variant="destructive"
-    confirmLabel="Yes, delete"
-    requiresText="DELETE"
+    config={{
+        heading: "Delete user?",
+        description: "This action cannot be undone.",
+        color: "destructive",
+        submitLabel: "Yes, delete",
+        cancelLabel: "Cancel",
+        requiresText: "DELETE",
+    }}
     onConfirm={handleDelete}
 />
 ```

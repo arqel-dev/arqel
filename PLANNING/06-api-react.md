@@ -21,25 +21,55 @@ Toda a página Inertia recebe `SharedProps` via `usePage().props`:
 ```typescript
 // packages-js/types/src/inertia.ts
 
-import type { User } from './user'
-import type { Panel, Tenant } from './resources'
-import type { Flash } from './flash'
+export interface AuthUserPayload {
+  id: number | string;
+  name?: string | null;
+  email?: string | null;
+}
+
+export interface AuthPayload {
+  user: AuthUserPayload | null;
+  can: Record<string, boolean>;
+}
+
+export interface PanelPayload {
+  id: string;
+  path: string;
+  brand: { name: string; logo: string | null };
+}
+
+export interface FlashPayload {
+  success: string | null;
+  error: string | null;
+  info: string | null;
+  warning: string | null;
+}
+
+export interface NotificationItem {
+  id: string;
+  type: string;
+  data: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface NotificationPayload {
+  unread_count: number;
+  recent: NotificationItem[];
+}
+
+export interface ArqelMeta {
+  version: string;
+}
 
 export interface SharedProps {
-    auth: {
-        user: User | null
-        can: Record<string, boolean>           // Global abilities
-    }
-    panel: Panel                                // Current panel config
-    // Hoje `unknown` no código (`types/src/inertia.ts`); será tipado como
-    // `Tenant | null` num follow-up JS — ver ADR-019 §6 (divergência G).
-    tenant: unknown                             // Current tenant (Fase 2+)
-    flash: Flash
-    translations: Record<string, string>
-    arqel: {
-        version: string
-        build: string
-    }
+  auth: AuthPayload;
+  panel: PanelPayload | null;
+  tenant: unknown;
+  flash: FlashPayload;
+  translations: Record<string, unknown>;
+  arqel: ArqelMeta;
+  notifications: NotificationPayload | null;
 }
 
 // Extend Inertia's PageProps
@@ -158,131 +188,105 @@ export interface ResourceDetailProps<T extends RecordType = RecordType> {
 Representação JSON-serializada dos Fields PHP.
 
 ```typescript
-export interface FieldSchema {
-    type: FieldType                         // 'text' | 'select' | 'belongsTo' | ...
-    name: string                            // 'email'
-    label: string                           // 'Email Address'
-    component: string                       // 'EmailInput' (React component name)
-    
-    // Common properties
-    required?: boolean
-    readonly?: boolean
-    disabled?: boolean
-    placeholder?: string | null
-    helperText?: string | null
-    defaultValue?: unknown
-    
-    // Validation
-    validation?: {
-        rules: string[]                     // ['required', 'email', 'max:255']
-        zodSchema?: string                  // Serialized Zod schema
-    }
-    
-    // Layout
-    columnSpan?: number | 'full'
-    
-    // Visibility
-    hiddenOnCreate?: boolean
-    hiddenOnEdit?: boolean
-    hiddenOnDetail?: boolean
-    visibleIf?: {                           // Conditional visibility
-        field: string
-        value: unknown
-        operator?: '=' | '!=' | 'in' | 'notIn'
-    }
-    
-    // Live/reactive
-    live?: boolean
-    liveDebounce?: number
-    dependsOn?: string[]
-    
-    // Authorization
-    canSee?: boolean                        // Resolved server-side
-    canEdit?: boolean
-    
-    // Type-specific props (discriminated union)
-    props: FieldProps<FieldType>
+// packages-js/types/src/fields.ts
+
+export interface FieldValidation {
+  rules: string[];
+  messages: Record<string, string>;
+  attribute: string | null;
 }
+
+export interface FieldVisibility {
+  create: boolean;
+  edit: boolean;
+  detail: boolean;
+  table: boolean;
+  canSee: boolean;
+}
+
+interface FieldBase<TType extends FieldType, TProps> {
+  type: TType;
+  name: string;
+  label: string | null;
+  component: string | null;
+  required: boolean;
+  readonly: boolean;
+  disabled: boolean;
+  placeholder: string | null;
+  helperText: string | null;
+  defaultValue: unknown;
+  columnSpan: number | string;
+  live: boolean;
+  liveDebounce: number | null;
+  validation: FieldValidation;
+  visibility: FieldVisibility;
+  dependsOn: string[];
+  props: TProps;
+}
+
+// FieldSchema is a discriminated union, not a flat interface:
+export type FieldSchema =
+  | TextFieldSchema | TextareaFieldSchema | EmailFieldSchema | UrlFieldSchema
+  | PasswordFieldSchema | SlugFieldSchema | NumberFieldSchema | CurrencyFieldSchema
+  | BooleanFieldSchema | ToggleFieldSchema | SelectFieldSchema | MultiSelectFieldSchema
+  | RadioFieldSchema | BelongsToFieldSchema | HasManyFieldSchema | DateFieldSchema
+  | DateTimeFieldSchema | FileFieldSchema | ImageFieldSchema | ColorFieldSchema
+  | HiddenFieldSchema;
 
 export type FieldType =
-    | 'text'
-    | 'textarea'
-    | 'number'
-    | 'currency'
-    | 'boolean'
-    | 'toggle'
-    | 'select'
-    | 'multiSelect'
-    | 'radio'
-    | 'email'
-    | 'url'
-    | 'password'
-    | 'slug'
-    | 'date'
-    | 'dateTime'
-    | 'belongsTo'
-    | 'hasMany'
-    | 'file'
-    | 'image'
-    | 'color'
-    | 'hidden'
-    // Fase 2+
-    | 'richText'
-    | 'markdown'
-    | 'code'
-    | 'repeater'
-    | 'builder'
-    | 'keyValue'
-    | 'tags'
-    | 'wizard'
-    | 'tabs'
+  | 'text'
+  | 'textarea'
+  | 'email'
+  | 'url'
+  | 'password'
+  | 'slug'
+  | 'number'
+  | 'currency'
+  | 'boolean'
+  | 'toggle'
+  | 'select'
+  | 'multiSelect'
+  | 'radio'
+  | 'belongsTo'
+  | 'hasMany'
+  | 'date'
+  | 'dateTime'
+  | 'file'
+  | 'image'
+  | 'color'
+  | 'hidden';
+
+// Fase 2+ (planejado, ainda não implementado no código):
+// richText, markdown, code, repeater, builder, keyValue, tags, wizard, tabs
 ```
 
-### 4.1 Field props por tipo (exemplos)
+### 4.1 Field props por tipo
 
 ```typescript
-// Discriminated union types
-export type FieldProps<T extends FieldType> =
-    T extends 'text' ? TextFieldProps :
-    T extends 'select' ? SelectFieldProps :
-    T extends 'belongsTo' ? BelongsToFieldProps :
-    T extends 'image' ? ImageFieldProps :
-    Record<string, unknown>
-
-export interface TextFieldProps {
-    maxLength?: number
-    minLength?: number
-    pattern?: string
-    autocomplete?: string
+export interface FileFieldProps {
+  disk: string;
+  directory?: string;
+  visibility?: 'public' | 'private';
+  maxSize?: number;
+  acceptedFileTypes?: string[];
+  multiple?: boolean;
+  reorderable?: boolean;
+  strategy?: string;
+  uploadRoute?: string;
 }
 
-export interface SelectFieldProps {
-    options: Array<{ value: string | number; label: string }>
-    searchable?: boolean
-    multiple?: boolean
-    native?: boolean
-    creatable?: boolean
+export interface ImageFieldProps extends FileFieldProps {
+  aspectRatio?: number;
+  crop?: boolean;
 }
 
 export interface BelongsToFieldProps {
-    relatedResource: string                 // 'UserResource'
-    searchRoute: string                     // '/admin/api/resources/user/search'
-    searchColumns: string[]
-    preload: boolean
-    optionLabel?: string | null             // Template: "{{name}} ({{email}})"
-    createRoute?: string                    // If createOptionForm enabled
-}
-
-export interface ImageFieldProps {
-    disk: string
-    directory: string | null
-    visibility: 'public' | 'private'
-    maxSize: number                         // KB
-    acceptedTypes: string[]                 // MIME types
-    multiple: boolean
-    reorderable: boolean
-    aspectRatio?: string                    // '1:1', '16:9'
-    resizeTargetWidth?: number
+  relatedResource: string;
+  relationship: string;
+  searchable: boolean;
+  searchColumns: string[];
+  preload: boolean;
+  searchRoute?: string;
 }
 ```
 

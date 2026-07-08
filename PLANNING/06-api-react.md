@@ -697,29 +697,66 @@ useFieldDependencies({
 })
 ```
 
+### 9.8 useNavigation
+
+Lê a navegação do panel a partir das shared props Inertia (`panel.navigation`).
+
+```typescript
+import { useNavigation } from '@arqel-dev/hooks'
+
+const { items } = useNavigation()   // NavigationItemPayload[]
+```
+
+### 9.9 useBreakpoint
+
+Estado reativo do breakpoint Tailwind atual.
+
+```typescript
+import { useBreakpoint } from '@arqel-dev/hooks'
+
+const breakpoint = useBreakpoint()
+```
+
+### 9.10 useArqelOptimistic
+
+Optimistic updates helper.
+
+```typescript
+import { useArqelOptimistic } from '@arqel-dev/hooks'
+```
+
+### 9.11 useResourceUpdates
+
+Realtime resource updates via Echo (Reverb/Pusher-compatible channel).
+
+```typescript
+import { useResourceUpdates } from '@arqel-dev/hooks'
+```
+
 ## 10. FieldRegistry (custom fields)
 
 ```typescript
 // resources/js/app.tsx
 import { createInertiaApp } from '@inertiajs/react'
 import { createArqelApp } from '@arqel-dev/react'
-import { registerField } from '@arqel-dev/fields'
+import { registerField } from '@arqel-dev/ui'
 import { MyCustomField } from './fields/MyCustomField'
 
 registerField('MyCustomField', MyCustomField)
 
 createArqelApp({
-    setup: ({ el, App, props }) => createRoot(el).render(<App {...props} />)
+    appName: 'Acme Admin',
+    pages: import.meta.glob('./pages/**/*.tsx'),
 })
 ```
 
 ### 10.1 Custom field component contract
 
 ```tsx
-import type { FieldComponentProps } from '@arqel-dev/fields'
+import type { FieldRendererProps } from '@arqel-dev/ui'
 
-export function MyCustomField(props: FieldComponentProps<MyCustomFieldProps>) {
-    const { field, value, onChange, error, disabled, readonly, record } = props
+export function MyCustomField(props: FieldRendererProps) {
+    const { field, value, onChange, errors, disabled } = props
     
     return (
         <div>
@@ -728,9 +765,10 @@ export function MyCustomField(props: FieldComponentProps<MyCustomFieldProps>) {
                 value={value as string ?? ''}
                 onChange={(e) => onChange(e.target.value)}
                 disabled={disabled}
-                readOnly={readonly}
             />
-            {error && <span className="error">{error}</span>}
+            {errors && errors.length > 0 && (
+                <span className="error">{errors[0]}</span>
+            )}
         </div>
     )
 }
@@ -754,15 +792,23 @@ import { Sidebar } from '@arqel-dev/ui'
 
 ### 11.2 Custom nav items
 
-```tsx
-import { Sidebar, NavGroup, NavItem } from '@arqel-dev/ui'
+`<Sidebar>` does not accept JSX children — pass an `items` override array
+(shape `NavigationItemPayload[]` from `@arqel-dev/hooks`) instead of, or
+merged with, the auto-rendered `panel.navigation`:
 
-<Sidebar>
-    <NavGroup label="Custom" icon="star">
-        <NavItem href="/custom" icon="zap">Custom page</NavItem>
-    </NavGroup>
-    {/* Auto-rendered navigation still shows below */}
-</Sidebar>
+```tsx
+import { Sidebar } from '@arqel-dev/ui'
+import { useNavigation } from '@arqel-dev/hooks'
+import type { NavigationItemPayload } from '@arqel-dev/hooks'
+
+function CustomSidebar() {
+    const { items } = useNavigation()
+    const customItems: NavigationItemPayload[] = [
+        { label: 'Custom page', url: '/custom', icon: 'zap', group: 'Custom' },
+        ...items,
+    ]
+    return <Sidebar items={customItems} />
+}
 ```
 
 ## 12. Theme & customization
@@ -965,15 +1011,15 @@ export default function UsersIndex(props: ResourceIndexProps<User>) {
 
 ```typescript
 // app.tsx
+import { createArqelApp } from '@arqel-dev/react/inertia'
+
 createArqelApp({
-    resolve: (name) => {
-        const pages = import.meta.glob<any>('./pages/**/*.tsx')
-        return pages[`./pages/${name}.tsx`]()
-    }
+    appName: 'Acme Admin',
+    pages: import.meta.glob('./pages/**/*.tsx'),
 })
 ```
 
-Cada resource page é lazy-loaded.
+Cada resource page é lazy-loaded via `import.meta.glob`, resolvido internamente por `createArqelApp` (não há opção pública `resolve`).
 
 ### 16.2 Shared chunks
 

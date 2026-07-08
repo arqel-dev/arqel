@@ -20,6 +20,7 @@ use Arqel\Table\Columns\{TextColumn, RelationshipColumn, BooleanColumn, DateColu
 use Arqel\Form\Form;
 use Arqel\Actions\Action;
 use Arqel\Actions\Actions;
+use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
 final class UserResource extends Resource
@@ -108,9 +109,9 @@ final class UserResource extends Resource
     // `table()` retorna `mixed` (não `Table`) por design — ver ADR-019 §5:
     // `arqel-dev/core` não pode depender de `arqel-dev/table` (dependência
     // circular), então o controller faz duck-typing do resultado.
-    public function table(Table $table): mixed
+    public function table(): mixed
     {
-        return $table
+        return (new Table)
             ->columns([
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('email')->searchable()->copyable(),
@@ -147,9 +148,9 @@ final class UserResource extends Resource
      * Retorna `mixed` pelo mesmo motivo de `table()` — ver ADR-019 §5
      * (`arqel-dev/core` não pode depender de `arqel-dev/form`).
      */
-    public function form(Form $form): mixed
+    public function form(): mixed
     {
-        return $form->schema([
+        return Form::make()->schema([
             Section::make('Profile')
                 ->columns(2)
                 ->schema([
@@ -191,6 +192,30 @@ final class UserResource extends Resource
     public function recordSubtitle($record): ?string
     {
         return $record->role?->name;
+    }
+
+    /**
+     * Global search opt-in (Cmd+K palette). Retorna os nomes de coluna
+     * buscáveis; vazio (default) = fora da busca global. Override
+     * `globalSearchResultTitle()` para customizar o rótulo do resultado.
+     */
+    public static function globallySearchable(): array
+    {
+        return ['name', 'email'];
+    }
+
+    public static function globalSearchResultTitle(Model $record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Relation Managers exibidos na página de edit (HasMany/BelongsToMany/…).
+     * Retorna FQCNs de classes `RelationManager`.
+     */
+    public function relations(): array
+    {
+        return [PostsRelationManager::class];
     }
 
     /**
@@ -264,8 +289,6 @@ Arqel::panel('admin')
 | `afterSave($record)` | Após create OU update | `void` |
 | `beforeDelete($record)` | Antes de delete (pode lançar para cancelar) | `void` |
 | `afterDelete($record)` | Após delete | `void` |
-| `mutateFormDataBeforeSave(array $data)` | Antes de save (form only) | `array` |
-| `mutateFormDataBeforeFill(array $data)` | Ao popular edit form | `array` |
 
 ## 2. Field
 
@@ -285,9 +308,8 @@ Field::text('name')                            // Static factory
     ->readonly()                               // Readonly em form
     ->disabled(fn ($user) => $user->isGuest())
     ->hidden(fn ($record) => ! $record->shouldShowName())
-    ->visibleOnDetail()                        // Shown em detail page
-    ->visibleOnEdit()
-    ->hiddenOnCreate()
+    ->visibleOn(['detail', 'edit'])            // Só nesses contextos
+    ->hiddenOnCreate()                         // Inverso: oculto no create
     ->rules(['max:255', 'regex:/^[a-z]+$/i'])  // Extra Laravel rules
     ->maxLength(255)
     ->minLength(2)
@@ -298,7 +320,6 @@ Field::text('name')                            // Static factory
     ->liveDebounced(300)                       // Debounced 300ms
     ->afterStateUpdated(fn ($state, $set) => $set('slug', Str::slug($state)))
     ->dependsOn(['role_id'])                   // Re-evaluate when role_id changes
-    ->dataType('string')                       // TypeScript type hint
     ->canSee(fn ($user) => $user->can('view_sensitive'))
     ->canEdit(fn ($user, $record) => $user->id === $record->created_by);
 ```
@@ -367,8 +388,7 @@ Field::belongsTo('author_id', UserResource::class)
     ->preload()
     ->searchColumns(['name', 'email'])
     ->optionLabel(fn ($user) => "{$user->name} ({$user->email})")
-    ->createOptionForm(fn () => UserResource::form())
-    ->relationship('author', 'name', fn ($query) => $query->where('active', true));
+    ->relationship('author', fn ($query) => $query->where('active', true));
 ```
 
 **FileField / ImageField:**
@@ -452,9 +472,15 @@ Action::make('transfer_ownership')
     });
 ```
 
-### 3.3 Action assíncrona (queued)
+### 3.3 Action assíncrona (queued) — planejado (não implementado)
+
+> **Status:** API planejada para uma fase futura. Os métodos abaixo
+> (`queue()`/`onQueue()`/`progress()`/`onComplete()`) **ainda não existem** em
+> `arqel-dev/actions` — não copiar como código atual. Para trabalho assíncrono
+> hoje, despache um Job Laravel de dentro do `->action(...)` da Action.
 
 ```php
+// EXEMPLO ILUSTRATIVO — API futura, ainda não disponível.
 Action::make('export')
     ->queue(ExportJob::class)
     ->onQueue('exports')
@@ -596,6 +622,42 @@ Arqel::panel('admin')
 Todas aceitam `bool $enabled = true` (ex.: `->registration(false)` desliga o
 registro). Se o host já expõe uma rota `login` (Breeze/Fortify), Arqel não
 re-registra a sua — integra-se em vez de colidir.
+
+### 5.2 Plugin API (extensibilidade in-code)
+
+Um plugin registra Resources/páginas/widgets no Panel de forma programática.
+Implemente `Arqel\Core\Contracts\Plugin` (`getId()`, `register(Panel)`,
+`boot(Panel)`) e passe ao Panel:
+
+```php
+use Arqel\Core\Contracts\Plugin;
+use Arqel\Core\Panel\Panel;
+
+final class BlogPlugin implements Plugin
+{
+    public function getId(): string
+    {
+        return 'acme-blog';
+    }
+
+    public function register(Panel $panel): void
+    {
+        $panel->resources([PostResource::class, CategoryResource::class]);
+    }
+
+    public function boot(Panel $panel): void
+    {
+        // Chamado depois que todos os plugins registraram — wiring cross-plugin.
+    }
+}
+
+Arqel::panel('admin')
+    ->plugin(new BlogPlugin)                 // um plugin
+    ->plugins([new BlogPlugin, new ShopPlugin]); // vários
+```
+
+Registrar o mesmo `getId()` duas vezes substitui o anterior (último-vence),
+permitindo que o app sobrescreva um plugin de terceiros pelo mesmo id.
 
 ## 6. Navigation
 

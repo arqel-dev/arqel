@@ -580,7 +580,7 @@ Typed access aos props da página Resource.
 import { useResource } from '@arqel-dev/hooks'
 
 function MyComponent() {
-    const { resource, records, filters, actions } = useResource<User>()
+    const { resource, records, record, filters, props } = useResource<User>()
     // ...
 }
 ```
@@ -592,20 +592,23 @@ Wrap do `useForm` Inertia com awareness de fields.
 ```typescript
 import { useArqelForm } from '@arqel-dev/hooks'
 
-const form = useArqelForm(defaults, fields)
+const form = useArqelForm({ fields, record, defaults })
 
-form.data                                   // Record<string, unknown>
+form.data                                   // Record<string, FormDataConvertible>
 form.errors                                 // Record<string, string[]>
 form.processing
 form.setData(name, value)
 form.post(url)
 form.put(url)
 form.delete(url)
-form.submit(method, url, options)
 form.reset()
 form.clearErrors()
 
-// Zod validation client-side (opt-in)
+form.fields                                 // readonly FieldSchema[] — echoed back
+form.clientErrors                           // Record<string, string[]> — always {} in Phase 1
+
+// Zod validation client-side — Phase 1 stub, always returns true until
+// the Zod bridge ships (HOOKS-002 follow-up):
 form.validate()                             // Returns true if valid
 form.validateField('email')                 // Single field
 ```
@@ -635,25 +638,28 @@ function Layout() {
 
 ### 9.5 useTable
 
-Estado de tabela (sort, filter, selection) com URL sync.
+Estado de tabela (sort, filter, selection).
 
 ```typescript
 import { useTable } from '@arqel-dev/hooks'
 
 const table = useTable({
     defaultSort: { column: 'created_at', direction: 'desc' },
-    persistInUrl: true,
+    // NOTE: URL persistence is not implemented in Phase 1 — pure local
+    // state only. Sync to the URL yourself via Inertia `router.get`/`reload`.
 })
 
-table.sort                                  // { column, direction }
+table.sort                                  // { column, direction } | null
 table.setSort(column, direction)
+table.clearSort()
 table.filters                               // Record<string, unknown>
 table.setFilter(name, value)
 table.clearFilters()
 table.selectedIds
 table.toggleSelection(id)
-table.selectAll()
+table.selectAll(ids)                        // requires the id list to select
 table.clearSelection()
+table.isSelected(id)
 ```
 
 ### 9.6 useAction
@@ -665,7 +671,11 @@ import { useAction } from '@arqel-dev/hooks'
 
 const { invoke, processing, progress } = useAction(actionSchema)
 
-await invoke(record, { additionalData })
+// invoke() is fire-and-forget (returns void, not a Promise) — track
+// completion via `processing`, not by awaiting the call.
+invoke(record, { additionalData })
+
+// Throws if `actionSchema.url` is unset (misconfigured custom action).
 ```
 
 ### 9.7 useFieldDependencies
@@ -675,10 +685,15 @@ Handles `dependsOn` Field reactivity.
 ```typescript
 import { useFieldDependencies } from '@arqel-dev/hooks'
 
-useFieldDependencies(form, fields, {
-    onDependencyChange: (fieldName, newOptions) => {
-        // React to server-side refresh
-    }
+useFieldDependencies({
+    fields,
+    values: form.data,
+    debounceMs: 300,               // default
+    onDependencyChange: (fieldName) => {
+        // Field's dependent options were just reloaded via router.reload({
+        // only: [`fields.${fieldName}.options`] }) — read the fresh
+        // `fields` prop after the Inertia visit resolves.
+    },
 })
 ```
 

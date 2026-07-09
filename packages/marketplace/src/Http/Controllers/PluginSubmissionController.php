@@ -16,6 +16,8 @@ use Illuminate\Http\JsonResponse;
  * Cria Plugin com `status=pending`, popula metadados de submissão e roda
  * o `PluginAutoChecker` para anexar relatório de checks à coluna
  * `submission_metadata`. Dispara `PluginSubmitted` ao final.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginSubmissionController
 {

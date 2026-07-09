@@ -35,6 +35,8 @@ use Illuminate\Support\Facades\Route;
  *     URLs that depend on the owning Resource + panel routing (e.g. a
  *     searchable `BelongsToField`'s `searchRoute`, #203) — these can't
  *     be produced by the Field in isolation.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class FieldSchemaSerializer
 {

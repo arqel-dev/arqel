@@ -21,6 +21,8 @@ use Inertia\Response;
  * Renderiza o componente Inertia `arqel-dev/auth/ForgotPassword` e dispara o
  * envio do reset link via `Password::sendResetLink`. A resposta é genérica
  * (não revela se o e-mail existe) — flash `status` constante.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ForgotPasswordController
 {

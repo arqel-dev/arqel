@@ -18,6 +18,8 @@ use Illuminate\Validation\ValidationException;
  *   (status → `hidden`, requer `reason`).
  *
  * Ambos os endpoints exigem ability `marketplace.moderate-reviews`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginReviewModerationController
 {

@@ -18,6 +18,8 @@ use Throwable;
  * Kept as a shared helper so the read path (`StateTransitionField`), the write
  * path (`HasWorkflow`), and the authorizer (`TransitionAuthorizer`) cannot
  * drift into emitting divergent target tokens (issue #119).
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class TransitionTargetResolver
 {

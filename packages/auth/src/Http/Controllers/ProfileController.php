@@ -18,6 +18,8 @@ use Inertia\Response;
  *
  * Renderiza o componente Inertia `arqel-dev/auth/Profile` e processa os
  * dois formulários: dados de conta (nome/email) e troca de senha.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ProfileController
 {

@@ -15,6 +15,8 @@ use Illuminate\Validation\ValidationException;
  *
  * Requer ability `marketplace.feature` via Gate. Body: `{featured: bool}`.
  * Quando `featured=true`, popula `featured_at = now()`; senão limpa.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginFeatureController
 {

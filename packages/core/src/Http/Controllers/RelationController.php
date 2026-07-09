@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  * model's Policy (fail-open when neither a Gate rule nor a Policy is
  * registered — matches ResourceController::authorize()'s two-tier
  * semantics).
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class RelationController
 {

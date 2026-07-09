@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Gate;
  * Listagem admin de security scans recentes (MKTPLC-009).
  *
  * Requer ability `marketplace.security-scans`. Aceita filtro `?status=`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class SecurityScanListController
 {

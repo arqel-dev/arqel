@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
  * - `helpful` (default) — `scopeMostHelpful`.
  * - `recent` — `scopeMostRecent`.
  * - `rating` — `scopeHighestRated`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginReviewListController
 {

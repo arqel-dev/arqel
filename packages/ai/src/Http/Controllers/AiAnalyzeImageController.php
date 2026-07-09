@@ -27,6 +27,8 @@ use Throwable;
  *
  * Authorization: Gate `use-ai` opt-in — quando ausente, allow por
  * default.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class AiAnalyzeImageController
 {

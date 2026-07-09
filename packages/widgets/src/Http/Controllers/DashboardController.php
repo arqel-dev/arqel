@@ -30,6 +30,8 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  *   5. Pass through `?filters[...]` query parameters as
  *      `filterValues` so the React side can rehydrate filter state
  *      after deep-link refreshes.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class DashboardController
 {

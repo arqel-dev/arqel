@@ -7,6 +7,8 @@
  * `arqel.version` for free.
  */
 
+import type { TenantContextProps } from './tenant.js';
+
 export interface AuthUserPayload {
   id: number | string;
   name?: string | null;
@@ -60,7 +62,7 @@ export interface SharedProps {
   auth: AuthPayload;
   panel: PanelPayload | null;
   /** Tenant payload — null in Phase 1 (scaffold only). */
-  tenant: unknown;
+  tenant: TenantContextProps | null;
   flash: FlashPayload;
   /** Translation map under the `arqel::*` namespace. */
   translations: Record<string, unknown>;

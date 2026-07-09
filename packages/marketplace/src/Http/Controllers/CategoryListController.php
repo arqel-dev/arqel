@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
  *
  * Quando `?root=1` é passado, retorna apenas categorias raiz com children
  * eager-loaded ordenados. Sem o flag, devolve a lista flat completa.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class CategoryListController
 {

@@ -20,6 +20,8 @@ use Inertia\Response;
  *
  * Renderiza o componente Inertia `arqel-dev/auth/Register` (servido pelo
  * pacote npm `@arqel-dev/auth`) e processa o submit via `RegisterRequest`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class RegisterController
 {

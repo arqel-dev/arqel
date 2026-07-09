@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
  *
  * Invalida a sessão, rotaciona CSRF e redireciona para a URL de login
  * configurada no painel atual.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class LogoutController
 {

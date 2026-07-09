@@ -38,6 +38,8 @@ use Throwable;
  * React side (CORE-012). Validation in this iteration is
  * intentionally lightweight — full FormRequest generation lands in
  * FORM-007.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ResourceController
 {

@@ -39,6 +39,8 @@ use Throwable;
  * `ResourceController::authorize()`. The DELETE handler additionally
  * constrains the supplied `path` to the field's configured directory
  * so it can never be used to delete arbitrary files on the disk.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class FieldUploadController
 {

@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 
 /**
  * Lista plugins featured (editor's picks) published (MKTPLC-007).
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class FeaturedPluginsController
 {

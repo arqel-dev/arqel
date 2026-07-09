@@ -16,6 +16,8 @@ use Spatie\Activitylog\Models\Activity;
  * timeline UI integration land in AUDIT-002+ — for AUDIT-001 the
  * controller stays minimal (JSON payload) so downstream tickets can
  * iterate on the shape without churning the trait.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ActivityLogController extends Controller
 {

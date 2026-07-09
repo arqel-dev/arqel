@@ -21,6 +21,8 @@ use Illuminate\Http\Request;
  * resolver that implements `SupportsTenantSwitching`; otherwise
  * the manager returns empty/false and the controller surfaces a
  * 403/404 as appropriate.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class TenantSwitcherController
 {

@@ -16,6 +16,8 @@ use Inertia\Response;
  *
  * Renderiza o componente Inertia `arqel-dev/auth/Login` (servido pelo
  * pacote npm `@arqel-dev/auth`) e processa o submit via `LoginRequest`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class LoginController
 {

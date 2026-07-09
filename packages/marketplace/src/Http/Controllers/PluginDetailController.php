@@ -15,6 +15,8 @@ use Illuminate\Http\JsonResponse;
  * Retorna o plugin + as últimas 5 reviews + histórico completo de
  * versões. 404 quando o slug não existe ou o plugin ainda não está
  * published (draft/pending/archived são opacos para o público).
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginDetailController
 {

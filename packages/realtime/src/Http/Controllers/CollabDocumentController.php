@@ -24,6 +24,8 @@ use Throwable;
  * Sync delta-by-delta de Yjs (via WebSocket / Reverb) fica para
  * follow-up (`@arqel-dev/realtime` cliente). Aqui só persistimos snapshot
  * consolidado.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class CollabDocumentController
 {

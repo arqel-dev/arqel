@@ -17,6 +17,8 @@ use Illuminate\Validation\ValidationException;
  * Idempotência: `firstOrCreate` por `(user_id, plugin_id)` — múltiplas
  * chamadas do mesmo user para o mesmo plugin não geram rows duplicadas.
  * MKTPLC-003 vai expandir para update + média ponderada de stars.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginReviewController
 {

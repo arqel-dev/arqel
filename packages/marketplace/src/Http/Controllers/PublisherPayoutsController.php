@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
  * Lista payouts do publisher autenticado (MKTPLC-008).
  *
  * Filtra automaticamente por `publisher_user_id = auth()->id()`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PublisherPayoutsController
 {

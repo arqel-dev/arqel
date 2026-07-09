@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  * The bundled `routes/admin.php` only adds `web` + `auth`; tightening
  * the policy is the consumer's responsibility because the package
  * does not know about the User model nor the Export ownership column.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ExportDownloadController
 {

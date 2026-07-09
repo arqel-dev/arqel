@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
  * Lista plugins published criados nos últimos N dias (MKTPLC-007).
  *
  * Default `?days=7`. Clamp em [1, 90].
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class NewPluginsController
 {

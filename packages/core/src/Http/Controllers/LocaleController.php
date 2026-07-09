@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Cookie;
  *     pelo middleware quando a sessão expira.
  *
  * Validação por allowlist via {@see TranslationLoader::availableLocales()}.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class LocaleController
 {

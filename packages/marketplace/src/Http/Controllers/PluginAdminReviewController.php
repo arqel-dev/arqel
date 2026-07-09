@@ -17,6 +17,8 @@ use Illuminate\Validation\ValidationException;
  *
  * Requer ability `marketplace.review` via Gate. Approve transiciona para
  * `published`; reject move para `archived` registrando `rejection_reason`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginAdminReviewController
 {

@@ -19,6 +19,8 @@ use Illuminate\Http\Request;
  *
  * Idempotência: se o usuário já tem uma purchase pending para o plugin, ela é reusada.
  * Se já tem uma completed, retorna 200 com a compra existente.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginPurchaseController
 {

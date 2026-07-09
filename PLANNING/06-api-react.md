@@ -21,25 +21,55 @@ Toda a página Inertia recebe `SharedProps` via `usePage().props`:
 ```typescript
 // packages-js/types/src/inertia.ts
 
-import type { User } from './user'
-import type { Panel, Tenant } from './resources'
-import type { Flash } from './flash'
+export interface AuthUserPayload {
+  id: number | string;
+  name?: string | null;
+  email?: string | null;
+}
+
+export interface AuthPayload {
+  user: AuthUserPayload | null;
+  can: Record<string, boolean>;
+}
+
+export interface PanelPayload {
+  id: string;
+  path: string;
+  brand: { name: string; logo: string | null };
+}
+
+export interface FlashPayload {
+  success: string | null;
+  error: string | null;
+  info: string | null;
+  warning: string | null;
+}
+
+export interface NotificationItem {
+  id: string;
+  type: string;
+  data: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface NotificationPayload {
+  unread_count: number;
+  recent: NotificationItem[];
+}
+
+export interface ArqelMeta {
+  version: string;
+}
 
 export interface SharedProps {
-    auth: {
-        user: User | null
-        can: Record<string, boolean>           // Global abilities
-    }
-    panel: Panel                                // Current panel config
-    // Hoje `unknown` no código (`types/src/inertia.ts`); será tipado como
-    // `Tenant | null` num follow-up JS — ver ADR-019 §6 (divergência G).
-    tenant: unknown                             // Current tenant (Fase 2+)
-    flash: Flash
-    translations: Record<string, string>
-    arqel: {
-        version: string
-        build: string
-    }
+  auth: AuthPayload;
+  panel: PanelPayload | null;
+  tenant: unknown;
+  flash: FlashPayload;
+  translations: Record<string, unknown>;
+  arqel: ArqelMeta;
+  notifications: NotificationPayload | null;
 }
 
 // Extend Inertia's PageProps
@@ -158,131 +188,105 @@ export interface ResourceDetailProps<T extends RecordType = RecordType> {
 Representação JSON-serializada dos Fields PHP.
 
 ```typescript
-export interface FieldSchema {
-    type: FieldType                         // 'text' | 'select' | 'belongsTo' | ...
-    name: string                            // 'email'
-    label: string                           // 'Email Address'
-    component: string                       // 'EmailInput' (React component name)
-    
-    // Common properties
-    required?: boolean
-    readonly?: boolean
-    disabled?: boolean
-    placeholder?: string | null
-    helperText?: string | null
-    defaultValue?: unknown
-    
-    // Validation
-    validation?: {
-        rules: string[]                     // ['required', 'email', 'max:255']
-        zodSchema?: string                  // Serialized Zod schema
-    }
-    
-    // Layout
-    columnSpan?: number | 'full'
-    
-    // Visibility
-    hiddenOnCreate?: boolean
-    hiddenOnEdit?: boolean
-    hiddenOnDetail?: boolean
-    visibleIf?: {                           // Conditional visibility
-        field: string
-        value: unknown
-        operator?: '=' | '!=' | 'in' | 'notIn'
-    }
-    
-    // Live/reactive
-    live?: boolean
-    liveDebounce?: number
-    dependsOn?: string[]
-    
-    // Authorization
-    canSee?: boolean                        // Resolved server-side
-    canEdit?: boolean
-    
-    // Type-specific props (discriminated union)
-    props: FieldProps<FieldType>
+// packages-js/types/src/fields.ts
+
+export interface FieldValidation {
+  rules: string[];
+  messages: Record<string, string>;
+  attribute: string | null;
 }
+
+export interface FieldVisibility {
+  create: boolean;
+  edit: boolean;
+  detail: boolean;
+  table: boolean;
+  canSee: boolean;
+}
+
+interface FieldBase<TType extends FieldType, TProps> {
+  type: TType;
+  name: string;
+  label: string | null;
+  component: string | null;
+  required: boolean;
+  readonly: boolean;
+  disabled: boolean;
+  placeholder: string | null;
+  helperText: string | null;
+  defaultValue: unknown;
+  columnSpan: number | string;
+  live: boolean;
+  liveDebounce: number | null;
+  validation: FieldValidation;
+  visibility: FieldVisibility;
+  dependsOn: string[];
+  props: TProps;
+}
+
+// FieldSchema is a discriminated union, not a flat interface:
+export type FieldSchema =
+  | TextFieldSchema | TextareaFieldSchema | EmailFieldSchema | UrlFieldSchema
+  | PasswordFieldSchema | SlugFieldSchema | NumberFieldSchema | CurrencyFieldSchema
+  | BooleanFieldSchema | ToggleFieldSchema | SelectFieldSchema | MultiSelectFieldSchema
+  | RadioFieldSchema | BelongsToFieldSchema | HasManyFieldSchema | DateFieldSchema
+  | DateTimeFieldSchema | FileFieldSchema | ImageFieldSchema | ColorFieldSchema
+  | HiddenFieldSchema;
 
 export type FieldType =
-    | 'text'
-    | 'textarea'
-    | 'number'
-    | 'currency'
-    | 'boolean'
-    | 'toggle'
-    | 'select'
-    | 'multiSelect'
-    | 'radio'
-    | 'email'
-    | 'url'
-    | 'password'
-    | 'slug'
-    | 'date'
-    | 'dateTime'
-    | 'belongsTo'
-    | 'hasMany'
-    | 'file'
-    | 'image'
-    | 'color'
-    | 'hidden'
-    // Fase 2+
-    | 'richText'
-    | 'markdown'
-    | 'code'
-    | 'repeater'
-    | 'builder'
-    | 'keyValue'
-    | 'tags'
-    | 'wizard'
-    | 'tabs'
+  | 'text'
+  | 'textarea'
+  | 'email'
+  | 'url'
+  | 'password'
+  | 'slug'
+  | 'number'
+  | 'currency'
+  | 'boolean'
+  | 'toggle'
+  | 'select'
+  | 'multiSelect'
+  | 'radio'
+  | 'belongsTo'
+  | 'hasMany'
+  | 'date'
+  | 'dateTime'
+  | 'file'
+  | 'image'
+  | 'color'
+  | 'hidden';
+
+// Fase 2+ (planejado, ainda não implementado no código):
+// richText, markdown, code, repeater, builder, keyValue, tags, wizard, tabs
 ```
 
-### 4.1 Field props por tipo (exemplos)
+### 4.1 Field props por tipo
 
 ```typescript
-// Discriminated union types
-export type FieldProps<T extends FieldType> =
-    T extends 'text' ? TextFieldProps :
-    T extends 'select' ? SelectFieldProps :
-    T extends 'belongsTo' ? BelongsToFieldProps :
-    T extends 'image' ? ImageFieldProps :
-    Record<string, unknown>
-
-export interface TextFieldProps {
-    maxLength?: number
-    minLength?: number
-    pattern?: string
-    autocomplete?: string
+export interface FileFieldProps {
+  disk: string;
+  directory?: string;
+  visibility?: 'public' | 'private';
+  maxSize?: number;
+  acceptedFileTypes?: string[];
+  multiple?: boolean;
+  reorderable?: boolean;
+  strategy?: string;
+  uploadRoute?: string;
 }
 
-export interface SelectFieldProps {
-    options: Array<{ value: string | number; label: string }>
-    searchable?: boolean
-    multiple?: boolean
-    native?: boolean
-    creatable?: boolean
+export interface ImageFieldProps extends FileFieldProps {
+  aspectRatio?: number;
+  crop?: boolean;
 }
 
 export interface BelongsToFieldProps {
-    relatedResource: string                 // 'UserResource'
-    searchRoute: string                     // '/admin/api/resources/user/search'
-    searchColumns: string[]
-    preload: boolean
-    optionLabel?: string | null             // Template: "{{name}} ({{email}})"
-    createRoute?: string                    // If createOptionForm enabled
-}
-
-export interface ImageFieldProps {
-    disk: string
-    directory: string | null
-    visibility: 'public' | 'private'
-    maxSize: number                         // KB
-    acceptedTypes: string[]                 // MIME types
-    multiple: boolean
-    reorderable: boolean
-    aspectRatio?: string                    // '1:1', '16:9'
-    resizeTargetWidth?: number
+  relatedResource: string;
+  relationship: string;
+  searchable: boolean;
+  searchColumns: string[];
+  preload: boolean;
+  searchRoute?: string;
 }
 ```
 
@@ -426,21 +430,15 @@ import { ResourceIndex } from '@arqel-dev/ui'
 import type { ResourceIndexProps } from '@arqel-dev/types'
 
 export default function UsersIndex(props: ResourceIndexProps<User>) {
-    return <ResourceIndex {...props} />
+    return (
+        <ResourceIndex
+            {...props}
+            toolbarActions={<CustomToolbar />}
+            emptyState={<CustomEmpty />}
+            rowActions={(record) => <ActionMenu actions={props.actions.row} onInvoke={handleAction} />}
+        />
+    )
 }
-```
-
-Declarative — todo o rendering é handled internamente pelo component a partir dos props Inertia. Customização via slots:
-
-```tsx
-<ResourceIndex 
-    {...props}
-    toolbar={<CustomToolbar />}
-    emptyState={<CustomEmpty />}
-    renderRow={(record, defaultRenderer) => (
-        record.is_vip ? <VipRow record={record} /> : defaultRenderer(record)
-    )}
-/>
 ```
 
 ### 8.3 DataTable (lower-level)
@@ -449,47 +447,45 @@ Declarative — todo o rendering é handled internamente pelo component a partir
 import { DataTable } from '@arqel-dev/ui'
 
 <DataTable
-    data={records.data}
     columns={columns}
-    filters={filters}
-    sort={sort}
-    onSortChange={handleSort}
-    onFilterChange={handleFilter}
-    onSelectionChange={setSelectedIds}
+    records={records.data}
+    enableSelection
     selectedIds={selectedIds}
-    actions={actions.row}
-    bulkActions={actions.bulk}
-    searchable
-    virtualScrolling={false}               // Fase 2
+    onSelectionChange={setSelectedIds}
+    sort={sort}
+    onSortChange={(column, direction) => handleSort(column, direction)}
+    rowActions={(record) => <ActionMenu actions={actions.row} onInvoke={handleAction} />}
 />
 ```
+
+Note: search/filters/bulk actions are NOT DataTable props — use `<ResourceIndex>` (which composes `TableToolbar` + `TableFilters` + `DataTable`) for that behaviour, or wire `TableFilters`/`TableToolbar` directly.
 
 ### 8.4 FormRenderer
 
 ```tsx
-import { FormRenderer, useArqelForm } from '@arqel-dev/ui'
-import type { ResourceCreateProps } from '@arqel-dev/types'
+import { FormRenderer } from '@arqel-dev/ui'
+import { useArqelForm } from '@arqel-dev/hooks'
 
-export default function UsersCreate({ resource, fields, form, defaults }: ResourceCreateProps<User>) {
-    const inertiaForm = useArqelForm(defaults, fields)
+export default function UsersCreate({ resource, fields, schema }: ResourceCreateProps<User>) {
+    const form = useArqelForm({ fields })
 
     return (
         <form onSubmit={(e) => {
             e.preventDefault()
-            inertiaForm.post(resource.urls.index)
+            form.post(resource.urls.index)
         }}>
-            <FormRenderer 
-                form={form}
+            <FormRenderer
+                schema={schema}
                 fields={fields}
-                data={inertiaForm.data}
-                errors={inertiaForm.errors}
-                onChange={inertiaForm.setData}
-                processing={inertiaForm.processing}
+                values={form.data}
+                errors={form.errors}
+                onChange={(name, value) => form.setData(name, value)}
+                disabled={form.processing}
             />
-            <FormActions 
+            <FormActions
                 submitLabel="Create"
                 onCancel={() => router.visit(resource.urls.index)}
-                processing={inertiaForm.processing}
+                processing={form.processing}
             />
         </form>
     )
@@ -507,15 +503,15 @@ import { FieldRenderer } from '@arqel-dev/ui'
     field={field}
     value={data[field.name]}
     onChange={(value) => setData(field.name, value)}
-    error={errors[field.name]}
-    record={record}                        // For context-aware fields
+    errors={errors[field.name]}
+    disabled={processing}
 />
 ```
 
 Internamente resolve via FieldRegistry:
 
 ```typescript
-import { getFieldComponent } from '@arqel-dev/fields'
+import { getFieldComponent } from '@arqel-dev/ui'
 
 const Component = getFieldComponent(field.component)  // 'EmailInput' → EmailInput
 ```
@@ -541,12 +537,14 @@ import { CanAccess } from '@arqel-dev/ui'
 
 ```tsx
 import { ActionButton, ActionMenu } from '@arqel-dev/ui'
+import { useAction } from '@arqel-dev/hooks'
 
 // Single action
-<ActionButton action={actionSchema} record={record} />
+const { invoke, processing } = useAction(actionSchema)
+<ActionButton action={actionSchema} onInvoke={(values) => invoke(record, values)} processing={processing} />
 
 // Dropdown menu
-<ActionMenu actions={actions.row} record={record} />
+<ActionMenu actions={actions.row} onInvoke={(action, values) => useAction(action).invoke(record, values)} />
 ```
 
 ### 8.8 ConfirmDialog
@@ -560,11 +558,14 @@ const [open, setOpen] = useState(false)
 <ConfirmDialog
     open={open}
     onOpenChange={setOpen}
-    heading="Delete user?"
-    description="This action cannot be undone."
-    variant="destructive"
-    confirmLabel="Yes, delete"
-    requiresText="DELETE"
+    config={{
+        heading: "Delete user?",
+        description: "This action cannot be undone.",
+        color: "destructive",
+        submitLabel: "Yes, delete",
+        cancelLabel: "Cancel",
+        requiresText: "DELETE",
+    }}
     onConfirm={handleDelete}
 />
 ```
@@ -579,7 +580,7 @@ Typed access aos props da página Resource.
 import { useResource } from '@arqel-dev/hooks'
 
 function MyComponent() {
-    const { resource, records, filters, actions } = useResource<User>()
+    const { resource, records, record, filters, props } = useResource<User>()
     // ...
 }
 ```
@@ -591,20 +592,23 @@ Wrap do `useForm` Inertia com awareness de fields.
 ```typescript
 import { useArqelForm } from '@arqel-dev/hooks'
 
-const form = useArqelForm(defaults, fields)
+const form = useArqelForm({ fields, record, defaults })
 
-form.data                                   // Record<string, unknown>
+form.data                                   // Record<string, FormDataConvertible>
 form.errors                                 // Record<string, string[]>
 form.processing
 form.setData(name, value)
 form.post(url)
 form.put(url)
 form.delete(url)
-form.submit(method, url, options)
 form.reset()
 form.clearErrors()
 
-// Zod validation client-side (opt-in)
+form.fields                                 // readonly FieldSchema[] — echoed back
+form.clientErrors                           // Record<string, string[]> — always {} in Phase 1
+
+// Zod validation client-side — Phase 1 stub, always returns true until
+// the Zod bridge ships (HOOKS-002 follow-up):
 form.validate()                             // Returns true if valid
 form.validateField('email')                 // Single field
 ```
@@ -634,25 +638,28 @@ function Layout() {
 
 ### 9.5 useTable
 
-Estado de tabela (sort, filter, selection) com URL sync.
+Estado de tabela (sort, filter, selection).
 
 ```typescript
 import { useTable } from '@arqel-dev/hooks'
 
 const table = useTable({
     defaultSort: { column: 'created_at', direction: 'desc' },
-    persistInUrl: true,
+    // NOTE: URL persistence is not implemented in Phase 1 — pure local
+    // state only. Sync to the URL yourself via Inertia `router.get`/`reload`.
 })
 
-table.sort                                  // { column, direction }
+table.sort                                  // { column, direction } | null
 table.setSort(column, direction)
+table.clearSort()
 table.filters                               // Record<string, unknown>
 table.setFilter(name, value)
 table.clearFilters()
 table.selectedIds
 table.toggleSelection(id)
-table.selectAll()
+table.selectAll(ids)                        // requires the id list to select
 table.clearSelection()
+table.isSelected(id)
 ```
 
 ### 9.6 useAction
@@ -664,7 +671,11 @@ import { useAction } from '@arqel-dev/hooks'
 
 const { invoke, processing, progress } = useAction(actionSchema)
 
-await invoke(record, { additionalData })
+// invoke() is fire-and-forget (returns void, not a Promise) — track
+// completion via `processing`, not by awaiting the call.
+invoke(record, { additionalData })
+
+// Throws if `actionSchema.url` is unset (misconfigured custom action).
 ```
 
 ### 9.7 useFieldDependencies
@@ -674,11 +685,52 @@ Handles `dependsOn` Field reactivity.
 ```typescript
 import { useFieldDependencies } from '@arqel-dev/hooks'
 
-useFieldDependencies(form, fields, {
-    onDependencyChange: (fieldName, newOptions) => {
-        // React to server-side refresh
-    }
+useFieldDependencies({
+    fields,
+    values: form.data,
+    debounceMs: 300,               // default
+    onDependencyChange: (fieldName) => {
+        // Field's dependent options were just reloaded via router.reload({
+        // only: [`fields.${fieldName}.options`] }) — read the fresh
+        // `fields` prop after the Inertia visit resolves.
+    },
 })
+```
+
+### 9.8 useNavigation
+
+Lê a navegação do panel a partir das shared props Inertia (`panel.navigation`).
+
+```typescript
+import { useNavigation } from '@arqel-dev/hooks'
+
+const { items } = useNavigation()   // NavigationItemPayload[]
+```
+
+### 9.9 useBreakpoint
+
+Estado reativo do breakpoint Tailwind atual.
+
+```typescript
+import { useBreakpoint } from '@arqel-dev/hooks'
+
+const breakpoint = useBreakpoint()
+```
+
+### 9.10 useArqelOptimistic
+
+Optimistic updates helper.
+
+```typescript
+import { useArqelOptimistic } from '@arqel-dev/hooks'
+```
+
+### 9.11 useResourceUpdates
+
+Realtime resource updates via Echo (Reverb/Pusher-compatible channel).
+
+```typescript
+import { useResourceUpdates } from '@arqel-dev/hooks'
 ```
 
 ## 10. FieldRegistry (custom fields)
@@ -687,23 +739,24 @@ useFieldDependencies(form, fields, {
 // resources/js/app.tsx
 import { createInertiaApp } from '@inertiajs/react'
 import { createArqelApp } from '@arqel-dev/react'
-import { registerField } from '@arqel-dev/fields'
+import { registerField } from '@arqel-dev/ui'
 import { MyCustomField } from './fields/MyCustomField'
 
 registerField('MyCustomField', MyCustomField)
 
 createArqelApp({
-    setup: ({ el, App, props }) => createRoot(el).render(<App {...props} />)
+    appName: 'Acme Admin',
+    pages: import.meta.glob('./pages/**/*.tsx'),
 })
 ```
 
 ### 10.1 Custom field component contract
 
 ```tsx
-import type { FieldComponentProps } from '@arqel-dev/fields'
+import type { FieldRendererProps } from '@arqel-dev/ui'
 
-export function MyCustomField(props: FieldComponentProps<MyCustomFieldProps>) {
-    const { field, value, onChange, error, disabled, readonly, record } = props
+export function MyCustomField(props: FieldRendererProps) {
+    const { field, value, onChange, errors, disabled } = props
     
     return (
         <div>
@@ -712,9 +765,10 @@ export function MyCustomField(props: FieldComponentProps<MyCustomFieldProps>) {
                 value={value as string ?? ''}
                 onChange={(e) => onChange(e.target.value)}
                 disabled={disabled}
-                readOnly={readonly}
             />
-            {error && <span className="error">{error}</span>}
+            {errors && errors.length > 0 && (
+                <span className="error">{errors[0]}</span>
+            )}
         </div>
     )
 }
@@ -738,15 +792,23 @@ import { Sidebar } from '@arqel-dev/ui'
 
 ### 11.2 Custom nav items
 
-```tsx
-import { Sidebar, NavGroup, NavItem } from '@arqel-dev/ui'
+`<Sidebar>` does not accept JSX children — pass an `items` override array
+(shape `NavigationItemPayload[]` from `@arqel-dev/hooks`) instead of, or
+merged with, the auto-rendered `panel.navigation`:
 
-<Sidebar>
-    <NavGroup label="Custom" icon="star">
-        <NavItem href="/custom" icon="zap">Custom page</NavItem>
-    </NavGroup>
-    {/* Auto-rendered navigation still shows below */}
-</Sidebar>
+```tsx
+import { Sidebar } from '@arqel-dev/ui'
+import { useNavigation } from '@arqel-dev/hooks'
+import type { NavigationItemPayload } from '@arqel-dev/hooks'
+
+function CustomSidebar() {
+    const { items } = useNavigation()
+    const customItems: NavigationItemPayload[] = [
+        { label: 'Custom page', url: '/custom', icon: 'zap', group: 'Custom' },
+        ...items,
+    ]
+    return <Sidebar items={customItems} />
+}
 ```
 
 ## 12. Theme & customization
@@ -949,15 +1011,15 @@ export default function UsersIndex(props: ResourceIndexProps<User>) {
 
 ```typescript
 // app.tsx
+import { createArqelApp } from '@arqel-dev/react/inertia'
+
 createArqelApp({
-    resolve: (name) => {
-        const pages = import.meta.glob<any>('./pages/**/*.tsx')
-        return pages[`./pages/${name}.tsx`]()
-    }
+    appName: 'Acme Admin',
+    pages: import.meta.glob('./pages/**/*.tsx'),
 })
 ```
 
-Cada resource page é lazy-loaded.
+Cada resource page é lazy-loaded via `import.meta.glob`, resolvido internamente por `createArqelApp` (não há opção pública `resolve`).
 
 ### 16.2 Shared chunks
 

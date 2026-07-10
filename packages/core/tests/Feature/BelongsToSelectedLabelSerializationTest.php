@@ -7,7 +7,9 @@ use Arqel\Core\Support\FieldSchemaSerializer;
 use Arqel\Core\Support\InertiaDataBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -188,4 +190,73 @@ it('does not populate selectedLabel in the create payload (fresh model, no FK va
     $payload = app(InertiaDataBuilder::class)->buildCreateData(new SlPostResource, new Request);
 
     expect($payload['fields'][0]['props'])->not->toHaveKey('selectedLabel');
+});
+
+/**
+ * Security regression (#128-style leak): `withSelectedLabel()` must gate
+ * the related Resource's model against its `viewAny` Policy — the same
+ * ability `FieldSearchController::authorizeViewAny()` enforces on the
+ * async search endpoint. Being authorized to edit the *owning* record
+ * (SlPost) must not imply authorization to view the *related* Resource's
+ * (SlAuthor) title. Unlike the controller, denial here degrades by
+ * omitting `selectedLabel` rather than aborting.
+ */
+it('omits selectedLabel when the user is denied viewAny on the related model', function (): void {
+    Gate::define('viewAny', fn (): bool => false);
+
+    $user = new class extends Authenticatable {};
+    $user->forceFill(['id' => 1]);
+
+    $record = new SlPost;
+    $record->setRawAttributes(['id' => 5, 'author_id' => 1]);
+    $record->exists = true;
+
+    $serializer = new FieldSchemaSerializer;
+
+    $serialized = $serializer->serialize([new StubBelongsToRelationField], $record, $user, $record);
+
+    expect($serialized[0]['props'])->not->toHaveKey('selectedLabel');
+});
+
+it('omits selectedLabel when there is no user and a viewAny gate is registered', function (): void {
+    Gate::define('viewAny', fn (): bool => false);
+
+    $record = new SlPost;
+    $record->setRawAttributes(['id' => 5, 'author_id' => 1]);
+    $record->exists = true;
+
+    $serializer = new FieldSchemaSerializer;
+
+    $serialized = $serializer->serialize([new StubBelongsToRelationField], $record, null, $record);
+
+    expect($serialized[0]['props'])->not->toHaveKey('selectedLabel');
+});
+
+it('still emits selectedLabel when the user is granted viewAny on the related model', function (): void {
+    Gate::define('viewAny', fn (): bool => true);
+
+    $user = new class extends Authenticatable {};
+    $user->forceFill(['id' => 1]);
+
+    $record = new SlPost;
+    $record->setRawAttributes(['id' => 5, 'author_id' => 1]);
+    $record->exists = true;
+
+    $serializer = new FieldSchemaSerializer;
+
+    $serialized = $serializer->serialize([new StubBelongsToRelationField], $record, $user, $record);
+
+    expect($serialized[0]['props']['selectedLabel'])->toBe('Ada Lovelace');
+});
+
+it('still emits selectedLabel in fail-open scaffold mode (no Policy/gate registered)', function (): void {
+    $record = new SlPost;
+    $record->setRawAttributes(['id' => 5, 'author_id' => 1]);
+    $record->exists = true;
+
+    $serializer = new FieldSchemaSerializer;
+
+    $serialized = $serializer->serialize([new StubBelongsToRelationField], $record, null, $record);
+
+    expect($serialized[0]['props']['selectedLabel'])->toBe('Ada Lovelace');
 });

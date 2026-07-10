@@ -8,6 +8,7 @@ use Arqel\Core\Resources\Resource;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Throwable;
 
@@ -93,7 +94,7 @@ final class FieldSchemaSerializer
             'validation' => $this->serializeValidation($field),
             'visibility' => $this->serializeVisibility($field, $record, $user),
             'dependsOn' => $this->serializeDependencies($field),
-            'props' => $this->serializeProps($field, $record, $owner, $resourceSlug),
+            'props' => $this->serializeProps($field, $record, $user, $owner, $resourceSlug),
         ];
     }
 
@@ -159,7 +160,7 @@ final class FieldSchemaSerializer
     /**
      * @return array<string, mixed>
      */
-    private function serializeProps(object $field, ?Model $record, ?Model $owner = null, ?string $resourceSlug = null): array
+    private function serializeProps(object $field, ?Model $record, ?Authenticatable $user, ?Model $owner = null, ?string $resourceSlug = null): array
     {
         if (! method_exists($field, 'getTypeSpecificProps')) {
             return [];
@@ -177,7 +178,7 @@ final class FieldSchemaSerializer
         }
 
         $clean = $this->withResolvedRelationOptions($field, $clean, $owner);
-        $clean = $this->withSelectedLabel($clean, $record);
+        $clean = $this->withSelectedLabel($clean, $record, $user);
 
         return $this->injectRelationshipRoutes($field, $clean, $resourceSlug);
     }
@@ -245,11 +246,26 @@ final class FieldSchemaSerializer
      * swallowed — the field still renders, it simply falls back to the
      * raw value client-side, same as before this fix.
      *
+     * Authorization: the related record's title is PII/business data
+     * the current user may not be entitled to see. Before resolving it
+     * we gate the related model against its `viewAny` Policy — the same
+     * ability `FieldSearchController::authorizeViewAny()` enforces on
+     * the async search endpoint (#128). Being authorized to edit the
+     * *owning* record does not imply authorization to view the related
+     * Resource, so without this gate a user could see the related
+     * record's title here even though the search endpoint would refuse
+     * to reveal it. Unlike the controller this is not an HTTP endpoint,
+     * so a denial does not `abort()` — it degrades by omitting
+     * `selectedLabel`, which is the safe pre-fix behaviour (client falls
+     * back to the raw FK value). When no Policy (and no matching
+     * ability gate) is registered, the gate allows silently (scaffold
+     * mode), mirroring the controller.
+     *
      * @param array<string, mixed> $props
      *
      * @return array<string, mixed>
      */
-    private function withSelectedLabel(array $props, ?Model $record): array
+    private function withSelectedLabel(array $props, ?Model $record, ?Authenticatable $user): array
     {
         if ($record === null) {
             return $props;
@@ -284,6 +300,13 @@ final class FieldSchemaSerializer
                 return $props;
             }
 
+            /** @var class-string<resource> $relatedResource */
+            $relatedModelClass = $relatedResource::getModel();
+
+            if ($this->deniesViewAny($relatedModelClass, $user)) {
+                return $props;
+            }
+
             $resourceInstance = app($relatedResource);
 
             if (! method_exists($resourceInstance, 'recordTitle')) {
@@ -296,6 +319,24 @@ final class FieldSchemaSerializer
         }
 
         return $props;
+    }
+
+    /**
+     * Mirrors `FieldSearchController::authorizeViewAny()`: gate a
+     * related model against its `viewAny` Policy, allowing silently
+     * when no Policy (and no matching ability gate) is registered.
+     *
+     * @param class-string<Model> $modelClass
+     */
+    private function deniesViewAny(string $modelClass, ?Authenticatable $user): bool
+    {
+        $ability = 'viewAny';
+
+        if (! Gate::has($ability) && ! Gate::getPolicyFor($modelClass)) {
+            return false;
+        }
+
+        return Gate::forUser($user)->denies($ability, $modelClass);
     }
 
     /**

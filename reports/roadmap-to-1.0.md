@@ -105,7 +105,7 @@ Resultado para o usuário: hoje o Resource gerado dá erro de classe indefinida 
 3. ✅ Congelados via doc alinhada: BelongsToField (D), Widget (E), auth do Panel documentada (H). Tipos TS (G) = follow-up JS.
 4. ✅ ADR-007 e ADR-014 declarados congelados sob o ADR-019 (deixam de estar "em risco").
 5. Deprecation policy escrita (≥1 minor com `@deprecated` + aviso runtime; nunca remover em patch).
-6. Sincronizar `07-roadmap-fases.md` com a realidade (v1.0 ≠ fim-Fase-3 hoje).
+6. ✅ Sincronizar `07-roadmap-fases.md` com a realidade (v1.0 ≠ fim-Fase-3 hoje) — nota de reconciliação adicionada ao §2.2 (ADR-019).
 
 ---
 

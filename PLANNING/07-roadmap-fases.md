@@ -28,9 +28,18 @@ Cada fase só fecha quando **todos os gates seguintes** estão verde:
 
 ### 2.2 Semantic versioning
 
-- Fase 1 completa → **v0.5.0** (beta)
-- Fase 2 completa → **v0.8.0** (RC)
-- Fase 3 completa → **v1.0.0** (stable)
+> **Nota de reconciliação (2026-07, ADR-019):** o mapeamento versão↔fase abaixo era o plano
+> original. Na prática o desenvolvimento não seguiu a cadência linear de fases — os *must-haves*
+> competitivos de 1.0 (Imports, Relation Managers, Plugin API, Global Search, Database
+> Notifications) foram entregues em minors 0.16–0.18 fora da estrutura rígida de "Fase 3", e
+> as Fases 2 e 3 do plano já estão majoritariamente embarcadas no código. **O bloqueio real
+> para v1.0 não é fechar uma fase — é o compromisso de estabilidade de API (ADR-019) + o
+> hardening final.** Ver `reports/roadmap-to-1.0.md` para o roadmap efetivo. A tabela abaixo
+> permanece como referência histórica do plano inicial.
+
+- Fase 1 completa → **v0.5.0** (beta) — *plano original*
+- Fase 2 completa → **v0.8.0** (RC) — *plano original*
+- Fase 3 completa → **v1.0.0** (stable) — *plano original; na prática v1.0 = ADR-019 freeze + hardening, não fim-Fase-3*
 - Fase 4 → **v1.x+** (maintenance + ecosystem)
 
 ### 2.3 LTS strategy

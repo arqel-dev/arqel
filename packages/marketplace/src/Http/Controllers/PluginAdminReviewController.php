@@ -55,6 +55,16 @@ final class PluginAdminReviewController
             return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.plugin_not_found', ['slug' => $slug])], 404);
         }
 
+        // Security: review actions only make sense against the normal moderation flow. Without
+        // this guard, an admin could approve a plugin that was `archived` (e.g. auto-delisted
+        // by SecurityScanner for a critical vulnerability) without a re-scan, silently
+        // reverting the auto-delist.
+        if ($plugin->status !== 'pending') {
+            return new JsonResponse([
+                'message' => (string) __('arqel::messages.marketplace.not_pending_review', ['status' => $plugin->status]),
+            ], 409);
+        }
+
         $user = $request->user();
         $reviewerId = null;
 

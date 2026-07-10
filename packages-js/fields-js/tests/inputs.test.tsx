@@ -155,6 +155,69 @@ describe('NumberInput', () => {
     await user.click(screen.getByRole('button', { name: 'Increment' }));
     expect(onChange).toHaveBeenLastCalledWith(3);
   });
+
+  const bounded: FieldSchema = {
+    ...baseField,
+    type: 'number',
+    name: 'count',
+    label: 'Count',
+    component: 'NumberInput',
+    props: { step: 1, min: 0, max: 5 },
+  };
+
+  it('does not increment past max via stepper and disables Increment at max', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { rerender } = render(<NumberInput field={bounded} value={5} onChange={onChange} />);
+    expect(screen.getByRole('button', { name: 'Increment' })).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: 'Increment' }));
+    expect(onChange).not.toHaveBeenCalled();
+
+    rerender(<NumberInput field={bounded} value={4} onChange={onChange} />);
+    await user.click(screen.getByRole('button', { name: 'Increment' }));
+    expect(onChange).toHaveBeenLastCalledWith(5);
+  });
+
+  it('does not decrement past min via stepper and disables Decrement at min', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { rerender } = render(<NumberInput field={bounded} value={0} onChange={onChange} />);
+    expect(screen.getByRole('button', { name: 'Decrement' })).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: 'Decrement' }));
+    expect(onChange).not.toHaveBeenCalled();
+
+    rerender(<NumberInput field={bounded} value={1} onChange={onChange} />);
+    await user.click(screen.getByRole('button', { name: 'Decrement' }));
+    expect(onChange).toHaveBeenLastCalledWith(0);
+  });
+
+  it('clamps a stepper jump that would overshoot max/min', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const steppedBounded: FieldSchema = {
+      ...baseField,
+      type: 'number',
+      name: 'count',
+      label: 'Count',
+      component: 'NumberInput',
+      props: { step: 3, min: 0, max: 5 },
+    };
+    render(<NumberInput field={steppedBounded} value={4} onChange={onChange} />);
+    await user.click(screen.getByRole('button', { name: 'Increment' }));
+    expect(onChange).toHaveBeenLastCalledWith(5);
+  });
+
+  it('is unbounded without min/max (no regression)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<NumberInput field={number} value={2} onChange={onChange} />);
+    expect(screen.getByRole('button', { name: 'Increment' })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Decrement' })).not.toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Decrement' }));
+    expect(onChange).toHaveBeenLastCalledWith(1);
+  });
 });
 
 const usdCurrency: FieldSchema = {

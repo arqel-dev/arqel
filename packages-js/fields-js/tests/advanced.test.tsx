@@ -101,6 +101,36 @@ describe('SelectInput', () => {
     await user.selectOptions(screen.getByRole('combobox'), 'admin');
     expect(onChange).toHaveBeenCalledWith('admin');
   });
+
+  const numericSelect: FieldSchema = {
+    ...baseField,
+    type: 'select',
+    name: 'priority',
+    label: 'Priority',
+    component: 'SelectInput',
+    props: {
+      options: [
+        { value: 1, label: 'Low' },
+        { value: 2, label: 'High' },
+      ],
+    },
+  };
+
+  it('emits a number when the selected option value is numeric', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<SelectInput field={numericSelect} value={null} onChange={onChange} />);
+    await user.selectOptions(screen.getByRole('combobox'), '2');
+    expect(onChange).toHaveBeenCalledWith(2);
+  });
+
+  it('still emits a string when the selected option value is a string', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<SelectInput field={select} value={null} onChange={onChange} />);
+    await user.selectOptions(screen.getByRole('combobox'), 'user');
+    expect(onChange).toHaveBeenCalledWith('user');
+  });
 });
 
 describe('MultiSelectInput', () => {

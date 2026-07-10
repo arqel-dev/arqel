@@ -15,7 +15,7 @@
 
 ## Nota de contexto crítica
 
-O roadmap canônico (`PLANNING/07-roadmap-fases.md:33`) define **v1.0.0 = fim da Fase 3**. Mas o código real já está em **v0.16.0** e **já embarca pacotes inteiros de Fase 2 e 3**: `tenant`, `audit`, `mcp`, `versioning`, `workflow`, `realtime`, `ai`, `marketplace`. O planejamento documentado está **dessincronizado do estado real** — o produto está bem além do que os docs de fase descrevem como pré-1.0.
+O roadmap canônico (`PLANNING/07-roadmap-fases.md`) definia **v1.0.0 = fim da Fase 3** — **corrigido** (2026-07): agora aponta ao ADR-019 (1.0 = API-freeze + SemVer). O código real está em **v0.18.0** e **embarca pacotes inteiros de Fase 2 e 3**: `tenant`, `audit`, `mcp`, `versioning`, `workflow`, `realtime`, `ai`, `marketplace`. Fases 1 e 2 estão entregues; Fase 3 em andamento. O critério de versionamento passou a ser o do ADR-019, não o mapa fase→versão original.
 
 Implicação: o critério de versionamento precisa ser reescrito antes de comunicar 1.0, senão a promessa de SemVer nasce inconsistente. **O bloqueio para 1.0 não é arquitetura nem features de fase — é ergonomia de API pública + um ADR de freeze.**
 
@@ -105,7 +105,7 @@ Resultado para o usuário: hoje o Resource gerado dá erro de classe indefinida 
 3. ✅ Congelados via doc alinhada: BelongsToField (D), Widget (E), auth do Panel documentada (H). Tipos TS (G) = follow-up JS.
 4. ✅ ADR-007 e ADR-014 declarados congelados sob o ADR-019 (deixam de estar "em risco").
 5. Deprecation policy escrita (≥1 minor com `@deprecated` + aviso runtime; nunca remover em patch).
-6. ✅ Sincronizar `07-roadmap-fases.md` com a realidade (v1.0 ≠ fim-Fase-3 hoje) — nota de reconciliação adicionada ao §2.2 (ADR-019).
+6. ✅ **Sincronizado** `07-roadmap-fases.md` com a realidade (v1.0 ≠ fim-Fase-3; critério agora aponta ao ADR-019 / milestone 0.20). Fases 1/2 marcadas Entregue, Fase 3 Em andamento.
 
 ---
 

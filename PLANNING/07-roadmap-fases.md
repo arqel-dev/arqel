@@ -6,12 +6,12 @@
 
 | Fase | Nome | Duração | Tickets | Team | Status |
 |---|---|---|---|---|---|
-| **Fase 1** | MVP | 4-7 meses | ~120 | 2-3 devs | Planeada |
-| **Fase 2** | Essenciais | 4-7 meses | ~90 | 3-4 devs | Planeada |
-| **Fase 3** | Avançadas | 7-10 meses | ~70 | 3-5 devs | Planeada |
+| **Fase 1** | MVP | 4-7 meses | ~120 | 2-3 devs | ✅ Entregue |
+| **Fase 2** | Essenciais | 4-7 meses | ~90 | 3-4 devs | ✅ Entregue |
+| **Fase 3** | Avançadas | 7-10 meses | ~70 | 3-5 devs | 🔄 Em andamento |
 | **Fase 4** | Ecossistema | 12+ meses | ~45 | 4-6 + community | Planeada |
 
-**Total estimado:** 27-36 meses até maturidade 1.0 completa.
+> **Estado real (2026-07, v0.18.0 publicado):** o produto já superou o plano original de faseamento. Fases 1 e 2 estão entregues e o código já embarca pacotes inteiros de Fase 2 e 3 (`tenant`, `audit`, `mcp`, `versioning`, `workflow`, `realtime`, `ai`, `marketplace`). O bloqueio para **v1.0.0 não é mais "completar a Fase 3"** — é o **API-freeze + compromisso SemVer** definido no **ADR-019**. Ver `reports/roadmap-to-1.0.md` para o gap analysis acionável e o milestone 0.20 (API-freeze prep).
 
 ## 2. Princípios de faseamento
 
@@ -28,19 +28,25 @@ Cada fase só fecha quando **todos os gates seguintes** estão verde:
 
 ### 2.2 Semantic versioning
 
-> **Nota de reconciliação (2026-07, ADR-019):** o mapeamento versão↔fase abaixo era o plano
-> original. Na prática o desenvolvimento não seguiu a cadência linear de fases — os *must-haves*
-> competitivos de 1.0 (Imports, Relation Managers, Plugin API, Global Search, Database
-> Notifications) foram entregues em minors 0.16–0.18 fora da estrutura rígida de "Fase 3", e
-> as Fases 2 e 3 do plano já estão majoritariamente embarcadas no código. **O bloqueio real
-> para v1.0 não é fechar uma fase — é o compromisso de estabilidade de API (ADR-019) + o
-> hardening final.** Ver `reports/roadmap-to-1.0.md` para o roadmap efetivo. A tabela abaixo
-> permanece como referência histórica do plano inicial.
+O mapeamento fase→versão abaixo era o **plano original**. A realidade divergiu:
+o desenvolvimento seguiu por minors incrementais (0.x) que atravessam fases, e
+o produto está em **v0.18.0** já embarcando features de Fase 2 e 3. O critério
+canônico de **v1.0.0 passou a ser o ADR-019** (API-freeze + compromisso SemVer),
+não "Fase 3 completa".
 
-- Fase 1 completa → **v0.5.0** (beta) — *plano original*
-- Fase 2 completa → **v0.8.0** (RC) — *plano original*
-- Fase 3 completa → **v1.0.0** (stable) — *plano original; na prática v1.0 = ADR-019 freeze + hardening, não fim-Fase-3*
-- Fase 4 → **v1.x+** (maintenance + ecosystem)
+Plano original (histórico):
+- Fase 1 completa → v0.5.0 (beta)
+- Fase 2 completa → v0.8.0 (RC)
+- Fase 3 completa → v1.0.0 (stable)
+
+**Critério vigente (ADR-019):**
+- **Pré-1.0 (regime atual):** minors `0.x` podem quebrar a API pública. Cada minor
+  entrega um milestone (ver `reports/roadmap-to-1.0.md`); v0.18.0 fechou o milestone 0.19.
+- **v1.0.0 (stable):** disparado quando o **API-freeze** está completo — superfície
+  pública vs `@internal` declarada, doc alinhada ao código, e o **compromisso SemVer**
+  em vigor (breaking→major, aditivo→minor, correção→patch). Milestone **0.20** (API-freeze
+  prep) é o pré-requisito duro.
+- Fase 4 → **v1.x+** (maintenance + ecosystem).
 
 ### 2.3 LTS strategy
 
@@ -285,7 +291,7 @@ Features diferenciadoras que posicionam Arqel como line leader em inovação vs 
 - [ ] 8.000+ GitHub stars
 - [ ] Menções em Laravel News, PHP Package of the Week
 - [ ] Enterprise adoption (≥2 empresas Fortune 500 ou equivalente)
-- [ ] v1.0.0 estável lançado com LTS
+- [ ] v1.0.0 estável lançado com LTS — **nota:** o gate de 1.0 é o API-freeze do ADR-019 (milestone 0.20), não a conclusão desta fase; ver §2.2 e `reports/roadmap-to-1.0.md`
 
 ### 5.4 Dependências externas
 
@@ -392,12 +398,19 @@ Overlap possível entre fases:
 
 Cada fase pode ter releases intermédios:
 
-| Fase | Releases |
+Mapa **original** (histórico — a numeração real divergiu, ver §2.2):
+
+| Fase | Releases (plano original) |
 |---|---|
 | Fase 1 | 0.1 (alpha), 0.2, 0.3, 0.4, 0.5 (beta complete) |
 | Fase 2 | 0.6, 0.7, 0.8 (RC) |
 | Fase 3 | 0.9, 1.0.0 (stable) |
 | Fase 4 | 1.1, 1.2, ... (monthly minor) |
+
+**Numeração real (2026-07):** o produto está em **v0.18.0**; os minors seguiram por
+milestone e não por fase (0.16 Imports, 0.17 Relation Managers, 0.18 = milestone 0.19
+completo). **v1.0.0** é disparado pelo API-freeze (ADR-019, milestone 0.20), não por uma
+fase específica.
 
 ## 9. Estratégia de comunicação
 

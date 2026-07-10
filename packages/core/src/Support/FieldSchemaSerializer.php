@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Support;
 
+use Arqel\Core\Resources\Resource;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use Throwable;
 
 /**
  * Serialise an `Arqel\Fields\Field` (or any structurally-compatible
@@ -91,7 +93,7 @@ final class FieldSchemaSerializer
             'validation' => $this->serializeValidation($field),
             'visibility' => $this->serializeVisibility($field, $record, $user),
             'dependsOn' => $this->serializeDependencies($field),
-            'props' => $this->serializeProps($field, $owner, $resourceSlug),
+            'props' => $this->serializeProps($field, $record, $owner, $resourceSlug),
         ];
     }
 
@@ -157,7 +159,7 @@ final class FieldSchemaSerializer
     /**
      * @return array<string, mixed>
      */
-    private function serializeProps(object $field, ?Model $owner = null, ?string $resourceSlug = null): array
+    private function serializeProps(object $field, ?Model $record, ?Model $owner = null, ?string $resourceSlug = null): array
     {
         if (! method_exists($field, 'getTypeSpecificProps')) {
             return [];
@@ -175,6 +177,7 @@ final class FieldSchemaSerializer
         }
 
         $clean = $this->withResolvedRelationOptions($field, $clean, $owner);
+        $clean = $this->withSelectedLabel($clean, $record);
 
         return $this->injectRelationshipRoutes($field, $clean, $resourceSlug);
     }
@@ -216,6 +219,80 @@ final class FieldSchemaSerializer
 
         if (is_array($resolved) && $resolved !== []) {
             $props['options'] = $resolved;
+        }
+
+        return $props;
+    }
+
+    /**
+     * Resolve `props.selectedLabel` for a `BelongsToField` so the React
+     * `BelongsToInput` has a human-readable label to show on initial
+     * load — before any async search has run.
+     *
+     * `BelongsToInput.tsx` only derives its displayed label from async
+     * search results (`results.find(...)`), which are empty right
+     * after mount. Without a pre-resolved label the picker falls back
+     * to rendering the raw FK value (e.g. "42") instead of the related
+     * record's title (e.g. "Ada Lovelace"). This mirrors the title
+     * mechanism `FieldSearchController` already uses for search
+     * results: `Resource::recordTitle()` of the field's
+     * `relatedResource`.
+     *
+     * Duck-typed and fully guarded: only runs when the props carry the
+     * BelongsTo signature (`relatedResource`), a record is available,
+     * and its FK attribute is non-null. Any resolution failure (record
+     * deleted, relation misconfigured, model class not a Resource) is
+     * swallowed — the field still renders, it simply falls back to the
+     * raw value client-side, same as before this fix.
+     *
+     * @param array<string, mixed> $props
+     *
+     * @return array<string, mixed>
+     */
+    private function withSelectedLabel(array $props, ?Model $record): array
+    {
+        if ($record === null) {
+            return $props;
+        }
+
+        if (! array_key_exists('relatedResource', $props)) {
+            return $props;
+        }
+
+        $relatedResource = $props['relatedResource'];
+        if (! is_string($relatedResource) || $relatedResource === '') {
+            return $props;
+        }
+
+        $relationship = $props['relationship'] ?? null;
+        if (! is_string($relationship) || $relationship === '') {
+            return $props;
+        }
+
+        try {
+            if (! method_exists($record, $relationship)) {
+                return $props;
+            }
+
+            $related = $record->{$relationship};
+
+            if (! $related instanceof Model) {
+                return $props;
+            }
+
+            if (! is_a($relatedResource, Resource::class, true)) {
+                return $props;
+            }
+
+            $resourceInstance = app($relatedResource);
+
+            if (! method_exists($resourceInstance, 'recordTitle')) {
+                return $props;
+            }
+
+            $props['selectedLabel'] = $resourceInstance->recordTitle($related);
+        } catch (Throwable) {
+            return $props;
         }
 
         return $props;

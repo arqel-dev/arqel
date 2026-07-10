@@ -138,6 +138,106 @@ Run once per app. Operations:
 
 Interactive command (or via flags) that creates a `User` with `email_verified_at` filled and password hashed via `Hash::make`. For panel-level gates (e.g. `viewAdminPanel`), the operator must register the ability separately — `make-user` only creates the record.
 
+## Relation Managers
+
+Manages a parent record's Eloquent relation from a tab on the parent's edit page (`hasMany`/`morphMany`/`belongsToMany`).
+
+### `Arqel\Core\Relations\RelationManager` (abstract)
+
+| Member | Type | Description |
+|---|---|---|
+| `$relationship` | `static string` | Eloquent relation method name on the parent model |
+| `table()` | `mixed` (abstract) | Returns `Arqel\Table\Table`-shaped object listing the related records |
+| `fields()` | `array<Field>` | Default `[]`. Validation + form source, mirrors `Resource::fields()` |
+| `form()` | `mixed` | Default `null`. Optional `Arqel\Form\Form`-shaped object for create/edit |
+| `relatedResource()` | `?class-string` | Default `null`. Optional FQCN of the related model's Resource |
+| `slug()` | `string` | `Str::snake($relationship)` |
+| `label()` | `string` | `Str::headline(slug())` |
+| `relationType(Model $parent)` | `'hasMany'\|'morphMany'\|'belongsToMany'` | Detected at runtime from `$parent->{$relationship}()`. Throws `InvalidArgumentException` for unsupported types (`MorphTo`/`HasManyThrough` out of scope) |
+| `supportsAttach(Model $parent)` | `bool` | `true` only for `belongsToMany` |
+| `pivotFields()` | `array<string>` | Default `[]`. Allowlist of pivot columns a client may set on `attach` — anything not listed is dropped |
+| `abilities(Model $parent, ?Authenticatable $user)` | `array{create,update,delete,attach,detach: bool}` | Fail-open only when neither a Gate rule nor a Policy exists for the related model |
+| `toArray(Model $parent, ?Authenticatable $user = null)` | `array` | `{ slug, label, type, table, fields, abilities }` — the Inertia payload shape |
+
+`table()`/`form()` return `mixed` for the same dependency-inversion reason as `Resource::table()`/`form()`: `arqel-dev/core` does not depend on `arqel-dev/table`/`arqel-dev/form`.
+
+Declare relation managers on a `Resource`:
+
+```php
+// UserResource.php
+public function relations(): array
+{
+    return [CommentsRelationManager::class];
+}
+```
+
+`Resource::getRelations(): array<string, RelationManager>` instantiates the declared classes and keys them by `slug()`; it throws `InvalidArgumentException` if a listed class doesn't extend `RelationManager`.
+
+### `Arqel\Core\Http\Controllers\RelationController` (final)
+
+8 endpoints registered under `arqel.resources.relations.*`, all relation-scoped:
+
+| Verb | Route | Name | Action |
+|---|---|---|---|
+| GET | `{resource}/{parent}/relations/{relation}` | `relations.index` | List related records |
+| GET | `{resource}/{parent}/relations/{relation}/create` | `relations.create` | Form schema for the create modal |
+| POST | `{resource}/{parent}/relations/{relation}` | `relations.store` | Create a child record |
+| GET | `{resource}/{parent}/relations/{relation}/{related}/edit` | `relations.edit` | Form schema + data for the edit modal |
+| PUT | `{resource}/{parent}/relations/{relation}/{related}` | `relations.update` | Update a child record |
+| DELETE | `{resource}/{parent}/relations/{relation}/{related}` | `relations.destroy` | Delete a child record |
+| POST | `{resource}/{parent}/relations/{relation}/attach` | `relations.attach` | `belongsToMany`: associate an existing record via pivot |
+| DELETE | `{resource}/{parent}/relations/{relation}/{related}/detach` | `relations.detach` | `belongsToMany`: disassociate (does not delete) |
+
+`{relation}` is validated against the allowlist of `Resource::getRelations()` (404 otherwise). `{related}` is always scoped by `{parent}` (anti-IDOR). `attach`/`detach` on a `hasMany`/`morphMany` relation return `405`. Authorization is two-tier fail-open against the **related** model's Policy (same semantics as `ResourceController::authorize()`); `attach`/`detach` fall back to `create`/`delete` when no bespoke ability is registered.
+
+## Plugin API
+
+Lets a package or app inject content into a `Panel` programmatically — resources, navigation groups, middleware — without editing the panel definition directly.
+
+### `Arqel\Core\Contracts\Plugin` (interface)
+
+| Method | Description |
+|---|---|
+| `getId(): string` | Stable, unique id per panel. Registering the same id twice replaces the previous plugin |
+| `register(Panel $panel): void` | Mutates the Panel. Runs eagerly, at the moment `Panel::plugin()` is called |
+| `boot(Panel $panel): void` | Runs after all plugins have registered, before the resource sync — resources added here still become routes |
+
+### `Arqel\Core\Panel\Concerns\CreatesPlugin` (trait)
+
+Optional sugar: `use CreatesPlugin;` adds a static `make(): static` factory (`new static`) for the fluent `Panel::plugin(MyPlugin::make())` call — not required to satisfy the `Plugin` contract.
+
+### `Arqel\Core\Panel\Panel` — plugin methods
+
+| Method | Description |
+|---|---|
+| `plugin(Plugin $plugin): self` | Registers a single plugin (keyed by `getId()`) and immediately calls `register($this)` |
+| `plugins(array<Plugin> $plugins): self` | Bulk `plugin()` |
+| `getPlugins(): array<string, Plugin>` | All registered plugins, keyed by id |
+| `getPlugin(string $id): ?Plugin` | Lookup by id |
+
+## Database Notifications
+
+Native Laravel `database` notification channel, with a bell + history UI on top of the standard `notifications` table.
+
+- Shared Inertia prop `notifications` (`NotificationPayload | null`) — **public and stable**, built by `HandleArqelInertiaRequests::notificationsPayload()`. `null` when no user is authenticated or the user model doesn't expose `notifications()` (`Notifiable` trait). Shape: `{ unread_count: int, recent: array }`, where each `recent` entry's `data` field follows the stable key convention `title`/`body`/`action_url`/`icon`.
+- `Arqel\Core\Http\Controllers\NotificationController` is `@internal` (may change in any minor) — `index`/`markAsRead`/`markAllAsRead`/`destroy`, always scoped to `$user->notifications()` (anti-IDOR: another owner's id resolves 404 via `findOrFail`).
+- Routes: `GET /admin/notifications`, `POST /admin/notifications/read-all`, `POST /admin/notifications/{notification}/read`, `DELETE /admin/notifications/{notification}`.
+
+## Global Search
+
+### `Resource::globallySearchable(): array<string>` (static, optional)
+
+Opt-in: a Resource declares which model column names are searchable from the command palette. Resources that don't override it (default `[]`) never appear in global search results.
+
+```php
+public static function globallySearchable(): array
+{
+    return ['title', 'slug'];
+}
+```
+
+Consumed by `Arqel\Core\CommandPalette\Providers\RecordSearchCommandProvider`, which runs a scoped `LIKE` query (SQL-bound, `%`/`_`/`\` escaped) against the declared columns, filters results by each resource's `viewAny` Policy, and emits one `Command` per matched record (category `'Records'`, linking to the record's edit page). Label uses the optional `Resource::globalSearchResultTitle(Model $record): string` override, falling back to `'#' . $record->getKey()`.
+
 ## Related
 
 - SKILL: [`packages/core/SKILL.md`](https://github.com/arqel-dev/arqel/blob/main/packages/core/SKILL.md)

@@ -23,8 +23,11 @@ php artisan arqel:install
 | `arqel-dev/actions` | Action abstract, 4 variants, Confirmable + HasForm + HasAuthorization, ActionController | [Actions →](/reference/php/actions) |
 | `arqel-dev/auth` | AbilityRegistry, PolicyDiscovery, ArqelGate, EnsureUserCanAccessPanel, helpers | [Auth →](/reference/php/auth) |
 | `arqel-dev/nav` | NavigationItem, NavigationGroup, Navigation builder, BreadcrumbsBuilder | [Nav →](/reference/php/nav) |
+| `arqel-dev/import` | Importer, ImportColumn, ImportFormat, ImportAction, ProcessImportJob | [Import →](/reference/php/import) |
+| `arqel-dev/export` | ExportFormat, Exporter contract + 3 exporters, ExportAction, ProcessExportJob | [Export →](/reference/php/export) |
+| `arqel-dev/widgets` | Widget abstract + 4 types, Dashboard, DashboardRegistry, WidgetRegistry, Filters | [Widgets →](/reference/php/widgets) |
 
-Total: **8 PHP packages** (1 meta + 7 core).
+Total: **11 PHP packages** (1 meta + 10 core).
 
 ## General conventions
 

@@ -27,6 +27,8 @@ use Throwable;
  * Authorization: Gate `use-ai` opt-in — quando ausente, allow por
  * default. Apps que precisam hard-gate AI registram a Gate em
  * `AppServiceProvider`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class AiTranslateController
 {

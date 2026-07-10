@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
  *
  * Authorization: this route is registered under `web + auth`. Consumer
  * apps SHOULD additionally gate it (e.g. the Resource `import` ability).
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ImportUploadController
 {

@@ -23,6 +23,8 @@ use Throwable;
  * aplicação. Quando ausente (`Gate::has('use-ai') === false`), o
  * acesso é permitido por default — apps que precisem hard-gate AI
  * devem registrar a Gate em `AppServiceProvider`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class AiGenerateController
 {

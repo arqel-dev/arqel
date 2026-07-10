@@ -19,6 +19,8 @@ use Illuminate\Validation\ValidationException;
  * trocar de `helpful` para `unhelpful` (ou vice-versa) decrementa o lado
  * antigo e incrementa o novo via transaction. `destroy` remove o voto e
  * decrementa o contador correspondente.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginReviewVoteController
 {

@@ -21,6 +21,8 @@ use Throwable;
  * forbidden feature name/link leaks (issues #118 and #129). Both call
  * {@see self::viewAnyDenied()} so the two surfaces stay symmetric and
  * cannot drift apart.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ResourceAuthorization
 {

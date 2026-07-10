@@ -35,6 +35,8 @@ use Throwable;
  * Nota: `Gate::has()` sozinho NÃO consulta Policies, então gatear apenas
  * por `Gate::has('update')` deixava models protegidos por Policy
  * passarem sem checagem (issue #91).
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class VersionRestoreController
 {

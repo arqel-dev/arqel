@@ -30,6 +30,8 @@ use Throwable;
  * otherwise we emit `{name, type}` as a fallback. The richer
  * serialiser lives in `arqel-dev/fields`'s `FieldSchemaSerializer`
  * (CORE-010), which this builder defers to once it lands.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class InertiaDataBuilder
 {

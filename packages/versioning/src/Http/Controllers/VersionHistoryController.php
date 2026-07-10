@@ -32,6 +32,8 @@ use Illuminate\Support\Facades\Gate;
  * Nota: `Gate::has()` sozinho NÃO consulta Policies, então gatear apenas
  * por `Gate::has('view')` deixava models protegidos por Policy
  * vazarem o snapshot (`?include=payload`) — issue #91.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class VersionHistoryController
 {

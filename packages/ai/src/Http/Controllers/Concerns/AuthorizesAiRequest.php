@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Gate;
  * of `Arqel\Core\Http\Controllers\ResourceController::authorize()`: a
  * registered gate/Policy is enforced, but "Hello World" apps with neither
  * are left permissive so the endpoints work out of the box.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 trait AuthorizesAiRequest
 {

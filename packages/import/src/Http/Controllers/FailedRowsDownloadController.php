@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
  * it. Consumer apps MUST wrap this route with their own authorization
  * (e.g. a `can:` middleware keyed to the import's owner), because the
  * package has no knowledge of your ownership model.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class FailedRowsDownloadController
 {

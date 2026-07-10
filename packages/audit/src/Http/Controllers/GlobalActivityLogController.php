@@ -38,6 +38,8 @@ use Throwable;
  * when one of those exists; in scaffold mode (no gate, no policy) the log
  * stays open so the showcase isn't broken. Mirrors the deny-when-defined
  * convention used by `versioning/VersionHistoryController`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class GlobalActivityLogController extends Controller
 {

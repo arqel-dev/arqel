@@ -11,6 +11,8 @@ use Illuminate\Http\JsonResponse;
  * Lista plugins published com mais instalações all-time (MKTPLC-007).
  *
  * Limitado a 20 itens.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class MostPopularPluginsController
 {

@@ -27,6 +27,8 @@ use Inertia\Response;
  * `verify` injeta {@see PanelEmailVerificationRequest}, que sobrescreve
  * `user()` para que o `authorize()`/`fulfill()` da request leiam o mesmo
  * guard.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class EmailVerificationController
 {

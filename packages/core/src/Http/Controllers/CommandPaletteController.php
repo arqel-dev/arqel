@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
  *
  * Always returns `{ commands: [...] }`, even when the query is
  * empty. The registry handles fuzzy filtering and the 20-item cap.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class CommandPaletteController
 {

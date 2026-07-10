@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Gate;
  *   - A defensive `viewMetrics` Gate check — if the gate is
  *     defined the user must pass it, otherwise we fall through
  *     and rely solely on `auth`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class MetricsController
 {

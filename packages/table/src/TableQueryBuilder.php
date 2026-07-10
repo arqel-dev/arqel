@@ -22,6 +22,8 @@ use Illuminate\Http\Request;
  * `withQueryString()` on the paginator preserves filters/search
  * in pagination links so the user does not lose state on page
  * navigation.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class TableQueryBuilder
 {

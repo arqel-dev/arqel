@@ -36,6 +36,8 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  * Resource cannot enumerate its records' labels/PII. When no Policy is
  * registered the gate silently allows (scaffold mode), mirroring
  * `ResourceController::authorize()`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class FieldSearchController
 {

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Gate;
  *
  * Requer ability `marketplace.review`. Aceita filtro `status` (default
  * `pending`) e paginação via `per_page` clamp [1, 100].
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginAdminListController
 {

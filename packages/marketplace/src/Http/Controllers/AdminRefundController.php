@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Gate;
  *
  * Requer Gate `marketplace.refund`. 422 quando a compra já está refunded ou
  * em status que não permite refund.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class AdminRefundController
 {

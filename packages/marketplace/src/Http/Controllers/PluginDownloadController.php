@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
  *
  * Plugins free são acessíveis a qualquer usuário autenticado. Premium exige
  * `PluginPurchase` com `status=completed` no nome do user autenticado.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginDownloadController
 {

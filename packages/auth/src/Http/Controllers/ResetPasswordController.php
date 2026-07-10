@@ -25,6 +25,8 @@ use Inertia\Response;
  * Renderiza o componente Inertia `arqel-dev/auth/ResetPassword` (com token na
  * rota e email vindo da query string) e processa o submit validando token
  * via `Password::reset`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ResetPasswordController
 {

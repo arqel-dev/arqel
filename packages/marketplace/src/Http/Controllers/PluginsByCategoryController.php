@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 
 /**
  * Lista plugins published de uma categoria (MKTPLC-007).
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginsByCategoryController
 {

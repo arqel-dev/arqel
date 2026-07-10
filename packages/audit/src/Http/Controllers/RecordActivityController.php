@@ -40,6 +40,8 @@ use Spatie\Activitylog\Models\Activity;
  * exists; in scaffold mode (no gate, no policy) access stays open so the
  * showcase isn't broken. `Gate::has('view')` alone never consults
  * Policies, so we also probe `Gate::getPolicyFor()`.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class RecordActivityController extends Controller
 {

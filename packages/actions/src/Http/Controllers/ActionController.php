@@ -37,6 +37,8 @@ use Throwable;
  * `toolbarActions(): array`, `headerActions(): array`). The
  * methods are duck-typed so user code does not need to declare
  * them when not used.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class ActionController
 {

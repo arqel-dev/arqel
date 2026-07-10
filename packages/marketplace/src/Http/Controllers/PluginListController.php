@@ -18,6 +18,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
  *   - `per_page` — clampado em [1, 100], default vem de
  *     `config('arqel-marketplace.pagination', 20)`
  *   - `page` — paginação stock do Laravel
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class PluginListController
 {

@@ -32,6 +32,8 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  *      mirroring `Dashboard::resolve()` so a deferred widget's first
  *      lazy fetch matches the SSR payload.
  *   6. Return `{ data: <widget->data()> }` as JSON.
+ *
+ * @internal Esta classe é interna ao Arqel (ADR-019) e pode mudar em qualquer minor.
  */
 final class WidgetDataController
 {

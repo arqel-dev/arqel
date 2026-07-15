@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Arqel\Core\Http\Middleware\HandleArqelInertiaRequests;
 use Illuminate\Http\Request;
-use Illuminate\Session\Store;
 use Illuminate\Session\NullSessionHandler;
+use Illuminate\Session\Store;
 
 /**
  * Issue: `ResourceController::bulkAction` flashes `download_url` to the

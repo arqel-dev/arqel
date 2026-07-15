@@ -47,7 +47,7 @@ export function FlashContainer({
     setToasts((prev) => [...prev, { id: ++nextId, kind, message }]);
   }, []);
 
-  useFlash({ onMessage: handleMessage });
+  const flash = useFlash({ onMessage: handleMessage });
 
   const dismiss = (id: number) => setToasts((prev) => prev.filter((t) => t.id !== id));
 
@@ -66,6 +66,7 @@ export function FlashContainer({
           kind={toast.kind}
           message={toast.message}
           durationMs={durationMs}
+          downloadUrl={toast.kind === 'success' ? flash.download_url : undefined}
           onDismiss={() => dismiss(toast.id)}
         />
       ))}

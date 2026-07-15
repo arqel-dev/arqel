@@ -111,6 +111,11 @@ return [
         'deleted' => 'Record deleted.',
         'restored' => 'Record restored.',
     ],
+    // Labels rendered inside <FlashToast> (@arqel-dev/ui) for the shared
+    // Inertia `flash` payload.
+    'flash' => [
+        'download' => 'Download',
+    ],
     'errors' => [
         'unauthorized' => 'You are not authorized to perform this action.',
         'forbidden' => 'Forbidden.',

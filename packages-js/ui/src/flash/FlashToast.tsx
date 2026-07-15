@@ -19,7 +19,10 @@ export interface FlashToastProps {
   onDismiss: () => void;
   durationMs?: number;
   className?: string;
-  downloadUrl?: string | null;
+  // Accepts `undefined` explicitly (not just an absent key) because
+  // FlashContainer passes `download_url` conditionally as
+  // `... : undefined` — required under `exactOptionalPropertyTypes`.
+  downloadUrl?: string | null | undefined;
 }
 
 const KIND_CLASSES: Record<FlashKind, string> = {

@@ -21,9 +21,7 @@ describe('FlashToast download link', () => {
   });
 
   it('renders no download link when downloadUrl is absent or empty', () => {
-    const { unmount } = render(
-      <FlashToast kind="success" message="Saved" onDismiss={() => {}} />,
-    );
+    const { unmount } = render(<FlashToast kind="success" message="Saved" onDismiss={() => {}} />);
     expect(screen.queryByTestId('flash-download-link')).toBeNull();
     unmount();
 

@@ -90,6 +90,7 @@ final class HandleArqelInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'info' => fn () => $request->session()->get('info'),
                 'warning' => fn () => $request->session()->get('warning'),
+                'download_url' => fn () => $request->session()->get('download_url'),
             ],
             'translations' => fn () => $this->translations(),
             'i18n' => fn () => $this->i18nPayload(),

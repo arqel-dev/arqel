@@ -36,6 +36,7 @@ export interface FlashPayload {
   error: string | null;
   info: string | null;
   warning: string | null;
+  download_url?: string | null;
 }
 
 export interface NotificationItem {

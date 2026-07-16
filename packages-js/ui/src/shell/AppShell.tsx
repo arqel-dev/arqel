@@ -17,6 +17,7 @@
  */
 
 import type { ReactNode } from 'react';
+import { FlashContainer } from '../flash/FlashContainer.js';
 import { CommandPalette } from '../palette/CommandPalette.js';
 import { SidebarInset, SidebarProvider } from '../shadcn/ui/sidebar.js';
 import { cn } from '../utils/cn.js';
@@ -47,6 +48,7 @@ export function AppShell({
         className={cn('min-h-screen bg-background text-foreground', className)}
       >
         <CommandPalette />
+        <FlashContainer />
         {children}
       </div>
     );
@@ -59,6 +61,7 @@ export function AppShell({
         className={cn('flex min-h-screen flex-col bg-background text-foreground', className)}
       >
         <CommandPalette />
+        <FlashContainer />
         {topbar}
         <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
         {footer}
@@ -80,6 +83,7 @@ export function AppShell({
         )}
       >
         <CommandPalette />
+        <FlashContainer />
         {sidebar}
         <SidebarInset>
           {topbar}

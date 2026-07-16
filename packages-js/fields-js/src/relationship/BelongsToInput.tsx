@@ -66,7 +66,8 @@ export function BelongsToInput({
     };
   }, [query, f.props.searchRoute]);
 
-  const selectedLabel = results.find((r) => String(r.value) === String(value))?.label;
+  const selectedLabel =
+    results.find((r) => String(r.value) === String(value))?.label ?? f.props.selectedLabel;
 
   return (
     <div className="relative">

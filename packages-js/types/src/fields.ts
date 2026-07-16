@@ -132,6 +132,13 @@ export interface BelongsToFieldProps {
   preload: boolean;
   /** Set client-side from the panel routes. */
   searchRoute?: string;
+  /**
+   * Pre-resolved title of the currently-selected related record,
+   * emitted server-side by `FieldSchemaSerializer` from the record
+   * being edited. Used as the initial label before any async search
+   * has run — without it, the picker would show the raw FK value.
+   */
+  selectedLabel?: string;
 }
 
 export interface HasManyFieldProps {

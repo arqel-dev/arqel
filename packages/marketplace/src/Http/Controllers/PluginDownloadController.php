@@ -27,7 +27,11 @@ final class PluginDownloadController
             return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
-        $plugin = Plugin::query()->where('slug', $slug)->first();
+        // Security: only `published` plugins are downloadable. A plugin that was archived
+        // (e.g. auto-delisted by SecurityScanner due to a critical vulnerability) must never
+        // be downloadable again, even by a user who purchased it before the archival — the
+        // archival itself means the shipped code is considered unsafe.
+        $plugin = Plugin::query()->published()->where('slug', $slug)->first();
 
         if (! $plugin instanceof Plugin) {
             return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.plugin_not_found', ['slug' => $slug])], 404);

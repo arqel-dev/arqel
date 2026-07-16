@@ -100,6 +100,8 @@ return [
         'payment_id_required' => 'paymentId é obrigatório.',
         'plugin_not_found' => 'Plugin [:slug] não encontrado',
         'category_not_found' => 'Categoria [:slug] não encontrada',
+        'not_pending_review' => 'O plugin não está pendente de revisão (status atual: :status).',
+        'amount_mismatch' => 'O valor do pagamento não corresponde ao valor esperado da compra.',
         'screenshots_count' => '{1}:count captura de tela fornecida.|[2,*]:count capturas de tela fornecidas.',
         'auto_check' => [
             'composer_package_invalid' => 'composer_package deve seguir o formato vendor/package (alfanumérico minúsculo + hifens).',

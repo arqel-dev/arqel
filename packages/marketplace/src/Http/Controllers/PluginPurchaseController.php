@@ -32,7 +32,9 @@ final class PluginPurchaseController
             return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.unauthenticated')], 401);
         }
 
-        $plugin = Plugin::query()->where('slug', $slug)->first();
+        // Security: an archived plugin (e.g. auto-delisted by SecurityScanner) must not be
+        // purchasable — mirrors PluginDetailController/PluginDownloadController.
+        $plugin = Plugin::query()->published()->where('slug', $slug)->first();
 
         if (! $plugin instanceof Plugin) {
             return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.plugin_not_found', ['slug' => $slug])], 404);
@@ -124,7 +126,9 @@ final class PluginPurchaseController
             ], 422);
         }
 
-        $plugin = Plugin::query()->where('slug', $slug)->first();
+        // Security: block confirming a purchase for a plugin that got archived after checkout
+        // was initiated (e.g. auto-delisted by SecurityScanner mid-flow) — mirrors initiate().
+        $plugin = Plugin::query()->published()->where('slug', $slug)->first();
 
         if (! $plugin instanceof Plugin) {
             return new JsonResponse(['message' => (string) __('arqel::messages.marketplace.plugin_not_found', ['slug' => $slug])], 404);
@@ -155,6 +159,19 @@ final class PluginPurchaseController
 
             return new JsonResponse([
                 'message' => (string) __('arqel::messages.marketplace.payment_verification_failed'),
+                'purchase' => $this->serialize($purchase),
+            ], 422);
+        }
+
+        // Security (defense in depth): the gateway confirmed the payment as completed, but the
+        // amount it reports must match what this purchase expects to charge. A mismatch could
+        // mean a tampered webhook/response, a gateway bug, or a race with a price change — in
+        // any case the purchase must not be completed silently with the wrong amount.
+        if ($result->amountCents !== $purchase->amount_cents) {
+            $purchase->update(['status' => 'failed']);
+
+            return new JsonResponse([
+                'message' => (string) __('arqel::messages.marketplace.amount_mismatch'),
                 'purchase' => $this->serialize($purchase),
             ], 422);
         }

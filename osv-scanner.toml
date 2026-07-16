@@ -1,0 +1,17 @@
+# osv-scanner configuration for the JS/TS dependency audit (see #383).
+#
+# `.github/workflows/security.yml` (audit-pnpm job) runs
+# `osv-scanner scan source --lockfile=pnpm-lock.yaml --config=osv-scanner.toml`
+# against this file. It replaces `pnpm audit`, whose underlying npm
+# quick/audits endpoints were retired (HTTP 410).
+#
+# As of 2026-07-16 the lockfile has 0 known OSV advisories. If osv-scanner
+# ever surfaces a transitive advisory with no upstream fix available yet,
+# document it here with a `reason` and a tracking issue link, mirroring how
+# the repo already handles long-tail Dependabot transitive alerts — do not
+# silently ignore real vulnerabilities.
+#
+# Example:
+# [[IgnoredVulns]]
+# id = "GHSA-xxxx-xxxx-xxxx"
+# reason = "Transitive dev-only dependency, no fix released upstream yet. Tracked in #NNN."

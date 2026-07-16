@@ -1,0 +1,2305 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined static property object\:\:\$slug\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: packages/actions/src/Action.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/actions/src/Action.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/actions/src/Http/Controllers/ActionController.php
+
+		-
+			message: '#^Parameter \#2 \$message of function abort expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/actions/src/Http/Controllers/ActionController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/ai/src/CostTracker.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 2
+			path: packages/ai/src/CostTracker.php
+
+		-
+			message: '#^Parameter \#1 \$message of class Arqel\\Ai\\Exceptions\\DailyLimitExceeded constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/ai/src/CostTracker.php
+
+		-
+			message: '#^Parameter \#1 \$message of class Arqel\\Ai\\Exceptions\\UserLimitExceeded constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/ai/src/CostTracker.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/ai/src/Fields/AiExtractField.php
+
+		-
+			message: '#^Method Arqel\\Ai\\Fields\\AiExtractField\:\:getButtonLabel\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/ai/src/Fields/AiExtractField.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/ai/src/Fields/AiImageField.php
+
+		-
+			message: '#^Method Arqel\\Ai\\Fields\\AiImageField\:\:getButtonLabel\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/ai/src/Fields/AiImageField.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/ai/src/Fields/AiTextField.php
+
+		-
+			message: '#^Method Arqel\\Ai\\Fields\\AiTextField\:\:getButtonLabel\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/ai/src/Fields/AiTextField.php
+
+		-
+			message: '#^Parameter \#1 \$modelClass of method Arqel\\Ai\\Http\\Controllers\\AiAnalyzeImageController\:\:authorizesResource\(\) expects class\-string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/ai/src/Http/Controllers/AiAnalyzeImageController.php
+
+		-
+			message: '#^Parameter \#1 \$modelClass of method Arqel\\Ai\\Http\\Controllers\\AiClassifyController\:\:authorizesResource\(\) expects class\-string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/ai/src/Http/Controllers/AiClassifyController.php
+
+		-
+			message: '#^Parameter \#1 \$modelClass of method Arqel\\Ai\\Http\\Controllers\\AiExtractController\:\:authorizesResource\(\) expects class\-string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/ai/src/Http/Controllers/AiExtractController.php
+
+		-
+			message: '#^Parameter \#1 \$modelClass of method Arqel\\Ai\\Http\\Controllers\\AiGenerateController\:\:authorizesResource\(\) expects class\-string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/ai/src/Http/Controllers/AiGenerateController.php
+
+		-
+			message: '#^Parameter \#1 \$modelClass of method Arqel\\Ai\\Http\\Controllers\\AiTranslateController\:\:authorizesResource\(\) expects class\-string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/ai/src/Http/Controllers/AiTranslateController.php
+
+		-
+			message: '#^Call to an undefined method GuzzleHttp\\Promise\\PromiseInterface\|Illuminate\\Http\\Client\\Response\:\:body\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: packages/ai/src/Providers/OllamaProvider.php
+
+		-
+			message: '#^Call to an undefined method GuzzleHttp\\Promise\\PromiseInterface\|Illuminate\\Http\\Client\\Response\:\:failed\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: packages/ai/src/Providers/OllamaProvider.php
+
+		-
+			message: '#^Call to an undefined method GuzzleHttp\\Promise\\PromiseInterface\|Illuminate\\Http\\Client\\Response\:\:json\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: packages/ai/src/Providers/OllamaProvider.php
+
+		-
+			message: '#^Call to an undefined method GuzzleHttp\\Promise\\PromiseInterface\|Illuminate\\Http\\Client\\Response\:\:status\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: packages/ai/src/Providers/OllamaProvider.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/ai/src/Providers/OpenAiProvider.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\|Spatie\\Activitylog\\Models\\Activity\:\:latest\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/audit/src/Http/Controllers/ActivityLogController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(Illuminate\\Database\\Eloquent\\Model\)\: mixed\)\|null, Closure\(Spatie\\Activitylog\\Models\\Activity\)\: array\{id\: mixed, log_name\: string\|null, description\: string, subject_type\: string\|null, subject_id\: int\|null, causer_type\: string\|null, causer_id\: int\|null, properties\: array\<mixed\>, created_at\: string\|null\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/audit/src/Http/Controllers/ActivityLogController.php
+
+		-
+			message: '#^Cannot cast array\|non\-empty\-string to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/audit/src/Http/Controllers/GlobalActivityLogController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 3
+			path: packages/audit/src/Http/Controllers/GlobalActivityLogController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, Closure\(Spatie\\Activitylog\\Models\\Activity\)\: array\<string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/audit/src/Http/Controllers/GlobalActivityLogController.php
+
+		-
+			message: '#^Parameter \#2 \$message of class Symfony\\Component\\HttpKernel\\Exception\\HttpException constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/audit/src/Http/Controllers/GlobalActivityLogController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\|Spatie\\Activitylog\\Models\\Activity\:\:where\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/audit/src/Http/Controllers/RecordActivityController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/audit/src/Http/Controllers/RecordActivityController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(Illuminate\\Database\\Eloquent\\Model\)\: mixed\)\|null, Closure\(Spatie\\Activitylog\\Models\\Activity\)\: array\{id\: mixed, log_name\: string\|null, description\: string, event\: string\|null, properties\: array\<mixed\>, causer\: array\{id\: mixed, type\: string\|null, name\: string\|null, email\: string\|null\}\|null, created_at\: string\|null\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/audit/src/Http/Controllers/RecordActivityController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable\:\:getAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/auth/src/Http/Controllers/EmailVerificationController.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/auth/src/Http/Controllers/ForgotPasswordController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Guard\:\:logout\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/auth/src/Http/Controllers/LogoutController.php
+
+		-
+			message: '#^Cannot access offset ''email'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot access offset ''name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot access offset ''password'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot access property \$email on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot access property \$name on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot access property \$password on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot call method only\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot call method save\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/auth/src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Guard\:\:login\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/auth/src/Http/Controllers/RegisterController.php
+
+		-
+			message: '#^Cannot access offset ''email'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: packages/auth/src/Http/Controllers/RegisterController.php
+
+		-
+			message: '#^Cannot access offset ''name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: packages/auth/src/Http/Controllers/RegisterController.php
+
+		-
+			message: '#^Cannot access offset ''password'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: packages/auth/src/Http/Controllers/RegisterController.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/auth/src/Http/Controllers/RegisterController.php
+
+		-
+			message: '#^Method Arqel\\Auth\\Http\\Controllers\\RegisterController\:\:resolveUserModel\(\) should return class\-string but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/auth/src/Http/Controllers/RegisterController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/auth/src/Http/Controllers/ResetPasswordController.php
+
+		-
+			message: '#^Parameter \#1 \$key of function __ expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/auth/src/Http/Controllers/ResetPasswordController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Guard\:\:attempt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/auth/src/Http/Requests/LoginRequest.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 3
+			path: packages/auth/src/Http/Requests/LoginRequest.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/auth/src/Http/Requests/RegisterRequest.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/auth/src/Http/Requests/ResetPasswordRequest.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/auth/src/Http/Requests/UpdatePasswordRequest.php
+
+		-
+			message: '#^Method Arqel\\Auth\\Http\\Requests\\UpdatePasswordRequest\:\:attributes\(\) should return array\<string, string\> but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/auth/src/Http/Requests/UpdatePasswordRequest.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/auth/src/Http/Requests/UpdateProfileRequest.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/auth/src/Http/Requests/UpdateProfileRequest.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/auth/src/Http/Requests/UpdateProfileRequest.php
+
+		-
+			message: '#^Method Arqel\\Auth\\Http\\Requests\\UpdateProfileRequest\:\:attributes\(\) should return array\<string, string\> but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/auth/src/Http/Requests/UpdateProfileRequest.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: packages/auth/src/Routes.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Arqel\\Core\\Panel\\Panel\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: packages/auth/src/Routes.php
+
+		-
+			message: '#^Trait Arqel\\Core\\CommandPalette\\Concerns\\HasCustomCommands is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: packages/core/src/CommandPalette/Concerns/HasCustomCommands.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/core/src/CommandPalette/Providers/NavigationCommandProvider.php
+
+		-
+			message: '#^Parameter \$category of class Arqel\\Core\\CommandPalette\\Command constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/NavigationCommandProvider.php
+
+		-
+			message: '#^Parameter \$label of class Arqel\\Core\\CommandPalette\\Command constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/NavigationCommandProvider.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Binary operation "\." between ''record\:'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 3
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Method Arqel\\Core\\CommandPalette\\Providers\\RecordSearchCommandProvider\:\:searchResource\(\) should return iterable\<int, Illuminate\\Database\\Eloquent\\Model\> but returns array\<int, stdClass\>\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Parameter \#1 \$sql of method Illuminate\\Database\\Query\\Builder\:\:orWhereRaw\(\) expects literal\-string, non\-falsy\-string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Parameter \#1 \$value of method Illuminate\\Database\\Grammar\:\:wrap\(\) expects Illuminate\\Contracts\\Database\\Query\\Expression\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Parameter \$category of class Arqel\\Core\\CommandPalette\\Command constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Parameter \$icon of class Arqel\\Core\\CommandPalette\\Command constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Parameter \$label of class Arqel\\Core\\CommandPalette\\Command constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/CommandPalette/Providers/RecordSearchCommandProvider.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 4
+			path: packages/core/src/CommandPalette/Providers/ThemeCommandProvider.php
+
+		-
+			message: '#^Parameter \$category of class Arqel\\Core\\CommandPalette\\Command constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: packages/core/src/CommandPalette/Providers/ThemeCommandProvider.php
+
+		-
+			message: '#^Parameter \$label of class Arqel\\Core\\CommandPalette\\Command constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: packages/core/src/CommandPalette/Providers/ThemeCommandProvider.php
+
+		-
+			message: '#^Parameter \#1 \$command of class Symfony\\Component\\Process\\Process constructor expects array\<string\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Commands/InstallCommand.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/core/src/Commands/MakeUserCommand.php
+
+		-
+			message: '#^Method Arqel\\Core\\Commands\\MakeUserCommand\:\:resolveUserModel\(\) should return class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|null but returns class\-string\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/Commands/MakeUserCommand.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: packages/core/src/Console/AuditCommand.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Foundation\\Application\:\:getLoadedProviders\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/core/src/Console/DoctorCommand.php
+
+		-
+			message: '#^Cannot access offset ''Arqel\\\\Core\\\\ArqelServiceProvider'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: packages/core/src/Console/DoctorCommand.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: packages/core/src/Console/PulseInfoCommand.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/core/src/Console/PulseInfoCommand.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$unreadNotifications\.$#'
+			identifier: property.notFound
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable\:\:notifications\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot access property \$created_at on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot access property \$data on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot access property \$id on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot access property \$read_at on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot access property \$type on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method delete\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method findOrFail\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method latest\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method markAsRead\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method paginate\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method through\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method when\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot call method whereNull\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Method Arqel\\Core\\Http\\Controllers\\NotificationController\:\:user\(\) should return Illuminate\\Contracts\\Auth\\Authenticatable but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Parameter \#1 \$class of function class_basename expects object\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Cannot access constant class on mixed\.$#'
+			identifier: classConstant.nonObject
+			count: 2
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot access offset string on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot access static property \$model on class\-string\<Arqel\\Core\\Contracts\\HasResource\>\|null\.$#'
+			identifier: staticProperty.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method attach\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method create\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method detach\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method find\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method getRelated\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method getRelations\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call method toArray\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot call static method query\(\) on mixed\.$#'
+			identifier: staticMethod.nonObject
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 5
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Method Arqel\\Core\\Http\\Controllers\\RelationController\:\:findRelated\(\) should return Illuminate\\Database\\Eloquent\\Model but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Method Arqel\\Core\\Http\\Controllers\\RelationController\:\:resolve\(\) should return array\{object, Arqel\\Core\\Relations\\RelationManager, Illuminate\\Database\\Eloquent\\Model\} but returns array\{mixed, mixed, mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Parameter \#1 \$attributes of method Illuminate\\Database\\Eloquent\\Model\:\:update\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Parameter \#1 \$class of static method Illuminate\\Support\\Facades\\Gate\:\:getPolicyFor\(\) expects object\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Parameter \#2 \$user of method Arqel\\Core\\Relations\\RelationManager\:\:abilities\(\) expects Illuminate\\Contracts\\Auth\\Authenticatable\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Parameter \#2 \$user of method Arqel\\Core\\Support\\InertiaDataBuilder\:\:serializeTableSchema\(\) expects Illuminate\\Contracts\\Auth\\Authenticatable\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Parameter \#3 \$user of method Arqel\\Core\\Support\\FieldSchemaSerializer\:\:serialize\(\) expects Illuminate\\Contracts\\Auth\\Authenticatable\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: packages/core/src/Http/Controllers/RelationController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:withTrashed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/core/src/Http/Controllers/ResourceController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/core/src/Http/Controllers/ResourceController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable\:\:unreadNotifications\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot access property \$created_at on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot access property \$data on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot access property \$id on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot access property \$read_at on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot access property \$type on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method count\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method latest\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method limit\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Method Arqel\\Core\\Http\\Middleware\\HandleArqelInertiaRequests\:\:notificationsPayload\(\) should return array\{unread_count\: int, recent\: array\<int, array\<string, mixed\>\>\}\|null but returns array\{unread_count\: mixed, recent\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Parameter \#1 \$class of function class_basename expects object\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Arqel\\Tenant\\TenantManager\:\:availableFor\(\) expects Illuminate\\Contracts\\Auth\\Authenticatable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-falsy\-string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: packages/core/src/Http/Middleware/HandleArqelInertiaRequests.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: packages/core/src/I18n/TranslationLoader.php
+
+		-
+			message: '#^Trait Arqel\\Core\\Panel\\Concerns\\CreatesPlugin is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: packages/core/src/Panel/Concerns/CreatesPlugin.php
+
+		-
+			message: '#^Method Arqel\\Core\\Panel\\Panel\:\:getRegistrationFields\(\) should return array\<int, array\<string, mixed\>\> but returns array\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/Panel/Panel.php
+
+		-
+			message: '#^Cannot call method count\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Pulse/Recorders/ArqelActionRecorder.php
+
+		-
+			message: '#^Cannot call method sum\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Pulse/Recorders/ArqelAiUsageRecorder.php
+
+		-
+			message: '#^Cannot access constant class on mixed\.$#'
+			identifier: classConstant.nonObject
+			count: 1
+			path: packages/core/src/Relations/RelationManager.php
+
+		-
+			message: '#^Cannot call method getRelated\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/core/src/Relations/RelationManager.php
+
+		-
+			message: '#^Parameter \#1 \$class of static method Illuminate\\Support\\Facades\\Gate\:\:getPolicyFor\(\) expects object\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Relations/RelationManager.php
+
+		-
+			message: '#^Binary operation "\." between ''\#'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: packages/core/src/Resources/Resource.php
+
+		-
+			message: '#^Parameter \#1 \$key of function array_key_exists expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/core/src/Resources/Resource.php
+
+		-
+			message: '#^Unsafe call to private method Arqel\\Core\\Resources\\Resource\:\:localizeLabel\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 4
+			path: packages/core/src/Resources/Resource.php
+
+		-
+			message: '#^Unsafe call to private method Arqel\\Core\\Resources\\Resource\:\:rawLabel\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: packages/core/src/Resources/Resource.php
+
+		-
+			message: '#^Call to an undefined method object\:\:toArray\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: packages/core/src/Support/InertiaDataBuilder.php
+
+		-
+			message: '#^Method Arqel\\Core\\Support\\InertiaDataBuilder\:\:callTableConfig\(\) should return array\<string, mixed\> but returns array\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/core/src/Support/InertiaDataBuilder.php
+
+		-
+			message: '#^Cannot call method diffForHumans\(\) on Carbon\\Carbon\|string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/export/src/Exporters/CsvExporter.php
+
+		-
+			message: '#^Cannot call method translatedFormat\(\) on Carbon\\Carbon\|string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/export/src/Exporters/CsvExporter.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 8
+			path: packages/export/src/Exporters/CsvExporter.php
+
+		-
+			message: '#^Cannot call method diffForHumans\(\) on Carbon\\Carbon\|string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/export/src/Exporters/PdfExporter.php
+
+		-
+			message: '#^Cannot call method translatedFormat\(\) on Carbon\\Carbon\|string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/export/src/Exporters/PdfExporter.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 8
+			path: packages/export/src/Exporters/PdfExporter.php
+
+		-
+			message: '#^Cannot call method diffForHumans\(\) on Carbon\\Carbon\|string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/export/src/Exporters/XlsxExporter.php
+
+		-
+			message: '#^Cannot call method translatedFormat\(\) on Carbon\\Carbon\|string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/export/src/Exporters/XlsxExporter.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 5
+			path: packages/export/src/Exporters/XlsxExporter.php
+
+		-
+			message: '#^Instanceof between Arqel\\Fields\\Field and Arqel\\Fields\\Field will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: packages/fields-advanced/src/Blocks/Block.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 9
+			path: packages/fields/src/Http/Controllers/FieldUploadController.php
+
+		-
+			message: '#^Parameter \#2 \$message of function abort expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 9
+			path: packages/fields/src/Http/Controllers/FieldUploadController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/import/src/Http/Controllers/ImportUploadController.php
+
+		-
+			message: '#^Parameter \#1 \$object_or_class of function is_subclass_of expects object\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/import/src/Http/Controllers/ImportUploadController.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/import/src/Jobs/ProcessImportJob.php
+
+		-
+			message: '#^Parameter \#1 \$raw of method Arqel\\Import\\ImportColumn\:\:applyFill\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/import/src/Jobs/ProcessImportJob.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_keys expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/routes/api.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 8
+			path: packages/marketplace/src/Http/Controllers/AdminRefundController.php
+
+		-
+			message: '#^Access to an undefined property Arqel\\Marketplace\\Models\\PluginCategory\:\:\$children\.$#'
+			identifier: property.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginCategory\>\:\:ordered\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginCategory\>\:\:root\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Cannot call method ordered\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Cannot call method with\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/CategoryListController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/FeaturedPluginsController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/FeaturedPluginsController.php
+
+		-
+			message: '#^Cannot call method featured\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/FeaturedPluginsController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/FeaturedPluginsController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/FeaturedPluginsController.php
+
+		-
+			message: '#^Cannot call method orderByDesc\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/FeaturedPluginsController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/MostPopularPluginsController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/MostPopularPluginsController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/MostPopularPluginsController.php
+
+		-
+			message: '#^Cannot call method limit\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/MostPopularPluginsController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/MostPopularPluginsController.php
+
+		-
+			message: '#^Cannot call method mostPopular\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/MostPopularPluginsController.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/MostPopularPluginsController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/NewPluginsController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/NewPluginsController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/NewPluginsController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/NewPluginsController.php
+
+		-
+			message: '#^Cannot call method orderByDesc\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/NewPluginsController.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/NewPluginsController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:query\(\) expects array\|string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/NewPluginsController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginAdminListController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) expects callable\(mixed, int\|string\)\: array\{id\: int, slug\: string, name\: string, type\: string, status\: string, submitted_by_user_id\: int\|null, submitted_at\: string\|null, submission_metadata\: array\<string, mixed\>\|null\}, Closure\(Arqel\\Marketplace\\Models\\Plugin\)\: array\{id\: int, slug\: string, name\: string, type\: string, status\: string, submitted_by_user_id\: int\|null, submitted_at\: string\|null, submission_metadata\: array\<string, mixed\>\|null\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginAdminListController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:query\(\) expects array\|string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginAdminListController.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginAdminReviewController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 4
+			path: packages/marketplace/src/Http/Controllers/PluginAdminReviewController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginReview\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot call method limit\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot call method mostHelpful\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) expects callable\(stdClass, int\)\: array\{id\: int, version\: string, changelog\: string\|null, released_at\: string\}, Closure\(Arqel\\Marketplace\\Models\\PluginVersion\)\: array\{id\: int, version\: string, changelog\: string\|null, released_at\: string\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDetailController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDownloadController.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDownloadController.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDownloadController.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginDownloadController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 3
+			path: packages/marketplace/src/Http/Controllers/PluginDownloadController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 3
+			path: packages/marketplace/src/Http/Controllers/PluginFeatureController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginListController.php
+
+		-
+			message: '#^Cannot call method ofType\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginListController.php
+
+		-
+			message: '#^Cannot call method orderBy\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/PluginListController.php
+
+		-
+			message: '#^Cannot call method paginate\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginListController.php
+
+		-
+			message: '#^Cannot call method search\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginListController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:query\(\) expects array\|string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginListController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/PluginPurchaseController.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/PluginPurchaseController.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/PluginPurchaseController.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Http/Controllers/PluginPurchaseController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 13
+			path: packages/marketplace/src/Http/Controllers/PluginPurchaseController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewController.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewController.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewController.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 3
+			path: packages/marketplace/src/Http/Controllers/PluginReviewController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginReview\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method count\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method highestRated\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method mostHelpful\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method mostRecent\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewListController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 4
+			path: packages/marketplace/src/Http/Controllers/PluginReviewModerationController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) expects callable\(mixed, int\|string\)\: array\{id\: int, plugin_id\: int, user_id\: int\|null, stars\: int, comment\: string\|null, status\: string, moderation_reason\: string\|null, created_at\: string\|null\}, Closure\(Arqel\\Marketplace\\Models\\PluginReview\)\: array\{id\: int, plugin_id\: int, user_id\: int\|null, stars\: int, comment\: string\|null, status\: string, moderation_reason\: string\|null, created_at\: string\|null\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewModerationController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:query\(\) expects array\|string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewModerationController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewVoteController.php
+
+		-
+			message: '#^Call to protected method decrement\(\) of class Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: method.protected
+			count: 4
+			path: packages/marketplace/src/Http/Controllers/PluginReviewVoteController.php
+
+		-
+			message: '#^Call to protected method increment\(\) of class Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: method.protected
+			count: 4
+			path: packages/marketplace/src/Http/Controllers/PluginReviewVoteController.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewVoteController.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewVoteController.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginReviewVoteController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 5
+			path: packages/marketplace/src/Http/Controllers/PluginReviewVoteController.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginSubmissionController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginsByCategoryController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) expects callable\(mixed, int\|string\)\: array\{id\: int, slug\: string, name\: string, description\: string, type\: string, github_url\: string, license\: string, latest_version\: string\|null\}, Closure\(Arqel\\Marketplace\\Models\\Plugin\)\: array\{id\: int, slug\: string, name\: string, description\: string, type\: string, github_url\: string, license\: string, latest_version\: string\|null\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginsByCategoryController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:query\(\) expects array\|string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PluginsByCategoryController.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PublisherPayoutsController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PublisherPayoutsController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) expects callable\(mixed, int\|string\)\: array\{id\: int, plugin_id\: int, amount_cents\: int, currency\: string, status\: string, period_start\: string, period_end\: string\}, Closure\(Arqel\\Marketplace\\Models\\PluginPayout\)\: array\{id\: int, plugin_id\: int, amount_cents\: int, currency\: string, status\: string, period_start\: string, period_end\: string\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/PublisherPayoutsController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/SecurityScanListController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) expects callable\(mixed, int\|string\)\: array\{id\: int, plugin_id\: int, status\: string, severity\: string\|null, findings\: array\<int, array\<string, mixed\>\>\|null, scanner_version\: string, scan_started_at\: string\|null, scan_completed_at\: string\|null\}, Closure\(Arqel\\Marketplace\\Models\\SecurityScan\)\: array\{id\: int, plugin_id\: int, status\: string, severity\: string\|null, findings\: array\<int, array\<string, mixed\>\>\|null, scanner_version\: string, scan_started_at\: string\|null, scan_completed_at\: string\|null\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/SecurityScanListController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:query\(\) expects array\|string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/SecurityScanListController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/TrendingPluginsController.php
+
+		-
+			message: '#^Cannot call method all\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/TrendingPluginsController.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/TrendingPluginsController.php
+
+		-
+			message: '#^Cannot call method limit\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/TrendingPluginsController.php
+
+		-
+			message: '#^Cannot call method map\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/TrendingPluginsController.php
+
+		-
+			message: '#^Cannot call method trending\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Http/Controllers/TrendingPluginsController.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Http\\Requests\\SubmitPluginRequest\:\:attributes\(\) should return array\<string, string\> but returns array\<string, array\|string\|null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Http/Requests/SubmitPluginRequest.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Http\\Requests\\SubmitPluginRequest\:\:messages\(\) should return array\<string, string\> but returns array\<string, array\|string\|null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Http/Requests/SubmitPluginRequest.php
+
+		-
+			message: '#^Cannot access offset ''config'' on Illuminate\\Contracts\\Foundation\\Application\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 6
+			path: packages/marketplace/src/MarketplaceServiceProvider.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 6
+			path: packages/marketplace/src/MarketplaceServiceProvider.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: packages/marketplace/src/MarketplaceServiceProvider.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 5
+			path: packages/marketplace/src/MarketplaceServiceProvider.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Models\\Plugin\:\:scopeMostPopular\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Models/Plugin.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Models\\Plugin\:\:scopeTrending\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Models/Plugin.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Models\\PluginCategory\:\:scopeOrdered\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginCategory\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Models/PluginCategory.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Models\\PluginCategory\:\:scopeRoot\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginCategory\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Models/PluginCategory.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Models\\PluginReview\:\:scopeHighestRated\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginReview\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Models/PluginReview.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Models\\PluginReview\:\:scopeMostHelpful\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginReview\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Models/PluginReview.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Models\\PluginReview\:\:scopeMostRecent\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\PluginReview\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Models/PluginReview.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 1
+			path: packages/marketplace/src/Models/Publisher.php
+
+		-
+			message: '#^Access to property \$checkout on an unknown class Stripe\\StripeClient\.$#'
+			identifier: class.notFound
+			count: 2
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Access to property \$refunds on an unknown class Stripe\\StripeClient\.$#'
+			identifier: class.notFound
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Call to method getMessage\(\) on an unknown class Stripe\\Exception\\ApiErrorException\.$#'
+			identifier: class.notFound
+			count: 5
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot access property \$amount_total on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot access property \$id on mixed\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot access property \$payment_status on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot access property \$sessions on mixed\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot access property \$url on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot call method create\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot call method retrieve\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 3
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Caught class Stripe\\Exception\\ApiErrorException not found\.$#'
+			identifier: class.notFound
+			count: 3
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Instantiated class Stripe\\StripeClient not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Parameter \$client of method Arqel\\Marketplace\\Services\\Payments\\StripeConnectGateway\:\:__construct\(\) has invalid type Stripe\\StripeClient\.$#'
+			identifier: class.notFound
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Property Arqel\\Marketplace\\Services\\Payments\\StripeConnectGateway\:\:\$client has unknown class Stripe\\StripeClient as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Property Arqel\\Marketplace\\Services\\Payments\\StripeConnectGateway\:\:\$platformAccountId is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Property Arqel\\Marketplace\\Services\\Payments\\StripeConnectGateway\:\:\$secretKey is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: packages/marketplace/src/Services/Payments/StripeConnectGateway.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 9
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkComposerPackageFormat\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''composer_package…'', status\: ''fail'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkComposerPackageFormat\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''composer_package…'', status\: ''ok'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkDescriptionLength\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''description_length'', status\: ''ok'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkDescriptionLength\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''description_length'', status\: ''warn'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkGithubUrlFormat\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''github_url_format'', status\: ''fail'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkGithubUrlFormat\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''github_url_format'', status\: ''ok'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkNameUniqueness\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''name_uniqueness'', status\: ''ok'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkNameUniqueness\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''name_uniqueness'', status\: ''warn'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\PluginAutoChecker\:\:checkScreenshotsCount\(\) should return array\{name\: string, status\: string, message\: string\} but returns array\{name\: ''screenshots_count'', status\: ''warn'', message\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/PluginAutoChecker.php
+
+		-
+			message: '#^Cannot cast array\|string to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/marketplace/src/Services/SecurityScanner.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\SecurityScanner\:\:checkLicense\(\) should return array\{type\: string, severity\: string, license\: string, summary\: string\}\|null but returns array\{type\: ''license\-warning'', severity\: ''low'', license\: '''', summary\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/SecurityScanner.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\SecurityScanner\:\:checkLicense\(\) should return array\{type\: string, severity\: string, license\: string, summary\: string\}\|null but returns array\{type\: ''license\-warning'', severity\: ''low'', license\: non\-empty\-string, summary\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/SecurityScanner.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Services/TrendingScoreCalculator.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\<Arqel\\Marketplace\\Models\\PluginReview, Arqel\\Marketplace\\Models\\Plugin\>\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/marketplace/src/Services/TrendingScoreCalculator.php
+
+		-
+			message: '#^Cannot call method count\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Services/TrendingScoreCalculator.php
+
+		-
+			message: '#^Cannot call method each\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/marketplace/src/Services/TrendingScoreCalculator.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: packages/marketplace/src/Services/TrendingScoreCalculator.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 1
+			path: packages/marketplace/src/Services/TrendingScoreCalculator.php
+
+		-
+			message: '#^Call to static method satisfies\(\) on an unknown class Composer\\Semver\\Semver\.$#'
+			identifier: class.notFound
+			count: 1
+			path: packages/marketplace/src/Services/VersionMatcher.php
+
+		-
+			message: '#^Method Arqel\\Marketplace\\Services\\VersionMatcher\:\:isAffected\(\) should return bool but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/marketplace/src/Services/VersionMatcher.php
+
+		-
+			message: '#^Method Arqel\\Mcp\\Tools\\DescribeResourceTool\:\:__invoke\(\) should return array\{class\: string, model\: string, slug\: string, label\: string\|null, pluralLabel\: string\|null, navigationIcon\: string\|null, navigationGroup\: string\|null, navigationSort\: int\|string\|null\} but returns array\{class\: class\-string, model\: mixed, slug\: mixed, label\: string, pluralLabel\: string, navigationIcon\: int\|string\|null, navigationGroup\: int\|string\|null, navigationSort\: int\|string\|null\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/mcp/src/Tools/DescribeResourceTool.php
+
+		-
+			message: '#^Parameter \#1 \$callable of method Arqel\\Mcp\\Tools\\DescribeResourceTool\:\:safeNullable\(\) expects Closure\(\)\: \(int\|string\|null\), Closure\(\)\: mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: packages/mcp/src/Tools/DescribeResourceTool.php
+
+		-
+			message: '#^Parameter \#1 \$callable of method Arqel\\Mcp\\Tools\\DescribeResourceTool\:\:safeString\(\) expects Closure\(\)\: string, Closure\(\)\: mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: packages/mcp/src/Tools/DescribeResourceTool.php
+
+		-
+			message: '#^Method Arqel\\Mcp\\Tools\\ListResourcesTool\:\:__invoke\(\) should return array\{resources\: array\<int, array\{class\: string, model\: string, slug\: string, label\: string, pluralLabel\: string, navigationGroup\: string\|null\}\>\} but returns array\{resources\: list\<array\{class\: class\-string, model\: mixed, slug\: mixed, label\: mixed, pluralLabel\: mixed, navigationGroup\: mixed\}\>\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/mcp/src/Tools/ListResourcesTool.php
+
+		-
+			message: '#^Method Arqel\\Realtime\\Collab\\YjsDocument\:\:morphedModel\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\MorphTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: packages/realtime/src/Collab/YjsDocument.php
+
+		-
+			message: '#^Property Arqel\\Realtime\\Collab\\YjsDocument\:\:\$casts type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: packages/realtime/src/Collab/YjsDocument.php
+
+		-
+			message: '#^Trait Arqel\\Realtime\\Concerns\\BroadcastsResourceUpdates is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: packages/realtime/src/Concerns/BroadcastsResourceUpdates.php
+
+		-
+			message: '#^Part \$this\-\>modelId \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: packages/realtime/src/Events/YjsUpdateReceived.php
+
+		-
+			message: '#^Cannot call method getAuthIdentifier\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/realtime/src/Http/Controllers/CollabDocumentController.php
+
+		-
+			message: '#^Property Arqel\\Realtime\\Collab\\YjsDocument\:\:\$updated_at \(Illuminate\\Support\\Carbon\|null\) does not accept Carbon\\CarbonInterface\.$#'
+			identifier: assign.propertyType
+			count: 2
+			path: packages/realtime/src/Http/Controllers/CollabDocumentController.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 4
+			path: packages/table/src/Table.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/tenant/src/Exceptions/TenantNotFoundException.php
+
+		-
+			message: '#^Parameter \#1 \$message of method Exception\:\:__construct\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Exceptions/TenantNotFoundException.php
+
+		-
+			message: '#^Anonymous function should return array\{id\: mixed, name\: string\|null, slug\: string\|null, logo\: string\|null\} but returns array\{id\: mixed, name\: string\|null, slug\: string\|null, logo\: string\|null\}\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Method Arqel\\Tenant\\Http\\Controllers\\TenantSwitcherController\:\:serialise\(\) should return array\{id\: mixed, name\: string\|null, slug\: string\|null, logo\: string\|null\}\|null but returns array\{id\: mixed, name\: mixed, slug\: mixed, logo\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Arqel\\Tenant\\TenantManager\:\:availableFor\(\) expects Illuminate\\Contracts\\Auth\\Authenticatable, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Arqel\\Tenant\\TenantManager\:\:canSwitchTo\(\) expects Illuminate\\Contracts\\Auth\\Authenticatable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Arqel\\Tenant\\TenantManager\:\:switchTo\(\) expects Illuminate\\Contracts\\Auth\\Authenticatable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Parameter \#2 \$tenant of method Arqel\\Tenant\\TenantManager\:\:canSwitchTo\(\) expects Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Parameter \#2 \$tenant of method Arqel\\Tenant\\TenantManager\:\:switchTo\(\) expects Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Parameter \$to of class Arqel\\Tenant\\Events\\TenantSwitched constructor expects Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Parameter \$user of class Arqel\\Tenant\\Events\\TenantSwitched constructor expects Illuminate\\Contracts\\Auth\\Authenticatable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Http/Controllers/TenantSwitcherController.php
+
+		-
+			message: '#^Cannot cast array\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/tenant/src/Middleware/RequireTenantFeature.php
+
+		-
+			message: '#^Parameter \#2 \$message of function abort expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/tenant/src/Middleware/RequireTenantFeature.php
+
+		-
+			message: '#^Cannot call method put\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/tenant/src/Resolvers/SessionResolver.php
+
+		-
+			message: '#^Trait Arqel\\Versioning\\Concerns\\Versionable is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: packages/versioning/src/Concerns/Versionable.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:with\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: packages/versioning/src/Http/Controllers/VersionHistoryController.php
+
+		-
+			message: '#^Cannot call method paginate\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/versioning/src/Http/Controllers/VersionHistoryController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:query\(\) expects array\|string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/versioning/src/Http/Controllers/VersionHistoryController.php
+
+		-
+			message: '#^Binary operation "\." between ''app/Dashboards/'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: packages/widgets/src/Commands/MakeDashboardCommand.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: packages/widgets/src/Commands/MakeDashboardCommand.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:headline\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/widgets/src/Commands/MakeDashboardCommand.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:snake\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/widgets/src/Commands/MakeDashboardCommand.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: packages/widgets/src/Commands/MakeDashboardCommand.php
+
+		-
+			message: '#^Parameter \#3 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/widgets/src/Commands/MakeDashboardCommand.php
+
+		-
+			message: '#^Binary operation "\." between ''app/Widgets/'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: packages/widgets/src/Commands/MakeWidgetCommand.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: packages/widgets/src/Commands/MakeWidgetCommand.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:snake\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/widgets/src/Commands/MakeWidgetCommand.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: packages/widgets/src/Commands/MakeWidgetCommand.php
+
+		-
+			message: '#^Parameter \#4 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: packages/widgets/src/Commands/MakeWidgetCommand.php
+
+		-
+			message: '#^Cannot call method canBeSeenBy\(\) on Arqel\\Widgets\\Dashboard\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/widgets/src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Cannot call method resolve\(\) on Arqel\\Widgets\\Dashboard\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/widgets/src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Trait Arqel\\Workflow\\Concerns\\HasWorkflow is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: packages/workflow/src/Concerns/HasWorkflow.php
+
+		-
+			message: '#^Trait Arqel\\Workflow\\Concerns\\RecordsStateTransition is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: packages/workflow/src/Concerns/RecordsStateTransition.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: packages/workflow/src/Fields/StateTransitionField.php

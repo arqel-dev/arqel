@@ -8,6 +8,14 @@
 # - Este ficheiro NÃO inclui Larastan directamente porque a raiz do monorepo
 #   não depende de Laravel (evita Fatal Error por falta da constante
 #   LARAVEL_VERSION).
+# - `phpstan-baseline.neon` congela os erros pré-existentes descobertos ao
+#   religar o gate real (issue #368 — o wrapper `scripts/phpstan.sh` estava
+#   a fazer no-op silencioso em CI). Não são falsos positivos: são débito
+#   técnico já existente, agora rastreado e não-regressivo (novos erros
+#   continuam a falhar o build). Ver #368 para o plano de limpeza faseada.
+
+includes:
+    - phpstan-baseline.neon
 
 parameters:
     level: max

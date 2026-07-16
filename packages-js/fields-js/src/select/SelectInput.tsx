@@ -33,7 +33,14 @@ export function SelectInput({
       required={f.required === true}
       aria-invalid={hasError || undefined}
       aria-describedby={describedBy}
-      onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
+      onChange={(e) => {
+        if (e.target.value === '') {
+          onChange(null);
+          return;
+        }
+        const selected = options.find((opt) => String(opt.value) === e.target.value);
+        onChange(selected ? selected.value : e.target.value);
+      }}
     >
       {(f.placeholder || !f.required) && <option value="">{f.placeholder ?? '—'}</option>}
       {options.map((opt) => (

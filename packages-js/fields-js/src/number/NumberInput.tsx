@@ -36,6 +36,18 @@ export function NumberInput({
 
   const current = typeof value === 'number' ? value : null;
   const step = typeof f.props.step === 'number' ? f.props.step : 1;
+  const min = typeof f.props.min === 'number' ? f.props.min : null;
+  const max = typeof f.props.max === 'number' ? f.props.max : null;
+
+  const clamp = (raw: number) => {
+    let clamped = raw;
+    if (min !== null && clamped < min) clamped = min;
+    if (max !== null && clamped > max) clamped = max;
+    return clamped;
+  };
+
+  const atMax = max !== null && current !== null && current >= max;
+  const atMin = min !== null && current !== null && current <= min;
 
   return (
     <div className="relative inline-flex w-full">
@@ -66,8 +78,8 @@ export function NumberInput({
         <button
           type="button"
           aria-label={t('arqel.fields.increment', 'Increment')}
-          disabled={isDisabled}
-          onClick={() => setValue((current ?? 0) + step)}
+          disabled={isDisabled || atMax}
+          onClick={() => setValue(clamp((current ?? 0) + step))}
           className="flex h-1/2 w-8 items-center justify-center text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           ▲
@@ -75,8 +87,8 @@ export function NumberInput({
         <button
           type="button"
           aria-label={t('arqel.fields.decrement', 'Decrement')}
-          disabled={isDisabled}
-          onClick={() => setValue((current ?? 0) - step)}
+          disabled={isDisabled || atMin}
+          onClick={() => setValue(clamp((current ?? 0) - step))}
           className="flex h-1/2 w-8 items-center justify-center text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           ▼

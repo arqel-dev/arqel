@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Arqel\Core\Support;
 
+use Arqel\Core\Resources\Resource;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Throwable;
 
 /**
  * Serialise an `Arqel\Fields\Field` (or any structurally-compatible
@@ -91,7 +94,7 @@ final class FieldSchemaSerializer
             'validation' => $this->serializeValidation($field),
             'visibility' => $this->serializeVisibility($field, $record, $user),
             'dependsOn' => $this->serializeDependencies($field),
-            'props' => $this->serializeProps($field, $owner, $resourceSlug),
+            'props' => $this->serializeProps($field, $record, $user, $owner, $resourceSlug),
         ];
     }
 
@@ -157,7 +160,7 @@ final class FieldSchemaSerializer
     /**
      * @return array<string, mixed>
      */
-    private function serializeProps(object $field, ?Model $owner = null, ?string $resourceSlug = null): array
+    private function serializeProps(object $field, ?Model $record, ?Authenticatable $user, ?Model $owner = null, ?string $resourceSlug = null): array
     {
         if (! method_exists($field, 'getTypeSpecificProps')) {
             return [];
@@ -175,6 +178,7 @@ final class FieldSchemaSerializer
         }
 
         $clean = $this->withResolvedRelationOptions($field, $clean, $owner);
+        $clean = $this->withSelectedLabel($clean, $record, $user);
 
         return $this->injectRelationshipRoutes($field, $clean, $resourceSlug);
     }
@@ -219,6 +223,120 @@ final class FieldSchemaSerializer
         }
 
         return $props;
+    }
+
+    /**
+     * Resolve `props.selectedLabel` for a `BelongsToField` so the React
+     * `BelongsToInput` has a human-readable label to show on initial
+     * load — before any async search has run.
+     *
+     * `BelongsToInput.tsx` only derives its displayed label from async
+     * search results (`results.find(...)`), which are empty right
+     * after mount. Without a pre-resolved label the picker falls back
+     * to rendering the raw FK value (e.g. "42") instead of the related
+     * record's title (e.g. "Ada Lovelace"). This mirrors the title
+     * mechanism `FieldSearchController` already uses for search
+     * results: `Resource::recordTitle()` of the field's
+     * `relatedResource`.
+     *
+     * Duck-typed and fully guarded: only runs when the props carry the
+     * BelongsTo signature (`relatedResource`), a record is available,
+     * and its FK attribute is non-null. Any resolution failure (record
+     * deleted, relation misconfigured, model class not a Resource) is
+     * swallowed — the field still renders, it simply falls back to the
+     * raw value client-side, same as before this fix.
+     *
+     * Authorization: the related record's title is PII/business data
+     * the current user may not be entitled to see. Before resolving it
+     * we gate the related model against its `viewAny` Policy — the same
+     * ability `FieldSearchController::authorizeViewAny()` enforces on
+     * the async search endpoint (#128). Being authorized to edit the
+     * *owning* record does not imply authorization to view the related
+     * Resource, so without this gate a user could see the related
+     * record's title here even though the search endpoint would refuse
+     * to reveal it. Unlike the controller this is not an HTTP endpoint,
+     * so a denial does not `abort()` — it degrades by omitting
+     * `selectedLabel`, which is the safe pre-fix behaviour (client falls
+     * back to the raw FK value). When no Policy (and no matching
+     * ability gate) is registered, the gate allows silently (scaffold
+     * mode), mirroring the controller.
+     *
+     * @param array<string, mixed> $props
+     *
+     * @return array<string, mixed>
+     */
+    private function withSelectedLabel(array $props, ?Model $record, ?Authenticatable $user): array
+    {
+        if ($record === null) {
+            return $props;
+        }
+
+        if (! array_key_exists('relatedResource', $props)) {
+            return $props;
+        }
+
+        $relatedResource = $props['relatedResource'];
+        if (! is_string($relatedResource) || $relatedResource === '') {
+            return $props;
+        }
+
+        $relationship = $props['relationship'] ?? null;
+        if (! is_string($relationship) || $relationship === '') {
+            return $props;
+        }
+
+        try {
+            if (! method_exists($record, $relationship)) {
+                return $props;
+            }
+
+            $related = $record->{$relationship};
+
+            if (! $related instanceof Model) {
+                return $props;
+            }
+
+            if (! is_a($relatedResource, Resource::class, true)) {
+                return $props;
+            }
+
+            /** @var class-string<resource> $relatedResource */
+            $relatedModelClass = $relatedResource::getModel();
+
+            if ($this->deniesViewAny($relatedModelClass, $user)) {
+                return $props;
+            }
+
+            $resourceInstance = app($relatedResource);
+
+            if (! method_exists($resourceInstance, 'recordTitle')) {
+                return $props;
+            }
+
+            $props['selectedLabel'] = $resourceInstance->recordTitle($related);
+        } catch (Throwable) {
+            return $props;
+        }
+
+        return $props;
+    }
+
+    /**
+     * Mirrors `FieldSearchController::authorizeViewAny()`: gate a
+     * related model against its `viewAny` Policy, allowing silently
+     * when no Policy (and no matching ability gate) is registered.
+     *
+     * @param class-string<Model> $modelClass
+     */
+    private function deniesViewAny(string $modelClass, ?Authenticatable $user): bool
+    {
+        $ability = 'viewAny';
+
+        if (! Gate::has($ability) && ! Gate::getPolicyFor($modelClass)) {
+            return false;
+        }
+
+        return Gate::forUser($user)->denies($ability, $modelClass);
     }
 
     /**

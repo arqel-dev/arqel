@@ -25,10 +25,10 @@ function regularUser(): TestUser
     return $u;
 }
 
-function pendingPlugin(): Plugin
+function pendingPlugin(array $overrides = []): Plugin
 {
     /** @var Plugin $p */
-    $p = Plugin::query()->create([
+    $p = Plugin::query()->create(array_merge([
         'slug' => 'pending-one',
         'name' => 'Pending One',
         'description' => 'A pending plugin under review.',
@@ -37,7 +37,7 @@ function pendingPlugin(): Plugin
         'composer_package' => 'acme/pending-one',
         'status' => 'pending',
         'submitted_at' => now(),
-    ]);
+    ], $overrides));
 
     return $p;
 }
@@ -147,4 +147,43 @@ it('localizes per-field validation errors under pt_BR', function (): void {
     $response->assertStatus(422);
     expect($response->json('errors.rejection_reason.0'))
         ->toBe('O campo de motivo da rejeição é obrigatório quando a ação é reject.');
+});
+
+it('refuses to approve an already archived plugin without re-scan', function (): void {
+    Event::fake();
+    allowAdminGate();
+    pendingPlugin(['status' => 'archived', 'rejection_reason' => 'Critical vulnerability detected.']);
+    $admin = adminUser();
+
+    $response = $this->actingAs($admin)
+        ->postJson('/api/marketplace/admin/plugins/pending-one/review', [
+            'action' => 'approve',
+        ]);
+
+    $response->assertStatus(409);
+
+    $plugin = Plugin::query()->where('slug', 'pending-one')->firstOrFail();
+    expect($plugin->status)->toBe('archived');
+
+    Event::assertNotDispatched(PluginApproved::class);
+});
+
+it('refuses to reject an already published plugin', function (): void {
+    Event::fake();
+    allowAdminGate();
+    pendingPlugin(['status' => 'published']);
+    $admin = adminUser();
+
+    $response = $this->actingAs($admin)
+        ->postJson('/api/marketplace/admin/plugins/pending-one/review', [
+            'action' => 'reject',
+            'rejection_reason' => 'Second thoughts.',
+        ]);
+
+    $response->assertStatus(409);
+
+    $plugin = Plugin::query()->where('slug', 'pending-one')->firstOrFail();
+    expect($plugin->status)->toBe('published');
+
+    Event::assertNotDispatched(PluginRejected::class);
 });

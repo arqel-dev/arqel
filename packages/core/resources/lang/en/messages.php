@@ -100,6 +100,8 @@ return [
         'payment_id_required' => 'paymentId is required.',
         'plugin_not_found' => 'Plugin [:slug] not found',
         'category_not_found' => 'Category [:slug] not found',
+        'not_pending_review' => 'Plugin is not pending review (current status: :status).',
+        'amount_mismatch' => 'Payment amount does not match the expected purchase amount.',
         'screenshots_count' => '{1}Provided :count screenshot.|[2,*]Provided :count screenshots.',
         'auto_check' => [
             'composer_package_invalid' => 'composer_package must match vendor/package (lowercase alnum + hyphens).',

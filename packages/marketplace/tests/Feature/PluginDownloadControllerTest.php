@@ -76,3 +76,31 @@ it('returns 404 for non-existent plugin', function (): void {
         ->getJson('/api/marketplace/plugins/nope/download')
         ->assertStatus(404);
 });
+
+it('returns 404 for archived plugin even with a completed purchase', function (): void {
+    $plugin = dlPlugin(['price_cents' => 1000, 'status' => 'archived']);
+    $user = dlUser();
+
+    PluginPurchase::query()->create([
+        'plugin_id' => $plugin->id,
+        'buyer_user_id' => $user->id,
+        'license_key' => 'ARQ-aaaa-bbbb-cccc-dddd',
+        'amount_cents' => 1000,
+        'currency' => 'USD',
+        'status' => 'completed',
+        'purchased_at' => now(),
+    ]);
+
+    $this->actingAs($user)
+        ->getJson("/api/marketplace/plugins/{$plugin->slug}/download")
+        ->assertStatus(404);
+});
+
+it('returns 404 for pending (not yet published) plugin', function (): void {
+    $plugin = dlPlugin(['price_cents' => 0, 'status' => 'pending']);
+    $user = dlUser();
+
+    $this->actingAs($user)
+        ->getJson("/api/marketplace/plugins/{$plugin->slug}/download")
+        ->assertStatus(404);
+});

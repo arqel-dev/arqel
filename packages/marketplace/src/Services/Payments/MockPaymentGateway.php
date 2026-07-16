@@ -32,9 +32,21 @@ final readonly class MockPaymentGateway implements PaymentGateway
     {
         $isMock = str_starts_with($paymentId, 'mock_');
 
+        // Mirrors a real gateway reporting the amount actually charged for this session: look
+        // up the purchase this payment_id belongs to and echo back its expected amount, so the
+        // amount-matching defense in PluginPurchaseController::confirm() behaves realistically
+        // in tests/dev instead of always reporting 0.
+        $amountCents = 0;
+
+        if ($isMock) {
+            /** @var PluginPurchase|null $purchase */
+            $purchase = PluginPurchase::query()->where('payment_id', $paymentId)->first();
+            $amountCents = $purchase instanceof PluginPurchase ? $purchase->amount_cents : 0;
+        }
+
         return new PaymentResult(
             status: $isMock ? 'completed' : 'failed',
-            amountCents: 0,
+            amountCents: $amountCents,
             paymentId: $paymentId,
         );
     }

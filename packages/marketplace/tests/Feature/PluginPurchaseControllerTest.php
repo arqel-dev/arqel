@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Arqel\Marketplace\Contracts\CheckoutSession;
+use Arqel\Marketplace\Contracts\PaymentGateway;
+use Arqel\Marketplace\Contracts\PaymentResult;
 use Arqel\Marketplace\Models\Plugin;
 use Arqel\Marketplace\Models\PluginPurchase;
 use Arqel\Marketplace\Tests\Fixtures\TestUser;
@@ -108,4 +111,98 @@ it('is idempotent on confirm and re-initiate', function (): void {
     expect($third->json('already_owned'))->toBeTrue();
 
     expect(PluginPurchase::query()->where('plugin_id', $plugin->id)->count())->toBe(1);
+});
+
+it('returns 404 when initiating a purchase for an archived plugin', function (): void {
+    $plugin = purPlugin(['status' => 'archived']);
+    $buyer = purBuyer();
+
+    $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase")
+        ->assertStatus(404);
+});
+
+it('returns 404 when confirming a purchase for an archived plugin', function (): void {
+    $plugin = purPlugin();
+    $buyer = purBuyer();
+
+    $initiate = $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase");
+    $sessionId = $initiate->json('checkout.session_id');
+
+    // Plugin gets archived (e.g. auto-delisted by SecurityScanner) after checkout started.
+    $plugin->update(['status' => 'archived']);
+
+    $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase/confirm", [
+            'paymentId' => $sessionId,
+        ])
+        ->assertStatus(404);
+});
+
+it('returns 404 for pending (not yet published) plugin on initiate', function (): void {
+    $plugin = purPlugin(['status' => 'pending']);
+    $buyer = purBuyer();
+
+    $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase")
+        ->assertStatus(404);
+});
+
+it('does not complete the purchase when gateway amount does not match expected amount', function (): void {
+    $plugin = purPlugin(['price_cents' => 2500]);
+    $buyer = purBuyer();
+
+    $initiate = $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase");
+    $sessionId = $initiate->json('checkout.session_id');
+
+    // Simulate a gateway that confirms payment as completed but reports a tampered/incorrect
+    // amount (e.g. a compromised webhook payload) — the confirm step must reject this even
+    // though the gateway says the payment itself succeeded.
+    $this->app->bind(PaymentGateway::class, fn () => new class implements PaymentGateway
+    {
+        public function createCheckoutSession(Plugin $plugin, int $userId): CheckoutSession
+        {
+            return new CheckoutSession(url: '/mock', sessionId: 'mock_tampered');
+        }
+
+        public function verifyPayment(string $paymentId): PaymentResult
+        {
+            return new PaymentResult(status: 'completed', amountCents: 100, paymentId: $paymentId);
+        }
+
+        public function processRefund(PluginPurchase $purchase): bool
+        {
+            return false;
+        }
+    });
+
+    $confirm = $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase/confirm", [
+            'paymentId' => $sessionId,
+        ]);
+
+    $confirm->assertStatus(422);
+    expect(PluginPurchase::query()->where('plugin_id', $plugin->id)->first()->status)
+        ->not->toBe('completed');
+});
+
+it('completes the purchase when gateway amount matches expected amount', function (): void {
+    $plugin = purPlugin(['price_cents' => 2500]);
+    $buyer = purBuyer();
+
+    $initiate = $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase");
+    $sessionId = $initiate->json('checkout.session_id');
+
+    // MockPaymentGateway reports the amount actually stored on the purchase for the session,
+    // mirroring a real gateway confirming the true charged amount.
+    $confirm = $this->actingAs($buyer)
+        ->postJson("/api/marketplace/plugins/{$plugin->slug}/purchase/confirm", [
+            'paymentId' => $sessionId,
+        ]);
+
+    $confirm->assertOk();
+    $confirm->assertJsonPath('purchase.status', 'completed');
 });

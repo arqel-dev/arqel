@@ -7,7 +7,9 @@ import { expect, test } from './fixtures';
  * (data-testid=flash-download-link). Clicking it downloads the CSV.
  */
 test.describe('Export bulk action', () => {
-  test('exports selected rows and offers a downloadable CSV via the flash link', async ({ loggedInPage }) => {
+  test('exports selected rows and offers a downloadable CSV via the flash link', async ({
+    loggedInPage,
+  }) => {
     const page = loggedInPage;
     await page.goto('/admin/posts');
     await page.waitForLoadState('networkidle');
@@ -21,10 +23,7 @@ test.describe('Export bulk action', () => {
     await expect(link).toBeVisible();
 
     // Clicking it downloads a non-empty CSV.
-    const [download] = await Promise.all([
-      page.waitForEvent('download'),
-      link.click(),
-    ]);
+    const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
     const path = await download.path();
     expect(path).toBeTruthy();
     expect(download.suggestedFilename()).toMatch(/\.csv$/i);

@@ -95,7 +95,7 @@ describe('renderResource', () => {
         { name: 'author_id', type: 'BelongsTo' },
       ],
     });
-    const content = out.files[0]!.content;
+    const content = out.files[0]?.content;
     const belongsToIdx = content.indexOf('BelongsToField');
     const textIdx = content.indexOf('TextField;');
     expect(belongsToIdx).toBeGreaterThan(-1);

@@ -27,7 +27,7 @@ function makeFakeConnection(initialState = 'connecting'): FakeConnection {
   return {
     bind: vi.fn((event: string, cb: Handler) => {
       if (!handlers.has(event)) handlers.set(event, new Set());
-      handlers.get(event)!.add(cb);
+      handlers.get(event)?.add(cb);
     }),
     unbind: vi.fn(),
     state: initialState,

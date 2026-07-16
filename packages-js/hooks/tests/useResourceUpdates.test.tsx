@@ -59,7 +59,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // biome-ignore lint/performance/noDelete: cleanly remove ambient global between tests.
   delete (window as { Echo?: EchoLike }).Echo;
 });
 

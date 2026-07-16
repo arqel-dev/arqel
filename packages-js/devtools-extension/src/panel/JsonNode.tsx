@@ -101,7 +101,7 @@ function formatPrimitive(value: unknown, term: string): React.ReactNode {
 
 function nodeMatches(key: string | undefined, value: unknown, term: string): boolean {
   if (term === '') return true;
-  if (key !== undefined && key.toLowerCase().includes(term)) return true;
+  if (key?.toLowerCase().includes(term)) return true;
   if (value === null || typeof value !== 'object') {
     return String(value).toLowerCase().includes(term);
   }

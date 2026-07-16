@@ -112,6 +112,11 @@ return [
         'deleted' => 'Registro excluído.',
         'restored' => 'Registro restaurado.',
     ],
+    // Rótulos renderizados dentro do <FlashToast> (@arqel-dev/ui) para o
+    // payload compartilhado `flash` do Inertia.
+    'flash' => [
+        'download' => 'Baixar',
+    ],
     'errors' => [
         'unauthorized' => 'Você não tem autorização para executar esta ação.',
         'forbidden' => 'Acesso negado.',

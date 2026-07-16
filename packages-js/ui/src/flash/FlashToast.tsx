@@ -8,6 +8,7 @@
 
 import { useArqelTranslations } from '@arqel-dev/react/utils';
 import { useEffect } from 'react';
+import { buttonVariants } from '../shadcn/ui/button.js';
 import { cn } from '../utils/cn.js';
 
 export type FlashKind = 'success' | 'error' | 'info' | 'warning';
@@ -18,6 +19,10 @@ export interface FlashToastProps {
   onDismiss: () => void;
   durationMs?: number;
   className?: string;
+  // Accepts `undefined` explicitly (not just an absent key) because
+  // FlashContainer passes `download_url` conditionally as
+  // `... : undefined` — required under `exactOptionalPropertyTypes`.
+  downloadUrl?: string | null | undefined;
 }
 
 const KIND_CLASSES: Record<FlashKind, string> = {
@@ -40,6 +45,7 @@ export function FlashToast({
   onDismiss,
   durationMs = 5000,
   className,
+  downloadUrl,
 }: FlashToastProps) {
   const t = useArqelTranslations();
   useEffect(() => {
@@ -63,6 +69,16 @@ export function FlashToast({
         {KIND_GLYPH[kind]}
       </span>
       <span className="flex-1">{message}</span>
+      {typeof downloadUrl === 'string' && downloadUrl !== '' && (
+        <a
+          href={downloadUrl}
+          download
+          data-testid="flash-download-link"
+          className={cn(buttonVariants({ variant: 'link', size: 'xs' }), 'h-auto p-0')}
+        >
+          {t('arqel.flash.download', 'Baixar')}
+        </a>
+      )}
       <button
         type="button"
         aria-label={t('arqel.aria.flash_dismiss', 'Dismiss')}

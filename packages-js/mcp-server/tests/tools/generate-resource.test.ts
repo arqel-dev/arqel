@@ -44,7 +44,7 @@ describe('generate_resource tool', () => {
   it('handler: INVALID_INPUT when model is missing', async () => {
     const out = await generateResourceTool.handle({});
     expect(out.isError).toBe(true);
-    const body = JSON.parse(out.content[0]?.text);
+    const body = JSON.parse(out.content[0]!.text);
     expect(body.error.code).toBe('INVALID_INPUT');
   });
 
@@ -54,7 +54,7 @@ describe('generate_resource tool', () => {
       fields: [{ name: 'title', type: 'Text' }],
     });
     expect(out.isError).toBeUndefined();
-    const body = JSON.parse(out.content[0]?.text);
+    const body = JSON.parse(out.content[0]!.text);
     expect(body.files[0].content).toContain("TextField::make('title')");
   });
 

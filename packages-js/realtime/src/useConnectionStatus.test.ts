@@ -16,7 +16,7 @@ function makeFakeConnection(initialState = 'connecting'): FakeConnection {
   const handlers = new Map<string, Set<Handler>>();
   const bind = vi.fn((event: string, cb: Handler) => {
     if (!handlers.has(event)) handlers.set(event, new Set());
-    handlers.get(event)?.add(cb);
+    handlers.get(event)!.add(cb);
   });
   const unbind = vi.fn((event: string, cb?: Handler) => {
     const set = handlers.get(event);

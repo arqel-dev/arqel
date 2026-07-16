@@ -24,21 +24,21 @@ describe('generate_field tool', () => {
   it('handler: returns INVALID_INPUT for missing name', async () => {
     const out = await generateFieldTool.handle({ type: 'Text' });
     expect(out.isError).toBe(true);
-    const body = JSON.parse(out.content[0]?.text);
+    const body = JSON.parse(out.content[0]!.text);
     expect(body.error.code).toBe('INVALID_INPUT');
   });
 
   it('handler: serializes a happy path response', async () => {
     const out = await generateFieldTool.handle({ name: 'name', type: 'Text' });
     expect(out.isError).toBeUndefined();
-    const body = JSON.parse(out.content[0]?.text);
+    const body = JSON.parse(out.content[0]!.text);
     expect(body.snippet).toBe("TextField::make('name'),");
   });
 
   it('handler: error envelope serialised with isError=true', async () => {
     const out = await generateFieldTool.handle({ name: 'x', type: 'Nope' });
     expect(out.isError).toBe(true);
-    const body = JSON.parse(out.content[0]?.text);
+    const body = JSON.parse(out.content[0]!.text);
     expect(body.error.code).toBe('UNKNOWN_FIELD_TYPE');
   });
 

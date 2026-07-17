@@ -10,6 +10,7 @@ use Arqel\Export\Exporters\CsvExporter;
 use Arqel\Export\Exporters\PdfExporter;
 use Arqel\Export\Exporters\XlsxExporter;
 use Arqel\Export\ExportFormat;
+use Arqel\Export\Models\Export;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Traversable;
@@ -152,9 +153,10 @@ final class ExportAction extends Action
         }
 
         // UUID id keeps filenames collision-free and matches the
-        // download controller's `[a-f0-9-]+` route constraint + glob,
-        // so the produced file is retrievable by id (#67 B).
-        $filename = 'export-'.Str::uuid()->toString().'.'.$this->format->extension();
+        // download controller's route constraint + Export::find lookup,
+        // so the produced file is retrievable and ownership-gated (#381).
+        $id = Str::uuid()->toString();
+        $filename = 'export-'.$id.'.'.$this->format->extension();
         $dir = rtrim($this->destinationDir, '/');
         $destination = $dir.'/'.$filename;
 
@@ -163,6 +165,15 @@ final class ExportAction extends Action
                 mkdir($dir, 0o755, true);
             }
             $this->resolveExporter()->export($record, $this->columns, $destination);
+
+            $ownerId = auth()->id();
+            Export::create([
+                'id' => $id,
+                'owner_user_id' => $ownerId !== null ? (string) $ownerId : null,
+                'format' => $this->format->value,
+                'path' => $destination,
+                'expires_at' => null,
+            ]);
         }
 
         return [

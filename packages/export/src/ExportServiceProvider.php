@@ -26,6 +26,7 @@ final class ExportServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('arqel-export')
+            ->hasMigration('2026_07_17_000000_create_arqel_exports_table')
             ->hasRoute('admin');
     }
 

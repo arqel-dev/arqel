@@ -7,7 +7,8 @@ use Arqel\Export\ExportFormat;
 use Arqel\Export\Models\Export;
 
 it('creates an Export row owned by the authenticated user', function (): void {
-    $user = new class extends \Illuminate\Foundation\Auth\User {
+    $user = new class extends Illuminate\Foundation\Auth\User
+    {
         protected $table = 'users';
 
         public function getAuthIdentifier(): mixed

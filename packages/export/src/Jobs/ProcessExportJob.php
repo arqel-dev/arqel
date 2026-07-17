@@ -34,6 +34,16 @@ use Throwable;
  *   implementation to persist Export rows + dispatch notifications.
  *
  * Cleanup of stale files (>7 days) is deferred to a separate ticket.
+ *
+ * NOTE(#381): this job is not dispatched anywhere yet (the async path
+ * above stays deferred per EXPORT-006/007/008). It writes
+ * `export-<exportId>.<ext>` but does NOT create an `Export` row.
+ * `ExportDownloadController` now gates downloads on an owning `Export`
+ * record (owner_user_id), so whichever future ticket wires this job up
+ * MUST also persist an `Arqel\Export\Models\Export` record (id = this
+ * job's exportId, owner_user_id = the initiating user's id) at or
+ * before dispatch time — otherwise every async-produced export will
+ * 404 for its own rightful owner.
  */
 final class ProcessExportJob implements ShouldQueue
 {

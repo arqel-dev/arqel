@@ -7,6 +7,26 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-07-28
+
+### Summary
+
+Release minor de **hardening de segurança e infraestrutura de CI**. Fecha as três issues de segurança/qualidade abertas (IDOR no download de export, gate de PHPStan silenciosamente no-op, auditoria JS quebrada) e faz um sweep de dependências vulneráveis em PHP e JS. Sem breaking changes de API pública desde 0.18.0.
+
+### Security
+
+- **export (IDOR):** o download de um export gerado passa a ser restrito ao usuário que o criou. `ExportAction::execute()` persiste um registro `Export` com `owner_user_id`, e `ExportDownloadController` só serve o arquivo ao dono — para um export de outro usuário responde **404** (não 403, para não vazar a existência do recurso via enumeração). Antes, qualquer usuário autenticado que adivinhasse o UUID do arquivo podia baixar o export de outro (#381).
+
+### Fixed
+
+- **infra (PHPStan CI):** `scripts/phpstan.sh` deixava de rodar `composer run analyse` na raiz do monorepo silenciosamente (no-op), fazendo o gate de análise estática passar sempre-verde sem de fato analisar nada. O script agora falha se a análise não executar (#368).
+- **infra (JS audit):** a auditoria de dependências JS migrou de `pnpm audit` — que dependia dos endpoints legados quick/audits do npm, aposentados (HTTP 410) e portanto falhando incondicionalmente — para **osv-scanner**, que escaneia `pnpm-lock.yaml` diretamente contra a base OSV. `osv-scanner.toml` documenta os advisories ignorados com justificativa e issue de rastreamento (#383, #389).
+
+### Changed (deps)
+
+- **PHP:** bump de `guzzlehttp/guzzle`, `guzzlehttp/psr7` e `dompdf/dompdf` no lock raiz e no `apps/marketplace` para resolver advisories (GHSA-wm3w-8rrp-j577 e correlatos). `composer audit` limpo (#387, #388).
+- **JS:** bump de `body-parser`, `fast-uri`, `linkify-it`, `hono`, `js-yaml` (5.2.1→5.2.2) e `postcss` (8.5.12→8.5.24) para versões sem advisories. `axios@1.17.0` e `@hono/node-server@1.19.14` permanecem pinados por compatibilidade (peer-dep do Inertia / MCP SDK) e são rastreados em #389 (#388).
+
 ## [0.18.0] - 2026-07-07
 
 ### Summary

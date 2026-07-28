@@ -11,7 +11,45 @@
 # the repo already handles long-tail Dependabot transitive alerts — do not
 # silently ignore real vulnerabilities.
 #
-# Example:
-# [[IgnoredVulns]]
-# id = "GHSA-xxxx-xxxx-xxxx"
-# reason = "Transitive dev-only dependency, no fix released upstream yet. Tracked in #NNN."
+# axios @ 1.17.0 is pinned: it is a peer dep of @inertiajs/react@3.0.3, and
+# bumping it forces pnpm to create a second @inertiajs/react instance
+# (peer-suffix keying), breaking the Inertia React context (ADR-001) — proven
+# empirically in #388 (76 packages-js/ai tests failed). Fixed version 1.18.0
+# requires upstream Inertia to widen its axios peer range. Tracked in #389.
+[[IgnoredVulns]]
+id = "GHSA-42h9-826w-cgv3"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-7q8q-rj6j-mhjq"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-f4gw-2p7v-4548"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-gcfj-64vw-6mp9"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-hcpx-6fm6-wx23"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-jqh4-m9w3-8hp9"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-mmx7-hfxf-jppx"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-mwf2-3pr3-8698"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-pmv8-rq9r-6j72"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+[[IgnoredVulns]]
+id = "GHSA-xj6q-8x83-jv6g"
+reason = "axios pinned to 1.17.0 for Inertia peer-dep compatibility (ADR-001). Tracked in #389."
+
+# @hono/node-server @ 1.19.14 is pinned: its fixed version 2.0.5 is a major
+# bump that breaks the MCP SDK integration (@arqel-dev/mcp-server). Tracked
+# in #389.
+[[IgnoredVulns]]
+id = "GHSA-frvp-7c67-39w9"
+reason = "@hono/node-server pinned to 1.19.14; fix 2.0.5 is a breaking major for the MCP SDK. Tracked in #389."

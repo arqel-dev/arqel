@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Arqel\Export\Http\Controllers\ExportDownloadController;
+use Arqel\Export\Models\Export;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -28,8 +29,25 @@ it('returns a BinaryFileResponse for a valid export id', function (): void {
     $path = $this->tempDir.'/export-'.$exportId.'.csv';
     file_put_contents($path, "id,name\n1,Alice\n");
 
+    Export::create([
+        'id' => $exportId,
+        'owner_user_id' => '9',
+        'format' => 'csv',
+        'path' => $path,
+        'expires_at' => null,
+    ]);
+
+    $request = Request::create('/admin/exports/'.$exportId.'/download');
+    $request->setUserResolver(fn () => new class
+    {
+        public function getAuthIdentifier(): string
+        {
+            return '9';
+        }
+    });
+
     $controller = new ExportDownloadController;
-    $response = $controller->download($exportId, Request::create('/admin/exports/'.$exportId.'/download'));
+    $response = $controller->download($exportId, $request);
 
     expect($response)->toBeInstanceOf(BinaryFileResponse::class);
     expect($response->getFile()->getPathname())->toBe($path);

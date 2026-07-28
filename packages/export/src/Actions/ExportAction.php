@@ -10,6 +10,7 @@ use Arqel\Export\Exporters\CsvExporter;
 use Arqel\Export\Exporters\PdfExporter;
 use Arqel\Export\Exporters\XlsxExporter;
 use Arqel\Export\ExportFormat;
+use Arqel\Export\Models\Export;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Traversable;
@@ -35,15 +36,22 @@ use Traversable;
  * so a produced file is retrievable end to end (#67). The controller's
  * caller (`ResourceController::bulkAction`) flashes the download URL.
  *
+ * #381 closed the IDOR on the download side: this action now persists
+ * an owned `Export` row (via `Export::create`, `owner_user_id` set to
+ * the acting user) on every non-dry-run execution, and
+ * `ExportDownloadController` only serves a file to its recorded owner
+ * (fail-closed, 404 not 403).
+ *
  * TODO(EXPORT-006/007/008): the original EXPORT-005 spec also covers
  * (a) a form-modal step to let the user pick the format/columns at
  * runtime, (b) a queue-threshold heuristic that dispatches
- * `ProcessExportJob` for large selections, and (c) the full flash
- * notification + SIGNED download URL backed by an `Export` model with
- * ownership + expiry. Those pieces require cross-package work into
- * `arqel-dev/actions` form integration plus the `Export` model + jobs
- * and remain deliberately deferred — this action stays a synchronous,
- * in-process exporter wrapper whose download URL is unsigned.
+ * `ProcessExportJob` for large selections, and (c) a SIGNED download
+ * URL plus expiry cleanup (the `Export` model has an `expires_at`
+ * column, but no reaper job runs yet). Those pieces require
+ * cross-package work into `arqel-dev/actions` form integration plus
+ * the export job pipeline and remain deliberately deferred — this
+ * action stays a synchronous, in-process exporter wrapper whose
+ * download URL is unsigned.
  */
 final class ExportAction extends Action
 {
@@ -152,9 +160,10 @@ final class ExportAction extends Action
         }
 
         // UUID id keeps filenames collision-free and matches the
-        // download controller's `[a-f0-9-]+` route constraint + glob,
-        // so the produced file is retrievable by id (#67 B).
-        $filename = 'export-'.Str::uuid()->toString().'.'.$this->format->extension();
+        // download controller's route constraint + Export::find lookup,
+        // so the produced file is retrievable and ownership-gated (#381).
+        $id = Str::uuid()->toString();
+        $filename = 'export-'.$id.'.'.$this->format->extension();
         $dir = rtrim($this->destinationDir, '/');
         $destination = $dir.'/'.$filename;
 
@@ -163,6 +172,15 @@ final class ExportAction extends Action
                 mkdir($dir, 0o755, true);
             }
             $this->resolveExporter()->export($record, $this->columns, $destination);
+
+            $ownerId = auth()->id();
+            Export::create([
+                'id' => $id,
+                'owner_user_id' => $ownerId !== null ? (string) $ownerId : null,
+                'format' => $this->format->value,
+                'path' => $destination,
+                'expires_at' => null,
+            ]);
         }
 
         return [

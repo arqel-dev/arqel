@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Arqel\Core\ArqelServiceProvider;
 use Arqel\Core\Panel\PanelRegistry;
 use Arqel\Widgets\Dashboard;
 use Arqel\Widgets\DashboardRegistry;
@@ -54,6 +55,29 @@ it('registers no dashboard when there are no panels at all', function (): void {
     invokeWidgetSync();
 
     expect(app(DashboardRegistry::class)->all())->toBe([]);
+});
+
+it('runs the widget sync after core has booted panel plugins', function (): void {
+    // Integração de verdade: em vez de chamar `Plugin::boot()` à mão, dispara
+    // os hooks dos DOIS providers na ordem de produção — core primeiro, que é
+    // onde `bootPanelPlugins()` vive, e widgets depois.
+    //
+    // Se o sync de widgets rodasse antes, o widget que só existe a partir do
+    // boot do plugin nunca chegaria ao dashboard, e a asserção falharia.
+    app(PanelRegistry::class)->panel('admin')
+        ->plugin(WidgetPlugin::make())
+        ->widgets([CounterWidget::class]);
+
+    $core = app()->getProvider(ArqelServiceProvider::class);
+    $bootPlugins = new ReflectionMethod($core, 'bootPanelPlugins');
+    $bootPlugins->invoke($core);
+
+    invokeWidgetSync();
+
+    $widgets = app(DashboardRegistry::class)->get('main')->getWidgets();
+
+    expect($widgets)->toContain(CounterWidget::class)
+        ->and($widgets)->toContain(SecondaryWidget::class);
 });
 
 it('appends panel widgets to a dashboard the app already registered', function (): void {

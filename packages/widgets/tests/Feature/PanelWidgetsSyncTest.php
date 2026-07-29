@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Arqel\Core\Panel\PanelRegistry;
+use Arqel\Widgets\Dashboard;
 use Arqel\Widgets\DashboardRegistry;
 use Arqel\Widgets\Tests\Fixtures\CounterWidget;
+use Arqel\Widgets\Tests\Fixtures\SecondaryWidget;
 use Arqel\Widgets\WidgetsServiceProvider;
 
 /**
@@ -51,4 +53,33 @@ it('registers no dashboard when there are no panels at all', function (): void {
     invokeWidgetSync();
 
     expect(app(DashboardRegistry::class)->all())->toBe([]);
+});
+
+it('appends panel widgets to a dashboard the app already registered', function (): void {
+    // A aplicação registra o seu dashboard primeiro — o caso de demo/showcase.
+    app(DashboardRegistry::class)->register(
+        Dashboard::make('main', 'App Dashboard')->widgets([SecondaryWidget::class]),
+    );
+
+    app(PanelRegistry::class)->panel('admin')->widgets([CounterWidget::class]);
+
+    invokeWidgetSync();
+
+    $widgets = app(DashboardRegistry::class)->get('main')->getWidgets();
+
+    // O widget da app continua presente — nada de clobbering.
+    expect($widgets)->toContain(SecondaryWidget::class)
+        ->and($widgets)->toContain(CounterWidget::class)
+        ->and($widgets)->toHaveCount(2);
+});
+
+it('keeps the label the app chose when merging', function (): void {
+    app(DashboardRegistry::class)->register(
+        Dashboard::make('main', 'App Dashboard'),
+    );
+    app(PanelRegistry::class)->panel('admin')->widgets([CounterWidget::class]);
+
+    invokeWidgetSync();
+
+    expect(app(DashboardRegistry::class)->get('main')->label)->toBe('App Dashboard');
 });

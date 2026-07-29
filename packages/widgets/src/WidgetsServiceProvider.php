@@ -25,6 +25,13 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
  */
 final class WidgetsServiceProvider extends PackageServiceProvider
 {
+    /**
+     * Id do dashboard implícito. É `main` porque é o fallback que
+     * `DashboardController::show()` usa para a rota `/admin` — qualquer
+     * outro valor produziria um dashboard inalcançável.
+     */
+    private const PANEL_DASHBOARD_ID = 'main';
+
     public function configurePackage(Package $package): void
     {
         $package
@@ -77,8 +84,21 @@ final class WidgetsServiceProvider extends PackageServiceProvider
             return;
         }
 
+        // `get()` devolve o próprio objeto (handle, não cópia) e a lista de
+        // widgets não é readonly — mutar aqui já reflete no registry, sem
+        // precisar de um `unregister()` que não existe.
+        $existing = $dashboards->get(self::PANEL_DASHBOARD_ID);
+
+        if ($existing !== null) {
+            foreach ($declared as $widgetClass) {
+                $existing->addWidget($widgetClass);
+            }
+
+            return;
+        }
+
         $dashboards->register(
-            Dashboard::make('main', 'Dashboard')->widgets($declared),
+            Dashboard::make(self::PANEL_DASHBOARD_ID, 'Dashboard')->widgets($declared),
         );
     }
 }

@@ -1,0 +1,316 @@
+name: Marketplace — Deploy
+
+# Builds apps/marketplace (Laravel + Inertia + React) and rsyncs it to the
+# Hostinger subdomain marketplace.arqel.dev.
+#
+# Why this app can't reuse docs-deploy.yml: the docs are a static VitePress
+# bundle, while this is a PHP app. The build produces vendor/ + public/build/
+# here, and the server needs a PHP document root pointing at public/.
+#
+# PATH REPOS: apps/marketplace/composer.json resolves arqel-dev/* through
+# `path` repositories with `"symlink": true`, pointing at ../../packages/*.
+# Those symlinks are meaningless on the server — rsync would ship dangling
+# links and the app would fatal on autoload. So the build step swaps them for
+# the versions published on Packagist (arqel-dev/* are published; 0.19.0 at
+# time of writing) via a production-only composer.json overlay.
+#
+# MIGRATIONS: packages/marketplace registers its migrations with Spatie's
+# `hasMigration()`, which is publish-only — they do NOT auto-run. The deploy
+# publishes them into the app and then migrates, otherwise the app boots with
+# an empty schema and every `Plugin::query()` fatals.
+#
+# Required secrets in arqel-dev/arqel (the HOSTINGER_SSH_* trio is already
+# used by docs-deploy.yml):
+#   HOSTINGER_SSH_HOST
+#   HOSTINGER_SSH_USER
+#   HOSTINGER_SSH_KEY
+#   HOSTINGER_SSH_PORT              optional, defaults to 65002
+#   HOSTINGER_MARKETPLACE_PATH      optional, defaults to
+#                                   /home/<user>/domains/marketplace.arqel.dev
+#   MARKETPLACE_APP_KEY             Laravel APP_KEY (base64:...)
+#   HOSTINGER_SSH_KNOWN_HOSTS       optional but RECOMMENDED — pins the host
+#                                   key so a MITM can't impersonate the server
+#                                   and harvest the deploy key. Generate with:
+#                                     ssh-keyscan -p 65002 <host>
+#                                   Without it the run falls back to trusting
+#                                   whatever key the server presents.
+#
+# O APP_KEY nunca é passado como argumento de `ssh` — argumentos aparecem em
+# `ps aux` para qualquer usuário, e este é um host compartilhado. Ele viaja
+# dentro do .env, enviado por rsync com modo 600.
+#
+# MANUAL PREREQUISITES on Hostinger (no commit can do these):
+#   1. Point the subdomain document root at <deploy path>/public
+#   2. Remove the stale index.html currently sitting in the subdomain root
+#   3. Ensure PHP 8.3+ is selected for the subdomain
+
+# DELIBERADAMENTE só manual por enquanto. O trigger automático em `push`
+# está comentado abaixo porque os pré-requisitos da Hostinger (document
+# root apontando para public/, .env, APP_KEY, remoção do index.html órfão)
+# são manuais e ainda não foram feitos — um deploy automático rodaria o
+# rsync antes disso e deixaria o servidor num estado intermediário.
+#
+# Depois do primeiro deploy manual bem-sucedido via workflow_dispatch,
+# descomente o bloco `push` para que a app passe a acompanhar a main.
+#
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - "apps/marketplace/**"
+#       - "packages/marketplace/**"
+#       - ".github/workflows/marketplace-deploy.yml"
+on:
+  workflow_dispatch:
+    inputs:
+      skip_migrations:
+        description: "Pular migrations (use se o schema já estiver atualizado)"
+        required: false
+        default: "false"
+        type: choice
+        options: ["true", "false"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketplace-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_DIR: apps/marketplace
+  SUBDOMAIN: marketplace.arqel.dev
+
+jobs:
+  deploy:
+    name: Build + rsync to Hostinger
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+          extensions: sqlite3, pdo_sqlite, mbstring, dom, curl, zip
+          coverage: none
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20.9.0
+
+      # The workspace lockfile covers apps/marketplace; installing at the root
+      # keeps the Vite/React versions identical to what CI tests against.
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build front-end assets
+        run: pnpm --filter @arqel-dev/marketplace-app build
+
+      # Swap the local path repos for the published packages. Editing the
+      # manifest in place (rather than committing a second one) keeps a single
+      # source of truth in the repo — the override exists only inside this job.
+      - name: Point composer at published packages
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          python3 - <<'PY'
+          import json
+
+          with open('composer.json') as fh:
+              manifest = json.load(fh)
+
+          # Drop every `path` repository; Packagist resolves arqel-dev/* now.
+          manifest['repositories'] = [
+              repo for repo in manifest.get('repositories', [])
+              if repo.get('type') != 'path'
+          ]
+
+          # `@dev` only resolves against a path repo — pin to the published line.
+          for name in list(manifest.get('require', {})):
+              if name.startswith('arqel-dev/') and manifest['require'][name] == '@dev':
+                  manifest['require'][name] = '^0.19'
+
+          with open('composer.json', 'w') as fh:
+              json.dump(manifest, fh, indent=4)
+              fh.write('\n')
+          PY
+          echo "--- resolved manifest ---"
+          cat composer.json
+
+      # O lock versionado trava arqel-dev/* como `path` (0.18.0), então um
+      # `install` puro traria de volta os symlinks que o passo anterior
+      # removeu. Atualizamos SÓ esses dois pacotes: todas as demais
+      # dependências permanecem exatamente nas versões do lock, sem resolução
+      # nova a cada deploy — um `composer update` irrestrito deixaria a porta
+      # aberta para um pacote comprometido entrar direto em produção.
+      - name: Install PHP dependencies
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          composer update arqel-dev/core arqel-dev/marketplace \
+            --with-dependencies \
+            --no-dev --prefer-dist --no-interaction --no-progress \
+            --optimize-autoloader
+
+          echo "--- versões instaladas de arqel-dev/* ---"
+          composer show 'arqel-dev/*' 2>/dev/null || true
+
+      # Auditoria de segurança das dependências resolvidas. `composer audit`
+      # é gate bloqueante no CI do repo; um deploy não deve ter padrão mais
+      # frouxo que o pipeline de testes.
+      - name: Audit PHP dependencies
+        working-directory: ${{ env.APP_DIR }}
+        run: composer audit --no-dev --ansi
+
+      # Publish-only migrations (Spatie `hasMigration`) must be copied into the
+      # app before they can run. Without this the schema stays empty.
+      - name: Publish package migrations
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          APP_KEY: ${{ secrets.MARKETPLACE_APP_KEY }}
+        run: |
+          cp .env.example .env
+          php artisan vendor:publish --tag=arqel-marketplace-migrations --force
+          ls -la database/migrations/
+
+      # `ssh-keyscan` sozinho aceita qualquer chave que o outro lado
+      # apresentar — não autentica nada. Se `HOSTINGER_SSH_KNOWN_HOSTS`
+      # estiver definido, fixamos a chave esperada e um MITM falha o deploy.
+      # Sem o secret, caímos no keyscan (comportamento herdado do
+      # docs-deploy.yml) e avisamos no log.
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          KNOWN_HOSTS: ${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+            echo "Host key fixada a partir de HOSTINGER_SSH_KNOWN_HOSTS."
+          else
+            echo "::warning::HOSTINGER_SSH_KNOWN_HOSTS não definido — a host key será aceita sem verificação (risco de MITM). Gere com: ssh-keyscan -p <porta> <host>"
+            ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      # `--delete` keeps the remote clean, but storage/ and the live .env and
+      # database file must survive: they hold runtime state this build has no
+      # copy of. Losing database/database.sqlite would wipe the catalog.
+      - name: Deploy via rsync
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          DEPLOY_PATH: ${{ secrets.HOSTINGER_MARKETPLACE_PATH || format('/home/{0}/domains/marketplace.arqel.dev', secrets.HOSTINGER_SSH_USER) }}
+        run: |
+          rsync -avz --delete \
+            --exclude '.env' \
+            --exclude 'storage/' \
+            --exclude 'database/database.sqlite' \
+            --exclude 'node_modules/' \
+            --exclude 'tests/' \
+            -e "ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT" \
+            "${APP_DIR}/" \
+            "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+
+      # First deploy bootstraps .env, the SQLite file and storage/. Later runs
+      # find them present and leave them alone.
+      - name: Bootstrap runtime state and migrate
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          DEPLOY_PATH: ${{ secrets.HOSTINGER_MARKETPLACE_PATH || format('/home/{0}/domains/marketplace.arqel.dev', secrets.HOSTINGER_SSH_USER) }}
+          APP_KEY: ${{ secrets.MARKETPLACE_APP_KEY }}
+          SKIP_MIGRATIONS: ${{ github.event.inputs.skip_migrations || 'false' }}
+          SUBDOMAIN: ${{ env.SUBDOMAIN }}
+        run: |
+          # O .env é montado aqui e enviado por rsync (canal cifrado, modo
+          # 600). O APP_KEY nunca vira argumento de `ssh`: argumentos ficam
+          # visíveis em `ps aux` para qualquer usuário do host — e este é um
+          # servidor compartilhado. `SendEnv` não serve porque depende de
+          # `AcceptEnv` no sshd, que não controlamos.
+          umask 077
+          python3 - <<'PY'
+          import os, re
+
+          with open('apps/marketplace/.env.example') as fh:
+              body = fh.read()
+
+          values = {
+              'APP_ENV': 'production',
+              'APP_DEBUG': 'false',
+              'APP_URL': f"https://{os.environ['SUBDOMAIN']}",
+              'APP_KEY': os.environ['APP_KEY'],
+          }
+          for key, value in values.items():
+              pattern = rf'^{key}=.*$'
+              line = f'{key}={value}'
+              body = re.sub(pattern, line, body, flags=re.M) \
+                  if re.search(pattern, body, flags=re.M) else body + f'\n{line}\n'
+
+          with open('env.deploy', 'w') as fh:
+              fh.write(body)
+          PY
+          chmod 600 env.deploy
+
+          rsync -az --chmod=F600 \
+            -e "ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT" \
+            env.deploy "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/.env.incoming"
+          rm -f env.deploy
+
+          ssh -i "$HOME/.ssh/deploy_key" -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' SUBDOMAIN='$SUBDOMAIN' SKIP_MIGRATIONS='$SKIP_MIGRATIONS' bash -s" <<'REMOTE'
+          set -euo pipefail
+          cd "$DEPLOY_PATH"
+
+          mkdir -p storage/framework/cache storage/framework/sessions \
+                   storage/framework/views storage/logs storage/app/public
+          mkdir -p database
+          touch database/database.sqlite
+
+          # O .env existente vence: ele pode ter ajustes feitos no servidor
+          # que este build desconhece. O arquivo novo só entra na primeira vez.
+          if [ -f .env ]; then
+            rm -f .env.incoming
+          else
+            mv .env.incoming .env
+            chmod 600 .env
+          fi
+
+          # APP_URL must match the live host: SitemapController derives every
+          # sitemap URL from it, so a stale value emits wrong links.
+          grep -q "^APP_URL=https://${SUBDOMAIN}$" .env || \
+            sed -i "s|^APP_URL=.*|APP_URL=https://${SUBDOMAIN}|" .env
+
+          if [ "$SKIP_MIGRATIONS" != "true" ]; then
+            php artisan migrate --force
+          fi
+
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          REMOTE
+
+      - name: Verify deploy
+        run: |
+          for attempt in 1 2 3; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 \
+              "https://${SUBDOMAIN}/" || echo 000)
+            echo "attempt ${attempt}: HTTP ${code}"
+            [ "$code" = "200" ] && exit 0
+            sleep 10
+          done
+          echo "::error::marketplace.arqel.dev did not return 200 after the deploy"
+          exit 1

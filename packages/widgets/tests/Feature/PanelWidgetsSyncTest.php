@@ -80,6 +80,34 @@ it('runs the widget sync after core has booted panel plugins', function (): void
         ->and($widgets)->toContain(SecondaryWidget::class);
 });
 
+it('silently drops entries that are not widgets', function (): void {
+    app(PanelRegistry::class)->panel('admin')->widgets([
+        CounterWidget::class,
+        'App\\Does\\Not\\Exist',
+        stdClass::class,
+    ]);
+
+    invokeWidgetSync();
+
+    // `Dashboard::widgets()`/`addWidget()` filtram non-Widget: má
+    // configuração não derruba o boot do painel.
+    expect(app(DashboardRegistry::class)->get('main')->getWidgets())
+        ->toBe([CounterWidget::class]);
+});
+
+it('collects widgets from every registered panel', function (): void {
+    $panels = app(PanelRegistry::class);
+    $panels->panel('admin')->widgets([CounterWidget::class]);
+    $panels->panel('reports')->widgets([SecondaryWidget::class]);
+
+    invokeWidgetSync();
+
+    // Documenta a consequência do multi-panel: tudo converge para `main`,
+    // porque não existe vínculo panel↔dashboard (spec, "Quais panels são lidos").
+    expect(app(DashboardRegistry::class)->get('main')->getWidgets())
+        ->toHaveCount(2);
+});
+
 it('appends panel widgets to a dashboard the app already registered', function (): void {
     // A aplicação registra o seu dashboard primeiro — o caso de demo/showcase.
     app(DashboardRegistry::class)->register(

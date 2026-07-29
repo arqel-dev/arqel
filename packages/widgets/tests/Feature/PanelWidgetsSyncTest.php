@@ -104,8 +104,12 @@ it('collects widgets from every registered panel', function (): void {
 
     // Documenta a consequência do multi-panel: tudo converge para `main`,
     // porque não existe vínculo panel↔dashboard (spec, "Quais panels são lidos").
+    //
+    // A asserção nomeia os widgets em vez de só contar: um simples
+    // `toHaveCount(2)` passaria mesmo se o sync duplicasse um panel e
+    // perdesse o outro.
     expect(app(DashboardRegistry::class)->get('main')->getWidgets())
-        ->toHaveCount(2);
+        ->toBe([CounterWidget::class, SecondaryWidget::class]);
 });
 
 it('appends panel widgets to a dashboard the app already registered', function (): void {

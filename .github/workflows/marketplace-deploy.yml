@@ -44,13 +44,23 @@ name: Marketplace — Deploy
 #   2. Remove the stale index.html currently sitting in the subdomain root
 #   3. Ensure PHP 8.3+ is selected for the subdomain
 
+# DELIBERADAMENTE só manual por enquanto. O trigger automático em `push`
+# está comentado abaixo porque os pré-requisitos da Hostinger (document
+# root apontando para public/, .env, APP_KEY, remoção do index.html órfão)
+# são manuais e ainda não foram feitos — um deploy automático rodaria o
+# rsync antes disso e deixaria o servidor num estado intermediário.
+#
+# Depois do primeiro deploy manual bem-sucedido via workflow_dispatch,
+# descomente o bloco `push` para que a app passe a acompanhar a main.
+#
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - "apps/marketplace/**"
+#       - "packages/marketplace/**"
+#       - ".github/workflows/marketplace-deploy.yml"
 on:
-  push:
-    branches: [main]
-    paths:
-      - "apps/marketplace/**"
-      - "packages/marketplace/**"
-      - ".github/workflows/marketplace-deploy.yml"
   workflow_dispatch:
     inputs:
       skip_migrations:

@@ -124,13 +124,22 @@ Resultado para o usuário: hoje o Resource gerado dá erro de classe indefinida 
 
 Core PHP (56 src / 95 test) robusto. E2E: **34 specs** Playwright (showcase 23, demo 10, tenant 1) — cobre CRUD/tables/actions/tenancy/workflow/realtime/versioning/responsivo. Faltam E2E de auth-avançado, export, marketplace.
 
-### Docs com gap material
-- **`apps/docs/resources/*` são stubs** (`resource.md`, `table.md`, `fields.md`, `form.md`, `actions.md` marcados `stub — DOCS-005`): a referência de API principal está vazia.
-- **Widgets sem página dedicada** (guide + reference/php).
-- **`reference/php/` incompleto**: falta widgets, tenant, workflow, versioning, marketplace, realtime.
-- **`i18n` e `realtime-collab` (JS) sem SKILL.md nem README.md** — únicos pacotes sem doc.
+### Docs — estado (atualizado 2026-07-28)
+
+Fechado nas rodadas 0.20 (#375) e docs-§3:
+
+- ✅ **`apps/docs/resources/*`** — os 5 arquivos (`resource`, `table`, `fields`, `form`, `actions`) foram preenchidos em inglês por #375; as versões pt-BR e es, que seguiam como stubs de 5 linhas, foram traduzidas na rodada docs-§3.
+- ✅ **`reference/php/` completo** — as 5 páginas que faltavam (`tenant`, `workflow`, `versioning`, `marketplace`, `realtime`) foram escritas, e `export`/`import`/`widgets`, que existiam em disco mas não apareciam na navegação, foram registradas na sidebar. Os 3 locales cobrem os mesmos 15 pacotes.
+- ✅ **Widgets com página dedicada** em `reference/php/widgets.md` (guide ainda pendente, ver abaixo).
+- ✅ **Paridade de tradução** — en/pt-BR/es alinhados em `resources/*` e `reference/php/*`.
+
+Gaps que permanecem:
+
+- **`i18n` e `realtime-collab` (JS) sem SKILL.md nem README.md** — únicos pacotes sem doc alguma.
 - READMEs ausentes: vários PHP (ai, audit, cli, export, marketplace, realtime, versioning, workflow) e JS (a11y, auth, versioning).
-- Paridade de tradução a auditar (en 49 < pt-BR/es 74 arquivos).
+- **Widgets sem página de _guide_** (a referência existe; falta o material narrativo de introdução).
+- `advanced/macros.md` segue stub (`DOCS-003`) nos 3 locales.
+- DOCS-005 pede geração automática de reference a partir de docblocks (phpDocumentor/doctum) + regeneração em CI. As páginas atuais são escritas à mão e conferidas contra o `src/`; a automação continua em aberto.
 
 ---
 

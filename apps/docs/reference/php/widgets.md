@@ -100,6 +100,34 @@ Declarative dashboard schema: a list of widgets + shared layout. Factory `Dashbo
 
 `register(string $type, class-string<Widget> $widgetClass)` (validates `is_subclass_of(Widget::class)`), `has(type)`, `get(type): ?class-string<Widget>`, `all()`, `clear()`.
 
+## Panel → Dashboard bridge
+
+Widgets declared on a Panel reach the rendered dashboard. `WidgetsServiceProvider` defers a sync to `app->booted()` that collects `Panel::getWidgets()` from **every** registered panel and folds it into the dashboard with id `main` — the id `DashboardController::show()` falls back to for the `/admin` route.
+
+```php
+// A ServiceProvider, or a Plugin's register()/boot()
+Panel::make('admin')->widgets([
+    TotalUsersWidget::class,
+    RevenueChartWidget::class,
+]);
+```
+
+The sync is **additive**, never destructive:
+
+| Situation | Behavior |
+|---|---|
+| No panel declares widgets | No-op — no phantom dashboard is registered |
+| Widgets declared, no `main` dashboard registered | Creates `Dashboard::make('main', 'Dashboard')` holding those widgets |
+| Widgets declared, `main` already registered by the app | **Appends** them via `addWidget()`, preserving both the widgets and the label the app chose |
+
+Notes:
+
+- The sync runs after core's `bootPanelPlugins()`, so widgets a Plugin injects in its `boot()` still reach the dashboard. That boot ordering is what makes the bridge useful to the Plugin API: a plugin adds widgets to the app's dashboard without knowing about it or replacing it.
+- Panel widgets are appended **after** the ones the app registered. Final render order does not depend on that: `Dashboard::resolve()` sorts by `Widget::getSort()`; insertion order is only the tie-breaker among equal `sort` values.
+- Entries that are not `Widget` subclasses are dropped silently — validation lives in `Dashboard::addWidget()`, and a misconfigured class-string must not break panel boot.
+- In a multi-panel app, widgets from **all** panels converge into the same `main` dashboard: there is no panel↔dashboard binding today.
+- Dashboards with their own id are still registered directly on the `DashboardRegistry`; the bridge only ever touches `main`.
+
 ## Filters
 
 ### `Arqel\Widgets\Filters\Filter` (abstract)

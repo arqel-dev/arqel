@@ -28,6 +28,9 @@ Valores exatos, válidos para todas as tarefas:
   Use `--no-verify` (o husky/lint-staged quebra neste host).
 - Antes de push: `composer run lint` **a partir da raiz do repositório** (não `vendor/bin/pint`
   por arquivo — o ruleset da raiz difere).
+- **Trailing comma obrigatória** em chamadas multi-linha. O `pint.json` da raiz aplica
+  `trailing_comma_in_multiline` a `arrays`, `arguments`, `parameters` e `match`, e `tests/`
+  não está excluído — vale para código de produção e de teste igualmente.
 - PHPStan **não roda localmente** neste ambiente (symlink loop do testbench-core). Confie no CI.
 
 ## Estrutura de arquivos
@@ -159,7 +162,7 @@ use Arqel\Core\Panel\PanelRegistry;
         }
 
         $dashboards->register(
-            Dashboard::make('main', 'Dashboard')->widgets($declared)
+            Dashboard::make('main', 'Dashboard')->widgets($declared),
         );
     }
 ```
@@ -293,7 +296,7 @@ Acrescentar a `PanelWidgetsSyncTest.php` (e `use Arqel\Widgets\Tests\Fixtures\Se
 it('appends panel widgets to a dashboard the app already registered', function (): void {
     // A aplicação registra o seu dashboard primeiro — o caso de demo/showcase.
     app(DashboardRegistry::class)->register(
-        Arqel\Widgets\Dashboard::make('main', 'App Dashboard')->widgets([SecondaryWidget::class])
+        Arqel\Widgets\Dashboard::make('main', 'App Dashboard')->widgets([SecondaryWidget::class]),
     );
 
     app(PanelRegistry::class)->panel('admin')->widgets([CounterWidget::class]);
@@ -310,7 +313,7 @@ it('appends panel widgets to a dashboard the app already registered', function (
 
 it('keeps the label the app chose when merging', function (): void {
     app(DashboardRegistry::class)->register(
-        Arqel\Widgets\Dashboard::make('main', 'App Dashboard')
+        Arqel\Widgets\Dashboard::make('main', 'App Dashboard'),
     );
     app(PanelRegistry::class)->panel('admin')->widgets([CounterWidget::class]);
 
@@ -354,7 +357,7 @@ Substituir o bloco final de `syncPanelWidgetsIntoDashboardRegistry()`:
         }
 
         $dashboards->register(
-            Dashboard::make(self::PANEL_DASHBOARD_ID, 'Dashboard')->widgets($declared)
+            Dashboard::make(self::PANEL_DASHBOARD_ID, 'Dashboard')->widgets($declared),
         );
 ```
 

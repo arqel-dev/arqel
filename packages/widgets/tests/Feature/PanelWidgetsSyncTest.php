@@ -7,6 +7,7 @@ use Arqel\Widgets\Dashboard;
 use Arqel\Widgets\DashboardRegistry;
 use Arqel\Widgets\Tests\Fixtures\CounterWidget;
 use Arqel\Widgets\Tests\Fixtures\SecondaryWidget;
+use Arqel\Widgets\Tests\Fixtures\WidgetPlugin;
 use Arqel\Widgets\WidgetsServiceProvider;
 
 /**
@@ -82,4 +83,19 @@ it('keeps the label the app chose when merging', function (): void {
     invokeWidgetSync();
 
     expect(app(DashboardRegistry::class)->get('main')->label)->toBe('App Dashboard');
+});
+
+it('picks up widgets a plugin adds during boot', function (): void {
+    $panel = app(PanelRegistry::class)->panel('admin')->widgets([CounterWidget::class]);
+
+    // Simula o que `bootPanelPlugins()` faz no core: o plugin muta o
+    // Panel antes de o sync de widgets rodar.
+    WidgetPlugin::make()->boot($panel);
+
+    invokeWidgetSync();
+
+    $widgets = app(DashboardRegistry::class)->get('main')->getWidgets();
+
+    expect($widgets)->toContain(CounterWidget::class)
+        ->and($widgets)->toContain(SecondaryWidget::class);
 });

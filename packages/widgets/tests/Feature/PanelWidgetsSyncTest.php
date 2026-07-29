@@ -17,8 +17,9 @@ use Arqel\Widgets\WidgetsServiceProvider;
 function invokeWidgetSync(): void
 {
     $provider = app()->getProvider(WidgetsServiceProvider::class);
+    // `setAccessible()` é dispensável desde o PHP 8.1 — a reflection já
+    // alcança membros protegidos — e está deprecada no 8.4.
     $method = new ReflectionMethod($provider, 'syncPanelWidgetsIntoDashboardRegistry');
-    $method->setAccessible(true);
     $method->invoke($provider);
 }
 

@@ -100,6 +100,34 @@ Esquema declarativo de dashboard: una lista de widgets + layout compartido. Fact
 
 `register(string $type, class-string<Widget> $widgetClass)` (valida `is_subclass_of(Widget::class)`), `has(type)`, `get(type): ?class-string<Widget>`, `all()`, `clear()`.
 
+## Puente Panel → Dashboard
+
+Los widgets declarados en un Panel llegan al dashboard renderizado. `WidgetsServiceProvider` difiere una sincronización a `app->booted()` que recopila `Panel::getWidgets()` de **todos** los panels registrados y la fusiona en el dashboard con id `main` — el id al que `DashboardController::show()` recurre por defecto para la ruta `/admin`.
+
+```php
+// Un ServiceProvider, o el register()/boot() de un Plugin
+Panel::make('admin')->widgets([
+    TotalUsersWidget::class,
+    RevenueChartWidget::class,
+]);
+```
+
+La sincronización es **aditiva**, nunca destructiva:
+
+| Situación | Comportamiento |
+|---|---|
+| Ningún panel declara widgets | No-op — no se registra ningún dashboard fantasma |
+| Widgets declarados, sin dashboard `main` registrado | Crea `Dashboard::make('main', 'Dashboard')` con esos widgets |
+| Widgets declarados, `main` ya registrado por la aplicación | **Añade** mediante `addWidget()`, preservando tanto los widgets como el label que eligió la aplicación |
+
+Notas:
+
+- La sincronización se ejecuta después de `bootPanelPlugins()` del core, así que los widgets que un Plugin inyecta en su `boot()` también llegan al dashboard. Ese orden de arranque es lo que hace útil el puente para la Plugin API: un plugin añade widgets al dashboard de la aplicación sin conocerlo ni reemplazarlo.
+- Los widgets del Panel se añaden **después** de los que registró la aplicación. El orden final de renderizado no depende de eso: `Dashboard::resolve()` ordena por `Widget::getSort()`; el orden de inserción solo desempata entre widgets con el mismo `sort`.
+- Las entradas que no son subclases de `Widget` se descartan en silencio — la validación vive en `Dashboard::addWidget()`, y una class-string mal configurada no debe tumbar el arranque del panel.
+- En una aplicación multi-panel, los widgets de **todos** los panels convergen en el mismo dashboard `main`: hoy no existe un vínculo panel↔dashboard.
+- Los dashboards con id propio se siguen registrando directamente en el `DashboardRegistry`; el puente solo toca `main`.
+
 ## Filtros
 
 ### `Arqel\Widgets\Filters\Filter` (abstract)

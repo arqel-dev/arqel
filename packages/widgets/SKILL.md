@@ -17,7 +17,16 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 - `Arqel\Widgets\Dashboard` — `(string $id, string $label, ?string $path = null)` props readonly; factory `Dashboard::make(...)`. `widgets(array)` aceita Widget instances **e** `class-string<Widget>` (resolvidos via container em `resolve()`); silently filtra entradas inválidas. `addWidget()`, `columns(int|array)` (clamp 1..12 ou mapa responsivo), `heading`, `description`, `canSee`. `findWidget(string $widgetId): ?Widget` (sem auth — caller distingue 404 vs 403; casa por `id()` = `<type>:<name>`). `resolve()` injeta `dashboardId` (= id do dashboard) + `widgetId` (= `id()` do widget) em cada widget serializado, para o cliente apontar o endpoint de data no refetch deferred/poll.
 - `Arqel\Widgets\DashboardRegistry` (final, singleton) — `register(Dashboard)` keyed por id (duplicata lança `InvalidArgumentException`); `has`/`get`/`all`/`clear`.
 - `Arqel\Widgets\WidgetRegistry` (final, singleton) — `register(type, class-string<Widget>)` valida `is_subclass_of(Widget)`; `has`/`get`/`all`/`clear`.
-- `Arqel\Widgets\WidgetsServiceProvider` auto-discovered; binds singletons em `packageRegistered`; `configurePackage()` chama `->hasRoute('admin')`.
+- `Arqel\Widgets\WidgetsServiceProvider` auto-discovered; binds singletons em `packageRegistered`; `configurePackage()` chama `->hasRoute('admin')`; `packageBooted()` agenda o bridge Panel→Dashboard em `app->booted()` (ver §Bridge abaixo).
+
+**Bridge `Panel::widgets()` → `DashboardRegistry` (0.19b):**
+
+- `WidgetsServiceProvider::syncPanelWidgetsIntoDashboardRegistry()` (protected) roda em `app->booted()` e copia `Panel::getWidgets()` de **todos** os panels do `PanelRegistry` para o Dashboard de id `main` (constante privada `PANEL_DASHBOARD_ID` — é o fallback de `DashboardController::show()` para `/admin`; qualquer outro id seria inalcançável). Fecha o campo órfão: antes, `Panel::widgets([...])` era aceito e silenciosamente descartado.
+- **Aditivo, nunca destrutivo.** Sem widgets declarados → no-op (nenhum dashboard fantasma). Sem `main` registrado → cria `Dashboard::make('main', 'Dashboard')->widgets($declared)`. Com `main` já registrado pela aplicação → `addWidget()` por widget, preservando os widgets **e** o label da app (`DashboardRegistry::get()` devolve o handle, não cópia, então a mutação já reflete no registry — não é preciso `unregister()`).
+- O bridge mora em `widgets` porque a dependência é `widgets` → `core`: `core` não pode referenciar `Dashboard`/`DashboardRegistry`/`Widget`.
+- Ordem de boot garantida entre pacotes: `widgets` é registrado depois de `core`, e callbacks de `app->booted()` executam em ordem de registro — o sync roda depois de `bootPanelPlugins()`, então widgets injetados no `Plugin::boot()` chegam ao dashboard. Coberto por teste explícito (`PanelWidgetsSyncTest`).
+- Sem validação duplicada no provider: entradas que não são `Widget` são descartadas em silêncio por `Dashboard::widgets()`/`addWidget()`.
+- Multi-panel: widgets de todos os panels convergem para `main` — não existe vínculo panel↔dashboard. Dashboards com id próprio continuam sendo registrados direto no `DashboardRegistry` pela aplicação.
 
 **Concrete widget types (WIDGETS-002..005):**
 
@@ -45,7 +54,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 - `Commands\MakeWidgetCommand` (final) — `arqel:widget <Name> --type=stat|chart|table|custom --force`. Gera `app/Widgets/<Name>.php`; snake_case do class name vira o `name` arg do construtor (e.g. `TotalUsers` → `'total_users'`). Idempotente (skip sem `--force`). Stubs em `stubs/widgets/{stat,chart,table,custom}.stub`. `stat`/`chart`/`table` geram uma subclasse `final` da base correspondente; `custom` gera uma factory `final` com `make(): CustomWidget` (compõe a base `final`, não a subclassa — referenciar via `App\Widgets\<Name>::make()` no `->widgets([...])` do dashboard).
 - `Commands\MakeDashboardCommand` (final) — `arqel:dashboard <Name> --id=<custom> --force`. Gera `app/Dashboards/<Name>.php` com factory static `make(): Dashboard`. `--id` default = snake_case; `label` humanised. Stub em `stubs/dashboards/dashboard.stub`.
 
-**Coverage:** ~154 testes Pest passando. Fixture `EchoFiltersWidget` usada em WIDGETS-008/009 e nos testes de enforcement do gate de dashboard + seeding de defaults no fetch.
+**Coverage:** ~173 testes Pest passando. Fixtures `SecondaryWidget` + `WidgetPlugin` cobrem o bridge Panel→Dashboard (`tests/Feature/PanelWidgetsSyncTest.php`); fixture `EchoFiltersWidget` usada em WIDGETS-008/009 e nos testes de enforcement do gate de dashboard + seeding de defaults no fetch.
 
 **Entregue (WIDGETS-010..012, 014..015):**
 
@@ -63,6 +72,7 @@ Suporta polling (refresh automático), deferred loading (lazy fetch para widgets
 - `columnSpan(int)` 1..12; `columnSpan(string)` aceita atalhos (`'full'`, `'1/2'`).
 - `deferred` widgets devem ter um `WidgetDataController` endpoint para fetch (entregue em WIDGETS-008).
 - Filters propagam via merge: `dashboard defaults` ← `widget filters(request values)` (request wins). Vale tanto no SSR (`Dashboard::resolve()`) quanto no fetch deferred/poll (`WidgetDataController`), que semeia `$dashboard->getFilters()` por baixo de `$request->input('filters')`.
+- `Panel::widgets([...])` alimenta o dashboard `main` via o bridge do provider, e o faz de forma **aditiva** — nunca substitui um dashboard que a aplicação registrou. Para dashboards com id próprio, registre-os direto no `DashboardRegistry`.
 - Autorização ao nível do dashboard (`Dashboard::canSee()`) é enforçada nos **dois** controllers (`abort_unless($dashboard->canBeSeenBy($user), 403)`) — não confiar só no gate por-widget.
 
 ## Anti-patterns

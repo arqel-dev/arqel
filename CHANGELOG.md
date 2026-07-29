@@ -7,6 +7,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Added
+
+- **widgets (bridge Panel→Dashboard):** widgets declarados via `Panel::widgets([...])` agora chegam ao dashboard renderizado. Antes `Panel::getWidgets()` era um campo órfão — a declaração era aceita e silenciosamente descartada. O sync roda no boot (`app->booted()`, depois do `bootPanelPlugins()` do core) e é **aditivo**: cria o dashboard `main` se não houver, ou acrescenta aos widgets que a aplicação já registrou, preservando-os junto com o label escolhido. Coleta de todos os panels registrados (em app multi-panel tudo converge para `main`) e descarta em silêncio entradas que não sejam `Widget`. Habilita plugins a injetarem widgets no dashboard da app (milestone 0.19b).
+
 ## [0.19.0] - 2026-07-28
 
 ### Summary

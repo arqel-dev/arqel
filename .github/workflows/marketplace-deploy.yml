@@ -28,6 +28,16 @@ name: Marketplace — Deploy
 #   HOSTINGER_MARKETPLACE_PATH      optional, defaults to
 #                                   /home/<user>/domains/marketplace.arqel.dev
 #   MARKETPLACE_APP_KEY             Laravel APP_KEY (base64:...)
+#   HOSTINGER_SSH_KNOWN_HOSTS       optional but RECOMMENDED — pins the host
+#                                   key so a MITM can't impersonate the server
+#                                   and harvest the deploy key. Generate with:
+#                                     ssh-keyscan -p 65002 <host>
+#                                   Without it the run falls back to trusting
+#                                   whatever key the server presents.
+#
+# O APP_KEY nunca é passado como argumento de `ssh` — argumentos aparecem em
+# `ps aux` para qualquer usuário, e este é um host compartilhado. Ele viaja
+# dentro do .env, enviado por rsync com modo 600.
 #
 # MANUAL PREREQUISITES on Hostinger (no commit can do these):
 #   1. Point the subdomain document root at <deploy path>/public
@@ -122,11 +132,29 @@ jobs:
           echo "--- resolved manifest ---"
           cat composer.json
 
+      # O lock versionado trava arqel-dev/* como `path` (0.18.0), então um
+      # `install` puro traria de volta os symlinks que o passo anterior
+      # removeu. Atualizamos SÓ esses dois pacotes: todas as demais
+      # dependências permanecem exatamente nas versões do lock, sem resolução
+      # nova a cada deploy — um `composer update` irrestrito deixaria a porta
+      # aberta para um pacote comprometido entrar direto em produção.
       - name: Install PHP dependencies
         working-directory: ${{ env.APP_DIR }}
         run: |
-          composer update --no-dev --prefer-dist --no-interaction --no-progress \
+          composer update arqel-dev/core arqel-dev/marketplace \
+            --with-dependencies \
+            --no-dev --prefer-dist --no-interaction --no-progress \
             --optimize-autoloader
+
+          echo "--- versões instaladas de arqel-dev/* ---"
+          composer show 'arqel-dev/*' 2>/dev/null || true
+
+      # Auditoria de segurança das dependências resolvidas. `composer audit`
+      # é gate bloqueante no CI do repo; um deploy não deve ter padrão mais
+      # frouxo que o pipeline de testes.
+      - name: Audit PHP dependencies
+        working-directory: ${{ env.APP_DIR }}
+        run: composer audit --no-dev --ansi
 
       # Publish-only migrations (Spatie `hasMigration`) must be copied into the
       # app before they can run. Without this the schema stays empty.
@@ -139,16 +167,31 @@ jobs:
           php artisan vendor:publish --tag=arqel-marketplace-migrations --force
           ls -la database/migrations/
 
+      # `ssh-keyscan` sozinho aceita qualquer chave que o outro lado
+      # apresentar — não autentica nada. Se `HOSTINGER_SSH_KNOWN_HOSTS`
+      # estiver definido, fixamos a chave esperada e um MITM falha o deploy.
+      # Sem o secret, caímos no keyscan (comportamento herdado do
+      # docs-deploy.yml) e avisamos no log.
       - name: Configure SSH
         env:
           SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
           SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
           SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          KNOWN_HOSTS: ${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+            echo "Host key fixada a partir de HOSTINGER_SSH_KNOWN_HOSTS."
+          else
+            echo "::warning::HOSTINGER_SSH_KNOWN_HOSTS não definido — a host key será aceita sem verificação (risco de MITM). Gere com: ssh-keyscan -p <porta> <host>"
+            ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
 
       # `--delete` keeps the remote clean, but storage/ and the live .env and
       # database file must survive: they hold runtime state this build has no
@@ -166,7 +209,7 @@ jobs:
             --exclude 'database/database.sqlite' \
             --exclude 'node_modules/' \
             --exclude 'tests/' \
-            -e "ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=no" \
+            -e "ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT" \
             "${APP_DIR}/" \
             "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
 
@@ -181,24 +224,59 @@ jobs:
           APP_KEY: ${{ secrets.MARKETPLACE_APP_KEY }}
           SKIP_MIGRATIONS: ${{ github.event.inputs.skip_migrations || 'false' }}
           SUBDOMAIN: ${{ env.SUBDOMAIN }}
-          REMOTE_APP_KEY: ${{ secrets.MARKETPLACE_APP_KEY }}
         run: |
-          ssh -i "$HOME/.ssh/deploy_key" -p "$SSH_PORT" -o StrictHostKeyChecking=no \
+          # O .env é montado aqui e enviado por rsync (canal cifrado, modo
+          # 600). O APP_KEY nunca vira argumento de `ssh`: argumentos ficam
+          # visíveis em `ps aux` para qualquer usuário do host — e este é um
+          # servidor compartilhado. `SendEnv` não serve porque depende de
+          # `AcceptEnv` no sshd, que não controlamos.
+          umask 077
+          python3 - <<'PY'
+          import os, re
+
+          with open('apps/marketplace/.env.example') as fh:
+              body = fh.read()
+
+          values = {
+              'APP_ENV': 'production',
+              'APP_DEBUG': 'false',
+              'APP_URL': f"https://{os.environ['SUBDOMAIN']}",
+              'APP_KEY': os.environ['APP_KEY'],
+          }
+          for key, value in values.items():
+              pattern = rf'^{key}=.*$'
+              line = f'{key}={value}'
+              body = re.sub(pattern, line, body, flags=re.M) \
+                  if re.search(pattern, body, flags=re.M) else body + f'\n{line}\n'
+
+          with open('env.deploy', 'w') as fh:
+              fh.write(body)
+          PY
+          chmod 600 env.deploy
+
+          rsync -az --chmod=F600 \
+            -e "ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT" \
+            env.deploy "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/.env.incoming"
+          rm -f env.deploy
+
+          ssh -i "$HOME/.ssh/deploy_key" -p "$SSH_PORT" \
             "$SSH_USER@$SSH_HOST" \
-            "APP_KEY='$REMOTE_APP_KEY' SUBDOMAIN='$SUBDOMAIN' SKIP_MIGRATIONS='$SKIP_MIGRATIONS' DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE'
+            "DEPLOY_PATH='$DEPLOY_PATH' SUBDOMAIN='$SUBDOMAIN' SKIP_MIGRATIONS='$SKIP_MIGRATIONS' bash -s" <<'REMOTE'
           set -euo pipefail
           cd "$DEPLOY_PATH"
 
-          mkdir -p storage/framework/{cache,sessions,views} storage/logs storage/app/public
+          mkdir -p storage/framework/cache storage/framework/sessions \
+                   storage/framework/views storage/logs storage/app/public
           mkdir -p database
           touch database/database.sqlite
 
-          if [ ! -f .env ]; then
-            cp .env.example .env
-            sed -i "s|^APP_ENV=.*|APP_ENV=production|"                     .env
-            sed -i "s|^APP_DEBUG=.*|APP_DEBUG=false|"                      .env
-            sed -i "s|^APP_URL=.*|APP_URL=https://${SUBDOMAIN}|"           .env
-            sed -i "s|^APP_KEY=.*|APP_KEY=${APP_KEY}|"                     .env
+          # O .env existente vence: ele pode ter ajustes feitos no servidor
+          # que este build desconhece. O arquivo novo só entra na primeira vez.
+          if [ -f .env ]; then
+            rm -f .env.incoming
+          else
+            mv .env.incoming .env
+            chmod 600 .env
           fi
 
           # APP_URL must match the live host: SitemapController derives every

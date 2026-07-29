@@ -37,3 +37,17 @@ it('creates the main dashboard from panel widgets when none is registered', func
     expect($dashboard)->not->toBeNull()
         ->and($dashboard->getWidgets())->toBe([CounterWidget::class]);
 });
+
+it('registers no dashboard when no panel declares widgets', function (): void {
+    app(PanelRegistry::class)->panel('admin');
+
+    invokeWidgetSync();
+
+    expect(app(DashboardRegistry::class)->has('main'))->toBeFalse();
+});
+
+it('registers no dashboard when there are no panels at all', function (): void {
+    invokeWidgetSync();
+
+    expect(app(DashboardRegistry::class)->all())->toBe([]);
+});

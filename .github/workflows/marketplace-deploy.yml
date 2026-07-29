@@ -19,15 +19,28 @@ name: Marketplace — Deploy
 # publishes them into the app and then migrates, otherwise the app boots with
 # an empty schema and every `Plugin::query()` fatals.
 #
+# BANCO: MySQL/MariaDB, não o SQLite do `.env.example`. A app roda com
+# SESSION_DRIVER, CACHE_STORE e QUEUE_CONNECTION todos em `database`, ou seja
+# grava a cada request — não apenas no checkout. O lock de arquivo do SQLite
+# serializa essas escritas e produz "database is locked" sob concorrência,
+# que é o cenário de um site público em hospedagem compartilhada.
+#
 # Required secrets in arqel-dev/arqel (the HOSTINGER_SSH_* trio is already
 # used by docs-deploy.yml):
 #   HOSTINGER_SSH_HOST
 #   HOSTINGER_SSH_USER
 #   HOSTINGER_SSH_KEY
 #   HOSTINGER_SSH_PORT              optional, defaults to 65002
-#   HOSTINGER_MARKETPLACE_PATH      optional, defaults to
-#                                   /home/<user>/domains/marketplace.arqel.dev
+#   MARKETPLACE_DEPLOY_PATH         caminho remoto da app (também aceita o
+#                                   nome legado HOSTINGER_MARKETPLACE_PATH;
+#                                   default /home/<user>/domains/marketplace.arqel.dev)
 #   MARKETPLACE_APP_KEY             Laravel APP_KEY (base64:...)
+#   MARKETPLACE_APP_URL             optional, default https://marketplace.arqel.dev
+#   MARKETPLACE_DB_HOST             MySQL/MariaDB — host
+#   MARKETPLACE_DB_PORT             MySQL/MariaDB — porta (3306)
+#   MARKETPLACE_DB_DATABASE         MySQL/MariaDB — nome do banco
+#   MARKETPLACE_DB_USERNAME         MySQL/MariaDB — usuário
+#   MARKETPLACE_DB_PASSWORD         MySQL/MariaDB — senha
 #   HOSTINGER_SSH_KNOWN_HOSTS       optional but RECOMMENDED — pins the host
 #                                   key so a MITM can't impersonate the server
 #                                   and harvest the deploy key. Generate with:
@@ -93,7 +106,7 @@ jobs:
         with:
           php-version: "8.3"
           tools: composer:v2
-          extensions: sqlite3, pdo_sqlite, mbstring, dom, curl, zip
+          extensions: pdo_mysql, mbstring, dom, curl, zip
           coverage: none
 
       - uses: pnpm/action-setup@v6
@@ -203,15 +216,17 @@ jobs:
           fi
           chmod 600 ~/.ssh/known_hosts
 
-      # `--delete` keeps the remote clean, but storage/ and the live .env and
-      # database file must survive: they hold runtime state this build has no
-      # copy of. Losing database/database.sqlite would wipe the catalog.
+      # `--delete` keeps the remote clean, but storage/ and the live .env
+      # must survive: they hold runtime state this build has no copy of.
+      # O banco é MySQL (externo ao filesystem), então não há arquivo de
+      # dados a preservar aqui — mas o exclude do sqlite fica por segurança,
+      # caso algum ambiente ainda tenha o arquivo legado.
       - name: Deploy via rsync
         env:
           SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
           SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
           SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
-          DEPLOY_PATH: ${{ secrets.HOSTINGER_MARKETPLACE_PATH || format('/home/{0}/domains/marketplace.arqel.dev', secrets.HOSTINGER_SSH_USER) }}
+          DEPLOY_PATH: ${{ secrets.MARKETPLACE_DEPLOY_PATH || secrets.HOSTINGER_MARKETPLACE_PATH || format('/home/{0}/domains/marketplace.arqel.dev', secrets.HOSTINGER_SSH_USER) }}
         run: |
           rsync -avz --delete \
             --exclude '.env' \
@@ -230,16 +245,23 @@ jobs:
           SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
           SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
           SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
-          DEPLOY_PATH: ${{ secrets.HOSTINGER_MARKETPLACE_PATH || format('/home/{0}/domains/marketplace.arqel.dev', secrets.HOSTINGER_SSH_USER) }}
+          DEPLOY_PATH: ${{ secrets.MARKETPLACE_DEPLOY_PATH || secrets.HOSTINGER_MARKETPLACE_PATH || format('/home/{0}/domains/marketplace.arqel.dev', secrets.HOSTINGER_SSH_USER) }}
           APP_KEY: ${{ secrets.MARKETPLACE_APP_KEY }}
           SKIP_MIGRATIONS: ${{ github.event.inputs.skip_migrations || 'false' }}
           SUBDOMAIN: ${{ env.SUBDOMAIN }}
+          APP_URL: ${{ secrets.MARKETPLACE_APP_URL || format('https://{0}', env.SUBDOMAIN) }}
+          DB_HOST: ${{ secrets.MARKETPLACE_DB_HOST }}
+          DB_PORT: ${{ secrets.MARKETPLACE_DB_PORT }}
+          DB_DATABASE: ${{ secrets.MARKETPLACE_DB_DATABASE }}
+          DB_USERNAME: ${{ secrets.MARKETPLACE_DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.MARKETPLACE_DB_PASSWORD }}
         run: |
           # O .env é montado aqui e enviado por rsync (canal cifrado, modo
-          # 600). O APP_KEY nunca vira argumento de `ssh`: argumentos ficam
-          # visíveis em `ps aux` para qualquer usuário do host — e este é um
-          # servidor compartilhado. `SendEnv` não serve porque depende de
-          # `AcceptEnv` no sshd, que não controlamos.
+          # 600). Nem o APP_KEY nem a senha do banco viram argumento de
+          # `ssh`: argumentos ficam visíveis em `ps aux` para qualquer
+          # usuário do host — e este é um servidor compartilhado. `SendEnv`
+          # não serve porque depende de `AcceptEnv` no sshd, que não
+          # controlamos.
           umask 077
           python3 - <<'PY'
           import os, re
@@ -250,8 +272,18 @@ jobs:
           values = {
               'APP_ENV': 'production',
               'APP_DEBUG': 'false',
-              'APP_URL': f"https://{os.environ['SUBDOMAIN']}",
+              'APP_URL': os.environ['APP_URL'],
               'APP_KEY': os.environ['APP_KEY'],
+              # MySQL em vez do SQLite do .env.example: a app usa
+              # SESSION_DRIVER/CACHE_STORE/QUEUE_CONNECTION=database, ou seja
+              # grava a cada request. O lock de arquivo do SQLite serializa
+              # essas escritas e produz "database is locked" sob concorrência.
+              'DB_CONNECTION': 'mysql',
+              'DB_HOST': os.environ['DB_HOST'],
+              'DB_PORT': os.environ['DB_PORT'],
+              'DB_DATABASE': os.environ['DB_DATABASE'],
+              'DB_USERNAME': os.environ['DB_USERNAME'],
+              'DB_PASSWORD': os.environ['DB_PASSWORD'],
           }
           for key, value in values.items():
               pattern = rf'^{key}=.*$'
@@ -277,8 +309,6 @@ jobs:
 
           mkdir -p storage/framework/cache storage/framework/sessions \
                    storage/framework/views storage/logs storage/app/public
-          mkdir -p database
-          touch database/database.sqlite
 
           # O .env existente vence: ele pode ter ajustes feitos no servidor
           # que este build desconhece. O arquivo novo só entra na primeira vez.

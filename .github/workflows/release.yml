@@ -173,7 +173,7 @@ jobs:
         with:
           version: 10.33.0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 20.9.0
           registry-url: https://registry.npmjs.org/
@@ -268,7 +268,7 @@ jobs:
         with:
           version: 10.33.0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 20.9.0
 

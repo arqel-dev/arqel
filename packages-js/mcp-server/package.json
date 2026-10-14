@@ -48,7 +48,7 @@
     "smoke": "node scripts/smoke-stdio.mjs"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "zod": "^3.25.0 || ^4.0.0"
   },
   "devDependencies": {
